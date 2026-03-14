@@ -1,5 +1,5 @@
 // ============================================================
-// FATE GENERATOR SUITE — Campaign Intro Engine
+// FATE GENERATOR SUITE - Campaign Intro Engine
 // core/intro.js  v31
 //
 // Self-contained overlay. No dependencies. No build step.
@@ -88,7 +88,7 @@
   // Each step: { txt, col, d(elay ms), tw(typewriter bool), cd(char delay ms), fade(ms), gap }
   // gap = true means empty line with extra spacing
 
-  // ── INDEX — three movements ───────────────────────────────
+  // ── INDEX - three movements ───────────────────────────────
   // Voice: the game itself talking to the table before anything starts.
   // Movement 1: what this isn't. Movement 2: what it is. Movement 3: CTA.
   function seqIndex() {
@@ -96,7 +96,7 @@
     var gd = C.gd; var dGd = C.dGd; var WH = C.WH; var dK = C.dK; var lG = C.lG;
     return [
       {txt:'', d:300},
-      // Movement 1 — what it isn't
+      // Movement 1 - what it isn't
       {txt:'This is not about winning.',           col:lG,  tw:1, cd:D,      d:200},
       {txt:'',                                                                d:200},
       {txt:'The dice do not decide what happens.', col:lG,  tw:1, cd:D*0.8,  d:80},
@@ -105,7 +105,7 @@
       {txt:'There are no hit points.',             col:lG,  tw:1, cd:D*0.8,  d:120},
       {txt:'There are consequences.',              col:WH,  tw:1, cd:D*1.2,  d:80},
       {txt:'',                                                                d:500},
-      // Movement 2 — what it is
+      // Movement 2 - what it is
       {txt:'You are the protagonists.',            col:gd,  tw:1, cd:D,      d:300},
       {txt:'Not adventurers. Not characters.',     col:dGd, tw:1, cd:D*0.7,  d:80},
       {txt:'',                                                                d:200},
@@ -124,7 +124,7 @@
       {txt:'Earn the fate point.',                 col:gd,  tw:1, cd:D,      d:80},
       {txt:'Spend it when it matters.',            col:WH,  tw:1, cd:D,      d:80},
       {txt:'',                                                                d:600},
-      // Movement 3 — CTA
+      // Movement 3 - CTA
       {txt:'Six worlds.',                          col:WH,  tw:1, cd:D*1.5,  d:300},
       {txt:'One system.',                          col:WH,  tw:1, cd:D*1.5,  d:80},
       {txt:'Infinite stories.',                    col:gd,  tw:1, cd:D*1.5,  d:80},
@@ -139,7 +139,7 @@
     ];
   }
 
-  // ── NEON ABYSS — Cyberpunk ────────────────────────────────
+  // ── NEON ABYSS - Cyberpunk ────────────────────────────────
   // Mr. Robot register: already inside the job, flat voiceover.
   // Grounded in: Meridian vertical city, OmniSec, augments as leash,
   // kill switches, fixers, "résumé and your leash"
@@ -148,7 +148,7 @@
     return [
       {txt:'', d:200},
       {txt:'> MERIDIAN CITY-NET  //  DISTRICT 7 NODE',          col:C.dC, tw:1, cd:26, d:60},
-      {txt:'> AUTHENTICATION: GHOST CREDENTIALS — ACCEPTED',    col:C.bG, tw:1, cd:20, d:40},
+      {txt:'> AUTHENTICATION: GHOST CREDENTIALS - ACCEPTED',    col:C.bG, tw:1, cd:20, d:40},
       {txt:'> ALTITUDE: SUB-LEVEL 12  //  CORP ACCESS: NONE',   col:C.dC, tw:1, cd:20, d:40},
       {txt:'> OmniSec SWEEP: SCHEDULED IN 4 MINUTES',           col:C.bR, tw:1, cd:20, d:80},
       {txt:'', d:340},
@@ -179,7 +179,7 @@
     ];
   }
 
-  // ── THE LONG ROAD — Post-Apoc ─────────────────────────────
+  // ── THE LONG ROAD - Post-Apoc ─────────────────────────────
   // Last of Us register: calm expertise before catastrophe.
   // Grounded in: "The world collapsed. Nature came back."
   // highways=forests, cities=coral reefs, Reclamation Cult,
@@ -189,7 +189,7 @@
     return [
       {txt:'', d:500},
       {txt:'SURFACE RECOVERY COMMISSION',                    col:C.dK, fade:1400, d:300},
-      {txt:'SETTLEMENT VIABILITY REPORT — YEAR ONE',         col:C.dK, fade:1200, d:100},
+      {txt:'SETTLEMENT VIABILITY REPORT - YEAR ONE',         col:C.dK, fade:1200, d:100},
       {txt:'', d:600},
       {txt:'The world collapsed.',                           col:C.bY, fade:F,    d:400},
       {txt:'Nature came back.',                              col:C.bY, fade:F,    d:300},
@@ -214,7 +214,7 @@
     ];
   }
 
-  // ── SHATTERED KINGDOMS — Fantasy ─────────────────────────
+  // ── SHATTERED KINGDOMS - Fantasy ─────────────────────────
   // Witcher/Malazan register: narrated doom, weight of history.
   // Grounded in: magic as ecological wound, Blight rewrites not kills,
   // Old Oaths waking, dead rise as creditors, Inquisition
@@ -237,7 +237,7 @@
       {txt:'', d:500},
       {txt:'The Old Oaths are waking.',            col:C.bR, fade:1000, d:400},
       {txt:'', d:300},
-      {txt:'The dead are rising —',                col:C.lG, fade:1000, d:400},
+      {txt:'The dead are rising -',                col:C.lG, fade:1000, d:400},
       {txt:'not as enemies.',                      col:C.WH, fade:1200, d:300},
       {txt:'', d:300},
       {txt:'As creditors.',                        col:C.bR, fade:1600, d:300},
@@ -253,7 +253,7 @@
     ];
   }
 
-  // ── VOID RUNNERS — Space ──────────────────────────────────
+  // ── VOID RUNNERS - Space ──────────────────────────────────
   // Firefly/Expanse register: blue-collar, ship payment.
   // Grounded in: CTA controls routes, Signal (coordinates + date),
   // 40 mins sensory deprivation per jump, Ghost Fleet
@@ -262,7 +262,7 @@
     return [
       {txt:'', d:300},
       {txt:'CREW LOG  //  INDEPENDENT VESSEL',       col:C.dB, tw:1, cd:22, d:80},
-      {txt:'CTA TRANSIT AUTHORITY — UNREGISTERED',   col:C.dB, tw:1, cd:22, d:60},
+      {txt:'CTA TRANSIT AUTHORITY - UNREGISTERED',   col:C.dB, tw:1, cd:22, d:60},
       {txt:'FUEL STATUS: 11 DAYS',                   col:C.bR, tw:1, cd:22, d:60},
       {txt:'SHIP PAYMENT: 18 DAYS OVERDUE',          col:C.bR, tw:1, cd:22, d:80},
       {txt:'', d:400},
@@ -292,7 +292,7 @@
     ];
   }
 
-  // ── GASLIGHT CHRONICLES — Victorian ──────────────────────
+  // ── GASLIGHT CHRONICLES - Victorian ──────────────────────
   // Penny Dreadful register: letter being written, second hand appears.
   // Grounded in: "Enlightenment promised reason...it lied",
   // Obsidian Lodge, "polite agreement not to notice",
@@ -317,10 +317,10 @@
       {txt:'The rational world has been',                       col:C.dK, tw:1, cd:D*0.8,  d:200},
       {txt:'a polite agreement not to notice.',                 col:C.dK, tw:1, cd:D*0.8,  d:80},
       {txt:'', d:500},
-      {txt:'In the fog, in the mirrors —',                      col:C.lG, tw:1, cd:D,      d:300},
+      {txt:'In the fog, in the mirrors -',                      col:C.lG, tw:1, cd:D,      d:300},
       {txt:'something ancient is paying attention.',            col:C.bR, tw:1, cd:D*0.9,  d:80},
       {txt:'', d:1000},
-      // Second hand — different colour, uninvited
+      // Second hand - different colour, uninvited
       {txt:'The entities have rules.',                          col:C.bR, tw:1, cd:D*1.3,  d:400},
       {txt:'The rules are not in English.',                     col:C.bR, tw:1, cd:D*1.6,  d:200},
       {txt:'', d:800},
@@ -416,14 +416,14 @@
       'opacity:1',
     ].join(';');
 
-    // CRT layer 1 — static scanlines
+    // CRT layer 1 - static scanlines
     var scan = document.createElement('div');
     scan.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:1;' +
       'background:repeating-linear-gradient(to bottom,transparent 0px,transparent 3px,' +
       'rgba(0,0,0,0.13) 3px,rgba(0,0,0,0.13) 4px);';
     ov.appendChild(scan);
 
-    // CRT layer 2 — rolling scan band (reduced-motion aware)
+    // CRT layer 2 - rolling scan band (reduced-motion aware)
     var noMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!noMotion) {
       var roll = document.createElement('div');
@@ -436,7 +436,7 @@
       ov.appendChild(roll);
     }
 
-    // CRT layer 3 — vignette
+    // CRT layer 3 - vignette
     var vig = document.createElement('div');
     vig.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:1;' +
       'background:radial-gradient(ellipse at 50% 50%,transparent 55%,rgba(0,0,0,0.55) 100%);';
@@ -444,6 +444,7 @@
 
     // Content
     var content = document.createElement('div');
+    content.className = 'fate-intro-content';
     content.style.cssText = 'position:relative;z-index:2;max-width:640px;width:100%;';
     ov.appendChild(content);
 
@@ -516,10 +517,10 @@
 
       // Title / sub styling
       if (s.title) {
-        el.style.cssText += 'font-size:22px;letter-spacing:9px;text-transform:uppercase;' +
+        el.style.cssText += 'font-size:1.57em;letter-spacing:9px;text-transform:uppercase;' +
           'margin:28px 0 6px;color:' + (s.col || '#FFFFFF') + ';';
       } else if (s.sub) {
-        el.style.cssText += 'font-size:10px;letter-spacing:3px;color:' + (s.col || '#555555') + ';';
+        el.style.cssText += 'font-size:0.71em;letter-spacing:3px;color:' + (s.col || '#555555') + ';';
       } else {
         el.style.color = s.col || '#AAAAAA';
       }
@@ -581,9 +582,18 @@
     style.textContent = [
       '@keyframes fate-blink{0%,100%{opacity:1}50%{opacity:0}}',
       '@keyframes fate-crt-roll{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}',
-      // Phosphor glow on typed text — applied per-element by renderLine
+      // Phosphor glow on typed text - applied per-element by renderLine
       '.fate-crt-line{text-shadow:0 0 6px currentColor,0 0 2px currentColor;}',
       '@media(prefers-reduced-motion:reduce){.fate-crt-roll{animation:none!important}}',
+      // Desktop scale-up - wider column, larger type
+      '@media(min-width:900px){' +
+        '#fate-intro-overlay{font-size:17px!important;padding:80px 48px 120px!important}' +
+        '.fate-intro-content{max-width:860px!important}' +
+      '}',
+      '@media(min-width:1400px){' +
+        '#fate-intro-overlay{font-size:19px!important}' +
+        '.fate-intro-content{max-width:1000px!important}' +
+      '}',
     ].join('');
     document.head.appendChild(style);
   }
@@ -637,7 +647,7 @@
   }
 
   // ── Public API ────────────────────────────────────────────
-  // window.fateReplayIntro() — forces the full sequence regardless
+  // window.fateReplayIntro() - forces the full sequence regardless
   // of whether the user has seen it before. Called by nav button.
   window.fateReplayIntro = function() {
     var worldKey = detectWorld();

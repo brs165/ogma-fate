@@ -3,14 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Session Zero — Ogma</title>
+  <title>Session Zero - Ogma</title>
   <meta name="description" content="Guided Session Zero wizard for Fate Condensed. Collaborative character creation walkthrough for shared-screen use at the table.">
   <meta name="theme-color" content="#888888">
   <link rel="icon" type="image/svg+xml" href="../assets/favicons/icon.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicons/icon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicons/apple-touch-icon.png">
   <link rel="manifest" href="../manifest.json">
-  <link rel="stylesheet" href="../assets/css/theme.css?v=10">
+  <link rel="stylesheet" href="https://unpkg.com/rpg-awesome@0.2.0/css/rpg-awesome.min.css">
+  <link rel="stylesheet" href="../assets/css/theme.css?v=18">
   <style>
     /* Session Zero wizard-specific styles */
     .sz-container { max-width: 760px; margin: 0 auto; padding: 24px 20px 80px; }
@@ -89,16 +90,16 @@
   <div id="root"></div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
-  <script src="../data/shared.js?v=10"></script>
-  <script src="../data/universal.js?v=10"></script>
-  <script src="../data/thelongafter.js?v=10"></script>
-  <script src="../data/cyberpunk.js?v=10"></script>
-  <script src="../data/fantasy.js?v=10"></script>
-  <script src="../data/space.js?v=10"></script>
-  <script src="../data/victorian.js?v=10"></script>
-  <script src="../data/postapoc.js?v=10"></script>
-  <script src="../core/engine.js?v=10"></script>
-  <script src="../core/ui.js?v=10"></script>
+  <script src="../data/shared.js?v=18"></script>
+  <script src="../data/universal.js?v=18"></script>
+  <script src="../data/thelongafter.js?v=18"></script>
+  <script src="../data/cyberpunk.js?v=18"></script>
+  <script src="../data/fantasy.js?v=18"></script>
+  <script src="../data/space.js?v=18"></script>
+  <script src="../data/victorian.js?v=18"></script>
+  <script src="../data/postapoc.js?v=18"></script>
+  <script src="../core/engine.js?v=18"></script>
+  <script src="../core/ui.js?v=18"></script>
   <script>
   (function() {
     var h = React.createElement;
@@ -128,7 +129,7 @@
     ];
     var SKILL_DESCS = {
       Academics:"Mundane knowledge, education, history, sciences, medicine",
-      Athletics:"Physical potential — running, jumping, dodging attacks",
+      Athletics:"Physical potential - running, jumping, dodging attacks",
       Burglary:"Bypassing security, picking pockets, committing crimes",
       Contacts:"Knowing the right people, information networks",
       Crafts:"Building, breaking, and repairing things",
@@ -139,13 +140,13 @@
       Investigate:"Deliberate study, piecing together clues",
       Lore:"Specialized or arcane knowledge, the weird stuff",
       Notice:"Spotting things in the moment, reacting quickly",
-      Physique:"Raw strength, toughness — also sets physical stress boxes",
+      Physique:"Raw strength, toughness - also sets physical stress boxes",
       Provoke:"Intimidation, goading, scaring people",
       Rapport:"Building trust, making connections, persuasion",
       Resources:"Access to money, gear, and material things",
-      Shoot:"Ranged combat — guns, bows, throwing weapons",
+      Shoot:"Ranged combat - guns, bows, throwing weapons",
       Stealth:"Staying unseen, escaping, blending in",
-      Will:"Mental fortitude, resisting pressure — also sets mental stress boxes",
+      Will:"Mental fortitude, resisting pressure - also sets mental stress boxes",
     };
     var PT = (typeof UNIVERSAL !== 'undefined' && UNIVERSAL.phase_trio) ? UNIVERSAL.phase_trio : {};
 
@@ -161,7 +162,7 @@
       var s = useState(0), step = s[0], setStep = s[1];
       var c = useState(null), campId = c[0], setCampId = c[1];
       var m = useState('standard'), mode = m[0], setMode = m[1];
-      // Reroll counter — incrementing forces new random values
+      // Reroll counter - incrementing forces new random values
       var rc = useState(0), rerolls = rc[0], setRerolls = rc[1];
       function reroll() { setRerolls(rerolls + 1); }
       // Phase 1 prompt (persists across steps)
@@ -231,7 +232,7 @@
         lines.push('- **Fair (+2):** _______________, _______________, _______________');
         lines.push('- **Average (+1):** _______________, _______________, _______________, _______________');
         lines.push('');
-        lines.push('### Stunts (3 free — leave blank and fill during play)');
+        lines.push('### Stunts (3 free - leave blank and fill during play)');
         lines.push('1. _______________');
         lines.push('2. _______________');
         lines.push('3. _______________');
@@ -251,11 +252,11 @@
         lines.push('- **Four Outcomes:** Fail, Tie, Succeed, Succeed with Style');
         lines.push('- **Success at a Cost:** On failure, GM may offer success at a minor cost (complication) or major cost (consequence)');
         lines.push('- **Stress clears** after every scene. Consequences persist until treated.');
-        lines.push('- **Popcorn Initiative:** After you act, you choose who goes next — PC or NPC. No fixed turn order.');
+        lines.push('- **Popcorn Initiative:** After you act, you choose who goes next - PC or NPC. No fixed turn order.');
         lines.push('');
         lines.push('## Advancement');
         lines.push('- **Milestone (end of session):** Swap two skill ranks, rewrite a stunt, rewrite one aspect (not high concept), or buy a stunt for 1 refresh');
-        lines.push('- **Breakthrough (end of arc):** All milestone options PLUS: rewrite high concept, increase one skill by +1, begin recovery of consequences');
+        lines.push('- **Major Milestone (end of arc):** All minor milestone options PLUS: rewrite high concept, increase one skill by +1, begin recovery of consequences');
         lines.push('');
         lines.push('---');
         lines.push('*Generated by Fate Condensed Session Zero Wizard*');
@@ -292,7 +293,7 @@
       var navBar = h('nav', {className:'land-topnav', role:'navigation', 'aria-label':'Site navigation'},
         h('a', {href:'../index.html', className:'land-topnav-brand', style:{textDecoration:'none'}}, '🎲 Ogma'),
         h('div', {className:'land-topnav-actions'},
-          h('a', {href:'../learn.html', className:'btn btn-ghost land-topnav-btn', style:{fontSize:13, textDecoration:'none'}}, '📖 Learn'),
+          h('a', {href:'../learn.html', className:'btn btn-ghost land-topnav-btn', style:{fontSize:13, textDecoration:'none'}}, '📖 Quick Start'),
           h('a', {href:'transition.html', className:'btn btn-ghost land-topnav-btn', style:{fontSize:13, textDecoration:'none'}}, '⚔ D&D Guide'),
           h('a', {href:'../about.html', className:'btn btn-ghost land-topnav-btn', style:{fontSize:13, textDecoration:'none'}}, 'About'),
           h('button', {className:'btn btn-icon btn-ghost', onClick: toggleTheme, title:'Toggle theme'}, '◑')
@@ -362,13 +363,13 @@
           h('div', {className:'sz-step-title'}, 'The World You\'re Playing In'),
           h('div', {className:'sz-body'},
             p('Read these aloud. These are the pressures that define your campaign world. Everything your characters do will exist in the shadow of these issues.'),
-            card('⚡ Current Issue — Happening NOW', h(F, null,
+            card('⚡ Current Issue - Happening NOW', h(F, null,
               ci.length > 0 ? h(F, null,
                 h('div', {className:'sz-issue-name'}, ci[ciIdx].name),
                 h('div', {className:'sz-issue-desc'}, ci[ciIdx].desc)
               ) : p('No current issues defined.')
             )),
-            card('🌑 Impending Issue — Brewing on the Horizon', h(F, null,
+            card('🌑 Impending Issue - Brewing on the Horizon', h(F, null,
               ii.length > 0 ? h(F, null,
                 h('div', {className:'sz-issue-name'}, ii[iiIdx].name),
                 h('div', {className:'sz-issue-desc'}, ii[iiIdx].desc)
@@ -388,7 +389,7 @@
         content = h(F, null,
           h('div', {className:'sz-step-title'}, 'High Concept'),
           h('div', {className:'sz-body'},
-            p('Go around the table. Each player says, in one phrase, who their character is. Not what they can do — who they are in the story.'),
+            p('Go around the table. Each player says, in one phrase, who their character is. Not what they can do - who they are in the story.'),
             h('div', {className:'sz-prompt-box'},
               '"If someone asked ', h('em', null, 'what\'s your character about?'), ' at a bar, what would you say?"'
             ),
@@ -411,7 +412,7 @@
         content = h(F, null,
           h('div', {className:'sz-step-title'}, 'Trouble'),
           h('div', {className:'sz-body'},
-            p('Go around the table. What makes your character\'s life harder? This is the aspect that will earn you the most fate points — so make it good.'),
+            p('Go around the table. What makes your character\'s life harder? This is the aspect that will earn you the most fate points - so make it good.'),
             h('div', {className:'sz-prompt-box'},
               '"When things go wrong for your character, ', h('em', null, 'why'), ' do they go wrong? What keeps pulling them back into trouble?"'
             ),
@@ -433,7 +434,7 @@
         content = h(F, null,
           h('div', {className:'sz-step-title'}, 'Relationship'),
           h('div', {className:'sz-body'},
-            p('Pair up. Each player connects their character to one other PC. Good relationships have tension — not hostility, but imbalance.'),
+            p('Pair up. Each player connects their character to one other PC. Good relationships have tension - not hostility, but imbalance.'),
             card('Pick a Template', h('ul', {className:'sz-template-list'},
               templates.map(function(t, i) { return h('li', {key:i}, t); })
             )),
@@ -448,7 +449,7 @@
         content = h(F, null,
           h('div', {className:'sz-step-title'}, 'Two Free Aspects'),
           h('div', {className:'sz-body'},
-            p('These can be anything — gear, history, reputation, a catchphrase, a connection to the setting. There are no restrictions beyond fitting the world.'),
+            p('These can be anything - gear, history, reputation, a catchphrase, a connection to the setting. There are no restrictions beyond fitting the world.'),
             h('div', {className:'sz-card', style:{borderColor:'var(--c-green)', background:'rgba(80,184,120,0.06)'}},
               h('div', {className:'sz-card-title', style:{color:'var(--c-green)'}}, '✓ You Can Leave These Blank'),
               p('This is an official Condensed rule (p.47), not cheating. Most experienced Fate GMs recommend leaving at least one blank. You\'ll know what your character needs after the first scene, not before it.')
@@ -473,9 +474,9 @@
       // ── PHASE 1 (Trio mode) ──
       else if (stepId === 'phase1') {
         content = h(F, null,
-          h('div', {className:'sz-step-title'}, 'Phase 1 — Your First Adventure'),
+          h('div', {className:'sz-step-title'}, 'Phase 1 - Your First Adventure'),
           h('div', {className:'sz-body'},
-            p('Go around the table. Each player tells a short story about something that happened to their character before the campaign begins. Use the prompt below as a starting point — generate one per player.'),
+            p('Go around the table. Each player tells a short story about something that happened to their character before the campaign begins. Use the prompt below as a starting point - generate one per player.'),
             phase1Prompt
               ? h('div', {className:'sz-prompt-box'},
                   '"I was at ', h('span', {className:'sz-prompt-fill'}, phase1Prompt.location),
@@ -487,7 +488,7 @@
               h('button', {className:'btn btn-primary', onClick: genPhase1}, phase1Prompt ? '🎲 New Prompt' : '🎲 Generate a Prompt'),
             ),
             card('What This Produces', h(F, null,
-              p('Your answer gives you: a situation (setting hook), a method (skill hint), and — most importantly — your third aspect.'),
+              p('Your answer gives you: a situation (setting hook), a method (skill hint), and - most importantly - your third aspect.'),
               p('After you narrate, ask yourself: "What does this say about who I am?" Write that as an aspect.')
             )),
             example('"I was at the Sealed Phade Vault when the Servitors reactivated, and I survived by talking to the lead unit in a language I shouldn\'t know." → Aspect: "The Old Machines Listen to Me"')
@@ -499,7 +500,7 @@
       else if (stepId === 'phase2') {
         var roles = PT.guest_star_roles || [];
         content = h(F, null,
-          h('div', {className:'sz-step-title'}, 'Phase 2 — Guest Starring'),
+          h('div', {className:'sz-step-title'}, 'Phase 2 - Guest Starring'),
           h('div', {className:'sz-body'},
             p('Pass your Phase 1 story to the player on your left. They were there. How were they involved? Pick a role:'),
             h('div', {className:'sz-grid'},
@@ -515,7 +516,7 @@
               })
             ),
             card('What This Produces', h(F, null,
-              p('This is your Relationship aspect — the same one Condensed requires, but now it\'s grounded in a shared story instead of invented from nothing.'),
+              p('This is your Relationship aspect - the same one Condensed requires, but now it\'s grounded in a shared story instead of invented from nothing.'),
               p('Narrate one sentence about how you were involved, then write the aspect.')
             ))
           )
@@ -526,7 +527,7 @@
       else if (stepId === 'phase3') {
         var roles3 = PT.guest_star_roles || [];
         content = h(F, null,
-          h('div', {className:'sz-step-title'}, 'Phase 3 — Guest Starring Again'),
+          h('div', {className:'sz-step-title'}, 'Phase 3 - Guest Starring Again'),
           h('div', {className:'sz-body'},
             p('Pass your Phase 1 story to the player on your right (a different player than Phase 2). They pick a role and narrate their involvement. This produces your fifth and final aspect.'),
             h('div', {className:'sz-grid'},
@@ -554,10 +555,10 @@
               h('p', {style:{fontSize:'var(--text-lg)', lineHeight:1.7}}, PT.flashback_rules || '')
             ),
             card('How It Works in Play', h(F, null,
-              example('"Wait — I know this mercenary! We served together in the Siege of Orizon. He still owes me 50 credits." → Write the aspect: "Brothers in Arms from the Siege of Orizon" → Use it immediately.'),
+              example('"Wait - I know this mercenary! We served together in the Siege of Orizon. He still owes me 50 credits." → Write the aspect: "Brothers in Arms from the Siege of Orizon" → Use it immediately.'),
               p('Each flashback slot produces one aspect. You have three slots for: your Relationship aspect and your two free aspects. Use them whenever a dramatic moment calls for a connection, a piece of history, or a reveal.')
             )),
-            tip('This method produces the best aspects because they emerge from actual dramatic need. The cost is starting Session 1 with a slightly incomplete sheet — which is perfectly legal and honestly better.'),
+            tip('This method produces the best aspects because they emerge from actual dramatic need. The cost is starting Session 1 with a slightly incomplete sheet - which is perfectly legal and honestly better.'),
             h('div', {className:'sz-warn'}, 'For now, write down only your High Concept and Trouble. Leave the other three slots blank. You\'ll fill them during play.')
           )
         );
@@ -579,11 +580,11 @@
             ),
             card('The 19 Skills', h('ul', {className:'sz-skill-list'},
               ALL_SKILLS.map(function(sk) {
-                return h('li', {key:sk}, h('strong', null, sk), ' — ', SKILL_DESCS[sk] || '');
+                return h('li', {key:sk}, h('strong', null, sk), ' - ', SKILL_DESCS[sk] || '');
               })
             )),
             PT.dnd_contrasts ? dnd(PT.dnd_contrasts.skills) : null,
-            tip('Physique sets your physical stress boxes. Will sets your mental stress boxes. Characters with neither above +0 get 3 boxes each — which isn\'t much. Plan accordingly.')
+            tip('Physique sets your physical stress boxes. Will sets your mental stress boxes. Characters with neither above +0 get 3 boxes each - which isn\'t much. Plan accordingly.')
           )
         );
       }
@@ -598,14 +599,14 @@
             p('You get 3 free stunts. There are two types:'),
             card('+2 Bonus Stunt', h(F, null,
               p('"Because I [describe why], I get +2 when I use [skill] to [overcome/create advantage/attack/defend] when [circumstance]."'),
-              stuntExamples[0] ? example(stuntExamples[0].name + ' [' + stuntExamples[0].skill + '] — ' + stuntExamples[0].desc) : null
+              stuntExamples[0] ? example(stuntExamples[0].name + ' [' + stuntExamples[0].skill + '] - ' + stuntExamples[0].desc) : null
             )),
             card('Rule-Changing Stunt', h(F, null,
               p('"Because I [describe why], I can [special effect], but only [limitation]."'),
-              stuntExamples[1] ? example(stuntExamples[1].name + ' [' + stuntExamples[1].skill + '] — ' + stuntExamples[1].desc) : null
+              stuntExamples[1] ? example(stuntExamples[1].name + ' [' + stuntExamples[1].skill + '] - ' + stuntExamples[1].desc) : null
             )),
             stuntExamples.length > 2 ? card('More Examples', h('ul', {className:'sz-aspect-list'},
-              stuntExamples.slice(2).map(function(s, i) { return h('li', {key: i + '-' + rerolls}, s.name + ' [' + s.skill + '] — ' + s.desc); })
+              stuntExamples.slice(2).map(function(s, i) { return h('li', {key: i + '-' + rerolls}, s.name + ' [' + s.skill + '] - ' + s.desc); })
             )) : null,
             rerollBtn(reroll, 'New stunt examples'),
             h('div', {className:'sz-card', style:{borderColor:'var(--c-green)', background:'rgba(80,184,120,0.06)'}},
@@ -638,20 +639,20 @@
                 h('tbody', null,
                   h('tr', null, h('td', null, 'Mild'), h('td', null, 'Absorbs 2 shifts'), h('td', null, 'Clears: next scene after treatment')),
                   h('tr', null, h('td', null, 'Moderate'), h('td', null, 'Absorbs 4 shifts'), h('td', null, 'Clears: full session after treatment')),
-                  h('tr', null, h('td', null, 'Severe'), h('td', null, 'Absorbs 6 shifts'), h('td', null, 'Clears: after breakthrough + treatment'))
+                  h('tr', null, h('td', null, 'Severe'), h('td', null, 'Absorbs 6 shifts'), h('td', null, 'Clears: after major milestone + treatment'))
                 )
               ),
               p('Treatment requires a successful overcome roll: Academics for physical, Empathy for mental.')
             )),
             PT.dnd_contrasts ? dnd(PT.dnd_contrasts.stress) : null,
-            tip('Stress clears after every scene. Consequences stick around and can be compelled against you — but they also earn you fate points when they cause trouble.')
+            tip('Stress clears after every scene. Consequences stick around and can be compelled against you - but they also earn you fate points when they cause trouble.')
           )
         );
       }
 
       // ── SUMMARY + EXPORT ──
       else if (stepId === 'summary') {
-        var campName = camp ? camp.meta.name : '—';
+        var campName = camp ? camp.meta.name : '-';
         var modeLabel = mode === 'trio' ? 'Phase Trio' : mode === 'flashback' ? 'Flashback Slots' : 'Condensed Standard';
         var hook = camp ? pick(camp.tables.backstory_hooks) : 'Something dangerous is happening right now.';
         void rerolls;
@@ -696,16 +697,16 @@
             )),
 
             // Advancement
-            card('📈 Advancement — How You Level Up', h(F, null,
+            card('Minor/Major Milestone - Advancement', h(F, null,
               h('div', {style:{marginBottom:10}},
-                h('strong', {style:{color:'var(--gold)'}}, 'Milestone'),
+                h('strong', {style:{color:'var(--gold)'}}, 'Minor Milestone'),
                 h('span', {style:{color:'var(--text-muted)'}}, ' (end of each session)'),
                 h('div', {style:{fontSize:14, color:'var(--text-dim)', marginTop:4}}, 'Swap two skill ranks, rewrite a stunt, rewrite one aspect (not high concept), or buy a new stunt for 1 Refresh.')
               ),
               h('div', null,
-                h('strong', {style:{color:'var(--gold)'}}, 'Breakthrough'),
+                h('strong', {style:{color:'var(--gold)'}}, 'Major Milestone'),
                 h('span', {style:{color:'var(--text-muted)'}}, ' (end of a story arc)'),
-                h('div', {style:{fontSize:14, color:'var(--text-dim)', marginTop:4}}, 'Everything from a milestone PLUS: rewrite your high concept, increase one skill by +1, and begin recovery of moderate/severe consequences.')
+                h('div', {style:{fontSize:14, color:'var(--text-dim)', marginTop:4}}, 'Everything from a minor milestone PLUS: rewrite your high concept, increase one skill by +1, and begin recovery of moderate/severe consequences.')
               )
             )),
 
@@ -756,6 +757,12 @@
         content,
         nav
       ) // close sz-container
+      ,h('footer', {style:{textAlign:'center',padding:'20px',fontSize:'12px',color:'var(--text-muted)',borderTop:'1px solid var(--border)',marginTop:20}},
+        'Fate™ is a trademark of Evil Hat Productions, LLC. · ',
+        h('a',{href:'../license.html',style:{color:'var(--text-muted)'}}, 'License & Attribution'),
+        ' · ',
+        h('a',{href:'../about.html',style:{color:'var(--text-muted)'}}, 'About Ogma')
+      )
       ); // close Fragment
     }
 

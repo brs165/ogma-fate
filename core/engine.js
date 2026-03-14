@@ -94,7 +94,7 @@ function generateScene(t) {
   var cats = ['scene_tone', 'scene_movement', 'scene_cover', 'scene_danger', 'scene_usable'];
   var chosen = pickN(cats, rand(3, 5));
   var aspects = chosen.map(function(cat) {
-    // ~40% of aspects get a pre-placed free invoke marker — a GM prep convenience
+    // ~40% of aspects get a pre-placed free invoke marker - a GM prep convenience
     // suggesting this aspect has a discoverable free invoke. In play, free invokes
     // are earned through Create Advantage actions (Condensed p.19).
     return {name: fillTemplate(t[cat]), category: cat.replace('scene_', ''), free_invoke: Math.random() > 0.6};
@@ -102,7 +102,7 @@ function generateScene(t) {
   var zones = pickN(t.zones, rand(2, 4)).map(function(z) {
     return {name: z[0], aspect: z[1], description: z[2]};
   });
-  // Scene framing questions — injected via mergeUniversal when toggle is on
+  // Scene framing questions - injected via mergeUniversal when toggle is on
   var framing = t.scene_framing_questions || [];
   return {aspects: aspects, zones: zones, framing_questions: framing};
 }
@@ -135,20 +135,20 @@ function generateSeed(t) {
   var complication = pick(t.seed_complications);
   var issueRaw     = pick(t.current_issues);
   var issue        = issueRaw && typeof issueRaw === 'object'
-                     ? issueRaw.name + (issueRaw.desc ? ' — ' + issueRaw.desc : '')
+                     ? issueRaw.name + (issueRaw.desc ? ' - ' + issueRaw.desc : '')
                      : String(issueRaw);
   var setting_asp  = fillTemplate(t.setting_aspects);
   var victory      = pick(t.victory);
   var defeat       = pick(t.defeat);
   var twist        = pick(t.twists);
 
-  // Opposition — same logic as encounter
+  // Opposition - same logic as encounter
   var minors = t.opposition.filter(function(o) { return o.type === 'minor'; });
   var majors = t.opposition.filter(function(o) { return o.type === 'major'; });
   var opp = [pick(minors)];
   if (Math.random() > 0.4 && majors.length) opp.push(pick(majors));
 
-  // Three scene sketch — constructed from generated elements
+  // Three scene sketch - constructed from generated elements
   var scenes = [
     {
       num: 1, type: 'OPENING',
@@ -157,7 +157,7 @@ function generateSeed(t) {
     },
     {
       num: 2, type: 'COMPLICATIONS',
-      brief: complication + '. The campaign issue — ' + issue + ' — surfaces here. ' +
+      brief: complication + '. The campaign issue - ' + issue + ' - surfaces here. ' +
              'This is the point to introduce the opposition and the first major roll.',
     },
     {
@@ -180,7 +180,7 @@ function generateSeed(t) {
 function generateCompel(t) {
   var situation   = pick(t.compel_situations);
   var consequence = pick(t.compel_consequences);
-  // Compel framing templates — injected via mergeUniversal when toggle is on
+  // Compel framing templates - injected via mergeUniversal when toggle is on
   var isEvent = Math.random() > 0.5;
   var templates = isEvent ? (t.compel_event_templates || []) : (t.compel_decision_templates || []);
   var template = templates.length > 0 ? pick(templates) : null;
@@ -203,7 +203,7 @@ function generateChallenge(t) {
 }
 
 function generateContest(t) {
-  // Contest types and twists — injected via mergeUniversal when toggle is on
+  // Contest types and twists - injected via mergeUniversal when toggle is on
   var ct = pick(t.contest_types || [{name:"Generic Contest",desc:"Two sides compete.",side_a:"Side A",side_b:"Side B",skills_a:"Athletics",skills_b:"Athletics"}]);
   var twists = pickN(t.contest_twists || ["Something unexpected happens."], 3);
   // Use campaign scene data for flavour
@@ -239,7 +239,7 @@ var UNIVERSAL_MERGE_KEYS = [
   'compel_situations', 'compel_consequences',
 ];
 
-// Keys that exist ONLY in UNIVERSAL (not in campaign tables) — injected when toggle is on
+// Keys that exist ONLY in UNIVERSAL (not in campaign tables) - injected when toggle is on
 var UNIVERSAL_INJECT_KEYS = [
   'contest_types', 'contest_twists',
   'scene_framing_questions',
@@ -317,15 +317,15 @@ var TABLE_GROUPS = [
 function entryLabel(entry) {
   if (typeof entry === 'string') return entry;
   if (Array.isArray(entry)) {
-    return entry[0] + (entry[1] ? ' — ' + entry[1] : '') + (entry[2] ? ' · ' + entry[2] : '');
+    return entry[0] + (entry[1] ? ' - ' + entry[1] : '') + (entry[2] ? ' · ' + entry[2] : '');
   }
   if (entry && typeof entry === 'object') {
     if (entry.name && entry.bond)  return entry.name + ': ' + entry.bond;
     if (entry.bond)                return entry.bond;
-    if (entry.name && entry.skill && entry.desc) return entry.name + ' [' + entry.skill + '] — ' + entry.desc;
+    if (entry.name && entry.skill && entry.desc) return entry.name + ' [' + entry.skill + '] - ' + entry.desc;
     if (entry.name && entry.desc)  return entry.name + ': ' + entry.desc;
     if (entry.name)                return entry.name;
-    if (entry.primary)             return (entry.name || '') + ' — ' + entry.primary;
+    if (entry.primary)             return (entry.name || '') + ' - ' + entry.primary;
   }
   return String(entry).slice(0, 100);
 }
@@ -467,7 +467,7 @@ function generateObstacle(t) {
       weapon: h.weapon,
       aspect: h.aspect,
       disable: h.disable,
-      gm_note: 'Hazards act in initiative. They attack or create advantages. They cannot be attacked — only overcome or disabled.',
+      gm_note: 'Hazards act in initiative. They attack or create advantages. They cannot be attacked - only overcome or disabled.',
     };
   } else if (obstacleType === 'block') {
     var b = pick(t.blocks || [{name:"Generic Block", rating:3, weapon:0, aspect:"In the Way", disable:"Overcome at +5"}]);
@@ -507,7 +507,7 @@ function generateCountdown(t) {
     unit: cd.unit,
     trigger: cd.trigger,
     outcome: cd.outcome,
-    gm_note: 'Place the track where players can see it. Check boxes visibly. When the last box fills, the outcome fires — no negotiation.',
+    gm_note: 'Place the track where players can see it. Check boxes visibly. When the last box fills, the outcome fires - no negotiation.',
   };
 }
 
@@ -520,7 +520,7 @@ function generateConstraint(t) {
       name: lim.name,
       restricted_action: lim.restricted_action,
       consequence: lim.consequence,
-      gm_note: 'Limitations don\'t forbid actions — they impose consequences. Players should always be free to act; the question is whether the cost is worth it.',
+      gm_note: 'Limitations don\'t forbid actions - they impose consequences. Players should always be free to act; the question is whether the cost is worth it.',
     };
   } else {
     var res = pick(t.resistances || [{name:"Generic Resistance", what_resists:"All standard attacks", bypass:"Find the weakness"}]);
@@ -545,25 +545,25 @@ function toMarkdown(genId, data, campName) {
     case 'npc_minor': {
       var d = data;
       return [
-        '# Minor NPC — ' + d.name,
+        '# Minor NPC - ' + d.name,
         '> *' + campName + '*\n',
         '## Aspects',
       ].concat(d.aspects.map(function(a, i) {
-        return '- *' + a + '*' + (i === 0 ? ' — **High Concept**' : i === 1 ? ' — **Weakness**' : '');
+        return '- *' + a + '*' + (i === 0 ? ' - **High Concept**' : i === 1 ? ' - **Weakness**' : '');
       })).concat([
         '\n## Skills',
       ]).concat(d.skills.map(function(s) {
         return '- **+' + s.r + ' ' + (SKILL_LABEL[s.r] || '') + '** ' + s.name;
       })).concat([
-        d.stunt ? '\n## Stunt\n**' + d.stunt.name + '** *(' + d.stunt.skill + ')* — `' + (d.stunt.type === 'special' ? 'ONCE/SCENE' : '+2 BONUS') + '`  \n' + d.stunt.desc : '',
+        d.stunt ? '\n## Stunt\n**' + d.stunt.name + '** *(' + d.stunt.skill + ')* - `' + (d.stunt.type === 'special' ? 'ONCE/SCENE' : '+2 BONUS') + '`  \n' + d.stunt.desc : '',
         '\n## Stress\n' + boxes(d.stress),
-        '\n---\n*Generated by Fate Condensed Campaign Generator*',
+        '\n---\n*Generated by Ogma - On-demand Generator for Masterful Adventures*',
       ]).filter(function(l) { return l !== ''; }).join('\n');
     }
     case 'npc_major': {
       var d = data;
       return [
-        '# Major NPC — ' + d.name,
+        '# Major NPC - ' + d.name,
         '> *' + campName + '*\n',
         '## Aspects',
         '- **High Concept:** *' + d.aspects.high_concept + '*',
@@ -584,7 +584,7 @@ function toMarkdown(genId, data, campName) {
         '| Moderate    | −4          |',
         '| Severe      | −6          |\n',
         '**Refresh:** ' + d.refresh,
-        '\n---\n*Generated by Fate Condensed Campaign Generator*',
+        '\n---\n*Generated by Ogma - On-demand Generator for Masterful Adventures*',
       ]).join('\n');
     }
     case 'scene': {
@@ -595,16 +595,16 @@ function toMarkdown(genId, data, campName) {
         '> *' + campName + '*\n',
         '## Situation Aspects',
       ].concat(d.aspects.map(function(a) {
-        return '- ' + (catEmoji[a.category] || '◈') + ' *' + a.name + '* — **' + a.category.toUpperCase() + '**' + (a.free_invoke ? ' 🎲 **FREE INVOKE**' : '');
+        return '- ' + (catEmoji[a.category] || '◈') + ' *' + a.name + '* - **' + a.category.toUpperCase() + '**' + (a.free_invoke ? ' 🎲 **FREE INVOKE**' : '');
       })).concat(['\n## Zones']).concat(d.zones.map(function(z) {
-        return '### ' + z.name + (z.aspect ? ' — *' + z.aspect + '*' : '') + '\n' + (z.description || '');
+        return '### ' + z.name + (z.aspect ? ' - *' + z.aspect + '*' : '') + '\n' + (z.description || '');
       }));
       if (d.framing_questions && d.framing_questions.length > 0) {
         lines.push('\n## Scene Framing Questions');
         d.framing_questions.forEach(function(q) { lines.push('- ' + q); });
       }
       lines.push('\n> **GM Note:** Mark 1–2 situation aspects with a free invoke to reward creative play.');
-      lines.push('\n---\n*Generated by Fate Condensed Campaign Generator*');
+      lines.push('\n---\n*Generated by Ogma - On-demand Generator for Masterful Adventures*');
       return lines.join('\n');
     }
     case 'campaign': {
@@ -622,12 +622,12 @@ function toMarkdown(genId, data, campName) {
       return [
         '# Campaign Issues',
         '> *' + campName + '*\n',
-        issueSection(d.current, '⚡ Current Issue — happening NOW'), '',
-        issueSection(d.impending, '🌑 Impending Issue — brewing on the horizon'),
+        issueSection(d.current, '⚡ Current Issue - happening NOW'), '',
+        issueSection(d.impending, '🌑 Impending Issue - brewing on the horizon'),
         '\n## Setting Aspects',
       ].concat(d.setting.map(function(a) { return '- *' + a + '*'; })).concat([
         '\n> **GM Note:** Current issues create immediate compel pressure. Impending issues become current if ignored.',
-        '\n---\n*Generated by Fate Condensed Campaign Generator*',
+        '\n---\n*Generated by Ogma - On-demand Generator for Masterful Adventures*',
       ]).join('\n');
     }
     case 'encounter': {
@@ -647,7 +647,7 @@ function toMarkdown(genId, data, campName) {
       ].concat(d.aspects.map(function(a) { return '- *' + a + '*'; })).concat([
         '\n## Zones',
       ]).concat(d.zones.map(function(z) {
-        return '- **' + z.name + '**' + (z.aspect ? ' — *' + z.aspect + '*' : '');
+        return '- **' + z.name + '**' + (z.aspect ? ' - *' + z.aspect + '*' : '');
       })).concat(['\n## Opposition']).concat(oppLines).concat([
         '## GM Fate Points',
         '●'.repeat(d.gm_fate_points) + ' *(= number of PCs)*\n',
@@ -657,16 +657,16 @@ function toMarkdown(genId, data, campName) {
         '| **Victory** | ' + d.victory + ' |',
         '| **Defeat** | ' + d.defeat + ' |',
         '| **Twist** | *' + d.twist + '* |',
-        '\n---\n*Generated by Fate Condensed Campaign Generator*',
+        '\n---\n*Generated by Ogma - On-demand Generator for Masterful Adventures*',
       ]).join('\n');
     }
     case 'seed': {
       var d = data;
       var sceneLines = d.scenes.map(function(s) {
-        return '### Scene ' + s.num + ' — ' + s.type + '\n' + s.brief;
+        return '### Scene ' + s.num + ' - ' + s.type + '\n' + s.brief;
       }).join('\n\n');
       var oppLines = d.opposition.map(function(o) {
-        return '- **' + o.name + '** (' + (o.type === 'major' ? 'Major NPC' : 'Mook') + (o.qty > 1 ? ' ×' + o.qty : '') + ') — *' + o.aspects.join(', ') + '*'
+        return '- **' + o.name + '** (' + (o.type === 'major' ? 'Major NPC' : 'Mook') + (o.qty > 1 ? ' ×' + o.qty : '') + ') - *' + o.aspects.join(', ') + '*'
           + '\n  Skills: ' + o.skills.map(function(s) { return '+' + s.r + ' ' + s.name; }).join(', ')
           + ' · Stress: ' + o.stress;
       }).join('\n');
@@ -689,8 +689,8 @@ function toMarkdown(genId, data, campName) {
         '\n## Campaign Anchor',
         '**Setting Aspect:** *' + d.setting_asp + '*',
         '**Active Issue:** ' + d.issue,
-        '\n> Prep Scene 1 in full. Scenes 2 and 3 are targets — follow the players. State victory/defeat before the first roll.',
-        '\n---\n*Generated by Fate Condensed Campaign Generator*',
+        '\n> Prep Scene 1 in full. Scenes 2 and 3 are targets - follow the players. State victory/defeat before the first roll.',
+        '\n---\n*Generated by Ogma - On-demand Generator for Masterful Adventures*',
       ].join('\n\n');
     }
     case 'compel': {
@@ -705,8 +705,8 @@ function toMarkdown(genId, data, campName) {
         lines.push('> ' + d.template);
       }
       lines.push('\n## GM Note');
-      lines.push('> Offer the fate point **before** stating the consequence. If the player pays 1 fp to refuse, accept it — that is the system working correctly.');
-      lines.push('\n---\n*Generated by Fate Condensed Campaign Generator*');
+      lines.push('> Offer the fate point **before** stating the consequence. If the player pays 1 fp to refuse, accept it - that is the system working correctly.');
+      lines.push('\n---\n*Generated by Ogma - On-demand Generator for Masterful Adventures*');
       return lines.join('\n\n');
     }
     case 'challenge': {
@@ -725,7 +725,7 @@ function toMarkdown(genId, data, campName) {
         '|--|--|',
         '| **If They Win** | ' + d.stakes_good + ' |',
         '| **If They Lose** | ' + d.stakes_bad + ' |',
-        '\n---\n*Generated by Fate Condensed Campaign Generator*',
+        '\n---\n*Generated by Ogma - On-demand Generator for Masterful Adventures*',
       ].join('\n');
     }
     case 'contest': {
@@ -750,8 +750,8 @@ function toMarkdown(genId, data, campName) {
         '|--|---------|',
         '| **' + d.side_a + ' wins** | ' + d.stakes_good + ' |',
         '| **' + d.side_b + ' wins** | ' + d.stakes_bad + ' |',
-        '\n> **Rules:** Each exchange, one overcome per side. Compare efforts — highest marks a victory. SWS = 2 victories. Tie = no victory + GM narrates an unexpected complication (FCon p.30).',
-        '\n---\n*Generated by Fate Condensed Campaign Generator*',
+        '\n> **Rules:** Each exchange, one overcome per side. Compare efforts - highest marks a victory. SWS = 2 victories. Tie = no victory + GM narrates an unexpected complication (FCon p.30).',
+        '\n---\n*Generated by Ogma - On-demand Generator for Masterful Adventures*',
       ].join('\n');
     }
     case 'consequence': {
@@ -768,8 +768,8 @@ function toMarkdown(genId, data, campName) {
         '- Recovery requires a successful overcome roll first: Academics (physical) or Empathy (mental). Difficulty +2 if self-treating.',
         '- Mild: overcome at Fair (+2), then clears after the next scene',
         '- Moderate: overcome at Great (+4), then clears after a full session',
-        '- Severe: overcome at Fantastic (+6), then clears after reaching a breakthrough (p.39)',
-        '\n---\n*Generated by Fate Condensed Campaign Generator*',
+        '- Severe: overcome at Fantastic (+6), then clears after a major milestone (FCon p.39)',
+        '\n---\n*Generated by Ogma - On-demand Generator for Masterful Adventures*',
       ].join('\n\n');
     }
     case 'faction': {
@@ -780,8 +780,8 @@ function toMarkdown(genId, data, campName) {
         '**Method:** ' + d.method,
         '**Weakness:** ' + d.weakness,
         '\n## Named Face',
-        '**' + d.face.name + '** — ' + d.face.role,
-        '\n---\n*Generated by Fate Condensed Campaign Generator*',
+        '**' + d.face.name + '** - ' + d.face.role,
+        '\n---\n*Generated by Ogma - On-demand Generator for Masterful Adventures*',
       ].join('\n\n');
     }
     case 'complication': {
@@ -792,8 +792,8 @@ function toMarkdown(genId, data, campName) {
         '**Arrival:** ' + d.arrival,
         '**Environment Shift:** ' + d.env,
         '\n## GM Tip',
-        'Introduce the spotlighted element first. If players Create Advantage against it they earn a free invoke — reward proactive play.',
-        '\n---\n*Generated by Fate Condensed Campaign Generator*',
+        'Introduce the spotlighted element first. If players Create Advantage against it they earn a free invoke - reward proactive play.',
+        '\n---\n*Generated by Ogma - On-demand Generator for Masterful Adventures*',
       ].join('\n\n');
     }
     case 'backstory': {
@@ -806,7 +806,7 @@ function toMarkdown(genId, data, campName) {
         d.relationship,
         '\n## Opening Hook',
         d.hook,
-        '\n---\n*Generated by Fate Condensed Campaign Generator*',
+        '\n---\n*Generated by Ogma - On-demand Generator for Masterful Adventures*',
       ].join('\n\n');
     }
     case 'obstacle': {
@@ -814,19 +814,19 @@ function toMarkdown(genId, data, campName) {
       if (d.obstacle_type === 'hazard') {
         return [
           '# Hazard: ' + d.name, '> *' + campName + ' · Universal*\n',
-          '**Type:** Hazard (attacks PCs — cannot be attacked)',
+          '**Type:** Hazard (attacks PCs - cannot be attacked)',
           '**Aspect:** *' + d.aspect + '*',
           '**Rating:** ' + d.rating_label + ' (+' + d.rating + ') · **Weapon:** ' + d.weapon,
           '\n## How to Disable',
           d.disable,
           '\n## GM Note',
           '> ' + d.gm_note,
-          '\n---\n*Generated by Fate Condensed Campaign Generator*',
+          '\n---\n*Generated by Ogma - On-demand Generator for Masterful Adventures*',
         ].join('\n\n');
       } else if (d.obstacle_type === 'block') {
         return [
           '# Block: ' + d.name, '> *' + campName + ' · Universal*\n',
-          '**Type:** Block (prevents actions — passive opposition)',
+          '**Type:** Block (prevents actions - passive opposition)',
           '**Aspect:** *' + d.aspect + '*',
           '**Rating:** ' + d.rating_label + ' (+' + d.rating + ')' + (d.weapon > 0 ? ' · **Weapon:** ' + d.weapon : ''),
           '**Disable Difficulty:** +' + (d.rating + 2),
@@ -834,7 +834,7 @@ function toMarkdown(genId, data, campName) {
           d.disable,
           '\n## GM Note',
           '> ' + d.gm_note,
-          '\n---\n*Generated by Fate Condensed Campaign Generator*',
+          '\n---\n*Generated by Ogma - On-demand Generator for Masterful Adventures*',
         ].join('\n\n');
       } else {
         return [
@@ -850,7 +850,7 @@ function toMarkdown(genId, data, campName) {
           '\n**Opposition (if rolled):** ' + d.opposition_label + ' (+' + d.opposition + ')',
           '\n## GM Note',
           '> ' + d.gm_note,
-          '\n---\n*Generated by Fate Condensed Campaign Generator*',
+          '\n---\n*Generated by Ogma - On-demand Generator for Masterful Adventures*',
         ].join('\n\n');
       }
     }
@@ -866,7 +866,7 @@ function toMarkdown(genId, data, campName) {
         d.outcome,
         '\n## GM Note',
         '> ' + d.gm_note,
-        '\n---\n*Generated by Fate Condensed Campaign Generator*',
+        '\n---\n*Generated by Ogma - On-demand Generator for Masterful Adventures*',
       ].join('\n\n');
     }
     case 'constraint': {
@@ -881,7 +881,7 @@ function toMarkdown(genId, data, campName) {
           d.consequence,
           '\n## GM Note',
           '> ' + d.gm_note,
-          '\n---\n*Generated by Fate Condensed Campaign Generator*',
+          '\n---\n*Generated by Ogma - On-demand Generator for Masterful Adventures*',
         ].join('\n\n');
       } else {
         return [
@@ -893,10 +893,310 @@ function toMarkdown(genId, data, campName) {
           d.bypass,
           '\n## GM Note',
           '> ' + d.gm_note,
-          '\n---\n*Generated by Fate Condensed Campaign Generator*',
+          '\n---\n*Generated by Ogma - On-demand Generator for Masterful Adventures*',
         ].join('\n\n');
       }
     }
     default: return '';
   }
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// FARI JSON EXPORT  (BL-33a)
+// Generates a Fari App .fari.json character object.
+// Also accepted by Foundry VTT "Fate Core Official" system importer.
+// Only meaningful for npc_minor and npc_major - all other generators
+// produce prep content (scenes, factions, etc.) that belong in notes,
+// not character sheets.
+// Fari schema: ICharacter { id, name, group, pages[], lastUpdated, version:4 }
+//   page: { id, label, sections[] }
+//   section: { id, label, blocks[], position:"left"|"right" }
+//   block: { id, label, type, value, meta{} }
+// Block types used: Text, Skill, SlotTracker, Number
+// ════════════════════════════════════════════════════════════════════════
+
+function _fariId() {
+  // Simple random ID in Fari's expected format
+  return Math.random().toString(36).slice(2, 10) + '-' + Date.now().toString(36);
+}
+
+function _fariBlock(type, label, value, meta) {
+  return { id: _fariId(), label: label, type: type, value: value, meta: meta || {}, commands: null };
+}
+
+function _fariSection(label, blocks, position) {
+  return { id: _fariId(), label: label, blocks: blocks, position: position || 'left', visibleOnCard: false };
+}
+
+function _fariPage(label, sections) {
+  return { id: _fariId(), label: label, sections: sections };
+}
+
+function toFariJSON(genId, data, campName) {
+  if (!data) return '';
+  var d = data;
+  var camp = campName || 'Fate Condensed';
+  var pages = [];
+
+  if (genId === 'npc_minor') {
+    // Page 1: Character
+    var leftBlocks = [];
+    // Aspects
+    leftBlocks.push(_fariBlock('Text', 'High Concept', d.aspects[0] || ''));
+    if (d.aspects[1]) leftBlocks.push(_fariBlock('Text', 'Weakness / Trouble', d.aspects[1]));
+    // Skills
+    var skillBlocks = d.skills.map(function(s) {
+      return _fariBlock('Skill', s.name, s.r, { commands: ['4dF'] });
+    });
+    var rightBlocks = skillBlocks.slice();
+    // Stress
+    var stressBoxes = Array.from({ length: d.stress }, function() { return { checked: false, label: '' }; });
+    rightBlocks.push(_fariBlock('SlotTracker', 'Stress', stressBoxes));
+    // Stunt
+    if (d.stunt) {
+      rightBlocks.push(_fariBlock('Text', d.stunt.name + ' (' + d.stunt.skill + ')', d.stunt.desc));
+    }
+    pages.push(_fariPage('Character', [
+      _fariSection('Aspects', leftBlocks, 'left'),
+      _fariSection('Skills & Stress', rightBlocks, 'right'),
+    ]));
+    // Page 2: Notes (GM content, not shown in player view)
+    pages.push(_fariPage('GM Notes', [
+      _fariSection('Notes', [
+        _fariBlock('Text', 'Campaign', camp),
+        _fariBlock('Text', 'GM Note', 'Minor NPC - no consequence slots. One good hit takes them out. Weakness aspect is your primary compel lever.'),
+      ], 'left'),
+    ]));
+  }
+
+  else if (genId === 'npc_major') {
+    // ── Page 1: Character ──
+    // Aspects section (left)
+    var aspectBlocks = [
+      _fariBlock('Text', 'High Concept', d.aspects.high_concept),
+      _fariBlock('Text', 'Trouble', d.aspects.trouble),
+    ];
+    d.aspects.others.forEach(function(a, i) {
+      aspectBlocks.push(_fariBlock('Text', 'Aspect ' + (i + 3), a));
+    });
+    // Skills section (right)
+    var skillBlocks = d.skills.map(function(s) {
+      return _fariBlock('Skill', s.name, s.r, { commands: ['4dF'] });
+    });
+    // Stress + Consequences section (right, continued)
+    var stressPhyBoxes = Array.from({ length: d.physical_stress }, function() { return { checked: false, label: '' }; });
+    var stressMenBoxes = Array.from({ length: d.mental_stress }, function() { return { checked: false, label: '' }; });
+    var stressBlocks = [
+      _fariBlock('SlotTracker', 'Physical Stress', stressPhyBoxes),
+      _fariBlock('SlotTracker', 'Mental Stress', stressMenBoxes),
+      _fariBlock('Text', 'Mild Consequence (−2)', ''),
+      _fariBlock('Text', 'Moderate Consequence (−4)', ''),
+      _fariBlock('Text', 'Severe Consequence (−6)', ''),
+      _fariBlock('Number', 'Refresh', d.refresh),
+      _fariBlock('Number', 'Fate Points', d.refresh),
+    ];
+    pages.push(_fariPage('Character', [
+      _fariSection('Aspects', aspectBlocks, 'left'),
+      _fariSection('Skills', skillBlocks, 'right'),
+    ]));
+    // ── Page 2: Stress & Stunts ──
+    var stuntBlocks = d.stunts.map(function(s) {
+      var typeLabel = s.type === 'special' ? '[ONCE/SCENE]' : '[+2 BONUS]';
+      return _fariBlock('Text', s.name + ' · ' + s.skill + ' ' + typeLabel, s.desc);
+    });
+    pages.push(_fariPage('Stress & Stunts', [
+      _fariSection('Stress & Consequences', stressBlocks, 'left'),
+      _fariSection('Stunts', stuntBlocks, 'right'),
+    ]));
+    // ── Page 3: GM Notes ──
+    pages.push(_fariPage('GM Notes', [
+      _fariSection('Notes', [
+        _fariBlock('Text', 'Campaign', camp),
+        _fariBlock('Text', 'GM Note', 'Starts each scene with Refresh (' + d.refresh + ') fate points. Can concede - let them escape dramatically for future scenes.'),
+      ], 'left'),
+    ]));
+  }
+
+  else {
+    // Not a character generator - should not be called, but return null gracefully
+    return null;
+  }
+
+  var character = {
+    id: _fariId(),
+    name: d.name,
+    group: camp,
+    lastUpdated: Date.now(),
+    pages: pages,
+    version: 4,
+    playedDuringTurn: false,
+    playerName: '',
+    color: 'default',
+  };
+
+  // Fari wraps the character in a container with a type discriminator
+  return JSON.stringify({ character: character }, null, 2);
+}
+
+
+// ════════════════════════════════════════════════════════════════════════
+// ROLL20 JSON EXPORT  (BL-33b)
+// Generates an attribute array for the "Fate by Evil Hat" sheet on Roll20.
+// GM pastes this into the sheet's Developer Mode import box.
+// Attribute key names verified against the Fate by Evil Hat sheet source
+// (roll20-character-sheets/Fate%20Core%20v2) and community documentation.
+// Repeating rows use Roll20 convention: repeating_<section>_<rowId>_<field>
+// ════════════════════════════════════════════════════════════════════════
+
+function _roll20Id() {
+  // Roll20 row IDs are -<random alphanumeric 20 chars>
+  var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var id = '-';
+  for (var i = 0; i < 20; i++) {
+    id += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return id;
+}
+
+function toRoll20JSON(genId, data) {
+  if (!data || (genId !== 'npc_minor' && genId !== 'npc_major')) return null;
+  var d = data;
+  var attribs = [];
+
+  function attr(name, current, max) {
+    attribs.push({ name: name, current: current !== undefined ? current : '', max: max !== undefined ? max : '' });
+  }
+
+  // ── Top-level fields ──
+  attr('character_name', d.name);
+
+  if (genId === 'npc_major') {
+    attr('refresh', d.refresh);
+    attr('fate_points', d.refresh);
+    // Aspects - repeating section
+    var aspectList = [
+      { label: 'High Concept', value: d.aspects.high_concept },
+      { label: 'Trouble', value: d.aspects.trouble },
+    ];
+    d.aspects.others.forEach(function(a, i) {
+      aspectList.push({ label: 'Aspect ' + (i + 3), value: a });
+    });
+    aspectList.forEach(function(a) {
+      var rowId = _roll20Id();
+      attr('repeating_aspects_' + rowId + '_aspect-name', a.label);
+      attr('repeating_aspects_' + rowId + '_aspect-value', a.value);
+    });
+    // Skills - repeating section, key format: skill-name / skill-value
+    d.skills.forEach(function(s) {
+      var rowId = _roll20Id();
+      attr('repeating_skills_' + rowId + '_skill-name', s.name);
+      attr('repeating_skills_' + rowId + '_skill-value', s.r);
+    });
+    // Stunts - repeating section
+    d.stunts.forEach(function(s) {
+      var rowId = _roll20Id();
+      attr('repeating_stunts_' + rowId + '_stunt-name', s.name + ' (' + s.skill + ')');
+      attr('repeating_stunts_' + rowId + '_stunt-description', s.desc);
+      if (s.type !== 'special') {
+        attr('repeating_stunts_' + rowId + '_stunt-skill', s.skill);
+        attr('repeating_stunts_' + rowId + '_stunt-bonus', '2');
+        attr('repeating_stunts_' + rowId + '_stunt-rollable', '1');
+      }
+    });
+    // Stress tracks
+    attr('physical_stress_count', d.physical_stress);
+    attr('mental_stress_count', d.mental_stress);
+    for (var i = 1; i <= d.physical_stress; i++) { attr('physical_' + i, '0', '1'); }
+    for (var j = 1; j <= d.mental_stress; j++)   { attr('mental_'   + j, '0', '1'); }
+    // Consequence slots - empty, ready to fill in play
+    attr('MildPhyConsequence',    '');
+    attr('MildMenConsequence',    '');
+    attr('ModerateConsequence',   '');
+    attr('SevereConsequence',     '');
+
+  } else {
+    // npc_minor - simpler
+    attr('refresh', '1');
+    attr('fate_points', '1');
+    d.aspects.forEach(function(a, i) {
+      var rowId = _roll20Id();
+      attr('repeating_aspects_' + rowId + '_aspect-name', i === 0 ? 'High Concept' : 'Weakness');
+      attr('repeating_aspects_' + rowId + '_aspect-value', a);
+    });
+    d.skills.forEach(function(s) {
+      var rowId = _roll20Id();
+      attr('repeating_skills_' + rowId + '_skill-name', s.name);
+      attr('repeating_skills_' + rowId + '_skill-value', s.r);
+    });
+    if (d.stunt) {
+      var rowId = _roll20Id();
+      attr('repeating_stunts_' + rowId + '_stunt-name', d.stunt.name + ' (' + d.stunt.skill + ')');
+      attr('repeating_stunts_' + rowId + '_stunt-description', d.stunt.desc);
+    }
+    attr('physical_stress_count', d.stress);
+    for (var k = 1; k <= d.stress; k++) { attr('physical_' + k, '0', '1'); }
+  }
+
+  // Roll20 Developer Mode import format
+  return JSON.stringify({ schema_version: 2, type: 'character', character: { name: d.name, bio: '', attribs: attribs, abilities: [] } }, null, 2);
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// BATCH FARI EXPORT  (BL-38)
+// Converts all pinned session cards into a single .fari.json file.
+// NPCs → individual Fari character objects (via toFariJSON)
+// All other generators → one "Session Notes" character with Text blocks
+// The file is importable via Fari App Characters → Import, and via
+// Foundry VTT "Fate Core Official" character importer (paste JSON text).
+// ════════════════════════════════════════════════════════════════════════
+
+function toBatchFariJSON(pinnedCards, campName) {
+  if (!pinnedCards || !pinnedCards.length) return null;
+  var camp = campName || 'Fate Session';
+  var characters = [];
+  var noteBlocks = [];
+
+  pinnedCards.forEach(function(card) {
+    var genId = card.genId;
+    var data  = card.data;
+    if (!data) return;
+
+    if (genId === 'npc_minor' || genId === 'npc_major') {
+      // Full character export
+      var json = toFariJSON(genId, data, camp);
+      if (json) {
+        try { characters.push(JSON.parse(json).character); } catch(e) {}
+      }
+    } else {
+      // Non-actor content → Text block in Session Notes
+      var md = toMarkdown(genId, data, camp);
+      var label = card.label || genId;
+      noteBlocks.push(_fariBlock('Text', label, md || ''));
+    }
+  });
+
+  // If there are non-actor notes, bundle into one "Session Notes" character
+  if (noteBlocks.length > 0) {
+    var notesChar = {
+      id: _fariId(),
+      name: camp + ' - Session Notes',
+      group: camp,
+      lastUpdated: Date.now(),
+      version: 4,
+      playedDuringTurn: false,
+      playerName: '',
+      color: 'default',
+      pages: [
+        _fariPage('Session Notes', [
+          _fariSection('Generated Content', noteBlocks, 'left'),
+        ]),
+      ],
+    };
+    characters.push(notesChar);
+  }
+
+  if (!characters.length) return null;
+
+  // Fari batch export: array of character objects
+  return JSON.stringify({ characters: characters }, null, 2);
 }

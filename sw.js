@@ -2,7 +2,7 @@
 // Strategy: cache-first for all static assets, network-first for CDN scripts.
 // Safari fix: redirected responses are cloned as non-redirected before caching.
 
-var CACHE_NAME = 'fate-generator-2026.03.10';
+var CACHE_NAME = 'fate-generator-2026.03.18';
 
 var APP_SHELL = [
   './index.html',
@@ -50,6 +50,8 @@ var APP_SHELL = [
 var CDN_SCRIPTS = [
   'https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js',
+  'https://unpkg.com/rpg-awesome@0.2.0/css/rpg-awesome.min.css',
+  'https://unpkg.com/rpg-awesome@0.2.0/fonts/rpgawesome-webfont.woff2',
 ];
 
 // Safari throws "Response served by service worker has redirections" if a

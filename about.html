@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About — Ogma — A Ogma — A Fate Condensed Generator Suite</title>
-  <meta name="description" content="About the Ogma — A Ogma — A Fate Condensed Generator Suite Suite — features, architecture, and credits.">
+  <title>About Ogma - On-demand Generator for Masterful Adventures</title>
+  <meta name="description" content="About Ogma - how it was built, what's inside, and how to use it offline.">
   <link rel="icon" type="image/svg+xml" href="assets/favicons/icon.svg">
-  <link rel="stylesheet" href="assets/css/theme.css?v=10">
+  <link rel="stylesheet" href="https://unpkg.com/rpg-awesome@0.2.0/css/rpg-awesome.min.css">
+  <link rel="stylesheet" href="assets/css/theme.css?v=18">
   <style>
     .about{max-width:680px;margin:0 auto;padding:24px 20px 80px;position:relative;z-index:1}
     .about h1{font-size:var(--text-hero);font-weight:800;color:var(--text);margin-bottom:8px;letter-spacing:-0.02em}
@@ -39,7 +40,7 @@
 <nav class="land-topnav" role="navigation" aria-label="Site navigation">
   <a href="index.html" class="land-topnav-brand" style="text-decoration:none">🎲 Ogma</a>
   <div class="land-topnav-actions">
-      <a href="learn.html" class="btn btn-ghost land-topnav-btn" style="font-size:13px;text-decoration:none">📖 Learn</a>
+      <a href="learn.html" class="btn btn-ghost land-topnav-btn" style="font-size:13px;text-decoration:none">📖 Quick Start</a>
       <a href="campaigns/transition.html" class="btn btn-ghost land-topnav-btn" style="font-size:13px;text-decoration:none">⚔ D&D Guide</a>
       <a href="campaigns/sessionzero.html" class="btn btn-ghost land-topnav-btn" style="font-size:13px;text-decoration:none">🎭 Session Zero</a>
       <a href="about.html" class="btn btn-ghost land-topnav-btn land-topnav-btn-active" style="font-size:13px;text-decoration:none">About</a>
@@ -47,7 +48,7 @@
   
     <button class="land-topnav-hamburger" id="topnav-hbg" aria-label="Open navigation" aria-expanded="false" aria-haspopup="true">☰</button>
     <div class="land-topnav-dropdown" id="topnav-dd">
-        <a href="learn.html">📖 Learn</a>
+        <a href="learn.html">📖 Quick Start</a>
         <a href="campaigns/transition.html">⚔ D&D Guide</a>
         <a href="campaigns/sessionzero.html">🎭 Session Zero</a>
         <a href="license.html">License</a>
@@ -56,68 +57,70 @@
 </nav>
 
 <div class="about">
-<h1>About</h1>
+<h1>About Ogma</h1>
 
 <div class="about-version" role="status" aria-label="Suite version information">
-  <span class="about-version-badge">2026.03.10</span>
+  <span class="about-version-badge">2026.03.18</span>
   <div class="about-version-meta">
-    <strong style="color:var(--text)">Ogma — A Fate Condensed Generator Suite</strong><br>
-    March 2026 · Cache: <code>fate-generator-2026.03.10</code> · 16 generators · 6 campaign worlds · 9,750+ table entries
+    <strong style="color:var(--text)">Ogma - A Fate Condensed Generator Suite</strong><br>
+    March 2026 · Cache: <code>fate-generator-2026.03.18</code> · 16 generators · 6 campaign worlds · 9,750+ table entries
   </div>
-  <div class="about-version-qa">✓ 96/96 smoke · 9,600 stress · toMarkdown 96/96</div>
+  <div class="about-version-qa">✓ 96/96 smoke · 19,200 stress · 19 named assertions · toMarkdown 96/96</div>
 </div>
 
-<p>The Ogma — A Ogma — A Fate Condensed Generator Suite Suite is a free, offline, rules-accurate random generator for the <a href="https://fate-srd.com" target="_blank" rel="noreferrer">Fate Condensed</a> tabletop RPG system. Every result — NPCs, scenes, encounters, challenges, contests, factions — is mechanically complete and ready to use at the table.</p>
+<p><em><strong>O</strong>n-demand <strong>G</strong>enerator for <strong>M</strong>asterful <strong>A</strong>dventures.</em> That's what Ogma is - a tool that collapses the distance between an idea and a playable session. Every result is mechanically complete, thematically specific to its campaign world, and ready to put on the table without a second pass. Ogma is an independent fan project built on the <a href="https://fate-srd.com" target="_blank" rel="noreferrer">Fate Condensed</a> SRD.</p>
 
 <div class="about-card" style="text-align:center">
   <div class="about-stat"><div class="about-stat-n">16</div><div class="about-stat-l">Generators</div></div>
   <div class="about-stat"><div class="about-stat-n">6</div><div class="about-stat-l">Campaign Worlds</div></div>
   <div class="about-stat"><div class="about-stat-n">9,750+</div><div class="about-stat-l">Table Entries</div></div>
-  <div class="about-stat"><div class="about-stat-n">0</div><div class="about-stat-l">AI Required</div></div>
+  <div class="about-stat"><div class="about-stat-n">19,200</div><div class="about-stat-l">QA Runs</div></div>
 </div>
 
 <h2>Features</h2>
-<p><strong>16 generators</strong> across four categories — Characters (Minor NPC, Major NPC, PC Backstory), Scenes (Scene Setup, Encounter, Complication), Pacing (Challenge, Contest, Obstacle, Countdown, Constraint), and World (Campaign Issues, Adventure Seed, Faction, Compel, Consequence).</p>
-<p><strong>6 campaign worlds</strong> — The Long After (sword &amp; planet), Neon Abyss (cyberpunk), Shattered Kingdoms (dark fantasy), Void Runners (space western), The Gaslight Chronicles (gothic horror), The Long Road (post-apocalypse). Each has 1,300–1,900 hand-written thematic entries.</p>
-<p><strong>Inline rules reference</strong> — before you roll, every generator shows what it produces, how the Fate Condensed mechanic works, and a GM tip. The tool teaches the system while you use it.</p>
-<p><strong>Table Manager</strong> — exclude entries you don't want, lock entries to force them, or add your own custom content. Full control over every table.</p>
-<p><strong>Export</strong> — Markdown copy, print/PDF, and pin results for later. Export all pinned items at once for session prep.</p>
-<p><strong>Works offline</strong> — installable as a PWA. No server, no API calls, no internet required. Runs from a USB drive.</p>
-<p><strong>Dark and light modes</strong> — Apple-inspired Liquid Glass design with campaign-tinted gradient backgrounds.</p>
+<p><strong>16 generators</strong> across four categories - Characters (Minor NPC, Major NPC, PC Backstory), Scenes (Scene Setup, Encounter, Complication), Pacing (Challenge, Contest, Obstacle, Countdown, Constraint), and World (Campaign Issues, Adventure Seed, Faction, Compel, Consequence).</p>
+<p><strong>6 campaign worlds</strong> - The Long After (sword &amp; planet), Neon Abyss (cyberpunk), Shattered Kingdoms (dark fantasy), Void Runners (space western), The Gaslight Chronicles (gothic horror), The Long Road (post-apocalypse). Each has 1,300–1,900 hand-written thematic entries.</p>
+<p><strong>Inline rules reference</strong> - before you roll, every generator shows what it produces, how the Fate Condensed mechanic works, and a GM tip. The tool teaches the system while you use it.</p>
+<p><strong>Table Manager</strong> - exclude entries you don't want, lock entries to force them, or add your own custom content. Full control over every table.</p>
+<p><strong>Export</strong> - Markdown copy, print/PDF, and pin results for later. Export all pinned items at once for session prep.</p>
+<p><strong>Works offline</strong> - installable as a PWA. No server, no API calls, no internet required. Runs from a USB drive.</p>
+<p><strong>Dark and light modes</strong> - Apple-inspired Liquid Glass design with campaign-tinted gradient backgrounds.</p>
 
 <h2>Coming from D&D?</h2>
 <p>If you or your players are transitioning from D&D 5e, the <a href="campaigns/transition.html">Coming from D&D guide</a> covers every major conceptual shift with side-by-side comparisons and concrete examples.</p>
 
 <h2>Running Offline</h2>
-<p>The suite is fully offline-capable and runs without an internet connection — including from a USB drive or local folder. There are two ways to use it offline:</p>
-<p><strong>Option 1 — Install as a PWA.</strong> Visit the site in Chrome or Edge, then use the browser's install option (address bar or menu → "Install Fate Condensed Generator"). The app installs to your device and runs from the home screen with no internet required.</p>
-<p><strong>Option 2 — Download the zip.</strong> Download the complete suite as a standalone zip, unzip it anywhere, and open <code>index.html</code> directly in your browser. No server required. Works on any machine, no installation needed.</p>
+<p>The suite is fully offline-capable and runs without an internet connection - including from a USB drive or local folder. There are two ways to use it offline:</p>
+<p><strong>Option 1 - Install as a PWA.</strong> Visit the site in Chrome or Edge, then use the browser's install option (address bar or menu → "Install Fate Condensed Generator"). The app installs to your device and runs from the home screen with no internet required.</p>
+<p><strong>Option 2 - Download the zip.</strong> Download the complete suite as a standalone zip, unzip it anywhere, and open <code>index.html</code> directly in your browser. No server required. Works on any machine, no installation needed.</p>
 <div class="about-card" style="text-align:center;padding:24px;">
   <div style="font-size:var(--text-base);font-weight:700;color:var(--text);margin-bottom:6px;">Download for Offline Use</div>
   <div style="font-size:var(--text-sm);color:var(--text-dim);line-height:1.6;margin-bottom:16px;max-width:400px;margin-left:auto;margin-right:auto;">Complete suite · No internet required · Works from USB or local folder</div>
-  <a href="https://github.com/brs165/ogma-fate" download
+  <a href="fate-generator-2026.03.18.zip" download
      style="display:inline-block;padding:12px 32px;background:var(--accent,#d4a832);color:#000;font-weight:700;font-size:var(--text-sm);border-radius:100px;text-decoration:none;letter-spacing:0.02em;">
-    ⬇ Download https://github.com/brs165/ogma-fate
+    ⬇ Download fate-generator-2026.03.18.zip
   </a>
-
+  <div style="font-size:var(--text-label);color:var(--text-muted);margin-top:10px;">2026.03.13 · 6 worlds · 16 generators · ~500 KB</div>
 </div>
-<p>Once unzipped, open <code>index.html</code> in any modern browser. All features work identically — generators, table manager, fate point tracker, session zero, campaign guides. The service worker does not run on <code>file://</code> but everything else does.</p>
+<p>Once unzipped, open <code>index.html</code> in any modern browser. All features work identically - generators, table manager, fate point tracker, session zero, campaign guides. The service worker does not run on <code>file://</code> but everything else does.</p>
 
 <h2>Technology</h2>
-<p>Pure JavaScript (no build step), React 18 via CDN, CSS custom properties, IndexedDB persistence with localStorage fallback. No ES modules — everything uses <code>var</code> and function declarations for maximum <code>file://</code> compatibility. The engine (<code>core/engine.js</code>) has zero React or DOM dependencies and is testable in Node.</p>
+<p>Pure JavaScript (no build step), React 18 via CDN, CSS custom properties, IndexedDB persistence with localStorage fallback. No ES modules - everything uses <code>var</code> and function declarations for maximum <code>file://</code> compatibility. The engine (<code>core/engine.js</code>) has zero React or DOM dependencies and is testable in Node.</p>
 
-<h2>AI-Assisted Development</h2>
-<p>This suite was built with AI assistance using 12 specialized role prompts across 5 categories. Each role carries specific standards, constraints, and quality gates. Roles are composed for different tasks — the most common combinations are listed below. The <strong>Rules Expert</strong> is included in any conversation that touches game content; it's the governance layer that keeps everything else honest.</p>
+<h2>How Ogma Is Built</h2>
+<p>Ogma is developed using a team of specialised AI roles - each with explicit standards, constraints, and quality gates. The content is hand-curated, not generated: every table entry is reviewed for rules accuracy, tonal consistency, and aspect quality before shipping. The AI roles handle engineering and structure; the creative voice and editorial bar are set by the project's own standards.</p>
+
+<p>Twelve roles across five categories. The most common combinations:</p>
 
 <div class="about-card" style="font-size:var(--text-sm);line-height:1.9;color:var(--text-dim);padding:14px 18px">
-<strong style="color:var(--accent)">Fiction Writer + Rules Expert</strong> — creating new campaign content<br>
-<strong style="color:var(--accent)">React Developer + CSS Engineer</strong> — building new UI features<br>
-<strong style="color:var(--accent)">UX Researcher + Product Strategist</strong> — evaluating and prioritizing changes<br>
-<strong style="color:var(--accent)">Content Designer + Info Architect</strong> — new educational pages<br>
-<strong style="color:var(--accent)">QA Engineer + React Developer</strong> — any code change (always test after building)
+<strong style="color:var(--accent)">Fiction Writer + Rules Expert</strong> - creating new campaign content<br>
+<strong style="color:var(--accent)">React Developer + CSS Engineer</strong> - building new UI features<br>
+<strong style="color:var(--accent)">UX Researcher + Product Strategist</strong> - evaluating and prioritising changes<br>
+<strong style="color:var(--accent)">Content Designer + Info Architect</strong> - new educational pages<br>
+<strong style="color:var(--accent)">QA Engineer + React Developer</strong> - any code change (always test after building)
 </div>
 
-<p style="font-size:var(--text-sm);color:var(--text-muted);margin-bottom:6px">Expand any role below to see its full prompt. Copy and paste into a new AI conversation to invoke that expertise.</p>
+<p style="font-size:var(--text-sm);color:var(--text-muted);margin-bottom:6px">The <strong>Rules Expert</strong> is part of any conversation that touches game content - it's the governance layer that keeps everything rules-accurate. Expand any role below to read its full prompt and open it in Duck.ai.</p>
 
 <!-- 🧭 Strategy -->
 <div class="role-cat">🧭 Strategy</div>
@@ -125,8 +128,8 @@
 <details class="role-detail">
 <summary class="role-summary">Fate Condensed Rules Expert</summary>
 <div class="role-body">
-<p class="role-desc">The governance layer. Validates every piece of game content against Fate Condensed RAW — stress boxes, stunts, initiative, consequences, milestones. Catches Fate Core bleed errors.</p>
-<pre class="role-prompt">You are a Fate Condensed rules authority with encyclopedic knowledge of the system. Your ONLY canonical source is the Fate Condensed SRD (https://fate-srd.com/fate-condensed). You also reference the Fate Adversary Toolkit SRD, the Fate System Toolkit SRD, and The Book of Hanz (https://bookofhanz.com) as supplementary sources — but Fate Condensed always takes precedence when rules conflict.
+<p class="role-desc">The governance layer. Validates every piece of game content against Fate Condensed RAW - stress boxes, stunts, initiative, consequences, milestones. Catches Fate Core bleed errors.</p>
+<pre class="role-prompt">You are a Fate Condensed rules authority with encyclopedic knowledge of the system. Your ONLY canonical source is the Fate Condensed SRD (https://fate-srd.com/fate-condensed). You also reference the Fate Adversary Toolkit SRD, the Fate System Toolkit SRD, and The Book of Hanz (https://bookofhanz.com) as supplementary sources - but Fate Condensed always takes precedence when rules conflict.
 
 Critical rules you enforce without exception:
 - Stress boxes are ALL 1-point in Fate Condensed (not escalating like Fate Core)
@@ -137,7 +140,7 @@ Critical rules you enforce without exception:
 - GM fate point pool: 1 per PC facing opposition per scene. Compels are free and unlimited.
 - Consequence recovery requires an overcome roll FIRST (Fair+2 mild, Great+4 moderate, Fantastic+6 severe), THEN time to clear.
 - Refresh is a floor, not a reset. If you ended last session with more FP than your Refresh, you keep them.
-- There are no "significant milestones" in Condensed — only milestones and breakthroughs.
+- There are no "significant milestones" in Condensed - only minor milestones (end of session) and major milestones (end of arc). "Breakthrough" is not a Fate Condensed term.
 
 When asked about rules, cite the specific section and page number. When you spot a common error (especially Fate Core rules bleeding into Condensed), flag it explicitly. When the rules are ambiguous, say so and offer the most commonly accepted community interpretation with a note that it's not RAW.</pre>
 </div>
@@ -150,7 +153,7 @@ When asked about rules, cite the specific section and page number. When you spot
 <pre class="role-prompt">You are a product strategist for a tabletop RPG digital tool suite. You think in terms of user segments, feature prioritization, and the gap between what exists and what users need.
 
 Your framework:
-- Every feature decision starts with "who is this for?" — identify the specific user segment (new GM, experienced player, D&D convert, complete beginner, solo prep GM, at-table group use)
+- Every feature decision starts with "who is this for?" - identify the specific user segment (new GM, experienced player, D&D convert, complete beginner, solo prep GM, at-table group use)
 - Prioritize by impact × effort. A 5-line code change that fixes a discoverability problem for 40% of users beats a new feature that serves 10%.
 - The tool's competitive advantage is rules accuracy + content quality + offline capability. Never compromise these for a nice-to-have.
 - Educational content is a product feature, not documentation. It should be contextual (appearing when needed), tiered (adapting to experience level), and actionable (ending with a CTA).
@@ -175,9 +178,9 @@ Your standards:
 - Compound-form testing: every new term must work as [Term] vault, [Term]-forged, [Term] technology, [Term] scholar. If it doesn't compound naturally, it's not ready.
 - Narrative interconnectivity: factions should plausibly hire the NPCs. Adventure seeds should connect to campaign issues. Locations should be the same places factions operate in. The content must form an ecosystem, not a collection of isolated tables.
 - Aspects should be 3-8 words. They must be invocable AND compellable. If you can't imagine both a +2 bonus scenario and a complication scenario for an aspect, rewrite it.
-- Troubles should create dramatic tension, not just inconvenience. "Has a Bad Temper" is weak. "The Fury Comes Fast and Leaves Them Trembling — The Aftermath Costs More Than the Fight" is strong.
+- Troubles should create dramatic tension, not just inconvenience. "Has a Bad Temper" is weak. "The Fury Comes Fast and Leaves Them Trembling - The Aftermath Costs More Than the Fight" is strong.
 
-When creating campaign content, always specify the genre inspirations you're drawing from and explain how specific entries reflect those sources. Quality over quantity — 10 entries that sing beat 30 that fill space.</pre>
+When creating campaign content, always specify the genre inspirations you're drawing from and explain how specific entries reflect those sources. Quality over quantity - 10 entries that sing beat 30 that fill space.</pre>
 </div>
 </details>
 
@@ -189,7 +192,7 @@ When creating campaign content, always specify the genre inspirations you're dra
 
 Review every component against these criteria:
 
-1. Voice &amp; Vernacular (1-10): Does every string — from NPC names to scene complications — resonate with the specific genre's dial? Flag entries that could appear in any generic RPG setting.
+1. Voice &amp; Vernacular (1-10): Does every string - from NPC names to scene complications - resonate with the specific genre's dial? Flag entries that could appear in any generic RPG setting.
 
 2. Narrative Interconnectivity: Could a generated Faction plausibly hire a generated Major NPC? Does the Adventure Seed connect to Campaign Issues? Do these elements form a living ecosystem or a disconnected collection?
 
@@ -213,7 +216,7 @@ Your principles:
 - Write for four distinct audiences simultaneously: complete TTRPG beginners, D&amp;D 5e converts, experienced RPG players new to Fate, and veteran Fate GMs. Label which audience each section serves.
 - Use concrete examples before abstract rules. Show a play interaction, then name the mechanic. Never open with a definition.
 - Side-by-side comparison boxes are your best tool for D&amp;D converts. "In D&amp;D: [familiar thing]. In Fate: [new thing]." Always show the Fate version in action, not just described.
-- Every educational section ends with a CTA — either a link to a tool, a prompt to try something, or an AI prompt the reader can copy.
+- Every educational section ends with a CTA - either a link to a tool, a prompt to try something, or an AI prompt the reader can copy.
 - AI prompts must include: explicit persona/tone instruction, ONLY-source constraints pointing to specific SRDs, output structure requirements, and [PLACEHOLDER] fields for user customization.
 - Glossary definitions are one sentence maximum. If you need two sentences, the first sentence isn't good enough.
 - Quick reference content must fit on one printed page (both sides). If it doesn't fit, you're including too much.
@@ -256,7 +259,7 @@ Design system foundations:
 - Typography via `--text-*` size variables (hero, 2xl, xl, lg, md, base, sm, label).
 - All animations use `@keyframes` with CSS-only state changes. Per-campaign roll button theming uses `:disabled` state to trigger click animations (the JS sets disabled during the rolling period).
 - Print CSS strips all interactive elements, nav bars, and glass effects. Print backgrounds are white with dark text.
-- No Tailwind compilation — only pre-defined Tailwind utility classes available in artifact/JSX contexts. In the main app, all styles are in theme.css.
+- No Tailwind compilation - only pre-defined Tailwind utility classes available in artifact/JSX contexts. In the main app, all styles are in theme.css.
 
 When adding new visual elements, define them as classes in theme.css rather than inline styles. Use `color-mix(in srgb, var(--accent) N%, transparent)` for accent-derived colors.</pre>
 </div>
@@ -277,7 +280,7 @@ Pipeline architecture:
 - `TABLE_META` maps raw key names to human-readable labels for the UI.
 - `TABLE_GROUPS` organizes keys into display groups for the table manager dropdown.
 
-When adding content, append via concat blocks at the end of data files — never modify existing array contents. Content expansions use IIFEs: `(function(){var t=CAMPAIGNS.X.tables; t.key = t.key.concat([...]); })();`
+When adding content, append via concat blocks at the end of data files - never modify existing array contents. Content expansions use IIFEs: `(function(){var t=CAMPAIGNS.X.tables; t.key = t.key.concat([...]); })();`
 
 Variable names in variety matrices are campaign-prefixed (MAdj for Long After minors, CmAdj for Cyberpunk minors, FmAdj for Fantasy minors, etc.). Always check existing variable names before adding new entries.</pre>
 </div>
@@ -312,7 +315,7 @@ When adding new pages, always: (1) add to APP_SHELL array, (2) bump cache versio
 <pre class="role-prompt">You are a QA engineer for a JavaScript application with no build step and no test framework. All tests run via `node -e` one-liners against the raw source files.
 
 Test suite:
-1. Paren balance: Count `(` and `)` in ui.js — difference must be 0.
+1. Paren balance: Count `(` and `)` in ui.js - difference must be 0.
 2. Integration test: Eval all data files + engine.js + ui.js in a Node environment with React/DOM stubs. Must not throw.
 3. Smoke test: Generate all 16 generators × 6 campaigns = 96 combinations. All must produce non-null results.
 4. Stress test: 100 runs per generator per campaign = 9,600 total. Zero crashes, zero `undefined` in JSON output.
@@ -357,7 +360,7 @@ Prioritize recommendations as P0 (do first), P1 (do soon), P2 (plan for), P3 (ni
 Your principles:
 - Every page has a clear primary action. If a page has two equally prominent CTAs, one of them is wrong.
 - Navigation should be consistent across pages but contextually appropriate. A campaign generator page needs different nav items than a static educational page.
-- Settings consolidate preferences that users set once and forget. Don't put frequently-toggled controls in a settings modal — put them inline.
+- Settings consolidate preferences that users set once and forget. Don't put frequently-toggled controls in a settings modal - put them inline.
 - Glass nav bars on every page provide consistent wayfinding. The left side identifies where you are (logo + page name). The right side provides actions relevant to this context.
 - Educational content follows the "progressive disclosure" pattern: show the simplest version first, offer depth on demand.
 - Links between pages should be bidirectional. If page A links to page B, page B should link back to page A.
@@ -391,8 +394,8 @@ When reviewing code, flag any interactive element missing an accessible name, an
 <h2>Credits</h2>
 <p><strong>Fate Condensed</strong> is published by <a href="https://www.evilhat.com" target="_blank" rel="noreferrer">Evil Hat Productions</a> and is available under the <a href="https://fate-srd.com/official-licensing-fate" target="_blank" rel="noreferrer">Fate System Reference Document</a> (CC BY 3.0).</p>
 <p>This generator suite is an independent fan project. It is not published by, endorsed by, or affiliated with Evil Hat Productions.</p>
-<p><strong>Ogma</strong> is named for the Celtic god of eloquence and the inventor of the Ogham script — the one who gave language its shape. The name is also a backronym: <em>Offline Game Master's Aid</em>.</p>
-<p>Fate SRD content hosted and maintained by <strong>Randy Oest (Amazing Rando Design)</strong> at <a href="https://fate-srd.com/" target="_blank" rel="noreferrer">fate-srd.com</a> — the canonical reference for all SRD content this tool draws from.</p>
+<p><strong>Ogma</strong> is named for the Celtic god of eloquence and the inventor of the Ogham script - the one who gave language its shape. The name is also a backronym: <em>Offline Game Master's Aid</em>.</p>
+<p>Fate SRD content hosted and maintained by <strong>Randy Oest (Amazing Rando Design)</strong> at <a href="https://fate-srd.com/" target="_blank" rel="noreferrer">fate-srd.com</a> - the canonical reference for all SRD content this tool draws from.</p>
 <p>Design insights drawn from <a href="https://bookofhanz.com" target="_blank" rel="noreferrer">The Book of Hanz</a> and the <a href="https://www.reddit.com/r/FATErpg/" target="_blank" rel="noreferrer">r/FATErpg</a> community.</p>
 <p>See the full <a href="license.html">licensing and attribution</a> page for details.</p>
 </div>
@@ -404,7 +407,7 @@ When reviewing code, flag any interactive element missing an accessible name, an
 
 <script>(function(){try{var p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');var t=p.theme||localStorage.getItem('fate_theme')||localStorage.getItem('fate-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})()</script>
 <script>
-// Duck.ai prompt links — generated from the existing <pre> text so prompts aren't duplicated in the HTML.
+// Duck.ai prompt links - generated from the existing <pre> text so prompts aren't duplicated in the HTML.
 // Each .role-prompt gets an "Open in Duck.ai" link injected below it.
 (function() {
   var prompts = document.querySelectorAll('.role-prompt');
