@@ -1,7 +1,7 @@
 {
   "name": "Ogma — A Fate Condensed Generator Suite",
   "short_name": "Ogma",
-  "description": "Offline GM prep tool for six Fate Condensed campaign settings. No AI, no internet required.",
+  "description": "Offline GM prep tool for six Fate Condensed campaign settings.  No internet required.",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "any",
