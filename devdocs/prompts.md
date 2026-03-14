@@ -72,7 +72,7 @@ QA REQUIREMENTS (every release, no exceptions):
   2. node --check core/engine.js → no syntax errors
   3. Paren balance: (match /\(/g).length === (match /\)/g).length for all core/*.js
   4. node [smoke test from README] → 96/96 PASS
-  5. node qa_named.js → all PASS (see qa_named.js for current count)
+  5. node qa_named.js → all PASS (currently 23 - see qa_named.js for live count)
   6. bash devdocs/bump-version.sh (now lives in devdocs/)
 
 RELEASE CHECKLIST:

@@ -2,7 +2,7 @@
 ## Backlog
 
 > **Source of truth.** Update this file whenever items are added, completed, or re-prioritised.
-> Current version: **2026.03.18** · Cache: `fate-generator-2026.03.18`
+> Current version: **2026.03.22** · Cache: `fate-generator-2026.03.22`
 
 ---
 
@@ -90,7 +90,7 @@ Covers: minor stress ≤3, major refresh formula, no FP stunts, contest tie text
 |---|---|---|---|---|---|
 | 1 | **BL-52** | EP-02 | RPG Awesome sidebar icon baseline - verify `sidebar-item-icon` renders at >=14px; add explicit font-size override if needed | XS | RaIcon inherits parent font-size (13px on sidebar items). Some glyphs may clip at that size. Quick CSS audit. |
 | 2 | **BL-53** | EP-02 | Dead CSS removal - remove `.camp-card`, `.camp-hero`, `.camp-hero-*`, `.camp-name`, `.consequence-table`, `.hist-badge`, `.hist-badge-btn`, `.land-camp-list` tombstone classes | XS | Tombstoned in 2026.03.17. Review date 2026.09 but they can go earlier if confident. |
-| 3 | **BL-08** | EP-06 | Frontier/western world - `data/western.js`, 1,300+ entries | L | Highest-impact content expansion. CONTRIBUTING.md has full how-to. Review date 2026.09 but move up if capacity exists. |
+| 3 | **BL-08** | EP-06 | Frontier/western world - `data/western.js`, 1,300+ entries | L | Highest-impact content expansion. devdocs/content-authoring.md has full how-to. Review date 2026.09 but move up if capacity exists. |
 
 ---
 
@@ -216,4 +216,4 @@ Covers: minor stress ≤3, major refresh formula, no FP stunts, contest tie text
 
 ---
 
-*Last updated: 2026.03.18*
+*Last updated: 2026.03.19*

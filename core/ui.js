@@ -1263,8 +1263,8 @@ function HelpModal(props) {
   var genId = props.genId;
   var hc = HELP_CONTENT[genId] || {};
 
-  return h(Modal, {onClose: props.onClose, ariaLabel: 'Help - ' + (hc.title || genId)},
-    h(ModalHeader, {title: 'Help - ' + (hc.title || 'Generator'), onClose: props.onClose}),
+  return h(Modal, {onClose: props.onClose, ariaLabel: 'Rules - ' + (hc.title || genId)},
+    h(ModalHeader, {title: 'Rules - ' + (hc.title || 'Generator'), onClose: props.onClose}),
     h('div', {className: 'modal-body'},
       h('div', {className: 'help-section'},
         h('div', {className: 'help-section-lbl'}, 'What this generates'),
@@ -1276,12 +1276,22 @@ function HelpModal(props) {
       ),
       h('div', {className: 'help-section'},
         h('div', {className: 'help-section-lbl'}, 'Rules reference (Fate Condensed)'),
-        (hc.rules || hc.how || []).map(function(r, i) {
-          return h('div', {key: i, className: 'help-rule-row'},
-            h('span', {className: 'help-rule-icon'}, '◈'),
-            h('span', {className: 'help-rule-text'}, r)
-          );
-        })
+        (function() {
+          var entry = (HELP_ENTRIES || []).find(function(e) { return e.id === genId; });
+          var srdUrl = entry && entry.srd_url;
+          return (hc.rules || hc.how || []).map(function(r, i) {
+            return h('div', {key: i, className: 'help-rule-row'},
+              h('span', {className: 'help-rule-icon'}, '◈'),
+              h('span', {className: 'help-rule-text'}, r),
+              srdUrl && h('a', {
+                className: 'help-rule-srd',
+                href: srdUrl,
+                target: '_blank', rel: 'noopener noreferrer',
+                title: 'Read on fate-srd.com',
+              }, 'SRD ↗')
+            );
+          });
+        })()
       ),
       (hc.tips && hc.tips.length > 0) ? h('div', {className: 'help-section'},
         h('div', {className: 'help-section-lbl'}, 'Tips'),
@@ -1308,19 +1318,8 @@ function HelpModal(props) {
           h('div', {style: {fontSize: 14, color: 'var(--text)', lineHeight: 1.55, padding: '8px 10px', background: 'var(--inset)', borderRadius: 8, borderLeft: '2px solid var(--c-red)'}}, hc.compel_example)
         )
       ),
-      // BL-34: SRD deep link
-      (function() {
-        var entry = (HELP_ENTRIES || []).find(function(e) { return e.id === genId; });
-        return (entry && entry.srd_url) ? h('div', {style: {marginTop: 12}},
-          h('a', {
-            href: entry.srd_url,
-            target: '_blank', rel: 'noopener noreferrer',
-            style: {fontSize: 13, color: 'var(--accent)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 5},
-          }, '📖 Read the SRD rule →')
-        ) : null;
-      })(),
       h('div', {style: {marginTop: 20, paddingTop: 14, borderTop: '1px solid var(--border)'}},
-        h('div', {className: 'help-section-lbl', style: {marginBottom: 8}}, 'Quick Reference - All Generators'),
+        h('div', {className: 'help-section-lbl', style: {marginBottom: 8}}, 'Quick Reference'),
         h('div', {className: 'help-gen-grid'},
           GENERATORS.map(function(g) {
             var hc = HELP_CONTENT[g.id] || {};
@@ -1366,7 +1365,7 @@ function HelpModal(props) {
             ['P', 'Pin current result'],
             ['G', 'Cycle to next generator'],
             ['I', 'Inspiration mode - roll 3 options, pick one'],
-            ['?', 'Open this help panel'],
+            ['?', 'Open Rules panel'],
             ['Esc', 'Close any open panel or sidebar'],
           ].map(function(row) {
             return h('div', {key: row[0], className: 'kbd-row'},
@@ -1558,10 +1557,10 @@ function HelpLevelOnboardingModal(props) {
 function SettingsModal(props) {
   var TEXT_SIZE_NAMES = ['Default', 'Large', 'Extra Large'];
   var LEVEL_OPTIONS = [
-    {id: 'experienced', label: 'Experienced Fate GM', desc: 'Minimal rules - just the generator output'},
-    {id: 'new_fate', label: 'New to Fate', desc: 'Full rules explanations with Fate Condensed page references'},
-    {id: 'dnd_convert', label: 'Coming from D&D', desc: 'Rules explanations + D&D contrast notes'},
-    {id: 'new_ttrpg', label: 'New to TTRPGs', desc: 'Gentle introductions assuming no prior RPG experience'},
+    {id: 'experienced', label: 'I know Fate well',       desc: 'Just the result - no coaching, no rules reference'},
+    {id: 'new_fate',    label: 'I play other RPGs',       desc: 'Full rules with Fate Condensed page references'},
+    {id: 'dnd_convert', label: 'I play D&D / Pathfinder', desc: 'Rules + side-by-side D&D contrast notes'},
+    {id: 'new_ttrpg',   label: 'New to tabletop RPGs',    desc: 'Gentle explanations, no prior RPG experience assumed'},
   ];
   return h(Modal, {onClose: props.onClose, label: 'Settings'},
     h('div', {className: 'modal-box', style: {maxWidth: 460}},
@@ -1857,8 +1856,9 @@ function LandingApp() {
                 h('div', {className: 'land-gen-group-items'},
                   grp.gens.map(function(gid) {
                     var g = GENERATORS.find(function(x) { return x.id === gid; });
-                    return g ? h('span', {key: gid, className: 'land-gen-item'},
-                      g.icon + ' ' + g.label
+                    return g ? h('div', {key: gid, className: 'land-gen-item'},
+                      h('span', {className: 'land-gen-item-name'}, g.icon + ' ' + g.label),
+                      g.sub && h('span', {className: 'land-gen-item-sub'}, g.sub)
                     ) : null;
                   })
                 )
@@ -2901,8 +2901,12 @@ function CampaignApp(props) {
         title: 'Menu',
       }, showSidebar ? '✕' : '☰'),
       h('a', {href: '../index.html', className: 'topbar-brand', 'aria-label': 'Ogma home'},
-        h('span', {className: 'topbar-brand-icon'}, '🎲'),
-        h('span', {className: 'topbar-brand-name'}, 'Ogma'),
+        h('span', {className: 'topbar-ogma'},
+          h('strong', null, 'O'), 'n-demand ',
+          h('strong', null, 'G'), 'enerator for ',
+          h('strong', null, 'M'), 'asterful ',
+          h('strong', null, 'A'), 'dventures'
+        ),
         h('span', {className: 'topbar-brand-sep'}, '·'),
         h('span', {className: 'topbar-brand-world'},
           camp.meta.name,
@@ -3092,13 +3096,6 @@ function CampaignApp(props) {
             h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.guide})),
             h('span', {className: 'sidebar-item-label'}, 'Campaign Guide')
           ),
-          h('button', {
-            className: 'sidebar-tool-btn',
-            onClick: function() { showPanel('help'); },
-          },
-            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.rules})),
-            h('span', {className: 'sidebar-item-label'}, 'Rules')
-          ),
           h('a', {href: '../campaigns/transition.html', className: 'sidebar-tool-btn'},
             h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.dnd_guide})),
             h('span', {className: 'sidebar-item-label'}, 'D&D Guide')
@@ -3132,7 +3129,8 @@ function CampaignApp(props) {
         h('div', {className: 'sidebar-legal'},
           'Fate™ is a trademark of Evil Hat Productions, LLC.',
           h('br', null),
-          'Licensed under CC BY 3.0'
+          h('a', {href: '../license.html', style: {color: 'inherit', textDecoration: 'underline', opacity: 0.7}},
+            'License & Attribution (CC BY 3.0)')
         )
       ),
 
@@ -3214,12 +3212,12 @@ function CampaignApp(props) {
               h('div', {className: 'panel-toolbar-right'},
                 // BL-21: Help always visible in result panel (mobile + desktop)
                 h('button', {
-                  className: 'btn btn-ghost',
+                  className: 'btn btn-ghost btn-sm',
                   onClick: function() { showPanel('help'); },
-                  title: 'Help and rules reference',
-                  'aria-label': 'Help',
-                  style: {fontSize: 13, padding: '4px 10px', minHeight: 0},
-                }, '?'),
+                  title: 'Rules reference for this generator',
+                  'aria-label': 'Rules reference',
+                  'aria-keyshortcuts': '?',
+                }, h(RaIcon, {n: RA_ICONS.rules}), ' Rules'),
                 // BL-22: Consolidated Share button (Export + Print inline drawer)
                 result && h('button', {
                   className: 'btn btn-ghost' + (showExport ? ' active' : ''),
@@ -3291,11 +3289,9 @@ function CampaignApp(props) {
               }
 
               var allRules = hc.rules || hc.how || [];
-              // For new_ttrpg: show max 3 rules and simplify labels
+              // new_ttrpg: first 3 rules only, simpler labels
               var showRules = lvl === 'new_ttrpg' ? allRules.slice(0, 3) : allRules;
-              var rulesLabel = lvl === 'new_ttrpg' ? 'How It Works' :
-                              lvl === 'dnd_convert' ? 'Rules - Fate Condensed (D&D differences highlighted)' :
-                              'Rules - Fate Condensed';
+              var rulesLabel = lvl === 'new_ttrpg' ? 'How It Works' : 'Rules - Fate Condensed';
 
               return h('div', {className: 'fade-up'},
                 // Generator title
@@ -3331,19 +3327,25 @@ function CampaignApp(props) {
                 showRules.length > 0 && h('div', {style: {marginBottom: 14}},
                   h('div', {className: 'lbl'}, rulesLabel),
                   showRules.map(function(r, i) {
-                    var isDnd = /D&D|hit point|HP|spell slot|initiative.*order|AC|armor class/i.test(r);
-                    return h('div', {key: i, className: 'help-rule-row', style: isDnd && lvl === 'dnd_convert' ? {
-                      background: 'color-mix(in srgb, var(--c-blue) 6%, transparent)',
-                      borderLeft: '3px solid var(--c-blue)', borderRadius: '0 6px 6px 0',
-                      padding: '6px 10px', marginLeft: -10,
-                    } : null},
-                      h('span', {className: 'help-rule-icon'}, isDnd && lvl === 'dnd_convert' ? '⚔' : '◈'),
+                    return h('div', {key: i, className: 'help-rule-row'},
+                      h('span', {className: 'help-rule-icon'}, '◈'),
                       h('span', {className: 'help-rule-text'}, r)
                     );
                   }),
                   lvl === 'new_ttrpg' && allRules.length > 3 && h('div', {style: {
                     fontSize: 'var(--text-label)', color: 'var(--text-muted)', marginTop: 6, fontStyle: 'italic',
                   }}, 'Change Help Level in ⚙ Settings to see all ' + allRules.length + ' rules.')
+                ),
+                // D&D convert: dedicated comparison note
+                lvl === 'dnd_convert' && hc.dnd_notes && h('div', {style: {
+                  background: 'color-mix(in srgb, var(--c-blue) 6%, transparent)',
+                  borderLeft: '3px solid var(--c-blue)', borderRadius: '0 8px 8px 0',
+                  padding: '10px 14px', marginBottom: 14,
+                }},
+                  h('div', {style: {fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--c-blue)', marginBottom: 5, display: 'flex', alignItems: 'center', gap: 5}},
+                    h(RaIcon, {n: 'crossed-swords'}), ' Vs. D&D / Pathfinder'
+                  ),
+                  h('div', {style: {fontSize: 'var(--text-sm)', color: 'var(--text-dim)', lineHeight: 1.65}}, hc.dnd_notes)
                 ),
                 // GM Tip (gated by GM Mode)
                 gmMode && hc.gm_tips && h('div', {className: 'gm-note', style: {marginTop: 12}},
@@ -3624,6 +3626,13 @@ function CampaignApp(props) {
     }, rolling ? '…' : '🎲')
 
       ) // close content-panel
+
+      // ── Content panel footer — license (mobile: sidebar hidden by default) ──
+      ,h('footer', {className: 'camp-content-footer'},
+        'Fate™ trademark of Evil Hat Productions, LLC. · ',
+        h('a', {href: '../license.html', className: 'camp-content-footer-link'},
+          'License & Attribution')
+      )
     ) // close app-body
   ); // close app-shell
 }

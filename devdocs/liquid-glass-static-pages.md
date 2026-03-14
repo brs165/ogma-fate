@@ -217,5 +217,5 @@ Ensure any new glass surface added to static pages is excluded from print:
 
 ---
 
-*Document version: 2026.03.14*  
+*Document version: see devdocs/CHANGELOG.md*  
 *Maintained by the Ogma CSS/Design Engineer. Update whenever a new static page is added or BL-36 adaptive vibrancy ships.*

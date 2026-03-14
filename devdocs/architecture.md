@@ -453,7 +453,10 @@ Never bump mid-sprint. One bump per release.
 
 Runs all 16 generators × 6 campaigns = 96 combinations. Confirms each returns a non-null, non-undefined object. Runs in Node (~100ms).
 
-### Named Assertions (18/18)
+### Named Assertions
+
+> Current count: 23 assertions. See `qa_named.js` for the live list.
+
 
 `qa_named.js` in project root. Covers:
 - NA-01: Minor NPC stress ≤ 3 (all 6 campaigns)
@@ -483,4 +486,4 @@ Runs 19,200 random generator calls. Checks zero crashes and zero undefined resul
 
 ---
 
-*Document version: 2026.03.12*
+*Document version: see devdocs/CHANGELOG.md*

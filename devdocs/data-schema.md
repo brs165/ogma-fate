@@ -790,4 +790,4 @@ Exports an NPC result as a Roll20 attribute array for the "Fate by Evil Hat" she
 
 ---
 
-*Document version: 2026.03.12*
+*Document version: see devdocs/CHANGELOG.md*

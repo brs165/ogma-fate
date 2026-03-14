@@ -57,7 +57,7 @@ Secondary objectives, in priority order:
 **Rules for conduct:**
 - Always check paren balance after any `ui.js` edit: `(s.match(/\(/g)||[]).length - (s.match(/\)/g)||[]).length === 0`
 - Always run 96/96 smoke test before declaring a sprint done
-- Always run `node qa_named.js` (18/18 named assertions) before releasing
+- Always run `node qa_named.js` (23 named assertions - check qa_named.js for current count) before releasing
 - Never introduce ES module syntax - `file://` compatibility is non-negotiable
 - Result renderers are stateful React components - `useState` for interactive elements (stress boxes, contest tracks, compel buttons). Do not use global state for per-result interactions.
 - `core/engine.js` has zero DOM/React dependencies - keep it that way so it stays Node-testable
@@ -168,8 +168,8 @@ box-shadow: var(--glass-inset), var(--glass-shadow);
 | NA-07 | Postapoc faction prefix/suffix arrays have no duplicates |
 
 **Rules for conduct:**
-- The release checklist is: (1) bump-version.sh, (2) BACKLOG.md update, (3) README.md update, (4) zip with `.zip` extension, (5) copy to `/mnt/user-data/outputs/`
-- Never ship without 96/96 smoke and 18/18 named assertions
+- The release checklist is: (1) bump-version.sh, (2) devdocs/BACKLOG.md update, (3) README.md update, (4) zip with `.zip` extension, (5) copy to `/mnt/user-data/outputs/`
+- Never ship without 96/96 smoke and all named assertions (run qa_named.js)
 - When a new rule is enforced (e.g. "breakthrough" → "major milestone"), add a named assertion to prevent regression
 - Node 16+ required. No browser required for QA.
 
@@ -203,17 +203,17 @@ box-shadow: var(--glass-inset), var(--glass-shadow);
 
 ### 8. Infrastructure / Release Engineer
 
-**What they do:** Owns versioning, the release pipeline, `bump-version.sh`, and `sw.js`. Manages the CalVer scheme and cache versioning. Ensures the service worker invalidates correctly on each release.
+**What they do:** Owns versioning, the release pipeline, `devdocs/bump-version.sh`, and `sw.js`. Manages the CalVer scheme and cache versioning. Ensures the service worker invalidates correctly on each release.
 
 **Their domain:**
 - CalVer scheme: `YYYY.MM.B` - year · month · build within that month
-- `bump-version.sh` - updates version string in `sw.js` (cache key) and `about.html`
+- `devdocs/bump-version.sh` - updates version string in `sw.js` (cache key) and `about.html`
 - `sw.js` - cache-first service worker, `APP_SHELL` array must include all critical files
 - `manifest.json` - PWA manifest, shortcuts, icons
 - `?v=N` cache-busting query parameter on all script tags (stamped by bump-version.sh)
 
 **Release checklist (enforced every version):**
-1. `bash bump-version.sh` - updates CalVer in `sw.js` + `about.html`
+1. `bash devdocs/bump-version.sh` (or `bash bump-version.sh` - root forwards) - updates CalVer in `sw.js` + `about.html`
 2. Update `BACKLOG.md` - current version line + completed items table
 3. Update `README.md` - version reference
 4. Zip filename must include `.zip` extension: `fate-generator-YYYY.MM.B.zip`
@@ -288,5 +288,5 @@ Each world has a distinct register that table content must honour.
 
 ---
 
-*Document version: 2026.03.12*
+*Document version: see devdocs/CHANGELOG.md*
 *Maintained by the Ogma development team. Update whenever a new role is added, a conduct rule changes, or a constraint is lifted.*

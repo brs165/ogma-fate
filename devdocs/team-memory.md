@@ -6,8 +6,16 @@
 >
 > **Size guidance:** If this grows past ~300 lines, split off the oldest "lessons learned" into an archive section or a separate `team-memory-archive.md`. The working copy should stay fast to read.
 
----
 
+## Versioning Rule - Devdocs Review
+
+**When the patch number ends in `.2` (e.g. 2026.03.12, 2026.04.2, 2026.05.12), review and update all devdocs before shipping.**
+
+Files to review: `devdocs/README.md`, `devdocs/prompts.md`, `devdocs/virtualteamroles.md`, `devdocs/architecture.md`, `devdocs/data-schema.md`, `devdocs/liquid-glass-static-pages.md`, `devdocs/content-authoring.md`, `devdocs/team-memory.md` itself.
+
+Check for: stale version references, outdated feature lists, removed items still documented, new items not yet documented. Update BACKLOG.md and CHANGELOG.md as usual regardless of version.
+
+---
 ## Current Project State
 
 **Tool:** Ogma - On-demand Generator for Masterful Adventures
@@ -94,8 +102,8 @@ If a function receives `campName` as a prop but the call site passes `campName: 
 
 | Decision | Status | Deadline |
 |----------|--------|----------|
-| OG meta URL (GitHub username/repo) | RESOLVED: brs165/ogma-fate | - |
-| BL-12 (OG meta URLs) | SHIPPED 2026.03.16 | - |
+| OG meta URL (GitHub username/repo) | Resolved - brs165/ogma-fate | - |
+| BL-12 (OG meta URLs) | Shipped | - |
 | Parking Lot review (BL-02, BL-05, BL-08, BL-11, PL-01/02/03) | Pending | 2026.09.01 |
 | Stunt generator chain (BL-02/05/11) | Parked | 2026.09.01 |
 | Build toolchain migration (PL-03) | Parked — breaks file:// compat | 2026.09.01 |

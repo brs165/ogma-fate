@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark" data-campaign="postapoc">
 <head>
+  <script>/* Theme restore - runs before CSS to prevent flash */
+  (function(){try{var p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');var t=p.theme||localStorage.getItem('fate_theme')||localStorage.getItem('fate-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})()</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -34,7 +36,7 @@
   <meta name="twitter:image" content="https://brs165.github.io/ogma-fate/assets/img/og-default.png">
 
   <link rel="stylesheet" href="https://unpkg.com/rpg-awesome@0.2.0/css/rpg-awesome.min.css">
-  <link rel="stylesheet" href="../assets/css/theme.css?v=18">
+  <link rel="stylesheet" href="../assets/css/theme.css?v=22">
 </head>
 <body>
   <div id="root">
@@ -46,18 +48,13 @@
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
-  <script src="../data/shared.js?v=18"></script>
-  <script src="../data/universal.js?v=18"></script>
-  <script src="../data/postapoc.js?v=18"></script>
-  <script src="../core/engine.js?v=18"></script>
-  <script src="../core/db.js?v=18"></script>
-  <script src="../core/ui.js?v=18"></script>
+  <script src="../data/shared.js?v=22"></script>
+  <script src="../data/universal.js?v=22"></script>
+  <script src="../data/postapoc.js?v=22"></script>
+  <script src="../core/engine.js?v=22"></script>
+  <script src="../core/db.js?v=22"></script>
+  <script src="../core/ui.js?v=22"></script>
   <script>
-    // Apply saved theme immediately (prevents flash)
-    (function() {
-      var raw=localStorage.getItem('fate_prefs_v1');var t=(raw?JSON.parse(raw).theme:null)||localStorage.getItem('fate_theme')||'dark';
-      document.documentElement.setAttribute('data-theme', t);
-    })();
 
     ReactDOM.createRoot(document.getElementById('root')).render(
       React.createElement(CampaignApp, { campId: 'postapoc' })
@@ -73,6 +70,6 @@
       });
     }
   </script>
-  <script src="../core/intro.js?v=18"></script>
+  <script src="../core/intro.js?v=22"></script>
 </body>
 </html>
