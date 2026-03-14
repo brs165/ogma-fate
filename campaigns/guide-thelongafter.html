@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-campaign="thelongafter">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Long After — Campaign Guide</title>
+<link rel="icon" type="image/svg+xml" href="../assets/favicons/icon.svg">
+<link rel="stylesheet" href="../assets/css/theme.css?v=10">
+<style>
+.cg{max-width:680px;margin:0 auto;padding:24px 20px 80px;position:relative;z-index:1}
+.cg h1{font-size:var(--text-hero);font-weight:800;color:var(--text);margin-bottom:4px;letter-spacing:-0.02em}
+.cg-sub{font-size:var(--text-md);color:var(--accent,var(--text-dim));font-weight:600;margin-bottom:16px}
+.cg h2{font-size:var(--text-xl);font-weight:800;color:var(--text);margin:32px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.cg p{font-size:var(--text-base);color:var(--text-dim);line-height:1.75;margin-bottom:14px}
+.cg strong{color:var(--text);font-weight:600}
+.cg a{color:var(--c-blue);text-decoration:none}.cg a:hover{text-decoration:underline}
+.cg-card{background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);border:1px solid var(--glass-border);border-radius:var(--glass-radius);padding:20px;margin:18px 0}
+.cg-stats{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.cg-stat{flex:1;min-width:90px;text-align:center;padding:12px 8px;background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);border:1px solid var(--glass-border);border-radius:var(--glass-radius-sm)}
+.cg-stat b{display:block;font-size:var(--text-xl);font-weight:800;color:var(--accent,var(--text))}
+.cg-stat span{font-size:var(--text-label);color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em}
+.cg-sample{border-left:3px solid var(--accent,var(--gold,#888));padding:10px 16px;margin:8px 0;font-style:italic;color:var(--text-dim);font-size:var(--text-sm);border-radius:0 var(--glass-radius-sm) var(--glass-radius-sm) 0;background:var(--inset)}
+.cg-cta{text-align:center;margin-top:32px}.cg-cta a{display:inline-block;padding:12px 28px;border-radius:100px;text-decoration:none;font-weight:700;font-size:var(--text-sm);margin:4px}
+.cg-ft{text-align:center;padding:28px 20px;font-size:var(--text-label);color:var(--text-muted);border-top:1px solid var(--border)}.cg-ft a{color:var(--text-dim);text-decoration:none}
+@media print{.land-topnav,.cg-ft,.cg-cta{display:none!important}body{background:#fff!important;color:#111!important}}
+</style>
+</head>
+<body>
+<nav class="land-topnav" role="navigation" aria-label="Site navigation">
+  <a href="../index.html" class="land-topnav-brand" style="text-decoration:none">🎲 Ogma</a>
+  <div class="land-topnav-actions">
+    <a href="../campaigns/thelongafter.html" class="btn btn-ghost land-topnav-btn" style="font-size:13px;text-decoration:none">🎲 Open Generator</a>
+    <a href="../learn.html" class="btn btn-ghost land-topnav-btn" style="font-size:13px;text-decoration:none">📖 Learn</a>
+    <a href="../about.html" class="btn btn-ghost land-topnav-btn land-topnav-hide-sm" style="font-size:13px;text-decoration:none">About</a>
+    <button class="btn btn-icon btn-ghost" onclick="var n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var _p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');_p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p));}catch(_e){}" title="Toggle theme">◑</button>
+  
+    <button class="land-topnav-hamburger" id="topnav-hbg" aria-label="Open navigation" aria-expanded="false">☰</button>
+    <div class="land-topnav-dropdown" id="topnav-dd">
+        <a href="../campaigns/thelongafter.html">🎲 Open Generator</a>
+        <a href="../learn.html">📖 Learn</a>
+        <a href="../campaigns/transition.html">⚔ D&D Guide</a>
+        <a href="../about.html">About</a>
+        <button onclick="window.print()">🖨 Print</button>
+        <button onclick="var n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var _p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');_p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p));}catch(_e){}" >◑ Theme</button>
+      </div></div>
+</nav>
+<div class="cg">
+<h1>◈ The Long After</h1>
+<div class="cg-sub">Sword-and-Planet Dying Earth</div>
+<p>The world ended. The world that replaced it thinks the debris is magic. Ancient Phade vaults litter a landscape of sand, fungal forests, and city-states ruled by warlords who claim divine authority because they can read the error messages. Delvers descend into the ruins to recover what was lost. The vaults are not empty. The technology is not dead.</p>
+<div class="cg-stats">
+<div class="cg-stat"><b>1917+</b><span>Entries</span></div>
+<div class="cg-stat"><b>14</b><span>Opposition</span></div>
+<div class="cg-stat"><b>28</b><span>Stunts</span></div>
+<div class="cg-stat"><b>181</b><span>Names</span></div>
+<div class="cg-stat"><b>16</b><span>Challenges</span></div>
+</div>
+<h2>Tone &amp; Atmosphere</h2>
+<p>Pulp adventure with literary depth. The action is broad — sky-chases, arena fights, beast-riding — but the world asks real questions about technology, authority, and building civilisation on someone else's ruins. The Phade are not gods. The warlords know this. The people do not.</p>
+<h2>For Players</h2>
+<p>You are delvers, wanderers, and rebels in a world where understanding is the most valuable commodity. Phade technology grants power but changes those who use it. Every vault teaches you something — and something in the vault learns about you.</p>
+<h2>Key Factions</h2>
+<p>Warlord states (military theocracies built on partial Phade knowledge), delver crews (scavenger-scholars), arena circuits (blood-sport economies), Phade cults (true believers in the old gods' return), sky-city remnants (last survivors of the old civilisation).</p>
+<h2>Inspirations</h2>
+<div class="cg-card"><p style="margin:0">Nausicaä of the Valley of the Wind, The Book of the New Sun, Thundarr the Barbarian, Horizon Zero Dawn, She-Ra, The Dying Earth</p></div>
+<h2>Sample Troubles</h2>
+<p>Every PC has a Trouble — the thing that makes their life complicated:</p>
+<div class="cg-sample">Cannot Resist the Pull of Forbidden Technology</div>
+<div class="cg-sample">My Empire Was Built on a Lie</div>
+<div class="cg-sample">The Phade Shard Is Eating My Mind</div>
+<div class="cg-sample">Every Victory Costs Me Someone I Love</div>
+<h2>Sample Locations</h2>
+<p>Adventure seeds start here. Each suggests a situation, not just a place:</p>
+<div class="cg-sample">A sealed Phade vault that began cycling open three nights ago</div>
+<div class="cg-sample">A warlord's fortress built directly on top of a buried city</div>
+<div class="cg-sample">The last sky-road waystation before the Deep Wastes</div>
+<div class="cg-sample">An arena city where the games have been suspended without explanation</div>
+<h2>Content Overview</h2>
+<div class="cg-card"><p style="margin:0;font-size:var(--text-sm);line-height:2;color:var(--text-dim)">
+<strong>NPCs:</strong> 121 first names, 60 epithets, variety-matrix concepts, 54 troubles, 28 stunts<br>
+<strong>Scenes:</strong> 21 zones, 57 movement, 51 cover, 65 objects<br>
+<strong>Adventures:</strong> 40 locations, 34 objectives, 35 complications<br>
+<strong>Encounters:</strong> 14 opposition, 68 twists, 36 victories, 35 defeats<br>
+<strong>Factions:</strong> 16 goals, 16 methods, 14 face roles<br>
+<strong>Compels:</strong> 50 situations, 37 consequences
+</p></div>
+<div class="cg-cta">
+<a href="thelongafter.html" style="background:var(--accent,var(--c-blue));color:#fff">🎲 Open Generator</a>
+<a href="sessionzero.html" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
+</div>
+</div>
+<footer class="cg-ft"><div>Fate™ is a trademark of <a href="https://www.evilhat.com" target="_blank" rel="noreferrer">Evil Hat Productions, LLC</a>.</div>
+<div><a href="../license.html">CC BY 3.0</a> · <a href="../about.html">About</a></div></footer>
+<script>(function(){try{var p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');var t=p.theme||localStorage.getItem('fate_theme')||localStorage.getItem('fate-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})()</script>
+<script>
+(function(){
+  var btn=document.getElementById('topnav-hbg');
+  var dd=document.getElementById('topnav-dd');
+  if(!btn||!dd) return;
+  btn.addEventListener('click',function(e){e.stopPropagation();dd.classList.toggle('open');btn.setAttribute('aria-expanded',dd.classList.contains('open'));});
+  document.addEventListener('click',function(){dd.classList.remove('open');btn.setAttribute('aria-expanded','false');});
+})();
+</script>
+</body>
+</html>

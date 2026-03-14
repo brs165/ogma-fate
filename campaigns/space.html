@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-campaign="space">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Primary meta -->
+  <title>Void Runners — Ogma</title>
+  <meta name="description" content="Space opera. Jump gates, hostile aliens, and a crew held together by debt and loyalty.">
+  <meta name="author" content="Ogma — A Ogma — A Fate Condensed Generator Suite">
+  <meta name="theme-color" content="#d4a832">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="../assets/favicons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicons/icon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicons/apple-touch-icon.png">
+
+  <!-- PWA manifest -->
+  <link rel="manifest" href="../manifest.json">
+
+  <!-- OpenGraph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Void Runners — Fate Condensed Generator">
+  <meta property="og:description" content="Space opera. Jump gates, hostile aliens, and a crew held together by debt and loyalty.">
+  <meta property="og:url" content="https://your-username.github.io/fate-generator/campaigns/space.html">
+  <meta property="og:image" content="https://your-username.github.io/fate-generator/assets/img/og-default.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <!-- Twitter card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Void Runners — Fate Condensed Generator">
+  <meta name="twitter:description" content="Space opera. Jump gates, hostile aliens, and a crew held together by debt and loyalty.">
+  <meta name="twitter:image" content="https://your-username.github.io/fate-generator/assets/img/og-default.png">
+
+  <link rel="stylesheet" href="../assets/css/theme.css?v=10">
+</head>
+<body>
+  <div id="root">
+    <noscript>
+      <p style="padding:40px;text-align:center;font-family:sans-serif;">
+        JavaScript is required. <a href="../index.html">Return to campaign list.</a>
+      </p>
+    </noscript>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+  <script src="../data/shared.js?v=10"></script>
+  <script src="../data/universal.js?v=10"></script>
+  <script src="../data/space.js?v=10"></script>
+  <script src="../core/engine.js?v=10"></script>
+  <script src="../core/db.js?v=10"></script>
+  <script src="../core/ui.js?v=10"></script>
+  <script>
+    // Apply saved theme immediately (prevents flash)
+    (function() {
+      var raw=localStorage.getItem('fate_prefs_v1');var t=(raw?JSON.parse(raw).theme:null)||localStorage.getItem('fate_theme')||'dark';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+
+    ReactDOM.createRoot(document.getElementById('root')).render(
+      React.createElement(CampaignApp, { campId: 'space' })
+    );
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('sw.js').catch(function(err) {
+          // SW registration failed (e.g. file:// protocol) — app still works normally
+          console.info('[SW] Registration skipped:', err.message);
+        });
+      });
+    }
+  </script>
+  <script src="../core/intro.js?v=10"></script>
+</body>
+</html>
