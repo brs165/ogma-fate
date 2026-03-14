@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
+  <script>/* Theme restore - must run before CSS to prevent flash of unstyled dark mode */
+  (function(){try{var p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');var t=p.theme||localStorage.getItem('fate_theme')||localStorage.getItem('fate-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})()</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>About Ogma - On-demand Generator for Masterful Adventures</title>
   <meta name="description" content="About Ogma - how it was built, what's inside, and how to use it offline.">
   <link rel="icon" type="image/svg+xml" href="assets/favicons/icon.svg">
   <link rel="stylesheet" href="https://unpkg.com/rpg-awesome@0.2.0/css/rpg-awesome.min.css">
-  <link rel="stylesheet" href="assets/css/theme.css?v=18">
+  <link rel="stylesheet" href="assets/css/theme.css?v=22">
   <style>
     .about{max-width:680px;margin:0 auto;padding:24px 20px 80px;position:relative;z-index:1}
     .about h1{font-size:var(--text-hero);font-weight:800;color:var(--text);margin-bottom:8px;letter-spacing:-0.02em}
@@ -60,10 +62,10 @@
 <h1>About Ogma</h1>
 
 <div class="about-version" role="status" aria-label="Suite version information">
-  <span class="about-version-badge">2026.03.18</span>
+  <span class="about-version-badge">2026.03.22</span>
   <div class="about-version-meta">
     <strong style="color:var(--text)">Ogma - A Fate Condensed Generator Suite</strong><br>
-    March 2026 · Cache: <code>fate-generator-2026.03.18</code> · 16 generators · 6 campaign worlds · 9,750+ table entries
+    March 2026 · Cache: <code>fate-generator-2026.03.22</code> · 16 generators · 6 campaign worlds · 9,750+ table entries
   </div>
   <div class="about-version-qa">✓ 96/96 smoke · 19,200 stress · 19 named assertions · toMarkdown 96/96</div>
 </div>
@@ -96,9 +98,9 @@
 <div class="about-card" style="text-align:center;padding:24px;">
   <div style="font-size:var(--text-base);font-weight:700;color:var(--text);margin-bottom:6px;">Download for Offline Use</div>
   <div style="font-size:var(--text-sm);color:var(--text-dim);line-height:1.6;margin-bottom:16px;max-width:400px;margin-left:auto;margin-right:auto;">Complete suite · No internet required · Works from USB or local folder</div>
-  <a href="fate-generator-2026.03.18.zip" download
+  <a href="fate-generator-2026.03.22.zip" download
      style="display:inline-block;padding:12px 32px;background:var(--accent,#d4a832);color:#000;font-weight:700;font-size:var(--text-sm);border-radius:100px;text-decoration:none;letter-spacing:0.02em;">
-    ⬇ Download fate-generator-2026.03.18.zip
+    ⬇ Download fate-generator-2026.03.22.zip
   </a>
   <div style="font-size:var(--text-label);color:var(--text-muted);margin-top:10px;">2026.03.13 · 6 worlds · 16 generators · ~500 KB</div>
 </div>
@@ -405,7 +407,6 @@ When reviewing code, flag any interactive element missing an accessible name, an
   <div><a href="license.html">CC BY 3.0</a> · <a href="https://fate-srd.com/official-licensing-fate" target="_blank" rel="noreferrer">Fate Licensing</a> · <a href="CONTRIBUTING.md" target="_blank" rel="noreferrer">Contribute</a></div>
 </footer>
 
-<script>(function(){try{var p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');var t=p.theme||localStorage.getItem('fate_theme')||localStorage.getItem('fate-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})()</script>
 <script>
 // Duck.ai prompt links - generated from the existing <pre> text so prompts aren't duplicated in the HTML.
 // Each .role-prompt gets an "Open in Duck.ai" link injected below it.
