@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coming from D&D — Fate Condensed Transition Guide</title>
+  <meta name="description" content="A practical guide for D&D 5e players and GMs transitioning to Fate Condensed. Side-by-side comparisons, examples, and FAQ.">
+  <meta name="theme-color" content="#5AC8FA">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicons/icon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicons/apple-touch-icon.png">
+  <link rel="manifest" href="../manifest.json">
+  <link rel="stylesheet" href="../assets/css/theme.css?v=10">
+  <style>
+    .tg{max-width:680px;margin:0 auto;padding:24px 20px 80px;position:relative;z-index:1}
+    .tg h1{font-size:var(--text-hero);font-weight:800;letter-spacing:-0.02em;color:var(--text);line-height:1.1;margin-bottom:10px}
+    .tg-lead{font-size:var(--text-md);color:var(--text-dim);line-height:1.7;margin-bottom:40px}
+    .tg-toc{background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);border:1px solid var(--glass-border);border-radius:var(--glass-radius);padding:20px 24px;margin-bottom:40px}
+    .tg-toc b{font-size:var(--text-sm);font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;display:block;margin-bottom:10px}
+    .tg-toc a{display:block;color:var(--c-blue);text-decoration:none;font-size:var(--text-sm);line-height:2}
+    .tg-toc a:hover{text-decoration:underline}
+    .tg-s{margin-bottom:48px;scroll-margin-top:24px}
+    .tg-s h2{font-size:var(--text-xl);font-weight:800;color:var(--text);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+    .tg-b{font-size:var(--text-base);color:var(--text-dim);line-height:1.75}
+    .tg-b p{margin-bottom:14px}
+    .tg-b strong{color:var(--text);font-weight:600}
+    .tg-b em{color:var(--gold,var(--text))}
+    .tg-dnd{background:rgba(90,200,250,0.06);border-left:3px solid var(--c-blue);padding:14px 18px;margin:18px 0;border-radius:0 var(--glass-radius-sm) var(--glass-radius-sm) 0}
+    .tg-dnd b{font-weight:700;color:var(--c-blue);font-size:var(--text-sm);display:block;margin-bottom:4px}
+    .tg-fate{background:rgba(76,217,100,0.06);border-left:3px solid var(--c-green);padding:14px 18px;margin:18px 0;border-radius:0 var(--glass-radius-sm) var(--glass-radius-sm) 0}
+    .tg-fate b{font-weight:700;color:var(--c-green);font-size:var(--text-sm);display:block;margin-bottom:4px}
+    .tg-ex{background:var(--inset);border-left:3px solid var(--gold,#888);padding:14px 18px;margin:18px 0;border-radius:0 var(--glass-radius-sm) var(--glass-radius-sm) 0;color:var(--text-dim);font-style:italic}
+    .tg-ex strong{font-style:normal}
+    .tg-c{background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);border:1px solid var(--glass-border);border-radius:var(--glass-radius);padding:20px;margin:18px 0}
+    .tg-c h3{font-size:var(--text-md);font-weight:700;color:var(--text);margin-bottom:8px}
+    .tg-vs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}
+    .tg-vs>div{padding:14px 16px;border-radius:var(--glass-radius-sm)}
+    .tg-vs .d{background:rgba(90,200,250,0.06);border:1px solid rgba(90,200,250,0.15)}
+    .tg-vs .f{background:rgba(76,217,100,0.06);border:1px solid rgba(76,217,100,0.15)}
+    .tg-vs b{font-size:var(--text-label);font-weight:700;letter-spacing:0.08em;text-transform:uppercase;display:block;margin-bottom:6px}
+    .tg-vs .d b{color:var(--c-blue)}
+    .tg-vs .f b{color:var(--c-green)}
+    .tg-vs p{font-size:var(--text-sm);color:var(--text-dim);line-height:1.6;margin:0}
+    .tg-tip{background:rgba(191,90,242,0.06);border-left:3px solid var(--c-purple);padding:14px 18px;margin:18px 0;border-radius:0 var(--glass-radius-sm) var(--glass-radius-sm) 0}
+    .tg-tip b{font-weight:700;color:var(--c-purple);font-size:var(--text-sm);display:block;margin-bottom:4px}
+    .tg-cta{text-align:center;margin-top:40px}
+    .tg-cta a{display:inline-block;padding:10px 24px;border-radius:100px;text-decoration:none;font-weight:700;font-size:var(--text-sm);margin:4px}
+    .tg-ft{text-align:center;padding:28px 20px;font-size:var(--text-label);color:var(--text-muted);border-top:1px solid var(--border);line-height:1.8}
+    .tg-ft a{color:var(--text-dim);text-decoration:none}
+    .tg-ft a:hover{text-decoration:underline}
+    @media(max-width:600px){.tg-vs{grid-template-columns:1fr}.tg{padding:16px 16px 60px}}
+    @media print{.land-topnav,.tg-toc,.tg-ft,.tg-cta{display:none!important}body{background:#fff!important;color:#111!important}.tg{max-width:100%;padding:0}.tg-s h2{color:#111!important;border-color:#ccc!important}.tg-b,.tg-b p{color:#333!important}.tg-dnd,.tg-fate,.tg-ex,.tg-tip,.tg-c{background:#f5f5f5!important;border-color:#ccc!important;backdrop-filter:none!important}}
+  </style>
+</head>
+<body>
+<nav class="land-topnav" role="navigation" aria-label="Site navigation">
+  <a href="../index.html" class="land-topnav-brand" style="text-decoration:none">🎲 Ogma</a>
+  <div class="land-topnav-actions">
+      <a href="../learn.html" class="btn btn-ghost land-topnav-btn" style="font-size:13px;text-decoration:none">📖 Learn</a>
+      <a href="transition.html" class="btn btn-ghost land-topnav-btn land-topnav-btn-active" style="font-size:13px;text-decoration:none">⚔ D&D Guide</a>
+      <a href="sessionzero.html" class="btn btn-ghost land-topnav-btn" style="font-size:13px;text-decoration:none">🎭 Session Zero</a>
+      <a href="../about.html" class="btn btn-ghost land-topnav-btn" style="font-size:13px;text-decoration:none">About</a>
+      <button class="btn btn-ghost land-topnav-btn" onclick="window.print()" style="font-size:13px" title="Print">🖨 Print</button>
+      <button class="btn btn-icon btn-ghost" onclick="var n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var _p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');_p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p));}catch(_e){}" title="Toggle theme">◑</button>
+  
+    <button class="land-topnav-hamburger" id="topnav-hbg" aria-label="Open navigation" aria-expanded="false" aria-haspopup="true">☰</button>
+    <div class="land-topnav-dropdown" id="topnav-dd">
+        <a href="../learn.html">📖 Learn</a>
+        <a href="sessionzero.html">🎭 Session Zero</a>
+        <a href="../about.html">About</a>
+        <a href="../license.html">License</a>
+        <button onclick="window.print()">🖨 Print</button>
+        <button onclick="var n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var _p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');_p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p));}catch(_e){}" id="dd-theme">◑ Theme</button>
+      </div></div>
+</nav>
+<div class="tg">
+
+<h1>Coming from D&D 5e?</h1>
+<p class="tg-lead">Fate Condensed isn't better or worse than D&D — it's a genuinely different kind of game. This guide covers the conceptual shifts that trip up experienced D&D players and GMs, with side-by-side comparisons and concrete examples. Read it before your first session and you'll be ahead of the curve.</p>
+
+<nav class="tg-toc">
+  <b>Contents</b>
+  <a href="#philosophy">The Big Philosophical Shift</a>
+  <a href="#characters">Characters: Aspects vs. Ability Scores</a>
+  <a href="#skills">Skills: Broad Strokes, Not Specifics</a>
+  <a href="#actions">The Four Actions</a>
+  <a href="#aspects">Aspects: The Heart of the System</a>
+  <a href="#fatepoints">Fate Points: The Economy of Drama</a>
+  <a href="#combat">Combat: Stress, Consequences, and Taken Out</a>
+  <a href="#initiative">Initiative: Popcorn Style</a>
+  <a href="#create">Create Advantage: The Action D&D Doesn't Have</a>
+  <a href="#scenes">Challenges, Contests, and Conflicts</a>
+  <a href="#gm">For the GM: Running Fate</a>
+  <a href="#session-zero">Session Zero: Building Together</a>
+  <a href="#faq">Quick FAQ</a>
+</nav>
+
+<div class="tg-s" id="philosophy">
+<h2>The Big Philosophical Shift</h2>
+<div class="tg-b">
+<p>In D&D, you interact with a world the GM has built. The rules simulate physics — armor class, damage dice, movement speed — and the fiction follows the mechanics.</p>
+<p>In Fate, the fiction comes first. You describe what you're trying to do, the table decides if it makes sense, and <em>then</em> you pick the mechanic that fits. The dice don't tell you what happens — they place constraints on the narration.</p>
+<p>The Book of Hanz puts it perfectly: <strong>"Fiction, not physics."</strong> Fate doesn't simulate a world. It simulates a <em>story</em> about characters in a world.</p>
+<div class="tg-vs">
+<div class="d"><b>D&D 5e</b><p>"I roll to attack. 17 hits? OK, I do 8 slashing damage."</p></div>
+<div class="f"><b>Fate Condensed</b><p>"I lunge for his sword arm — I want to disarm him." "Sounds like Fight against his Athletics. Roll it."</p></div>
+</div>
+<div class="tg-tip"><b>Mindset Tip</b><p>The biggest adjustment isn't learning new rules — it's unlearning the habit of looking up what you're "allowed" to do. In Fate, if it makes sense in the fiction, you can try it. The rules resolve the outcome, they don't define the options.</p></div>
+</div>
+</div>
+
+<div class="tg-s" id="characters">
+<h2>Characters: Aspects vs. Ability Scores</h2>
+<div class="tg-b">
+<p>A D&D character is defined by numbers: six ability scores, a class, hit points. A Fate character is defined by <strong>five aspects</strong> — short phrases that say who this person is, what drives them, and what gets them in trouble.</p>
+<div class="tg-c">
+<h3>A Fate Character Has:</h3>
+<p><strong>5 Aspects</strong> — High Concept, Trouble, Relationship, and two free aspects<br>
+<strong>Skill Pyramid</strong> — one Great (+4), two Good (+3), three Fair (+2), four Average (+1)<br>
+<strong>3 Stunts</strong> — narrow bonuses or rule-bending tricks<br>
+<strong>Stress</strong> — 3 physical + 3 mental boxes (plot armor, clears each scene)<br>
+<strong>Consequences</strong> — Mild (2 shifts), Moderate (4), Severe (6)<br>
+<strong>Refresh 3</strong> — fate points you start each session with</p>
+</div>
+<p>No hit points, no spell slots, no passive perception, no alignment. Your personality, capabilities, and vulnerabilities are all in those five aspect phrases.</p>
+<div class="tg-ex"><strong>D&D:</strong> "Level 5 Human Fighter, Champion, STR 18, DEX 14, CON 16."<br><br><strong>Fate:</strong> High Concept: <em>Disgraced Knight of the Silver Order</em> · Trouble: <em>The Drink Takes What the War Left</em> · Relationship: <em>I Owe Mara a Debt I Can't Name</em></div>
+<p>The D&D version tells you what the character <em>can do</em>. The Fate version tells you who they <em>are</em> — and every phrase comes up in play, both as a bonus and as a complication.</p>
+</div>
+</div>
+
+<div class="tg-s" id="skills">
+<h2>Skills: Broad Strokes, Not Specifics</h2>
+<div class="tg-b">
+<p>Fate Condensed has 19 skills, each covering a broad area. No weapon proficiencies, no tool checks, no saving throws as a separate mechanic. Skills are arranged in a pyramid (+4, +3, +3, +2, +2, +2, +1, +1, +1, +1). You roll 4 Fate dice (each -1, 0, or +1) and add your skill. The bell curve trends heavily toward your rating.</p>
+<div class="tg-dnd"><b>D&D Habit to Break</b><p>In D&D, you say "I roll Perception." In Fate, describe what you're doing: "I scan the rooftops for snipers." The GM decides the skill: Notice (spotting in the moment) vs. Investigate (piecing together clues). Fiction first, skill second.</p></div>
+<p>The key insight: <strong>skills represent what you're trying to accomplish, not a specific physical action.</strong> You don't roll Athletics to climb a wall — you roll Athletics to overcome an obstacle requiring physical effort. The wall is flavor.</p>
+</div>
+</div>
+
+<div class="tg-s" id="actions">
+<h2>The Four Actions</h2>
+<div class="tg-b">
+<p>D&D has attacks, saves, ability checks, and a complex action economy. Fate has exactly <strong>four actions</strong>:</p>
+<div class="tg-c">
+<h3>Overcome · Create Advantage · Attack · Defend</h3>
+<p><strong>Overcome</strong> — remove an obstacle. Closest to a D&D ability check.<br>
+<strong>Create Advantage</strong> — introduce new aspects or add free invokes. <em>D&D has no equivalent.</em><br>
+<strong>Attack</strong> — try to harm someone. Outcome is shifts, not damage dice.<br>
+<strong>Defend</strong> — resist an attack or advantage creation.</p>
+</div>
+<p>Each has four outcomes: <strong>Fail</strong>, <strong>Tie</strong>, <strong>Succeed</strong>, <strong>Succeed with Style</strong> (3+ shifts). Every outcome does something — even failure advances the story, usually at a cost.</p>
+<div class="tg-fate"><b>Failure Is Interesting</b><p>In D&D, a missed attack means nothing happens. In Fate, the GM should make failure mean something: succeed at a serious cost, the situation worsens, or a new complication appears. The story never stalls on a bad roll.</p></div>
+</div>
+</div>
+
+<div class="tg-s" id="aspects">
+<h2>Aspects: The Heart of the System</h2>
+<div class="tg-b">
+<p>An aspect is a short phrase describing something important about a person, place, or situation. The critical rule: <strong>aspects are always true.</strong></p>
+<p>If a room is <em>Pitch Black</em>, you cannot see — not "you have disadvantage on Perception." If someone is <em>Pinned Under the Wreckage</em>, they can't walk away. Aspects define what's possible, not just what gets a bonus.</p>
+<div class="tg-c">
+<h3>What Aspects Do</h3>
+<p><strong>Grant permission</strong> — a <em>Wizard of the Silver Tower</em> can use magic. You can't.<br>
+<strong>Make you awesome</strong> — invoke for +2 or a reroll when relevant.<br>
+<strong>Get you in trouble</strong> — the GM compels them to create complications.<br>
+<strong>Define the scene</strong> — <em>Crates of TNT</em> and <em>Howling Winds</em> shape what's possible.<br>
+<strong>Be true</strong> — they don't need invocation to matter. They just are.</p>
+</div>
+<div class="tg-vs">
+<div class="d"><b>D&D</b><p>"Difficult terrain. Movement costs double." A mechanical rule, applied uniformly.</p></div>
+<div class="f"><b>Fate</b><p>"The floor is <em>Covered in Caustic Slime</em>." Invoke it, compel it, use it for narrative permission, or have it restrict actions. It's a story element, not a rule lookup.</p></div>
+</div>
+<div class="tg-tip"><b>The "Aspects Are Feats" Trap</b><p>Coming from D&D, it's natural to think aspects are "feat-like bonuses you named yourself." They're not. An aspect is a true thing about the world. The +2 invoke is just one of its uses. The narrative truth is more powerful than the +2.</p></div>
+</div>
+</div>
+
+<div class="tg-s" id="fatepoints">
+<h2>Fate Points: The Economy of Drama</h2>
+<div class="tg-b">
+<p>D&D has Inspiration (which many tables forget). Fate has a <strong>core economy</strong> that drives every session.</p>
+<div class="tg-c">
+<h3>How Fate Points Flow</h3>
+<p><strong>Start</strong> each session with fate points = your Refresh (default 3).<br>
+<strong>Spend</strong> to invoke an aspect (+2 or reroll) or declare a story detail.<br>
+<strong>Earn</strong> when the GM compels your aspects, when you concede, or from hostile invocations.<br>
+<strong>Refuse</strong> a compel by spending a fate point — but at zero, you can't refuse.</p>
+</div>
+<p>This creates a rhythm: <strong>the more trouble you accept, the more power you accumulate.</strong> Accept your Trouble complicating scene 1, and you have extra fate points for the climax in scene 5.</p>
+<div class="tg-ex"><strong>The Compel Cycle:</strong> Your Trouble is <em>The Drink Takes What the War Left</em>. GM says: "You've had a few too many by the time the informant arrives — they don't take you seriously. Take a fate point?" You accept. Later, you invoke <em>Disgraced Knight</em> with that fate point when you need to impress the rebel leader.</div>
+<div class="tg-dnd"><b>D&D Habit to Break</b><p>In D&D, the goal is to minimize bad things happening. In Fate, you <em>want</em> bad things at the right time — that's how you earn fuel to be awesome later. Compels aren't punishment; they're the story getting more interesting and you getting paid for it.</p></div>
+<p><strong>The GM's pool:</strong> 1 fate point per PC per scene. Spent to invoke on behalf of NPCs. Compels are free and unlimited. The GM's job is to spend their budget creating drama.</p>
+</div>
+</div>
+
+<div class="tg-s" id="combat">
+<h2>Combat: Stress, Consequences, and Taken Out</h2>
+<div class="tg-b">
+<p>This is where D&D players struggle most, because the words sound familiar but mean different things.</p>
+<div class="tg-vs">
+<div class="d"><b>D&D 5e</b><p><strong>Hit Points</strong> count down to 0. <strong>Damage</strong> = dice rolls subtracted from HP. <strong>0 HP</strong> = unconscious + death saves. <strong>Healing</strong> = spells that restore numbers.</p></div>
+<div class="f"><b>Fate Condensed</b><p><strong>Stress boxes</strong> are binary, each absorbs 1 shift, clear every scene. <strong>Consequences</strong> are aspects on your sheet: Mild=2, Mod=4, Severe=6 shifts. <strong>Taken Out</strong> = opponent narrates your fate. <strong>Recovery</strong> = overcome roll + time.</p></div>
+</div>
+<p><strong>Stress is not damage.</strong> It's plot armor — "I barely dodged" or "that knocked the wind out of me." Default is 3 physical + 3 mental boxes. Higher Physique or Will gives more.</p>
+<p><strong>Consequences are real injuries</strong> — and they're aspects. A <em>Gaping Chest Wound</em> is true. The enemy gets a free invoke. Anyone can compel it. It restricts what you can do.</p>
+<div class="tg-ex"><strong>Taking a 5-shift hit:</strong> 1 stress box left. Take a Moderate consequence (<em>Gaping Chest Wound</em>, absorbs 4) + last stress box (absorbs 1). 4 + 1 = 5. You survive — but now the enemy invokes that wound against you.</div>
+<div class="tg-fate"><b>Conceding: The Escape Valve</b><p>Before any roll, you can <strong>concede</strong>. You lose, but <em>you</em> decide how you exit. You get a fate point for conceding plus one per consequence taken. Losing on your terms with resources for the next scene is often smarter than getting taken out.</p></div>
+<p><strong>Recovery:</strong> Stress clears at end of scene. Consequences need an overcome roll (Academics for physical, Empathy for mental), then: Mild clears after next scene, Moderate after a full session, Severe after a breakthrough. Self-treatment adds +2 to difficulty.</p>
+</div>
+</div>
+
+<div class="tg-s" id="initiative">
+<h2>Initiative: Popcorn Style</h2>
+<div class="tg-b">
+<p>D&D rolls initiative once, producing a fixed order. Fate uses <strong>popcorn initiative</strong>: after you act, <em>you pick who goes next</em> — ally or enemy.</p>
+<div class="tg-c">
+<h3>How It Works</h3>
+<p>1. The table decides who goes first (negotiated, not rolled).<br>
+2. That character acts.<br>
+3. They choose who goes next — anyone who hasn't gone this exchange.<br>
+4. After everyone goes, the last person picks who starts next exchange.<br>
+5. GM's NPCs are in the order just like PCs.</p>
+</div>
+<div class="tg-dnd"><b>Why This Matters</b><p>In D&D, initiative is something that happens to you. In Fate, turn order is a resource you manage. Pass to your ally so they can use the advantage you just created. Or force the enemy to go before they're set up. Teams that coordinate will dominate.</p></div>
+</div>
+</div>
+
+<div class="tg-s" id="create">
+<h2>Create Advantage: The Action D&D Doesn't Have</h2>
+<div class="tg-b">
+<p>This is the most important tactical action in Fate, and D&D has no equivalent. Create Advantage introduces a new aspect or adds free invokes to an existing one.</p>
+<div class="tg-ex"><strong>Example:</strong> Instead of attacking the armored warlord (his Fight +6 vs. your Fight +4 — bad matchup), use Provoke to create <em>Blinded by Rage</em>. You get a free invoke. Pass to your ally, who attacks using Fight + your free invoke (+2). That +2 cost no fate point and came from a skill matchup you could win.</div>
+<p><strong>Why it's so powerful:</strong> It lets you use your best skills even in combat. A character with Provoke +4 is more useful taunting than swinging a mediocre sword. It generates free invokes (no FP cost). It creates narrative truth. And it lets the team stack bonuses.</p>
+<div class="tg-tip"><b>The Create Advantage Cascade</b><p>The deadliest tactic in Fate: 2-3 characters spend an exchange Creating Advantages, piling up free invokes. Then the best attacker uses all of them on a single massive hit. A +4 attacker with three free invokes (+6) rolls at effective +10. That one hit often ends the fight. This is how Fate rewards teamwork over optimization.</p></div>
+</div>
+</div>
+
+<div class="tg-s" id="scenes">
+<h2>Challenges, Contests, and Conflicts</h2>
+<div class="tg-b">
+<p>D&D defaults nearly everything to combat. Fate has three scene types:</p>
+<div class="tg-c">
+<h3>Challenge</h3>
+<p>A series of overcome actions against a dynamic situation with no "other side." Each player picks a task; GM considers the mix of results. <em>Example: Escaping a collapsing ruin — navigate, hold a beam, disarm a trap, carry the wounded.</em></p>
+</div>
+<div class="tg-c">
+<h3>Contest</h3>
+<p>Two sides pursuing mutually exclusive goals, <strong>not</strong> trying to harm each other. Opposed overcome rolls per exchange; first to 3 victories wins. Ties cause twists. <em>Example: A chase. A debate before the council. A race to decode the signal.</em></p>
+</div>
+<div class="tg-c">
+<h3>Conflict</h3>
+<p>Characters can and want to harm each other. Attack/defend rolls, stress and consequences, zones, popcorn initiative. <em>Example: A swordfight. A shootout. A psychic assault. An interrogation inflicting mental consequences.</em></p>
+</div>
+<div class="tg-dnd"><b>The Key Question</b><p>Can the characters harm each other? If yes → Conflict. Racing toward opposing goals? → Contest. Complex situation, no clear enemy? → Challenge. Many D&D combats are actually Contests or Challenges in Fate.</p></div>
+</div>
+</div>
+
+<div class="tg-s" id="gm">
+<h2>For the GM: Running Fate</h2>
+<div class="tg-b">
+<p><strong>You build situations, not encounters.</strong> Instead of CR budgets, set up interesting problems with 3-5 situation aspects, clear stakes, and at least two interesting outcomes.</p>
+<p><strong>You don't own the story.</strong> When a player Creates an Advantage declaring the guard's sword is <em>Old and Brittle</em>, that's true. When someone invokes an aspect to add a story detail — "there's a back alley" — and it makes sense, it exists.</p>
+<p><strong>Setting difficulty:</strong> Routine? Don't roll. Tough? Set opposition around their skill level. Nearly impossible? Go higher. Mediocre (+0) is trivial, Great (+4) is serious, Fantastic (+6) is extraordinary.</p>
+<div class="tg-fate"><b>GM Fate Point Budget</b><p>1 fate point per PC per scene. Invoke on behalf of NPCs. Compels are free and unlimited. Spend your budget making scenes dangerous and interesting. Don't hoard.</p></div>
+<p><strong>NPCs are simpler.</strong> Minor NPCs: 1-2 aspects, a skill or two, 0-2 stress boxes — designed to be defeated. Major NPCs: full aspects, skill list, stress, consequences — session anchors. No monster manual needed.</p>
+<div class="tg-tip"><b>The Hardest Adjustment</b><p>In D&D, pacing comes from encounter design. In Fate, pacing comes from the fate point economy. Story feels flat? Compel more. Players feel weak? They're not earning enough fate points through trouble. The economy is the engine.</p></div>
+</div>
+</div>
+
+<div class="tg-s" id="session-zero">
+<h2>Session Zero: Building Together</h2>
+<div class="tg-b">
+<p>In D&D, you build characters independently. In Fate, character creation is collaborative — the group decides what the game is <em>about</em> together.</p>
+<p>You establish setting aspects as a group. You create characters whose aspects connect through the Relationship aspect and Phase Trio. By the end, every character has a reason to be here and at least one tie to another PC.</p>
+<div class="tg-dnd"><b>Why This Matters</b><p>In D&D, "why is the party together?" is often hand-waved. In Fate, it's mechanical — the Relationship aspect can be invoked and compelled. The party isn't together because the DM said so; they're together because their stories are intertwined.</p></div>
+<p>This suite includes a <a href="sessionzero.html" style="color:var(--c-blue)">Session Zero Wizard</a> that walks your table through the process with D&D contrast notes at every stage.</p>
+</div>
+</div>
+
+<div class="tg-s" id="faq">
+<h2>Quick FAQ</h2>
+<div class="tg-b">
+<div class="tg-c"><h3>Where's the damage? How much does a sword do?</h3><p>No damage dice. Shifts (your effort minus their defense) = "damage." A sword doesn't inherently do more than a fist — what matters is skill rating, invocations, and stunts. A stunt giving +2 to Fight with a named blade? That's your sword damage.</p></div>
+<div class="tg-c"><h3>Can my character die?</h3><p>Only if you're taken out and the group agrees death is on the table. You can always concede before a roll to exit on your terms. Death should be dramatic, not a random bad roll.</p></div>
+<div class="tg-c"><h3>What about magic?</h3><p>No spell system. Magic = aspects (a <em>Pyromancer</em> has permission to do fire things) + stunts (use Lore to attack with fire). No slots, no components, no separate subsystem.</p></div>
+<div class="tg-c"><h3>What about equipment and loot?</h3><p>Important items become aspects (<em>My Father's Cursed Blade</em>) or stunts. Everything else is assumed — fighters have weapons, thieves have lockpicks. No inventory tracking.</p></div>
+<div class="tg-c"><h3>How does leveling up work?</h3><p>Milestones, not XP. Minor (per session): swap skills, rename an aspect. Significant (per arc): add skill points or stunts. Major (big campaign beat): increase refresh or rewrite high concept. Characters <em>change</em> more than they power up.</p></div>
+<div class="tg-c"><h3>Where's the battle grid?</h3><p>No grid, no squares, no feet. Scenes use 2-4 zones — abstract areas like "the rooftop" and "the alley." Move one zone free; more if nothing's in your way. Zones have aspects. Sketch it on an index card.</p></div>
+<div class="tg-c"><h3>When do I roll?</h3><p>Only when there's both a chance of failure <em>and</em> an interesting consequence. Picking a lock on an unguarded door with no pressure? Just do it. Picking it while guards patrol? Roll Burglary to overcome.</p></div>
+<div class="tg-c"><h3>Won't players abuse the looseness?</h3><p>Fate is collaborative. The table (not just the GM) decides what's plausible. Aspects have to pass the "sniff test." The social contract is the balancing mechanism.</p></div>
+</div>
+</div>
+
+<div class="tg-c tg-cta">
+<h3>Ready to play?</h3>
+<p style="margin-bottom:16px;font-size:var(--text-sm)">Pick a world and start rolling, or walk your table through Session Zero.</p>
+<a href="../index.html" style="background:var(--c-blue);color:#fff">🎲 Choose a Campaign</a>
+<a href="sessionzero.html" style="border:1px solid var(--c-blue);color:var(--c-blue);background:transparent">🎭 Session Zero</a>
+</div>
+
+</div>
+
+<footer class="tg-ft">
+<div>Fate™ is a trademark of <a href="https://www.evilhat.com" target="_blank" rel="noreferrer">Evil Hat Productions, LLC</a>.</div>
+<div>Licensed under <a href="../license.html">CC BY 3.0</a> · <a href="https://fate-srd.com/official-licensing-fate" target="_blank" rel="noreferrer">Fate Licensing</a></div>
+</footer>
+<script>(function(){try{var p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');var t=p.theme||localStorage.getItem('fate_theme')||localStorage.getItem('fate-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})()</script>
+<script>
+(function(){
+  var btn = document.getElementById('topnav-hbg');
+  var dd  = document.getElementById('topnav-dd');
+  if(!btn||!dd) return;
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    dd.classList.toggle('open');
+    btn.setAttribute('aria-expanded', dd.classList.contains('open'));
+  });
+  document.addEventListener('click', function(){ dd.classList.remove('open'); btn.setAttribute('aria-expanded','false'); });
+  // Update theme button label
+  var tb = document.getElementById('dd-theme');
+  if(tb){
+    var t=document.documentElement.getAttribute('data-theme');
+    tb.textContent=(t==='dark'?'☀️ Light':'🌙 Dark');
+    tb.addEventListener('click',function(){
+      var n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+      tb.textContent=(n==='dark'?'☀️ Light':'🌙 Dark');
+    });
+  }
+})();
+</script>
+</body>
+</html>

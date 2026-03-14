@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Session Zero — Ogma</title>
+  <meta name="description" content="Guided Session Zero wizard for Fate Condensed. Collaborative character creation walkthrough for shared-screen use at the table.">
+  <meta name="theme-color" content="#888888">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicons/icon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicons/apple-touch-icon.png">
+  <link rel="manifest" href="../manifest.json">
+  <link rel="stylesheet" href="../assets/css/theme.css?v=10">
+  <style>
+    /* Session Zero wizard-specific styles */
+    .sz-container { max-width: 760px; margin: 0 auto; padding: 24px 20px 80px; }
+    .sz-header { text-align: center; margin-bottom: 32px; }
+    .sz-title { font-size: var(--text-hero); font-weight: 800; letter-spacing: -0.5px; color: var(--text); margin-bottom: 4px; }
+    .sz-subtitle { font-size: var(--text-lg); color: var(--text-dim); font-weight: 400; }
+    .sz-step-counter { font-size: var(--text-sm); color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; margin-bottom: 8px; }
+    .sz-step-title { font-size: var(--text-2xl); font-weight: 700; color: var(--text); margin-bottom: 16px; }
+    .sz-body { font-size: var(--text-md); color: var(--text-dim); line-height: 1.7; }
+    .sz-body p { margin-bottom: 14px; }
+    .sz-body strong { color: var(--text); font-weight: 600; }
+    .sz-card { background: var(--glass-bg); backdrop-filter: var(--glass-blur-sm); -webkit-backdrop-filter: var(--glass-blur-sm); border: 1px solid var(--glass-border); border-radius: var(--glass-radius); padding: 20px; margin: 16px 0; }
+    .sz-card-title { font-size: var(--text-lg); font-weight: 700; color: var(--gold); margin-bottom: 8px; }
+    .sz-example { background: var(--inset); border-left: 3px solid var(--gold); padding: 12px 16px; margin: 12px 0; border-radius: 0 6px 6px 0; font-style: italic; color: var(--text-dim); }
+    .sz-dnd { background: rgba(80,144,208,0.08); border-left: 3px solid var(--c-blue); padding: 12px 16px; margin: 16px 0; border-radius: 0 6px 6px 0; }
+    .sz-dnd::before { content: '⚔ D&D Contrast: '; font-weight: 700; color: var(--c-blue); }
+    .sz-tip { background: rgba(80,184,120,0.08); border-left: 3px solid var(--c-green); padding: 12px 16px; margin: 16px 0; border-radius: 0 6px 6px 0; }
+    .sz-tip::before { content: '💡 '; }
+    .sz-warn { background: rgba(208,160,80,0.08); border-left: 3px solid var(--gold); padding: 12px 16px; margin: 16px 0; border-radius: 0 6px 6px 0; }
+    .sz-nav { display: flex; gap: 12px; justify-content: space-between; margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--border); }
+    .sz-nav .btn { min-width: 120px; padding: 12px 24px; font-size: var(--text-md); font-weight: 600; }
+    .sz-grid { display: grid; gap: 12px; margin: 16px 0; }
+    .sz-grid-2 { grid-template-columns: 1fr 1fr; }
+    .sz-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+    @media (max-width: 600px) { .sz-grid-2, .sz-grid-3 { grid-template-columns: 1fr; } }
+    .sz-option { background: var(--glass-bg); backdrop-filter: var(--glass-blur-sm); -webkit-backdrop-filter: var(--glass-blur-sm); border: 2px solid var(--glass-border); border-radius: var(--glass-radius); padding: 16px; cursor: pointer; transition: all 0.15s; text-align: center; }
+    .sz-option:hover { border-color: var(--gold); background: var(--panel-raised); }
+    .sz-option.selected { border-color: var(--gold); background: var(--gold)11; }
+    .sz-option-title { font-size: var(--text-lg); font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .sz-option-sub { font-size: var(--text-sm); color: var(--text-dim); }
+    .sz-option-tag { font-size: var(--text-label); color: var(--gold); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+    .sz-role-card { background: var(--glass-bg); backdrop-filter: var(--glass-blur-sm); -webkit-backdrop-filter: var(--glass-blur-sm); border: 2px solid var(--glass-border); border-radius: var(--glass-radius); padding: 16px; cursor: pointer; transition: all 0.15s; }
+    .sz-role-card:hover { border-color: var(--gold); }
+    .sz-role-card.selected { border-color: var(--gold); background: var(--gold)11; }
+    .sz-role-label { font-size: var(--text-lg); font-weight: 700; color: var(--gold); margin-bottom: 4px; }
+    .sz-role-desc { font-size: var(--text-sm); color: var(--text-dim); margin-bottom: 8px; }
+    .sz-role-hint { font-size: var(--text-sm); color: var(--text-muted); font-style: italic; }
+    .sz-prompt-box { background: var(--panel-raised); backdrop-filter: var(--glass-blur-sm); -webkit-backdrop-filter: var(--glass-blur-sm); border: 2px dashed var(--gold); border-radius: var(--glass-radius); padding: 20px; margin: 16px 0; font-size: var(--text-lg); color: var(--text); text-align: center; line-height: 1.6; }
+    .sz-prompt-fill { color: var(--gold); font-weight: 700; text-decoration: underline; text-decoration-style: dotted; }
+    .sz-skill-pyramid { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 16px 0; }
+    .sz-skill-row { display: flex; gap: 6px; justify-content: center; }
+    .sz-skill-slot { background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 6px 14px; font-size: var(--text-sm); color: var(--text-dim); min-width: 80px; text-align: center; }
+    .sz-skill-label { font-size: var(--text-sm); color: var(--gold); font-weight: 600; margin-right: 8px; min-width: 80px; text-align: right; }
+    .sz-skill-row-wrap { display: flex; align-items: center; gap: 6px; }
+    .sz-stress-table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+    .sz-stress-table th, .sz-stress-table td { padding: 8px 12px; border: 1px solid var(--border); font-size: var(--text-sm); }
+    .sz-stress-table th { background: var(--panel); color: var(--gold); font-weight: 600; text-align: left; }
+    .sz-stress-table td { color: var(--text-dim); }
+    .sz-issue { margin: 12px 0; }
+    .sz-issue-name { font-size: var(--text-lg); font-weight: 700; color: var(--accent); }
+    .sz-issue-desc { font-size: var(--text-sm); color: var(--text-dim); margin-top: 4px; }
+    .sz-aspect-list { list-style: none; padding: 0; margin: 8px 0; }
+    .sz-aspect-list li { padding: 6px 0; color: var(--text-dim); font-style: italic; }
+    .sz-aspect-list li::before { content: '◈ '; color: var(--gold); }
+    .sz-skill-list { columns: 2; column-gap: 24px; list-style: none; padding: 0; margin: 12px 0; }
+    .sz-skill-list li { padding: 3px 0; font-size: var(--text-sm); color: var(--text-dim); break-inside: avoid; }
+    .sz-skill-list li strong { color: var(--text); font-weight: 600; }
+    .sz-template-list { list-style: none; padding: 0; margin: 8px 0; }
+    .sz-template-list li { padding: 8px 12px; margin: 6px 0; background: var(--inset); border-radius: 6px; font-style: italic; color: var(--text-dim); cursor: default; }
+    .sz-reroll { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; }
+    .sz-summary-section { margin: 16px 0; padding: 16px; background: var(--glass-bg); backdrop-filter: var(--glass-blur-sm); -webkit-backdrop-filter: var(--glass-blur-sm); border: 1px solid var(--glass-border); border-radius: var(--glass-radius); }
+    .sz-summary-label { font-size: var(--text-label); color: var(--gold); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+    .sz-summary-value { font-size: var(--text-md); color: var(--text); font-style: italic; }
+    .sz-summary-note { font-size: var(--text-sm); color: var(--text-muted); margin-top: 4px; }
+    .sz-export-bar { display: flex; gap: 10px; flex-wrap: wrap; margin: 20px 0; }
+    .sz-export-bar .btn { flex: 1; min-width: 140px; text-align: center; }
+    .sz-copied { color: var(--c-green); font-size: var(--text-sm); margin-top: 6px; text-align: center; }
+    @media print {
+      .land-topnav, .sz-nav, .sz-export-bar { display: none; }
+      .sz-container { max-width: 100%; padding: 0; }
+      .sz-card, .sz-summary-section { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+  <script src="../data/shared.js?v=10"></script>
+  <script src="../data/universal.js?v=10"></script>
+  <script src="../data/thelongafter.js?v=10"></script>
+  <script src="../data/cyberpunk.js?v=10"></script>
+  <script src="../data/fantasy.js?v=10"></script>
+  <script src="../data/space.js?v=10"></script>
+  <script src="../data/victorian.js?v=10"></script>
+  <script src="../data/postapoc.js?v=10"></script>
+  <script src="../core/engine.js?v=10"></script>
+  <script src="../core/ui.js?v=10"></script>
+  <script>
+  (function() {
+    var h = React.createElement;
+    var useState = React.useState;
+    var F = React.Fragment;
+
+    // ── Helpers ──
+    function p(text) { return h('p', null, text); }
+    function card(title, children) {
+      return h('div', {className:'sz-card'},
+        title ? h('div', {className:'sz-card-title'}, title) : null,
+        children
+      );
+    }
+    function dnd(text) { return h('div', {className:'sz-dnd'}, text); }
+    function tip(text) { return h('div', {className:'sz-tip'}, text); }
+    function example(text) { return h('div', {className:'sz-example'}, text); }
+    function rerollBtn(onClick, label) {
+      return h('button', {className:'btn btn-ghost sz-reroll', onClick: onClick}, '🎲 ' + (label || 'Re-roll'));
+    }
+
+    var CAMP_ORDER = ['thelongafter','cyberpunk','fantasy','space','victorian','postapoc'];
+    var MODES = [
+      {id:'standard', label:'Condensed Standard', tag:'Recommended', sub:'High Concept → Trouble → Relationship → leave the rest blank → play. Fastest path to the table.'},
+      {id:'trio', label:'Phase Trio', tag:'Enriched', sub:'Collaborative backstory workshop. Three phases produce all five aspects through shared stories. ~20 min extra.'},
+      {id:'flashback', label:'Flashback Slots', tag:'Play-First', sub:'Start with High Concept + Trouble + top skill only. Discover the rest during play through flashback moments.'},
+    ];
+    var SKILL_DESCS = {
+      Academics:"Mundane knowledge, education, history, sciences, medicine",
+      Athletics:"Physical potential — running, jumping, dodging attacks",
+      Burglary:"Bypassing security, picking pockets, committing crimes",
+      Contacts:"Knowing the right people, information networks",
+      Crafts:"Building, breaking, and repairing things",
+      Deceive:"Lying convincingly, creating false identities",
+      Drive:"Controlling vehicles under pressure",
+      Empathy:"Reading moods, spotting lies, understanding people",
+      Fight:"Hand-to-hand combat, melee weapons",
+      Investigate:"Deliberate study, piecing together clues",
+      Lore:"Specialized or arcane knowledge, the weird stuff",
+      Notice:"Spotting things in the moment, reacting quickly",
+      Physique:"Raw strength, toughness — also sets physical stress boxes",
+      Provoke:"Intimidation, goading, scaring people",
+      Rapport:"Building trust, making connections, persuasion",
+      Resources:"Access to money, gear, and material things",
+      Shoot:"Ranged combat — guns, bows, throwing weapons",
+      Stealth:"Staying unseen, escaping, blending in",
+      Will:"Mental fortitude, resisting pressure — also sets mental stress boxes",
+    };
+    var PT = (typeof UNIVERSAL !== 'undefined' && UNIVERSAL.phase_trio) ? UNIVERSAL.phase_trio : {};
+
+    function getSteps(mode) {
+      var common = ['campaign','mode','setting','highconcept','trouble'];
+      if (mode === 'standard') return common.concat(['relationship','freeaspects','skills','stunts','stress','summary']);
+      if (mode === 'trio')     return common.concat(['phase1','phase2','phase3','skills','stunts','stress','summary']);
+      if (mode === 'flashback') return common.concat(['flashbacks','skills','stunts','stress','summary']);
+      return common;
+    }
+
+    function SessionZeroApp() {
+      var s = useState(0), step = s[0], setStep = s[1];
+      var c = useState(null), campId = c[0], setCampId = c[1];
+      var m = useState('standard'), mode = m[0], setMode = m[1];
+      // Reroll counter — incrementing forces new random values
+      var rc = useState(0), rerolls = rc[0], setRerolls = rc[1];
+      function reroll() { setRerolls(rerolls + 1); }
+      // Phase 1 prompt (persists across steps)
+      var ph = useState(null), phase1Prompt = ph[0], setPhase1Prompt = ph[1];
+      // Export state
+      var cp = useState(''), copied = cp[0], setCopied = cp[1];
+
+      var steps = getSteps(mode);
+      var stepId = steps[step] || 'campaign';
+      var camp = campId && CAMPAIGNS[campId] ? CAMPAIGNS[campId] : null;
+      var totalSteps = steps.length;
+
+      function next() { if (step < totalSteps - 1) setStep(step + 1); }
+      function back() { if (step > 0) setStep(step - 1); }
+      function selectCamp(id) { setCampId(id); setPhase1Prompt(null); }
+      function selectMode(id) { setMode(id); }
+      function genPhase1() {
+        if (!camp) return;
+        var t = camp.tables;
+        var loc = pick(t.seed_locations);
+        var opp = pick(t.opposition);
+        var threat = opp ? opp.aspects[0] : 'something dangerous';
+        setPhase1Prompt({location: loc, threat: threat});
+      }
+      function toggleTheme() {
+        var cur = document.documentElement.getAttribute('data-theme') || 'dark';
+        var nxt = cur === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', nxt);
+        try { try{var _p2=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');_p2.theme=nxt;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p2));}catch(_e2){} } catch(e) {}
+      }
+
+      // ── Summary markdown builder ──
+      function buildSummaryMarkdown() {
+        var campName = camp ? camp.meta.name : 'Unknown';
+        var modeLabel = mode === 'trio' ? 'Phase Trio' : mode === 'flashback' ? 'Flashback Slots' : 'Condensed Standard';
+        var lines = [
+          '# Session Zero Summary',
+          '**Campaign:** ' + campName,
+          '**Mode:** ' + modeLabel,
+          '**Date:** ' + new Date().toLocaleDateString(),
+          '',
+          '---',
+          '',
+          '## Character Sheet Template',
+          '',
+          '### Aspects',
+          '- **High Concept:** _______________',
+          '- **Trouble:** _______________',
+        ];
+        if (mode === 'standard') {
+          lines.push('- **Relationship:** _______________');
+          lines.push('- **Free Aspect:** _______________');
+          lines.push('- **Free Aspect:** _______________');
+        } else if (mode === 'trio') {
+          lines.push('- **Phase 1 Aspect:** _______________');
+          lines.push('- **Phase 2 (Relationship):** _______________');
+          lines.push('- **Phase 3 Aspect:** _______________');
+        } else {
+          lines.push('- **Flashback 1:** _(discover during play)_');
+          lines.push('- **Flashback 2:** _(discover during play)_');
+          lines.push('- **Flashback 3:** _(discover during play)_');
+        }
+        lines.push('');
+        lines.push('### Skills (Pyramid)');
+        lines.push('- **Great (+4):** _______________');
+        lines.push('- **Good (+3):** _______________, _______________');
+        lines.push('- **Fair (+2):** _______________, _______________, _______________');
+        lines.push('- **Average (+1):** _______________, _______________, _______________, _______________');
+        lines.push('');
+        lines.push('### Stunts (3 free — leave blank and fill during play)');
+        lines.push('1. _______________');
+        lines.push('2. _______________');
+        lines.push('3. _______________');
+        lines.push('');
+        lines.push('### Vitals');
+        lines.push('- **Physical Stress:** ☐ ☐ ☐ (+ more from Physique)');
+        lines.push('- **Mental Stress:** ☐ ☐ ☐ (+ more from Will)');
+        lines.push('- **Consequences:** Mild (2) / Moderate (4) / Severe (6)');
+        lines.push('- **Refresh:** 3');
+        lines.push('');
+        lines.push('---');
+        lines.push('');
+        lines.push('## Fate Condensed Quick Reference');
+        lines.push('- **Invoke:** Spend a fate point → +2 or reroll');
+        lines.push('- **Compel:** Accept complication → gain a fate point');
+        lines.push('- **Four Actions:** Overcome, Create Advantage, Attack, Defend');
+        lines.push('- **Four Outcomes:** Fail, Tie, Succeed, Succeed with Style');
+        lines.push('- **Success at a Cost:** On failure, GM may offer success at a minor cost (complication) or major cost (consequence)');
+        lines.push('- **Stress clears** after every scene. Consequences persist until treated.');
+        lines.push('- **Popcorn Initiative:** After you act, you choose who goes next — PC or NPC. No fixed turn order.');
+        lines.push('');
+        lines.push('## Advancement');
+        lines.push('- **Milestone (end of session):** Swap two skill ranks, rewrite a stunt, rewrite one aspect (not high concept), or buy a stunt for 1 refresh');
+        lines.push('- **Breakthrough (end of arc):** All milestone options PLUS: rewrite high concept, increase one skill by +1, begin recovery of consequences');
+        lines.push('');
+        lines.push('---');
+        lines.push('*Generated by Fate Condensed Session Zero Wizard*');
+        return lines.join('\n');
+      }
+
+      function copyMarkdown() {
+        var md = buildSummaryMarkdown();
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(md).then(function() { setCopied('Copied!'); setTimeout(function(){ setCopied(''); }, 2000); });
+        } else {
+          // Fallback
+          var ta = document.createElement('textarea');
+          ta.value = md;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          setCopied('Copied!');
+          setTimeout(function(){ setCopied(''); }, 2000);
+        }
+      }
+
+      // ── Navigation ──
+      var nav = h('div', {className:'sz-nav'},
+        step > 0
+          ? h('button', {className:'btn btn-ghost', onClick: back}, '← Back')
+          : h('div'),
+        step < totalSteps - 1
+          ? h('button', {className:'btn btn-primary', onClick: next,
+              disabled: (stepId === 'campaign' && !campId)}, 'Next →')
+          : null
+      );
+      var navBar = h('nav', {className:'land-topnav', role:'navigation', 'aria-label':'Site navigation'},
+        h('a', {href:'../index.html', className:'land-topnav-brand', style:{textDecoration:'none'}}, '🎲 Ogma'),
+        h('div', {className:'land-topnav-actions'},
+          h('a', {href:'../learn.html', className:'btn btn-ghost land-topnav-btn', style:{fontSize:13, textDecoration:'none'}}, '📖 Learn'),
+          h('a', {href:'transition.html', className:'btn btn-ghost land-topnav-btn', style:{fontSize:13, textDecoration:'none'}}, '⚔ D&D Guide'),
+          h('a', {href:'../about.html', className:'btn btn-ghost land-topnav-btn', style:{fontSize:13, textDecoration:'none'}}, 'About'),
+          h('button', {className:'btn btn-icon btn-ghost', onClick: toggleTheme, title:'Toggle theme'}, '◑')
+        )
+      );
+      var counter = h(F, null,
+        h('div', {className:'sz-step-counter'}, 'Step ' + (step + 1) + ' of ' + totalSteps),
+        h('div', {style:{width:'100%', height:3, borderRadius:2, background:'var(--border)', marginBottom:12, overflow:'hidden'}},
+          h('div', {style:{width: ((step + 1) / totalSteps * 100) + '%', height:'100%', borderRadius:2, background:'var(--accent, var(--gold, #888))', transition:'width 0.3s ease'}})
+        )
+      );
+
+      // ════════════════════════════════════════════════════════════════
+      // STEP RENDERERS
+      // ════════════════════════════════════════════════════════════════
+      var content;
+
+      // ── CAMPAIGN ──
+      if (stepId === 'campaign') {
+        content = h(F, null,
+          h('div', {className:'sz-step-title'}, 'Choose Your Campaign'),
+          h('div', {className:'sz-body'},
+            p('Which world are you playing in? This determines the setting details, example aspects, and story prompts throughout the wizard.'),
+            h('div', {style:{display:'flex',alignItems:'flex-start',gap:10,padding:'10px 14px',background:'var(--glass-bg)',border:'1px solid var(--glass-border)',borderRadius:'var(--glass-radius)',margin:'8px 0 4px',fontSize:'var(--text-sm)',color:'var(--text-dim)',lineHeight:1.6}},
+              h('span', {style:{fontSize:18,flexShrink:0}}, '💡'),
+              h('span', null, h('strong', {style:{color:'var(--text)',fontWeight:600}}, 'Works solo or with your full table. '), 'Run it alone to prep your campaign and print character sheets, or share your screen and walk through it together as a group.')
+            )
+          ),
+          h('div', {className:'sz-grid sz-grid-2'},
+            CAMP_ORDER.map(function(id) {
+              var cm = CAMPAIGNS[id].meta;
+              return h('div', {key: id, className: 'sz-option' + (campId === id ? ' selected' : ''), onClick: function() { selectCamp(id); }},
+                h('div', {className:'sz-option-title'}, cm.name),
+                h('div', {className:'sz-option-sub'}, cm.tagline.split('.')[0] + '.')
+              );
+            })
+          )
+        );
+      }
+
+      // ── MODE ──
+      else if (stepId === 'mode') {
+        content = h(F, null,
+          h('div', {className:'sz-step-title'}, 'How Deep Do You Want to Go?'),
+          h('div', {className:'sz-body'},
+            p('All three methods produce valid Fate Condensed characters. Choose based on how much time you have and how much pre-play collaboration your group wants.')
+          ),
+          h('div', {className:'sz-grid'},
+            MODES.map(function(md) {
+              return h('div', {key: md.id, className: 'sz-option' + (mode === md.id ? ' selected' : ''), onClick: function() { selectMode(md.id); }, style: {textAlign:'left'}},
+                h('div', {className:'sz-option-tag'}, md.tag),
+                h('div', {className:'sz-option-title'}, md.label),
+                h('div', {className:'sz-option-sub'}, md.sub)
+              );
+            })
+          )
+        );
+      }
+
+      // ── SETTING ──
+      else if (stepId === 'setting') {
+        var ci = camp ? camp.tables.current_issues : [];
+        var ii = camp ? camp.tables.impending_issues : [];
+        var ciIdx = ci.length > 0 ? rerolls % ci.length : 0;
+        var iiIdx = ii.length > 0 ? (rerolls + 1) % ii.length : 0;
+        content = h(F, null,
+          h('div', {className:'sz-step-title'}, 'The World You\'re Playing In'),
+          h('div', {className:'sz-body'},
+            p('Read these aloud. These are the pressures that define your campaign world. Everything your characters do will exist in the shadow of these issues.'),
+            card('⚡ Current Issue — Happening NOW', h(F, null,
+              ci.length > 0 ? h(F, null,
+                h('div', {className:'sz-issue-name'}, ci[ciIdx].name),
+                h('div', {className:'sz-issue-desc'}, ci[ciIdx].desc)
+              ) : p('No current issues defined.')
+            )),
+            card('🌑 Impending Issue — Brewing on the Horizon', h(F, null,
+              ii.length > 0 ? h(F, null,
+                h('div', {className:'sz-issue-name'}, ii[iiIdx].name),
+                h('div', {className:'sz-issue-desc'}, ii[iiIdx].desc)
+              ) : p('No impending issues defined.')
+            )),
+            rerollBtn(reroll, 'Different issues'),
+            tip('Discuss for 5 minutes: What does this world feel like? Who has power? What\'s at stake? This shared understanding is the foundation everything else builds on.')
+          )
+        );
+      }
+
+      // ── HIGH CONCEPT ──
+      else if (stepId === 'highconcept') {
+        // Use rerolls counter to seed deterministic-ish picks
+        var hcExamples = camp ? [fillTemplate(camp.tables.major_concepts), fillTemplate(camp.tables.major_concepts), fillTemplate(camp.tables.major_concepts), fillTemplate(camp.tables.major_concepts)] : [];
+        void rerolls; // force dependency so re-render picks new values
+        content = h(F, null,
+          h('div', {className:'sz-step-title'}, 'High Concept'),
+          h('div', {className:'sz-body'},
+            p('Go around the table. Each player says, in one phrase, who their character is. Not what they can do — who they are in the story.'),
+            h('div', {className:'sz-prompt-box'},
+              '"If someone asked ', h('em', null, 'what\'s your character about?'), ' at a bar, what would you say?"'
+            ),
+            card('Setting Examples', h(F, null,
+              h('ul', {className:'sz-aspect-list'},
+                hcExamples.map(function(ex, i) { return h('li', {key: i + '-' + rerolls}, ex); })
+              ),
+              rerollBtn(reroll, 'New examples')
+            )),
+            PT.dnd_contrasts ? dnd(PT.dnd_contrasts.high_concept) : null,
+            PT.aspect_tips ? tip(PT.aspect_tips[0]) : null
+          )
+        );
+      }
+
+      // ── TROUBLE ──
+      else if (stepId === 'trouble') {
+        var trExamples = camp ? pickN(camp.tables.troubles, 4) : [];
+        void rerolls;
+        content = h(F, null,
+          h('div', {className:'sz-step-title'}, 'Trouble'),
+          h('div', {className:'sz-body'},
+            p('Go around the table. What makes your character\'s life harder? This is the aspect that will earn you the most fate points — so make it good.'),
+            h('div', {className:'sz-prompt-box'},
+              '"When things go wrong for your character, ', h('em', null, 'why'), ' do they go wrong? What keeps pulling them back into trouble?"'
+            ),
+            card('Setting Examples', h(F, null,
+              h('ul', {className:'sz-aspect-list'},
+                trExamples.map(function(ex, i) { return h('li', {key: i + '-' + rerolls}, ex); })
+              ),
+              rerollBtn(reroll, 'New examples')
+            )),
+            PT.dnd_contrasts ? dnd(PT.dnd_contrasts.trouble) : null,
+            tip('A boring trouble earns you nothing. "Has Enemies" is flat. "The Warlord\'s Daughter Wants Me Dead" is a compel waiting to happen every single session.')
+          )
+        );
+      }
+
+      // ── RELATIONSHIP (Standard mode) ──
+      else if (stepId === 'relationship') {
+        var templates = PT.relationship_templates || [];
+        content = h(F, null,
+          h('div', {className:'sz-step-title'}, 'Relationship'),
+          h('div', {className:'sz-body'},
+            p('Pair up. Each player connects their character to one other PC. Good relationships have tension — not hostility, but imbalance.'),
+            card('Pick a Template', h('ul', {className:'sz-template-list'},
+              templates.map(function(t, i) { return h('li', {key:i}, t); })
+            )),
+            tip('The relationship aspect is the strongest compel material in the entire campaign. Cross-PC history is fuel. Invest here.'),
+            h('div', {className:'sz-warn'}, 'Write this one down on paper now. It\'s your third aspect.')
+          )
+        );
+      }
+
+      // ── FREE ASPECTS (Standard mode) ──
+      else if (stepId === 'freeaspects') {
+        content = h(F, null,
+          h('div', {className:'sz-step-title'}, 'Two Free Aspects'),
+          h('div', {className:'sz-body'},
+            p('These can be anything — gear, history, reputation, a catchphrase, a connection to the setting. There are no restrictions beyond fitting the world.'),
+            h('div', {className:'sz-card', style:{borderColor:'var(--c-green)', background:'rgba(80,184,120,0.06)'}},
+              h('div', {className:'sz-card-title', style:{color:'var(--c-green)'}}, '✓ You Can Leave These Blank'),
+              p('This is an official Condensed rule (p.47), not cheating. Most experienced Fate GMs recommend leaving at least one blank. You\'ll know what your character needs after the first scene, not before it.')
+            ),
+            card('If You Want to Fill Them Now', h(F, null,
+              p('Think about:'),
+              h('ul', {className:'sz-aspect-list'},
+                ['A signature piece of equipment or weapon',
+                 'A reputation or title that precedes you',
+                 'A personal code or belief that drives decisions',
+                 'A connection to a faction, place, or NPC in the setting',
+                 'A catchphrase that captures your attitude'].map(function(item, i) {
+                  return h('li', {key:i}, item);
+                })
+              )
+            )),
+            PT.aspect_tips ? tip(PT.aspect_tips[1]) : null
+          )
+        );
+      }
+
+      // ── PHASE 1 (Trio mode) ──
+      else if (stepId === 'phase1') {
+        content = h(F, null,
+          h('div', {className:'sz-step-title'}, 'Phase 1 — Your First Adventure'),
+          h('div', {className:'sz-body'},
+            p('Go around the table. Each player tells a short story about something that happened to their character before the campaign begins. Use the prompt below as a starting point — generate one per player.'),
+            phase1Prompt
+              ? h('div', {className:'sz-prompt-box'},
+                  '"I was at ', h('span', {className:'sz-prompt-fill'}, phase1Prompt.location),
+                  ' when ', h('span', {className:'sz-prompt-fill'}, phase1Prompt.threat),
+                  ' happened, and I [solved it / survived / escaped] by ', h('span', {className:'sz-prompt-fill'}, '______'), '."'
+                )
+              : null,
+            h('div', {style:{display:'flex', gap:8, marginTop:12}},
+              h('button', {className:'btn btn-primary', onClick: genPhase1}, phase1Prompt ? '🎲 New Prompt' : '🎲 Generate a Prompt'),
+            ),
+            card('What This Produces', h(F, null,
+              p('Your answer gives you: a situation (setting hook), a method (skill hint), and — most importantly — your third aspect.'),
+              p('After you narrate, ask yourself: "What does this say about who I am?" Write that as an aspect.')
+            )),
+            example('"I was at the Sealed Phade Vault when the Servitors reactivated, and I survived by talking to the lead unit in a language I shouldn\'t know." → Aspect: "The Old Machines Listen to Me"')
+          )
+        );
+      }
+
+      // ── PHASE 2 (Trio mode) ──
+      else if (stepId === 'phase2') {
+        var roles = PT.guest_star_roles || [];
+        content = h(F, null,
+          h('div', {className:'sz-step-title'}, 'Phase 2 — Guest Starring'),
+          h('div', {className:'sz-body'},
+            p('Pass your Phase 1 story to the player on your left. They were there. How were they involved? Pick a role:'),
+            h('div', {className:'sz-grid'},
+              roles.map(function(role) {
+                return h('div', {key: role.id, className:'sz-role-card'},
+                  h('div', {className:'sz-role-label'}, role.label),
+                  h('div', {className:'sz-role-desc'}, role.desc),
+                  h('div', {className:'sz-role-hint'}, 'Aspect type: ' + role.aspect_hint),
+                  h('ul', {className:'sz-aspect-list'},
+                    role.examples.map(function(ex, i) { return h('li', {key:i}, ex); })
+                  )
+                );
+              })
+            ),
+            card('What This Produces', h(F, null,
+              p('This is your Relationship aspect — the same one Condensed requires, but now it\'s grounded in a shared story instead of invented from nothing.'),
+              p('Narrate one sentence about how you were involved, then write the aspect.')
+            ))
+          )
+        );
+      }
+
+      // ── PHASE 3 (Trio mode) ──
+      else if (stepId === 'phase3') {
+        var roles3 = PT.guest_star_roles || [];
+        content = h(F, null,
+          h('div', {className:'sz-step-title'}, 'Phase 3 — Guest Starring Again'),
+          h('div', {className:'sz-body'},
+            p('Pass your Phase 1 story to the player on your right (a different player than Phase 2). They pick a role and narrate their involvement. This produces your fifth and final aspect.'),
+            h('div', {className:'sz-grid'},
+              roles3.map(function(role) {
+                return h('div', {key: role.id, className:'sz-role-card'},
+                  h('div', {className:'sz-role-label'}, role.label),
+                  h('div', {className:'sz-role-desc'}, role.desc),
+                  h('div', {className:'sz-role-hint'}, 'Aspect type: ' + role.aspect_hint)
+                );
+              })
+            ),
+            tip('If someone is struggling, remind them: you only need one sentence. "I was the one who brought the rope" is enough. The aspect writes itself from there.'),
+            h('div', {className:'sz-warn'}, 'After this step, every character should have five aspects: High Concept, Trouble, and three from the Phase Trio. Write them all down.')
+          )
+        );
+      }
+
+      // ── FLASHBACKS ──
+      else if (stepId === 'flashbacks') {
+        content = h(F, null,
+          h('div', {className:'sz-step-title'}, 'Flashback Slots'),
+          h('div', {className:'sz-body'},
+            h('div', {className:'sz-card', style:{borderColor:'var(--c-green)', background:'rgba(80,184,120,0.06)'}},
+              h('div', {className:'sz-card-title', style:{color:'var(--c-green)'}}, 'The Rule'),
+              h('p', {style:{fontSize:'var(--text-lg)', lineHeight:1.7}}, PT.flashback_rules || '')
+            ),
+            card('How It Works in Play', h(F, null,
+              example('"Wait — I know this mercenary! We served together in the Siege of Orizon. He still owes me 50 credits." → Write the aspect: "Brothers in Arms from the Siege of Orizon" → Use it immediately.'),
+              p('Each flashback slot produces one aspect. You have three slots for: your Relationship aspect and your two free aspects. Use them whenever a dramatic moment calls for a connection, a piece of history, or a reveal.')
+            )),
+            tip('This method produces the best aspects because they emerge from actual dramatic need. The cost is starting Session 1 with a slightly incomplete sheet — which is perfectly legal and honestly better.'),
+            h('div', {className:'sz-warn'}, 'For now, write down only your High Concept and Trouble. Leave the other three slots blank. You\'ll fill them during play.')
+          )
+        );
+      }
+
+      // ── SKILLS ──
+      else if (stepId === 'skills') {
+        content = h(F, null,
+          h('div', {className:'sz-step-title'}, 'Skills'),
+          h('div', {className:'sz-body'},
+            p('Your skill pyramid defines what your character is good at. Assign ratings in this shape:'),
+            h('div', {className:'sz-skill-pyramid'},
+              [['Great (+4)', '1 skill'], ['Good (+3)', '2 skills'], ['Fair (+2)', '3 skills'], ['Average (+1)', '4 skills'], ['Mediocre (+0)', 'Everything else']].map(function(row) {
+                return h('div', {key: row[0], className:'sz-skill-row-wrap'},
+                  h('span', {className:'sz-skill-label'}, row[0]),
+                  h('div', {className:'sz-skill-row'}, h('div', {className:'sz-skill-slot'}, row[1]))
+                );
+              })
+            ),
+            card('The 19 Skills', h('ul', {className:'sz-skill-list'},
+              ALL_SKILLS.map(function(sk) {
+                return h('li', {key:sk}, h('strong', null, sk), ' — ', SKILL_DESCS[sk] || '');
+              })
+            )),
+            PT.dnd_contrasts ? dnd(PT.dnd_contrasts.skills) : null,
+            tip('Physique sets your physical stress boxes. Will sets your mental stress boxes. Characters with neither above +0 get 3 boxes each — which isn\'t much. Plan accordingly.')
+          )
+        );
+      }
+
+      // ── STUNTS ──
+      else if (stepId === 'stunts') {
+        var stuntExamples = camp ? pickN(camp.tables.stunts, 4) : [];
+        void rerolls;
+        content = h(F, null,
+          h('div', {className:'sz-step-title'}, 'Stunts'),
+          h('div', {className:'sz-body'},
+            p('You get 3 free stunts. There are two types:'),
+            card('+2 Bonus Stunt', h(F, null,
+              p('"Because I [describe why], I get +2 when I use [skill] to [overcome/create advantage/attack/defend] when [circumstance]."'),
+              stuntExamples[0] ? example(stuntExamples[0].name + ' [' + stuntExamples[0].skill + '] — ' + stuntExamples[0].desc) : null
+            )),
+            card('Rule-Changing Stunt', h(F, null,
+              p('"Because I [describe why], I can [special effect], but only [limitation]."'),
+              stuntExamples[1] ? example(stuntExamples[1].name + ' [' + stuntExamples[1].skill + '] — ' + stuntExamples[1].desc) : null
+            )),
+            stuntExamples.length > 2 ? card('More Examples', h('ul', {className:'sz-aspect-list'},
+              stuntExamples.slice(2).map(function(s, i) { return h('li', {key: i + '-' + rerolls}, s.name + ' [' + s.skill + '] — ' + s.desc); })
+            )) : null,
+            rerollBtn(reroll, 'New stunt examples'),
+            h('div', {className:'sz-card', style:{borderColor:'var(--c-green)', background:'rgba(80,184,120,0.06)'}},
+              h('div', {className:'sz-card-title', style:{color:'var(--c-green)'}}, '✓ Leave All Three Blank'),
+              p('Define stunts the first time you wish you had one. "I wish I could do X right now" is the perfect moment to write a stunt. This is official Condensed design.')
+            ),
+            PT.dnd_contrasts ? dnd(PT.dnd_contrasts.stunts) : null
+          )
+        );
+      }
+
+      // ── STRESS ──
+      else if (stepId === 'stress') {
+        content = h(F, null,
+          h('div', {className:'sz-step-title'}, 'Stress & Consequences'),
+          h('div', {className:'sz-body'},
+            p('Look at your Physique rating and your Will rating. Find them on the table below.'),
+            h('table', {className:'sz-stress-table'},
+              h('thead', null, h('tr', null, h('th', null, 'Skill Rating'), h('th', null, 'Stress Boxes'))),
+              h('tbody', null,
+                h('tr', null, h('td', null, 'Mediocre (+0)'), h('td', null, '☐ ☐ ☐ (3 boxes)')),
+                h('tr', null, h('td', null, 'Average (+1) or Fair (+2)'), h('td', null, '☐ ☐ ☐ ☐ (4 boxes)')),
+                h('tr', null, h('td', null, 'Good (+3) or Great (+4)'), h('td', null, '☐ ☐ ☐ ☐ ☐ ☐ (6 boxes)')),
+                h('tr', null, h('td', null, 'Superb (+5)+'), h('td', null, '☐ ☐ ☐ ☐ ☐ ☐ + extra mild consequence'))
+              )
+            ),
+            card('Consequences', h(F, null,
+              p('Everyone starts with three consequence slots:'),
+              h('table', {className:'sz-stress-table'},
+                h('tbody', null,
+                  h('tr', null, h('td', null, 'Mild'), h('td', null, 'Absorbs 2 shifts'), h('td', null, 'Clears: next scene after treatment')),
+                  h('tr', null, h('td', null, 'Moderate'), h('td', null, 'Absorbs 4 shifts'), h('td', null, 'Clears: full session after treatment')),
+                  h('tr', null, h('td', null, 'Severe'), h('td', null, 'Absorbs 6 shifts'), h('td', null, 'Clears: after breakthrough + treatment'))
+                )
+              ),
+              p('Treatment requires a successful overcome roll: Academics for physical, Empathy for mental.')
+            )),
+            PT.dnd_contrasts ? dnd(PT.dnd_contrasts.stress) : null,
+            tip('Stress clears after every scene. Consequences stick around and can be compelled against you — but they also earn you fate points when they cause trouble.')
+          )
+        );
+      }
+
+      // ── SUMMARY + EXPORT ──
+      else if (stepId === 'summary') {
+        var campName = camp ? camp.meta.name : '—';
+        var modeLabel = mode === 'trio' ? 'Phase Trio' : mode === 'flashback' ? 'Flashback Slots' : 'Condensed Standard';
+        var hook = camp ? pick(camp.tables.backstory_hooks) : 'Something dangerous is happening right now.';
+        void rerolls;
+
+        var aspectSlots;
+        if (mode === 'standard') aspectSlots = ['High Concept', 'Trouble', 'Relationship', 'Free Aspect', 'Free Aspect'];
+        else if (mode === 'trio') aspectSlots = ['High Concept', 'Trouble', 'Phase 1 Aspect', 'Phase 2 (Relationship)', 'Phase 3 Aspect'];
+        else aspectSlots = ['High Concept', 'Trouble', 'Flashback 1 _(during play)_', 'Flashback 2 _(during play)_', 'Flashback 3 _(during play)_'];
+
+        content = h(F, null,
+          h('div', {className:'sz-step-title'}, 'Summary & Export'),
+          h('div', {className:'sz-body'},
+
+            // Summary cards
+            h('div', {className:'sz-summary-section'},
+              h('div', {className:'sz-summary-label'}, 'Campaign'),
+              h('div', {className:'sz-summary-value'}, campName)
+            ),
+            h('div', {className:'sz-summary-section'},
+              h('div', {className:'sz-summary-label'}, 'Mode'),
+              h('div', {className:'sz-summary-value'}, modeLabel)
+            ),
+            h('div', {className:'sz-summary-section'},
+              h('div', {className:'sz-summary-label'}, 'Aspect Slots'),
+              h('ol', {style:{margin:'8px 0 0 20px', color:'var(--text-dim)'}},
+                aspectSlots.map(function(s, i) { return h('li', {key:i, style:{padding:'4px 0'}}, s); })
+              )
+            ),
+            h('div', {className:'sz-summary-section'},
+              h('div', {className:'sz-summary-label'}, 'Skill Pyramid'),
+              h('div', {className:'sz-summary-value'}, '1 × Great (+4) · 2 × Good (+3) · 3 × Fair (+2) · 4 × Average (+1)')
+            ),
+            h('div', {className:'sz-summary-section'},
+              h('div', {className:'sz-summary-label'}, 'Stunts & Refresh'),
+              h('div', {className:'sz-summary-value'}, '3 free stunts (can leave blank) · Refresh: 3')
+            ),
+
+            // Opening hook
+            card('🎬 Opening Hook', h(F, null,
+              h('div', {style:{fontSize:'var(--text-lg)', fontStyle:'italic', color:'var(--text)', lineHeight:1.7, padding:'8px 0'}}, hook),
+              rerollBtn(reroll, 'Different hook')
+            )),
+
+            // Advancement
+            card('📈 Advancement — How You Level Up', h(F, null,
+              h('div', {style:{marginBottom:10}},
+                h('strong', {style:{color:'var(--gold)'}}, 'Milestone'),
+                h('span', {style:{color:'var(--text-muted)'}}, ' (end of each session)'),
+                h('div', {style:{fontSize:14, color:'var(--text-dim)', marginTop:4}}, 'Swap two skill ranks, rewrite a stunt, rewrite one aspect (not high concept), or buy a new stunt for 1 Refresh.')
+              ),
+              h('div', null,
+                h('strong', {style:{color:'var(--gold)'}}, 'Breakthrough'),
+                h('span', {style:{color:'var(--text-muted)'}}, ' (end of a story arc)'),
+                h('div', {style:{fontSize:14, color:'var(--text-dim)', marginTop:4}}, 'Everything from a milestone PLUS: rewrite your high concept, increase one skill by +1, and begin recovery of moderate/severe consequences.')
+              )
+            )),
+
+            // Checklist
+            card('✓ Quick Checklist', h('ul', {className:'sz-aspect-list'},
+              [
+                'High Concept written down',
+                'Trouble written down',
+                mode === 'flashback' ? 'Three Flashback Slots noted (use during play)' : 'Relationship aspect written down',
+                mode === 'trio' ? 'Phase 1 + Phase 2 + Phase 3 aspects written down' : (mode === 'standard' ? 'Free aspects: written or marked blank' : 'Remaining aspects: discover during play'),
+                'Skill pyramid filled in (at minimum: Great, Good, and Fair rows)',
+                'Stunts: filled in or marked blank for later',
+                'Stress boxes counted from Physique and Will',
+                'Refresh: 3 (minus extra stunts beyond 3)',
+              ].map(function(item, i) { return h('li', {key:i}, item); })
+            )),
+
+            // Export bar
+            h('div', {className:'sz-export-bar'},
+              h('button', {className:'btn btn-primary', onClick: copyMarkdown}, '📋 Copy as Markdown'),
+              h('button', {className:'btn btn-ghost', onClick: function() { window.print(); }}, '🖨 Print / Save PDF')
+            ),
+            copied ? h('div', {className:'sz-copied'}, copied) : null,
+
+            tip('Session 1 starts IN the situation. No tavern. No meeting. The opening hook drops the PCs directly into the action. Aspects you left blank will reveal themselves naturally in the first few scenes.'),
+
+            // Campaign link
+            h('div', {style:{textAlign:'center', marginTop:24}},
+              h('a', {
+                href: campId ? campId + '.html' : '../index.html',
+                className:'btn btn-primary',
+                style:{fontSize:'var(--text-lg)', padding:'14px 32px'}
+              }, '→ Go to ' + campName + ' Generators')
+            )
+          )
+        );
+      }
+
+      // ── Assemble ──
+      return h(F, null,
+        navBar,
+        h('div', {className:'sz-container'},
+        step === 0 ? h('div', {className:'sz-header'},
+          h('div', {className:'sz-title'}, 'Session Zero'),
+          h('div', {className:'sz-subtitle'}, 'Fate Condensed Character Creation Wizard')
+        ) : null,
+        counter,
+        content,
+        nav
+      ) // close sz-container
+      ); // close Fragment
+    }
+
+    // ── Mount ──
+    (function() {
+      var raw=localStorage.getItem('fate_prefs_v1');var t=(raw?JSON.parse(raw).theme:null)||localStorage.getItem('fate_theme')||'dark';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+    ReactDOM.createRoot(document.getElementById('root')).render(h(SessionZeroApp));
+  })();
+  </script>
+</body>
+</html>
