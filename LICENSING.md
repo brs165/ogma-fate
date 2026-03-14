@@ -5,13 +5,13 @@ This document covers the licensing of the **Fate Condensed Campaign Generator Su
 
 The authoritative source for all Fate SRD licensing requirements is: **https://fate-srd.com/official-licensing-fate**
 
-Fate SRD content hosted and maintained by **Randy Oest (Amazing Rando Design)** at https://fate-srd.com/ — the canonical online reference for all SRD content this tool draws from.
+Fate SRD content hosted and maintained by **Randy Oest (Amazing Rando Design)** at https://fate-srd.com/ - the canonical online reference for all SRD content this tool draws from.
 
 ---
 
 ## This Work
 
-The Fate Condensed Campaign Generator Suite — including all code, generator logic, campaign data tables, and original content — is released under the **Creative Commons Attribution 3.0 Unported license**.
+The Fate Condensed Campaign Generator Suite - including all code, generator logic, campaign data tables, and original content - is released under the **Creative Commons Attribution 3.0 Unported license**.
 
 https://creativecommons.org/licenses/by/3.0/
 
@@ -57,7 +57,7 @@ This project is not affiliated with, endorsed by, or sponsored by Evil Hat Produ
 
 ## Original Content
 
-Campaign table content — NPC names, aspects, scene elements, opposition, locations, and all original prose — is released under CC BY 3.0 alongside the rest of this work.
+Campaign table content - NPC names, aspects, scene elements, opposition, locations, and all original prose - is released under CC BY 3.0 alongside the rest of this work.
 
 ---
 
@@ -65,10 +65,10 @@ Campaign table content — NPC names, aspects, scene elements, opposition, locat
 
 CC BY 3.0 requires that you:
 
-1. **Credit this work** — state clearly that your work is derived from the Fate Condensed Campaign Generator Suite
-2. **Credit the upstream sources** — include all five attribution blocks above, exactly as written, at the same text size as your other copyright text
-3. **Link to the license** — reference the Creative Commons Attribution 3.0 Unported license (https://creativecommons.org/licenses/by/3.0/)
-4. **Indicate changes** — note if you have modified the content
+1. **Credit this work** - state clearly that your work is derived from the Fate Condensed Campaign Generator Suite
+2. **Credit the upstream sources** - include all five attribution blocks above, exactly as written, at the same text size as your other copyright text
+3. **Link to the license** - reference the Creative Commons Attribution 3.0 Unported license (https://creativecommons.org/licenses/by/3.0/)
+4. **Indicate changes** - note if you have modified the content
 
 You do **not** need to license your derivative work under CC BY 3.0, make it open source, or seek permission from this project or from Evil Hat Productions.
 

@@ -2,9 +2,9 @@
 <html lang="en" data-theme="dark" data-campaign="cyberpunk">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Neon Abyss — Campaign Guide</title>
+<title>Neon Abyss - Campaign Guide</title>
 <link rel="icon" type="image/svg+xml" href="../assets/favicons/icon.svg">
-<link rel="stylesheet" href="../assets/css/theme.css?v=10">
+<link rel="stylesheet" href="../assets/css/theme.css?v=18">
 <style>
 .cg{max-width:680px;margin:0 auto;padding:24px 20px 80px;position:relative;z-index:1}
 .cg h1{font-size:var(--text-hero);font-weight:800;color:var(--text);margin-bottom:4px;letter-spacing:-0.02em}
@@ -22,6 +22,13 @@
 .cg-cta{text-align:center;margin-top:32px}.cg-cta a{display:inline-block;padding:12px 28px;border-radius:100px;text-decoration:none;font-weight:700;font-size:var(--text-sm);margin:4px}
 .cg-ft{text-align:center;padding:28px 20px;font-size:var(--text-label);color:var(--text-muted);border-top:1px solid var(--border)}.cg-ft a{color:var(--text-dim);text-decoration:none}
 @media print{.land-topnav,.cg-ft,.cg-cta{display:none!important}body{background:#fff!important;color:#111!important}}
+
+  .cg-guide-nav{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+    margin:32px 0 0;padding:16px 20px;
+    background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);
+    border:1px solid var(--glass-border);border-radius:var(--glass-radius);font-size:var(--text-sm)}
+  .cg-guide-nav a{color:var(--accent);text-decoration:none;font-weight:600}
+  .cg-guide-nav a:hover{text-decoration:underline}
 </style>
 </head>
 <body>
@@ -29,14 +36,14 @@
   <a href="../index.html" class="land-topnav-brand" style="text-decoration:none">🎲 Ogma</a>
   <div class="land-topnav-actions">
     <a href="../campaigns/cyberpunk.html" class="btn btn-ghost land-topnav-btn" style="font-size:13px;text-decoration:none">🎲 Open Generator</a>
-    <a href="../learn.html" class="btn btn-ghost land-topnav-btn" style="font-size:13px;text-decoration:none">📖 Learn</a>
+    <a href="../learn.html" class="btn btn-ghost land-topnav-btn" style="font-size:13px;text-decoration:none">📖 Quick Start</a>
     <a href="../about.html" class="btn btn-ghost land-topnav-btn land-topnav-hide-sm" style="font-size:13px;text-decoration:none">About</a>
     <button class="btn btn-icon btn-ghost" onclick="var n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var _p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');_p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p));}catch(_e){}" title="Toggle theme">◑</button>
   
     <button class="land-topnav-hamburger" id="topnav-hbg" aria-label="Open navigation" aria-expanded="false">☰</button>
     <div class="land-topnav-dropdown" id="topnav-dd">
         <a href="../campaigns/cyberpunk.html">🎲 Open Generator</a>
-        <a href="../learn.html">📖 Learn</a>
+        <a href="../learn.html">📖 Quick Start</a>
         <a href="../campaigns/transition.html">⚔ D&D Guide</a>
         <a href="../about.html">About</a>
         <button onclick="window.print()">🖨 Print</button>
@@ -55,15 +62,15 @@
 <div class="cg-stat"><b>12</b><span>Challenges</span></div>
 </div>
 <h2>Tone & Atmosphere</h2>
-<p>Noir-inflected techno-anxiety. The technology is personal — in your body, owned by someone else, knowing things about you that you don't. The corporations are profitable in a way that makes evil efficient.</p>
+<p>Noir-inflected techno-anxiety. The technology is personal - in your body, owned by someone else, knowing things about you that you don't. The corporations are profitable in a way that makes evil efficient.</p>
 <h2>For Players</h2>
-<p>You are runners, fixers, and ghosts in the machine. Your augments are your résumé and your leash. Every job pays the debt a little — and puts you deeper into someone else's ledger.</p>
+<p>You are runners, fixers, and ghosts in the machine. Your augments are your résumé and your leash. Every job pays the debt a little - and puts you deeper into someone else's ledger.</p>
 <h2>Key Factions</h2>
 <p>Megacorporations (OmniSec and others), street gangs (territorial), fixer networks (grey-market brokers), underground resistance, black clinics (outside the contract system), media operatives (the story is the weapon).</p>
 <h2>Inspirations</h2>
 <div class="cg-card"><p style="margin:0">Neuromancer, Blade Runner, Cyberpunk Edgerunners, Ghost in the Shell, Akira, Mr. Robot</p></div>
 <h2>Sample Troubles</h2>
-<p>Every PC has a Trouble — the thing that makes their life complicated:</p>
+<p>Every PC has a Trouble - the thing that makes their life complicated:</p>
 <div class="cg-sample">My Augments Are Corp Property and They Know It</div>
 <div class="cg-sample">There's a Kill Switch I Can't Find</div>
 <div class="cg-sample">I Owe Everyone and Trust No One</div>
@@ -87,6 +94,11 @@
 <a href="cyberpunk.html" style="background:var(--accent,var(--c-blue));color:#fff">🎲 Open Generator</a>
 <a href="sessionzero.html" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
 </div>
+</div>
+
+<div class="cg-guide-nav">
+  <a href="../index.html"><i class="ra ra-mountains" aria-hidden="true"></i> All Worlds</a>
+  <a href="cyberpunk.html"><i class="ra ra-crossed-swords" aria-hidden="true"></i> Open Neon Abyss Generator</a>
 </div>
 <footer class="cg-ft"><div>Fate™ is a trademark of <a href="https://www.evilhat.com" target="_blank" rel="noreferrer">Evil Hat Productions, LLC</a>.</div>
 <div><a href="../license.html">CC BY 3.0</a> · <a href="../about.html">About</a></div></footer>

@@ -13,6 +13,75 @@ var useEffect    = React.useEffect;
 var useRef       = React.useRef;
 var Fragment     = React.Fragment;
 
+// ── RPG Awesome icon map (BL-iconography) ────────────────────────────────
+// Maps generator IDs and UI keys to RPG Awesome class names.
+// Usage: h(RaIcon, {n:'crossed-swords'}) or RaIcon({n:'trophy'})
+var RA_ICONS = {
+  // Generators
+  npc_minor:    'player',
+  npc_major:    'player-king',
+  scene:        'campfire',
+  campaign:     'scroll-unfurled',
+  encounter:    'crossed-swords',
+  seed:         'trail',
+  compel:       'divert',
+  challenge:    'archery-target',
+  contest:      'trophy',
+  consequence:  'bleeding-hearts',
+  faction:      'castle-flag',
+  complication: 'burst-blob',
+  backstory:    'quill-ink',
+  obstacle:     'barrier',
+  countdown:    'hourglass',
+  constraint:   'locked-fortress',
+  // UI chrome
+  gm_mode:      'player-king',
+  fp_tracker:   'diamond',
+  history:      'scroll-unfurled',
+  pin:          'rune-stone',
+  play_intro:   'forward',
+  guide:        'book',
+  rules:        'help',
+  dnd_guide:    'crossed-swords',
+  home:         'castle-emblem',
+  customize:    'cog',
+  settings:     'cog-wheel',
+  theme_light:  'sun',
+  theme_dark:   'snowflake',
+  inspire:      'crystal-ball',
+  // Landing
+  session_zero: 'sprout',
+  learn:        'book',
+  // Generator groups
+  characters:   'player',
+  scenes:       'campfire',
+  pacing:       'hourglass',
+  world:        'mountains',
+};
+
+// RaIcon: renders an RPG Awesome <i> tag. n = class suffix (e.g. 'sword').
+// Pass size prop for ra-lg, ra-2x etc.
+function RaIcon(props) {
+  return h('i', {
+    className: 'ra ra-' + props.n + (props.size ? ' ra-' + props.size : ''),
+    'aria-hidden': 'true',
+    style: {fontSize: 'inherit', lineHeight: 1, verticalAlign: 'middle'},
+  });
+}
+
+// ModalHeader: standard modal title bar with close button.
+// Extracted from 4 identical inline patterns — single source of truth.
+function ModalHeader(props) {
+  return h('div', {className: 'modal-header'},
+    h('div', {className: 'modal-title'}, props.title),
+    h('button', {
+      className: 'btn btn-icon btn-ghost',
+      onClick: props.onClose,
+      'aria-label': 'Close',
+    }, '✕')
+  );
+}
+
 // ── UI timing constants ────────────────────────────────────────────────────
 var TIMING = {
   COPY_CONFIRM_MS:  2200,  // "Copied!" badge display duration
@@ -56,14 +125,14 @@ function Lbl(props) {
 
 function AspectBadge(props) {
   var COLOR_LABEL = {
-    "var(--accent)":   "High Concept — core identity; invoke for +2 or reroll, compel to create complications",
-    "var(--c-red)":    "Trouble — the complication driving drama; GMs compel this to offer fate points",
-    "var(--text-dim)": "Aspect — a true statement about the fiction; invoke with a fate point for +2 or reroll",
-    "var(--c-blue)":   "Setting Aspect — a permanent world truth; always available to invoke or compel",
-    "var(--c-purple)": "Scene Tone — atmospheric aspect; invoke to reinforce the mood or overcome it",
-    "var(--c-green)":  "Usable Element — something in the scene to exploit; invoke for +2 or Create Advantage",
+    "var(--accent)":   "High Concept - core identity; invoke for +2 or reroll, compel to create complications",
+    "var(--c-red)":    "Trouble - the complication driving drama; GMs compel this to offer fate points",
+    "var(--text-dim)": "Aspect - a true statement about the fiction; invoke with a fate point for +2 or reroll",
+    "var(--c-blue)":   "Setting Aspect - a permanent world truth; always available to invoke or compel",
+    "var(--c-purple)": "Scene Tone - atmospheric aspect; invoke to reinforce the mood or overcome it",
+    "var(--c-green)":  "Usable Element - something in the scene to exploit; invoke for +2 or Create Advantage",
   };
-  var tip = props.label || COLOR_LABEL[props.color] || "Aspect — invoke with a fate point for +2 or a reroll";
+  var tip = props.label || COLOR_LABEL[props.color] || "Aspect - invoke with a fate point for +2 or a reroll";
   return h('div', {
     className: 'aspect-badge',
     title: tip,
@@ -79,7 +148,7 @@ function AspectBadge(props) {
 
 function SkillBar(props) {
   var label = SKILL_LABEL[props.r] || ('+' + props.r);
-  var tip = props.name + ' at ' + label + ' (+' + props.r + ') — roll 4dF + ' + props.r + ' when this skill applies.';
+  var tip = props.name + ' at ' + label + ' (+' + props.r + ') - roll 4dF + ' + props.r + ' when this skill applies.';
   return h('div', {className: 'skill-bar', title: tip},
     h('div', {className: 'skill-rating'}, '+' + props.r),
     h('div', {className: 'skill-label-text'}, label),
@@ -87,11 +156,11 @@ function SkillBar(props) {
   );
 }
 
-// Interactive stress boxes — tap to mark/clear
+// Interactive stress boxes - tap to mark/clear
 function StressBoxes(props) {
   var _hit = useState(0); var hits = _hit[0]; var setHits = _hit[1];
   var n = props.n || 0;
-  var trackTip = (props.label || 'Stress') + ' track — ' + n + ' box' + (n !== 1 ? 'es' : '') + '. Tap a box to mark it. All stress clears at end of scene.';
+  var trackTip = (props.label || 'Stress') + ' track - ' + n + ' box' + (n !== 1 ? 'es' : '') + '. Tap a box to mark it. All stress clears at end of scene.';
   return h('div', {className: 'stress-track', title: trackTip},
     h('div', {className: 'stress-label-text'}, props.label || 'Stress'),
     h('div', {className: 'stress-boxes'},
@@ -124,7 +193,7 @@ function StuntRow(props) {
       h('span', {className: 'stunt-skill'}, s.skill),
       h('span', {
         className: 'stunt-badge',
-        title: isSpecial ? 'Once per scene — usable once; provides a special mechanical effect beyond a simple +2' : '+2 bonus — when the stunt condition applies, add +2 to the named skill roll',
+        title: isSpecial ? 'Once per scene - usable once; provides a special mechanical effect beyond a simple +2' : '+2 bonus - when the stunt condition applies, add +2 to the named skill roll',
         style: {
           background: isSpecial ? 'rgba(80,184,120,0.15)' : 'rgba(80,144,208,0.15)',
           color: isSpecial ? 'var(--c-green)' : 'var(--c-blue)',
@@ -137,7 +206,7 @@ function StuntRow(props) {
 }
 
 function GMNote(props) {
-  return h('div', {className: 'gm-note gm-guidance', title: 'GM Note — table advice for running this content'},
+  return h('div', {className: 'gm-note gm-guidance', title: 'GM Note - table advice for running this content'},
     h('div', {className: 'gm-note-label'}, 'GM Note'),
     h('div', {className: 'gm-note-text'}, props.text)
   );
@@ -166,7 +235,7 @@ function MinorResult(props) {
     h('div', {style: {fontSize: 20, fontWeight: 700, color: 'var(--gold)', marginBottom: 12, fontFamily: 'var(--font-ui)'}}, d.name),
     h(Lbl, {mb: 6}, 'ASPECTS'),
     d.aspects.map(function(a, i) {
-      return h(AspectBadge, {key: i, text: a, color: i === 0 ? 'var(--accent)' : 'var(--c-red)', label: i === 0 ? 'High Concept' : 'Weakness — GMs compel this for drama'});
+      return h(AspectBadge, {key: i, text: a, color: i === 0 ? 'var(--accent)' : 'var(--c-red)', label: i === 0 ? 'High Concept' : 'Weakness - GMs compel this for drama'});
     }),
     h('div', {style: {marginTop: 12}},
       h(Lbl, {mb: 6}, 'SKILLS'),
@@ -203,7 +272,7 @@ function MajorResult(props) {
     h('div', {style: {display:'flex', alignItems:'baseline', justifyContent:'space-between', marginBottom: 14}},
       h('div', {style: {fontSize: 20, fontWeight: 700, color: 'var(--gold)', fontFamily: 'var(--font-ui)'}}, d.name),
       h('div', {
-        title: 'Refresh — fate points this NPC starts each scene with; also minimum fate points after a session',
+        title: 'Refresh - fate points this NPC starts each scene with; also minimum fate points after a session',
         style: {fontSize: 'var(--text-sm)', color: 'var(--accent)', fontWeight: 700, background: 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 30%, transparent)', borderRadius: 20, padding: '2px 10px'},
       }, '↺ Refresh ' + d.refresh)
     ),
@@ -216,7 +285,7 @@ function MajorResult(props) {
     // Tab content
     activeTab === 'aspects' && h('div', null,
       h(AspectBadge, {text: d.aspects.high_concept, color: 'var(--accent)'}),
-      h(AspectBadge, {text: d.aspects.trouble, color: 'var(--c-red)', label: 'Trouble — the core complication driving this NPC\'s drama; compel it for a fate point'}),
+      h(AspectBadge, {text: d.aspects.trouble, color: 'var(--c-red)', label: 'Trouble - the core complication driving this NPC\'s drama; compel it for a fate point'}),
       d.aspects.others.map(function(a, i) { return h(AspectBadge, {key: i, text: a, color: 'var(--text-dim)'}); })
     ),
     activeTab === 'skills' && h('div', null,
@@ -243,7 +312,7 @@ function MajorResult(props) {
     ),
     activeTab === 'stunts' && h('div', null,
       d.stunts.map(function(s, i) { return h(StuntRow, {key: i, stunt: s}); }),
-      h(GMNote, {text: 'Major NPCs start each scene with Refresh fate points. They can concede — let them escape dramatically for a future session.'})
+      h(GMNote, {text: 'Major NPCs start each scene with Refresh fate points. They can concede - let them escape dramatically for a future session.'})
     )
   );
 }
@@ -256,7 +325,7 @@ function SceneResult(props) {
   var catLabel = {tone: 'TONE', movement: 'MOVEMENT', cover: 'COVER', danger: 'DANGER', usable: 'USABLE'};
   return h('div', null,
     h(Lbl, null, 'SCENE SETUP'),
-    h(Lbl, {mb: 6}, 'SITUATION ASPECTS — tap to mark active at the table'),
+    h(Lbl, {mb: 6}, 'SITUATION ASPECTS - tap to mark active at the table'),
     d.aspects.map(function(a, i) {
       var col = catColor[a.category] || 'var(--accent)';
       var isActive = pinned.includes(i);
@@ -292,7 +361,7 @@ function SceneResult(props) {
       h(Lbl, {mb: 6}, 'ZONES'),
       h('div', {className: 'zone-grid'},
         d.zones.map(function(z, i) {
-          return h('div', {key: i, className: 'zone-card', title: 'Zone — a distinct area of the scene.'},
+          return h('div', {key: i, className: 'zone-card', title: 'Zone - a distinct area of the scene.'},
             h('div', {className: 'zone-name'}, z.name),
             z.aspect && h('div', {className: 'zone-aspect-text'}, z.aspect),
             z.description && h('div', {className: 'zone-desc'}, z.description)
@@ -308,7 +377,7 @@ function SceneResult(props) {
         })
       )
     ),
-    h(GMNote, {text: 'Announce 1–2 visible aspects as players arrive. Let them discover the rest. ✓ marks the aspects currently in play — keep them where the table can see.'})
+    h(GMNote, {text: 'Announce 1–2 visible aspects as players arrive. Let them discover the rest. ✓ marks the aspects currently in play - keep them where the table can see.'})
   );
 }
 
@@ -332,7 +401,7 @@ function CampaignResult(props) {
         h('div', {style: {fontSize: 'var(--text-sm)', color: 'var(--text-dim)', lineHeight: 1.6, marginBottom: 8, marginTop: 4}}, iss.desc),
         iss.faces && iss.faces.map(function(f, i) {
           return h('div', {key: i, style: {fontSize: 'var(--text-sm)', color: 'var(--text-dim)', marginBottom: 3}},
-            h('span', {style: {color: iprops.color, fontWeight: 700}}, f.name), ' — ', f.role
+            h('span', {style: {color: iprops.color, fontWeight: 700}}, f.name), ' - ', f.role
           );
         }),
         iss.places && h('div', {style: {fontSize: 'var(--text-sm)', color: 'var(--text-muted)', marginTop: 4}}, '📍 ' + iss.places.join('  ·  '))
@@ -342,16 +411,16 @@ function CampaignResult(props) {
   return h('div', null,
     h(Lbl, null, 'CAMPAIGN ISSUES'),
     h('div', {style: {background: 'var(--inset)', border: '1px solid var(--border)', borderRadius: 8, padding: 12, marginBottom: 10}},
-      h('div', {style: {fontSize: 'var(--text-label)', letterSpacing: 2, color: 'var(--c-red)', textTransform: 'uppercase', marginBottom: 8}}, '⚡ Current Issue — happening NOW'),
+      h('div', {style: {fontSize: 'var(--text-label)', letterSpacing: 2, color: 'var(--c-red)', textTransform: 'uppercase', marginBottom: 8}}, '⚡ Current Issue - happening NOW'),
       h(Issue, {issue: d.current, color: 'var(--accent)'})
     ),
     h('div', {style: {background: 'var(--inset)', border: '1px solid var(--border)', borderRadius: 8, padding: 12, marginBottom: 10}},
-      h('div', {style: {fontSize: 'var(--text-label)', letterSpacing: 2, color: 'var(--c-purple)', textTransform: 'uppercase', marginBottom: 8}}, '🌑 Impending Issue — brewing on the horizon'),
+      h('div', {style: {fontSize: 'var(--text-label)', letterSpacing: 2, color: 'var(--c-purple)', textTransform: 'uppercase', marginBottom: 8}}, '🌑 Impending Issue - brewing on the horizon'),
       h(Issue, {issue: d.impending, color: 'var(--accent)'})
     ),
     h(Lbl, {mb: 6}, 'SETTING ASPECTS'),
-    d.setting.map(function(a, i) { return h(AspectBadge, {key: i, text: a, color: 'var(--c-blue)', label: 'Setting Aspect — a permanent world truth; always available to invoke or compel'}); }),
-    h(GMNote, {text: 'Roll two issues for your opening sessions. Roll a third when the first resolves. Keep one current and one impending — perpetual forward momentum.'})
+    d.setting.map(function(a, i) { return h(AspectBadge, {key: i, text: a, color: 'var(--c-blue)', label: 'Setting Aspect - a permanent world truth; always available to invoke or compel'}); }),
+    h(GMNote, {text: 'Roll two issues for your opening sessions. Roll a third when the first resolves. Keep one current and one impending - perpetual forward momentum.'})
   );
 }
 
@@ -376,7 +445,7 @@ function EncounterResult(props) {
     h('div', {style: {marginTop: 12}},
       h(Lbl, {mb: 6}, 'OPPOSITION'),
       d.opposition.map(function(o, oi) {
-        return h('div', {key: oi, className: 'opp-card opp-type-' + o.type, title: o.type === 'major' ? 'Major NPC — full stress track; can concede to escape dramatically' : 'Minor NPC — one solid hit usually takes them out'},
+        return h('div', {key: oi, className: 'opp-card opp-type-' + o.type, title: o.type === 'major' ? 'Major NPC - full stress track; can concede to escape dramatically' : 'Minor NPC - one solid hit usually takes them out'},
           h('div', {style: {display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 6}},
             h('div', {style: {fontSize: 'var(--text-base)', fontWeight: 700, color: o.type === 'major' ? 'var(--accent)' : 'var(--c-red)'}},
               o.name + (o.qty > 1 ? ' ×' + o.qty : '')
@@ -394,7 +463,7 @@ function EncounterResult(props) {
         );
       })
     ),
-    // GM Fate Points — interactive tally
+    // GM Fate Points - interactive tally
     h('div', {style: {marginTop: 12, padding: '10px 14px', background: 'var(--inset)', border: '1px solid var(--border)', borderRadius: 10, display: 'flex', alignItems: 'center', gap: 12}},
       h('div', {style: {flex: 1}},
         h('div', {style: {fontSize: 'var(--text-label)', color: 'var(--accent)', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 4}}, 'GM Fate Points'),
@@ -487,14 +556,14 @@ function SeedResult(props) {
       h('div', {className: 'gm-note-label'}, '🌐 Active Campaign Issue'),
       h('div', {className: 'gm-note-text'}, d.issue)
     ),
-    h(GMNote, {text: 'Prep Scene 1 in full. Scenes 2 and 3 are targets — follow the players, not the brief. State victory and defeat conditions before the first roll.'})
+    h(GMNote, {text: 'Prep Scene 1 in full. Scenes 2 and 3 are targets - follow the players, not the brief. State victory and defeat conditions before the first roll.'})
   );
 }
 
 function CompelResult(props) {
   var d = props.data;
   var _res = useState(null); var resolution = _res[0]; var setResolution = _res[1];
-  return h('div', {style: {animation: 'fadeUp 0.3s ease both'}},
+  return h('div', {className: 'fade-up'},
     h('div', {className: 'lbl', style: {marginBottom: 12}}, 'Compel'),
     h('div', {className: 'info-box', style: {borderColor: 'var(--accent)', background: 'color-mix(in srgb, var(--accent) 10%, transparent)', marginBottom: 10}},
       h('div', {className: 'info-box-label', style: {color: 'var(--gold)'}}, '🎭 Situation'),
@@ -518,7 +587,7 @@ function CompelResult(props) {
           color: 'var(--c-green)', fontWeight: 700, fontSize: 'var(--text-sm)', fontFamily: 'var(--font-ui)',
           transition: 'all 0.15s',
         },
-      }, '✓ Accept — gain 1 FP'),
+      }, '✓ Accept - gain 1 FP'),
       h('button', {
         onClick: function() { setResolution('refused'); },
         style: {
@@ -527,7 +596,7 @@ function CompelResult(props) {
           color: 'var(--c-red)', fontWeight: 700, fontSize: 'var(--text-sm)', fontFamily: 'var(--font-ui)',
           transition: 'all 0.15s',
         },
-      }, '✕ Refuse — spend 1 FP')
+      }, '✕ Refuse - spend 1 FP')
     ),
     resolution && h('div', {
       style: {
@@ -537,7 +606,7 @@ function CompelResult(props) {
       },
     },
       h('div', {style: {fontWeight: 700, fontSize: 'var(--text-sm)', color: resolution === 'accepted' ? 'var(--c-green)' : 'var(--c-red)'}},
-        resolution === 'accepted' ? 'Accepted — complication enters play, player gains 1 FP' : 'Refused — player spends 1 FP'
+        resolution === 'accepted' ? 'Accepted - complication enters play, player gains 1 FP' : 'Refused - player spends 1 FP'
       ),
       h('button', {
         onClick: function() { setResolution(null); },
@@ -546,7 +615,7 @@ function CompelResult(props) {
     ),
     h('div', {className: 'gm-note gm-guidance', style: {marginTop: 10}},
       h('div', {className: 'gm-note-label'}, '💡 Fate Point Flow'),
-      h('div', {className: 'gm-note-text'}, 'Offer the fate point BEFORE stating the consequence. If the player pays 1 FP to refuse, accept it — that is the system working.')
+      h('div', {className: 'gm-note-text'}, 'Offer the fate point BEFORE stating the consequence. If the player pays 1 FP to refuse, accept it - that is the system working.')
     )
   );
 }
@@ -554,7 +623,7 @@ function CompelResult(props) {
 function ChallengeResult(props) {
   var d = props.data;
   var _out = useState('none'); var outcome = _out[0]; var setOutcome = _out[1];
-  return h('div', {style: {animation: 'fadeUp 0.3s ease both'}},
+  return h('div', {className: 'fade-up'},
     h('div', {className: 'lbl', style: {marginBottom: 4}}, 'Challenge'),
     h('div', {style: {fontSize: 20, fontWeight: 800, color: 'var(--gold)', marginBottom: 6}}, d.name),
     h('div', {style: {fontSize: 'var(--text-sm)', color: 'var(--text-dim)', lineHeight: 1.6, marginBottom: 14}}, d.desc),
@@ -650,15 +719,15 @@ function ContestResult(props) {
         })
       ),
       h('div', {style: {fontSize: 'var(--text-label)', color: isWinner ? 'var(--accent)' : 'var(--text-muted)'}},
-        score + ' / ' + WIN + (isWinner ? ' — First to 3!' : '')
+        score + ' / ' + WIN + (isWinner ? ' - First to 3!' : '')
       )
     );
   }
-  return h('div', {style: {animation: 'fadeUp 0.3s ease both'}},
+  return h('div', {className: 'fade-up'},
     h(Lbl, null, 'CONTEST'),
     h('div', {style: {fontSize: 20, fontWeight: 800, color: 'var(--gold)', marginBottom: 4}}, d.contest_type),
     h('div', {style: {fontSize: 'var(--text-sm)', color: 'var(--text-dim)', lineHeight: 1.6, marginBottom: 12}}, d.desc),
-    h(AspectBadge, {text: d.aspect, color: 'var(--accent)', label: 'Situation aspect — always in play during the contest'}),
+    h(AspectBadge, {text: d.aspect, color: 'var(--accent)', label: 'Situation aspect - always in play during the contest'}),
     h('div', {style: {display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 12}},
       h(TrackSide, {name: d.side_a, skills: d.skills_a, score: scoreA, setScore: setScoreA, colorVar: 'var(--c-blue)',  icon: '🔵'}),
       h(TrackSide, {name: d.side_b, skills: d.skills_b, score: scoreB, setScore: setScoreB, colorVar: 'var(--c-red)',   icon: '🔴'})
@@ -678,7 +747,7 @@ function ContestResult(props) {
       }, '↩ Reset')
     ),
     h('div', {style: {marginTop: 12}},
-      h(Lbl, {mb: 6}, 'TWISTS — ON TIED EXCHANGES'),
+      h(Lbl, {mb: 6}, 'TWISTS - ON TIED EXCHANGES'),
       d.twists.map(function(tw, i) {
         return h('div', {key: i, style: {fontSize: 'var(--text-sm)', color: 'var(--text-dim)', lineHeight: 1.6, padding: '4px 0', borderBottom: i < d.twists.length - 1 ? '1px solid var(--border)' : 'none'}},
           h('span', {style: {color: 'var(--c-purple)', fontWeight: 700}}, (i + 1) + '. '), tw
@@ -736,7 +805,7 @@ function ConsequenceResult(props) {
           h('div', {style: {width: 20, height: 20, borderRadius: 5, border: '2px solid ' + (cleared ? 'var(--c-green)' : 'var(--border)'), background: cleared ? 'var(--c-green)' : 'transparent', flexShrink: 0, transition: 'all 0.15s', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: 'var(--bg)'}}, cleared ? '✓' : ''),
           h('div', null,
             h('div', {style: {fontSize: 'var(--text-sm)', color: cleared ? 'var(--c-green)' : 'var(--text-dim)', fontWeight: cleared ? 600 : 400}}, 'Cleared after ' + recoveryWindow[d.severity]),
-            h('div', {style: {fontSize: 'var(--text-label)', color: 'var(--text-muted)'}}, treated ? 'Treatment done — mark when window passes' : 'Treat first')
+            h('div', {style: {fontSize: 'var(--text-label)', color: 'var(--text-muted)'}}, treated ? 'Treatment done - mark when window passes' : 'Treat first')
           )
         )
       )
@@ -777,7 +846,7 @@ function FactionResult(props) {
         )
       )
     ),
-    h(GMNote, {text: 'Give this faction an aspect of its own — usually the goal rewritten as a truth. The named face is their point of contact — build them out with the Major NPC generator.'})
+    h(GMNote, {text: 'Give this faction an aspect of its own - usually the goal rewritten as a truth. The named face is their point of contact - build them out with the Major NPC generator.'})
   );
 }
 
@@ -785,12 +854,12 @@ function ComplicationResult(props) {
   var d = props.data;
   var _spot = useState(d.spotlight || 'aspect'); var spotlightChosen = _spot[0]; var setSpotlightChosen = _spot[1];
   var spotlightItems = [
-    {id: 'aspect',  label: 'New Aspect',   text: d.new_aspect, color: 'var(--c-red)',    tip: 'Drop this new aspect into the fiction right now — name it aloud'},
+    {id: 'aspect',  label: 'New Aspect',   text: d.new_aspect, color: 'var(--c-red)',    tip: 'Drop this new aspect into the fiction right now - name it aloud'},
     {id: 'arrival', label: 'Arrival',      text: d.arrival,    color: 'var(--c-blue)',   tip: 'Introduce the arrival this exchange'},
     {id: 'env',     label: 'Env. Shift',   text: d.env,        color: 'var(--c-green)',  tip: 'Trigger the environment shift immediately'},
   ];
   var spotlightTips = {
-    aspect:  'Drop the new aspect into the fiction right now — name it aloud and tell the players it exists.',
+    aspect:  'Drop the new aspect into the fiction right now - name it aloud and tell the players it exists.',
     arrival: 'Introduce the arrival this exchange. They enter with their own agenda and no obligation to help.',
     env:     'Trigger the environment shift immediately. Describe what changes and what it now costs to act.',
   };
@@ -799,7 +868,7 @@ function ComplicationResult(props) {
     h('div', {style: {display: 'inline-block', padding: '3px 10px', borderRadius: 4, fontSize: 12, fontWeight: 700, letterSpacing: 1, marginBottom: 12, color: 'var(--c-purple)', border: '1px solid var(--c-purple)55', background: 'var(--c-purple)18'}}, d.type.toUpperCase()),
     // Spotlight selector
     h('div', {style: {marginBottom: 12}},
-      h(Lbl, {mb: 6}, 'SPOTLIGHT — which to introduce first'),
+      h(Lbl, {mb: 6}, 'SPOTLIGHT - which to introduce first'),
       h('div', {style: {display: 'flex', gap: 4}},
         spotlightItems.map(function(item) {
           var isActive = spotlightChosen === item.id;
@@ -834,7 +903,7 @@ function BackstoryResult(props) {
   var _exp = useState(-1); var expanded = _exp[0]; var setExpanded = _exp[1];
   return h('div', null,
     h(Lbl, null, 'PC BACKSTORY'),
-    h(Lbl, {mb: 8}, 'SESSION ZERO QUESTIONS — tap to expand'),
+    h(Lbl, {mb: 8}, 'SESSION ZERO QUESTIONS - tap to expand'),
     h('div', {style: {marginBottom: 14}},
       d.questions.map(function(q, i) {
         var isOpen = expanded === i;
@@ -860,9 +929,9 @@ function BackstoryResult(props) {
         );
       })
     ),
-    h(InfoBox, {label: '🔗 RELATIONSHIP WEB', text: d.relationship, color: 'var(--c-blue)', tip: 'Relationship web — run this after individual questions; it creates cross-PC connections that become your strongest compel material'}),
-    h(InfoBox, {label: '◎ OPENING HOOK', text: d.hook, color: 'var(--c-green)', tip: 'Opening hook — the framing for Session 1 Scene 1'}),
-    h(GMNote, {text: 'Every answer should produce at least one aspect — write them down as the players speak. These are your primary compel material for the whole campaign.'})
+    h(InfoBox, {label: '🔗 RELATIONSHIP WEB', text: d.relationship, color: 'var(--c-blue)', tip: 'Relationship web - run this after individual questions; it creates cross-PC connections that become your strongest compel material'}),
+    h(InfoBox, {label: '◎ OPENING HOOK', text: d.hook, color: 'var(--c-green)', tip: 'Opening hook - the framing for Session 1 Scene 1'}),
+    h(GMNote, {text: 'Every answer should produce at least one aspect - write them down as the players speak. These are your primary compel material for the whole campaign.'})
   );
 }
 
@@ -871,9 +940,9 @@ function ObstacleResult(props) {
   var typeColor = {hazard: 'var(--c-red)', block: 'var(--c-blue)', distraction: 'var(--c-purple)'};
   var typeLabel = {hazard: 'HAZARD', block: 'BLOCK', distraction: 'DISTRACTION'};
   var typeTip = {
-    hazard:      'Hazard — acts in initiative, attacks PCs. Cannot be attacked. Overcome or Create Advantage against it.',
-    block:       'Block — passive opposition. Does not act in initiative. Disable difficulty = rating + 2.',
-    distraction: 'Distraction — forces a choice with consequences on both sides. The drama is in the decision.',
+    hazard:      'Hazard - acts in initiative, attacks PCs. Cannot be attacked. Overcome or Create Advantage against it.',
+    block:       'Block - passive opposition. Does not act in initiative. Disable difficulty = rating + 2.',
+    distraction: 'Distraction - forces a choice with consequences on both sides. The drama is in the decision.',
   };
   var col = typeColor[d.obstacle_type] || 'var(--accent)';
   if (d.obstacle_type === 'distraction') {
@@ -881,7 +950,7 @@ function ObstacleResult(props) {
       h(Lbl, null, 'OBSTACLE'),
       h('div', {title: typeTip.distraction, style: {display:'inline-block', padding:'3px 10px', borderRadius:4, fontSize:12, fontWeight:700, letterSpacing:1, marginBottom:12, color:col, border:'1px solid '+col+'55', background:col+'18'}}, 'DISTRACTION'),
       h('div', {style:{fontSize:22, fontWeight:700, color:'var(--gold)', marginBottom:14}}, d.name),
-      h(InfoBox, {label:'⚖ THE CHOICE', text:d.choice, color:'var(--c-purple)', tip:'Present this to the players — both options have consequences'}),
+      h(InfoBox, {label:'⚖ THE CHOICE', text:d.choice, color:'var(--c-purple)', tip:'Present this to the players - both options have consequences'}),
       h('div', {style:{display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, margin:'12px 0'}},
         h('div', {style:{padding:'10px 14px', borderRadius:6, border:'1px solid var(--c-red)44', background:'var(--c-red)11'}},
           h('div', {style:{fontSize:12, fontWeight:700, color:'var(--c-red)', letterSpacing:1, marginBottom:4}}, 'LEAVE IT'),
@@ -900,7 +969,7 @@ function ObstacleResult(props) {
     h(Lbl, null, 'OBSTACLE'),
     h('div', {title: typeTip[d.obstacle_type], style: {display:'inline-block', padding:'3px 10px', borderRadius:4, fontSize:12, fontWeight:700, letterSpacing:1, marginBottom:12, color:col, border:'1px solid '+col+'55', background:col+'18'}}, typeLabel[d.obstacle_type]),
     h('div', {style:{fontSize:22, fontWeight:700, color:'var(--gold)', marginBottom:14}}, d.name),
-    h(AspectBadge, {text: d.aspect, color: col, label: typeLabel[d.obstacle_type] + ' aspect — invoke or compel as normal'}),
+    h(AspectBadge, {text: d.aspect, color: col, label: typeLabel[d.obstacle_type] + ' aspect - invoke or compel as normal'}),
     h('div', {style:{display:'flex', gap:16, flexWrap:'wrap', margin:'12px 0'}},
       h('div', {style:{fontSize:'var(--text-sm)', color:'var(--text-dim)'}}, 'Rating: ', h('strong', {style:{color:'var(--text)'}}, d.rating_label + ' (+' + d.rating + ')')),
       d.weapon > 0 ? h('div', {style:{fontSize:'var(--text-sm)', color:'var(--c-red)'}}, 'Weapon: ' + d.weapon) : null,
@@ -925,7 +994,7 @@ function CountdownResult(props) {
     h('div', {style:{position:'relative', padding:'14px 12px', borderRadius:12, marginBottom:10, border:'1px solid ' + (triggered ? 'var(--c-red)66' : 'var(--border)'), background:'var(--inset)', overflow:'hidden', transition:'border-color 0.3s'}},
       h('div', {style:{position:'absolute', top:0, left:0, height:'100%', width: (pct*100)+'%', background:'color-mix(in srgb, ' + barColor + ' 12%, transparent)', transition:'width 0.3s, background 0.3s', pointerEvents:'none', borderRadius:12}}),
       h('div', {style:{fontSize:'var(--text-label)', color: triggered ? 'var(--c-red)' : barColor, fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:10, position:'relative', transition:'color 0.3s'}},
-        triggered ? '⚡ TRIGGERED' : 'TRACK — tap to mark'
+        triggered ? '⚡ TRIGGERED' : 'TRACK - tap to mark'
       ),
       h('div', {style:{display:'flex', gap:6, flexWrap:'wrap', position:'relative', marginBottom:8}},
         Array.from({length: d.boxes}, function(_, i) {
@@ -955,7 +1024,7 @@ function CountdownResult(props) {
         background: triggered ? 'color-mix(in srgb, var(--c-red) 15%, transparent)' : 'color-mix(in srgb, var(--c-red) 6%, transparent)',
       },
     },
-      h('div', {style:{fontSize:12, fontWeight:700, color:'var(--c-red)', letterSpacing:1, textTransform:'uppercase', marginBottom:5}}, triggered ? '💀 TRIGGERED — THIS HAPPENS NOW' : '💀 WHEN THE CLOCK HITS ZERO'),
+      h('div', {style:{fontSize:12, fontWeight:700, color:'var(--c-red)', letterSpacing:1, textTransform:'uppercase', marginBottom:5}}, triggered ? '💀 TRIGGERED - THIS HAPPENS NOW' : '💀 WHEN THE CLOCK HITS ZERO'),
       h('div', {style:{fontSize:'var(--text-sm)', color: triggered ? 'var(--text)' : 'var(--text-dim)', fontWeight: triggered ? 600 : 400, lineHeight:1.55}}, d.outcome)
     ),
     h(GMNote, {text: d.gm_note})
@@ -969,16 +1038,16 @@ function ConstraintResult(props) {
   var col = isLim ? 'var(--c-purple)' : 'var(--c-blue)';
   var tag = isLim ? 'LIMITATION' : 'RESISTANCE';
   var tagTip = isLim
-    ? 'Limitation — restricts a PC action with consequences. Players can still act; the question is whether the cost is worth it.'
-    : 'Resistance — makes the target immune to a category of action until a specific bypass is achieved. Forces Plan B.';
+    ? 'Limitation - restricts a PC action with consequences. Players can still act; the question is whether the cost is worth it.'
+    : 'Resistance - makes the target immune to a category of action until a specific bypass is achieved. Forces Plan B.';
   return h('div', null,
     h(Lbl, null, 'CONSTRAINT'),
     h('div', {title: tagTip, style: {display:'inline-block', padding:'3px 10px', borderRadius:4, fontSize:12, fontWeight:700, letterSpacing:1, marginBottom:12, color:col, border:'1px solid '+col+'55', background:col+'18'}}, tag),
     h('div', {style:{fontSize:22, fontWeight:700, color:'var(--gold)', marginBottom:14}}, d.name),
     isLim
       ? h(Fragment, null,
-          h(InfoBox, {label:'🚫 RESTRICTED ACTION', text:d.restricted_action, color:'var(--c-purple)', tip:'What the PCs cannot do freely — announce this before they act'}),
-          h(InfoBox, {label:'⚡ CONSEQUENCE IF TAKEN ANYWAY', text:d.consequence, color:'var(--c-red)', tip:'What happens if they do it anyway — this is the cost, not a prohibition'})
+          h(InfoBox, {label:'🚫 RESTRICTED ACTION', text:d.restricted_action, color:'var(--c-purple)', tip:'What the PCs cannot do freely - announce this before they act'}),
+          h(InfoBox, {label:'⚡ CONSEQUENCE IF TAKEN ANYWAY', text:d.consequence, color:'var(--c-red)', tip:'What happens if they do it anyway - this is the cost, not a prohibition'})
         )
       : h(Fragment, null,
           h(InfoBox, {label:'🛡 WHAT IT RESISTS', text:d.what_resists, color:'var(--c-blue)', tip:'What category of action is blocked'}),
@@ -994,7 +1063,7 @@ function ConstraintResult(props) {
             h('div', {style:{display:'flex', alignItems:'flex-start', gap:10}},
               h('div', {style:{width:18, height:18, borderRadius:4, flexShrink:0, marginTop:1, border:'1.5px solid ' + (bypassDone ? 'var(--c-green)' : 'var(--border)'), background: bypassDone ? 'var(--c-green)' : 'transparent', display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, color:'var(--bg)', transition:'all 0.15s'}}, bypassDone ? '✓' : ''),
               h('div', null,
-                h('div', {style:{fontSize:'var(--text-label)', fontWeight:700, color:'var(--c-green)', letterSpacing:'0.06em', textTransform:'uppercase', marginBottom:4}}, '🔓 HOW TO BYPASS' + (bypassDone ? ' — DONE' : '')),
+                h('div', {style:{fontSize:'var(--text-label)', fontWeight:700, color:'var(--c-green)', letterSpacing:'0.06em', textTransform:'uppercase', marginBottom:4}}, '🔓 HOW TO BYPASS' + (bypassDone ? ' - DONE' : '')),
                 h('div', {style:{fontSize:'var(--text-sm)', color: bypassDone ? 'var(--text)' : 'var(--text-dim)', lineHeight:1.55, textDecoration: bypassDone ? 'line-through' : 'none'}}, d.bypass)
               )
             )
@@ -1042,7 +1111,7 @@ function Modal(props) {
     return function() { document.removeEventListener('keydown', onKeyDown); };
   }, [props.onClose]);
 
-  // Focus trap — WCAG 2.1 SC 2.1.2
+  // Focus trap - WCAG 2.1 SC 2.1.2
   // On mount: find all focusable children, auto-focus the first.
   // Tab/Shift+Tab cycles within the modal; focus cannot escape to background content.
   useEffect(function() {
@@ -1086,25 +1155,34 @@ function Modal(props) {
 // ════════════════════════════════════════════════════════════════════════
 
 // ════════════════════════════════════════════════════════════════════════
-// SHARE DRAWER (BL-22) — inline expand below panel toolbar
+// SHARE DRAWER (BL-22) - inline expand below panel toolbar
 // ════════════════════════════════════════════════════════════════════════
 
 function ShareDrawer(props) {
   var genId = props.genId; var data = props.data; var campName = props.campName;
-  var _c = useState(false); var copied = _c[0]; var setCopied = _c[1];
+  var _c = useState(null); var copiedFormat = _c[0]; var setCopiedFormat = _c[1];
+
   // _batchMd is set when exporting a full pinned session pack via old-browser fallback
   var md = (data && data._batchMd) ? data._batchMd : toMarkdown(genId, data, campName);
 
-  function copyText() {
+  // VTT exports only make sense for NPC generators
+  var isNpc = genId === 'npc_minor' || genId === 'npc_major';
+  var fariJson  = isNpc ? toFariJSON(genId, data, campName)  : null;
+  var roll20Json = isNpc ? toRoll20JSON(genId, data)          : null;
+
+  function copyTo(text, format) {
+    if (!text) return;
+    function confirm() {
+      setCopiedFormat(format);
+      setTimeout(function() { setCopiedFormat(null); }, TIMING.COPY_CONFIRM_MS);
+    }
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(md).then(function() {
-        setCopied(true); setTimeout(function() { setCopied(false); }, TIMING.COPY_CONFIRM_MS);
-      });
+      navigator.clipboard.writeText(text).then(confirm);
     } else {
       var ta = document.createElement('textarea');
-      ta.value = md; document.body.appendChild(ta); ta.select();
+      ta.value = text; document.body.appendChild(ta); ta.select();
       document.execCommand('copy'); document.body.removeChild(ta);
-      setCopied(true); setTimeout(function() { setCopied(false); }, TIMING.COPY_CONFIRM_MS);
+      confirm();
     }
   }
 
@@ -1126,36 +1204,53 @@ function ShareDrawer(props) {
       borderTop: '1px solid var(--border)',
       background: 'var(--inset)',
       padding: '10px 16px',
-      display: 'flex',
-      alignItems: 'center',
-      gap: 8,
-      flexWrap: 'wrap',
     }
   },
-    h('span', {style: {fontSize: 'var(--text-label)', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginRight: 4}}, 'Export / Print'),
-    h('button', {
-      className: 'btn btn-primary' + (copied ? ' export-copied' : ''),
-      onClick: copyText,
-      style: {fontSize: 12, padding: '4px 12px', minHeight: 0},
-    }, copied ? '✓ Copied!' : '📋 Copy Markdown'),
-    h('button', {
-      className: 'btn btn-ghost',
-      onClick: downloadFile,
-      title: 'Save as .md file',
-      style: {fontSize: 12, padding: '4px 12px', minHeight: 0},
-    }, '💾 Save .md'),
-    h('button', {
-      className: 'btn btn-ghost',
-      onClick: function() { window.print(); },
-      title: 'Print or save as PDF',
-      style: {fontSize: 12, padding: '4px 12px', minHeight: 0},
-    }, '🖨 Print'),
-    h('button', {
-      className: 'btn btn-icon btn-ghost',
-      onClick: props.onClose,
-      'aria-label': 'Close share options',
-      style: {marginLeft: 'auto', fontSize: 13},
-    }, '✕')
+    // ── Row 1: Markdown + file + print ────────────────────────────────
+    h('div', {style: {display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: isNpc ? 8 : 0}},
+      h('span', {style: {fontSize: 'var(--text-label)', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginRight: 4}}, 'Export / Print'),
+      h('button', {
+        className: 'btn btn-primary btn-sm' + (copiedFormat === 'md' ? ' export-copied' : ''),
+        onClick: function() { copyTo(md, 'md'); },
+      }, copiedFormat === 'md' ? '✓ Copied!' : '📋 Copy Markdown'),
+      h('button', {
+        className: 'btn btn-ghost btn-sm',
+        onClick: downloadFile,
+        title: 'Save as .md file',
+      }, '💾 Save .md'),
+      h('button', {
+        className: 'btn btn-ghost btn-sm',
+        onClick: function() { window.print(); },
+        title: 'Print or save as PDF',
+      }, '🖨 Print'),
+      h('button', {
+        className: 'btn btn-icon btn-ghost',
+        onClick: props.onClose,
+        'aria-label': 'Close share options',
+        style: {marginLeft: 'auto', fontSize: 13},
+      }, '✕')
+    ),
+
+    // ── Row 2: VTT exports (NPC generators only) ──────────────────────
+    isNpc && h('div', {style: {display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', paddingTop: 8, borderTop: '1px solid var(--border)'}},
+      h('span', {style: {fontSize: 'var(--text-label)', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginRight: 4}}, 'VTT Export'),
+
+      h('button', {
+        className: 'btn btn-ghost' + (copiedFormat === 'fari' ? ' export-copied' : ''),
+        onClick: function() { copyTo(fariJson, 'fari'); },
+        title: 'Fari App: Characters → Import\nFoundry VTT (Fate Core Official): paste into character importer',
+      }, copiedFormat === 'fari' ? '✓ Copied!' : '🎲 Fari / Foundry'),
+
+      h('button', {
+        className: 'btn btn-ghost' + (copiedFormat === 'roll20' ? ' export-copied' : ''),
+        onClick: function() { copyTo(roll20Json, 'roll20'); },
+        title: 'Roll20: open "Fate by Evil Hat" sheet → Developer Mode → paste into import box',
+      }, copiedFormat === 'roll20' ? '✓ Copied!' : '🎲 Roll20'),
+
+      h('span', {style: {fontSize: 'var(--text-label)', color: 'var(--text-muted)', fontStyle: 'italic', marginLeft: 4}},
+        genId === 'npc_minor' ? 'Minor NPC' : 'Major NPC'
+      )
+    )
   );
 }
 
@@ -1168,11 +1263,8 @@ function HelpModal(props) {
   var genId = props.genId;
   var hc = HELP_CONTENT[genId] || {};
 
-  return h(Modal, {onClose: props.onClose, ariaLabel: 'Help — ' + (hc.title || genId)},
-    h('div', {className: 'modal-header'},
-      h('div', {className: 'modal-title'}, 'Help — ' + (hc.title || 'Generator')),
-      h('button', {className: 'btn btn-icon btn-ghost', onClick: props.onClose, 'aria-label': 'Close'}, '✕')
-    ),
+  return h(Modal, {onClose: props.onClose, ariaLabel: 'Help - ' + (hc.title || genId)},
+    h(ModalHeader, {title: 'Help - ' + (hc.title || 'Generator'), onClose: props.onClose}),
     h('div', {className: 'modal-body'},
       h('div', {className: 'help-section'},
         h('div', {className: 'help-section-lbl'}, 'What this generates'),
@@ -1204,15 +1296,63 @@ function HelpModal(props) {
         h('div', {className: 'help-gm-tip-label'}, 'GM Tip'),
         h('div', {className: 'help-gm-tip-text'}, hc.gm_tips || '')
       ),
+      // BL-07: Invoke & Compel examples
+      (hc.invoke_example || hc.compel_example) && h('div', {className: 'help-section gm-guidance', style: {marginTop: 10}},
+        h('div', {className: 'help-section-lbl'}, '✦ Invoke & Compel Examples'),
+        hc.invoke_example && h('div', {style: {marginBottom: 10}},
+          h('div', {style: {fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 4}}, '✦ Invoke for +2'),
+          h('div', {style: {fontSize: 14, color: 'var(--text)', lineHeight: 1.55, padding: '8px 10px', background: 'var(--inset)', borderRadius: 8, borderLeft: '2px solid var(--accent)'}}, hc.invoke_example)
+        ),
+        hc.compel_example && h('div', null,
+          h('div', {style: {fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--c-red)', marginBottom: 4}}, '⊗ Compel for drama'),
+          h('div', {style: {fontSize: 14, color: 'var(--text)', lineHeight: 1.55, padding: '8px 10px', background: 'var(--inset)', borderRadius: 8, borderLeft: '2px solid var(--c-red)'}}, hc.compel_example)
+        )
+      ),
+      // BL-34: SRD deep link
+      (function() {
+        var entry = (HELP_ENTRIES || []).find(function(e) { return e.id === genId; });
+        return (entry && entry.srd_url) ? h('div', {style: {marginTop: 12}},
+          h('a', {
+            href: entry.srd_url,
+            target: '_blank', rel: 'noopener noreferrer',
+            style: {fontSize: 13, color: 'var(--accent)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 5},
+          }, '📖 Read the SRD rule →')
+        ) : null;
+      })(),
       h('div', {style: {marginTop: 20, paddingTop: 14, borderTop: '1px solid var(--border)'}},
-        h('div', {className: 'help-section-lbl', style: {marginBottom: 8}}, 'Quick Reference — All Generators'),
+        h('div', {className: 'help-section-lbl', style: {marginBottom: 8}}, 'Quick Reference - All Generators'),
         h('div', {className: 'help-gen-grid'},
           GENERATORS.map(function(g) {
+            var hc = HELP_CONTENT[g.id] || {};
             return h('div', {key: g.id, className: 'help-gen-item' + (g.id === genId ? ' current' : '')},
               h('div', {className: 'help-gen-label'},
-                h('span', null, g.icon), h('span', null, g.label)
+                h('span', {style: {marginRight: 4}}, RA_ICONS[g.id] ? h(RaIcon, {n: RA_ICONS[g.id]}) : g.icon),
+                h('span', null, g.label)
               ),
-              h('div', {className: 'help-gen-sub'}, g.sub)
+              h('div', {className: 'help-gen-sub'}, g.sub),
+              (hc.invoke_example || hc.compel_example) && h('div', {
+                className: 'gm-guidance',
+                style: {display: 'flex', gap: 4, marginTop: 5, flexWrap: 'wrap'},
+              },
+                hc.invoke_example && h('span', {
+                  title: hc.invoke_example,
+                  style: {
+                    fontSize: 10, padding: '2px 6px', borderRadius: 100,
+                    background: 'color-mix(in srgb,var(--accent) 12%,transparent)',
+                    border: '1px solid color-mix(in srgb,var(--accent) 30%,transparent)',
+                    color: 'var(--accent)', cursor: 'help', letterSpacing: '0.04em',
+                  },
+                }, '+ Invoke'),
+                hc.compel_example && h('span', {
+                  title: hc.compel_example,
+                  style: {
+                    fontSize: 10, padding: '2px 6px', borderRadius: 100,
+                    background: 'color-mix(in srgb,var(--c-red) 10%,transparent)',
+                    border: '1px solid color-mix(in srgb,var(--c-red) 25%,transparent)',
+                    color: 'var(--c-red)', cursor: 'help', letterSpacing: '0.04em',
+                  },
+                }, '+ Compel')
+              )
             );
           })
         )
@@ -1225,6 +1365,7 @@ function HelpModal(props) {
             ['Space', 'Roll current generator'],
             ['P', 'Pin current result'],
             ['G', 'Cycle to next generator'],
+            ['I', 'Inspiration mode - roll 3 options, pick one'],
             ['?', 'Open this help panel'],
             ['Esc', 'Close any open panel or sidebar'],
           ].map(function(row) {
@@ -1267,7 +1408,7 @@ function HelpPanel(props) {
       ),
       h('p', {style: {color: 'var(--text-dim)', fontSize: 15, marginBottom: 20, lineHeight: 1.6}},
         'This is a ', h('strong', {style: {color: 'var(--text)'}}, 'Fate Condensed'),
-        ' GM prep tool. Each generator draws from hundreds of curated, setting-specific table entries. No AI, no internet — fully offline. Roll as often as you like; re-roll anything that doesn\'t fit.'
+        ' GM prep tool. Each generator draws from hundreds of curated, setting-specific table entries. Fully offline once loaded - roll as often as you like, re-roll anything that doesn\'t fit.'
       ),
       h('div', {style: {fontSize: 15, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 12}}, 'Generators'),
       (HELP_ENTRIES || []).map(function(entry) {
@@ -1289,18 +1430,18 @@ function HelpPanel(props) {
         );
       }),
       h('div', {style: {marginTop: 20, background: 'var(--inset)', borderRadius: 12, padding: '14px 16px'}},
-        h('div', {style: {fontSize: 15, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8}}, 'Fate Condensed — Core Concepts'),
+        h('div', {style: {fontSize: 15, color: 'var(--text-muted)', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 8}}, 'Fate Condensed - Core Concepts'),
         [
           ['Aspects', 'Phrases that are always true in the fiction. Invoke for +2 or a reroll (costs a fate point). Compel to complicate a character\'s life (GM gives a fate point).'],
-          ['Stress', 'Temporary hits. 1-point boxes in Fate Condensed (not escalating like Fate Core). Minor NPCs have no consequences — one good hit takes them out.'],
-          ['Success at a Cost', 'When a PC fails a roll, the GM can offer success at a minor cost (a complication, a bad aspect) or a major cost (a consequence, a serious setback). This is the "Yes, but..." engine — use it instead of flat failure. (p.16)'],
-          ['Initiative', 'Popcorn / Balsera-style: the acting character picks who goes next — PC or NPC. No fixed turn order. Tactical and social. (p.31)'],
+          ['Stress', 'Temporary hits. 1-point boxes in Fate Condensed (not escalating like Fate Core). Minor NPCs have no consequences - one good hit takes them out.'],
+          ['Success at a Cost', 'When a PC fails a roll, the GM can offer success at a minor cost (a complication, a bad aspect) or a major cost (a consequence, a serious setback). This is the "Yes, but..." engine - use it instead of flat failure. (p.16)'],
+          ['Initiative', 'Popcorn / Balsera-style: the acting character picks who goes next - PC or NPC. No fixed turn order. Tactical and social. (p.31)'],
           ['Fate Points', 'Currency of player agency. PCs start with Refresh fate points each session. GM starts each scene with points equal to the number of PCs.'],
           ['Conceding', 'A character can concede before being taken out. They negotiate terms of their exit (they stay in the story) and earn one fate point per consequence taken in the conflict. Villains should concede too. (p.37)'],
-          ['Exchanges', 'Fate uses "exchanges" not "rounds". An exchange ends when everyone has acted. There is no fixed initiative count — just the popcorn pass.'],
+          ['Exchanges', 'Fate uses "exchanges" not "rounds". An exchange ends when everyone has acted. There is no fixed initiative count - just the popcorn pass.'],
           ['Full Defense', 'Optional (p.48): Skip your action to get +2 to all defend rolls until your next turn. If nothing attacks you, you get a boost instead.'],
           ['Teamwork', 'One character rolls, others contribute +1 each if they have at least Average (+1) in a relevant skill. (p.32)'],
-          ['Advancement', 'Milestones (end of every session): swap skills, rewrite a stunt, or rewrite an aspect. Breakthroughs (end of a story arc): milestone options PLUS increase one skill by one step and rewrite your high concept. No XP, no levels. (p.39)'],
+          ['Advancement', 'Minor Milestone (end of every session): swap skills, rewrite a stunt, or rewrite an aspect. Major Milestone (end of a story arc): do one minor milestone option PLUS increase one skill by one step - and optionally rewrite your high concept. No XP, no levels. (FCon p.39)'],
         ].map(function(pair, i) {
           return h('div', {key: i, style: {marginBottom: 8}},
             h('div', {style: {fontSize: 15, fontWeight: 700, color: 'var(--accent)', marginBottom: 2}}, pair[0]),
@@ -1358,10 +1499,10 @@ function SettingsRow(props) {
 
 function HelpLevelOnboardingModal(props) {
   var LEVEL_OPTIONS = [
-    {id: 'new_ttrpg',    icon: '🌱', label: 'New to tabletop RPGs',    desc: 'Gentle explanations — no prior RPG experience needed'},
+    {id: 'new_ttrpg',    icon: '🌱', label: 'New to tabletop RPGs',    desc: 'Gentle explanations - no prior RPG experience needed'},
     {id: 'dnd_convert',  icon: '⚔',  label: 'I play D&D / Pathfinder',  desc: 'Rules help + side-by-side D&D comparisons'},
     {id: 'new_fate',     icon: '🎲', label: 'I play other RPGs',         desc: 'Fate mechanics explained, no jargon'},
-    {id: 'experienced',  icon: '🎭', label: 'I know Fate well',          desc: 'Minimal help — just the generated content'},
+    {id: 'experienced',  icon: '🎭', label: 'I know Fate well',          desc: 'Minimal help - just the generated content'},
   ];
   return h('div', {
     className: 'modal-overlay',
@@ -1375,11 +1516,9 @@ function HelpLevelOnboardingModal(props) {
       onClick: function(e) { e.stopPropagation(); },
       style: {maxWidth: 420},
     },
-      h('div', {className: 'modal-header'},
-        h('div', {className: 'modal-title'}, '👋 Quick question'),
-      ),
+      h(ModalHeader, {title: '👋 Quick question', onClose: function() {}}),
       h('div', {style: {padding: '4px 20px 8px', fontSize: 'var(--text-sm)', color: 'var(--text-dim)', lineHeight: 1.6}},
-        'How much Fate experience do you have? This sets the ', h('strong', null, 'Help Level'), ' — inline rules coaching you\'ll see on every result. You can change it any time in ⚙ Settings.'
+        'How much Fate experience do you have? This sets the ', h('strong', null, 'Help Level'), ' - inline rules coaching you\'ll see on every result. You can change it any time in ⚙ Settings.'
       ),
       h('div', {style: {padding: '0 16px 16px', display: 'flex', flexDirection: 'column', gap: 8}},
         LEVEL_OPTIONS.map(function(opt) {
@@ -1392,7 +1531,7 @@ function HelpLevelOnboardingModal(props) {
               background: 'var(--glass-bg)', cursor: 'pointer', textAlign: 'left',
               fontFamily: 'var(--font-ui)', transition: 'all 0.15s', width: '100%',
             },
-            'aria-label': opt.label + ' — ' + opt.desc,
+            'aria-label': opt.label + ' - ' + opt.desc,
             onMouseEnter: function(e) { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.background = 'color-mix(in srgb, var(--accent) 8%, transparent)'; },
             onMouseLeave: function(e) { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'var(--glass-bg)'; },
           },
@@ -1419,19 +1558,16 @@ function HelpLevelOnboardingModal(props) {
 function SettingsModal(props) {
   var TEXT_SIZE_NAMES = ['Default', 'Large', 'Extra Large'];
   var LEVEL_OPTIONS = [
-    {id: 'experienced', label: 'Experienced Fate GM', desc: 'Minimal rules — just the generator output'},
+    {id: 'experienced', label: 'Experienced Fate GM', desc: 'Minimal rules - just the generator output'},
     {id: 'new_fate', label: 'New to Fate', desc: 'Full rules explanations with Fate Condensed page references'},
     {id: 'dnd_convert', label: 'Coming from D&D', desc: 'Rules explanations + D&D contrast notes'},
     {id: 'new_ttrpg', label: 'New to TTRPGs', desc: 'Gentle introductions assuming no prior RPG experience'},
   ];
   return h(Modal, {onClose: props.onClose, label: 'Settings'},
     h('div', {className: 'modal-box', style: {maxWidth: 460}},
-      h('div', {className: 'modal-header'},
-        h('div', {className: 'modal-title'}, '⚙ Settings'),
-        h('button', {className: 'btn btn-icon btn-ghost', onClick: props.onClose, 'aria-label': 'Close'}, '✕')
-      ),
+      h(ModalHeader, {title: '⚙ Settings', onClose: props.onClose}),
 
-      // Experience Level — the most important setting
+      // Experience Level - the most important setting
       h('div', {style: {padding: '14px 20px', borderBottom: '1px solid var(--border)'}},
         h('div', {style: {fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--text)', marginBottom: 8}}, 'Help Level'),
         h('div', {style: {fontSize: 'var(--text-label)', color: 'var(--text-muted)', marginBottom: 10}}, 'Adjusts the inline rules reference shown before each roll.'),
@@ -1493,7 +1629,7 @@ function SettingsModal(props) {
         padding: '14px 20px', borderTop: '1px solid var(--border)',
         display: 'flex', gap: 10, flexWrap: 'wrap',
       }},
-        h('a', {href: '../learn.html', className: 'btn btn-ghost', style: {fontSize: 13, textDecoration: 'none', flex: 1, justifyContent: 'center'}}, '📖 Learn Fate'),
+        h('a', {href: '../learn.html', className: 'btn btn-ghost', style: {fontSize: 13, textDecoration: 'none', flex: 1, justifyContent: 'center'}}, '📖 Quick Start'),
         h('a', {href: '../about.html', className: 'btn btn-ghost', style: {fontSize: 13, textDecoration: 'none', flex: 1, justifyContent: 'center'}}, 'About'),
         h('a', {href: '../license.html', className: 'btn btn-ghost', style: {fontSize: 13, textDecoration: 'none', flex: 1, justifyContent: 'center'}}, 'License')
       )
@@ -1513,9 +1649,9 @@ function ThemeToggle(props) {
 
 var TEXT_SIZE_LABELS = ['A', 'A⁺', 'A⁺⁺'];
 var TEXT_SIZE_TITLES = [
-  'Normal text — click to increase',
-  'Large text — click to increase',
-  'Extra-large text — click to reset',
+  'Normal text - click to increase',
+  'Large text - click to increase',
+  'Extra-large text - click to reset',
 ];
 function TextSizeToggle(props) {
   var sz = props.size || 0;
@@ -1567,7 +1703,7 @@ function LandingApp() {
   }
   var camps = Object.values(CAMPAIGNS);
 
-  // R-11: Last-used campaign — read from localStorage session data
+  // R-11: Last-used campaign - read from localStorage session data
   var lastCamp = (function() {
     try {
       var ids = Object.keys(CAMPAIGN_PAGES);
@@ -1587,7 +1723,7 @@ function LandingApp() {
     h('nav', {className: 'land-topnav', role: 'navigation'},
       h('a', {href: 'index.html', className: 'land-topnav-brand'}, '🎲 Ogma'),
       h('div', {className: 'land-topnav-actions'},
-        h('a', {href: 'learn.html', className: 'btn btn-ghost land-topnav-btn'}, '📖 Learn'),
+        h('a', {href: 'learn.html', className: 'btn btn-ghost land-topnav-btn'}, '📖 Quick Start'),
         h('a', {href: 'campaigns/transition.html', className: 'btn btn-ghost land-topnav-btn'}, '⚔ D&D Guide'),
         h('a', {href: 'about.html', className: 'btn btn-ghost land-topnav-btn land-topnav-hide-sm'}, 'About'),
         h('button', {
@@ -1601,24 +1737,28 @@ function LandingApp() {
 
     h('main', {id: 'main'},
 
-      // ── Hero — straight to the point ──────────────────────────────────
+      // ── Hero ──────────────────────────────────────────────────────────
       h('div', {className: 'land-hero'},
         h('div', {className: 'land-hero-inner'},
-          h('p', {className: 'land-hero-eyebrow'}, 'Fate Condensed · 16 Generators · 6 Worlds'),
+          h('p', {className: 'land-hero-eyebrow'},
+            h('strong', null, 'O'), 'n-demand ',
+            h('strong', null, 'G'), 'enerator for ',
+            h('strong', null, 'M'), 'asterful ',
+            h('strong', null, 'A'), 'dventures'
+          ),
           h('h1', {className: 'land-hero-title'},
             'Your session is in two hours.',
             h('br', null),
-            h('span', {className: 'land-hero-sub'}, 'Pick a world. Start rolling.')
+            h('span', {className: 'land-hero-sub'}, 'Pick a world. Roll. Play.')
           ),
           h('p', {className: 'land-hero-desc'},
-            'Complete NPCs with aspects and skill pyramids. Scenes with zones. Encounters. Factions. Compels. ' +
-            'Every result is rules-accurate Fate Condensed, ready to put on the table.'
+            'Rules-accurate NPCs, scenes, and encounters - generated in one click, ready for the table.'
           ),
           h('div', {className: 'land-hero-pills'},
-            h('span', {className: 'land-hero-pill'}, '📴 Offline'),
+            h('span', {className: 'land-hero-pill'}, '📴 Fully offline'),
             h('span', {className: 'land-hero-pill'}, '🔓 Free forever'),
             h('span', {className: 'land-hero-pill'}, '🖨 Print-ready'),
-            h('span', {className: 'land-hero-pill'}, '🎲 One click')
+            h('span', {className: 'land-hero-pill'}, '⚡ One click')
           ),
           lastCamp && h('a', {
             href: lastCamp.href,
@@ -1631,7 +1771,7 @@ function LandingApp() {
         )
       ),
 
-      // ── World picker — the primary CTA ───────────────────────────────
+      // ── World picker - the primary CTA ───────────────────────────────
       h('div', {className: 'land-worlds-section', id: 'worlds'},
         h('div', {className: 'land-worlds-inner'},
           h('h2', {className: 'land-section-heading'}, 'Choose your world'),
@@ -1670,32 +1810,32 @@ function LandingApp() {
         )
       ),
 
-      // ── New here? onboarding paths ────────────────────────────────────
+      // ── New GM? onboarding paths ──────────────────────────────────────
       h('div', {className: 'land-onboard-section'},
         h('div', {className: 'land-worlds-inner'},
           h('h2', {className: 'land-section-heading'}, 'New to Fate?'),
           h('div', {className: 'land-onboard-grid'},
             h('a', {href: 'campaigns/sessionzero.html', className: 'land-onboard-card'},
-              h('div', {className: 'land-onboard-icon'}, '🌱'),
+              h('div', {className: 'land-onboard-icon'}, h(RaIcon, {n: RA_ICONS.session_zero, size: '2x'})),
               h('div', {className: 'land-onboard-text'},
-                h('div', {className: 'land-onboard-label'}, 'Session Zero'),
+                h('div', {className: 'land-onboard-label'}, 'Session Zero Wizard'),
                 h('div', {className: 'land-onboard-desc'}, 'Guided character creation for a new table. Works solo or as a group.')
               ),
               h('span', {className: 'land-onboard-arrow'}, '›')
             ),
             h('a', {href: 'campaigns/transition.html', className: 'land-onboard-card'},
-              h('div', {className: 'land-onboard-icon'}, '⚔'),
+              h('div', {className: 'land-onboard-icon'}, h(RaIcon, {n: RA_ICONS.dnd_guide, size: '2x'})),
               h('div', {className: 'land-onboard-text'},
                 h('div', {className: 'land-onboard-label'}, 'Coming from D&D?'),
-                h('div', {className: 'land-onboard-desc'}, 'Every major difference explained. Aspects vs ability scores, stress vs HP, and more.')
+                h('div', {className: 'land-onboard-desc'}, 'Every major difference explained side by side. Aspects vs. ability scores, stress vs. HP, and more.')
               ),
               h('span', {className: 'land-onboard-arrow'}, '›')
             ),
             h('a', {href: 'learn.html', className: 'land-onboard-card'},
-              h('div', {className: 'land-onboard-icon'}, '📖'),
+              h('div', {className: 'land-onboard-icon'}, h(RaIcon, {n: RA_ICONS.learn, size: '2x'})),
               h('div', {className: 'land-onboard-text'},
-                h('div', {className: 'land-onboard-label'}, 'Learn Fate'),
-                h('div', {className: 'land-onboard-desc'}, 'Condensed rules primer, GM craft tips, AI prompt library, and full glossary.')
+                h('div', {className: 'land-onboard-label'}, 'Quick-Start Guide'),
+                h('div', {className: 'land-onboard-desc'}, 'Rules primer, GM craft tips, worked examples, and a full Fate glossary.')
               ),
               h('span', {className: 'land-onboard-arrow'}, '›')
             )
@@ -1706,12 +1846,12 @@ function LandingApp() {
       // ── What's inside ─────────────────────────────────────────────────
       h('div', {className: 'land-generators-section'},
         h('div', {className: 'land-worlds-inner'},
-          h('h2', {className: 'land-section-heading'}, '16 generators. One click each.'),
+          h('h2', {className: 'land-section-heading'}, '16 generators. Every result rules-ready.'),
           h('div', {className: 'land-gen-groups'},
             GENERATOR_GROUPS.map(function(grp) {
               return h('div', {key: grp.id, className: 'land-gen-group'},
                 h('div', {className: 'land-gen-group-header'},
-                  h('span', {className: 'land-gen-group-icon'}, grp.icon),
+                  h('span', {className: 'land-gen-group-icon'}, h(RaIcon, {n: RA_ICONS[grp.id] || grp.id})),
                   h('span', {className: 'land-gen-group-name'}, grp.label)
                 ),
                 h('div', {className: 'land-gen-group-items'},
@@ -1732,18 +1872,25 @@ function LandingApp() {
     // ── Footer ─────────────────────────────────────────────────────────
     h('footer', {className: 'land-footer'},
       h('div', {className: 'land-footer-inner'},
+        h('div', {style: {fontStyle: 'italic', color: 'var(--text-muted)', marginBottom: 4}},
+          h('strong', null, 'O'), 'n-demand ',
+          h('strong', null, 'G'), 'enerator for ',
+          h('strong', null, 'M'), 'asterful ',
+          h('strong', null, 'A'), 'dventures'
+        ),
         h('div', null,
           'Fate™ is a trademark of ',
           h('a', {href: 'https://www.evilhat.com', target: '_blank', rel: 'noreferrer'}, 'Evil Hat Productions, LLC'),
           '.'
         ),
         h('div', {style: {marginTop: 4}},
-          'Licensed under ',
           h('a', {href: 'license.html'}, 'CC BY 3.0'),
           ' · ',
           h('a', {href: 'https://fate-srd.com/official-licensing-fate', target: '_blank', rel: 'noreferrer'}, 'Fate Licensing'),
           ' · ',
-          h('a', {href: 'about.html'}, 'About & contribute')
+          h('a', {href: 'about.html'}, 'About Ogma'),
+          ' · ',
+          h('a', {href: 'CONTRIBUTING.md', target: '_blank', rel: 'noreferrer'}, 'Contribute')
         )
       )
     )
@@ -1785,7 +1932,7 @@ function TableManagerModal(props) {
   var _custIn    = useState('');               var custIn = _custIn[0]; var setCustIn = _custIn[1];
   var _skillFilt = useState('');               var skillFilt = _skillFilt[0]; var setSkillFilt = _skillFilt[1];
 
-  // Resolve selected key — handle universal prefix (must be before allEntries)
+  // Resolve selected key - handle universal prefix (must be before allEntries)
   var isUniversalKey = selKey.indexOf('u_') === 0;
   var resolvedKey = isUniversalKey ? selKey.slice(2) : selKey;
 
@@ -1798,7 +1945,7 @@ function TableManagerModal(props) {
         return acc;
       }, []).sort())
     : [];
-  // Apply skill filter (stunts only) — filter view only, indices still map to allEntries
+  // Apply skill filter (stunts only) - filter view only, indices still map to allEntries
   var visibleIndices = isStuntTable && skillFilt
     ? allEntries.reduce(function(acc, e, i) {
         if (e && e.skill === skillFilt) acc.push(i);
@@ -1897,18 +2044,15 @@ function TableManagerModal(props) {
   return h(Modal, {onClose: props.onClose, label: 'Customize Tables'},
     h('div', {className: 'modal-box modal-box-wide', style: {maxHeight: '92vh', display: 'flex', flexDirection: 'column'}},
 
-      // ── Header ────────────────────────────────────────────────────
-      h('div', {className: 'modal-header'},
-        h('div', {className: 'modal-title'}, '🎛 Customize Tables'),
-        h('button', {className: 'btn btn-icon btn-ghost', onClick: props.onClose, 'aria-label': 'Close'}, '✕')
-      ),
+      // -- Header --------------------------------------------------------
+      h(ModalHeader, {title: '🎛 Customize Tables', onClose: props.onClose}),
 
       // ── Intro ──────────────────────────────────────────────────────
       h('div', {style: {
         padding: '8px 16px', borderBottom: '1px solid var(--border)', flexShrink: 0,
         fontSize: 'var(--text-label)', color: 'var(--text-muted)', lineHeight: 1.5,
       }}, 'Exclude entries you don\'t want, lock entries to force them, or add your own.' +
-        (props.universalMerge ? ' Generic Fate tables are included — change in ⚙ Settings.' : ' Generic Fate tables are off — enable in ⚙ Settings.')),
+        (props.universalMerge ? ' Generic Fate tables are included - change in ⚙ Settings.' : ' Generic Fate tables are off - enable in ⚙ Settings.')),
 
       // ── Table selector bar ────────────────────────────────────────
       h('div', {style: {padding: '10px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', flexShrink: 0}},
@@ -1949,7 +2093,7 @@ function TableManagerModal(props) {
 
       // ── Lock mode warning ─────────────────────────────────────────
       lockMode && h('div', {className: 'tm-lock-warning'},
-        '🔒 Lock mode — only ' + lockArr.length + ' locked entr' + (lockArr.length === 1 ? 'y' : 'ies') + ' will roll from this table'
+        '🔒 Lock mode - only ' + lockArr.length + ' locked entr' + (lockArr.length === 1 ? 'y' : 'ies') + ' will roll from this table'
       ),
 
       // ── Entry list ────────────────────────────────────────────────
@@ -1965,7 +2109,7 @@ function TableManagerModal(props) {
             h('button', {
               className: 'tm-icon-btn',
               onClick: function() { toggleLock(i); },
-              title: isLock ? 'Unlock' : 'Lock — only locked entries will roll',
+              title: isLock ? 'Unlock' : 'Lock - only locked entries will roll',
               style: {color: isLock ? 'var(--accent)' : 'var(--text-muted)'},
               'aria-pressed': String(isLock), 'aria-label': 'Lock entry',
             }, isLock ? '🔒' : '🔓'),
@@ -2063,7 +2207,7 @@ function NextStepStrip(props) {
           key: step.id,
           className: 'next-step-btn',
           onClick: function() { props.onSelectGen(step.id); },
-          'aria-label': step.hint + ' — switch to ' + g.label + ' generator',
+          'aria-label': step.hint + ' - switch to ' + g.label + ' generator',
           title: step.hint,
         },
           h('span', {'aria-hidden': 'true'}, g.icon),
@@ -2097,6 +2241,207 @@ var DEFAULT_FP_STATE = {
   ],
   pool: 0,
 };
+
+// ════════════════════════════════════════════════════════════════════════
+// BL-10: MILESTONE TRACKER - session-only, no IDB persistence
+// Renders as second tab in the FP panel
+// ════════════════════════════════════════════════════════════════════════
+
+function MilestoneTracker(props) {
+  var _minor = useState([]); var minorDone = _minor[0]; var setMinorDone = _minor[1];
+  var _major = useState([]); var majorDone = _major[0]; var setMajorDone = _major[1];
+
+  var MINOR_OPTIONS = [
+    'Swap two skill ratings',
+    'Rewrite one stunt (free)',
+    'Buy a new stunt (−1 Refresh)',
+    'Rewrite any non-High Concept aspect',
+  ];
+  var MAJOR_OPTIONS = [
+    'Do one Minor Milestone option',
+    'Increase one skill rating by one step',
+    'Rewrite High Concept (optional)',
+    'Begin recovery on moderate/severe consequence',
+  ];
+
+  function toggle(arr, setArr, val) {
+    setArr(function(prev) {
+      return prev.includes(val) ? prev.filter(function(x) { return x !== val; }) : prev.concat([val]);
+    });
+  }
+
+  function Option(oProps) {
+    var checked = oProps.arr.includes(oProps.val);
+    return h('label', {
+      onClick: function() { toggle(oProps.arr, oProps.setArr, oProps.val); },
+      style: {
+        display: 'flex', alignItems: 'flex-start', gap: 8,
+        padding: '6px 0', cursor: 'pointer',
+        borderBottom: '1px solid var(--border)',
+        color: checked ? 'var(--text)' : 'var(--text-dim)',
+      },
+    },
+      h('div', {style: {
+        width: 16, height: 16, borderRadius: 4, flexShrink: 0, marginTop: 1,
+        border: '1.5px solid ' + (checked ? 'var(--accent)' : 'var(--border)'),
+        background: checked ? 'var(--accent)' : 'transparent',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: 10, color: 'var(--bg)', transition: 'all 0.15s',
+      }}, checked ? '✓' : ''),
+      h('span', {style: {fontSize: 'var(--text-sm)', lineHeight: 1.45, textDecoration: checked ? 'line-through' : 'none', opacity: checked ? 0.6 : 1}}, oProps.val)
+    );
+  }
+
+  return h('div', {style: {padding: '4px 0'}},
+    h('div', {style: {marginBottom: 14}},
+      h('div', {style: {fontSize: 'var(--text-label)', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 6}}, '⬡ Minor Milestone'),
+      h('div', {style: {fontSize: 'var(--text-label)', color: 'var(--text-muted)', marginBottom: 8}}, 'End of every session - pick ONE'),
+      MINOR_OPTIONS.map(function(opt) { return h(Option, {key: opt, val: opt, arr: minorDone, setArr: setMinorDone}); }),
+      h('button', {
+        onClick: function() { setMinorDone([]); },
+        style: {marginTop: 8, fontSize: 'var(--text-label)', color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'var(--font-ui)'},
+      }, '↺ Clear')
+    ),
+    h('div', null,
+      h('div', {style: {fontSize: 'var(--text-label)', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--c-purple)', marginBottom: 6}}, '◆ Major Milestone'),
+      h('div', {style: {fontSize: 'var(--text-label)', color: 'var(--text-muted)', marginBottom: 8}}, 'End of a story arc - do ALL of these'),
+      MAJOR_OPTIONS.map(function(opt) { return h(Option, {key: opt, val: opt, arr: majorDone, setArr: setMajorDone}); }),
+      h('button', {
+        onClick: function() { setMajorDone([]); },
+        style: {marginTop: 8, fontSize: 'var(--text-label)', color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'var(--font-ui)'},
+      }, '↺ Clear')
+    )
+  );
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// BL-35: POPCORN INITIATIVE TRACKER - session-only, no IDB
+// Wired to last Encounter result's opposition names + party size
+// ════════════════════════════════════════════════════════════════════════
+
+function PopcornTracker(props) {
+  var partySize = props.partySize || 3;
+  var lastEncounter = props.lastEncounter || null;
+
+  // Build default participant list from encounter opposition + generic PCs
+  function defaultParticipants() {
+    var list = [];
+    for (var i = 1; i <= partySize; i++) { list.push({id: 'pc_'+i, name: 'PC '+i, done: false, type: 'pc'}); }
+    if (lastEncounter && lastEncounter.opposition) {
+      lastEncounter.opposition.forEach(function(o, i) {
+        list.push({id: 'npc_'+i, name: o.name || ('NPC '+(i+1)), done: false, type: 'npc'});
+      });
+    }
+    return list;
+  }
+
+  // BL-42: load from sessionStorage, fall back to defaults
+  var _parts = useState(function() {
+    try {
+      var saved = sessionStorage.getItem('ogma_popcorn');
+      if (saved) return JSON.parse(saved);
+    } catch(e) {}
+    return defaultParticipants();
+  });
+  var participants = _parts[0]; var setParticipants = _parts[1];
+  var _newName = useState(''); var newName = _newName[0]; var setNewName = _newName[1];
+
+  // BL-42: persist to sessionStorage on any change
+  useEffect(function() {
+    try { sessionStorage.setItem('ogma_popcorn', JSON.stringify(participants)); } catch(e) {}
+  }, [participants]);
+
+  function toggleDone(id) {
+    setParticipants(function(prev) {
+      return prev.map(function(p) { return p.id === id ? Object.assign({}, p, {done: !p.done}) : p; });
+    });
+  }
+
+  function addParticipant() {
+    var name = newName.trim();
+    if (!name) return;
+    setParticipants(function(prev) { return prev.concat([{id: 'custom_'+Date.now(), name: name, done: false, type: 'pc'}]); });
+    setNewName('');
+  }
+
+  function removeParticipant(id) {
+    setParticipants(function(prev) { return prev.filter(function(p) { return p.id !== id; }); });
+  }
+
+  function newRound() {
+    setParticipants(function(prev) { return prev.map(function(p) { return Object.assign({}, p, {done: false}); }); });
+  }
+
+  var remaining = participants.filter(function(p) { return !p.done; }).length;
+
+  return h('div', {style: {padding: '4px 0'}},
+    h('div', {style: {display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8}},
+      h('div', {style: {fontSize: 'var(--text-label)', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--accent)'}},
+        '🏁 Popcorn Initiative'
+      ),
+      h('div', {style: {display: 'flex', gap: 4}},
+        h('span', {style: {fontSize: 'var(--text-label)', color: remaining === 0 ? 'var(--c-green)' : 'var(--text-muted)'}},
+          remaining === 0 ? 'Round done!' : remaining + ' to go'
+        ),
+        h('button', {
+          onClick: newRound,
+          style: {fontSize: 'var(--text-label)', color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 0 6px', fontFamily: 'var(--font-ui)'},
+          title: 'New round - clear all checkmarks',
+        }, '↺')
+      )
+    ),
+    h('div', {style: {marginBottom: 8}},
+      participants.map(function(p) {
+        return h('div', {
+          key: p.id,
+          onClick: function() { toggleDone(p.id); },
+          style: {
+            display: 'flex', alignItems: 'center', gap: 8, padding: '6px 4px',
+            borderBottom: '1px solid var(--border)', cursor: 'pointer',
+            opacity: p.done ? 0.45 : 1, transition: 'opacity 0.15s',
+          },
+        },
+          h('div', {style: {
+            width: 16, height: 16, borderRadius: '50%', flexShrink: 0,
+            border: '1.5px solid ' + (p.done ? 'var(--c-green)' : (p.type === 'npc' ? 'var(--c-red)' : 'var(--accent)')),
+            background: p.done ? 'var(--c-green)' : 'transparent',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 9, color: 'var(--bg)',
+          }}, p.done ? '✓' : ''),
+          h('span', {style: {
+            flex: 1, fontSize: 'var(--text-sm)',
+            color: p.type === 'npc' ? 'var(--c-red)' : 'var(--text)',
+            textDecoration: p.done ? 'line-through' : 'none',
+          }}, p.name),
+          h('button', {
+            onClick: function(e) { e.stopPropagation(); removeParticipant(p.id); },
+            style: {background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: 12, padding: '0 2px', lineHeight: 1},
+            'aria-label': 'Remove ' + p.name,
+          }, '×')
+        );
+      })
+    ),
+    h('div', {style: {display: 'flex', gap: 4}},
+      h('input', {
+        value: newName,
+        onChange: function(e) { setNewName(e.target.value); },
+        onKeyDown: function(e) { if (e.key === 'Enter') addParticipant(); },
+        placeholder: 'Add participant…',
+        style: {
+          flex: 1, background: 'var(--inset)', border: '1px solid var(--border)',
+          borderRadius: 6, padding: '4px 8px', color: 'var(--text)',
+          fontSize: 'var(--text-sm)', fontFamily: 'var(--font-ui)',
+        },
+        'aria-label': 'New participant name',
+      }),
+      h('button', {
+        onClick: addParticipant,
+        className: 'btn btn-ghost',
+        style: {fontSize: 12, padding: '4px 10px', minHeight: 0},
+      }, '+')
+    )
+  );
+}
 
 function FatePointTracker(props) {
   var state = props.state || DEFAULT_FP_STATE;
@@ -2144,42 +2489,66 @@ function FatePointTracker(props) {
     update(Object.assign({}, state, {pool: Math.max(0, (state.pool || 0) + delta)}));
   }
 
+  var _fpTab = useState('fp'); var fpTab = _fpTab[0]; var setFpTab = _fpTab[1];
+
+  var TAB_STYLE = function(id) { return {
+    flex: 1, background: 'none', border: 'none', cursor: 'pointer',
+    padding: '6px 4px', fontSize: 'var(--text-label)', fontFamily: 'var(--font-ui)',
+    fontWeight: fpTab === id ? 700 : 500,
+    color: fpTab === id ? 'var(--accent)' : 'var(--text-muted)',
+    borderBottom: '2px solid ' + (fpTab === id ? 'var(--accent)' : 'transparent'),
+    transition: 'all 0.15s', whiteSpace: 'nowrap',
+  }; };
+
   return h('div', {className: 'fp-tracker'},
     h('div', {className: 'fp-header'},
-      h('span', {className: 'fp-title'}, '◎ Fate Points'),
-      h('button', {className: 'btn btn-ghost', onClick: resetAll, title: 'Reset all to refresh', style: {fontSize: 12, padding: '2px 8px', minHeight: 0}}, '↺ Reset'),
+      h('span', {className: 'fp-title'}, '◎ Fate Tools'),
+      fpTab === 'fp' && h('button', {className: 'btn btn-ghost', onClick: resetAll, title: 'Reset all to refresh', style: {fontSize: 12, padding: '2px 8px', minHeight: 0}}, '↺ Reset'),
       h('button', {className: 'btn btn-ghost', onClick: props.onClose, style: {fontSize: 14, padding: '2px 8px', minHeight: 0}, 'aria-label': 'Close'}, '✕')
     ),
-    h('div', {className: 'fp-pcs'},
-      state.pcs.map(function(pc) {
-        return h('div', {key: pc.id, className: 'fp-pc-row'},
-          h('input', {
-            className: 'fp-pc-name',
-            value: pc.name,
-            onChange: function(e) { setName(pc.id, e.target.value); },
-            'aria-label': 'Player character name',
-          }),
-          h('div', {className: 'fp-controls'},
-            h('button', {className: 'fp-btn fp-minus', onClick: function() { adjustPC(pc.id, -1); }, 'aria-label': 'Spend fate point', disabled: pc.current === 0}, '−'),
-            h('div', {className: 'fp-dots'},
-              [0,1,2,3,4,5].map(function(i) {
-                return h('div', {key: i, className: 'fp-dot' + (i < pc.current ? ' fp-dot-filled' : ''), onClick: function() { adjustPC(pc.id, i < pc.current ? -1 : 1); }});
-              })
+    // Tab bar
+    h('div', {style: {display: 'flex', borderBottom: '1px solid var(--border)', marginBottom: 10}},
+      h('button', {onClick: function() { setFpTab('fp'); }, style: TAB_STYLE('fp'), 'aria-pressed': String(fpTab==='fp')}, '◎ Fate Points'),
+      h('button', {onClick: function() { setFpTab('ms'); }, style: TAB_STYLE('ms'), 'aria-pressed': String(fpTab==='ms')}, '⬡ Milestones'),
+      h('button', {onClick: function() { setFpTab('pi'); }, style: TAB_STYLE('pi'), 'aria-pressed': String(fpTab==='pi')}, '🏁 Initiative')
+    ),
+    // Tab: Fate Points
+    fpTab === 'fp' && h(Fragment, null,
+      h('div', {className: 'fp-pcs'},
+        state.pcs.map(function(pc) {
+          return h('div', {key: pc.id, className: 'fp-pc-row'},
+            h('input', {
+              className: 'fp-pc-name',
+              value: pc.name,
+              onChange: function(e) { setName(pc.id, e.target.value); },
+              'aria-label': 'Player character name',
+            }),
+            h('div', {className: 'fp-controls'},
+              h('button', {className: 'fp-btn fp-minus', onClick: function() { adjustPC(pc.id, -1); }, 'aria-label': 'Spend fate point', disabled: pc.current === 0}, '−'),
+              h('div', {className: 'fp-dots'},
+                [0,1,2,3,4,5].map(function(i) {
+                  return h('div', {key: i, className: 'fp-dot' + (i < pc.current ? ' fp-dot-filled' : ''), onClick: function() { adjustPC(pc.id, i < pc.current ? -1 : 1); }});
+                })
+              ),
+              h('button', {className: 'fp-btn fp-plus', onClick: function() { adjustPC(pc.id, 1); }, 'aria-label': 'Gain fate point'}, '+'),
+              h('span', {className: 'fp-count'}, pc.current)
             ),
-            h('button', {className: 'fp-btn fp-plus', onClick: function() { adjustPC(pc.id, 1); }, 'aria-label': 'Gain fate point'}, '+'),
-            h('span', {className: 'fp-count'}, pc.current)
-          ),
-          h('button', {className: 'fp-remove', onClick: function() { removePC(pc.id); }, 'aria-label': 'Remove ' + pc.name, title: 'Remove'}, '×')
-        );
-      })
+            h('button', {className: 'fp-remove', onClick: function() { removePC(pc.id); }, 'aria-label': 'Remove ' + pc.name, title: 'Remove'}, '×')
+          );
+        })
+      ),
+      h('div', {className: 'fp-pool-row'},
+        h('span', {className: 'fp-pool-label'}, 'GM Pool'),
+        h('button', {className: 'fp-btn fp-minus', onClick: function() { adjustPool(-1); }, disabled: (state.pool || 0) === 0}, '−'),
+        h('span', {className: 'fp-pool-count'}, state.pool || 0),
+        h('button', {className: 'fp-btn fp-plus', onClick: function() { adjustPool(1); }}, '+')
+      ),
+      h('button', {className: 'fp-add-pc', onClick: addPC}, '+ Add PC')
     ),
-    h('div', {className: 'fp-pool-row'},
-      h('span', {className: 'fp-pool-label'}, 'GM Pool'),
-      h('button', {className: 'fp-btn fp-minus', onClick: function() { adjustPool(-1); }, disabled: (state.pool || 0) === 0}, '−'),
-      h('span', {className: 'fp-pool-count'}, state.pool || 0),
-      h('button', {className: 'fp-btn fp-plus', onClick: function() { adjustPool(1); }}, '+')
-    ),
-    h('button', {className: 'fp-add-pc', onClick: addPC}, '+ Add PC')
+    // Tab: Milestones (BL-10)
+    fpTab === 'ms' && h(MilestoneTracker, null),
+    // Tab: Popcorn Initiative (BL-35)
+    fpTab === 'pi' && h(PopcornTracker, {partySize: props.partySize, lastEncounter: props.lastEncounter})
   );
 }
 
@@ -2200,12 +2569,18 @@ function CampaignApp(props) {
   var _party = useState(3);           var partySize = _party[0]; var setPartySize = _party[1];
   var _roll  = useState(false);       var rolling = _roll[0];  var setRolling = _roll[1];
   var _hist  = useState([]);          var history = _hist[0];  var setHistory = _hist[1];
-  var _help  = useState(false);       var showHelp = _help[0]; var setShowHelp = _help[1];
+  // openPanel: single state for mutually-exclusive panels -- eliminates 5 boolean re-renders
+  // Values: null | 'help' | 'fp' | 'history' | 'settings' | 'tables'
+  var _panel = useState(null); var openPanel = _panel[0]; var setOpenPanel = _panel[1];
+  function showPanel(name) { setOpenPanel(name); setShowSidebar(false); }
+  function closePanel()    { setOpenPanel(null); }
+  // Derived booleans -- zero re-render cost, just string comparisons
+  var showHelp     = openPanel === 'help';
+  var showFP       = openPanel === 'fp';
+  var showSettings = openPanel === 'settings';
+  var showTables   = openPanel === 'tables';
   var _exp   = useState(false);       var showExport = _exp[0]; var setShowExport = _exp[1];
   var _prefs = useState({excluded:{}, locked:{}, custom:{}}); var prefs = _prefs[0]; var setPrefs = _prefs[1];
-  var _tbls  = useState(false);       var showTables = _tbls[0]; var setShowTables = _tbls[1];
-  var _sett  = useState(false);       var showSettings = _sett[0]; var setShowSettings = _sett[1];
-  var _showFP = useState(false);      var showFP = _showFP[0];     var setShowFP = _showFP[1];
   var _fp = useState(function() {
     try { var s = LS.get('fp_state'); return s || null; } catch(e) { return null; }
   });
@@ -2219,7 +2594,7 @@ function CampaignApp(props) {
   var _inspR = useState([]);          var inspireResults = _inspR[0]; var setInspireResults = _inspR[1];
   var prefsRef = useRef(prefs); prefsRef.current = prefs;
   var _pins    = useState([]);          var pinnedCards = _pins[0];    var setPinnedCards = _pins[1];
-  // Universal merge toggle — default on, persisted globally in localStorage
+  // Universal merge toggle - default on, persisted globally in localStorage
   var _uMerge  = useState(function() { try { return LS.get('universal_merge') !== false; } catch(e) { return true; } });
   var universalMerge = _uMerge[0]; var setUniversalMerge = _uMerge[1];
   function toggleUniversalMerge() {
@@ -2227,8 +2602,12 @@ function CampaignApp(props) {
     setUniversalMerge(next);
     try { LS.set('universal_merge', next); } catch(e) {}
   }
-  // F4: Consequence severity selector — '' means random (default)
+  // F4: Consequence severity selector - '' means random (default)
   var _csev = useState(''); var consequenceSev = _csev[0]; var setConsequenceSev = _csev[1];
+
+  // BL-09: PWA install nudge
+  var deferredInstallPrompt = useRef(null);
+  var _pwa = useState(false); var showPwaNudge = _pwa[0]; var setShowPwaNudge = _pwa[1];
 
   // Load last session + table prefs on mount
   useEffect(function() {
@@ -2253,6 +2632,23 @@ function CampaignApp(props) {
   useEffect(function() {
     DB.saveSession('fate_tprefs_' + campId, prefs).catch(function() {});
   }, [prefs]);
+
+  // BL-09: PWA install nudge - capture prompt, show after 2nd visit if not dismissed
+  useEffect(function() {
+    var dismissed = false;
+    try { dismissed = LS.get('pwa_nudge_dismissed'); } catch(e) {}
+    if (dismissed) return;
+    // Increment visit count
+    var visits = 0;
+    try { visits = (LS.get('visit_count_' + campId) || 0) + 1; LS.set('visit_count_' + campId, visits); } catch(e) {}
+    function onBeforeInstall(e) {
+      e.preventDefault();
+      deferredInstallPrompt.current = e;
+      if (visits >= 2) setShowPwaNudge(true);
+    }
+    window.addEventListener('beforeinstallprompt', onBeforeInstall);
+    return function() { window.removeEventListener('beforeinstallprompt', onBeforeInstall); };
+  }, [campId]);
 
   function getResultLabel(r) {
     if (!r || !r.data) return '\u2014';
@@ -2286,7 +2682,7 @@ function CampaignApp(props) {
     };
     setPinnedCards(function(prev) { return [card].concat(prev); });
     DB.saveCard(campId, card).catch(function() {});
-    showToast('📌 Pinned — find it in 📋 History');
+    showToast('📌 Pinned - find it in 📋 History');
   }
 
   function unpinCard(cardId) {
@@ -2322,8 +2718,9 @@ function CampaignApp(props) {
   var groupGens = currentGroup.gens.map(function(gid) { return GENERATORS.find(function(g) { return g.id === gid; }); }).filter(Boolean);
   // History/Pinned drawer
   var _drawer = useState(false); var showDrawer = _drawer[0]; var setShowDrawer = _drawer[1];
-  var _showHist = useState(false); var showHistory = _showHist[0]; var setShowHistory = _showHist[1];
-  // Help level preference — controls inline help detail
+  // showHistory derived from openPanel -- see openPanel state above
+  var showHistory  = openPanel === 'history';
+  // Help level preference - controls inline help detail
   var _helpLvl = useState(function() { try { return LS.get('help_level') || 'new_fate'; } catch(e) { return 'new_fate'; } });
   var helpLevel = _helpLvl[0]; var setHelpLevel = _helpLvl[1];
   function changeHelpLevel(lvl) { setHelpLevel(lvl); try { LS.set('help_level', lvl); } catch(e) {} }
@@ -2340,7 +2737,7 @@ function CampaignApp(props) {
     try { LS.set('onboarding_done', true); } catch(e) {}
   }
 
-  // GM Mode — surfaces running guidance on results
+  // GM Mode - surfaces running guidance on results
   var _gmMode = useState(function() { try { return LS.get('gm_mode') !== false; } catch(e) { return true; } });
   var gmMode = _gmMode[0]; var setGmMode = _gmMode[1];
   var _gmPill = useState(null); var gmPill = _gmPill[0]; var setGmPill = _gmPill[1];
@@ -2370,7 +2767,7 @@ function CampaignApp(props) {
     }, 220);
   }, [activeGen, t, partySize, gen, universalMerge, consequenceSev]);
 
-  // ND-07: Inspiration Mode — generate 3 options, pick one
+  // ND-07: Inspiration Mode - generate 3 options, pick one
   var doInspire = useCallback(function() {
     if (rolling) return;
     setRolling(true);
@@ -2413,7 +2810,7 @@ function CampaignApp(props) {
     document.documentElement.setAttribute('data-gm-mode', gmMode ? 'on' : 'off');
   }, [gmMode]);
 
-  // TD-10: Sidebar focus management — move focus to first item when drawer opens (mobile a11y)
+  // TD-10: Sidebar focus management - move focus to first item when drawer opens (mobile a11y)
   var sidebarRef = useRef(null);
   useEffect(function() {
     if (!showSidebar) return;
@@ -2424,7 +2821,7 @@ function CampaignApp(props) {
     if (first) setTimeout(function() { first.focus(); }, 50);
   }, [showSidebar]);
 
-  // R-13: Sticky Roll FAB — appears when Roll button scrolls off-screen
+  // R-13: Sticky Roll FAB - appears when Roll button scrolls off-screen
   var rollBtnRef = useRef(null);
   var _fab = useState(false); var showFAB = _fab[0]; var setShowFAB = _fab[1];
   useEffect(function() {
@@ -2446,15 +2843,15 @@ function CampaignApp(props) {
       // Escape always closes any open panel
       if (e.key === 'Escape') {
         if (showSidebar)   { setShowSidebar(false);   return; }
-        if (showHistory)   { setShowHistory(false);   return; }
-        if (showHelp)      { setShowHelp(false);      return; }
-        if (showTables)    { setShowTables(false);    return; }
-        if (showSettings)  { setShowSettings(false);  return; }
+        if (showHistory)   { closePanel();   return; }
+        if (showHelp)      { closePanel();   return; }
+        if (showTables)    { closePanel();   return; }
+        if (showSettings)  { closePanel();   return; }
         return;
       }
 
       // All other shortcuts blocked when a modal/panel is open
-      if (showHelp || showTables || showSettings || showHistory || showSidebar) return;
+      if (openPanel || showSidebar) return;
 
       if (e.code === 'Space' && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();
@@ -2473,13 +2870,15 @@ function CampaignApp(props) {
         var idx = allGens.indexOf(activeGen);
         var next = allGens[(idx + 1) % allGens.length];
         selectGen(next);
+      } else if (e.key === 'i' || e.key === 'I') {
+        if (!rolling) doInspire();
       } else if (e.key === '?' && !e.shiftKey) {
-        setShowHelp(true);
+        showPanel('help');
       }
     }
     document.addEventListener('keydown', onKey);
     return function() { document.removeEventListener('keydown', onKey); };
-  }, [rolling, result, activeGen, showHelp, showTables, showSettings, showHistory, showSidebar, doGenerate]);
+  }, [rolling, result, activeGen, openPanel, showSidebar, doGenerate, doInspire]);
 
   var totalEntries = Object.values(t).reduce(function(n, v) { return n + (Array.isArray(v) ? v.length : 0); }, 0);
 
@@ -2492,7 +2891,7 @@ function CampaignApp(props) {
     // Mobile:  sticky topbar + off-canvas drawer + full-width content
     // ════════════════════════════════════════════════════════════════
 
-    // ── Top bar — brand + campaign identity only ─────────────────────
+    // ── Top bar - brand + campaign identity only ─────────────────────
     h('header', {className: 'topbar', role: 'banner'},
       h('button', {
         className: 'topbar-hamburger btn btn-icon btn-ghost',
@@ -2538,7 +2937,7 @@ function CampaignApp(props) {
             'aria-pressed': String(gmMode),
             title: 'Toggle GM Mode',
           },
-            h('span', {className: 'sidebar-item-icon'}, '🎭'),
+            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.gm_mode})),
             h('span', {className: 'sidebar-item-label'}, 'GM Mode'),
             h('span', {className: 'sidebar-gm-badge'}, gmMode ? 'ON' : 'OFF')
           )
@@ -2549,18 +2948,18 @@ function CampaignApp(props) {
         h('div', {className: 'sidebar-section'},
           h('button', {
             className: 'sidebar-tool-btn' + (showFP ? ' active' : ''),
-            onClick: function() { setShowFP(!showFP); setShowSidebar(false); },
+            onClick: function() { openPanel === 'fp' ? closePanel() : showPanel('fp'); },
             'aria-pressed': String(showFP),
           },
-            h('span', {className: 'sidebar-item-icon'}, '◎'),
+            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.fp_tracker})),
             h('span', {className: 'sidebar-item-label'}, 'FP Tracker')
           ),
           h('button', {
             className: 'sidebar-tool-btn' + (showHistory ? ' active' : ''),
-            onClick: function() { setShowHistory(!showHistory); setShowSidebar(false); },
+            onClick: function() { openPanel === 'history' ? closePanel() : showPanel('history'); },
             'aria-pressed': String(showHistory),
           },
-            h('span', {className: 'sidebar-item-icon'}, '📋'),
+            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.history})),
             h('span', {className: 'sidebar-item-label'},
               pinnedCards.length > 0 ? 'History · ' + pinnedCards.length + ' pinned' : 'History'
             )
@@ -2580,7 +2979,7 @@ function CampaignApp(props) {
               className: 'sidebar-gen-item' + (activeGen === gid ? ' active' : ''),
               onClick: function() { selectGen(gid); setShowSidebar(false); },
             },
-              h('span', {className: 'sidebar-item-icon'}, g.icon),
+              h('span', {className: 'sidebar-item-icon'}, RA_ICONS[gid] ? h(RaIcon, {n: RA_ICONS[gid]}) : g.icon),
               h('span', {className: 'sidebar-item-label'}, g.label)
             );
           })
@@ -2588,7 +2987,7 @@ function CampaignApp(props) {
 
         h('div', {className: 'sidebar-divider'}),
 
-        // ── Scenes ───────────────────────────────────────────────────
+        // -- Scenes -----------------------------------------------------
         h('div', {className: 'sidebar-section'},
           h('div', {className: 'sidebar-group-label'}, 'Scenes'),
           ['scene','encounter','complication'].map(function(gid) {
@@ -2599,7 +2998,7 @@ function CampaignApp(props) {
               className: 'sidebar-gen-item' + (activeGen === gid ? ' active' : ''),
               onClick: function() { selectGen(gid); setShowSidebar(false); },
             },
-              h('span', {className: 'sidebar-item-icon'}, g.icon),
+              h('span', {className: 'sidebar-item-icon'}, RA_ICONS[gid] ? h(RaIcon, {n: RA_ICONS[gid]}) : g.icon),
               h('span', {className: 'sidebar-item-label'}, g.label)
             );
           })
@@ -2607,7 +3006,7 @@ function CampaignApp(props) {
 
         h('div', {className: 'sidebar-divider'}),
 
-        // ── Pacing ───────────────────────────────────────────────────
+        // -- Pacing -----------------------------------------------------
         h('div', {className: 'sidebar-section'},
           h('div', {className: 'sidebar-group-label'}, 'Pacing'),
           ['challenge','contest','obstacle','countdown','constraint'].map(function(gid) {
@@ -2618,7 +3017,7 @@ function CampaignApp(props) {
               className: 'sidebar-gen-item' + (activeGen === gid ? ' active' : ''),
               onClick: function() { selectGen(gid); setShowSidebar(false); },
             },
-              h('span', {className: 'sidebar-item-icon'}, g.icon),
+              h('span', {className: 'sidebar-item-icon'}, RA_ICONS[gid] ? h(RaIcon, {n: RA_ICONS[gid]}) : g.icon),
               h('span', {className: 'sidebar-item-label'}, g.label)
             );
           })
@@ -2626,14 +3025,14 @@ function CampaignApp(props) {
 
         h('div', {className: 'sidebar-divider'}),
 
-        // ── World ────────────────────────────────────────────────────
+        // -- World ------------------------------------------------------
         h('div', {className: 'sidebar-section'},
           h('div', {className: 'sidebar-group-label'}, 'World'),
           h('a', {
             href: '../campaigns/guide-' + campId + '.html',
             className: 'sidebar-gen-item',
           },
-            h('span', {className: 'sidebar-item-icon'}, '📜'),
+            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.guide})),
             h('span', {className: 'sidebar-item-label'}, 'Campaign Guide')
           ),
           ['campaign','seed','faction','compel','consequence'].map(function(gid) {
@@ -2644,7 +3043,7 @@ function CampaignApp(props) {
               className: 'sidebar-gen-item' + (activeGen === gid ? ' active' : ''),
               onClick: function() { selectGen(gid); setShowSidebar(false); },
             },
-              h('span', {className: 'sidebar-item-icon'}, g.icon),
+              h('span', {className: 'sidebar-item-icon'}, RA_ICONS[gid] ? h(RaIcon, {n: RA_ICONS[gid]}) : g.icon),
               h('span', {className: 'sidebar-item-label'}, g.label)
             );
           })
@@ -2656,23 +3055,23 @@ function CampaignApp(props) {
         h('div', {className: 'sidebar-section sidebar-settings-row'},
           h('button', {
             className: 'sidebar-tool-btn',
-            onClick: function() { setShowTables(true); setShowSidebar(false); },
+            onClick: function() { showPanel('tables'); },
           },
-            h('span', {className: 'sidebar-item-icon'}, '🎛'),
+            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.customize})),
             h('span', {className: 'sidebar-item-label'}, 'Customize Tables')
           ),
           h('button', {
             className: 'sidebar-tool-btn',
-            onClick: function() { setShowSettings(true); setShowSidebar(false); },
+            onClick: function() { showPanel('settings'); },
           },
-            h('span', {className: 'sidebar-item-icon'}, '⚙'),
+            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.settings})),
             h('span', {className: 'sidebar-item-label'}, 'Settings')
           ),
           h('button', {
             className: 'sidebar-tool-btn',
             onClick: toggleTheme,
           },
-            h('span', {className: 'sidebar-item-icon'}, theme === 'dark' ? '☀️' : '🌙'),
+            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: theme === 'dark' ? RA_ICONS.theme_light : RA_ICONS.theme_dark})),
             h('span', {className: 'sidebar-item-label'}, theme === 'dark' ? 'Light' : 'Dark')
           )
         ),
@@ -2686,30 +3085,30 @@ function CampaignApp(props) {
             className: 'sidebar-tool-btn',
             onClick: function() { setShowSidebar(false); setTimeout(function() { if (window.fateReplayIntro) window.fateReplayIntro(); }, TIMING.INTRO_REPLAY_MS); },
           },
-            h('span', {className: 'sidebar-item-icon'}, '▶'),
+            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.play_intro})),
             h('span', {className: 'sidebar-item-label'}, 'Play Intro')
           ),
           h('a', {href: '../campaigns/guide-' + campId + '.html', className: 'sidebar-tool-btn'},
-            h('span', {className: 'sidebar-item-icon'}, '📜'),
+            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.guide})),
             h('span', {className: 'sidebar-item-label'}, 'Campaign Guide')
           ),
           h('button', {
             className: 'sidebar-tool-btn',
-            onClick: function() { setShowHelp(true); setShowSidebar(false); },
+            onClick: function() { showPanel('help'); },
           },
-            h('span', {className: 'sidebar-item-icon'}, '?'),
+            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.rules})),
             h('span', {className: 'sidebar-item-label'}, 'Rules')
           ),
           h('a', {href: '../campaigns/transition.html', className: 'sidebar-tool-btn'},
-            h('span', {className: 'sidebar-item-icon'}, '⚔'),
+            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.dnd_guide})),
             h('span', {className: 'sidebar-item-label'}, 'D&D Guide')
           ),
           h('a', {href: '../learn.html', className: 'sidebar-tool-btn'},
-            h('span', {className: 'sidebar-item-icon'}, '📖'),
-            h('span', {className: 'sidebar-item-label'}, 'Learn Fate')
+            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.learn})),
+            h('span', {className: 'sidebar-item-label'}, 'Quick Start')
           ),
           h('a', {href: '../index.html', className: 'sidebar-tool-btn'},
-            h('span', {className: 'sidebar-item-icon'}, '🏠'),
+            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.home})),
             h('span', {className: 'sidebar-item-label'}, 'Home')
           )
         ),
@@ -2740,7 +3139,7 @@ function CampaignApp(props) {
       // ── Main content panel ───────────────────────────────────────────
       h('div', {className: 'content-panel'},
 
-        // Roll hero — primary action, straight to business
+        // Roll hero - primary action, straight to business
         h('div', {className: 'roll-hero', ref: rollBtnRef},
           h('div', {className: 'roll-wrap'},
             h('button', {
@@ -2756,8 +3155,9 @@ function CampaignApp(props) {
               className: 'btn btn-ghost inspire-btn' + (inspireMode ? ' inspire-active' : ''),
               onClick: inspireMode ? function() { setInspireMode(false); setInspireResults([]); } : doInspire,
               disabled: rolling,
-              title: inspireMode ? 'Exit inspiration mode' : 'Inspiration mode — roll 3 options, pick one',
-              'aria-label': 'Inspiration mode',
+              title: inspireMode ? 'Exit inspiration mode' : 'Inspiration mode - roll 3 options, pick one [I]',
+              'aria-label': inspireMode ? 'Exit inspiration mode' : 'Inspiration mode',
+              'aria-keyshortcuts': 'I',
             }, inspireMode ? '✕ Exit' : '✦ 3')
           )
         ),
@@ -2815,7 +3215,7 @@ function CampaignApp(props) {
                 // BL-21: Help always visible in result panel (mobile + desktop)
                 h('button', {
                   className: 'btn btn-ghost',
-                  onClick: function() { setShowHelp(true); },
+                  onClick: function() { showPanel('help'); },
                   title: 'Help and rules reference',
                   'aria-label': 'Help',
                   style: {fontSize: 13, padding: '4px 10px', minHeight: 0},
@@ -2846,10 +3246,10 @@ function CampaignApp(props) {
 
             // ── Panel content ───────────────────────────────────────────
             h('div', {style: {padding: 20}},
-            // ND-07: Inspiration mode — 3 results to choose from
+            // ND-07: Inspiration mode - 3 results to choose from
             inspireMode && inspireResults.length > 0 && h('div', {className: 'inspire-wrap'},
               h('div', {className: 'inspire-header'},
-                h('span', {className: 'lbl'}, '✦ Inspiration Mode — pick one'),
+                h('span', {className: 'lbl'}, '✦ Inspiration Mode - pick one'),
                 h('button', {
                   className: 'btn btn-ghost',
                   onClick: doInspire,
@@ -2894,10 +3294,10 @@ function CampaignApp(props) {
               // For new_ttrpg: show max 3 rules and simplify labels
               var showRules = lvl === 'new_ttrpg' ? allRules.slice(0, 3) : allRules;
               var rulesLabel = lvl === 'new_ttrpg' ? 'How It Works' :
-                              lvl === 'dnd_convert' ? 'Rules — Fate Condensed (D&D differences highlighted)' :
-                              'Rules — Fate Condensed';
+                              lvl === 'dnd_convert' ? 'Rules - Fate Condensed (D&D differences highlighted)' :
+                              'Rules - Fate Condensed';
 
-              return h('div', {style: {animation: 'fadeUp 0.3s ease both'}},
+              return h('div', {className: 'fade-up'},
                 // Generator title
                 h('div', {style: {display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16}},
                   h('span', {style: {fontSize: 28}}, gen.icon),
@@ -2913,7 +3313,7 @@ function CampaignApp(props) {
                   borderLeft: '3px solid var(--c-green)', borderRadius: '0 8px 8px 0',
                   padding: '10px 14px', marginBottom: 14, fontSize: 'var(--text-sm)', color: 'var(--text-dim)', lineHeight: 1.6,
                 }},
-                  'New to tabletop RPGs? This generator creates ready-to-use game content. You describe what your character does, roll dice to see how well it goes, and the GM (Game Master — the person running the story) uses these results to bring the world to life. ',
+                  'New to tabletop RPGs? This generator creates ready-to-use game content. You describe what your character does, roll dice to see how well it goes, and the GM (Game Master - the person running the story) uses these results to bring the world to life. ',
                   h('a', {href: '../learn.html', style: {color: 'var(--c-green)'}}, 'Learn more about how to play →')
                 ),
 
@@ -2974,12 +3374,12 @@ function CampaignApp(props) {
                   )
                 ),
                 h('div', {className: 'print-header-meta'},
-                  'Ogma — A Fate Condensed Generator Suite', h('br', null),
+                  'Ogma - A Fate Condensed Generator Suite', h('br', null),
                   new Date().toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'})
                 )
               ),
 
-              // ── GM Mode guidance — Pill Bar (above result) ──────────
+              // ── GM Mode guidance - Pill Bar (above result) ──────────
               gmMode && (function() {
                 var hc = HELP_CONTENT[result.genId] || {};
                 var pills = [];
@@ -2987,6 +3387,8 @@ function CampaignApp(props) {
                 if (hc.gm_checklist) pills.push({id: 'check', icon: '☐', label: 'Checklist', list: hc.gm_checklist});
                 if (hc.gm_compel) pills.push({id: 'compel', icon: '🔄', label: 'Compel', content: hc.gm_compel});
                 if (hc.gm_hook) pills.push({id: 'hook', icon: '→', label: 'Hook', content: hc.gm_hook});
+                if (hc.invoke_example) pills.push({id: 'invoke', icon: '✦', label: 'Invoke', content: hc.invoke_example});
+                if (hc.compel_example) pills.push({id: 'compelx', icon: '⊗', label: 'Compel eg.', content: hc.compel_example});
                 if (pills.length === 0) return null;
 
                 var activePill = pills.find(function(p) { return p.id === gmPill; });
@@ -3026,38 +3428,58 @@ function CampaignApp(props) {
     ),
 
     // ── History & Pinned slide-over panel ─────────────────────────────
-    showHistory && h('div', {className: 'hist-overlay', onClick: function() { setShowHistory(false); }}),
+    showHistory && h('div', {className: 'hist-overlay', onClick: function() { closePanel(); }}),
     showHistory && h('div', {className: 'hist-panel'},
       h('div', {className: 'hist-panel-header'},
         h('span', {style: {fontSize: 'var(--text-md)', fontWeight: 700, color: 'var(--text)'}}, '📋 History & Pinned'),
         h('button', {
           className: 'btn btn-icon btn-ghost',
-          onClick: function() { setShowHistory(false); },
+          onClick: function() { closePanel(); },
           'aria-label': 'Close history panel',
           style: {fontSize: 18, padding: '4px 8px'},
         }, '✕')
       ),
-      // ND-03: Session Pack — copy all pinned as single Markdown doc
+      // ND-03: Session Pack - copy all pinned as single Markdown doc
       pinnedCards.length > 0 && h('button', {
         className: 'btn btn-ghost',
         onClick: function() {
-          var header = '# ' + camp.meta.name + ' — Session Pack\n_Generated ' + new Date().toLocaleDateString() + ' · ' + pinnedCards.length + ' pinned results_\n\n';
+          var header = '# ' + camp.meta.name + ' - Session Pack\n_Generated ' + new Date().toLocaleDateString() + ' · ' + pinnedCards.length + ' pinned results_\n\n';
           var body = pinnedCards.map(function(c, i) {
             return '## ' + (i + 1) + '. ' + (c.data.name || c.data.title || c.genId) + '\n' + toMarkdown(c.genId, c.data, camp.meta.name);
           }).join('\n\n---\n\n');
           var md = header + body;
           if (navigator.clipboard) {
             navigator.clipboard.writeText(md).then(function() {
-              setToast('Session pack copied — ' + pinnedCards.length + ' results');
+              setToast('Session pack copied - ' + pinnedCards.length + ' results');
             });
           } else {
             setResult({genId: pinnedCards[0].genId, data: pinnedCards[0].data, _batchMd: md});
             setShowExport(true);
-            setShowHistory(false);
+            closePanel();
           }
         },
+        style: {width: '100%', marginBottom: 4, justifyContent: 'center', fontSize: 'var(--text-sm)'},
+      }, '📋 Copy Session Pack (' + pinnedCards.length + ')'),
+      // BL-38: Batch Fari / Foundry export of all pinned
+      pinnedCards.length > 0 && h('button', {
+        className: 'btn btn-ghost',
+        onClick: function() {
+          var json = (typeof toBatchFariJSON !== 'undefined') ? toBatchFariJSON(pinnedCards, camp.meta.name) : null;
+          if (!json) { setToast('Nothing to export'); return; }
+          var blob = new Blob([json], {type: 'application/json'});
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.href = url;
+          a.download = camp.meta.name.replace(/\s+/g, '-').toLowerCase() + '-session.fari.json';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(function() { URL.revokeObjectURL(url); }, 60000);
+          setToast('🎲 Fari pack downloaded - ' + pinnedCards.length + ' results');
+          closePanel();
+        },
         style: {width: '100%', marginBottom: 8, justifyContent: 'center', fontSize: 'var(--text-sm)'},
-      }, '📋 Copy Session Pack (' + pinnedCards.length + ')'  ),
+      }, '🎲 Export to Fari / Foundry (' + pinnedCards.length + ')'  ),
       // Pinned section
       pinnedCards.length > 0 && h('div', {style: {marginBottom: 16}},
         h('div', {className: 'history-label'}, '📌 Pinned'),
@@ -3072,7 +3494,7 @@ function CampaignApp(props) {
                 style: {flex:1, textAlign:'left', background:'none', border:'none', cursor:'pointer',
                   color:'var(--text)', fontSize:'inherit', overflow:'hidden', textOverflow:'ellipsis',
                   whiteSpace:'nowrap', padding:0, fontFamily:'var(--font-ui)'},
-                onClick: function() { restoreCard(card); setShowHistory(false); },
+                onClick: function() { restoreCard(card); closePanel(); },
                 title: 'Restore: ' + card.label,
               }, card.label),
               h('button', {
@@ -3094,14 +3516,14 @@ function CampaignApp(props) {
             return h('button', {
               key: i,
               className: 'history-item',
-              onClick: function() { setResult({genId: item.genId, data: item.data}); setActiveGen(item.genId); setActiveGroup(groupForGen(item.genId)); setShowHistory(false); },
+              onClick: function() { setResult({genId: item.genId, data: item.data}); setActiveGen(item.genId); setActiveGroup(groupForGen(item.genId)); closePanel(); },
               title: 'Restore this result',
             },
               (item.gen ? item.gen.icon + ' ' : '') +
               (item.data.name || item.data.contest_type || (item.data.current && item.data.current.name) ||
                (item.data.stunts ? 'Stunts' : null) ||
                (item.data.aspects ? 'Scene' : null) ||
-               (item.data.opposition ? 'Encounter' : null) || '—')
+               (item.data.opposition ? 'Encounter' : null) || '-')
             );
           })
         )
@@ -3116,14 +3538,14 @@ function CampaignApp(props) {
     toast && h('div', {className: 'toast'}, toast),
 
     // ── Modals ────────────────────────────────────────────────────────
-    showHelp && h(HelpModal, {genId: activeGen, onClose: function() { setShowHelp(false); }}),
+    showHelp && h(HelpModal, {genId: activeGen, onClose: closePanel}),
     showTables && h(TableManagerModal, {
       tables: t,
       prefs: prefs,
       activeGen: activeGen,
       universalMerge: universalMerge,
       onPrefsChange: function(newPrefs) { setPrefs(newPrefs); },
-      onClose: function() { setShowTables(false); },
+      onClose: closePanel,
     }),
     showSettings && h(SettingsModal, {
       theme: theme,
@@ -3134,22 +3556,65 @@ function CampaignApp(props) {
       onToggleTextSize: toggleTextSize,
       onSetHelpLevel: changeHelpLevel,
       onToggleUniversal: toggleUniversalMerge,
-      onClose: function() { setShowSettings(false); },
+      onClose: closePanel,
     }),
 
-    // First-visit onboarding — only shown once, surfaces Help Level for C1/C2 users
+    // First-visit onboarding - only shown once, surfaces Help Level for C1/C2 users
     showOnboarding && h(HelpLevelOnboardingModal, {onSelect: handleOnboardingSelect}),
 
-    // ND-10: Fate Point tracker — floating panel
+    // ND-10: Fate Point / Milestone / Initiative panel (BL-10, BL-35)
     showFP && h('div', {className: 'fp-panel'},
       h(FatePointTracker, {
         state: fpState || DEFAULT_FP_STATE,
         onUpdate: updateFP,
-        onClose: function() { setShowFP(false); },
+        onClose: closePanel,
+        partySize: partySize,
+        lastEncounter: (result && result.genId === 'encounter') ? result.data : null,
       })
     ),
 
-    // R-13: Sticky Roll FAB — mobile only, appears when Roll button scrolls off-screen
+    // BL-09: PWA install nudge - shown after 2nd visit if installable and not dismissed
+    showPwaNudge && h('div', {
+      style: {
+        position: 'fixed', bottom: 80, left: '50%', transform: 'translateX(-50%)',
+        zIndex: 1200, display: 'flex', alignItems: 'center', gap: 10,
+        background: 'var(--glass-bg)', backdropFilter: 'var(--glass-blur)',
+        WebkitBackdropFilter: 'var(--glass-blur)',
+        border: '1px solid var(--glass-border)', borderRadius: 12,
+        boxShadow: 'var(--glass-shadow)',
+        padding: '10px 14px', maxWidth: 340, width: 'calc(100vw - 32px)',
+      },
+      role: 'status', 'aria-live': 'polite',
+    },
+      h('span', {style: {fontSize: 20}}, '📲'),
+      h('span', {style: {flex: 1, fontSize: 'var(--text-sm)', color: 'var(--text)', lineHeight: 1.4}},
+        'Install Ogma for offline use - works without internet'
+      ),
+      h('button', {
+        onClick: function() {
+          if (deferredInstallPrompt.current) {
+            deferredInstallPrompt.current.prompt();
+            deferredInstallPrompt.current.userChoice.then(function() {
+              deferredInstallPrompt.current = null;
+              setShowPwaNudge(false);
+              try { LS.set('pwa_nudge_dismissed', true); } catch(e) {}
+            });
+          }
+        },
+        className: 'btn btn-ghost',
+        style: {fontSize: 12, padding: '4px 10px', minHeight: 0, whiteSpace: 'nowrap'},
+      }, 'Install'),
+      h('button', {
+        onClick: function() {
+          setShowPwaNudge(false);
+          try { LS.set('pwa_nudge_dismissed', true); } catch(e) {}
+        },
+        style: {background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: 16, padding: '0 2px', lineHeight: 1},
+        'aria-label': 'Dismiss install prompt',
+      }, '✕')
+    ),
+
+    // R-13: Sticky Roll FAB - mobile only, appears when Roll button scrolls off-screen
     showFAB && h('button', {
       className: 'roll-fab',
       onClick: doGenerate,

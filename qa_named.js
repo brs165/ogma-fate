@@ -100,6 +100,38 @@ var sfxDups = sfx.filter(function(v,i){ return sfx.indexOf(v) !== i; });
 assert('NA-07 postapoc faction_name_prefix no dups', pfxDups.length === 0, 'dups: '+pfxDups.join(', '));
 assert('NA-07 postapoc faction_name_suffix no dups', sfxDups.length === 0, 'dups: '+sfxDups.join(', '));
 
+// NA-08: toBatchFariJSON — valid JSON, version:4, correct character count
+var na08Fail = [];
+['thelongafter','cyberpunk','fantasy','space','victorian','postapoc'].forEach(function(camp) {
+  var bt = filteredTables(mergeUniversal(CAMPAIGNS[camp].tables), {});
+  var maj = generate('npc_major', bt, 4);
+  var min = generate('npc_minor', bt, 4);
+  var scn = generate('scene', bt, 4);
+  var cards = [
+    {id:'1', campId:camp, genId:'npc_major', label:maj.name, data:maj},
+    {id:'2', campId:camp, genId:'npc_minor', label:min.name, data:min},
+    {id:'3', campId:camp, genId:'scene',     label:'Scene',   data:scn},
+  ];
+  try {
+    var json = toBatchFariJSON(cards, CAMPAIGNS[camp].meta.name);
+    if (!json) { na08Fail.push(camp+':null'); return; }
+    var parsed = JSON.parse(json);
+    if (!parsed.characters || parsed.characters.length !== 3) { na08Fail.push(camp+':count='+( parsed.characters||[]).length); return; }
+    if (parsed.characters.some(function(c){return c.version !== 4;})) { na08Fail.push(camp+':version'); return; }
+    if (parsed.characters.some(function(c){return !c.name;})) { na08Fail.push(camp+':name'); return; }
+  } catch(e) { na08Fail.push(camp+':'+e.message); }
+});
+// null guard
+var nullGuard = toBatchFariJSON([], null) === null && toBatchFariJSON(null, null) === null;
+assert('NA-08 toBatchFariJSON valid + version:4 + null guard', na08Fail.length === 0 && nullGuard, na08Fail.join(', '));
+
+// NA-09: intro.js responsive scale — fate-intro-content class + media queries present
+var introSrc = fs.readFileSync('core/intro.js','utf8');
+assert('NA-09 intro fate-intro-content class set', introSrc.includes("className = 'fate-intro-content'"), 'fate-intro-content class missing from content div');
+assert('NA-09 intro desktop media query 900px', introSrc.includes('min-width:900px'), '900px desktop breakpoint missing');
+assert('NA-09 intro wide media query 1400px', introSrc.includes('min-width:1400px'), '1400px wide breakpoint missing');
+assert('NA-09 intro em-based title size', introSrc.includes('1.57em'), 'title font-size not in em');
+
 // Summary
 console.log('Named assertions: '+(pass+fail)+' total  pass:'+pass+'  fail:'+fail);
 results.forEach(function(r){console.log(r);});

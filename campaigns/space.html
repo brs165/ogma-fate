@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Primary meta -->
-  <title>Void Runners — Ogma</title>
+  <title>Void Runners - Ogma</title>
   <meta name="description" content="Space opera. Jump gates, hostile aliens, and a crew held together by debt and loyalty.">
-  <meta name="author" content="Ogma — A Ogma — A Fate Condensed Generator Suite">
+  <meta name="author" content="Ogma - A Ogma - A Fate Condensed Generator Suite">
   <meta name="theme-color" content="#d4a832">
 
   <!-- Favicon -->
@@ -20,20 +20,21 @@
 
   <!-- OpenGraph -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Void Runners — Fate Condensed Generator">
+  <meta property="og:title" content="Void Runners - Fate Condensed Generator">
   <meta property="og:description" content="Space opera. Jump gates, hostile aliens, and a crew held together by debt and loyalty.">
-  <meta property="og:url" content="https://your-username.github.io/fate-generator/campaigns/space.html">
-  <meta property="og:image" content="https://your-username.github.io/fate-generator/assets/img/og-default.png">
+  <meta property="og:url" content="https://brs165.github.io/ogma-fate/campaigns/space.html">
+  <meta property="og:image" content="https://brs165.github.io/ogma-fate/assets/img/og-default.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
 
   <!-- Twitter card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Void Runners — Fate Condensed Generator">
+  <meta name="twitter:title" content="Void Runners - Fate Condensed Generator">
   <meta name="twitter:description" content="Space opera. Jump gates, hostile aliens, and a crew held together by debt and loyalty.">
-  <meta name="twitter:image" content="https://your-username.github.io/fate-generator/assets/img/og-default.png">
+  <meta name="twitter:image" content="https://brs165.github.io/ogma-fate/assets/img/og-default.png">
 
-  <link rel="stylesheet" href="../assets/css/theme.css?v=10">
+  <link rel="stylesheet" href="https://unpkg.com/rpg-awesome@0.2.0/css/rpg-awesome.min.css">
+  <link rel="stylesheet" href="../assets/css/theme.css?v=18">
 </head>
 <body>
   <div id="root">
@@ -45,12 +46,12 @@
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
-  <script src="../data/shared.js?v=10"></script>
-  <script src="../data/universal.js?v=10"></script>
-  <script src="../data/space.js?v=10"></script>
-  <script src="../core/engine.js?v=10"></script>
-  <script src="../core/db.js?v=10"></script>
-  <script src="../core/ui.js?v=10"></script>
+  <script src="../data/shared.js?v=18"></script>
+  <script src="../data/universal.js?v=18"></script>
+  <script src="../data/space.js?v=18"></script>
+  <script src="../core/engine.js?v=18"></script>
+  <script src="../core/db.js?v=18"></script>
+  <script src="../core/ui.js?v=18"></script>
   <script>
     // Apply saved theme immediately (prevents flash)
     (function() {
@@ -66,12 +67,12 @@
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('sw.js').catch(function(err) {
-          // SW registration failed (e.g. file:// protocol) — app still works normally
+          // SW registration failed (e.g. file:// protocol) - app still works normally
           console.info('[SW] Registration skipped:', err.message);
         });
       });
     }
   </script>
-  <script src="../core/intro.js?v=10"></script>
+  <script src="../core/intro.js?v=18"></script>
 </body>
 </html>

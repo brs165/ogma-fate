@@ -1,8 +1,8 @@
-# Ogma — A Fate Condensed Generator Suite
+# Ogma - A Fate Condensed Generator Suite
 
 An offline, browser-based random content generator for **Fate Condensed** tabletop RPG campaigns.
 
-> *Named for the Celtic god of eloquence — the one who gave language its shape. Also a backronym: **Offline Game Master's Aid**.* No internet required after download. No AI, no server, no build step — pure random tables with a clean UI.
+> *Named for the Celtic god of eloquence - the one who gave language its shape. Also a backronym: **Offline Game Master's Aid**.* No internet required after download. No server, no build step - pure random tables with a clean UI.
 
 > **16 generators · 6 campaign worlds · works from `file://`**
 
@@ -10,7 +10,7 @@ An offline, browser-based random content generator for **Fate Condensed** tablet
 
 ## Quick Start
 
-1. Download and unzip the archive — or clone this repo
+1. Download and unzip the archive - or clone this repo
 2. Open `index.html` in any modern browser
 3. Pick a campaign world
 4. Pick a generator and click **Roll**
@@ -59,33 +59,33 @@ Each world has deep thematic table content. The same 16 generators produce tonal
 
 ## Features
 
-**Campaign Intros** — Each campaign opens with an animated intro sequence with a distinct voice per world. Skip anytime. Replay via **▶ Intro** in the nav or mobile **⋯** menu.
+**Campaign Intros** - Each campaign opens with an animated intro sequence with a distinct voice per world. Skip anytime. Replay via **▶ Intro** in the nav or mobile **⋯** menu.
 
-**Fate Point Tracker** — ◎ FP opens a floating panel. Add PCs by name, set refresh, spend and recover. Persists to `localStorage`.
+**Fate Point Tracker** - ◎ FP opens a floating panel. Add PCs by name, set refresh, spend and recover. Persists to `localStorage`.
 
-**Inspiration Mode** — ✦ 3 draws three random results from different generators as a creative triptych.
+**Inspiration Mode** - ✦ 3 draws three random results from different generators as a creative triptych.
 
-**GM Tips** — 🎭 adds coaching overlays: invoke/compel examples, D&D contrast notes, rules references inline with every result.
+**GM Tips** - 🎭 adds coaching overlays: invoke/compel examples, D&D contrast notes, rules references inline with every result.
 
-**Table Manager** — 🎛 Customize lets you exclude entries, lock specific entries, or add your own custom content to any string table. Saved per campaign via IndexedDB.
+**Table Manager** - 🎛 Customize lets you exclude entries, lock specific entries, or add your own custom content to any string table. Saved per campaign via IndexedDB.
 
-**Player View** — 👥 hides all GM coaching notes, leaving only player-facing content for projecting at the table.
+**Player View** - 👥 hides all GM coaching notes, leaving only player-facing content for projecting at the table.
 
-**Session Zero Wizard** — `campaigns/sessionzero.html` walks a new table through Fate Condensed character creation with D&D contrast notes at every step.
+**Session Zero Wizard** - `campaigns/sessionzero.html` walks a new table through Fate Condensed character creation with D&D contrast notes at every step.
 
-**Coming from D&D?** — `campaigns/transition.html` is a side-by-side guide covering every major conceptual difference between D&D 5e and Fate Condensed.
+**Coming from D&D?** - `campaigns/transition.html` is a side-by-side guide covering every major conceptual difference between D&D 5e and Fate Condensed.
 
-**Export** — ↓ MD copies results as formatted Markdown. 🖨 Print hides all UI chrome and formats cleanly for A4/Letter.
+**Export** - ↓ MD copies results as formatted Markdown. 🖨 Print hides all UI chrome and formats cleanly for A4/Letter.
 
-**Pinned Results** — 📌 saves any result to a persistent pinned list (IndexedDB). Survives reloads.
+**Pinned Results** - 📌 saves any result to a persistent pinned list (IndexedDB). Survives reloads.
 
-**Consequence Severity Selector** — When the Consequence generator is active, a severity bar appears: Random / Mild / Moderate / Severe.
+**Consequence Severity Selector** - When the Consequence generator is active, a severity bar appears: Random / Mild / Moderate / Severe.
 
-**Universal Content Toggle** — Merges 163 setting-agnostic entries into campaign tables. Default on. Saved to `localStorage`.
+**Universal Content Toggle** - Merges 163 setting-agnostic entries into campaign tables. Default on. Saved to `localStorage`.
 
-**Dark / Light Mode** — ◑ toggle, saved to `localStorage`.
+**Dark / Light Mode** - ◑ toggle, saved to `localStorage`.
 
-**Offline / PWA** — Works fully offline after first load. Installable on iOS, Android, and desktop Chrome. Also works directly from `file://`.
+**Offline / PWA** - Works fully offline after first load. Installable on iOS, Android, and desktop Chrome. Also works directly from `file://`.
 
 ---
 
@@ -112,8 +112,8 @@ fate-suite/
 │   └── transition.html           ← Coming from D&D? guide
 │
 ├── core/
-│   ├── engine.js                 ← Pure logic — generators, table prefs, markdown export
-│   │                               Zero React/DOM dependencies — testable in Node
+│   ├── engine.js                 ← Pure logic - generators, table prefs, markdown export
+│   │                               Zero React/DOM dependencies - testable in Node
 │   ├── ui.js                     ← React components: LandingApp, CampaignApp, all renderers
 │   ├── db.js                     ← IndexedDB wrapper with localStorage fallback
 │   └── intro.js                  ← Campaign intro overlay engine (self-contained, no deps)
@@ -135,9 +135,9 @@ fate-suite/
 │   └── favicons/                 ← icon.svg, icon-32/192/512.png, apple-touch-icon.png
 │
 ├── manifest.json                 ← PWA manifest (install, shortcuts, icons)
-├── sw.js                         ← Service worker — cache-first, offline-first
-├── BACKLOG.md                    ← Active backlog — source of truth for all planned work
-├── CONTRIBUTING.md               ← Table authoring guide, schemas, smoke test, PR checklist
+├── sw.js                         ← Service worker - cache-first, offline-first
+├── BACKLOG.md                    ← Active backlog - source of truth for all planned work
+├── devdocs/content-authoring.md               ← Table authoring guide, schemas, smoke test, PR checklist
 ├── LICENSING.md                  ← CC BY 3.0 compliance and required attributions
 └── README.md                     ← This file
 ```
@@ -166,7 +166,7 @@ Each campaign page loads scripts in this exact order:
 
 - **No build step.** Raw JavaScript via `<script>` tags. React 18 via CDN UMD.
 - **No ES modules.** `var` and function declarations for maximum `file://` compatibility.
-- **No AI calls.** Pure random table combinations — deterministic, instant, offline.
+- **Pure random tables.** Deterministic, instant, offline - no network calls of any kind.
 - **Variety Matrix.** Tables using `{t:[...], v:{...}}` produce thousands of unique combinations from compact data. `fillTemplate()` picks a template and substitutes `{VarName}` tokens.
 - **Universal layer.** `mergeUniversal()` concatenates setting-agnostic entries into campaign tables without mutating the originals.
 - **IndexedDB persistence.** Session state and table preferences stored per campaign, with in-memory fallback.
@@ -213,7 +213,7 @@ Built against **Fate Condensed** (Evil Hat, 2020), audited against the full Fate
 
 - Stress boxes are all single-point (not Fate Core's escalating model)
 - Major NPC stress calculated from Physique/Will per Fate Condensed p.12
-- Initiative is popcorn/Balsera-style — acting character picks who goes next
+- Initiative is popcorn/Balsera-style - acting character picks who goes next
 - Stunts are `+2 to [Skill] when [Condition]` or a once-per-scene special effect
 - Full 19-skill list including Academics
 - GM fate point pool = 1 per PC (shared pool, not per-NPC)
@@ -225,12 +225,12 @@ Built against **Fate Condensed** (Evil Hat, 2020), audited against the full Fate
 
 ## Versioning
 
-**CalVer:** `YYYY.MM.B` — year · month · build within that month. Run `bump-version.sh` before every zip. No argument needed — the script reads the current version and auto-increments.
+**CalVer:** `YYYY.MM.B` - year · month · build within that month. Run `bump-version.sh` before every zip. No argument needed - the script reads the current version and auto-increments.
 
 ---
 
 ## License
 
-CC BY 3.0 — see `LICENSING.md` for required attribution blocks.
+CC BY 3.0 - see `LICENSING.md` for required attribution blocks.
 
 Fate™ is a trademark of Evil Hat Productions, LLC. This is an independent fan project, not affiliated with or endorsed by Evil Hat Productions.

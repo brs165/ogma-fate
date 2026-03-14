@@ -1,7 +1,7 @@
 // fate-suite/db.js
 // Promise-based IndexedDB wrapper with synchronous memStore fallback.
 // Works on file:// protocol in Chrome, Firefox, Edge.
-// Safari on file:// may block IDB — memStore silently takes over.
+// Safari on file:// may block IDB - memStore silently takes over.
 
 // ── BL-01: Versioned localStorage schema ─────────────────────────────────────
 // All app preferences are stored under a single versioned JSON key.
@@ -9,14 +9,14 @@
 // Access via window.LS.get(key) / window.LS.set(key, value).
 //
 // Schema v1 keys:
-//   theme            — 'dark' | 'light'
-//   textsize         — integer (-2..+4)
-//   fp_state         — object (FatePointTracker state)
-//   universal_merge  — boolean
-//   help_level       — string ('new_fate' | 'know_fate' | 'expert')
-//   onboarding_done  — boolean
-//   gm_mode          — boolean
-//   intro_seen       — object { [worldKey]: true }
+//   theme            - 'dark' | 'light'
+//   textsize         - integer (-2..+4)
+//   fp_state         - object (FatePointTracker state)
+//   universal_merge  - boolean
+//   help_level       - string ('new_fate' | 'know_fate' | 'expert')
+//   onboarding_done  - boolean
+//   gm_mode          - boolean
+//   intro_seen       - object { [worldKey]: true }
 
 (function() {
   var LS_KEY     = 'fate_prefs_v1';

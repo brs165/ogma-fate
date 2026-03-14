@@ -5,7 +5,7 @@
 CAMPAIGNS["space"] = {
     meta: {
       id: "space", name: "Void Runners",
-      tagline: "The Used Future. Blue-collar space western — ships held together by prayers and stolen parts, survival meeting lawlessness at the edge of everything.",
+      tagline: "The Used Future. Blue-collar space western - ships held together by prayers and stolen parts, survival meeting lawlessness at the edge of everything.",
       icon: "◯", font: "'Exo 2', 'Futura', sans-serif",
     },
     colors: {
@@ -50,7 +50,7 @@ CAMPAIGNS["space"] = {
             ],
           }
         },
-      minor_weaknesses: ["Owes the Wrong People More Than Credits","Their Ship Was Impounded — They're Desperate","Communication Array Has a Corp Backdoor","Won't Risk the Warrant They Already Have","Homesick for a Planet That Doesn't Exist Anymore","One Bad Jump Away from System Failure","Allegiance to Someone Not in This Room","Addicted to Drift — Neural Jump Stimulant","Their Cover Identity Has a Hole In It","Terrified of Open Space — Trauma Response","Agoraphobia — Works Fine in Corridors, Not Open Space","The Ship's Debts Come With Actual Debt Collectors","Colonial Accent Marks Them Immediately to Authority","Old Fleet Rank Means Old Fleet Enemies","The Warrant Is Still Active in Six Jurisdictions","Addicted to Drift — The Neural Jump Suppressant","Cannot Pass a Biometric Checkpoint Under Any Cover","The Crew Thinks They're the Captain — They're Not","Terrified of Uncontrolled Atmospheric Entry Since the Last One","Owes a Life-Debt to the Wrong Species","Communication Implant Has a Corp Back-Channel","Their Clone Is Still Active Somewhere — That's Complicated","Will Not Abandon a Damaged Ship While Crew Is Aboard","Pride About Navigation — Will Not Admit the Chart Is Wrong","Prosthetic Arm Needs Calibration Every Forty-Eight Hours","The Alien Biology Requires a Medication Nobody Stocks","Can't Keep Quiet in a Vacuum Suit — Keeps Talking","The Ship AI Likes Them Less Each Day","Old Combat PTSD: Certain Sounds Cause Freeze Response","The Cargo They're Moving Isn't Declared and Someone Knows","Belt-Born Bones — Gravity Worlds Are Hard Work and Always Have Been","Cannot Abandon a Distress Beacon — Every Single Time","The Ship's Name Is Famous in the Wrong Ports — Half the Belt Knows the Registry","Deep-Space Sickness Is Being Managed — Barely — by Something They Can't Always Access","Former Fleet: The Reflex to Follow Authority Orders Fires Before the Brain Can Override","Will Not Leave Anyone Aboard a Dying Ship — Has Extended Every Extract Into a Disaster","The Alien Contact Residue Means Certain Technologies Behave Strangely Near Them","Colonial Pride: Cannot Admit to Inners That the Outer Systems Have a Problem","The Warrant Is Technically Suspended — Technically — and Station Security Always Checks","Three Separate Corps Consider Them a Proprietary Asset Under Contract Clause Seven","Cannot Watch Someone Perform Poorly at Their Job Without Saying So — Very Loudly","The Prosthetic Needs Calibration That Only One Station in Range Can Provide","Owes the Crew a Morale Debt They Have Been Running on Empty to Cover","Former Authority — Every Criminal Contact They Have Requires Proof They Are No Longer","The Jump Sickness Hits Different Every Time — Duration Unknown, Onset Without Warning","Responsible for the Safety of Someone Else's Child Who Is Currently Aboard This Ship","The Cargo Manifest Has Never Been Fully Accurate and Someone Knows It","Will Not Engage a Life Pod — Has Reasons — Reasons That Have Created Multiple Problems","Their Navigation Style Is Identifiable to Anyone Who Learned from the Same Fleet Manual","The Part the Ship Needs Most Is Under Embargo in the Three Systems They Can Reach"],
+      minor_weaknesses: ["Owes the Wrong People More Than Credits","Their Ship Was Impounded - They're Desperate","Communication Array Has a Corp Backdoor","Won't Risk the Warrant They Already Have","Homesick for a Planet That Doesn't Exist Anymore","One Bad Jump Away from System Failure","Allegiance to Someone Not in This Room","Addicted to Drift - Neural Jump Stimulant","Their Cover Identity Has a Hole In It","Terrified of Open Space - Trauma Response","Agoraphobia - Works Fine in Corridors, Not Open Space","The Ship's Debts Come With Actual Debt Collectors","Colonial Accent Marks Them Immediately to Authority","Old Fleet Rank Means Old Fleet Enemies","The Warrant Is Still Active in Six Jurisdictions","Addicted to Drift - The Neural Jump Suppressant","Cannot Pass a Biometric Checkpoint Under Any Cover","The Crew Thinks They're the Captain - They're Not","Terrified of Uncontrolled Atmospheric Entry Since the Last One","Owes a Life-Debt to the Wrong Species","Communication Implant Has a Corp Back-Channel","Their Clone Is Still Active Somewhere - That's Complicated","Will Not Abandon a Damaged Ship While Crew Is Aboard","Pride About Navigation - Will Not Admit the Chart Is Wrong","Prosthetic Arm Needs Calibration Every Forty-Eight Hours","The Alien Biology Requires a Medication Nobody Stocks","Can't Keep Quiet in a Vacuum Suit - Keeps Talking","The Ship AI Likes Them Less Each Day","Old Combat PTSD: Certain Sounds Cause Freeze Response","The Cargo They're Moving Isn't Declared and Someone Knows","Belt-Born Bones - Gravity Worlds Are Hard Work and Always Have Been","Cannot Abandon a Distress Beacon - Every Single Time","The Ship's Name Is Famous in the Wrong Ports","Deep-Space Sickness Managed Barely - Supply Is Limited","Former Fleet - Authority Reflex Fires Before Reason","Won't Leave Anyone on a Dying Ship - Every Time","The Alien Contact Residue Means Certain Technologies Behave Strangely Near Them","Colonial Pride - Won't Admit the Outer Systems Struggle","Warrant Technically Suspended - Security Always Checks","Three Separate Corps Consider Them a Proprietary Asset Under Contract Clause Seven","Cannot Watch Poor Work Without Saying So - Loudly","The Prosthetic Needs Calibration That Only One Station in Range Can Provide","Owes the Crew a Morale Debt - Running on Empty","Former Authority - Every Contact Needs Proof They've Changed","Jump Sickness Hits Different Every Time - No Warning","Responsible for Someone Else's Child Aboard This Ship","The Cargo Manifest Has Never Been Fully Accurate and Someone Knows It","Won't Use a Life Pod - Has Reasons, Has Problems","Navigation Style Identifiable to Any Fleet-Trained Reader","The Part the Ship Needs Is Embargoed Everywhere Reachable"],
       major_concepts: {
           t: [
             "A {SmajAdj} {SmajRole} who {SmajDrive}",
@@ -79,11 +79,11 @@ CAMPAIGNS["space"] = {
             SmajAlt: ["authority asset", "independent contractor", "fugitive", "civilian", "the problem", "reluctant ally"],
             SmajRep: ["most wanted", "most useful", "most expensive", "most dangerous", "most unreachable", "last surviving"],
             SmajSpace: ["the belt", "the outer systems", "charted space", "this sector", "the station network", "the dead zones"],
-            SmajSecret: ["a jump point on no official chart", "an authority file with their real history", "a contact inside the target corp", "a ship registered under a dead person's name", "a debt settleable in only one currency", "a first-contact record never filed", "a first contact record that changes the legal status of three systems", "a route map that bypasses every authority checkpoint in the belt", "the location of the corp's classified xenotech site", "a ship registered under a destroyed settlement's colonial charter — still legally valid"
+            SmajSecret: ["a jump point on no official chart", "an authority file with their real history", "a contact inside the target corp", "a ship registered under a dead person's name", "a debt settleable in only one currency", "a first-contact record never filed", "a first contact record that changes the legal status of three systems", "a route map that bypasses every authority checkpoint in the belt", "the location of the corp's classified xenotech site", "a ship registered under a destroyed settlement's colonial charter - still legally valid"
             ],
           }
         },
-      troubles: ["My Ship Is All I Have Left and She's Failing","I Owe a Debt Across Three Systems","The Fleet Wants Me for What I Know","My Last Mission Is the Reason I Can't Go Home","I Trust the Crew; I Can't Afford Not To","The Coordinates I Have Are Worth Dying Over","My Loyalty to the Mission Comes Second to Survival","The Alien Contact Changed Something In Me","The War Is Over and I Don't Know Who I Am Without It","One More Jump and the Drive Fails — I Know It","The Fleet Still Considers Me a Deserter and They Are Not Wrong","My Notorious Reputation Opens Doors That I Would Rather Stay Closed","The Addiction Travels Well — It Packed Itself","Something Followed Us Back Through That Jump Point","The Ship's Registry Has Been Wrong Since the Last Port of Call","My Jump Coordinates Are the Only Things Keeping Me Alive","Three Crews Have Signed On and Left This Ship — by Airlock","I Know the Location of the Fleet's Hidden Weapon Cache","The Authority Considers Me Responsible for the Colony Incident","My Clone Has Apparently Been Living My Life Better Than I Did","I Owe the Station Master Something That Isn't Transferable","Every Port Recognises Me — None of Them Favourably","The Alien Contact Changed Something in My Neurology","I Am Being Followed By Something That Jumps With Me","The Ship Trusts Me More Than I Trust Myself","My Cargo Has Been Alive Longer Than I Have Known About It","I Made a Treaty Without Authority and It Is Holding","The Signal I Decoded Has Been Decoding Me Back","Three Systems Away, Something Thinks I Still Work for Them","The War Ended. I Did Not. The Adjustment Is Ongoing.","The Ship Is the Only Thing Keeping This Crew Together and She's Dying","The Belt Doesn't Forgive Inners and I Was Born Inner","I Know Where the Colony Ship Went and Nobody Will Like the Answer","My Last Captain Died Because of My Decision and I Haven't Told Anyone","The Corp Owns the Patent on My Prosthetic — That Means Something Legal","I Spent Three Years in Cryo Dreaming the Same Thing and I Still Don't Know What It Means","The Alien Contact Changed My Biology in a Way No Doctor Can Explain Yet","I Made a Promise to a Dead Crew and I Am the Only One Left to Keep It","The Authority Thinks I'm an Asset — I Stopped Being Their Asset Two Years Ago","I Have Been Surviving on Empty for Six Months and I Am Running Out of Reasons Why","The Jump I Made to Get Here Shouldn't Have Been Survivable","Someone Is Using My Ship's Transponder and They Are Being Very Memorable","I Know What the Signal Says and I Have Been Pretending I Don't for Three Weeks","My Crew Trusts Me Completely and I Am Not Completely Trustworthy","I Was the Only Survivor of the Survey Team and I Have Not Been Honest About What Happened","The Addiction Was Manageable Until the Last Station Run — Now It's Scheduling My Days","Every Port I Dock at Has Someone Who Remembers the Colony Incident Differently Than I Do","The Thing That Came Back With Me From the Ruins Is Still On My Ship","Three Authority Jurisdictions All Believe I Am Currently Working For Them","I Built This Reputation on Jobs That Hurt People I Have Not Stopped Thinking About"],
+      troubles: ["My Ship Is All I Have Left and She's Failing","I Owe a Debt Across Three Systems","The Fleet Wants Me for What I Know","My Last Mission Is the Reason I Can't Go Home","I Trust the Crew; I Can't Afford Not To","The Coordinates I Have Are Worth Dying Over","My Loyalty to the Mission Comes Second to Survival","The Alien Contact Changed Something In Me","The War Is Over and I Don't Know Who I Am","One More Jump and the Drive Fails - I Know It","The Fleet Still Considers Me a Deserter and They Are Not Wrong","My Notorious Reputation Opens Doors That I Would Rather Stay Closed","The Addiction Travels Well - It Packed Itself","Something Followed Us Back Through That Jump Point","The Ship's Registry Has Been Wrong Since the Last Port of Call","My Jump Coordinates Are the Only Things Keeping Me Alive","Three Crews Have Signed On and Left This Ship - by Airlock","I Know the Location of the Fleet's Hidden Weapon Cache","The Authority Considers Me Responsible for the Colony Incident","My Clone Has Apparently Been Living My Life Better Than I Did","I Owe the Station Master Something That Isn't Transferable","Every Port Recognises Me - None of Them Favourably","The Alien Contact Changed Something in My Neurology","I Am Being Followed By Something That Jumps With Me","The Ship Trusts Me More Than I Trust Myself","My Cargo Has Been Alive Longer Than I Have Known About It","I Made a Treaty Without Authority and It Is Holding","The Signal I Decoded Has Been Decoding Me Back","Three Systems Away, Something Thinks I Still Work for Them","The War Ended. I Did Not. The Adjustment Is Ongoing.","The Ship Is Keeping This Crew Together - She's Dying","The Belt Doesn't Forgive Inners and I Was Born Inner","I Know Where the Colony Ship Went","My Last Captain Died Because of My Decision","The Corp Owns My Prosthetic's Patent - Legally","Three Years in Cryo Dreaming the Same Thing","Alien Contact Changed My Biology - Unexplained","Made a Promise to a Dead Crew - Only One Left","Authority Thinks I'm Their Asset - I Stopped","Surviving on Empty Six Months - Running Out of Reasons","The Jump I Made to Get Here Shouldn't Have Been Survivable","Someone Is Using My Ship's Transponder and They Are Being Very Memorable","Know What the Signal Says - Pretending I Don't","My Crew Trusts Me Completely and I Am Not Completely Trustworthy","Only Survivor of the Survey Team - Not Been Honest","The Addiction Schedules My Days Now","Every Port Has Someone Who Remembers the Incident","The Thing I Brought Back From the Ruins Is Aboard","Three Authority Jurisdictions All Believe I Am Currently Working For Them","Built This Reputation on Jobs I Can't Stop Thinking About"],
       other_aspects: {
           t: [
             "{SOAdj} for the {SODomain}",
@@ -116,12 +116,12 @@ CAMPAIGNS["space"] = {
         {name:"Outer Belt Contacts",skill:"Contacts",desc:"+2 to overcome when seeking smugglers, pirates, or outlier settlements beyond standard jurisdiction.",type:"bonus"},
         {name:"Dead Reckoning",skill:"Lore",desc:"+2 to overcome when navigating without instruments or plotting a course through unmapped space.",type:"bonus"},
         {name:"Extraction Protocol",skill:"Athletics",desc:"+2 to overcome when moving through zero-gravity or vacuum environments.",type:"bonus"},
-        {name:"Emergency Purge",skill:"Crafts",desc:"Once per scene, vent atmosphere, engage EM pulse, or trigger a ship system failure as a free action — affects everyone in that zone equally.",type:"special"},
-        {name:"Ghost Signature",skill:"Stealth",desc:"Once per scene, your ship or person drops off all sensors for one exchange — no roll required.",type:"special"},
+        {name:"Emergency Purge",skill:"Crafts",desc:"Once per scene, vent atmosphere, engage EM pulse, or trigger a ship system failure as a free action - affects everyone in that zone equally.",type:"special"},
+        {name:"Ghost Signature",skill:"Stealth",desc:"Once per scene, your ship or person drops off all sensors for one exchange - no roll required.",type:"special"},
         {name:"Alien Contact",skill:"Empathy",desc:"Once per scene, establish emotional communication with a non-human entity even without a shared language.",type:"special"},
-        {name:"Critical Override",skill:"Crafts",desc:"Once per scene, force a ship or station system to execute a command it's locked against — no roll, but the system is damaged afterward.",type:"special"},
+        {name:"Critical Override",skill:"Crafts",desc:"Once per scene, force a ship or station system to execute a command it's locked against - no roll, but the system is damaged afterward.",type:"special"},
         {name:"Jump Point Savant",skill:"Lore",desc:"Once per scene, identify an unmapped jump point in range that no charts record.",type:"special"},
-        {name:"Not If I See You First",skill:"Notice",desc:"Once per scene, declare you spotted the ambush before it triggered — your side acts first this exchange.",type:"special"},
+        {name:"Not If I See You First",skill:"Notice",desc:"Once per scene, declare you spotted the ambush before it triggered - your side acts first this exchange.",type:"special"},
       {name:"Ace Pilot",skill:"Drive",desc:"+2 to Drive when performing evasive maneuvers.",type:"bonus"}, {name:"Babel Fish",skill:"Lore",desc:"+2 to Lore when deciphering alien languages.",type:"bonus"}, {name:"Evasive Thrust",skill:"Drive",desc:"Once per scene swap your position with any other ship in a chase without a roll.",type:"special"}, {name:"Intimidating Presence",skill:"Provoke",desc:"+2 to Provoke when dealing with low-life pirates.",type:"bonus"}, {name:"Long-Range Scanner",skill:"Notice",desc:"+2 to Notice when detecting cloaked ships.",type:"bonus"}, {name:"Multilingual Liaison",skill:"Rapport",desc:"+2 to Create Advantage when dealing with non-human species for the first time.",type:"bonus"}, {name:"Overcharge Shields",skill:"Crafts",desc:"Once per scene give your ship a 2-point armor soak.",type:"special"}, {name:"Political Savvy",skill:"Contacts",desc:"+2 to Contacts when dealing with planetary governments.",type:"bonus"}, {name:"Quick Draw",skill:"Shoot",desc:"Use Notice instead of Shoot to determine who fires first.",type:"special"}, {name:"Scrounge",skill:"Resources",desc:"Use Resources to find rare ship parts in junkyards.",type:"special"},
         {name:"Ship's Mechanic",skill:"Crafts",desc:"+2 to Crafts when repairing ship systems under pressure.",type:"bonus"},
         {name:"Zero-G Combat",skill:"Athletics",desc:"+2 to Athletics when fighting in weightless environments.",type:"bonus"}],
@@ -130,25 +130,25 @@ CAMPAIGNS["space"] = {
             "{StAdj} and {StAdj2}",
             "{StNoun}-saturated {StQual}",
             "The comms are {StComms}",
-            "{StQual} — every system {StSys}",
+            "{StQual} - every system {StSys}",
           ],
           v: {
             StAdj: ["Vacuum-cold", "Surveilled", "Tense", "Corp-adjacent", "Pressure-sealed", "Signal-dark", "Weapons-hot", "Decompression-adjacent", "Authority-heavy", "Blackout-quiet"],
             StAdj2: ["watched from the station", "authority-adjacent", "professionally hostile", "logged for incident review", "quiet in a way that means something", "officially neutral but not really", "one breach from vacuum", "already past deniability", "armed as a matter of procedure", "running on borrowed clearance"],
             StNoun: ["Corp", "Authority", "Vacuum", "Radiation", "Signal", "Silence", "Distance", "Weapons"],
             StQual: ["standoff", "controlled threat", "professional hostility", "implied escalation", "manufactured neutrality", "armed truce", "corp-managed calm"],
-            StComms: ["dark", "monitored", "lagged — someone's interfering", "clean and that's suspicious", "showing traffic not on the manifest", "routing through something it shouldn't"],
+            StComms: ["dark", "monitored", "lagged - someone's interfering", "clean and that's suspicious", "showing traffic not on the manifest", "routing through something it shouldn't"],
             StSys: ["armed", "monitored", "running hot", "showing anomalous readings", "logged for the authority", "ready for emergency protocol"],
           }
         },
-      scene_movement: ["Airlock Cycling — Can't Use This Passage for Two Exchanges","Zero Gravity Sector Active","Bulkheads Slamming Closed on a Timer","Exposed Conduit Array — Touch It and You're Down","Cargo Containers Shifting in the Bay","Narrow Maintenance Tube — One at a Time","Gravity Inversion Between Zones","Emergency Foam Deployed — One Zone Impassable","Power Cables Hanging Loose Across the Corridor","Automated Transport Cart Blocking the Main Passage","Active Thruster Backwash Channel — Lethal Without Suit","Emergency Mag-Lock Floor — Movement Requires Physique Roll","Debris Field From Recent Hull Compromise","Pressure Drop Between Zones — Ear Pain, Cognitive Fog","Active Docking Arm Sweeping the Zone","Zero-G Transit Tube — Movement By Handhold Only","Coolant Spray From Ruptured Line — Slick and Cold","Automated Cargo Transport Cycle — Zone Impassable Every Other Exchange","Emergency Bulkhead Pattern — Two Zones Cut Off on a Timer","Atmospheric Particulate From the Air Filter Failure — Visibility Thirty Metres","Power Grid Cycling — Mag-Boots Disengage Randomly","Hard Rotation Section — Centrifugal Gravity Pulls Away From Centre","Collapsed Maintenance Catwalk — Drop to Lower Deck Available","The Docking Tunnel Is Decompressing Slowly — Moving Against It Costs Extra","Radiation-Hot Section: Minimum Transit Time Is the Only Sensible Approach"],
-      scene_cover: ["Massive Cargo Containers","Docked Shuttle — Good but Gets in the Way","Equipment Locker Rows","Prefab Crew Bunks","Engineering Station Consoles","Communications Array Housing","Medical Bay Partitions","Heavy Cargo Netting","Fuel Drum Stack","Emergency Bulkhead, Partially Closed","Stacked Ore Processing Canisters — Chest-High, Heavy","Emergency Pressure Curtain — Blocks LOS, Not Weapons","Row of Cryo Chambers, Most Occupied","Docked Salvage Shuttle — Hatch Accessible","Dense Array of Atmospheric Scrubbers","Overturned Mess Table — Bolted to the Floor, Solid","Rack of EVA Suits in Storage Position","Comm Station Housing — Full Height, Sturdy","Stacked Fuel Cell Blocks in Transit Configuration","Dense Row of Server Columns, Floor-to-Ceiling","Emergency Blast Shield, Partially Deployed","Stack of Sealed Sample Containers — Unknown Contents","Portable Habitat Module, Uninflated But Solid","Mass of Tangled Cable Rigging From Last Repair Job","Reactor Shield Wall — Partial, But Radiation-Rated"],
+      scene_movement: ["Airlock Cycling - Can't Use This Passage for Two Exchanges","Zero Gravity Sector Active","Bulkheads Slamming Closed on a Timer","Exposed Conduit Array - Touch It and You're Down","Cargo Containers Shifting in the Bay","Narrow Maintenance Tube - One at a Time","Gravity Inversion Between Zones","Emergency Foam Deployed - One Zone Impassable","Power Cables Hanging Loose Across the Corridor","Automated Transport Cart Blocking the Main Passage","Active Thruster Backwash Channel - Lethal Without Suit","Emergency Mag-Lock Floor - Movement Requires Physique Roll","Debris Field From Recent Hull Compromise","Pressure Drop Between Zones - Ear Pain, Cognitive Fog","Active Docking Arm Sweeping the Zone","Zero-G Transit Tube - Movement By Handhold Only","Coolant Spray From Ruptured Line - Slick and Cold","Automated Cargo Transport Cycle - Zone Impassable Every Other Exchange","Emergency Bulkhead Pattern - Two Zones Cut Off on a Timer","Atmospheric Particulate From the Air Filter Failure - Visibility Thirty Metres","Power Grid Cycling - Mag-Boots Disengage Randomly","Hard Rotation Section - Centrifugal Gravity Pulls Away From Centre","Collapsed Maintenance Catwalk - Drop to Lower Deck Available","The Docking Tunnel Is Decompressing Slowly - Moving Against It Costs Extra","Radiation-Hot Section: Minimum Transit Time Is the Only Sensible Approach"],
+      scene_cover: ["Massive Cargo Containers","Docked Shuttle - Good but Gets in the Way","Equipment Locker Rows","Prefab Crew Bunks","Engineering Station Consoles","Communications Array Housing","Medical Bay Partitions","Heavy Cargo Netting","Fuel Drum Stack","Emergency Bulkhead, Partially Closed","Stacked Ore Processing Canisters - Chest-High, Heavy","Emergency Pressure Curtain - Blocks LOS, Not Weapons","Row of Cryo Chambers, Most Occupied","Docked Salvage Shuttle - Hatch Accessible","Dense Array of Atmospheric Scrubbers","Overturned Mess Table - Bolted to the Floor, Solid","Rack of EVA Suits in Storage Position","Comm Station Housing - Full Height, Sturdy","Stacked Fuel Cell Blocks in Transit Configuration","Dense Row of Server Columns, Floor-to-Ceiling","Emergency Blast Shield, Partially Deployed","Stack of Sealed Sample Containers - Unknown Contents","Portable Habitat Module, Uninflated But Solid","Mass of Tangled Cable Rigging From Last Repair Job","Reactor Shield Wall - Partial, But Radiation-Rated"],
       scene_danger: {
           t: [
             "{SdAdj} {SdHazard}",
             "{SdHazard} that {SdBehave}",
             "Active {SdSys} {SdState}",
-            "{SdHazard} — {SdWarn}",
+            "{SdHazard} - {SdWarn}",
           ],
           v: {
             SdAdj: ["Military-spec", "Corp-grade", "Malfunctioning", "Vacuum-adjacent", "Pressurised", "Automated", "Experimental", "Remotely-operated", "Cascading", "Emergency-state"],
@@ -159,26 +159,26 @@ CAMPAIGNS["space"] = {
             SdWarn: ["the authority receives a report regardless", "there's no quiet way through", "someone on the other end is watching", "everyone in range is already in the log", "this room is already flagged"],
           }
         },
-      scene_usable: ["Hackable Station Controls — Doors, Lights, Locks","Magnetic Boots Available — Useful in Zero-G","Emergency Spacesuit Rack","Oxygen Canister — Improvised Projectile","Panicking Station Civilians","Cargo Handling Exo-Rig, Operational","Explosive Decompression Button — Well-Labelled","Active Docking Clamps","Ship's Manifest Terminal","Intercom System Across All Zones", "Automated Defense Turrets", "Dense Asteroid Field", "Double-thick blast shielding", "Exposed Plasma Conduit", "Flickering Emergency Lights", "Hull-Breach Alarm Blaring", "Low-Gravity Cargo Bay", "Radiation-Leaking Containers", "Shattered Viewport Glass", "Slow-cycling airlock", "Sparking Computer Terminal", "Whirring Life-Support Fans"],
-      zones: [["The Bridge","Line of Sight in All Directions","Ship control is here; whoever holds it holds the ship."],["The Engine Bay","Heat and Noise","Communications impossible; systems vulnerable to sabotage."],["The Cargo Hold","Dense Cover, Shifting Contents","Pursuit is difficult; zero-gravity sectors can activate."],["The Airlock","One Step From Vacuum","Whoever controls this controls who boards and exits."],["The Medical Bay","Civilians in the Crossfire","Cover is good; civilians may be present."],["The Observation Deck","Exposed to Exterior View","Sight lines to space; hull integrity is a concern."],["The Crew Quarters","Tight and Personal","Civilians likely; combat is brutal at this range."],["The Station Hub","Crowds and Commerce","Witnesses everywhere; authority arrives quickly."],["The Docking Ring","Multiple Escape Routes","Ships are parked here; leaving is suddenly easy."],["The Communication Array","Signal Advantage","Whoever holds this can call for help — or jam everyone else."]],
+      scene_usable: ["Hackable Station Controls - Doors, Lights, Locks","Magnetic Boots Available - Useful in Zero-G","Emergency Spacesuit Rack","Oxygen Canister - Improvised Projectile","Panicking Station Civilians","Cargo Handling Exo-Rig, Operational","Explosive Decompression Button - Well-Labelled","Active Docking Clamps","Ship's Manifest Terminal","Intercom System Across All Zones", "Automated Defense Turrets", "Dense Asteroid Field", "Double-thick blast shielding", "Exposed Plasma Conduit", "Flickering Emergency Lights", "Hull-Breach Alarm Blaring", "Low-Gravity Cargo Bay", "Radiation-Leaking Containers", "Shattered Viewport Glass", "Slow-cycling airlock", "Sparking Computer Terminal", "Whirring Life-Support Fans"],
+      zones: [["The Bridge","Line of Sight in All Directions","Ship control is here; whoever holds it holds the ship."],["The Engine Bay","Heat and Noise","Communications impossible; systems vulnerable to sabotage."],["The Cargo Hold","Dense Cover, Shifting Contents","Pursuit is difficult; zero-gravity sectors can activate."],["The Airlock","One Step From Vacuum","Whoever controls this controls who boards and exits."],["The Medical Bay","Civilians in the Crossfire","Cover is good; civilians may be present."],["The Observation Deck","Exposed to Exterior View","Sight lines to space; hull integrity is a concern."],["The Crew Quarters","Tight and Personal","Civilians likely; combat is brutal at this range."],["The Station Hub","Crowds and Commerce","Witnesses everywhere; authority arrives quickly."],["The Docking Ring","Multiple Escape Routes","Ships are parked here; leaving is suddenly easy."],["The Communication Array","Signal Advantage","Whoever holds this can call for help - or jam everyone else."]],
       current_issues: [
-        {name:"The Blockade Has Gone Up",desc:"Three cruisers from the Colonial Authority are stopping all traffic into the Outer Belt. No stated reason. Ships not complying are impounded.",faces:[{name:"Admiral Vorn Ironwake",role:"Commanding the blockade — not happy about it either"}],places:["Jump Gate Kappa-7","The Outer Belt Stations"]},
+        {name:"The Blockade Has Gone Up",desc:"Three cruisers from the Colonial Authority are stopping all traffic into the Outer Belt. No stated reason. Ships not complying are impounded.",faces:[{name:"Admiral Vorn Ironwake",role:"Commanding the blockade - not happy about it either"}],places:["Jump Gate Kappa-7","The Outer Belt Stations"]},
         {name:"The Colony Ships Are Missing",desc:"Four colony transports carrying 12,000 settlers left on schedule. None arrived. The Authority isn't looking. Someone has to.",faces:[{name:"Mission Director Neela Stellarborn",role:"Filed the report; been told to un-file it"}],places:["The Last Known Trajectory","Unmapped Sector Kappa-Null"]},
         {name:"The Station Is Under New Management",desc:"Deepport Station changed hands two weeks ago. The new owners aren't corp, aren't pirate, aren't authority. Nobody knows who they are or what they want.",faces:[{name:"The Station Manager (unknown identity)",role:"Polite, efficient, and watching everything"}],places:["Deepport Station","The Outer Belt Trade Routes"]},
-        {name:"The Salvage Rights War",desc:"A derelict ship of extraordinary value has been located. Five parties hold partial claims. The first to strip the wreck keeps it. Violence has already started.",faces:[{name:"Salvager Brynn Far-Range",role:"Holds the most defensible claim — barely"}],places:["The Derelict — Designation Unknown","Neutral Arbitration Station Theta"]}
+        {name:"The Salvage Rights War",desc:"A derelict ship of extraordinary value has been located. Five parties hold partial claims. The first to strip the wreck keeps it. Violence has already started.",faces:[{name:"Salvager Brynn Far-Range",role:"Holds the most defensible claim - barely"}],places:["The Derelict - Designation Unknown","Neutral Arbitration Station Theta"]}
       ],
       impending_issues: [
-        {name:"First Contact Was Made Without Us",desc:"A transmission has been received from beyond known space. The Authority received it four months ago. They haven't responded — or told anyone.",faces:[{name:"Intelligence Director Oryn Coldvac",role:"Has read the translation; looks scared"}],places:["The Deep Array Listening Post","Classified — Location Redacted"]},
-        {name:"The Drive Technology Is Failing",desc:"The jump drive technology that makes the whole network viable is based on an alien artefact nobody fully understands. It's degrading. Fast.",faces:[{name:"Chief Engineer Sev Driftmark",role:"Has the data; doesn't have the solution"}],places:["The Jump Gate Network","The Original Artefact — Location Classified"]},
-        {name:"The Separatist Fleet Is Ready",desc:"The Colonial Separatist movement has quietly assembled a fleet. They're one bad decision by the Authority away from declaring war.",faces:[{name:"General Quell Systemfall",role:"Commanding the separatist forces — reluctantly"}],places:["Hidden Dock in the Outer Belt","The Colonial Parliament Station"]},
-        {name:"Something Followed Us Back",desc:"The deep-space survey team returned. Three survived. They won't say what happened. Their ship has been broadcasting a signal on an alien frequency ever since.",faces:[{name:"Survivor Zira the Uncharted",role:"Knows exactly what followed them; can't bring herself to say"}],places:["Quarantine Bay 7","Deep Space — Where They Went"]},
+        {name:"First Contact Was Made Without Us",desc:"A transmission has been received from beyond known space. The Authority received it four months ago. They haven't responded - or told anyone.",faces:[{name:"Intelligence Director Oryn Coldvac",role:"Has read the translation; looks scared"}],places:["The Deep Array Listening Post","Classified - Location Redacted"]},
+        {name:"The Drive Technology Is Failing",desc:"The jump drive technology that makes the whole network viable is based on an alien artefact nobody fully understands. It's degrading. Fast.",faces:[{name:"Chief Engineer Sev Driftmark",role:"Has the data; doesn't have the solution"}],places:["The Jump Gate Network","The Original Artefact - Location Classified"]},
+        {name:"The Separatist Fleet Is Ready",desc:"The Colonial Separatist movement has quietly assembled a fleet. They're one bad decision by the Authority away from declaring war.",faces:[{name:"General Quell Systemfall",role:"Commanding the separatist forces - reluctantly"}],places:["Hidden Dock in the Outer Belt","The Colonial Parliament Station"]},
+        {name:"Something Followed Us Back",desc:"The deep-space survey team returned. Three survived. They won't say what happened. Their ship has been broadcasting a signal on an alien frequency ever since.",faces:[{name:"Survivor Zira the Uncharted",role:"Knows exactly what followed them; can't bring herself to say"}],places:["Quarantine Bay 7","Deep Space - Where They Went"]},
       ],
       setting_aspects: {
           t: [
             "The {SsActor} {SsAct}",
             "{SsResource} Is {SsWorth}",
             "Every {SsThing} Has {SsProp}",
-            "{SsTruth} — {SsConseq}",
+            "{SsTruth} - {SsConseq}",
           ],
           v: {
             SsActor: ["Authority", "Corps", "Void", "Jump Gates", "Outer Belt", "First Contact Protocols", "Ship Registry", "Deep Space", "Belt Communities", "Corp Legal Division", "Jump Gate Authority", "Alien Signal", "Colonial Charter", "Deep Space Survey", "Independent Haulers", "Outer Systems"
@@ -189,7 +189,7 @@ CAMPAIGNS["space"] = {
             SsWorth: ["the only currency that works in the belt", "power until someone else registers the same point", "what separates operating from detained", "older than the treaty and binding regardless", "the most dangerous thing in charted space", "worth the warrant it attracts"],
             SsThing: ["jump point", "treaty", "salvage claim", "first contact record", "colonial charter", "distress signal", "black box", "derelict"],
             SsProp: ["a prior claimant", "a corp interest", "an authority file", "a story that doesn't match the manifest", "a price somebody's willing to pay", "more interested parties than the official record shows"],
-            SsTruth: ["Known space is smaller than the charts suggest", "The authority's reach ends at the beacon signal", "Out here your ship is your nation", "Salvage rights are the only rights nobody disputes", "First contact protocols were written by optimists", "The void remembers what goes into it", "The corps own the infrastructure and therefore the people", "Belt-born bones don't lie about where you grew up", "First contact was made — the question is what they were told", "A ship is a nation of one and some nations are at war"
+            SsTruth: ["Known space is smaller than the charts suggest", "The authority's reach ends at the beacon signal", "Out here your ship is your nation", "Salvage rights are the only rights nobody disputes", "First contact protocols were written by optimists", "The void remembers what goes into it", "The corps own the infrastructure and therefore the people", "Belt-born bones don't lie about where you grew up", "First contact was made - the question is what they were told", "A ship is a nation of one and some nations are at war"
             ],
             SsConseq: ["and what's outside the charts is someone else's problem", "and past it you're operating without a net", "and it's a nation of one", "and everyone disputes the finder's share", "and nothing making contact was consulted", "and it's been accumulating for a long time", "and they price access accordingly", "and inners will never fully understand that", "and the translation has been sitting in a classified folder for four months", "and some of those wars have been ongoing for a long time without anyone declaring them"
             ],
@@ -199,16 +199,16 @@ CAMPAIGNS["space"] = {
         {name:"Security Patrol",type:"minor",aspects:["Authority-Backed and Armed"],skills:[{name:"Fight",r:2},{name:"Shoot",r:2},{name:"Notice",r:1}],stress:2,stunt:null,qty:3},
         {name:"Pirate Crew",type:"minor",aspects:["Desperate and Experienced"],skills:[{name:"Fight",r:2},{name:"Shoot",r:2},{name:"Athletics",r:2}],stress:2,stunt:null,qty:4},
         {name:"Combat Drone",type:"minor",aspects:["No Self-Preservation Protocol"],skills:[{name:"Shoot",r:3},{name:"Athletics",r:2}],stress:2,stunt:"+2 to attack targets who haven't moved this exchange.",qty:2},
-        {name:"Fleet Operative",type:"major",aspects:["Authority of the Colonial Fleet","Expendable for Mission Success"],skills:[{name:"Shoot",r:4},{name:"Fight",r:3},{name:"Notice",r:3},{name:"Stealth",r:2}],stress:3,stunt:"Once per scene, call in Authority backup — a minor NPC squad arrives next exchange.",qty:1},
+        {name:"Fleet Operative",type:"major",aspects:["Authority of the Colonial Fleet","Expendable for Mission Success"],skills:[{name:"Shoot",r:4},{name:"Fight",r:3},{name:"Notice",r:3},{name:"Stealth",r:2}],stress:3,stunt:"Once per scene, call in Authority backup - a minor NPC squad arrives next exchange.",qty:1},
         {name:"Pirate Captain",type:"major",aspects:["Owns These Lanes","My Crew Follows Into the Void"],skills:[{name:"Fight",r:3},{name:"Provoke",r:4},{name:"Drive",r:3},{name:"Contacts",r:2}],stress:3,stunt:"+2 to Provoke when invoking a reputation aspect on someone who knows your name.",qty:1},
-        {name:"Belt Militia",type:"minor",aspects:["Defending Their Own Rock", "Seen This Before and Have Opinions About It"],skills:[{name:"Shoot",r:3}, {name:"Athletics",r:2}, {name:"Notice",r:2}],stress:2,stunt:"In their home zone, belt militia defend at +2 — they know every handhold and blind spot.",qty:3},
-        {name:"Corp Security Specialist",type:"major",aspects:["Contract-Backed Legal Authority", "Expendable and Knows It", "This Is Just a Job and the Job Is Thorough"],skills:[{name:"Fight",r:4}, {name:"Shoot",r:4}, {name:"Investigate",r:3}, {name:"Notice",r:2}],stress:3,stunt:"Once per scene, invoke a legal warrant to compel compliance — target must overcome Will 3 or defer for one exchange.",qty:1},
-        {name:"Alien Presence",type:"major",aspects:["Does Not Share Your Reference Frame", "Has Been Here Much Longer", "Is Not Hostile — It Simply Does Not Account for You"],skills:[{name:"Physique",r:5}, {name:"Notice",r:4}, {name:"Will",r:3}],stress:4,stunt:"Conventional weapons do half stress against the alien presence unless invoking an aspect that represents understanding its nature.",qty:1},
-        {name:"Desperate Survivor",type:"minor",aspects:["Nothing Left to Lose", "Has Already Made a Decision About This"],skills:[{name:"Fight",r:2}, {name:"Provoke",r:3}, {name:"Will",r:3}],stress:2,stunt:"Survivor ignores their first mild consequence each scene — they've had worse.",qty:1}
+        {name:"Belt Militia",type:"minor",aspects:["Defending Their Own Rock", "Seen This Before and Have Opinions About It"],skills:[{name:"Shoot",r:3}, {name:"Athletics",r:2}, {name:"Notice",r:2}],stress:2,stunt:"In their home zone, belt militia defend at +2 - they know every handhold and blind spot.",qty:3},
+        {name:"Corp Security Specialist",type:"major",aspects:["Contract-Backed Legal Authority", "Expendable and Knows It", "This Is Just a Job and the Job Is Thorough"],skills:[{name:"Fight",r:4}, {name:"Shoot",r:4}, {name:"Investigate",r:3}, {name:"Notice",r:2}],stress:3,stunt:"Once per scene, invoke a legal warrant to compel compliance - target must overcome Will 3 or defer for one exchange.",qty:1},
+        {name:"Alien Presence",type:"major",aspects:["Does Not Share Your Reference Frame", "Has Been Here Much Longer", "Is Not Hostile - It Simply Does Not Account for You"],skills:[{name:"Physique",r:5}, {name:"Notice",r:4}, {name:"Will",r:3}],stress:4,stunt:"Conventional weapons do half stress against the alien presence unless invoking an aspect that represents understanding its nature.",qty:1},
+        {name:"Desperate Survivor",type:"minor",aspects:["Nothing Left to Lose", "Has Already Made a Decision About This"],skills:[{name:"Fight",r:2}, {name:"Provoke",r:3}, {name:"Will",r:3}],stress:2,stunt:"Survivor ignores their first mild consequence each scene - they've had worse.",qty:1}
       ],
-      twists: ["A ship on the long-range scan is on intercept — fifteen minutes out.","The station's automated defence system comes online.","A civilian is caught in the crossfire — and broadcasting it live.","The mission target isn't on this ship — they jumped two hours ago.","An unexpected party claims legal salvage rights to the location.","Life support has been sabotaged — everyone has four exchanges before the air changes.","An alien vessel emerges from a previously unknown jump point.","The ship's AI makes an independent decision — and it's not wrong.","A distress signal starts broadcasting from inside the location.","One of the opposition is working against their own crew.","The derelict isn't derelict. It's been waiting.","Gravity reverses in one zone. The cause is unknown.","A second ship with identical transponder codes just docked.","The alien entity makes contact — in a language one PC somehow understands.","The station administrator arrives. They have jurisdiction and questions.","The cargo opens from the inside.","Jump point collapse: the only route out has closed.","The ship AI makes an autonomous decision that is correct and troubling.","A cryo pod opens. The occupant has been in there for forty years.","The opposition leader reveals they're trying to stop something worse.","Authority response is seventeen minutes out. Closer than expected.","One of the opposition was a passenger on the colony ship.","The weapon system has a dead-man trigger.","The signal that started this is transmitting again — from inside the ship.","Fleet jurisdiction has just been extended to this sector. As of now."],
+      twists: ["A ship on the long-range scan is on intercept - fifteen minutes out.","The station's automated defence system comes online.","A civilian is caught in the crossfire - and broadcasting it live.","The mission target isn't on this ship - they jumped two hours ago.","An unexpected party claims legal salvage rights to the location.","Life support has been sabotaged - everyone has four exchanges before the air changes.","An alien vessel emerges from a previously unknown jump point.","The ship's AI makes an independent decision - and it's not wrong.","A distress signal starts broadcasting from inside the location.","One of the opposition is working against their own crew.","The derelict isn't derelict. It's been waiting.","Gravity reverses in one zone. The cause is unknown.","A second ship with identical transponder codes just docked.","The alien entity makes contact - in a language one PC somehow understands.","The station administrator arrives. They have jurisdiction and questions.","The cargo opens from the inside.","Jump point collapse: the only route out has closed.","The ship AI makes an autonomous decision that is correct and troubling.","A cryo pod opens. The occupant has been in there for forty years.","The opposition leader reveals they're trying to stop something worse.","Authority response is seventeen minutes out. Closer than expected.","One of the opposition was a passenger on the colony ship.","The weapon system has a dead-man trigger.","The signal that started this is transmitting again - from inside the ship.","Fleet jurisdiction has just been extended to this sector. As of now."],
       victory: ["Extract with the cargo/person intact.","Capture the ship without destroying it.","Reach the jump gate before the blockade tightens.","Broadcast the signal before it can be jammed.","Survive until the rendezvous window opens.","Disable the weapon system before it fires.","Get the ship to jump before the Authority fleet arrives.","Broadcast the signal before the jamming array comes fully online.","Recover the black box before the wreck falls into the gravity well.","Neutralise the boarding party before they reach the bridge.","Hold the docking bay for three exchanges until passengers are loaded.","Disable the weapon system before it cycles to firing position.","Translate the alien message before the fleet fires.","Escape the debris field before the structural failure cascades.","Get the colony ship's beacon active before it crosses the dead zone.","Complete the data transfer before the connection window closes."],
-      defeat: ["The cargo is jettisoned or destroyed.","The ship is impounded; the crew is arrested.","The jump gate closes — no escape this route.","The signal is jammed and the Authority gets there first.","A crew member is left behind.","The weapon fires; the consequences are enormous.","The ship is impounded, crew detained for questioning.","The jump window closes — no route out for a week.","The weapon fires. The consequences are enormous and public.","The cargo is confiscated and the client is very unhappy.","A crew member is left behind. Not voluntarily.","The colony ship makes it through without the warning.","The Authority gets the data first.","The alien contact is broken and cannot be re-established.","The route they discovered is now in Fleet records.","The ship is damaged beyond quick repair in uninhabited space."],
+      defeat: ["The cargo is jettisoned or destroyed.","The ship is impounded; the crew is arrested.","The jump gate closes - no escape this route.","The signal is jammed and the Authority gets there first.","A crew member is left behind.","The weapon fires; the consequences are enormous.","The ship is impounded, crew detained for questioning.","The jump window closes - no route out for a week.","The weapon fires. The consequences are enormous and public.","The cargo is confiscated and the client is very unhappy.","A crew member is left behind. Not voluntarily.","The colony ship makes it through without the warning.","The Authority gets the data first.","The alien contact is broken and cannot be re-established.","The route they discovered is now in Fleet records.","The ship is damaged beyond quick repair in uninhabited space."],
 
       seed_locations: [
         "A derelict colony ship drifting inside an asteroid belt with its emergency beacon on",
@@ -227,19 +227,19 @@ CAMPAIGNS["space"] = {
         "An alien ruin that is being excavated by a corporation with no academic credentials",
         "A waystation at the intersection of three smuggling routes that everyone denies using",
         "A belt settlement whose water reclamation is failing and whose corp supplier has stopped answering comms",
-        "A generation ship one jump from its destination — its governance has collapsed and three factions hold different decks",
+        "A generation ship one jump from its destination - its governance has collapsed and three factions hold different decks",
         "A gas giant extraction platform where the corp was running a classified project and the last transmission was screaming",
-        "A jump point that has begun appearing on charts that previously showed empty space — opened from the other side",
+        "A jump point that has begun appearing on charts that previously showed empty space - opened from the other side",
         "A derelict military vessel from the authority's last war, intact, broadcasting on a frequency the war ended",
         "A station that was declared uninhabitable two years ago and now has a population of several hundred who have nowhere else to go",
         "An alien structure in a debris field that is measurably larger than it was when the survey logged it",
         "A corp's private research station where the staff rotation never arrived and the installed team hasn't called home",
         "A neutral trade hub where three smuggling networks are maintaining a truce over shared infrastructure that is about to break",
         "A colony on a moon that has been surviving without authority support for eleven years and wants it to stay that way",
-        "A wrecked authority gunship in contested belt territory — the weapons systems are intact and both sides want them",
+        "A wrecked authority gunship in contested belt territory - the weapons systems are intact and both sides want them",
         "A refuelling depot at the edge of charted space where ships heading out never seem to come back from",
         "An alien contact site that was sealed under corp embargo and has since become the most wanted address in the sector",
-        "A hospital ship that has been operating in the outer systems for thirty years without a home port — independent, respected, and currently in trouble",
+        "A hospital ship that has been operating in the outer systems for thirty years without a home port - independent, respected, and currently in trouble",
         "A jump gate construction site where the workforce has downed tools and the corp is calling it a labour dispute and the workers are calling it something else"
       
       ],
@@ -248,27 +248,27 @@ CAMPAIGNS["space"] = {
         "A ship with unknown markings is holding position just outside sensor range",
         "The station's life support is being deliberately managed to limit the party's options",
         "One crew member's biometrics are flagged on the station's entry manifest from a previous visit",
-        "The contact is alive but compromised — everything they say is being monitored",
+        "The contact is alive but compromised - everything they say is being monitored",
         "A derelict in the vicinity is not as derelict as it appears",
         "The authority ship arrives six hours ahead of schedule",
         "The alien signal the party is investigating has changed since the mission briefing",
         "The cargo the party is carrying turns out to be exactly what the opposition is looking for",
         "The station administrator has a personal stake in the outcome and has not disclosed it",
-        "A second buyer appears — better funded, more dangerous, and apparently better informed",
+        "A second buyer appears - better funded, more dangerous, and apparently better informed",
         "The route back requires passing through a region where a battle is currently ongoing",
         "The information the party was given is six months out of date and the situation has changed",
         "Someone has already been through this location and taken the most useful thing",
         "The alien presence in the area responds to the mission's activity in an unexpected way",
-        "The party's ship is the only one that can reach the objective in time — and it is not rated for that route",
-        "The authority has placed a corridor hold on the system — no traffic in or out without a reason that holds up",
+        "The party's ship is the only one that can reach the objective in time - and it is not rated for that route",
+        "The authority has placed a corridor hold on the system - no traffic in or out without a reason that holds up",
         "The person the party was sent to find has become the person who sent someone to find the party",
-        "The location's life support is functional but being managed remotely — by someone who knows the party is coming",
+        "The location's life support is functional but being managed remotely - by someone who knows the party is coming",
         "The belt community the party needs help from remembers the last Inner crew that came asking for something",
-        "The alien presence in the area has already interacted with the opposition — in a way that changed them",
-        "The corp's legal team is already en route with authority to claim anything salvaged — they are three hours behind",
+        "The alien presence in the area has already interacted with the opposition - in a way that changed them",
+        "The corp's legal team is already en route with authority to claim anything salvaged - they are three hours behind",
         "The ship's drive can make this run or the run home, but not both, and the engineer has not told the captain",
         "The route the party planned passes through a debris field that was not debris when the charts were made",
-        "The contact the party was counting on has changed sides since the briefing — apparently not involuntarily"
+        "The contact the party was counting on has changed sides since the briefing - apparently not involuntarily"
       
       ],
       seed_objectives: [
@@ -291,7 +291,7 @@ CAMPAIGNS["space"] = {
         "Find out what the authority is burying in the sector's abandoned station before they finish burying it",
         "Get the belt settlement's water reclamation part before the corp's embargo locks the last supply run",
         "Stop the corp's weapons test before it destroys the asteroid that three hundred people call home",
-        "Locate the ship that went dark carrying twelve families of colonists and report back — honestly",
+        "Locate the ship that went dark carrying twelve families of colonists and report back - honestly",
         "Prevent the alien contact site from being sterilised by an authority response team that doesn't understand what it found",
         "Get the settlement's independence petition to the colonial assembly before the corp buys the swing vote",
         "Extract the corp's whistleblower from a station that is currently in corp jurisdiction",
@@ -299,60 +299,60 @@ CAMPAIGNS["space"] = {
       
       ],
       compel_situations: [
-        "Your ship's registration is flagged at this station — the flag predates you owning it",
+        "Your ship's registration is flagged at this station - the flag predates you owning it",
         "The authority inspector is thorough, courteous, and is about to find something",
         "The alien presence responds to your specific biosignature in a way others have not triggered",
         "Your crew owes fuel debt at this station and the station master has not forgotten",
         "The distress signal is genuine and you are the closest ship",
         "Your military record means you are recognised by the officer who just boarded",
-        "Your nav computer has the only charts for this route — both sides know it",
+        "Your nav computer has the only charts for this route - both sides know it",
         "The fugitive you're carrying has just been publicly identified on a station broadcast",
         "The derelict's configuration matches something from your own past",
         "Your weapons are the only thing between the colony and what is coming",
         "The alien artefact interacts with your specific genetic profile and will not respond to others",
         "You are owed a favour by the person you most need to be neutral right now",
         "The jump point calculation requires a level of skill only one person aboard has",
-        "The station's systems identify you as an authority operative — a classification you no longer hold",
+        "The station's systems identify you as an authority operative - a classification you no longer hold",
         "Helping the colony means violating your current contract",
-        "Your ship is the fastest thing in this system — and the job requires the fastest thing",
+        "Your ship is the fastest thing in this system - and the job requires the fastest thing",
         "The alien signal is clearly directed at you specifically",
         "Your engineer's modifications are the only reason this station is still operational",
         "The smuggled cargo is something you have strong personal reasons to care about",
         "The authority warrant is technically valid and technically applying to you right now",
-        "The beacon is active and you are the closest ship — by a margin that makes ignoring it legally complicated",
+        "The beacon is active and you are the closest ship - by a margin that makes ignoring it legally complicated",
         "The belt workers recognise your ship and your history with the corp that employs them and are deciding what to do about it",
         "Your ship's registry flags the authority scanner before you can stop it",
         "The wounded alien is clearly intelligent, clearly in pain, and the med-bay protocols do not cover this species",
         "The sample your cargo hold contains has begun reacting to the ship's environmental systems",
-        "The corp security team has a warrant that covers everything on this station — including you",
+        "The corp security team has a warrant that covers everything on this station - including you",
         "The settlement's children are watching and the adults have run out of options and are now looking at you",
         "Your navigator is the only person who can calculate the jump in time and they are currently detained",
         "The dying ship has twelve crew and your ship has rated capacity for eight",
-        "The alien contact is responding to your specifically — not the ship, not the crew — and the crew has noticed",
+        "The alien contact is responding to your specifically - not the ship, not the crew - and the crew has noticed",
         "The corp's whistleblower knows something that makes your current contract significantly more complicated",
         "The black box you're carrying records the moment that would end three careers, including yours",
         "Your ship is faster than anything else in range and the colony has eight hours of air",
         "The authority officer who just boarded served with you in the fleet and knows what you did and did not do",
-        "The jump you need to make requires burning the last of the drive reserve — making the return trip theoretical"
+        "The jump you need to make requires burning the last of the drive reserve - making the return trip theoretical"
       
       ],
       compel_consequences: [
-        "Your ship is impounded pending investigation — for a duration nobody will specify",
-        "The inspection finds something — not what you expected, but something",
+        "Your ship is impounded pending investigation - for a duration nobody will specify",
+        "The inspection finds something - not what you expected, but something",
         "The alien contact singles you out in a way that makes the rest of your crew uncomfortable",
-        "The fuel debt is paid — in a currency you had not planned to spend",
+        "The fuel debt is paid - in a currency you had not planned to spend",
         "You divert to the distress signal and arrive to find a situation considerably worse than a distress",
         "Your record marks you as a person of interest in a current investigation",
         "Both sides gain something from your charts that you wanted only one side to have",
         "The fugitive's presence triggers a station lockdown",
         "Investigating the derelict delays your objective by a margin you cannot recover",
-        "You win the engagement but the colony now needs you — indefinitely",
+        "You win the engagement but the colony now needs you - indefinitely",
         "The artefact activates in a way that commits you to a course you had not chosen",
         "Calling in the favour changes the person's neutrality in a direction that helps one problem and creates another",
         "The calculation is made but the one who made it is now known to both sides as the navigator of record",
         "The authority status creates an obligation you cannot ignore without confirming you have abandoned it",
         "The colony is safe; your contract is void; the client is hostile",
-        "You answer the beacon. What you find is not a rescue situation — it is a decision situation.",
+        "You answer the beacon. What you find is not a rescue situation - it is a decision situation.",
         "The belt workers help you. The cost is that you are now known to be on their side, which means known to be against the corp.",
         "The scanner flag triggers an inspection that is thorough and finds something you had categorised as not a problem.",
         "You treat the alien. It survives. It is now aboard your ship and has opinions about where it is going.",
@@ -370,24 +370,24 @@ CAMPAIGNS["space"] = {
       
       ],
       challenge_types: [
-        {name: "Ship-to-Ship Boarding", desc: "Take or defend a ship in close quarters before the other crew can seal the critical sections", primary: "Fight and Athletics", opposing: "Defenders' knowledge of their own ship's layout and their desperation", success: "Section secured; objective achieved inside the target ship", failure: "Repelled to vacuum — or trapped inside a ship that is now controlled by the other side"},
-        {name: "Authority Inspection", desc: "Get through a thorough official inspection without anything prohibited being found", primary: "Deceive and Resources", opposing: "The inspector's thoroughness and their suspicion level", success: "Cleared; on your way with cover intact", failure: "Detained for further questioning — or worse, something found"},
-        {name: "Deep Space Navigation", desc: "Plot a route through hazardous space on incomplete charts before fuel or time runs out", primary: "Lore and Crafts", opposing: "Cumulative navigation errors and environmental hazards", success: "Destination reached with margin to spare", failure: "Arrival delayed or off-target — in space, that has consequences"},
-        {name: "Diplomatic Summit", desc: "Broker agreement between factions that have every reason to fail to agree", primary: "Rapport and Empathy", opposing: "Each faction's non-negotiables and the outside parties trying to sabotage the summit", success: "Framework agreed; hostilities suspended", failure: "Summit collapses — and you are blamed by at least one side"},
-        {name: "First Contact Protocol", desc: "Establish enough mutual understanding with an alien presence to prevent a violent misunderstanding", primary: "Empathy and Lore", opposing: "Communication barriers, cultural assumptions, and the alien's own agenda", success: "Contact established; intentions clarified", failure: "Misunderstanding escalates — the alien presence now has a negative association with your species"},
-        {name: "Race to the Wreck", desc: "Reach a specific location in contested space before the opposition does", primary: "Pilot (Drive) and Crafts", opposing: "The opposition's resources, route, and willingness to fire first", success: "First on site; objective secured before contestation begins", failure: "Arrived simultaneously or second — now it's a negotiation or a fight"},
-        {name: "Station Sabotage", desc: "Destroy or disable a specific system without triggering a full station lockdown", primary: "Crafts and Stealth", opposing: "Station security, redundant systems, and time pressure", success: "System disabled; objective achieved; exit clean", failure: "Partial damage and full alarm — now you need to fight your way out"},
-        {name: "Alien Ruins Expedition", desc: "Navigate and extract something valuable from a structure built by minds that thought differently", primary: "Lore and Investigate", opposing: "The structure's remaining mechanisms and the physical hazards of age and alien engineering", success: "Objective found and extracted safely", failure: "Lost or trapped inside — and something in the structure knows you are here"},
-        {name: "Belt Community Negotiation", desc: "Win the trust of a belt or colonial settlement that has every reason not to trust anyone coming from inner space", primary: "Rapport and Empathy", opposing: "Justified historical grievance, community self-protection instinct, and the corp representative who got there first", success: "Trust extended; community cooperates; the party has a debt they will be glad to carry", failure: "Refused — and the community's position has hardened in a way that will take longer than available to change"},
-        {name: "Jury-Rig Under Fire", desc: "Restore a critical ship system while the ship is taking damage and the engineer is the only person who knows where things are", primary: "Crafts and Physique", opposing: "Accumulating damage, time pressure, and whatever is causing the damage continuing to cause it", success: "System restored; crisis averted; the ship is flyable", failure: "Partial repair — the system holds for now and the now has an expiry"},
-        {name: "Alien Artefact Containment", desc: "Prevent an alien object or entity from causing uncontrolled consequences in a populated environment", primary: "Lore and Will", opposing: "The artefact's behaviour, which does not respond to human threat models, and the time it takes for understanding to catch up", success: "Contained or redirected; damage limited; understanding marginally increased", failure: "Not contained — consequences are happening and the party is now managing a crisis instead of preventing one"},
-        {name: "Frontier Justice Hearing", desc: "Achieve a just outcome in a dispute adjudicated by a community with its own law and no interest in outside authority", primary: "Contacts and Rapport", opposing: "The community's history with the type of person the party appears to be and the other party's prior relationship with the adjudicators", success: "Ruling in the party's favour; standing in the community increased", failure: "Ruling against — and challenging it marks the party as the kind of people who don't respect local law"}
+        {name: "Ship-to-Ship Boarding", desc: "Take or defend a ship in close quarters before the other crew can seal the critical sections", primary: "Fight and Athletics", opposing: "Defenders' knowledge of their own ship's layout and their desperation", success: "Section secured; objective achieved inside the target ship", failure: "Repelled to vacuum - or trapped inside a ship that is now controlled by the other side"},
+        {name: "Authority Inspection", desc: "Get through a thorough official inspection without anything prohibited being found", primary: "Deceive and Resources", opposing: "The inspector's thoroughness and their suspicion level", success: "Cleared; on your way with cover intact", failure: "Detained for further questioning - or worse, something found"},
+        {name: "Deep Space Navigation", desc: "Plot a route through hazardous space on incomplete charts before fuel or time runs out", primary: "Lore and Crafts", opposing: "Cumulative navigation errors and environmental hazards", success: "Destination reached with margin to spare", failure: "Arrival delayed or off-target - in space, that has consequences"},
+        {name: "Diplomatic Summit", desc: "Broker agreement between factions that have every reason to fail to agree", primary: "Rapport and Empathy", opposing: "Each faction's non-negotiables and the outside parties trying to sabotage the summit", success: "Framework agreed; hostilities suspended", failure: "Summit collapses - and you are blamed by at least one side"},
+        {name: "First Contact Protocol", desc: "Establish enough mutual understanding with an alien presence to prevent a violent misunderstanding", primary: "Empathy and Lore", opposing: "Communication barriers, cultural assumptions, and the alien's own agenda", success: "Contact established; intentions clarified", failure: "Misunderstanding escalates - the alien presence now has a negative association with your species"},
+        {name: "Race to the Wreck", desc: "Reach a specific location in contested space before the opposition does", primary: "Pilot (Drive) and Crafts", opposing: "The opposition's resources, route, and willingness to fire first", success: "First on site; objective secured before contestation begins", failure: "Arrived simultaneously or second - now it's a negotiation or a fight"},
+        {name: "Station Sabotage", desc: "Destroy or disable a specific system without triggering a full station lockdown", primary: "Crafts and Stealth", opposing: "Station security, redundant systems, and time pressure", success: "System disabled; objective achieved; exit clean", failure: "Partial damage and full alarm - now you need to fight your way out"},
+        {name: "Alien Ruins Expedition", desc: "Navigate and extract something valuable from a structure built by minds that thought differently", primary: "Lore and Investigate", opposing: "The structure's remaining mechanisms and the physical hazards of age and alien engineering", success: "Objective found and extracted safely", failure: "Lost or trapped inside - and something in the structure knows you are here"},
+        {name: "Belt Community Negotiation", desc: "Win the trust of a belt or colonial settlement that has every reason not to trust anyone coming from inner space", primary: "Rapport and Empathy", opposing: "Justified historical grievance, community self-protection instinct, and the corp representative who got there first", success: "Trust extended; community cooperates; the party has a debt they will be glad to carry", failure: "Refused - and the community's position has hardened in a way that will take longer than available to change"},
+        {name: "Jury-Rig Under Fire", desc: "Restore a critical ship system while the ship is taking damage and the engineer is the only person who knows where things are", primary: "Crafts and Physique", opposing: "Accumulating damage, time pressure, and whatever is causing the damage continuing to cause it", success: "System restored; crisis averted; the ship is flyable", failure: "Partial repair - the system holds for now and the now has an expiry"},
+        {name: "Alien Artefact Containment", desc: "Prevent an alien object or entity from causing uncontrolled consequences in a populated environment", primary: "Lore and Will", opposing: "The artefact's behaviour, which does not respond to human threat models, and the time it takes for understanding to catch up", success: "Contained or redirected; damage limited; understanding marginally increased", failure: "Not contained - consequences are happening and the party is now managing a crisis instead of preventing one"},
+        {name: "Frontier Justice Hearing", desc: "Achieve a just outcome in a dispute adjudicated by a community with its own law and no interest in outside authority", primary: "Contacts and Rapport", opposing: "The community's history with the type of person the party appears to be and the other party's prior relationship with the adjudicators", success: "Ruling in the party's favour; standing in the community increased", failure: "Ruling against - and challenging it marks the party as the kind of people who don't respect local law"}
       ],
 
       consequence_mild: [
         "Plasma Burn on the Forearm",
         "Ringing Ears from the Hull Strike",
-        "Suit Breach — Patched but Pressure Low",
+        "Suit Breach - Patched but Pressure Low",
         "Grazed by the Flechette Burst",
         "Zero-G Tumble Left the Knee Wrong",
         "Hands Shaking from the Hard Burn",
@@ -397,48 +397,48 @@ CAMPAIGNS["space"] = {
         "Dazed from the EMP Pulse",
         "Minor Burn from the Console Surge",
         "Wrist Sprained in the Emergency Seal",
-        "Suit Seal Degraded — Not Critical But Not Comfortable",
+        "Suit Seal Degraded - Not Critical But Not Comfortable",
         "Ringing Head from the Pressure Wave",
         "Wrenched Shoulder from the Hard Dock Impact",
         "Singed Palm from the Conduit Burst",
-        "Cracked Visor Lens — Periphery Obscured",
-        "Mild Radiation Exposure — Nausea Cycling"
+        "Cracked Visor Lens - Periphery Obscured",
+        "Mild Radiation Exposure - Nausea Cycling"
       
       ],
       consequence_moderate: [
         "Gunshot Wound, Sealed but Not Treated",
-        "Suit Compromised — Fifteen Minutes of Air Left",
+        "Suit Compromised - Fifteen Minutes of Air Left",
         "Concussed from the Bulkhead Impact",
         "Leg Pinned by Debris, Extracted but Damaged",
         "Neural Interface Glitching from the EMP",
-        "Radiation Exposure — Nausea and Cognitive Fog",
+        "Radiation Exposure - Nausea and Cognitive Fog",
         "Shoulder Dislocated in the Hard Dock",
-        "Fragmentation Hit — Shrapnel Still in There",
+        "Fragmentation Hit - Shrapnel Still in There",
         "Lung Bruised from the Pressure Wave",
         "Hand Burned to the Bone from the Plasma Conduit",
-        "Ship Registry Flagged — Authority Knows the Name",
-        "Jump Drive Trauma — Can't Navigate Straight",
-        "Deep-Space Decompression Trauma — Body Still Adjusting",
-        "Suit Breach Sealed With Foam — Twelve Minutes of Air",
+        "Ship Registry Flagged - Authority Knows the Name",
+        "Jump Drive Trauma - Can't Navigate Straight",
+        "Deep-Space Decompression Trauma - Body Still Adjusting",
+        "Suit Breach Sealed With Foam - Twelve Minutes of Air",
         "Fracture From the Zero-G Impact",
-        "Neural Interface Feedback — Piloting Is Now Unreliable",
-        "Belt Sickness Triggered by the Acceleration — Can't Keep Anything Down",
-        "Arm Pinned and Freed — Freed Is Relative"
+        "Neural Interface Feedback - Piloting Is Now Unreliable",
+        "Belt Sickness Triggered by the Acceleration - Can't Keep Anything Down",
+        "Arm Pinned and Freed - Freed Is Relative"
       
       ],
       consequence_severe: [
-        "Suit Integrity Gone — Dependent on Others for Air",
+        "Suit Integrity Gone - Dependent on Others for Air",
         "Internal Bleeding That Needs a Med-Bay Now",
         "Neural Burn Has Taken Piloting Precision Offline",
-        "Bone Fracture in Vacuum — Every Movement Costs",
-        "Ship Is Destroyed — Everything Was On That Ship",
+        "Bone Fracture in Vacuum - Every Movement Costs",
+        "Ship Is Destroyed - Everything Was On That Ship",
         "Bounty Upgraded to Kill-on-Sight",
-        "Radiation Poisoning — Timeline Now Measured in Weeks",
+        "Radiation Poisoning - Timeline Now Measured in Weeks",
         "Witnessed Something the Authority Will Bury Along With Me",
-        "Long-Term Radiation Exposure — Timeline Now Has an End Date",
-        "Belt Bone Loss Triggered by the G-Force — Moving Without Pain Is No Longer Simple",
-        "Ship Registration Burned Across the Sector — Every Port Has the Name",
-        "Alien Contact Residue — Something Changed and Nobody Knows What Yet"
+        "Long-Term Radiation Exposure - Timeline Now Has an End Date",
+        "Belt Bone Loss Triggered by the G-Force - Moving Without Pain Is No Longer Simple",
+        "Ship Registration Burned Across the Sector - Every Port Has the Name",
+        "Alien Contact Residue - Something Changed and Nobody Knows What Yet"
       
       ],
       consequence_contexts: [
@@ -501,7 +501,7 @@ CAMPAIGNS["space"] = {
         "Recover and control the derelict generation ship and its contents",
         "Establish belt communities' right to self-governance under colonial law before the authority votes on the Outer Systems Compact",
         "Break the corp's monopoly on jump coordinate registration in the outer belt",
-        "Maintain the alien contact blackout until humanity is ready — as defined by this faction — to handle it",
+        "Maintain the alien contact blackout until humanity is ready - as defined by this faction - to handle it",
         "Connect every independent settlement in the outer systems to a mutual aid network the authority cannot disrupt"
       
       ],
@@ -516,7 +516,7 @@ CAMPAIGNS["space"] = {
         "Using a legal advocacy front to monitor and frustrate authority operations",
         "Running a network of independent freight haulers who carry more than freight",
         "Maintaining unlicensed medical and technical support for settlements the corps have abandoned",
-        "Operating an encrypted comm network that routes through the alien signal — nobody official has decoded either",
+        "Operating an encrypted comm network that routes through the alien signal - nobody official has decoded either",
         "Placing people inside corp logistics chains to redirect essential supplies toward belt settlements"
       
       ],
@@ -527,9 +527,9 @@ CAMPAIGNS["space"] = {
         "A recent operation went public in a way that's drawn authority attention",
         "Their best ship was seized and the pilot hasn't been heard from since",
         "They owe safe passage to a faction they now need to move against",
-        "The jump coordinates that fund them are degrading — the route is closing",
+        "The jump coordinates that fund them are degrading - the route is closing",
         "Their leadership council requires unanimous votes to act, and it's gridlocked",
-        "Their network depends on ships that are held together with improvisation and goodwill — either can fail",
+        "Their network depends on ships that are held together with improvisation and goodwill - either can fail",
         "The faction's most effective operator has been operating independently for long enough to have developed independent goals",
         "Their strongest political argument relies on records that the corp has a legal claim to suppress",
         "The alliance between inner-system sympathisers and outer-system communities is held together by one person who is currently missing"
@@ -543,7 +543,7 @@ CAMPAIGNS["space"] = {
         "the arms dealer who supplies the fleet and sets the price accordingly",
         "the idealist founder whose principles complicate every practical decision",
         "the belt-born medic who maintains the faction's credibility with the outer settlements",
-        "the former authority navigator who provides route intelligence and charges nothing — which means they want something else",
+        "the former authority navigator who provides route intelligence and charges nothing - which means they want something else",
         "the ship captain who runs the deep routes and whose vessel is three repairs from becoming permanent",
         "the corp defector who brought two years of manifest data and whose motives are still being evaluated"
       
@@ -559,23 +559,23 @@ CAMPAIGNS["space"] = {
         "Alien factor"
       ],
       complication_aspects: [
-        "Hull Breach — Pressure Dropping, Clock Is Running",
-        "Authority Transponder Sweep — We're Being Queried",
-        "The Drive Signature Is Being Tracked — Someone Followed Us",
-        "Civilian Ship in the Crossfire — Can't Ignore It",
-        "Comms Are Being Jammed — No Way to Call for Help",
+        "Hull Breach - Pressure Dropping, Clock Is Running",
+        "Authority Transponder Sweep - We're Being Queried",
+        "The Drive Signature Is Being Tracked - Someone Followed Us",
+        "Civilian Ship in the Crossfire - Can't Ignore It",
+        "Comms Are Being Jammed - No Way to Call for Help",
         "The Station Is Entering Emergency Lockdown",
-        "Docking Clamps Have Engaged — We're Not Leaving Without Permission",
-        "Radiation Spike — Suits Required, Movement Restricted",
-        "The Manifest Is Wrong — Whatever We're Carrying Isn't What We Were Told",
-        "Weapons Systems Are Non-Responsive — Defence Only",
+        "Docking Clamps Have Engaged - We're Not Leaving Without Permission",
+        "Radiation Spike - Suits Required, Movement Restricted",
+        "The Manifest Is Wrong - Whatever We're Carrying Isn't What We Were Told",
+        "Weapons Systems Are Non-Responsive - Defence Only",
         "A Second Ship Just Dropped Out of Nowhere",
-        "Life Support Is on Reserve — Time Limit Now Applies to Everything",
+        "Life Support Is on Reserve - Time Limit Now Applies to Everything",
         "The Ship's AI Has Developed an Opinion About This Situation and Is Expressing It Operationally",
-        "Hull Stress Reading Critical — One More Hit and It's a Different Kind of Problem",
+        "Hull Stress Reading Critical - One More Hit and It's a Different Kind of Problem",
         "The Belt Settlement's Water Is Running Out Faster Than Anyone Expected",
-        "Authority Jurisdiction Just Extended to This Sector — As of Twenty Minutes Ago",
-        "The Alien Signal Has Intensified — Whatever It Was Doing, It Is Doing More of It",
+        "Authority Jurisdiction Just Extended to This Sector - As of Twenty Minutes Ago",
+        "The Alien Signal Has Intensified - Whatever It Was Doing, It Is Doing More of It",
         "The Corp's Legal Team Has Arrived and Has Standing to Claim Everything Here"
       
       ],
@@ -584,25 +584,25 @@ CAMPAIGNS["space"] = {
         "A bounty hunter with a current contract on someone in the party",
         "A derelict that is not as empty as its registry suggests",
         "A corp rapid response team with legal authority to board",
-        "An alien vessel — no known registry, no known language",
+        "An alien vessel - no known registry, no known language",
         "A ship claiming distress that is better-armed than distress requires",
         "A belt prospector whose claim overlaps with the party's objective and who has a legal record of being here first",
-        "A corp cleanup team with authority to sterilise the site — they are not primarily interested in witnesses",
+        "A corp cleanup team with authority to sterilise the site - they are not primarily interested in witnesses",
         "An alien vessel that is not attacking and is not leaving and is clearly waiting for something",
         "A refugee shuttle that has overshot its destination and is running out of consumables"
       
       ],
       complication_env: [
-        "Gravity plate failure — the fight is now in zero-g",
-        "Solar flare — all electronics have sixty seconds before they need to be shielded",
-        "Debris field — piloting requires Overcome rolls to move between zones",
-        "Plasma conduit rupture — one zone is now a lethal hazard",
-        "Emergency bulkheads seal — the party is now split between zones",
-        "Power transfer to weapons — life support is on reserve, timer starts now",
-        "Solar particle event — unshielded electronics fail; suit comms are down; navigation is manual",
-        "Micrometeor impact sequence — the hull is taking grazing hits on a timer; someone needs to be outside",
-        "Gravity plate cascade failure — different zones now have different gravity, none of them predictable",
-        "Alien atmospheric chemistry intrusion — the life support is filtering it but not fast enough"
+        "Gravity plate failure - the fight is now in zero-g",
+        "Solar flare - all electronics have sixty seconds before they need to be shielded",
+        "Debris field - piloting requires Overcome rolls to move between zones",
+        "Plasma conduit rupture - one zone is now a lethal hazard",
+        "Emergency bulkheads seal - the party is now split between zones",
+        "Power transfer to weapons - life support is on reserve, timer starts now",
+        "Solar particle event - unshielded electronics fail; suit comms are down; navigation is manual",
+        "Micrometeor impact sequence - the hull is taking grazing hits on a timer; someone needs to be outside",
+        "Gravity plate cascade failure - different zones now have different gravity, none of them predictable",
+        "Alien atmospheric chemistry intrusion - the life support is filtering it but not fast enough"
       
       ],
       backstory_questions: [
@@ -640,7 +640,7 @@ CAMPAIGNS["space"] = {
         "You each received a distress signal from a different source. The coordinates were identical.",
         "Each of you received the same route coordinates from a different source. None of your sources are currently reachable.",
         "You were all on the same station when it was evacuated. You all made it out. A lot of people did not. You have not compared notes on why.",
-        "Your ships all have the same hull modification — identical, at a level below standard inspection tolerance. None of you ordered it.",
+        "Your ships all have the same hull modification - identical, at a level below standard inspection tolerance. None of you ordered it.",
         "A corp legal notice has been served to each of you individually. You are each named as a witness to the same event. None of you remember attending it."
       
       ],
@@ -649,40 +649,40 @@ CAMPAIGNS["space"] = {
   };
 
 // ═══════════════════════════════════════════════════════════════════════
-// CONTENT EXPANSION — v9.1 (Void Runners)
+// CONTENT EXPANSION - v9.1 (Void Runners)
 // Inspirations: Firefly, The Expanse, Cowboy Bebop, Alien
 // ═══════════════════════════════════════════════════════════════════════
 (function(){var t=CAMPAIGNS.space.tables;
 
 t.opposition = t.opposition.concat([
-  {name:"Station Militia — Pressed Into Service", type:"minor", aspects:["Didn't Sign Up for This"], skills:[{name:"Shoot",r:2},{name:"Will",r:1}], stress:1, stunt:null, qty:4},
+  {name:"Station Militia - Pressed Into Service", type:"minor", aspects:["Didn't Sign Up for This"], skills:[{name:"Shoot",r:2},{name:"Will",r:1}], stress:1, stunt:null, qty:4},
   {name:"Salvage Claim Jumper", type:"minor", aspects:["First Come, First Served, First to Shoot"], skills:[{name:"Shoot",r:2},{name:"Drive",r:3}], stress:2, stunt:null, qty:3},
-  {name:"Authority Customs Cutter", type:"major", aspects:["Legal Mandate and Heavy Weapons","Your Transponder Is on File","Every Inspection Is a Fishing Expedition"], skills:[{name:"Shoot",r:5},{name:"Notice",r:4},{name:"Investigate",r:3},{name:"Drive",r:3}], stress:6, stunt:"Can demand a ship halt and submit to inspection — refusing justifies pursuit and boarding.", qty:1},
+  {name:"Authority Customs Cutter", type:"major", aspects:["Legal Mandate and Heavy Weapons","Your Transponder Is on File","Every Inspection Is a Fishing Expedition"], skills:[{name:"Shoot",r:5},{name:"Notice",r:4},{name:"Investigate",r:3},{name:"Drive",r:3}], stress:6, stunt:"Can demand a ship halt and submit to inspection - refusing justifies pursuit and boarding.", qty:1},
   {name:"Xenoparasite Colony", type:"minor", aspects:["They Get Inside and Multiply"], skills:[{name:"Stealth",r:3},{name:"Fight",r:2}], stress:1, stunt:null, qty:6},
-  {name:"Decommissioned War Drone", type:"major", aspects:["Obsolete But Still Lethal","Corrupted Friend-or-Foe Logic","Armored Like a Small Ship"], skills:[{name:"Shoot",r:5},{name:"Fight",r:4},{name:"Physique",r:4}], stress:6, stunt:"Once per scene, switch targeting criteria — allies become targets and enemies friendlies for one exchange.", qty:1},
+  {name:"Decommissioned War Drone", type:"major", aspects:["Obsolete But Still Lethal","Corrupted Friend-or-Foe Logic","Armored Like a Small Ship"], skills:[{name:"Shoot",r:5},{name:"Fight",r:4},{name:"Physique",r:4}], stress:6, stunt:"Once per scene, switch targeting criteria - allies become targets and enemies friendlies for one exchange.", qty:1},
   {name:"Fuel Depot Guard", type:"minor", aspects:["Protecting Corporate Property, Not People"], skills:[{name:"Shoot",r:2},{name:"Notice",r:2}], stress:2, stunt:null, qty:3},
   {name:"Ghost Ship AI", type:"major", aspects:["The Crew Is Gone But the Ship Remembers","Lonely Enough to Be Dangerous","Controls Every System"], skills:[{name:"Lore",r:4},{name:"Deceive",r:4},{name:"Crafts",r:3},{name:"Provoke",r:3}], stress:3, stunt:"Can vent atmosphere, lock bulkheads, or kill gravity in any zone on its ship as a free Create Advantage at +4.", qty:1},
   {name:"Pirate Boarding Party", type:"minor", aspects:["Mag-Boots and Breaching Charges"], skills:[{name:"Fight",r:3},{name:"Athletics",r:2}], stress:2, stunt:null, qty:4},
-  {name:"Corporate Repo Agent", type:"major", aspects:["Your Ship Was Never Yours — Read the Contract","Pleasant Until the Paperwork Runs Out","Has Done This a Hundred Times"], skills:[{name:"Resources",r:5},{name:"Rapport",r:4},{name:"Deceive",r:3},{name:"Fight",r:2}], stress:3, stunt:"+2 to Create Advantage using legal or financial leverage against targets with debts.", qty:1},
-  {name:"Void Kraken Juvenile", type:"major", aspects:["Silhouette Bigger Than the Ship","Curious Not Hostile — Until Provoked","Tentacles Reach Multiple Zones"], skills:[{name:"Fight",r:6},{name:"Physique",r:5},{name:"Athletics",r:3}], stress:6, stunt:"Attacks two adjacent zones simultaneously. If it grapples the ship, escape requires Fantastic +6 overcome with Drive.", qty:1},
-  {name:"Scrapyard Guard Dog — Cybernetic Mastiff", type:"minor", aspects:["Sensor Suite Better Than Yours"], skills:[{name:"Notice",r:3},{name:"Fight",r:2},{name:"Athletics",r:2}], stress:2, stunt:null, qty:2},
+  {name:"Corporate Repo Agent", type:"major", aspects:["Your Ship Was Never Yours - Read the Contract","Pleasant Until the Paperwork Runs Out","Has Done This a Hundred Times"], skills:[{name:"Resources",r:5},{name:"Rapport",r:4},{name:"Deceive",r:3},{name:"Fight",r:2}], stress:3, stunt:"+2 to Create Advantage using legal or financial leverage against targets with debts.", qty:1},
+  {name:"Void Kraken Juvenile", type:"major", aspects:["Silhouette Bigger Than the Ship","Curious Not Hostile - Until Provoked","Tentacles Reach Multiple Zones"], skills:[{name:"Fight",r:6},{name:"Physique",r:5},{name:"Athletics",r:3}], stress:6, stunt:"Attacks two adjacent zones simultaneously. If it grapples the ship, escape requires Fantastic +6 overcome with Drive.", qty:1},
+  {name:"Scrapyard Guard Dog - Cybernetic Mastiff", type:"minor", aspects:["Sensor Suite Better Than Yours"], skills:[{name:"Notice",r:3},{name:"Fight",r:2},{name:"Athletics",r:2}], stress:2, stunt:null, qty:2},
 ]);
 
 t.zones = t.zones.concat([
-  ["The Airlock — Between Worlds", "One Button From Vacuum", "The ultimate leverage; everything here can be vented."],
+  ["The Airlock - Between Worlds", "One Button From Vacuum", "The ultimate leverage; everything here can be vented."],
   ["The Mess Hall", "Tables Bolted Down, Everything Else Isn't", "Improvised weapons everywhere; tight quarters."],
   ["The Docking Collar", "Two Ships, One Seal", "Controlled chokepoint; cutting the collar separates the ships."],
-  ["Asteroid Surface — Low Gravity", "Every Step Is a Leap of Faith", "Movement is Athletics-based; ranged attacks drift."],
+  ["Asteroid Surface - Low Gravity", "Every Step Is a Leap of Faith", "Movement is Athletics-based; ranged attacks drift."],
   ["The Scrapyard", "Mountains of Dead Ships", "Dense cover; unstable terrain; something might still have power."],
-  ["The Smuggler's Hold — False Floor", "It's Not on the Schematics", "Hidden zone; discovery requires Investigate at +3."],
+  ["The Smuggler's Hold - False Floor", "It's Not on the Schematics", "Hidden zone; discovery requires Investigate at +3."],
   ["The Station Bazaar", "Everyone's Armed, Nobody's Shooting", "Neutral ground; violence breaks the truce."],
-  ["The Reactor — Do Not Fire Weapons", "Breach Means Everyone Dies", "Absolute stakes; no ranged combat."],
-  ["EVA — Tethered to the Hull", "Silence and Vertigo", "Zero-g; radio communication only; drift hazard."],
+  ["The Reactor - Do Not Fire Weapons", "Breach Means Everyone Dies", "Absolute stakes; no ranged combat."],
+  ["EVA - Tethered to the Hull", "Silence and Vertigo", "Zero-g; radio communication only; drift hazard."],
   ["The Captain's Quarters", "Personal Effects and Hidden Safes", "Small; defensible; the ship's last resort."],
 ]);
 
 t.complication_arrivals = t.complication_arrivals.concat([
-  "A distress beacon activates — genuine rescue or pirate bait?",
+  "A distress beacon activates - genuine rescue or pirate bait?",
   "An authority patrol not scheduled in this sector for another week",
   "A passenger not on the manifest who won't explain where they came from",
   "A ship matching one reported destroyed two years ago, transponder and all",
@@ -693,14 +693,14 @@ t.complication_arrivals = t.complication_arrivals.concat([
 ]);
 
 t.complication_env = t.complication_env.concat([
-  "Micrometeorite shower — the hull takes hits and patches aren't holding",
-  "Reactor enters emergency cooling — minimal power for 3 exchanges",
+  "Micrometeorite shower - the hull takes hits and patches aren't holding",
+  "Reactor enters emergency cooling - minimal power for 3 exchanges",
   "A comm buoy broadcasts the party's position on an open channel",
-  "Artificial gravity rotates 90 degrees — the wall is now the floor",
-  "Solar storm disrupts navigation — the ship is flying blind",
-  "Air recycler fails — oxygen is now a countdown",
+  "Artificial gravity rotates 90 degrees - the wall is now the floor",
+  "Solar storm disrupts navigation - the ship is flying blind",
+  "Air recycler fails - oxygen is now a countdown",
   "A sealed bulkhead opens, revealing a section that shouldn't exist",
-  "The jump drive charges on its own — someone is accessing the ship remotely",
+  "The jump drive charges on its own - someone is accessing the ship remotely",
 ]);
 
 t.backstory_hooks = t.backstory_hooks.concat([
@@ -736,36 +736,36 @@ t.faction_face_roles = t.faction_face_roles.concat([
 ]);
 
 t.complication_types = t.complication_types.concat([
-  "System Failure — a critical ship system goes down at the worst time",
-  "Claim Dispute — someone else has legal or traditional rights to the prize",
-  "Stowaway — an uninvited presence changes the dynamics",
-  "Signal — an unexpected transmission changes everything the party knew",
+  "System Failure - a critical ship system goes down at the worst time",
+  "Claim Dispute - someone else has legal or traditional rights to the prize",
+  "Stowaway - an uninvited presence changes the dynamics",
+  "Signal - an unexpected transmission changes everything the party knew",
 ]);
 
 t.current_issues = t.current_issues.concat([
-  "The Fuel Monopoly — One corporation controls the refineries. Prices double every quarter. Ships that can't pay get impounded.",
-  "Ghost Fleet — Decommissioned warships vanish from the scrapyard. Someone is rebuilding them. No one knows who.",
+  "The Fuel Monopoly - One corporation controls the refineries. Prices double every quarter. Ships that can't pay get impounded.",
+  "Ghost Fleet - Decommissioned warships vanish from the scrapyard. Someone is rebuilding them. No one knows who.",
 ]);
 
 t.impending_issues = t.impending_issues.concat([
-  "The Quarantine Zone — Authority sealed an entire sector. No ships in or out. The official reason doesn't match the refugee stories.",
-  "The Signal — Every ship received the same transmission last month. Coordinates and a date. The date is approaching.",
+  "The Quarantine Zone - Authority sealed an entire sector. No ships in or out. The official reason doesn't match the refugee stories.",
+  "The Signal - Every ship received the same transmission last month. Coordinates and a date. The date is approaching.",
 ]);
 
 })();
 
 // ═══════════════════════════════════════════════════════════════════════
-// AUDIT FIXES — v9.2 (Void Runners)
+// AUDIT FIXES - v9.2 (Void Runners)
 // Named Authority, ship culture, shipboard NPC vars, issue normalization
 // ═══════════════════════════════════════════════════════════════════════
 (function(){var t=CAMPAIGNS.space.tables;
 
 // The Authority is now named and has internal factions
 t.setting_aspects.t = t.setting_aspects.t.concat([
-  "The Colonial Transit Authority — Bureaucracy With Battleships. They Tax the Routes They Don't Patrol and Patrol the Routes They Don't Understand.",
-  "The CTA Has Two Factions — the Bureau of Navigation (cartographers and scientists, mostly reasonable) and Enforcement Division (warships and zero tolerance, not reasonable at all)",
-  "The Ship Is the Fifth Crew Member — It Has a Personality Whether You Want It To or Not",
-  "Jump Transit Is Not Instantaneous — It Takes Forty Minutes of Sensory Deprivation and Nobody Comes Out Quite the Same Twice",
+  "The Colonial Transit Authority - Bureaucracy With Battleships. They Tax the Routes They Don't Patrol and Patrol the Routes They Don't Understand.",
+  "The CTA Has Two Factions - the Bureau of Navigation (cartographers and scientists, mostly reasonable) and Enforcement Division (warships and zero tolerance, not reasonable at all)",
+  "The Ship Is the Fifth Crew Member - It Has a Personality Whether You Want It To or Not",
+  "Jump Transit Is Not Instantaneous - It Takes Forty Minutes of Sensory Deprivation and Nobody Comes Out Quite the Same Twice",
 ]);
 
 // Shipboard NPC variables
@@ -792,8 +792,8 @@ t.faction_face_roles = t.faction_face_roles.concat([
 ['current_issues','impending_issues'].forEach(function(k){
   for(var i=t[k].length-1;i>=0;i--){
     if(typeof t[k][i]==='string'){
-      var p=t[k][i].split(' — ');
-      t[k][i]={name:p[0],desc:p.slice(1).join(' — ')};
+      var p=t[k][i].split(' - ');
+      t[k][i]={name:p[0],desc:p.slice(1).join(' - ')};
     }
   }
 });
