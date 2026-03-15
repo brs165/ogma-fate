@@ -1682,7 +1682,8 @@ function SettingsModal(props) {
         padding: '14px 20px', borderTop: '1px solid var(--border)',
         display: 'flex', gap: 10, flexWrap: 'wrap',
       }},
-        h('a', {href: '../learn.html', className: 'btn btn-ghost btn-nav'}, '📖 Quick Start'),
+        h('a', {href: '../wiki/new-to-ogma.html', className: 'btn btn-ghost btn-nav'}, '📖 Help & Wiki'),
+        h('a', {href: '../wiki/index.html', className: 'btn btn-ghost btn-nav'}, '📖 Help'),
         h('a', {href: '../about.html', className: 'btn btn-ghost btn-nav'}, 'About'),
         h('a', {href: '../license.html', className: 'btn btn-ghost btn-nav'}, 'License')
       )
@@ -1789,8 +1790,8 @@ function LandingApp() {
         h('span', {className: 'topbar-crumb-item current', 'aria-current': 'page'}, 'Campaign Select')
       ),
       h('div', {className: 'topbar-status'},
-        h('a', {href: 'learn.html', className: 'btn btn-ghost topbar-nav-btn topbar-nav-hide-sm', style: {textDecoration: 'none'}}, '📖 Quick Start'),
-        h('a', {href: 'campaigns/transition.html', className: 'btn btn-ghost topbar-nav-btn topbar-nav-hide-sm', style: {textDecoration: 'none'}}, '⚔ D&D Guide'),
+        h('a', {href: 'wiki/index.html', className: 'btn btn-ghost topbar-nav-btn topbar-nav-hide-sm', style: {textDecoration: 'none'}}, '📖 Help'),
+        h('a', {href: 'campaigns/sessionzero.html', className: 'btn btn-ghost topbar-nav-btn topbar-nav-hide-sm', style: {textDecoration: 'none'}}, '🎭 Session Zero'),
         h('a', {href: 'about.html', className: 'btn btn-ghost topbar-nav-btn topbar-nav-hide-sm', style: {textDecoration: 'none'}}, 'About'),
         h('button', {
           className: 'btn btn-icon btn-ghost',
@@ -1895,7 +1896,7 @@ function LandingApp() {
               ),
               h('span', {className: 'land-onboard-arrow'}, '›')
             ),
-            h('a', {href: 'campaigns/transition.html', className: 'land-onboard-card'},
+            h('a', {href: 'wiki/dnd-transition.html', className: 'land-onboard-card'},
               h('div', {className: 'land-onboard-icon'}, h(RaIcon, {n: RA_ICONS.dnd_guide, size: '2x'})),
               h('div', {className: 'land-onboard-text'},
                 h('div', {className: 'land-onboard-label'}, 'Coming from D&D?'),
@@ -1903,11 +1904,11 @@ function LandingApp() {
               ),
               h('span', {className: 'land-onboard-arrow'}, '›')
             ),
-            h('a', {href: 'learn.html', className: 'land-onboard-card'},
+            h('a', {href: 'wiki/new-to-ogma.html', className: 'land-onboard-card'},
               h('div', {className: 'land-onboard-icon'}, h(RaIcon, {n: RA_ICONS.learn, size: '2x'})),
               h('div', {className: 'land-onboard-text'},
-                h('div', {className: 'land-onboard-label'}, 'Quick-Start Guide'),
-                h('div', {className: 'land-onboard-desc'}, 'Rules primer, GM craft tips, worked examples, and a full Fate glossary.')
+                h('div', {className: 'land-onboard-label'}, 'New to Ogma?'),
+                h('div', {className: 'land-onboard-desc'}, 'Pick your background and find the right starting point — new to TTRPGs, D&D player, or experienced Fate GM.')
               ),
               h('span', {className: 'land-onboard-arrow'}, '›')
             )
@@ -1961,6 +1962,7 @@ function LandingApp() {
           ' · ',
           h('a', {href: 'https://fate-srd.com/official-licensing-fate', target: '_blank', rel: 'noreferrer'}, 'Fate Licensing'),
           ' · ',
+          h('a', {href: 'wiki/index.html'}, '📖 Help'),
           h('a', {href: 'about.html'}, 'About Ogma'),
           ' · ',
           h('a', {href: 'CONTRIBUTING.md', target: '_blank', rel: 'noreferrer'}, 'Contribute')
@@ -3792,7 +3794,7 @@ function CampaignApp(props) {
             h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: 'keyboard'})),
             h('span', {className: 'sidebar-item-label'}, 'KB Shortcuts')
           ),
-          h('a', {href: '../campaigns/transition.html', className: 'sidebar-tool-btn'},
+          h('a', {href: '../wiki/dnd-transition.html', className: 'sidebar-tool-btn'},
             h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.dnd_guide})),
             h('span', {className: 'sidebar-item-label'}, 'D&D Guide')
           ),
@@ -3800,13 +3802,17 @@ function CampaignApp(props) {
             h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.learn || 'player'})),
             h('span', {className: 'sidebar-item-label'}, 'Session Zero')
           ),
-          h('a', {href: '../learn.html', className: 'sidebar-tool-btn'},
+          h('a', {href: '../wiki/new-to-ogma.html', className: 'sidebar-tool-btn'},
             h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.learn})),
             h('span', {className: 'sidebar-item-label'}, 'Quick Start')
           ),
           h('a', {href: '../index.html', className: 'sidebar-tool-btn'},
             h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.home})),
             h('span', {className: 'sidebar-item-label'}, 'Home')
+          ),
+          h('a', {href: '../wiki/index.html', className: 'sidebar-tool-btn'},
+            h('span', {className: 'sidebar-item-icon'}, '📖'),
+            h('span', {className: 'sidebar-item-label'}, 'Help & Wiki')
           ),
           h('a', {href: '../about.html', className: 'sidebar-tool-btn'},
             h('span', {className: 'sidebar-item-icon'}, 'ℹ'),

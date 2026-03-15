@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <script>/* Theme restore */(function(){try{var p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');var t=p.theme||localStorage.getItem('fate_theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fate Mechanics — Ogma Help</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/favicons/icon.svg">
+  <link rel="stylesheet" href="../assets/css/rpg-awesome-local.css">
+  <link rel="stylesheet" href="../assets/css/theme.css?v=70">
+  <style>/* ── Wiki shared layout ─────────────────────────────────────────────────── */
+.wiki-shell{display:flex;min-height:calc(100vh - 52px)}
+.wiki-sidebar{width:220px;flex-shrink:0;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;border-right:1px solid var(--border);background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);padding:16px 0}
+.wiki-sidebar-section{padding:0 12px;margin-bottom:20px}
+.wiki-sidebar-label{font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);padding:0 8px;margin-bottom:6px}
+.wiki-sidebar-link{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px;font-size:12px;color:var(--text-dim);text-decoration:none;transition:all 0.12s;line-height:1.3}
+.wiki-sidebar-link:hover{background:color-mix(in srgb,var(--accent) 8%,transparent);color:var(--text)}
+.wiki-sidebar-link.active{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent);font-weight:600}
+.wiki-sidebar-link .icon{font-size:14px;flex-shrink:0;width:18px;text-align:center}
+.wiki-sidebar-divider{height:1px;background:var(--border);margin:8px 12px}
+.wiki-content{flex:1;min-width:0;max-width:740px;padding:32px 32px 80px;margin:0 auto}
+@media(max-width:768px){.wiki-sidebar{display:none}.wiki-content{padding:20px 16px 60px}}
+kbd{display:inline-block;background:var(--panel);border:1px solid var(--border-mid);border-radius:4px;padding:1px 7px;font-family:'Courier New',monospace;font-size:11px;color:var(--text);box-shadow:0 1px 0 var(--border-mid);white-space:nowrap}
+.wiki-content h1{font-size:var(--text-2xl);font-weight:800;color:var(--text);margin:0 0 8px;letter-spacing:-0.02em}
+.wiki-content h2{font-size:var(--text-xl);font-weight:800;color:var(--text);margin:40px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.wiki-content h2:first-of-type{margin-top:24px}
+.wiki-content h3{font-size:var(--text-lg);font-weight:700;color:var(--text);margin:28px 0 10px}
+.wiki-content h4{font-size:var(--text-base);font-weight:700;color:var(--text);margin:20px 0 8px}
+.wiki-content p{font-size:var(--text-base);color:var(--text-dim);line-height:1.75;margin-bottom:14px}
+.wiki-content strong{color:var(--text);font-weight:600}
+.wiki-content a{color:var(--c-blue);text-decoration:none}
+.wiki-content a:hover{text-decoration:underline}
+.wiki-content ul,.wiki-content ol{padding-left:24px;margin-bottom:14px}
+.wiki-content li{font-size:var(--text-base);color:var(--text-dim);line-height:1.7;margin-bottom:4px}
+.wiki-content li strong{color:var(--text)}
+.wiki-content code{font-family:'Courier New',monospace;font-size:12px;background:var(--inset);border:1px solid var(--border);border-radius:4px;padding:1px 5px;color:var(--accent)}
+.callout{border-radius:var(--glass-radius-sm);padding:14px 18px;margin:18px 0;border-left:3px solid}
+.callout-title{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px}
+.callout p,.callout li{margin:0 0 4px;font-size:var(--text-sm)}
+.callout-scenario{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 6%,transparent)}
+.callout-scenario .callout-title{color:var(--accent)}
+.callout-warning{border-color:var(--c-red);background:color-mix(in srgb,var(--c-red) 6%,transparent)}
+.callout-warning .callout-title{color:var(--c-red)}
+.callout-tip{border-color:var(--c-green);background:color-mix(in srgb,var(--c-green) 6%,transparent)}
+.callout-tip .callout-title{color:var(--c-green)}
+.callout-info{border-color:var(--c-blue);background:color-mix(in srgb,var(--c-blue) 6%,transparent)}
+.callout-info .callout-title{color:var(--c-blue)}
+.wiki-page-eyebrow{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px}
+.wiki-page-desc{font-size:var(--text-md,1rem);color:var(--text-muted);margin-bottom:32px;line-height:1.6}
+.gen-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin:16px 0}
+.gen-card{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--glass-radius-sm);padding:14px 16px;backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm)}
+.gen-card-icon{font-size:22px;margin-bottom:8px}
+.gen-card-name{font-size:var(--text-sm);font-weight:700;color:var(--text);margin-bottom:4px}
+.gen-card-desc{font-size:var(--text-label);color:var(--text-muted);line-height:1.5}
+.wiki-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:var(--text-sm)}
+.wiki-table th{text-align:left;padding:8px 12px;border-bottom:2px solid var(--border);color:var(--text-muted);font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase}
+.wiki-table td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text-dim);vertical-align:top;line-height:1.5}
+.wiki-table tr:last-child td{border-bottom:none}
+.wiki-table td strong{color:var(--text)}
+.steps{counter-reset:steps;list-style:none;padding:0;margin:16px 0}
+.steps li{counter-increment:steps;display:flex;gap:14px;margin-bottom:14px;align-items:flex-start}
+.steps li::before{content:counter(steps);display:flex;align-items:center;justify-content:center;min-width:26px;height:26px;background:color-mix(in srgb,var(--accent) 15%,transparent);border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);border-radius:50%;font-size:11px;font-weight:800;color:var(--accent);flex-shrink:0;margin-top:1px}
+.steps li .step-body{flex:1}
+.steps li .step-body strong{display:block;font-size:var(--text-sm);color:var(--text);margin-bottom:2px}
+.steps li .step-body span{font-size:var(--text-sm);color:var(--text-dim);line-height:1.6}
+.wiki-footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--border);display:flex;gap:16px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.wiki-footer a{font-size:var(--text-sm);color:var(--text-muted);text-decoration:none}
+.wiki-footer a:hover{color:var(--text)}</style>
+</head>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<header class="land-topnav" role="banner">
+  <a href="../index.html" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
+  <div class="topbar-sep" aria-hidden="true"></div>
+  <nav class="topbar-crumb" aria-label="Breadcrumb">
+    <a href="../index.html" class="topbar-crumb-item">Home</a>
+    <span class="topbar-crumb-sep" aria-hidden="true">&#8250;</span>
+    <a href="index.html" class="topbar-crumb-item">Help &amp; Wiki</a>
+    <span class="topbar-crumb-sep" aria-hidden="true">&#8250;</span>
+    <span class="topbar-crumb-item current" aria-current="page">Fate Mechanics</span>
+  </nav>
+  <div class="topbar-status">
+    <a href="index.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#128218; Help</a>
+    <a href="../learn.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#128218; Quick Start</a>
+    <a href="../about.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">About</a>
+    <button class="btn btn-icon btn-ghost" onclick="(function(){{var n=document.documentElement.getAttribute('data-theme')=='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{{var p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{{}}');p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(p));}}catch(e){{}}}})()" title="Toggle theme" aria-label="Switch to dark mode">&#9680;</button>
+    <button class="topbar-hamburger btn btn-icon btn-ghost" id="topnav-hbg" aria-label="Open navigation" aria-expanded="false" aria-haspopup="true" onclick="(function(b){{var d=document.getElementById('topnav-dd');var o=d.classList.toggle('open');b.setAttribute('aria-expanded',o);}})(this)">&#9776;</button>
+    <div class="land-topnav-dropdown" id="topnav-dd">
+      <a href="index.html">&#128218; Help Home</a>
+      <a href="getting-started.html">&#128640; Getting Started</a>
+      <a href="generators.html">&#127922; Generators</a>
+      <a href="fate-mechanics.html">&#127922; Fate Mechanics</a>
+      <a href="at-the-table.html">&#127481; At the Table</a>
+      <a href="export-share.html">&#128279; Export &amp; Share</a>
+      <a href="customise.html">&#9881; Customise</a>
+      <a href="faq.html">&#10067; FAQ</a>
+    </div>
+  </div>
+</header>
+<div class="wiki-shell">
+  <aside class="wiki-sidebar" role="navigation" aria-label="Wiki navigation">
+  <div class="wiki-sidebar-section">
+    <div class="wiki-sidebar-label">Getting Started</div>
+    <a href="index.html" class="wiki-sidebar-link "><span class="icon">&#127968;</span>Wiki Home</a>
+    <a href="getting-started.html" class="wiki-sidebar-link "><span class="icon">&#128640;</span>Getting Started</a>
+  </div>
+  <div class="wiki-sidebar-divider"></div>
+  <div class="wiki-sidebar-section">
+    <div class="wiki-sidebar-label">Using Ogma</div>
+    <a href="generators.html" class="wiki-sidebar-link "><span class="icon">&#127922;</span>Generator Suite</a>
+    <a href="fate-mechanics.html" class="wiki-sidebar-link active"><span class="icon">&#127922;</span>Fate Mechanics</a>
+    <a href="at-the-table.html" class="wiki-sidebar-link "><span class="icon">&#127481;</span>At the Table</a>
+  </div>
+  <div class="wiki-sidebar-divider"></div>
+  <div class="wiki-sidebar-section">
+    <div class="wiki-sidebar-label">Advanced</div>
+    <a href="export-share.html" class="wiki-sidebar-link "><span class="icon">&#128279;</span>Export &amp; Share</a>
+    <a href="customise.html" class="wiki-sidebar-link "><span class="icon">&#9881;</span>Customise</a>
+  </div>
+  <div class="wiki-sidebar-divider"></div>
+  <div class="wiki-sidebar-section">
+    <div class="wiki-sidebar-label">Support</div>
+    <a href="faq.html" class="wiki-sidebar-link "><span class="icon">&#10067;</span>FAQ &amp; Troubleshoot</a>
+  </div>
+  <div class="wiki-sidebar-divider"></div>
+  <div class="wiki-sidebar-section">
+    <a href="../index.html" class="wiki-sidebar-link" style="color:var(--accent)"><span class="icon">&#9654;</span>Open Ogma</a>
+  </div>
+</aside>
+  <main class="wiki-content" id="main-content">
+    
+<div class="wiki-page-eyebrow">Fate Mechanics</div>
+<h1>Fate Condensed — the mechanics behind the generators</h1>
+<p class="wiki-page-desc">Ogma generates mechanically correct Fate Condensed content. This page explains the mechanics that drive the generators so you understand not just what the output is, but how to use it at the table.</p>
+
+<div class="callout callout-info">
+  <div class="callout-title">&#128218; New to Fate?</div>
+  <p>Start with the <a href="../learn.html">Quick Start guide</a> or the <a href="../campaigns/transition.html">D&amp;D Transition guide</a>. This page goes deeper into specific mechanics.</p>
+</div>
+
+<h2>Aspects</h2>
+<p>An <strong>Aspect</strong> is a short phrase that describes something true and important about a character, scene, or situation. Aspects can be <strong>invoked</strong> (spend a Fate Point for +2 or a reroll) or <strong>compelled</strong> (the GM offers a Fate Point to introduce a complication).</p>
+<p>Every NPC Ogma generates has:</p>
+<ul>
+  <li><strong>High Concept</strong> — the character in a phrase. "Chrome Fixer with a Debt to the Yakuza." Always invokable for the character's core competency.</li>
+  <li><strong>Trouble</strong> — the thing that makes their life complicated. "The Magic is Burning Out of Me." The GM's primary compel lever.</li>
+  <li><strong>Other aspects</strong> — supporting details. Can be invoked or compelled situationally.</li>
+</ul>
+
+<h2>The Skill Ladder</h2>
+<p>Skills are rated on the <strong>Fate Ladder</strong>: Average (+1), Fair (+2), Good (+3), Great (+4), Superb (+5), Fantastic (+6), Epic (+7), Legendary (+8). Most NPCs have a peak skill of Good (+3) to Superb (+5). Major NPCs have 5 rated skills; Minor NPCs have 1.</p>
+<p>The four actions in Fate are <strong>Overcome</strong> (clear an obstacle), <strong>Create an Advantage</strong> (place or discover an aspect), <strong>Attack</strong> (inflict stress), and <strong>Defend</strong> (resist an action).</p>
+
+<h2>Stress</h2>
+<p>Stress is <strong>not hit points</strong>. It measures how long a character can stay in a conflict before being taken out. All stress boxes clear at the end of every scene — there is no long-term attrition from stress alone.</p>
+<p>Fate Condensed uses <strong>1-point stress boxes</strong> (not escalating like Fate Core). Minor NPCs have 1–3 stress boxes. Major NPCs have physical and mental tracks separately, each 2–4 boxes depending on Physique/Will.</p>
+<p>Ogma's interactive stress track lets you tap boxes during play. When all boxes are filled, the character is <strong>Taken Out</strong> — the TAKEN OUT overlay fires on the projector if it's active.</p>
+
+<h2>Consequences</h2>
+<p>Consequences are lasting aspects that a character takes to avoid being Taken Out. They persist beyond the scene and must be treated:</p>
+<table class="wiki-table">
+  <thead><tr><th>Severity</th><th>Shifts absorbed</th><th>Treatment difficulty</th><th>Clears after</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Mild (−2)</strong></td><td>2 shifts</td><td>Fair (+2)</td><td>One full scene after treatment</td></tr>
+    <tr><td><strong>Moderate (−4)</strong></td><td>4 shifts</td><td>Great (+4)</td><td>One full session after treatment</td></tr>
+    <tr><td><strong>Severe (−6)</strong></td><td>6 shifts</td><td>Fantastic (+6)</td><td>After a Major Milestone</td></tr>
+  </tbody>
+</table>
+<p>The Consequence generator produces a named aspect ready to write on a character sheet. Always name it specifically — <em>"Badly Burned Hands"</em> not just <em>"Injured"</em>. The aspect must work as a compel hook.</p>
+
+<div class="callout callout-tip">
+  <div class="callout-title">&#128161; GM tip from the generator</div>
+  <p>Plan at least one compel on a consequence before it heals. A consequence that never got invoked or compelled was a missed dramatic opportunity.</p>
+</div>
+
+<h2>Fate Points and Refresh</h2>
+<p>Fate Points are the economy of player agency. Players start each session with their <strong>Refresh</strong> (usually 3). They spend Fate Points to invoke aspects; they earn them when they accept compels.</p>
+<p>Major NPCs have a <strong>Refresh</strong> calculated as <code>max(1, 3 − stunts)</code>. The GM starts each scene with this many Fate Points for that NPC. The FP Tracker in Ogma manages this automatically.</p>
+<p>See the <a href="at-the-table.html">At the Table guide</a> for how to use the FP Tracker during play.</p>
+
+<h2>Stunts</h2>
+<p>Stunts give characters specific mechanical advantages. Fate Condensed has two types:</p>
+<ul>
+  <li><strong>+2 Bonus stunts</strong> — when a specific condition applies, add +2 to a named skill. E.g. "When I bluff a mark face to face with Deceive, add +2."</li>
+  <li><strong>Once-per-scene stunts</strong> — a special mechanical effect beyond a simple +2. Can only be used once per scene. E.g. "Once per scene, I can treat a failed Physique roll as a tie."</li>
+</ul>
+<p>Each stunt a character has costs 1 point of Refresh (minimum Refresh 1). Major NPCs in Ogma have 1–2 stunts, and their Refresh is automatically reduced accordingly.</p>
+
+<h2>Contests</h2>
+<p>A Contest is used when two sides compete for the same goal without directly harming each other. Each exchange, both sides roll — the higher effort marks a victory. <strong>First to 3 victories wins.</strong> A tie (equal effort) means neither side scores; instead, introduce a twist aspect.</p>
+<p>The Contest generator gives you the two sides, their relevant skills, a situation aspect, and 3 pre-rolled twists. The interactive victory track lets you tap boxes during play — scores appear live on the projector.</p>
+
+<h2>Challenges</h2>
+<p>A Challenge is a sequence of Overcome actions against different obstacles, each with its own skill and difficulty. The group succeeds on the whole challenge only if they pass all individual rolls — or accepts success at a cost when they fail some.</p>
+<p>The Challenge generator gives you a named challenge, success and failure consequences, and a situation aspect. Use it when the party needs to accomplish something complex before an external pressure resolves.</p>
+
+<h2>Countdowns</h2>
+<p>A Countdown is a threat clock. It has 4–8 boxes and fills when a trigger condition occurs. When the last box fills, the outcome happens — no exceptions. Use countdowns to create temporal pressure the players can see building.</p>
+<p>The live countdown track in Ogma fills in real time on the projector as the GM marks boxes. When the clock hits zero, particles fire on both screens simultaneously.</p>
+
+<h2>Compels</h2>
+<p>A Compel is when the GM offers a Fate Point to a player in exchange for an aspect making their character's life harder. The player can spend a Fate Point to refuse — but they have to spend one they already have.</p>
+<p>The Compel generator produces a ready-to-offer compel: the situation ("You've been made by the corporate drone") and the consequence if accepted ("Your only exit is the one they're watching"). Offer the Fate Point before you describe the consequence.</p>
+
+    <div class="wiki-footer">
+  <div>
+    <a href="index.html">Wiki Home</a> &nbsp;·&nbsp;
+    <a href="../index.html">Open Ogma</a> &nbsp;·&nbsp;
+    <a href="../about.html">About</a> &nbsp;·&nbsp;
+    <a href="../license.html">License</a>
+  </div>
+  <div style="font-size:var(--text-label);color:var(--text-muted)">Ogma — A Fate Condensed Generator Suite</div>
+</div>
+  </main>
+</div>
+<script>
+(function() {
+  var btn = document.getElementById('topnav-hbg');
+  if (btn) {
+    document.addEventListener('click', function(e) {
+      var dd = document.getElementById('topnav-dd');
+      if (dd && !btn.contains(e.target) && !dd.contains(e.target)) {
+        dd.classList.remove('open');
+        btn.setAttribute('aria-expanded','false');
+      }
+    });
+  }
+})();
+</script>
+</html>

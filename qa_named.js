@@ -146,9 +146,11 @@ assert('NA-11 result-panel aria-live polite', uiSrc.includes("'aria-live': 'poli
 assert('NA-11 result-panel aria-atomic true', uiSrc.includes("'aria-atomic': 'true'"), 'aria-atomic true missing from result-panel');
 
 // NA-12: theme-toggle aria-label present on static pages and React components
-var staticPages = ['about.html','learn.html','license.html','campaigns/transition.html',
+// learn.html and campaigns/transition.html are now redirect stubs — excluded from this check
+var staticPages = ['about.html','license.html',
   'campaigns/guide-cyberpunk.html','campaigns/guide-fantasy.html','campaigns/guide-postapoc.html',
-  'campaigns/guide-space.html','campaigns/guide-thelongafter.html','campaigns/guide-victorian.html'];
+  'campaigns/guide-space.html','campaigns/guide-thelongafter.html','campaigns/guide-victorian.html',
+  'campaigns/guide-western.html'];
 var na12Fail = staticPages.filter(function(p) {
   try {
     var c = fs.readFileSync(p, 'utf8');
@@ -621,6 +623,81 @@ assert('NA-12 React theme-toggle aria-label dynamic', uiSrc.includes("'Switch to
   assert('NA-42: mulberry32 PRNG + seeded generate() in engine.js',
     hasPRNG && hasSeedParam,
     'mulberry32=' + hasPRNG + ' seedParam=' + hasSeedParam);
+})();
+
+
+// ── NA-43: wiki pages exist and have correct structure ────────────────────────
+(function() {
+  var WIKI_PAGES = [
+    'wiki/index.html',
+    'wiki/new-to-ogma.html',
+    'wiki/getting-started.html',
+    'wiki/generators.html',
+    'wiki/fate-mechanics.html',
+    'wiki/at-the-table.html',
+    'wiki/export-share.html',
+    'wiki/customise.html',
+    'wiki/dnd-transition.html',
+    'wiki/faq.html',
+  ];
+  var missing = [];
+  var badStructure = [];
+  WIKI_PAGES.forEach(function(p) {
+    try {
+      var html = fs.readFileSync(p, 'utf8');
+      if (!html) { missing.push(p); return; }
+      // Each page must have: wiki-shell, wiki-sidebar, wiki-content, topbar wordmark
+      var hasShell   = html.indexOf('wiki-shell') !== -1;
+      var hasSidebar = html.indexOf('wiki-sidebar') !== -1;
+      var hasContent = html.indexOf('wiki-content') !== -1;
+      var hasTopbar  = html.indexOf('topbar-wordmark') !== -1;
+      if (!hasShell || !hasSidebar || !hasContent || !hasTopbar) {
+        badStructure.push(p + '(shell=' + hasShell + ' sidebar=' + hasSidebar +
+          ' content=' + hasContent + ' topbar=' + hasTopbar + ')');
+      }
+    } catch(e) { missing.push(p + ':' + e.message); }
+  });
+  // about.html must have a link to wiki/index.html
+  var about = fs.readFileSync('about.html','utf8');
+  var aboutHasWiki = about.indexOf('wiki/index.html') !== -1;
+  assert('NA-43: all 10 wiki pages exist with correct structure + about.html links wiki',
+    missing.length === 0 && badStructure.length === 0 && aboutHasWiki,
+    'missing:[' + missing.join(',') + '] bad:[' + badStructure.join(',') + ']' +
+    ' | about links wiki: ' + aboutHasWiki);
+})();
+
+
+// ── NA-44: learn.html and transition.html are redirect stubs ─────────────────
+// Regression guard: these pages were converted to meta-refresh stubs pointing
+// to wiki/new-to-ogma.html and wiki/dnd-transition.html respectively.
+// Catch accidental revert to full page content.
+(function() {
+  var issues = [];
+  ['learn.html', 'campaigns/transition.html'].forEach(function(p) {
+    try {
+      var html = fs.readFileSync(p, 'utf8');
+      var hasRefresh = html.indexOf('http-equiv="refresh"') !== -1;
+      var isSmall = html.length < 2000;
+      if (!hasRefresh || !isSmall) {
+        issues.push(p + '(refresh=' + hasRefresh + ' small=' + isSmall + ')');
+      }
+    } catch(e) { issues.push(p + ':' + e.message); }
+  });
+  assert('NA-44: learn.html and transition.html are redirect stubs (not full pages)',
+    issues.length === 0, issues.join(', '));
+})();
+
+// ── NA-45: wiki/new-to-ogma.html and wiki/dnd-transition.html exist and link correctly ──
+(function() {
+  var issues = [];
+  var newToOgma = fs.readFileSync('wiki/new-to-ogma.html', 'utf8');
+  var dndTrans  = fs.readFileSync('wiki/dnd-transition.html', 'utf8');
+  if (newToOgma.indexOf('wiki-shell') === -1) issues.push('new-to-ogma: missing wiki-shell');
+  if (newToOgma.indexOf('dnd-transition.html') === -1) issues.push('new-to-ogma: no link to dnd-transition');
+  if (dndTrans.indexOf('wiki-shell') === -1)  issues.push('dnd-transition: missing wiki-shell');
+  if (dndTrans.indexOf('fate-mechanics.html') === -1) issues.push('dnd-transition: no link to fate-mechanics');
+  assert('NA-45: wiki/new-to-ogma.html + wiki/dnd-transition.html have correct structure and cross-links',
+    issues.length === 0, issues.join(', '));
 })();
 
 // Summary

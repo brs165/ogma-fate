@@ -2,7 +2,7 @@
 // Strategy: cache-first for all static assets, network-first for CDN scripts.
 // Safari fix: redirected responses are cloned as non-redirected before caching.
 
-var CACHE_NAME = 'fate-generator-2026.03.62';
+var CACHE_NAME = 'fate-generator-2026.03.70';
 
 var APP_SHELL = [
   './index.html',
@@ -11,6 +11,16 @@ var APP_SHELL = [
   './assets/css/projector.css',
   './learn.html',
   './license.html',
+  './wiki/index.html',
+  './wiki/new-to-ogma.html',
+  './wiki/getting-started.html',
+  './wiki/generators.html',
+  './wiki/fate-mechanics.html',
+  './wiki/at-the-table.html',
+  './wiki/export-share.html',
+  './wiki/customise.html',
+  './wiki/dnd-transition.html',
+  './wiki/faq.html',
   './campaigns/thelongafter.html',
   './campaigns/sessionzero.html',
   './campaigns/transition.html',

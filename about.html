@@ -9,7 +9,7 @@
   <meta name="description" content="About Ogma - how it was built, what's inside, and how to use it offline.">
   <link rel="icon" type="image/svg+xml" href="assets/favicons/icon.svg">
   <link rel="stylesheet" href="assets/css/rpg-awesome-local.css">
-  <link rel="stylesheet" href="assets/css/theme.css?v=62">
+  <link rel="stylesheet" href="assets/css/theme.css?v=70">
   <style>
     .about{max-width:680px;margin:0 auto;padding:24px 20px 80px;position:relative;z-index:1}
     .about h1{font-size:var(--text-hero);font-weight:800;color:var(--text);margin-bottom:8px;letter-spacing:-0.02em}
@@ -55,18 +55,16 @@
     <a href="index.html" class="topbar-crumb-item">Home</a><span class="topbar-crumb-sep" aria-hidden="true">&#8250;</span><span class="topbar-crumb-item current" aria-current="page">About</span>
   </nav>
   <div class="topbar-status">
-    <a href="learn.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">📖 Quick Start</a>
-    <a href="campaigns/transition.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#9876; D&D Guide</a>
-    <a href="campaigns/sessionzero.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#127917; Session Zero</a>
+    <a href="wiki/index.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#128218; Help</a>
+    <a href="../campaigns/sessionzero.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#127917; Session Zero</a>
     <a href="about.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">About</a>
     <button class="btn btn-icon btn-ghost" onclick="(function(){var n=document.documentElement.getAttribute('data-theme')=='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var _p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}}');_p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p));}catch(_e){}this.setAttribute('aria-label',n==='dark'?'Switch to light mode':'Switch to dark mode');})()" title="Toggle theme" aria-label="Switch to dark mode" id="theme-toggle-btn">◑</button>
     <button class="topbar-hamburger btn btn-icon btn-ghost" id="topnav-hbg-new"
       aria-label="Open navigation" aria-expanded="false" aria-haspopup="true"
       onclick="(function(btn){var dd=btn.nextElementSibling;var open=dd.classList.toggle('open');btn.setAttribute('aria-expanded',open);})(this)">&#9776;</button>
     <div class="land-topnav-dropdown" id="topnav-dd-new">
-      <a href="learn.html">📖 Quick Start</a>
-      <a href="campaigns/transition.html">&#9876; D&D Guide</a>
-      <a href="campaigns/sessionzero.html">&#127917; Session Zero</a>
+      <a href="wiki/index.html">&#128218; Help &amp; Wiki</a>
+      <a href="../campaigns/sessionzero.html">&#127917; Session Zero</a>
       <a href="about.html">About</a>
       <button class="btn btn-icon btn-ghost" onclick="(function(){var n=document.documentElement.getAttribute('data-theme')=='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var _p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}}');_p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p));}catch(_e){}this.setAttribute('aria-label',n==='dark'?'Switch to light mode':'Switch to dark mode');})()" title="Toggle theme" aria-label="Switch to dark mode" id="theme-toggle-btn">◑</button>
     </div>
@@ -77,10 +75,10 @@
 <h1 id="main-content">About Ogma</h1>
 
 <div class="about-version" role="status" aria-label="Suite version information">
-  <span class="about-version-badge">2026.03.62</span>
+  <span class="about-version-badge">2026.03.70</span>
   <div class="about-version-meta">
     <strong style="color:var(--text)">Ogma - A Fate Condensed Generator Suite</strong><br>
-    March 2026 · Cache: <code>fate-generator-2026.03.62</code> · 16 generators · 6 campaign worlds · 9,750+ table entries
+    March 2026 · Cache: <code>fate-generator-2026.03.70</code> · 16 generators · 7 campaign worlds · 9,750+ table entries
   </div>
   <div class="about-version-qa">✓ 96/96 smoke · 19,200 stress · 19 named assertions · toMarkdown 96/96</div>
 </div>
@@ -89,14 +87,14 @@
 
 <div class="about-card" style="text-align:center">
   <div class="about-stat"><div class="about-stat-n">16</div><div class="about-stat-l">Generators</div></div>
-  <div class="about-stat"><div class="about-stat-n">6</div><div class="about-stat-l">Campaign Worlds</div></div>
+  <div class="about-stat"><div class="about-stat-n">7</div><div class="about-stat-l">Campaign Worlds</div></div>
   <div class="about-stat"><div class="about-stat-n">9,750+</div><div class="about-stat-l">Table Entries</div></div>
   <div class="about-stat"><div class="about-stat-n">19,200</div><div class="about-stat-l">QA Runs</div></div>
 </div>
 
 <h2>Features</h2>
 <p><strong>16 generators</strong> across four categories - Characters (Minor NPC, Major NPC, PC Backstory), Scenes (Scene Setup, Encounter, Complication), Pacing (Challenge, Contest, Obstacle, Countdown, Constraint), and World (Campaign Issues, Adventure Seed, Faction, Compel, Consequence).</p>
-<p><strong>6 campaign worlds</strong> - The Long After (sword &amp; planet), Neon Abyss (cyberpunk), Shattered Kingdoms (dark fantasy), Void Runners (space western), The Gaslight Chronicles (gothic horror), The Long Road (post-apocalypse). Each has 1,300–1,900 hand-written thematic entries.</p>
+<p><strong>7 campaign worlds</strong> - The Long After (sword &amp; planet), Neon Abyss (cyberpunk), Shattered Kingdoms (dark fantasy), Void Runners (space western), The Gaslight Chronicles (gothic horror), The Long Road (post-apocalypse), Dust and Iron (frontier western). Each has 1,300–1,900 AI-generated thematic entries.</p>
 <p><strong>Inline rules reference</strong> - before you roll, every generator shows what it produces, how the Fate Condensed mechanic works, and a GM tip. The tool teaches the system while you use it.</p>
 <p><strong>Table Manager</strong> - exclude entries you don't want, lock entries to force them, or add your own custom content. Full control over every table.</p>
 <p><strong>Export</strong> - Markdown copy, print/PDF, and pin results for later. Export all pinned items at once for session prep.</p>
@@ -123,22 +121,24 @@
 <p>Once unzipped, open <code>index.html</code> in any modern browser. All features work identically - generators, table manager, fate point tracker, session zero, campaign guides. The service worker does not run on <code>file://</code> but everything else does.</p>
 
 <h2>Technology</h2>
-<p>Pure JavaScript (no build step), React 18 via CDN, CSS custom properties, IndexedDB persistence with localStorage fallback. No ES modules - everything uses <code>var</code> and function declarations for maximum <code>file://</code> compatibility. The engine (<code>core/engine.js</code>) has zero React or DOM dependencies and is testable in Node.</p>
+<p>Pure JavaScript — no build step, no bundler, no TypeScript. React 18 via CDN UMD, CSS custom properties with dark/light/per-campaign theming, IndexedDB persistence with localStorage fallback. Uses <code>var</code> and function declarations throughout for <code>file://</code> compatibility — the ZIP runs locally without a server.</p>
+<p style="font-size:var(--text-sm);color:var(--text-dim)">The generator engine (<code>core/engine.js</code>) has zero React or DOM dependencies and runs in Node for QA — <strong>112 generator/campaign combinations</strong> are tested before every release, plus 68 named assertions covering component structure, CSS consistency, and Fate rules accuracy. The service worker caches all 789KB for full offline use.</p>
 
 <h2>How Ogma Is Built</h2>
-<p>Ogma is developed using a team of specialised AI roles - each with explicit standards, constraints, and quality gates. The content is hand-curated, not generated: every table entry is reviewed for rules accuracy, tonal consistency, and aspect quality before shipping. The AI roles handle engineering and structure; the creative voice and editorial bar are set by the project's own standards.</p>
+<p>Ogma is developed using a structured team of specialised AI roles, each with a defined domain. The generator logic, UI, and QA harness are built and tested systematically — 112 generator/campaign combinations are verified before every release.</p>
 
-<p>Twelve roles across five categories. The most common combinations:</p>
+<p>The table content — names, aspects, factions, scene details — is AI-generated. It is not manually written or independently reviewed. The Fate Condensed SRD is used as the reference for rules accuracy in the generator engine.</p>
 
 <div class="about-card" style="font-size:var(--text-sm);line-height:1.9;color:var(--text-dim);padding:14px 18px">
-<strong style="color:var(--accent)">Fiction Writer + Rules Expert</strong> - creating new campaign content<br>
-<strong style="color:var(--accent)">React Developer + CSS Engineer</strong> - building new UI features<br>
-<strong style="color:var(--accent)">UX Researcher + Product Strategist</strong> - evaluating and prioritising changes<br>
-<strong style="color:var(--accent)">Content Designer + Info Architect</strong> - new educational pages<br>
-<strong style="color:var(--accent)">QA Engineer + React Developer</strong> - any code change (always test after building)
+<strong style="color:var(--accent)">Rules Expert + Content Designer</strong> → campaign table content and GM tips<br>
+<strong style="color:var(--accent)">Senior Dev + CSS Engineer</strong> → UI features, interactive renderers, design system<br>
+<strong style="color:var(--accent)">UX Researcher + IA Specialist</strong> → navigation, information architecture, wiki structure<br>
+<strong style="color:var(--accent)">QA Engineer + Senior Dev</strong> → every code change (112/112 smoke test required)<br>
+<strong style="color:var(--accent)">A11y Specialist</strong> → WCAG AA compliance, keyboard navigation, touch targets<br>
+<strong style="color:var(--accent)">Documentation Lead (Morgan)</strong> → the Help &amp; Wiki — 10 pages, zero-questions standard
 </div>
 
-<p style="font-size:var(--text-sm);color:var(--text-muted);margin-bottom:6px">The <strong>Rules Expert</strong> is part of any conversation that touches game content - it's the governance layer that keeps everything rules-accurate. Expand any role below to read its full prompt and open it in Duck.ai.</p>
+<p style="font-size:var(--text-sm);color:var(--text-muted);margin-bottom:6px">The <strong>Rules Expert</strong> reviews any content that touches game mechanics. It's the governance layer that keeps everything Fate Condensed–accurate. Expand any role below to read its full prompt and open it in Duck.ai.</p>
 
 <!-- 🧭 Strategy -->
 <div class="role-cat">🧭 Strategy</div>
@@ -418,6 +418,48 @@ When reviewing code, flag any interactive element missing an accessible name, an
 <p>See the full <a href="license.html">licensing and attribution</a> page for details.</p>
 </div>
 
+<h2 id="help-wiki">Help &amp; Wiki</h2>
+<p>The <strong>Ogma Help &amp; Wiki</strong> is a comprehensive reference covering every feature — from the local-first data philosophy to live projector sync at the table. Whether you're new to Fate or a veteran GM, it has something for you.</p>
+<div class="about-card" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;padding:16px">
+  <a href="wiki/getting-started.html" style="text-decoration:none;display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:var(--glass-radius-sm);border:1px solid var(--glass-border);background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);transition:background 0.12s" onmouseover="this.style.background='color-mix(in srgb,var(--accent) 8%,transparent)'" onmouseout="this.style.background='var(--glass-bg)'">
+    <div style="font-size:18px">🚀</div>
+    <div style="font-size:var(--text-sm);font-weight:700;color:var(--text)">Getting Started</div>
+    <div style="font-size:var(--text-label);color:var(--text-muted)">Local-first data, first roll, backup guide</div>
+  </a>
+  <a href="wiki/generators.html" style="text-decoration:none;display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:var(--glass-radius-sm);border:1px solid var(--glass-border);background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);transition:background 0.12s" onmouseover="this.style.background='color-mix(in srgb,var(--accent) 8%,transparent)'" onmouseout="this.style.background='var(--glass-bg)'">
+    <div style="font-size:18px">🎲</div>
+    <div style="font-size:var(--text-sm);font-weight:700;color:var(--text)">Generator Suite</div>
+    <div style="font-size:var(--text-label);color:var(--text-muted)">All 16 generators, 112 combinations</div>
+  </a>
+  <a href="wiki/fate-mechanics.html" style="text-decoration:none;display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:var(--glass-radius-sm);border:1px solid var(--glass-border);background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);transition:background 0.12s" onmouseover="this.style.background='color-mix(in srgb,var(--accent) 8%,transparent)'" onmouseout="this.style.background='var(--glass-bg)'">
+    <div style="font-size:18px">♾</div>
+    <div style="font-size:var(--text-sm);font-weight:700;color:var(--text)">Fate Mechanics</div>
+    <div style="font-size:var(--text-label);color:var(--text-muted)">Stress, Consequences, Aspects, FP</div>
+  </a>
+  <a href="wiki/at-the-table.html" style="text-decoration:none;display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:var(--glass-radius-sm);border:1px solid var(--glass-border);background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);transition:background 0.12s" onmouseover="this.style.background='color-mix(in srgb,var(--accent) 8%,transparent)'" onmouseout="this.style.background='var(--glass-bg)'">
+    <div style="font-size:18px">📺</div>
+    <div style="font-size:var(--text-sm);font-weight:700;color:var(--text)">At the Table</div>
+    <div style="font-size:var(--text-label);color:var(--text-muted)">Projector, FP Tracker, Inspiration</div>
+  </a>
+  <a href="wiki/export-share.html" style="text-decoration:none;display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:var(--glass-radius-sm);border:1px solid var(--glass-border);background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);transition:background 0.12s" onmouseover="this.style.background='color-mix(in srgb,var(--accent) 8%,transparent)'" onmouseout="this.style.background='var(--glass-bg)'">
+    <div style="font-size:18px">🔗</div>
+    <div style="font-size:var(--text-sm);font-weight:700;color:var(--text)">Export &amp; Share</div>
+    <div style="font-size:var(--text-label);color:var(--text-muted)">Markdown, Fari JSON, shareable links</div>
+  </a>
+  <a href="wiki/customise.html" style="text-decoration:none;display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:var(--glass-radius-sm);border:1px solid var(--glass-border);background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);transition:background 0.12s" onmouseover="this.style.background='color-mix(in srgb,var(--accent) 8%,transparent)'" onmouseout="this.style.background='var(--glass-bg)'">
+    <div style="font-size:18px">⚙</div>
+    <div style="font-size:var(--text-sm);font-weight:700;color:var(--text)">Customise</div>
+    <div style="font-size:var(--text-label);color:var(--text-muted)">Help Levels, GM Mode, Table Manager</div>
+  </a>
+  <a href="wiki/faq.html" style="text-decoration:none;display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:var(--glass-radius-sm);border:1px solid var(--glass-border);background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);transition:background 0.12s" onmouseover="this.style.background='color-mix(in srgb,var(--accent) 8%,transparent)'" onmouseout="this.style.background='var(--glass-bg)'">
+    <div style="font-size:18px">❓</div>
+    <div style="font-size:var(--text-sm);font-weight:700;color:var(--text)">FAQ</div>
+    <div style="font-size:var(--text-label);color:var(--text-muted)">Cache, offline, data loss, browsers</div>
+  </a>
+</div>
+<p style="margin-top:12px"><a href="wiki/index.html" class="btn btn-ghost" style="font-size:var(--text-sm)">📖 Open Help &amp; Wiki →</a></p>
+
+
 <footer class="about-ft">
   <div>Fate™ is a trademark of <a href="https://www.evilhat.com" target="_blank" rel="noreferrer">Evil Hat Productions, LLC</a>.</div>
   <div><a href="license.html">License & Attribution</a> · <a href="https://fate-srd.com/official-licensing-fate" target="_blank" rel="noreferrer">Fate Licensing</a></div>
@@ -466,6 +508,7 @@ When reviewing code, flag any interactive element missing an accessible name, an
     });
   }
 })();
+
 </script>
 </body>
 </html>

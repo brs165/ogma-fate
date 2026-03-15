@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <script>/* Theme restore */(function(){try{var p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');var t=p.theme||localStorage.getItem('fate_theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D&D Transition Guide — Ogma Help</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/favicons/icon.svg">
+  <link rel="stylesheet" href="../assets/css/rpg-awesome-local.css">
+  <link rel="stylesheet" href="../assets/css/theme.css?v=70">
+  <style>/* ── Wiki shared layout ─────────────────────────────────────────────────── */
+.wiki-shell{display:flex;min-height:calc(100vh - 52px)}
+.wiki-sidebar{width:220px;flex-shrink:0;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;border-right:1px solid var(--border);background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);padding:16px 0}
+.wiki-sidebar-section{padding:0 12px;margin-bottom:20px}
+.wiki-sidebar-label{font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);padding:0 8px;margin-bottom:6px}
+.wiki-sidebar-link{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px;font-size:12px;color:var(--text-dim);text-decoration:none;transition:all 0.12s;line-height:1.3}
+.wiki-sidebar-link:hover{background:color-mix(in srgb,var(--accent) 8%,transparent);color:var(--text)}
+.wiki-sidebar-link.active{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent);font-weight:600}
+.wiki-sidebar-link .icon{font-size:14px;flex-shrink:0;width:18px;text-align:center}
+.wiki-sidebar-divider{height:1px;background:var(--border);margin:8px 12px}
+.wiki-content{flex:1;min-width:0;max-width:740px;padding:32px 32px 80px;margin:0 auto}
+@media(max-width:768px){.wiki-sidebar{display:none}.wiki-content{padding:20px 16px 60px}}
+kbd{display:inline-block;background:var(--panel);border:1px solid var(--border-mid);border-radius:4px;padding:1px 7px;font-family:'Courier New',monospace;font-size:11px;color:var(--text);box-shadow:0 1px 0 var(--border-mid);white-space:nowrap}
+.wiki-content h1{font-size:var(--text-2xl);font-weight:800;color:var(--text);margin:0 0 8px;letter-spacing:-0.02em}
+.wiki-content h2{font-size:var(--text-xl);font-weight:800;color:var(--text);margin:40px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.wiki-content h2:first-of-type{margin-top:24px}
+.wiki-content h3{font-size:var(--text-lg);font-weight:700;color:var(--text);margin:28px 0 10px}
+.wiki-content h4{font-size:var(--text-base);font-weight:700;color:var(--text);margin:20px 0 8px}
+.wiki-content p{font-size:var(--text-base);color:var(--text-dim);line-height:1.75;margin-bottom:14px}
+.wiki-content strong{color:var(--text);font-weight:600}
+.wiki-content a{color:var(--c-blue);text-decoration:none}
+.wiki-content a:hover{text-decoration:underline}
+.wiki-content ul,.wiki-content ol{padding-left:24px;margin-bottom:14px}
+.wiki-content li{font-size:var(--text-base);color:var(--text-dim);line-height:1.7;margin-bottom:4px}
+.wiki-content li strong{color:var(--text)}
+.wiki-content code{font-family:'Courier New',monospace;font-size:12px;background:var(--inset);border:1px solid var(--border);border-radius:4px;padding:1px 5px;color:var(--accent)}
+.callout{border-radius:var(--glass-radius-sm);padding:14px 18px;margin:18px 0;border-left:3px solid}
+.callout-title{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px}
+.callout p,.callout li{margin:0 0 4px;font-size:var(--text-sm)}
+.callout-scenario{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 6%,transparent)}
+.callout-scenario .callout-title{color:var(--accent)}
+.callout-warning{border-color:var(--c-red);background:color-mix(in srgb,var(--c-red) 6%,transparent)}
+.callout-warning .callout-title{color:var(--c-red)}
+.callout-tip{border-color:var(--c-green);background:color-mix(in srgb,var(--c-green) 6%,transparent)}
+.callout-tip .callout-title{color:var(--c-green)}
+.callout-info{border-color:var(--c-blue);background:color-mix(in srgb,var(--c-blue) 6%,transparent)}
+.callout-info .callout-title{color:var(--c-blue)}
+.wiki-page-eyebrow{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px}
+.wiki-page-desc{font-size:var(--text-md,1rem);color:var(--text-muted);margin-bottom:32px;line-height:1.6}
+.gen-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin:16px 0}
+.gen-card{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--glass-radius-sm);padding:14px 16px;backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm)}
+.gen-card-icon{font-size:22px;margin-bottom:8px}
+.gen-card-name{font-size:var(--text-sm);font-weight:700;color:var(--text);margin-bottom:4px}
+.gen-card-desc{font-size:var(--text-label);color:var(--text-muted);line-height:1.5}
+.wiki-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:var(--text-sm)}
+.wiki-table th{text-align:left;padding:8px 12px;border-bottom:2px solid var(--border);color:var(--text-muted);font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase}
+.wiki-table td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text-dim);vertical-align:top;line-height:1.5}
+.wiki-table tr:last-child td{border-bottom:none}
+.wiki-table td strong{color:var(--text)}
+.steps{counter-reset:steps;list-style:none;padding:0;margin:16px 0}
+.steps li{counter-increment:steps;display:flex;gap:14px;margin-bottom:14px;align-items:flex-start}
+.steps li::before{content:counter(steps);display:flex;align-items:center;justify-content:center;min-width:26px;height:26px;background:color-mix(in srgb,var(--accent) 15%,transparent);border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);border-radius:50%;font-size:11px;font-weight:800;color:var(--accent);flex-shrink:0;margin-top:1px}
+.steps li .step-body{flex:1}
+.steps li .step-body strong{display:block;font-size:var(--text-sm);color:var(--text);margin-bottom:2px}
+.steps li .step-body span{font-size:var(--text-sm);color:var(--text-dim);line-height:1.6}
+.wiki-footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--border);display:flex;gap:16px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.wiki-footer a{font-size:var(--text-sm);color:var(--text-muted);text-decoration:none}
+.wiki-footer a:hover{color:var(--text)}</style>
+</head>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<header class="land-topnav" role="banner">
+  <a href="../index.html" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
+  <div class="topbar-sep" aria-hidden="true"></div>
+  <nav class="topbar-crumb" aria-label="Breadcrumb">
+    <a href="../index.html" class="topbar-crumb-item">Home</a>
+    <span class="topbar-crumb-sep" aria-hidden="true">&#8250;</span>
+    <a href="index.html" class="topbar-crumb-item">Help &amp; Wiki</a>
+    <span class="topbar-crumb-sep" aria-hidden="true">&#8250;</span>
+    <span class="topbar-crumb-item current" aria-current="page">D&D Transition</span>
+  </nav>
+  <div class="topbar-status">
+    <a href="../campaigns/sessionzero.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#127917; Session Zero</a>
+    <a href="../about.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">About</a>
+    <button class="btn btn-icon btn-ghost" onclick="(function(){var n=document.documentElement.getAttribute('data-theme')=='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(p));}catch(e){}})()" title="Toggle theme" aria-label="Switch to dark mode">&#9680;</button>
+    <button class="topbar-hamburger btn btn-icon btn-ghost" id="topnav-hbg" aria-label="Open navigation" aria-expanded="false" aria-haspopup="true" onclick="(function(b){var d=document.getElementById('topnav-dd');var o=d.classList.toggle('open');b.setAttribute('aria-expanded',o);})(this)">&#9776;</button>
+    <div class="land-topnav-dropdown" id="topnav-dd">
+      <a href="index.html">&#128218; Help Home</a>
+      <a href="new-to-ogma.html">&#128640; New to Ogma?</a>
+      <a href="getting-started.html">&#128196; Getting Started</a>
+      <a href="generators.html">&#127922; Generators</a>
+      <a href="fate-mechanics.html">&#9855; Fate Mechanics</a>
+      <a href="at-the-table.html">&#127481; At the Table</a>
+      <a href="export-share.html">&#128279; Export &amp; Share</a>
+      <a href="customise.html">&#9881; Customise</a>
+      <a href="dnd-transition.html">&#9876; D&amp;D Transition</a>
+      <a href="faq.html">&#10067; FAQ</a>
+    </div>
+  </div>
+</header>
+<div class="wiki-shell">
+  <aside class="wiki-sidebar" role="navigation" aria-label="Wiki navigation">
+  <div class="wiki-sidebar-section">
+    <div class="wiki-sidebar-label">Getting Started</div>
+    <a href="index.html" class="wiki-sidebar-link "><span class="icon">&#127968;</span>Wiki Home</a>
+    <a href="new-to-ogma.html" class="wiki-sidebar-link "><span class="icon">&#128640;</span>New to Ogma?</a>
+    <a href="getting-started.html" class="wiki-sidebar-link "><span class="icon">&#128196;</span>Getting Started</a>
+  </div>
+  <div class="wiki-sidebar-divider"></div>
+  <div class="wiki-sidebar-section">
+    <div class="wiki-sidebar-label">Using Ogma</div>
+    <a href="generators.html" class="wiki-sidebar-link "><span class="icon">&#127922;</span>Generator Suite</a>
+    <a href="fate-mechanics.html" class="wiki-sidebar-link "><span class="icon">&#9855;</span>Fate Mechanics</a>
+    <a href="at-the-table.html" class="wiki-sidebar-link "><span class="icon">&#127481;</span>At the Table</a>
+  </div>
+  <div class="wiki-sidebar-divider"></div>
+  <div class="wiki-sidebar-section">
+    <div class="wiki-sidebar-label">Advanced</div>
+    <a href="export-share.html" class="wiki-sidebar-link "><span class="icon">&#128279;</span>Export &amp; Share</a>
+    <a href="customise.html" class="wiki-sidebar-link "><span class="icon">&#9881;</span>Customise</a>
+    <a href="dnd-transition.html" class="wiki-sidebar-link active"><span class="icon">&#9876;</span>D&amp;D Transition</a>
+  </div>
+  <div class="wiki-sidebar-divider"></div>
+  <div class="wiki-sidebar-section">
+    <div class="wiki-sidebar-label">Support</div>
+    <a href="faq.html" class="wiki-sidebar-link "><span class="icon">&#10067;</span>FAQ &amp; Troubleshoot</a>
+  </div>
+  <div class="wiki-sidebar-divider"></div>
+  <div class="wiki-sidebar-section">
+    <a href="../index.html" class="wiki-sidebar-link" style="color:var(--accent)"><span class="icon">&#9654;</span>Open Ogma</a>
+  </div>
+</aside>
+  <main class="wiki-content" id="main-content">
+    
+<div class="wiki-page-eyebrow">D&amp;D Transition</div>
+<h1>Coming from D&amp;D 5e</h1>
+<p class="wiki-page-desc">You already know how to play TTRPGs. Here's every major mechanical and philosophical difference between D&amp;D 5e and Fate Condensed — section by section, with concrete play examples.</p>
+
+<div class="callout callout-info">
+  <div class="callout-title">&#128218; Where this fits</div>
+  <p>This is the deep-dive reference. For a quick overview of the three biggest shifts, see <a href="new-to-ogma.html#from-dnd">New to Ogma? → I play D&amp;D</a>. For Fate mechanics without D&amp;D comparison, see <a href="fate-mechanics.html">Fate Mechanics</a>.</p>
+</div>
+
+<h2>The big philosophical shift</h2>
+<p>D&amp;D asks: <em>"What can your character do?"</em> — and answers it with a class, subclass, ability scores, proficiencies, and a grid of features.</p>
+<p>Fate asks: <em>"Who is your character?"</em> — and answers it with five short phrases (aspects) that are always true, a skill pyramid, and three stunts. Everything else is narrated, not tracked.</p>
+<p>This matters because it changes what you optimise for. In D&amp;D, you build around mechanical capability. In Fate, you build around narrative interest — a character is interesting <em>because of their flaws</em>, not despite them.</p>
+
+<h2>Characters: Aspects vs. ability scores</h2>
+<table class="wiki-table">
+  <thead><tr><th>D&amp;D</th><th>Fate Condensed</th></tr></thead>
+  <tbody>
+    <tr><td>6 ability scores (STR, DEX, CON, INT, WIS, CHA)</td><td>5 aspects — short phrases, not numbers</td></tr>
+    <tr><td>Class + subclass = identity</td><td>High Concept aspect = identity ("Burned-Out Fixer With One Last Job")</td></tr>
+    <tr><td>Background provides flavour, minimal mechanics</td><td>Trouble aspect drives drama ("My Loyalty Will Be My Ruin")</td></tr>
+    <tr><td>Proficiency in specific skills and tools</td><td>One skill pyramid (peak at +4, no negatives possible)</td></tr>
+    <tr><td>Feats are optional mechanical upgrades</td><td>Stunts are +2 bonuses in specific circumstances or once-per-scene effects</td></tr>
+  </tbody>
+</table>
+
+<div class="callout callout-scenario">
+  <div class="callout-title">&#127914; Example — D&amp;D character vs Fate character</div>
+  <p><strong>D&amp;D:</strong> Human Rogue 5, STR 10 DEX 18 CON 12 INT 14 WIS 13 CHA 16. Expertise in Stealth and Sleight of Hand. Uncanny Dodge. Evasion.</p>
+  <p><strong>Fate:</strong> High Concept: <em>"Chrome-Fingered Pickpocket Who Knows Every Face in the Market."</em> Trouble: <em>"I Owe the Syndicate a Debt I Can't Pay."</em> Stunt: "When I palm a small object in a crowd, I get +2 to Stealth."</p>
+  <p>The Fate version tells you who she is and what will get her in trouble. The D&amp;D version tells you what she can do. Both are valid — they're answering different questions.</p>
+</div>
+
+<h2>Skills: Broad strokes, not specifics</h2>
+<p>D&amp;D has 18 skills. Fate Condensed has 19 skills — but they're dramatically broader. <strong>Athletics</strong> covers everything D&amp;D's Acrobatics, Athletics, and some Survival tasks do. <strong>Notice</strong> covers Perception and some Investigation. There are no tool proficiencies, no weapon proficiencies, no saving throw proficiencies.</p>
+<p>The skill pyramid means every character is <em>deliberately incompetent</em> at most things. This is by design — the incompetence creates drama and supports character specialisation without requiring a 20-level ability progression.</p>
+
+<h2>The four actions — not attack/bonus/move/reaction</h2>
+<table class="wiki-table">
+  <thead><tr><th>Fate action</th><th>What it does</th><th>D&amp;D equivalent (approximate)</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Overcome</strong></td><td>Clear an obstacle, remove a situation aspect</td><td>Ability check against a DC</td></tr>
+    <tr><td><strong>Create Advantage</strong></td><td>Add/discover an aspect, gain free invokes</td><td>Has no real equivalent — this is Fate's superpower</td></tr>
+    <tr><td><strong>Attack</strong></td><td>Inflict stress shifts on a target</td><td>Attack roll → damage roll</td></tr>
+    <tr><td><strong>Defend</strong></td><td>Resist an attack or advantage</td><td>Armour Class / saving throw</td></tr>
+  </tbody>
+</table>
+<p>The most important action D&amp;D doesn't have is <strong>Create Advantage</strong>. It places a new aspect on a target, an ally, or the scene. That aspect has a free invoke — anyone can cash it for +2 on a relevant roll. Stacking two or three free invokes before the decisive attack is Fate's version of "pre-buffing." It's the tactically optimal play that most D&amp;D converts discover in their second session.</p>
+
+<h2>Aspects: The heart of the system</h2>
+<p>Every aspect is a phrase that is <strong>always narratively true</strong>. If the room is <em>Pitch Black</em>, you cannot see — no roll to perceive light that isn't there. If an NPC has the aspect <em>Loyal to the Old King</em>, you can compel that to complicate their relationship with the new regime.</p>
+<p>Aspects are mechanically active in two ways:</p>
+<ul>
+  <li><strong>Invoke</strong> — spend a fate point (or use a free invoke) to get +2 or a reroll. You must explain how the aspect is relevant.</li>
+  <li><strong>Compel</strong> — the GM offers a fate point in exchange for the aspect making your life harder. Refuse by spending a fate point. Accept by taking the fate point and the complication.</li>
+</ul>
+
+<h2>Fate Points: The economy of drama</h2>
+<p>In D&amp;D, inspiration is a binary bonus you either have or don't. In Fate, fate points are a <em>flowing economy</em>.</p>
+<ul>
+  <li>You start each session at your Refresh (default 3).</li>
+  <li>You spend fate points to invoke aspects (be more awesome now).</li>
+  <li>You earn fate points by accepting compels (accept trouble now, be awesome later).</li>
+  <li>At zero fate points, you cannot refuse compels — the story bends toward your trouble aspects.</li>
+</ul>
+<p>The optimal play is <em>not</em> to conserve fate points — it's to spend freely and accept compels to refill. GMs who understand this hand out compels constantly and the economy hums.</p>
+
+<h2>Combat: Stress, Consequences, and Taken Out</h2>
+<table class="wiki-table">
+  <thead><tr><th>D&amp;D</th><th>Fate Condensed</th></tr></thead>
+  <tbody>
+    <tr><td>Hit points — persistent across encounters, healed by rest or spells</td><td>Stress boxes — clear every scene, not cumulative</td></tr>
+    <tr><td>Damage is abstract (HP lost), specific effects via conditions</td><td>Shifts are absorbed by stress or paid with consequences</td></tr>
+    <tr><td>Death saving throws — knocked out at 0 HP</td><td>Taken Out — attacker narrates what happens to you</td></tr>
+    <tr><td>Healing word, potions, short/long rest</td><td>Concede before being Taken Out — lose but narrate how on your terms</td></tr>
+  </tbody>
+</table>
+
+<div class="callout callout-warning">
+  <div class="callout-title">&#9888; Stress is NOT hit points</div>
+  <p>Stress boxes each absorb exactly 1 shift and clear at the end of every scene. There is no "5 HP remaining" equivalent. A character who took 3 stress boxes in scene 1 is fully reset in scene 2. The persistent damage track is the <strong>consequence slots</strong> — not stress.</p>
+</div>
+
+<h2>Initiative: Popcorn style</h2>
+<p>D&amp;D uses fixed initiative order (roll dex, act in sequence). Fate Condensed uses <strong>popcorn initiative</strong>: after you act, you choose who goes next — ally or enemy. There is no fixed turn order.</p>
+<p>This creates tactical decisions about pacing. Enemies can chain activations. Players can chain activations. The group that controls the sequencing controls the tempo of the conflict.</p>
+
+<h2>Challenges, Contests, and Conflicts</h2>
+<p>In D&amp;D, almost all dramatic situations resolve as combat. Fate Condensed has three structured scene types:</p>
+<ul>
+  <li><strong>Challenge</strong> — a series of overcome rolls against different obstacles. Success on all → success; failure on some → success at a cost.</li>
+  <li><strong>Contest</strong> — two sides racing toward a goal. Each exchange, both roll; higher effort scores a victory. First to 3 victories wins.</li>
+  <li><strong>Conflict</strong> — the full combat structure, when someone wants to harm someone else and the other side resists.</li>
+</ul>
+
+<h2>Quick FAQ</h2>
+<p><strong>Where's the damage? How much does a sword do?</strong> In Fate, weapons don't deal fixed damage — you roll your Fight skill, and shifts above the defender's effort become stress. A sword might grant +1 Weapon rating (add +1 to shifts on successful attacks), but there's no d6/d8/d10 damage die.</p>
+<p><strong>Can my character die?</strong> Yes, but only if you agree. The standard outcome of being Taken Out is narrative removal from the conflict — captured, fled, dramatically incapacitated. Permanent death is a table conversation, not a mechanical outcome.</p>
+<p><strong>There's no CR. How do I know if an encounter is appropriate?</strong> You don't balance by math — you balance by stakes. A fight where the GM doesn't know who will win is a fight worth having. Most encounters in Fate are significantly harder than "appropriate-by-CR," because consequences create lasting complications even from victories.</p>
+<p><strong>What about magic?</strong> There's no spell list. Magic is handled by aspects and stunts. "I am a Flame-Touched Witch" as a High Concept means you can invoke it to justify fire-related attacks and creates advantages. A stunt might say "once per session, I can cause a fire to erupt at any visible point within 30 feet."</p>
+
+    <div class="wiki-footer">
+  <div>
+    <a href="index.html">Wiki Home</a> &nbsp;·&nbsp;
+    <a href="../index.html">Open Ogma</a> &nbsp;·&nbsp;
+    <a href="../about.html">About</a> &nbsp;·&nbsp;
+    <a href="../license.html">License</a>
+  </div>
+  <div style="font-size:var(--text-label);color:var(--text-muted)">Ogma — A Fate Condensed Generator Suite</div>
+</div>
+  </main>
+</div>
+<script>
+(function() {
+  var btn = document.getElementById('topnav-hbg');
+  if (btn) {
+    document.addEventListener('click', function(e) {
+      var dd = document.getElementById('topnav-dd');
+      if (dd && !btn.contains(e.target) && !dd.contains(e.target)) {
+        dd.classList.remove('open');
+        btn.setAttribute('aria-expanded','false');
+      }
+    });
+  }
+})();
+</script>
+</html>
