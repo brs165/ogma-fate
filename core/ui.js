@@ -35,6 +35,7 @@ var RA_ICONS = {
   countdown:    'hourglass',
   constraint:   'locked-fortress',
   // UI chrome
+  pin:          'rune-stone',
   gm_mode:      'player-king',
   fp_tracker:   'diamond',
   history:      'scroll-unfurled',
@@ -67,19 +68,6 @@ function RaIcon(props) {
     'aria-hidden': 'true',
     style: {fontSize: 'inherit', lineHeight: 1, verticalAlign: 'middle'},
   });
-}
-
-// ModalHeader: standard modal title bar with close button.
-// Extracted from 4 identical inline patterns — single source of truth.
-function ModalHeader(props) {
-  return h('div', {className: 'modal-header'},
-    h('div', {className: 'modal-title'}, props.title),
-    h('button', {
-      className: 'btn btn-icon btn-ghost',
-      onClick: props.onClose,
-      'aria-label': 'Close',
-    }, '✕')
-  );
 }
 
 // ── UI timing constants ────────────────────────────────────────────────────
@@ -563,7 +551,7 @@ function SeedResult(props) {
 function CompelResult(props) {
   var d = props.data;
   var _res = useState(null); var resolution = _res[0]; var setResolution = _res[1];
-  return h('div', {className: 'fade-up'},
+  return h('div', {style: {animation: 'fadeUp 0.3s ease both'}},
     h('div', {className: 'lbl', style: {marginBottom: 12}}, 'Compel'),
     h('div', {className: 'info-box', style: {borderColor: 'var(--accent)', background: 'color-mix(in srgb, var(--accent) 10%, transparent)', marginBottom: 10}},
       h('div', {className: 'info-box-label', style: {color: 'var(--gold)'}}, '🎭 Situation'),
@@ -623,7 +611,7 @@ function CompelResult(props) {
 function ChallengeResult(props) {
   var d = props.data;
   var _out = useState('none'); var outcome = _out[0]; var setOutcome = _out[1];
-  return h('div', {className: 'fade-up'},
+  return h('div', {style: {animation: 'fadeUp 0.3s ease both'}},
     h('div', {className: 'lbl', style: {marginBottom: 4}}, 'Challenge'),
     h('div', {style: {fontSize: 20, fontWeight: 800, color: 'var(--gold)', marginBottom: 6}}, d.name),
     h('div', {style: {fontSize: 'var(--text-sm)', color: 'var(--text-dim)', lineHeight: 1.6, marginBottom: 14}}, d.desc),
@@ -723,7 +711,7 @@ function ContestResult(props) {
       )
     );
   }
-  return h('div', {className: 'fade-up'},
+  return h('div', {style: {animation: 'fadeUp 0.3s ease both'}},
     h(Lbl, null, 'CONTEST'),
     h('div', {style: {fontSize: 20, fontWeight: 800, color: 'var(--gold)', marginBottom: 4}}, d.contest_type),
     h('div', {style: {fontSize: 'var(--text-sm)', color: 'var(--text-dim)', lineHeight: 1.6, marginBottom: 12}}, d.desc),
@@ -1210,18 +1198,21 @@ function ShareDrawer(props) {
     h('div', {style: {display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: isNpc ? 8 : 0}},
       h('span', {style: {fontSize: 'var(--text-label)', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginRight: 4}}, 'Export / Print'),
       h('button', {
-        className: 'btn btn-primary btn-sm' + (copiedFormat === 'md' ? ' export-copied' : ''),
+        className: 'btn btn-primary' + (copiedFormat === 'md' ? ' export-copied' : ''),
         onClick: function() { copyTo(md, 'md'); },
+        style: {fontSize: 12, padding: '4px 12px', minHeight: 0},
       }, copiedFormat === 'md' ? '✓ Copied!' : '📋 Copy Markdown'),
       h('button', {
-        className: 'btn btn-ghost btn-sm',
+        className: 'btn btn-ghost',
         onClick: downloadFile,
         title: 'Save as .md file',
+        style: {fontSize: 12, padding: '4px 12px', minHeight: 0},
       }, '💾 Save .md'),
       h('button', {
-        className: 'btn btn-ghost btn-sm',
+        className: 'btn btn-ghost',
         onClick: function() { window.print(); },
         title: 'Print or save as PDF',
+        style: {fontSize: 12, padding: '4px 12px', minHeight: 0},
       }, '🖨 Print'),
       h('button', {
         className: 'btn btn-icon btn-ghost',
@@ -1239,12 +1230,14 @@ function ShareDrawer(props) {
         className: 'btn btn-ghost' + (copiedFormat === 'fari' ? ' export-copied' : ''),
         onClick: function() { copyTo(fariJson, 'fari'); },
         title: 'Fari App: Characters → Import\nFoundry VTT (Fate Core Official): paste into character importer',
+        style: {fontSize: 12, padding: '4px 12px', minHeight: 0},
       }, copiedFormat === 'fari' ? '✓ Copied!' : '🎲 Fari / Foundry'),
 
       h('button', {
         className: 'btn btn-ghost' + (copiedFormat === 'roll20' ? ' export-copied' : ''),
         onClick: function() { copyTo(roll20Json, 'roll20'); },
         title: 'Roll20: open "Fate by Evil Hat" sheet → Developer Mode → paste into import box',
+        style: {fontSize: 12, padding: '4px 12px', minHeight: 0},
       }, copiedFormat === 'roll20' ? '✓ Copied!' : '🎲 Roll20'),
 
       h('span', {style: {fontSize: 'var(--text-label)', color: 'var(--text-muted)', fontStyle: 'italic', marginLeft: 4}},
@@ -1259,12 +1252,43 @@ function ShareDrawer(props) {
 // HELP MODAL
 // ════════════════════════════════════════════════════════════════════════
 
+// ════════════════════════════════════════════════════════════════════════
+// KB SHORTCUTS MODAL
+// ════════════════════════════════════════════════════════════════════════
+
+function KBShortcutsModal(props) {
+  var shortcuts = [
+    ['Space', 'Roll current generator'],
+    ['G',     'Cycle to next generator'],
+    ['P',     'Pin current result'],
+    ['I',     'Inspiration mode - roll 3, pick one'],
+    ['?',     'Open this shortcuts panel'],
+    ['Esc',   'Close any open panel or sidebar'],
+  ];
+  return h(Modal, {onClose: props.onClose, ariaLabel: 'Keyboard shortcuts'},
+    h(ModalHeader, {title: 'KB Shortcuts', onClose: props.onClose}),
+    h('div', {className: 'modal-body'},
+      h('div', {className: 'kbd-grid', style: {marginTop: 4}},
+        shortcuts.map(function(row) {
+          return h('div', {key: row[0], className: 'kbd-row'},
+            h('kbd', {className: 'kbd-key'}, row[0]),
+            h('span', {className: 'kbd-desc'}, row[1])
+          );
+        })
+      )
+    )
+  );
+}
+
 function HelpModal(props) {
   var genId = props.genId;
   var hc = HELP_CONTENT[genId] || {};
 
-  return h(Modal, {onClose: props.onClose, ariaLabel: 'Rules - ' + (hc.title || genId)},
-    h(ModalHeader, {title: 'Rules - ' + (hc.title || 'Generator'), onClose: props.onClose}),
+  return h(Modal, {onClose: props.onClose, ariaLabel: 'Help - ' + (hc.title || genId)},
+    h('div', {className: 'modal-header'},
+      h('div', {className: 'modal-title'}, 'Help - ' + (hc.title || 'Generator')),
+      h('button', {className: 'btn btn-icon btn-ghost', onClick: props.onClose, 'aria-label': 'Close'}, '✕')
+    ),
     h('div', {className: 'modal-body'},
       h('div', {className: 'help-section'},
         h('div', {className: 'help-section-lbl'}, 'What this generates'),
@@ -1318,63 +1342,7 @@ function HelpModal(props) {
           h('div', {style: {fontSize: 14, color: 'var(--text)', lineHeight: 1.55, padding: '8px 10px', background: 'var(--inset)', borderRadius: 8, borderLeft: '2px solid var(--c-red)'}}, hc.compel_example)
         )
       ),
-      h('div', {style: {marginTop: 20, paddingTop: 14, borderTop: '1px solid var(--border)'}},
-        h('div', {className: 'help-section-lbl', style: {marginBottom: 8}}, 'Quick Reference'),
-        h('div', {className: 'help-gen-grid'},
-          GENERATORS.map(function(g) {
-            var hc = HELP_CONTENT[g.id] || {};
-            return h('div', {key: g.id, className: 'help-gen-item' + (g.id === genId ? ' current' : '')},
-              h('div', {className: 'help-gen-label'},
-                h('span', {style: {marginRight: 4}}, RA_ICONS[g.id] ? h(RaIcon, {n: RA_ICONS[g.id]}) : g.icon),
-                h('span', null, g.label)
-              ),
-              h('div', {className: 'help-gen-sub'}, g.sub),
-              (hc.invoke_example || hc.compel_example) && h('div', {
-                className: 'gm-guidance',
-                style: {display: 'flex', gap: 4, marginTop: 5, flexWrap: 'wrap'},
-              },
-                hc.invoke_example && h('span', {
-                  title: hc.invoke_example,
-                  style: {
-                    fontSize: 10, padding: '2px 6px', borderRadius: 100,
-                    background: 'color-mix(in srgb,var(--accent) 12%,transparent)',
-                    border: '1px solid color-mix(in srgb,var(--accent) 30%,transparent)',
-                    color: 'var(--accent)', cursor: 'help', letterSpacing: '0.04em',
-                  },
-                }, '+ Invoke'),
-                hc.compel_example && h('span', {
-                  title: hc.compel_example,
-                  style: {
-                    fontSize: 10, padding: '2px 6px', borderRadius: 100,
-                    background: 'color-mix(in srgb,var(--c-red) 10%,transparent)',
-                    border: '1px solid color-mix(in srgb,var(--c-red) 25%,transparent)',
-                    color: 'var(--c-red)', cursor: 'help', letterSpacing: '0.04em',
-                  },
-                }, '+ Compel')
-              )
-            );
-          })
-        )
-      ),
-      // ND-08: Keyboard shortcuts legend
-      h('div', {style: {marginTop: 20, paddingTop: 14, borderTop: '1px solid var(--border)'}},
-        h('div', {className: 'help-section-lbl', style: {marginBottom: 10}}, 'Keyboard Shortcuts'),
-        h('div', {className: 'kbd-grid'},
-          [
-            ['Space', 'Roll current generator'],
-            ['P', 'Pin current result'],
-            ['G', 'Cycle to next generator'],
-            ['I', 'Inspiration mode - roll 3 options, pick one'],
-            ['?', 'Open Rules panel'],
-            ['Esc', 'Close any open panel or sidebar'],
-          ].map(function(row) {
-            return h('div', {key: row[0], className: 'kbd-row'},
-              h('kbd', {className: 'kbd-key'}, row[0]),
-              h('span', {className: 'kbd-desc'}, row[1])
-            );
-          })
-        )
-      )
+
     )
   );
 }
@@ -1515,7 +1483,9 @@ function HelpLevelOnboardingModal(props) {
       onClick: function(e) { e.stopPropagation(); },
       style: {maxWidth: 420},
     },
-      h(ModalHeader, {title: '👋 Quick question', onClose: function() {}}),
+      h('div', {className: 'modal-header'},
+        h('div', {className: 'modal-title'}, '👋 Quick question'),
+      ),
       h('div', {style: {padding: '4px 20px 8px', fontSize: 'var(--text-sm)', color: 'var(--text-dim)', lineHeight: 1.6}},
         'How much Fate experience do you have? This sets the ', h('strong', null, 'Help Level'), ' - inline rules coaching you\'ll see on every result. You can change it any time in ⚙ Settings.'
       ),
@@ -1557,14 +1527,17 @@ function HelpLevelOnboardingModal(props) {
 function SettingsModal(props) {
   var TEXT_SIZE_NAMES = ['Default', 'Large', 'Extra Large'];
   var LEVEL_OPTIONS = [
-    {id: 'experienced', label: 'I know Fate well',       desc: 'Just the result - no coaching, no rules reference'},
-    {id: 'new_fate',    label: 'I play other RPGs',       desc: 'Full rules with Fate Condensed page references'},
-    {id: 'dnd_convert', label: 'I play D&D / Pathfinder', desc: 'Rules + side-by-side D&D contrast notes'},
-    {id: 'new_ttrpg',   label: 'New to tabletop RPGs',    desc: 'Gentle explanations, no prior RPG experience assumed'},
+    {id: 'experienced', label: 'Experienced Fate GM', desc: 'Minimal rules - just the generator output'},
+    {id: 'new_fate', label: 'New to Fate', desc: 'Full rules explanations with Fate Condensed page references'},
+    {id: 'dnd_convert', label: 'Coming from D&D', desc: 'Rules explanations + D&D contrast notes'},
+    {id: 'new_ttrpg', label: 'New to TTRPGs', desc: 'Gentle introductions assuming no prior RPG experience'},
   ];
   return h(Modal, {onClose: props.onClose, label: 'Settings'},
     h('div', {className: 'modal-box', style: {maxWidth: 460}},
-      h(ModalHeader, {title: '⚙ Settings', onClose: props.onClose}),
+      h('div', {className: 'modal-header'},
+        h('div', {className: 'modal-title'}, '⚙ Settings'),
+        h('button', {className: 'btn btn-icon btn-ghost', onClick: props.onClose, 'aria-label': 'Close'}, '✕')
+      ),
 
       // Experience Level - the most important setting
       h('div', {style: {padding: '14px 20px', borderBottom: '1px solid var(--border)'}},
@@ -1720,7 +1693,14 @@ function LandingApp() {
 
     // ── Minimal top nav ────────────────────────────────────────────────
     h('nav', {className: 'land-topnav', role: 'navigation'},
-      h('a', {href: 'index.html', className: 'land-topnav-brand'}, '🎲 Ogma'),
+      h('a', {href: 'index.html', className: 'land-topnav-brand', 'aria-label': 'Ogma home'},
+        h('span', {className: 'topbar-ogma'},
+          h('strong', null, 'O'), 'n-demand ',
+          h('strong', null, 'G'), 'enerator for ',
+          h('strong', null, 'M'), 'asterful ',
+          h('strong', null, 'A'), 'dventures'
+        )
+      ),
       h('div', {className: 'land-topnav-actions'},
         h('a', {href: 'learn.html', className: 'btn btn-ghost land-topnav-btn'}, '📖 Quick Start'),
         h('a', {href: 'campaigns/transition.html', className: 'btn btn-ghost land-topnav-btn'}, '⚔ D&D Guide'),
@@ -2044,8 +2024,11 @@ function TableManagerModal(props) {
   return h(Modal, {onClose: props.onClose, label: 'Customize Tables'},
     h('div', {className: 'modal-box modal-box-wide', style: {maxHeight: '92vh', display: 'flex', flexDirection: 'column'}},
 
-      // -- Header --------------------------------------------------------
-      h(ModalHeader, {title: '🎛 Customize Tables', onClose: props.onClose}),
+      // ── Header ────────────────────────────────────────────────────
+      h('div', {className: 'modal-header'},
+        h('div', {className: 'modal-title'}, '🎛 Customize Tables'),
+        h('button', {className: 'btn btn-icon btn-ghost', onClick: props.onClose, 'aria-label': 'Close'}, '✕')
+      ),
 
       // ── Intro ──────────────────────────────────────────────────────
       h('div', {style: {
@@ -2569,18 +2552,13 @@ function CampaignApp(props) {
   var _party = useState(3);           var partySize = _party[0]; var setPartySize = _party[1];
   var _roll  = useState(false);       var rolling = _roll[0];  var setRolling = _roll[1];
   var _hist  = useState([]);          var history = _hist[0];  var setHistory = _hist[1];
-  // openPanel: single state for mutually-exclusive panels -- eliminates 5 boolean re-renders
-  // Values: null | 'help' | 'fp' | 'history' | 'settings' | 'tables'
-  var _panel = useState(null); var openPanel = _panel[0]; var setOpenPanel = _panel[1];
-  function showPanel(name) { setOpenPanel(name); setShowSidebar(false); }
-  function closePanel()    { setOpenPanel(null); }
-  // Derived booleans -- zero re-render cost, just string comparisons
-  var showHelp     = openPanel === 'help';
-  var showFP       = openPanel === 'fp';
-  var showSettings = openPanel === 'settings';
-  var showTables   = openPanel === 'tables';
+  var _help  = useState(false);       var showHelp = _help[0]; var setShowHelp = _help[1];
+  var _kbsc  = useState(false);       var showKbShortcuts = _kbsc[0]; var setShowKbShortcuts = _kbsc[1];
   var _exp   = useState(false);       var showExport = _exp[0]; var setShowExport = _exp[1];
   var _prefs = useState({excluded:{}, locked:{}, custom:{}}); var prefs = _prefs[0]; var setPrefs = _prefs[1];
+  var _tbls  = useState(false);       var showTables = _tbls[0]; var setShowTables = _tbls[1];
+  var _sett  = useState(false);       var showSettings = _sett[0]; var setShowSettings = _sett[1];
+  var _showFP = useState(false);      var showFP = _showFP[0];     var setShowFP = _showFP[1];
   var _fp = useState(function() {
     try { var s = LS.get('fp_state'); return s || null; } catch(e) { return null; }
   });
@@ -2718,8 +2696,7 @@ function CampaignApp(props) {
   var groupGens = currentGroup.gens.map(function(gid) { return GENERATORS.find(function(g) { return g.id === gid; }); }).filter(Boolean);
   // History/Pinned drawer
   var _drawer = useState(false); var showDrawer = _drawer[0]; var setShowDrawer = _drawer[1];
-  // showHistory derived from openPanel -- see openPanel state above
-  var showHistory  = openPanel === 'history';
+  var _showHist = useState(false); var showHistory = _showHist[0]; var setShowHistory = _showHist[1];
   // Help level preference - controls inline help detail
   var _helpLvl = useState(function() { try { return LS.get('help_level') || 'new_fate'; } catch(e) { return 'new_fate'; } });
   var helpLevel = _helpLvl[0]; var setHelpLevel = _helpLvl[1];
@@ -2843,15 +2820,16 @@ function CampaignApp(props) {
       // Escape always closes any open panel
       if (e.key === 'Escape') {
         if (showSidebar)   { setShowSidebar(false);   return; }
-        if (showHistory)   { closePanel();   return; }
-        if (showHelp)      { closePanel();   return; }
-        if (showTables)    { closePanel();   return; }
-        if (showSettings)  { closePanel();   return; }
+        if (showHistory)   { setShowHistory(false);   return; }
+        if (showKbShortcuts) { setShowKbShortcuts(false); return; }
+        if (showHelp)      { setShowHelp(false);      return; }
+        if (showTables)    { setShowTables(false);    return; }
+        if (showSettings)  { setShowSettings(false);  return; }
         return;
       }
 
       // All other shortcuts blocked when a modal/panel is open
-      if (openPanel || showSidebar) return;
+      if (showHelp || showTables || showSettings || showHistory || showSidebar) return;
 
       if (e.code === 'Space' && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();
@@ -2872,13 +2850,13 @@ function CampaignApp(props) {
         selectGen(next);
       } else if (e.key === 'i' || e.key === 'I') {
         if (!rolling) doInspire();
-      } else if (e.key === '?' && !e.shiftKey) {
-        showPanel('help');
+      } else if (e.key === '?') {
+        setShowKbShortcuts(true);
       }
     }
     document.addEventListener('keydown', onKey);
     return function() { document.removeEventListener('keydown', onKey); };
-  }, [rolling, result, activeGen, openPanel, showSidebar, doGenerate, doInspire]);
+  }, [rolling, result, activeGen, showHelp, showTables, showSettings, showHistory, showSidebar, doGenerate, doInspire]);
 
   var totalEntries = Object.values(t).reduce(function(n, v) { return n + (Array.isArray(v) ? v.length : 0); }, 0);
 
@@ -2952,7 +2930,7 @@ function CampaignApp(props) {
         h('div', {className: 'sidebar-section'},
           h('button', {
             className: 'sidebar-tool-btn' + (showFP ? ' active' : ''),
-            onClick: function() { openPanel === 'fp' ? closePanel() : showPanel('fp'); },
+            onClick: function() { setShowFP(!showFP); setShowSidebar(false); },
             'aria-pressed': String(showFP),
           },
             h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.fp_tracker})),
@@ -2960,7 +2938,7 @@ function CampaignApp(props) {
           ),
           h('button', {
             className: 'sidebar-tool-btn' + (showHistory ? ' active' : ''),
-            onClick: function() { openPanel === 'history' ? closePanel() : showPanel('history'); },
+            onClick: function() { setShowHistory(!showHistory); setShowSidebar(false); },
             'aria-pressed': String(showHistory),
           },
             h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.history})),
@@ -3059,14 +3037,14 @@ function CampaignApp(props) {
         h('div', {className: 'sidebar-section sidebar-settings-row'},
           h('button', {
             className: 'sidebar-tool-btn',
-            onClick: function() { showPanel('tables'); },
+            onClick: function() { setShowTables(true); setShowSidebar(false); },
           },
             h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.customize})),
             h('span', {className: 'sidebar-item-label'}, 'Customize Tables')
           ),
           h('button', {
             className: 'sidebar-tool-btn',
-            onClick: function() { showPanel('settings'); },
+            onClick: function() { setShowSettings(true); setShowSidebar(false); },
           },
             h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.settings})),
             h('span', {className: 'sidebar-item-label'}, 'Settings')
@@ -3095,6 +3073,14 @@ function CampaignApp(props) {
           h('a', {href: '../campaigns/guide-' + campId + '.html', className: 'sidebar-tool-btn'},
             h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.guide})),
             h('span', {className: 'sidebar-item-label'}, 'Campaign Guide')
+          ),
+          h('button', {
+            className: 'sidebar-tool-btn',
+            onClick: function() { setShowKbShortcuts(true); setShowSidebar(false); },
+            title: 'Keyboard shortcuts reference',
+          },
+            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: 'keyboard'})),
+            h('span', {className: 'sidebar-item-label'}, 'KB Shortcuts')
           ),
           h('a', {href: '../campaigns/transition.html', className: 'sidebar-tool-btn'},
             h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.dnd_guide})),
@@ -3137,28 +3123,7 @@ function CampaignApp(props) {
       // ── Main content panel ───────────────────────────────────────────
       h('div', {className: 'content-panel'},
 
-        // Roll hero - primary action, straight to business
-        h('div', {className: 'roll-hero', ref: rollBtnRef},
-          h('div', {className: 'roll-wrap'},
-            h('button', {
-              className: 'btn-roll',
-              onClick: doGenerate,
-              disabled: rolling,
-              'aria-live': 'polite',
-            },
-              h('span', {className: 'roll-label'}, rolling ? 'Rolling…' : '🎲 Roll ' + gen.label),
-              h('span', {className: 'roll-fx'})
-            ),
-            h('button', {
-              className: 'btn btn-ghost inspire-btn' + (inspireMode ? ' inspire-active' : ''),
-              onClick: inspireMode ? function() { setInspireMode(false); setInspireResults([]); } : doInspire,
-              disabled: rolling,
-              title: inspireMode ? 'Exit inspiration mode' : 'Inspiration mode - roll 3 options, pick one [I]',
-              'aria-label': inspireMode ? 'Exit inspiration mode' : 'Inspiration mode',
-              'aria-keyshortcuts': 'I',
-            }, inspireMode ? '✕ Exit' : '✦ 3')
-          )
-        ),
+        // Roll hero removed - actions unified into action-bar inside result panel
 
         // Main layout
         h('main', {id: 'main'},
@@ -3168,69 +3133,85 @@ function CampaignApp(props) {
         h('div', {id: 'result-panel', role: 'region', 'aria-label': 'Generated result', 'aria-live': 'polite'},
           h('div', {className: 'result-panel', style: {padding: 0, overflow: 'hidden'}},
 
-            // ── Panel toolbar: generator name + Roll + actions ──────────
-            h('div', {className: 'panel-toolbar'},
-              // Left: generator name
-              h('div', {className: 'panel-toolbar-left'},
-                h('span', {style: {fontSize: 16}}, gen.icon),
-                h('span', {style: {fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-dim)'}}, gen.label),
-                // Consequence severity pills (inline)
-                activeGen === 'consequence' && h(Fragment, null,
-                  h('span', {style: {color: 'var(--text-muted)', fontSize: 12, marginLeft: 6}}, '·'),
-                  ['', 'mild', 'moderate', 'severe'].map(function(sev) {
-                    var label = sev || 'Any';
-                    var isActive = consequenceSev === sev;
-                    var sevColors = {'': 'var(--text-dim)', mild: 'var(--c-blue)', moderate: 'var(--c-purple)', severe: 'var(--c-red)'};
-                    return h('button', {
-                      key: sev || 'random',
-                      className: 'btn btn-ghost',
-                      onClick: function() { setConsequenceSev(sev); },
-                      style: {
-                        fontSize: 11, padding: '2px 8px', borderRadius: 100, minHeight: 0,
-                        color: isActive ? '#fff' : sevColors[sev],
-                        background: isActive ? sevColors[sev] : 'transparent',
-                        border: '1px solid ' + (isActive ? sevColors[sev] : 'var(--border)'),
-                      },
-                    }, label.charAt(0).toUpperCase() + label.slice(1));
-                  })
+            // ── Unified action bar: Roll + Inspire + contextual + secondary ──
+            h('div', {className: 'action-bar', ref: rollBtnRef},
+              // PRIMARY: Roll
+              h('button', {
+                className: 'btn-roll action-bar-roll' + (rolling ? ' rolling' : ''),
+                onClick: doGenerate,
+                disabled: rolling,
+                'aria-live': 'polite',
+              },
+                h('span', {className: 'roll-label'},
+                  rolling ? 'Rolling…'
+                  : h(Fragment, null, h(RaIcon, {n: 'perspective-dice-random'}), ' Roll ', gen.label)
                 ),
-                // Party size (encounter only)
-                activeGen === 'encounter' && h(Fragment, null,
-                  h('span', {style: {color: 'var(--text-muted)', fontSize: 12, marginLeft: 6}}, '·'),
-                  h('span', {className: 'party-label'}, 'Party:'),
-                  [2, 3, 4, 5].map(function(n) {
-                    return h('button', {
-                      key: n,
-                      className: 'party-btn' + (partySize === n ? ' active' : ''),
-                      onClick: function() { setPartySize(n); },
-                      style: {fontSize: 12, padding: '2px 7px', minWidth: 24},
-                    }, n);
-                  })
-                )
+                h('span', {className: 'roll-fx'})
               ),
-              // Right: action buttons (visible only after result)
-              h('div', {className: 'panel-toolbar-right'},
-                // BL-21: Help always visible in result panel (mobile + desktop)
+              // INSPIRE
+              h('button', {
+                className: 'btn btn-ghost action-bar-inspire' + (inspireMode ? ' inspire-active' : ''),
+                onClick: inspireMode
+                  ? function() { setInspireMode(false); setInspireResults([]); }
+                  : doInspire,
+                disabled: rolling,
+                title: inspireMode ? 'Exit inspiration mode' : 'Roll 3 options to pick from [I]',
+                'aria-label': inspireMode ? 'Exit inspiration mode' : 'Inspiration mode',
+                'aria-keyshortcuts': 'I',
+              },
+                h(RaIcon, {n: inspireMode ? 'cancel' : 'crystal-ball'}),
+                h('span', {className: 'action-bar-label'}, inspireMode ? ' Exit' : ' Inspire')
+              ),
+              // CONTEXTUAL: consequence severity / party size
+              activeGen === 'consequence' && h(Fragment, null,
+                h('span', {className: 'action-bar-divider'}),
+                ['', 'mild', 'moderate', 'severe'].map(function(sev) {
+                  var label = sev || 'Any';
+                  var isActive = consequenceSev === sev;
+                  var sevColors = {'': 'var(--text-dim)', mild: 'var(--c-blue)', moderate: 'var(--c-purple)', severe: 'var(--c-red)'};
+                  return h('button', {
+                    key: sev || 'random',
+                    className: 'btn btn-ghost action-bar-ctx',
+                    onClick: function() { setConsequenceSev(sev); },
+                    style: {
+                      color: isActive ? '#fff' : sevColors[sev],
+                      background: isActive ? sevColors[sev] : 'transparent',
+                      border: '1px solid ' + (isActive ? sevColors[sev] : 'var(--border)'),
+                    },
+                  }, label.charAt(0).toUpperCase() + label.slice(1));
+                })
+              ),
+              activeGen === 'encounter' && h(Fragment, null,
+                h('span', {className: 'action-bar-divider'}),
+                h('span', {className: 'party-label'}, 'Party:'),
+                [2, 3, 4, 5].map(function(n) {
+                  return h('button', {
+                    key: n,
+                    className: 'party-btn action-bar-ctx' + (partySize === n ? ' active' : ''),
+                    onClick: function() { setPartySize(n); },
+                  }, n);
+                })
+              ),
+              // SECONDARY (pushed right): Rules / Share / Pin
+              h('div', {className: 'action-bar-secondary'},
                 h('button', {
-                  className: 'btn btn-ghost btn-sm',
-                  onClick: function() { showPanel('help'); },
-                  title: 'Rules reference for this generator',
+                  className: 'btn btn-ghost action-bar-icon',
+                  onClick: function() { setShowHelp(true); },
+                  title: 'Rules reference [?]',
                   'aria-label': 'Rules reference',
-                  'aria-keyshortcuts': '?',
-                }, h(RaIcon, {n: RA_ICONS.rules}), ' Rules'),
-                // BL-22: Consolidated Share button (Export + Print inline drawer)
+                }, h(RaIcon, {n: RA_ICONS.rules})),
                 result && h('button', {
-                  className: 'btn btn-ghost' + (showExport ? ' active' : ''),
+                  className: 'btn btn-ghost action-bar-icon' + (showExport ? ' active' : ''),
                   onClick: function() { setShowExport(!showExport); },
-                  title: showExport ? 'Close share options' : 'Export or print this result',
-                  style: {fontSize: 13, padding: '4px 12px', minHeight: 0},
-                }, '⬆ Share'),
+                  title: showExport ? 'Close share options' : 'Share or export',
+                  'aria-label': 'Share',
+                }, h(RaIcon, {n: 'quill-ink'})),
                 result && h('button', {
-                  className: 'btn btn-ghost',
+                  className: 'btn btn-ghost action-bar-icon',
                   onClick: pinResult,
-                  title: 'Pin result',
-                  style: {fontSize: 13, padding: '4px 12px', minHeight: 0},
-                }, '📌 Pin')
+                  title: 'Pin result [P]',
+                  'aria-label': 'Pin result',
+                }, h(RaIcon, {n: RA_ICONS.pin}))
               )
             ),
 
@@ -3289,11 +3270,11 @@ function CampaignApp(props) {
               }
 
               var allRules = hc.rules || hc.how || [];
-              // new_ttrpg: first 3 rules only, simpler labels
+              // For new_ttrpg: show max 3 rules and simplify labels
               var showRules = lvl === 'new_ttrpg' ? allRules.slice(0, 3) : allRules;
               var rulesLabel = lvl === 'new_ttrpg' ? 'How It Works' : 'Rules - Fate Condensed';
 
-              return h('div', {className: 'fade-up'},
+              return h('div', {style: {animation: 'fadeUp 0.3s ease both'}},
                 // Generator title
                 h('div', {style: {display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16}},
                   h('span', {style: {fontSize: 28}}, gen.icon),
@@ -3430,13 +3411,13 @@ function CampaignApp(props) {
     ),
 
     // ── History & Pinned slide-over panel ─────────────────────────────
-    showHistory && h('div', {className: 'hist-overlay', onClick: function() { closePanel(); }}),
+    showHistory && h('div', {className: 'hist-overlay', onClick: function() { setShowHistory(false); }}),
     showHistory && h('div', {className: 'hist-panel'},
       h('div', {className: 'hist-panel-header'},
         h('span', {style: {fontSize: 'var(--text-md)', fontWeight: 700, color: 'var(--text)'}}, '📋 History & Pinned'),
         h('button', {
           className: 'btn btn-icon btn-ghost',
-          onClick: function() { closePanel(); },
+          onClick: function() { setShowHistory(false); },
           'aria-label': 'Close history panel',
           style: {fontSize: 18, padding: '4px 8px'},
         }, '✕')
@@ -3457,7 +3438,7 @@ function CampaignApp(props) {
           } else {
             setResult({genId: pinnedCards[0].genId, data: pinnedCards[0].data, _batchMd: md});
             setShowExport(true);
-            closePanel();
+            setShowHistory(false);
           }
         },
         style: {width: '100%', marginBottom: 4, justifyContent: 'center', fontSize: 'var(--text-sm)'},
@@ -3478,7 +3459,7 @@ function CampaignApp(props) {
           document.body.removeChild(a);
           setTimeout(function() { URL.revokeObjectURL(url); }, 60000);
           setToast('🎲 Fari pack downloaded - ' + pinnedCards.length + ' results');
-          closePanel();
+          setShowHistory(false);
         },
         style: {width: '100%', marginBottom: 8, justifyContent: 'center', fontSize: 'var(--text-sm)'},
       }, '🎲 Export to Fari / Foundry (' + pinnedCards.length + ')'  ),
@@ -3496,7 +3477,7 @@ function CampaignApp(props) {
                 style: {flex:1, textAlign:'left', background:'none', border:'none', cursor:'pointer',
                   color:'var(--text)', fontSize:'inherit', overflow:'hidden', textOverflow:'ellipsis',
                   whiteSpace:'nowrap', padding:0, fontFamily:'var(--font-ui)'},
-                onClick: function() { restoreCard(card); closePanel(); },
+                onClick: function() { restoreCard(card); setShowHistory(false); },
                 title: 'Restore: ' + card.label,
               }, card.label),
               h('button', {
@@ -3518,7 +3499,7 @@ function CampaignApp(props) {
             return h('button', {
               key: i,
               className: 'history-item',
-              onClick: function() { setResult({genId: item.genId, data: item.data}); setActiveGen(item.genId); setActiveGroup(groupForGen(item.genId)); closePanel(); },
+              onClick: function() { setResult({genId: item.genId, data: item.data}); setActiveGen(item.genId); setActiveGroup(groupForGen(item.genId)); setShowHistory(false); },
               title: 'Restore this result',
             },
               (item.gen ? item.gen.icon + ' ' : '') +
@@ -3540,14 +3521,15 @@ function CampaignApp(props) {
     toast && h('div', {className: 'toast'}, toast),
 
     // ── Modals ────────────────────────────────────────────────────────
-    showHelp && h(HelpModal, {genId: activeGen, onClose: closePanel}),
+    showHelp && h(HelpModal, {genId: activeGen, onClose: function() { setShowHelp(false); }}),
+    showKbShortcuts && h(KBShortcutsModal, {onClose: function() { setShowKbShortcuts(false); }}),
     showTables && h(TableManagerModal, {
       tables: t,
       prefs: prefs,
       activeGen: activeGen,
       universalMerge: universalMerge,
       onPrefsChange: function(newPrefs) { setPrefs(newPrefs); },
-      onClose: closePanel,
+      onClose: function() { setShowTables(false); },
     }),
     showSettings && h(SettingsModal, {
       theme: theme,
@@ -3558,7 +3540,7 @@ function CampaignApp(props) {
       onToggleTextSize: toggleTextSize,
       onSetHelpLevel: changeHelpLevel,
       onToggleUniversal: toggleUniversalMerge,
-      onClose: closePanel,
+      onClose: function() { setShowSettings(false); },
     }),
 
     // First-visit onboarding - only shown once, surfaces Help Level for C1/C2 users
@@ -3569,7 +3551,7 @@ function CampaignApp(props) {
       h(FatePointTracker, {
         state: fpState || DEFAULT_FP_STATE,
         onUpdate: updateFP,
-        onClose: closePanel,
+        onClose: function() { setShowFP(false); },
         partySize: partySize,
         lastEncounter: (result && result.genId === 'encounter') ? result.data : null,
       })
@@ -3623,16 +3605,15 @@ function CampaignApp(props) {
       disabled: rolling,
       'aria-label': 'Roll ' + gen.label,
       title: 'Roll ' + gen.label,
-    }, rolling ? '…' : '🎲')
+    }, rolling ? '…' : '🎲'),
+
+    // License footer - last item in content-panel; always visible without opening sidebar
+    h('footer', {className: 'camp-content-footer'},
+      'Fate\u2122 trademark of Evil Hat Productions, LLC. \u00b7 ',
+      h('a', {href: '../license.html', className: 'camp-content-footer-link'}, 'License & Attribution')
+    )
 
       ) // close content-panel
-
-      // ── Content panel footer — license (mobile: sidebar hidden by default) ──
-      ,h('footer', {className: 'camp-content-footer'},
-        'Fate™ trademark of Evil Hat Productions, LLC. · ',
-        h('a', {href: '../license.html', className: 'camp-content-footer-link'},
-          'License & Attribution')
-      )
     ) // close app-body
   ); // close app-shell
 }

@@ -433,7 +433,7 @@ var HELP_ENTRIES = [
     how:"Draw before or during a scene. Read name + concept aloud. Use weakness as a compel hook - offer a fate point if they hesitate or flee.",
     tip:"Don't name every mook - only the ones who might interact with the party. Optionally, treat a mob as sharing a single stress track.",
     rule:"Fate Condensed p.43 - Minor NPCs: 1–2 aspects, 0–3 stress boxes, no consequences.",
-    srd_url:"https://fate-srd.com/fate-condensed/optional-rules#creating-npcs-and-other-characters",
+    srd_url:"https://fate-srd.com/fate-condensed/being-game-master#npcs",
   },
   {
     id:"npc_major", icon:"◉", label:"Major NPC",
@@ -441,7 +441,7 @@ var HELP_ENTRIES = [
     how:"Read concept + trouble first - those drive personality. Reveal other aspects through play. Use the skills to set difficulty numbers.",
     tip:"Major NPCs should feel like PCs. Give them a want, a fear, and a reason the party might sympathise with them.",
     rule:"Fate Condensed p.43 - Major NPCs: full aspects, skills, stunts, stress, and consequences.",
-    srd_url:"https://fate-srd.com/fate-condensed/optional-rules#creating-npcs-and-other-characters",
+    srd_url:"https://fate-srd.com/fate-condensed/being-game-master#npcs",
   },
   {
     id:"scene", icon:"◈", label:"Scene Setup",

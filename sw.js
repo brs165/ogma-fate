@@ -1,8 +1,8 @@
-// sw.js — Fate Condensed Campaign Generator Service Worker
+// sw.js - Ogma Service Worker
 // Strategy: cache-first for all static assets, network-first for CDN scripts.
 // Safari fix: redirected responses are cloned as non-redirected before caching.
 
-var CACHE_NAME = 'fate-generator-2026.03.22';
+var CACHE_NAME = 'fate-generator-2026.03.26';
 
 var APP_SHELL = [
   './index.html',
