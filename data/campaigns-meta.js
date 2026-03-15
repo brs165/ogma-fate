@@ -19,6 +19,7 @@ if (typeof CAMPAIGNS === 'undefined') { var CAMPAIGNS = {}; }
     {id: 'space',        icon: '\u25ef', name: 'Void Runners'},
     {id: 'victorian',    icon: '\u2295', name: 'The Gaslight Chronicles'},
     {id: 'postapoc',     icon: '\u25fb', name: 'The Long Road'},
+    {id: 'western',      icon: '\u2605', name: 'Dust and Iron'},
   ];
   meta.forEach(function(m) {
     CAMPAIGNS[m.id] = { meta: m };

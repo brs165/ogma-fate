@@ -9,7 +9,7 @@
   <meta name="description" content="About Ogma - how it was built, what's inside, and how to use it offline.">
   <link rel="icon" type="image/svg+xml" href="assets/favicons/icon.svg">
   <link rel="stylesheet" href="https://unpkg.com/rpg-awesome@0.2.0/css/rpg-awesome.min.css">
-  <link rel="stylesheet" href="assets/css/theme.css?v=33">
+  <link rel="stylesheet" href="assets/css/theme.css?v=36">
   <style>
     .about{max-width:680px;margin:0 auto;padding:24px 20px 80px;position:relative;z-index:1}
     .about h1{font-size:var(--text-hero);font-weight:800;color:var(--text);margin-bottom:8px;letter-spacing:-0.02em}
@@ -69,10 +69,10 @@
 <h1 id="main-content">About Ogma</h1>
 
 <div class="about-version" role="status" aria-label="Suite version information">
-  <span class="about-version-badge">2026.03.33</span>
+  <span class="about-version-badge">2026.03.36</span>
   <div class="about-version-meta">
     <strong style="color:var(--text)">Ogma - A Fate Condensed Generator Suite</strong><br>
-    March 2026 · Cache: <code>fate-generator-2026.03.33</code> · 16 generators · 6 campaign worlds · 9,750+ table entries
+    March 2026 · Cache: <code>fate-generator-2026.03.36</code> · 16 generators · 6 campaign worlds · 9,750+ table entries
   </div>
   <div class="about-version-qa">✓ 96/96 smoke · 19,200 stress · 19 named assertions · toMarkdown 96/96</div>
 </div>
@@ -102,14 +102,15 @@
 <p>The suite is fully offline-capable and runs without an internet connection - including from a USB drive or local folder. There are two ways to use it offline:</p>
 <p><strong>Option 1 - Install as a PWA.</strong> Visit the site in Chrome or Edge, then use the browser's install option (address bar or menu → "Install Fate Condensed Generator"). The app installs to your device and runs from the home screen with no internet required.</p>
 <p><strong>Option 2 - Download the zip.</strong> Download the complete suite as a standalone zip, unzip it anywhere, and open <code>index.html</code> directly in your browser. No server required. Works on any machine, no installation needed.</p>
-<div class="about-card" style="text-align:center;padding:24px;">
-  <div id="download" style="font-size:var(--text-base);font-weight:700;color:var(--text);margin-bottom:6px;">Download for Offline Use</div>
+<div class="about-card" id="download" style="text-align:center;padding:24px;">
+  <div style="font-size:var(--text-base);font-weight:700;color:var(--text);margin-bottom:6px;">Download for Offline Use</div>
   <div style="font-size:var(--text-sm);color:var(--text-dim);line-height:1.6;margin-bottom:16px;max-width:400px;margin-left:auto;margin-right:auto;">Complete suite · No internet required · Works from USB or local folder</div>
-  <a href="fate-generator-2026.03.33.zip" download
+  <a href="https://github.com/brs165/ogma-fate"
+     target="_blank" rel="noopener noreferrer"
      style="display:inline-block;padding:12px 32px;background:var(--accent,#d4a832);color:#000;font-weight:700;font-size:var(--text-sm);border-radius:100px;text-decoration:none;letter-spacing:0.02em;">
-    ⬇ Download fate-generator-2026.03.33.zip
+    Visit GitHub Repo
   </a>
-  <div style="font-size:var(--text-label);color:var(--text-muted);margin-top:10px;">2026.03.13 · 6 worlds · 16 generators · ~500 KB</div>
+  <div style="font-size:var(--text-label);color:var(--text-muted);margin-top:10px;">Releases tab · latest zip · source code</div>
 </div>
 <p>Once unzipped, open <code>index.html</code> in any modern browser. All features work identically - generators, table manager, fate point tracker, session zero, campaign guides. The service worker does not run on <code>file://</code> but everything else does.</p>
 

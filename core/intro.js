@@ -38,6 +38,7 @@
     var url = window.location.pathname;
     if (url.indexOf('cyberpunk') !== -1)    return 'cyberpunk';
     if (url.indexOf('postapoc') !== -1)     return 'postapoc';
+    if (url.indexOf('western') !== -1)      return 'western';
     if (url.indexOf('fantasy') !== -1)      return 'fantasy';
     if (url.indexOf('space') !== -1)        return 'space';
     if (url.indexOf('victorian') !== -1)    return 'victorian';
@@ -369,6 +370,37 @@
     ];
   }
 
+
+  // ── DUST AND IRON ─────────────────────────────────────────
+  // Register: bone-dry, economical, one word at a time.
+  // The land as character. The law as the problem.
+  function seqWestern() {
+    var D = 1.0;
+    return [
+      {txt:'', d:900},
+      {txt:'The survey stakes went in at dawn.',               col:C.bY, fade:1600, d:600},
+      {txt:'', d:800},
+      {txt:'The homesteaders pulled them up by noon.',         col:C.dG, fade:1400, d:500},
+      {txt:'', d:600},
+      {txt:'The Harker Company rode in at three.',             col:C.bR, fade:1800, d:400},
+      {txt:'', d:1200},
+      {txt:'The law came too.',                                col:C.dK, fade:1400, d:600},
+      {txt:'', d:500},
+      {txt:'The law was on the company side.',                 col:C.bR, fade:2000, d:400},
+      {txt:'', d:1000},
+      {txt:'This is the frontier.',                            col:C.bY, fade:1800, d:700},
+      {txt:'', d:600},
+      {txt:'It has always worked this way.',                   col:C.dK, fade:1600, d:500},
+      {txt:'', d:800},
+      {txt:'Until today.',                                     col:C.WH, fade:2200, d:300},
+      {txt:'', d:1400},
+      {txt:'DUST AND IRON',                                    col:C.bY, title:true, fade:2800, d:400},
+      {txt:'FATE CONDENSED  //  FRONTIER WESTERN',             col:C.dY, sub:true,  fade:2200, d:300},
+      {txt:'', d:300},
+      {txt:'- - - - - - - - - - - - - - - - - - - - - - - -', col:C.dY, fade:1400, d:100},
+    ];
+  }
+
   var SEQUENCES = {
     index:       seqIndex,
     cyberpunk:   seqCyberpunk,
@@ -377,6 +409,7 @@
     space:       seqSpace,
     victorian:   seqVictorian,
     thelongafter: seqLongAfter,
+    western:      seqWestern,
   };
 
   // ── Title card (return visit) ─────────────────────────────
@@ -388,6 +421,7 @@
                    worldKey === 'space'       ? C.bB  :
                    worldKey === 'victorian'   ? C.lG  :
                    worldKey === 'thelongafter'? C.bG  :
+                   worldKey === 'western'     ? C.bY  :
                    C.gd; // index
     return [
       {txt:'', d:400},

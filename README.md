@@ -4,7 +4,7 @@ An offline, browser-based random content generator for **Fate Condensed** tablet
 
 > *Named for the Celtic god of eloquence - the one who gave language its shape. Also a backronym: **Offline Game Master's Aid**.* No internet required after download. No server, no build step - pure random tables with a clean UI.
 
-> **16 generators · 6 campaign worlds · works from `file://`**
+> **16 generators · 7 campaign worlds · works from `file://`**
 
 ---
 

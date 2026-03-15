@@ -1,5 +1,5 @@
 {
-  "name": "Ogma — A Fate Condensed Generator Suite",
+  "name": "Ogma \u2014 A Fate Condensed Generator Suite",
   "short_name": "Ogma",
   "description": "Offline GM prep tool for six Fate Condensed campaign settings. No internet required after first load.",
   "start_url": "./index.html",
@@ -119,6 +119,19 @@
         {
           "src": "assets/favicons/icon-192.png",
           "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Dust and Iron",
+      "short_name": "Western",
+      "description": "Frontier Western Fate Condensed Generator",
+      "url": "./campaigns/western.html",
+      "icons": [
+        {
+          "src": "assets/favicons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
         }
       ]
     }

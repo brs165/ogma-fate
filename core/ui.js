@@ -1649,6 +1649,7 @@ var CAMPAIGN_PAGES = {
   space:     'campaigns/space.html',
   victorian: 'campaigns/victorian.html',
   postapoc:  'campaigns/postapoc.html',
+  western:   'campaigns/western.html',
 };
 
 var CAMPAIGN_GUIDE_PAGES = {
@@ -1658,6 +1659,7 @@ var CAMPAIGN_GUIDE_PAGES = {
   space:        'campaigns/guide-space.html',
   victorian:    'campaigns/guide-victorian.html',
   postapoc:     'campaigns/guide-postapoc.html',
+  western:      'campaigns/guide-western.html',
 };
 
 var CAMPAIGN_INFO = {
@@ -1667,6 +1669,7 @@ var CAMPAIGN_INFO = {
   space:        {genre: 'Space Western',   vibes: 'Firefly · The Expanse · Cowboy Bebop',        tones: ['action','dark'],  era: 'stars',  hook: 'Hard vacuum, hard choices, and no one coming to help'},
   victorian:    {genre: 'Gothic Horror',   vibes: 'Penny Dreadful · From Hell · The Prestige',   tones: ['dark','weird'],   era: 'swords', hook: 'Gaslight and secrets and things that should not exist'},
   postapoc:     {genre: 'Post-Apocalypse', vibes: 'Mad Max · Last of Us · Station Eleven',       tones: ['action','dark'],  era: 'guns',   hook: 'The world already ended. Survive what comes next'},
+  western:      {genre: 'Frontier Western',  vibes: 'Blood Meridian · Deadwood · True Grit',       tones: ['action','dark'],  era: 'guns',   hook: 'Frontier justice. Railroad money and the weight of the old war'},
 };
 
 function LandingApp() {
