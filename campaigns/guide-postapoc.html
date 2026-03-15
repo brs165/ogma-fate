@@ -6,7 +6,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Long Road - Campaign Guide</title>
 <link rel="icon" type="image/svg+xml" href="../assets/favicons/icon.svg">
-<link rel="stylesheet" href="../assets/css/theme.css?v=44">
+<link rel="stylesheet" href="../assets/css/theme.css?v=62">
 <style>
 .cg{max-width:680px;margin:0 auto;padding:24px 20px 80px;position:relative;z-index:1}
 .cg h1{font-size:var(--text-hero);font-weight:800;color:var(--text);margin-bottom:4px;letter-spacing:-0.02em}
@@ -73,6 +73,16 @@
 <div class="cg-stat"><b>168</b><span>Names</span></div>
 <div class="cg-stat"><b>18</b><span>Challenges</span></div>
 </div>
+<div id="guide-intro-teaser" aria-label="Campaign introduction"></div>
+<script>(function(){
+  function tryInit(){
+    if(typeof window.fateInitInline==='function'){
+      window.fateInitInline(document.getElementById('guide-intro-teaser'),
+        {worldKey:'postapoc',titleOnly:true,freeze:true});
+    } else { setTimeout(tryInit,50); }
+  }
+  tryInit();
+})()</script>
 <h2>Tone & Atmosphere</h2>
 <p>Lyrical post-apocalypse. The world is dangerous but beautiful. Nature is not hostile - it is indifferent, and its indifference is gorgeous. The pre-war technology is miraculous and cursed. The question is not how to survive but what kind of world you build with what you salvage.</p>
 <h2>For Players</h2>
@@ -123,5 +133,7 @@
   document.addEventListener('click',function(){dd.classList.remove('open');btn.setAttribute('aria-expanded','false');});
 })();
 </script>
+<script src="../core/db.js?v=62"></script>
+<script src="../core/intro.js?v=62"></script>
 </body>
 </html>

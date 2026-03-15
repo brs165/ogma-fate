@@ -6,7 +6,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dust and Iron - Campaign Guide</title>
 <link rel="icon" type="image/svg+xml" href="../assets/favicons/icon.svg">
-<link rel="stylesheet" href="../assets/css/theme.css?v=44">
+<link rel="stylesheet" href="../assets/css/theme.css?v=62">
 <style>
 .cg{max-width:680px;margin:0 auto;padding:24px 20px 80px;position:relative;z-index:1}
 .cg h1{font-size:var(--text-hero);font-weight:800;color:var(--text);margin-bottom:4px;letter-spacing:-0.02em}
@@ -81,6 +81,16 @@
 <p>The territory is not lawless. It's worse: the law is present and it belongs to someone. The sheriff, the land deed, and the territorial judge are all instruments of the same pocket. Your characters are the people who aren't in that pocket — or who used to be.</p>
 <p><em>Inspirations: Blood Meridian, Deadwood, True Grit, Lonesome Dove, No Country for Old Men.</em></p>
 
+<div id="guide-intro-teaser" aria-label="Campaign introduction"></div>
+<script>(function(){
+  function tryInit(){
+    if(typeof window.fateInitInline==='function'){
+      window.fateInitInline(document.getElementById('guide-intro-teaser'),
+        {worldKey:'western',titleOnly:true,freeze:true});
+    } else { setTimeout(tryInit,50); }
+  }
+  tryInit();
+})()</script>
 <h2>Tone & Voice</h2>
 <p>Hard-earned and spare. Bone-dry. The frontier strips things down to what they are. People are loyal or they aren't. Land is worth what someone will kill for. The darkness comes from human choices. Violence has weight. Death is rarely poetic.</p>
 
@@ -139,5 +149,7 @@
   document.addEventListener('click',function(){dd.classList.remove('open');btn.setAttribute('aria-expanded','false');});
 })();
 </script>
+<script src="../core/db.js?v=62"></script>
+<script src="../core/intro.js?v=62"></script>
 </body>
 </html>

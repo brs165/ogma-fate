@@ -1,0 +1,416 @@
+/* Ogma Projector — TV display stylesheet
+   Optimised for 40"+ screens at 2–4m reading distance.
+   No blur, no glass, no GM chrome. High contrast, large type. */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --proj-bg:      #0d0d0f;
+  --proj-panel:   #1a1a1f;
+  --proj-border:  rgba(255,255,255,0.12);
+  --proj-text:    #f0f4f8;
+  --proj-dim:     rgba(255,255,255,0.60);
+  --proj-muted:   rgba(255,255,255,0.40);
+  --proj-accent:  #D4884A;   /* default fantasy; overridden per camp */
+  --proj-red:     #FF6B4A;
+  --proj-green:   #4CD964;
+  --proj-blue:    #5AC8FA;
+  /* Campaign overrides */
+}
+
+/* Campaign accent colours */
+#root.camp-thelongafter { --proj-accent: #F5A623; }
+#root.camp-cyberpunk    { --proj-accent: #32D7E8; }
+#root.camp-fantasy      { --proj-accent: #D4884A; }
+#root.camp-space        { --proj-accent: #BF7AF0; }
+#root.camp-victorian    { --proj-accent: #C8B858; }
+#root.camp-postapoc     { --proj-accent: #F08030; }
+#root.camp-western      { --proj-accent: #D4924A; }
+
+html, body {
+  height: 100%;
+  background: var(--proj-bg);
+  color: var(--proj-text);
+  font-family: 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 24px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 80px;
+}
+
+/* ── Waiting state ────────────────────────────────────────────────────────── */
+.proj-waiting {
+  text-align: center;
+  opacity: 0.35;
+}
+.proj-waiting-icon { font-size: 64px; margin-bottom: 24px; line-height: 1; }
+.proj-waiting-text { font-size: 36px; font-weight: 600; margin-bottom: 8px; color: var(--proj-text); }
+.proj-waiting-sub  { font-size: 20px; color: var(--proj-dim); }
+
+/* ── Result card ─────────────────────────────────────────────────────────── */
+.proj-result {
+  max-width: 900px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@keyframes proj-fade-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.proj-fade-in { animation: proj-fade-in 0.4s ease both; }
+
+/* Generator badge */
+.proj-gen-badge {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--proj-accent);
+  text-transform: uppercase;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--proj-border);
+}
+
+/* Name / title */
+.proj-name {
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--proj-text);
+  line-height: 1.15;
+}
+.proj-italic { font-style: italic; font-weight: 400; }
+.proj-dim    { font-size: 22px; color: var(--proj-dim); line-height: 1.5; }
+
+/* Aspects */
+.proj-asp-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.proj-asp-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 9px;
+  background: var(--proj-accent);
+}
+.proj-asp-hc { background: var(--proj-accent); }
+.proj-asp-tr { background: var(--proj-red); }
+.proj-asp-ot { background: var(--proj-dim); }
+.proj-asp-text { font-size: 26px; color: var(--proj-text); line-height: 1.4; }
+
+/* Skills */
+.proj-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+.proj-skill {
+  font-size: 18px;
+  color: var(--proj-dim);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--proj-border);
+  border-radius: 6px;
+  padding: 4px 12px;
+}
+
+/* Info boxes */
+.proj-infobox {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--proj-border);
+  border-radius: 10px;
+  padding: 16px 20px;
+}
+.proj-infobox-label {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--proj-accent);
+  margin-bottom: 8px;
+}
+.proj-infobox-value { font-size: 22px; color: var(--proj-text); line-height: 1.5; }
+
+/* Countdown track */
+.proj-track {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.proj-track-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  border: 2px solid var(--proj-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--proj-accent);
+}
+.proj-track-unit { font-size: 16px; color: var(--proj-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+/* Zones */
+.proj-zones { display: flex; flex-wrap: wrap; gap: 10px; }
+.proj-zone  {
+  font-size: 18px;
+  padding: 6px 16px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--proj-border);
+  color: var(--proj-dim);
+}
+
+/* Severity badge */
+.proj-severity {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 4px;
+  border: 1px solid;
+}
+.proj-sev-mild     { color: var(--proj-blue);  border-color: var(--proj-blue);  background: rgba(90,200,250,0.1); }
+.proj-sev-moderate { color: #BF7AF0;            border-color: #BF7AF0;           background: rgba(191,122,240,0.1); }
+.proj-sev-severe   { color: var(--proj-red);   border-color: var(--proj-red);   background: rgba(255,107,74,0.1); }
+
+/* Pill */
+.proj-pill { display: flex; align-items: baseline; gap: 8px; }
+.proj-pill-label { font-size: 14px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--proj-muted); }
+.proj-pill-value { font-size: 22px; color: var(--proj-text); }
+
+
+/* ── BL-41: Live state updates ─────────────────────────────────────────── */
+.proj-track-box {
+  transition: background 0.3s, border-color 0.3s, transform 0.2s;
+}
+.proj-box-filled {
+  background: var(--proj-accent, #4cd964) !important;
+  border-color: var(--proj-accent, #4cd964) !important;
+  color: #000 !important;
+  transform: scale(1.08);
+}
+.proj-box-triggered {
+  background: #ff3b30 !important;
+  border-color: #ff3b30 !important;
+  animation: proj-box-pulse 0.4s ease both;
+}
+.proj-track-triggered .proj-track-box.proj-box-filled {
+  background: #ff3b30 !important;
+  border-color: #ff3b30 !important;
+}
+.proj-name-triggered {
+  color: #ff3b30 !important;
+  animation: proj-shake 0.4s ease both;
+}
+.proj-outcome-active {
+  border-color: #ff3b30 !important;
+  background: rgba(255,59,48,0.12) !important;
+  animation: proj-fade-in 0.4s ease both;
+}
+.proj-box-a { background: #5ac8fa !important; border-color: #5ac8fa !important; }
+.proj-box-b { background: #ff3b30 !important; border-color: #ff3b30 !important; }
+.proj-winner {
+  display: none;
+  margin-top: 16px;
+  font-size: 2.2em;
+  font-weight: 800;
+  color: #ffd60a;
+  text-align: center;
+  animation: proj-fade-in 0.4s ease both;
+  letter-spacing: 2px;
+}
+.proj-asp-row {
+  transition: all 0.3s ease;
+}
+.proj-asp-active {
+  padding: 6px 12px !important;
+  border-radius: 8px;
+  border: 2px solid var(--proj-accent, #4cd964) !important;
+  background: rgba(76,217,100,0.14) !important;
+  transform: scale(1.04);
+  order: -1;
+  animation: proj-asp-spotlight 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes proj-asp-spotlight {
+  from { opacity: 0.4; transform: scale(0.97); }
+  to   { opacity: 1;   transform: scale(1.04); }
+}
+.proj-asp-active .proj-asp-dot {
+  box-shadow: 0 0 10px currentColor, 0 0 3px currentColor;
+}
+.proj-asp-active .proj-asp-text {
+  color: #fff;
+  font-weight: 600;
+  text-shadow: 0 0 8px rgba(76,217,100,0.4);
+}
+/* Container needs flex+flex-direction for order to work */
+.proj-result:has(.proj-asp-active) .proj-asp-row:not(.proj-asp-active) {
+  opacity: 0.45;
+  transform: scale(0.98);
+  transition: all 0.3s ease;
+}
+
+/* ── BL-44: FP dot strip ────────────────────────────────────────────────── */
+.proj-fp-strip {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 24px;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.proj-fp-label {
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  font-family: 'Courier New', monospace;
+  white-space: nowrap;
+}
+.proj-fp-dots {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.proj-fp-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  transition: all 0.35s ease;
+}
+.proj-fp-dot-on {
+  background: #ffd60a;
+  box-shadow: 0 0 8px #ffd60a, 0 0 16px rgba(255,214,10,0.4);
+  animation: proj-dot-pop 0.3s ease both;
+}
+.proj-fp-dot-off {
+  background: transparent;
+  border: 1.5px solid rgba(255,255,255,0.2);
+}
+@keyframes proj-box-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.25); }
+  100% { transform: scale(1.08); }
+}
+@keyframes proj-shake {
+  0%,100% { transform: translateX(0); }
+  20%,60% { transform: translateX(-6px); }
+  40%,80% { transform: translateX(6px); }
+}
+@keyframes proj-dot-pop {
+  0% { transform: scale(0.5); opacity: 0; }
+  70% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes proj-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── BL-43: NPC stress tracks ──────────────────────────────────────────────── */
+.proj-stress-track {
+  margin-top: 16px;
+  transition: opacity 0.3s;
+}
+.proj-stress-label {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 6px;
+  font-family: 'Courier New', monospace;
+}
+.proj-stress-boxes {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.proj-stress-box {
+  width: 36px;
+  height: 36px;
+  border: 2px solid rgba(255,255,255,0.25);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: rgba(255,255,255,0.3);
+  font-family: 'Courier New', monospace;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.proj-stress-box.proj-stress-filled {
+  background: var(--proj-accent, #D4A832);
+  border-color: var(--proj-accent, #D4A832);
+  color: #000;
+  font-weight: 800;
+  transform: scale(1.1);
+}
+.proj-stress-track.proj-stress-takenout .proj-stress-box.proj-stress-filled {
+  background: #ff3b30;
+  border-color: #ff3b30;
+}
+
+/* ── BL-43: TAKEN OUT overlay ───────────────────────────────────────────────── */
+.proj-taken-out {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(0,0,0,0.82);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  border-radius: inherit;
+  z-index: 10;
+}
+.proj-taken-out.proj-taken-out-visible {
+  opacity: 1;
+  animation: proj-takenout-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes proj-takenout-in {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.proj-taken-out-icon {
+  font-size: 52px;
+  animation: proj-icon-spin 0.6s ease-out;
+}
+@keyframes proj-icon-spin {
+  from { transform: rotate(-20deg) scale(0.6); }
+  to   { transform: rotate(0deg) scale(1); }
+}
+.proj-taken-out-label {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  color: #ff3b30;
+  font-family: 'Courier New', monospace;
+  text-transform: uppercase;
+  text-shadow: 0 0 20px rgba(255,59,48,0.6);
+}
+.proj-taken-out-name {
+  font-size: 16px;
+  color: rgba(255,255,255,0.6);
+  font-style: italic;
+  font-family: 'Courier New', monospace;
+}

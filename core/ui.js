@@ -151,7 +151,14 @@ function StressBoxes(props) {
   function mark(i) {
     var next = hits === i + 1 ? i : i + 1;
     setHits(next);
-    if (next >= n && n > 0) {
+    var takenOutNow = next >= n && n > 0;
+    if (props.onUpdate) props.onUpdate({
+      label: props.label || 'Stress',
+      hits: next,
+      total: n,
+      takenOut: takenOutNow,
+    });
+    if (takenOutNow) {
       setShaking(true);
       setTimeout(function() { setShaking(false); }, 600);
       if (navigator.vibrate) navigator.vibrate([40, 60, 80]);
@@ -169,6 +176,11 @@ function StressBoxes(props) {
           key: i,
           className: 'stress-box',
           onClick: function() { mark(i); },
+          onKeyDown: function(e) { if(e.key===' '||e.key==='Enter'){e.preventDefault();mark(i);} },
+          role: 'checkbox',
+          'aria-checked': String(marked),
+          'aria-label': (props.label||'Stress')+' box '+(i+1),
+          tabIndex: 0,
           title: marked ? 'Click to clear' : 'Click to mark hit',
           style: {
             cursor: 'pointer',
@@ -245,7 +257,7 @@ function MinorResult(props) {
       h(StuntRow, {stunt: d.stunt})
     ),
     h('div', {style: {marginTop: 12}},
-      h(StressBoxes, {n: d.stress, label: 'Stress'})
+      h(StressBoxes, {n: d.stress, label: 'Stress', onUpdate: props.onUpdate})
     ),
     h(GMNote, {text: 'No consequence slots. One good hit takes them out. Weakness aspect is your best compel lever.'})
   );
@@ -295,8 +307,8 @@ function MajorResult(props) {
         ),
         h('div', null,
           h(Lbl, {mb: 6}, 'STRESS'),
-          h(StressBoxes, {n: d.physical_stress, label: 'Physical'}),
-          h(StressBoxes, {n: d.mental_stress, label: 'Mental'}),
+          h(StressBoxes, {n: d.physical_stress, label: 'Physical', onUpdate: props.onUpdate}),
+          h(StressBoxes, {n: d.mental_stress,   label: 'Mental',   onUpdate: props.onUpdate}),
           h('div', {style: {marginTop: 10}},
             h(Lbl, {mb: 4}, 'CONSEQUENCES'),
             ['Mild −2', 'Moderate −4', 'Severe −6'].map(function(row, i) {
@@ -319,7 +331,13 @@ function MajorResult(props) {
 function SceneResult(props) {
   var d = props.data;
   var _pinned = useState([]); var pinned = _pinned[0]; var setPinned = _pinned[1];
-  function togglePin(i) { setPinned(function(p) { return p.includes(i) ? p.filter(function(x) { return x !== i; }) : p.concat([i]); }); }
+  function togglePin(i) {
+    setPinned(function(p) {
+      var next = p.includes(i) ? p.filter(function(x){ return x!==i; }) : p.concat([i]);
+      if (props.onUpdate) props.onUpdate({active_aspects: next});
+      return next;
+    });
+  }
   var catColor = {tone: 'var(--c-purple)', movement: 'var(--c-red)', cover: 'var(--c-blue)', danger: 'var(--c-red)', usable: 'var(--c-green)'};
   var catLabel = {tone: 'TONE', movement: 'MOVEMENT', cover: 'COVER', danger: 'DANGER', usable: 'USABLE'};
   return h('div', null,
@@ -483,8 +501,8 @@ function EncounterResult(props) {
         )
       ),
       h('div', {style: {display: 'flex', flexDirection: 'column', gap: 4}},
-        h('button', {onClick: function() { setGmFP(function(v) { return v + 1; }); }, style: {width: 28, height: 28, borderRadius: 6, border: '1px solid var(--border)', background: 'var(--panel)', color: 'var(--text-dim)', fontSize: 16, cursor: 'pointer', lineHeight: 1}}, '+'),
-        h('button', {onClick: function() { setGmFP(function(v) { return Math.max(0, v - 1); }); }, style: {width: 28, height: 28, borderRadius: 6, border: '1px solid var(--border)', background: 'var(--panel)', color: 'var(--text-dim)', fontSize: 16, cursor: 'pointer', lineHeight: 1}}, '−')
+        h('button', {onClick: function() { setGmFP(function(v) { return v + 1; }); }, className: 'fp-counter-btn'}, '+'),
+        h('button', {onClick: function() { setGmFP(function(v) { return Math.max(0, v - 1); }); }, className: 'fp-counter-btn'}, '−')
       )
     ),
     h('div', {style: {marginTop: 10}},
@@ -514,13 +532,11 @@ function SeedResult(props) {
         return h('button', {
           key: scene.num,
           onClick: function() { setActiveScene(scene.num - 1); },
+          className: 'seed-scene-tab',
           style: {
-            flex: 1, padding: '6px 8px', border: 'none', cursor: 'pointer', borderRadius: 8,
             background: isActive ? 'color-mix(in srgb, ' + col + ' 15%, transparent)' : 'var(--inset)',
-            border: '1px solid ' + (isActive ? col + '55' : 'var(--border)'),
+            borderColor: isActive ? col + '55' : 'var(--border)',
             color: isActive ? col : 'var(--text-muted)',
-            fontSize: 'var(--text-label)', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
-            fontFamily: 'var(--font-ui)', transition: 'all 0.15s',
           },
         }, scene.type);
       })
@@ -562,7 +578,7 @@ function SeedResult(props) {
 function CompelResult(props) {
   var d = props.data;
   var _res = useState(null); var resolution = _res[0]; var setResolution = _res[1];
-  return h('div', {style: {animation: 'fadeUp 0.3s ease both'}},
+  return h('div', {className: 'result-fade-up'},
     h('div', {className: 'lbl', style: {marginBottom: 12}}, 'Compel'),
     h('div', {className: 'info-box', style: {borderColor: 'var(--accent)', background: 'color-mix(in srgb, var(--accent) 10%, transparent)', marginBottom: 10}},
       h('div', {className: 'info-box-label', style: {color: 'var(--gold)'}}, '🎭 Situation'),
@@ -622,7 +638,7 @@ function CompelResult(props) {
 function ChallengeResult(props) {
   var d = props.data;
   var _out = useState('none'); var outcome = _out[0]; var setOutcome = _out[1];
-  return h('div', {style: {animation: 'fadeUp 0.3s ease both'}},
+  return h('div', {className: 'result-fade-up'},
     h('div', {className: 'lbl', style: {marginBottom: 4}}, 'Challenge'),
     h('div', {style: {fontSize: 20, fontWeight: 800, color: 'var(--gold)', marginBottom: 6}}, d.name),
     h('div', {style: {fontSize: 'var(--text-sm)', color: 'var(--text-dim)', lineHeight: 1.6, marginBottom: 14}}, d.desc),
@@ -684,6 +700,20 @@ function ContestResult(props) {
   var _a = useState(0); var scoreA = _a[0]; var setScoreA = _a[1];
   var _b = useState(0); var scoreB = _b[0]; var setScoreB = _b[1];
   var winner = scoreA >= WIN ? d.side_a : scoreB >= WIN ? d.side_b : null;
+  function updateScoreA(fn) {
+    setScoreA(function(v) {
+      var next = fn(v);
+      if (props.onUpdate) props.onUpdate({scoreA: next, scoreB: scoreB, WIN: WIN});
+      return next;
+    });
+  }
+  function updateScoreB(fn) {
+    setScoreB(function(v) {
+      var next = fn(v);
+      if (props.onUpdate) props.onUpdate({scoreA: scoreA, scoreB: next, WIN: WIN});
+      return next;
+    });
+  }
   function TrackSide(tprops) {
     var score = tprops.score;
     var isWinner = score >= WIN;
@@ -707,12 +737,11 @@ function ContestResult(props) {
             key: i,
             title: filled ? 'Click to remove victory' : 'Click to mark victory',
             onClick: function() { tprops.setScore(function(v) { return v === i + 1 ? i : i + 1; }); },
+            className: 'contest-box',
             style: {
-              width: 28, height: 28, borderRadius: 7, cursor: 'pointer', transition: 'all 0.2s',
               border: '2px solid ' + (filled ? (isWinner ? 'var(--accent)' : tprops.colorVar) : 'var(--border)'),
               background: filled ? (isWinner ? 'var(--accent)' : ('color-mix(in srgb, ' + tprops.colorVar + ' 30%, transparent)')) : 'transparent',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 11, fontWeight: 800, color: filled ? (isWinner ? 'var(--bg)' : tprops.colorVar) : 'var(--text-muted)',
+              color: filled ? (isWinner ? 'var(--bg)' : tprops.colorVar) : 'var(--text-muted)',
             },
           }, filled ? '✓' : '');
         })
@@ -722,14 +751,14 @@ function ContestResult(props) {
       )
     );
   }
-  return h('div', {style: {animation: 'fadeUp 0.3s ease both'}},
+  return h('div', {className: 'result-fade-up'},
     h(Lbl, null, 'CONTEST'),
     h('div', {style: {fontSize: 20, fontWeight: 800, color: 'var(--gold)', marginBottom: 4}}, d.contest_type),
     h('div', {style: {fontSize: 'var(--text-sm)', color: 'var(--text-dim)', lineHeight: 1.6, marginBottom: 12}}, d.desc),
     h(AspectBadge, {text: d.aspect, color: 'var(--accent)', label: 'Situation aspect - always in play during the contest'}),
     h('div', {style: {display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 12}},
-      h(TrackSide, {name: d.side_a, skills: d.skills_a, score: scoreA, setScore: setScoreA, colorVar: 'var(--c-blue)',  icon: '🔵'}),
-      h(TrackSide, {name: d.side_b, skills: d.skills_b, score: scoreB, setScore: setScoreB, colorVar: 'var(--c-red)',   icon: '🔴'})
+      h(TrackSide, {name: d.side_a, skills: d.skills_a, score: scoreA, setScore: updateScoreA, colorVar: 'var(--c-blue)',  icon: '🔵'}),
+      h(TrackSide, {name: d.side_b, skills: d.skills_b, score: scoreB, setScore: updateScoreB, colorVar: 'var(--c-red)',   icon: '🔴'})
     ),
     winner && h('div', {
       style: {
@@ -741,8 +770,8 @@ function ContestResult(props) {
     },
       h('div', {style: {fontSize: 'var(--text-base)', fontWeight: 800, color: 'var(--accent)'}}, winner + ' wins the contest!'),
       h('button', {
-        onClick: function() { setScoreA(0); setScoreB(0); },
-        style: {marginTop: 6, background: 'none', border: 'none', cursor: 'pointer', fontSize: 'var(--text-label)', color: 'var(--text-muted)', fontFamily: 'var(--font-ui)'},
+        onClick: function() { setScoreA(0); setScoreB(0); if (props.onUpdate) props.onUpdate({scoreA:0, scoreB:0, WIN:WIN}); },
+        className: 'contest-reset-btn',
       }, '↩ Reset')
     ),
     h('div', {style: {marginTop: 12}},
@@ -777,7 +806,7 @@ function ConsequenceResult(props) {
   var col = sevColor[d.severity] || 'var(--accent)';
   return h('div', null,
     h(Lbl, null, 'CONSEQUENCE'),
-    h('div', {title: sevTip[d.severity], style: {display: 'inline-block', padding: '3px 10px', borderRadius: 4, fontSize: 12, fontWeight: 700, letterSpacing: 1, marginBottom: 12, color: col, border: '1px solid ' + col + '55', background: col + '18'}}, sevLabel[d.severity] || d.severity.toUpperCase()),
+    h('div', {title: sevTip[d.severity], className: 'gen-badge', style: {color: col, border: '1px solid ' + col + '55', background: col + '18'}}, sevLabel[d.severity] || d.severity.toUpperCase()),
     h('div', {style: {fontSize: 18, fontStyle: 'italic', color: 'var(--text)', padding: '10px 14px', marginBottom: 10, background: col + '0d', border: '1px solid ' + col + '33', borderRadius: 10, lineHeight: 1.4}},
       '"' + d.aspect + '"'
     ),
@@ -791,20 +820,20 @@ function ConsequenceResult(props) {
           onClick: function() { setTreated(function(v) { return !v; }); },
           style: {display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer'},
         },
-          h('div', {className: treated ? 'consequence-marked' : '', style: {width: 20, height: 20, borderRadius: 5, border: '2px solid ' + (treated ? col : 'var(--border)'), background: treated ? col : 'transparent', flexShrink: 0, transition: 'all 0.15s', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: 'var(--bg)'}}, treated ? '✓' : ''),
+          h('div', {className: treated ? 'consequence-marked' : '', className: 'check-marker', style: {border: '2px solid ' + (treated ? col : 'var(--border)'), background: treated ? col : 'transparent'}}, treated ? '✓' : ''),
           h('div', null,
             h('div', {style: {fontSize: 'var(--text-sm)', color: treated ? 'var(--text)' : 'var(--text-dim)', fontWeight: treated ? 600 : 400}}, 'Treatment: overcome ' + recoveryTarget[d.severity]),
-            h('div', {style: {fontSize: 'var(--text-label)', color: 'var(--text-muted)'}}, 'Academics (physical) or Empathy (mental) · +2 if self-treating')
+            h('div', {className: 'text-label-muted'}, 'Academics (physical) or Empathy (mental) · +2 if self-treating')
           )
         ),
         h('label', {
           onClick: function() { if (treated) setCleared(function(v) { return !v; }); },
           style: {display: 'flex', alignItems: 'center', gap: 10, cursor: treated ? 'pointer' : 'not-allowed', opacity: treated ? 1 : 0.4},
         },
-          h('div', {style: {width: 20, height: 20, borderRadius: 5, border: '2px solid ' + (cleared ? 'var(--c-green)' : 'var(--border)'), background: cleared ? 'var(--c-green)' : 'transparent', flexShrink: 0, transition: 'all 0.15s', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: 'var(--bg)'}}, cleared ? '✓' : ''),
+          h('div', {className: 'check-marker', style: {border: '2px solid ' + (cleared ? 'var(--c-green)' : 'var(--border)'), background: cleared ? 'var(--c-green)' : 'transparent'}}, cleared ? '✓' : ''),
           h('div', null,
             h('div', {style: {fontSize: 'var(--text-sm)', color: cleared ? 'var(--c-green)' : 'var(--text-dim)', fontWeight: cleared ? 600 : 400}}, 'Cleared after ' + recoveryWindow[d.severity]),
-            h('div', {style: {fontSize: 'var(--text-label)', color: 'var(--text-muted)'}}, treated ? 'Treatment done - mark when window passes' : 'Treat first')
+            h('div', {className: 'text-label-muted'}, treated ? 'Treatment done - mark when window passes' : 'Treat first')
           )
         )
       )
@@ -864,7 +893,7 @@ function ComplicationResult(props) {
   };
   return h('div', null,
     h(Lbl, null, 'SCENE COMPLICATION'),
-    h('div', {style: {display: 'inline-block', padding: '3px 10px', borderRadius: 4, fontSize: 12, fontWeight: 700, letterSpacing: 1, marginBottom: 12, color: 'var(--c-purple)', border: '1px solid var(--c-purple)55', background: 'var(--c-purple)18'}}, d.type.toUpperCase()),
+    h('div', {className: 'gen-badge', style: {color: 'var(--c-purple)', border: '1px solid var(--c-purple)55', background: 'var(--c-purple)18'}}, d.type.toUpperCase()),
     // Spotlight selector
     h('div', {style: {marginBottom: 12}},
       h(Lbl, {mb: 6}, 'SPOTLIGHT - which to introduce first'),
@@ -947,17 +976,17 @@ function ObstacleResult(props) {
   if (d.obstacle_type === 'distraction') {
     return h('div', null,
       h(Lbl, null, 'OBSTACLE'),
-      h('div', {title: typeTip.distraction, style: {display:'inline-block', padding:'3px 10px', borderRadius:4, fontSize:12, fontWeight:700, letterSpacing:1, marginBottom:12, color:col, border:'1px solid '+col+'55', background:col+'18'}}, 'DISTRACTION'),
-      h('div', {style:{fontSize:22, fontWeight:700, color:'var(--gold)', marginBottom:14}}, d.name),
+      h('div', {title: typeTip.distraction, className:'gen-badge', style:{color:col, border:'1px solid '+col+'55', background:col+'18'}}, 'DISTRACTION'),
+      h('div', {className:'result-gold-header'}, d.name),
       h(InfoBox, {label:'⚖ THE CHOICE', text:d.choice, color:'var(--c-purple)', tip:'Present this to the players - both options have consequences'}),
       h('div', {style:{display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, margin:'12px 0'}},
         h('div', {style:{padding:'10px 14px', borderRadius:6, border:'1px solid var(--c-red)44', background:'var(--c-red)11'}},
           h('div', {style:{fontSize:12, fontWeight:700, color:'var(--c-red)', letterSpacing:1, marginBottom:4}}, 'LEAVE IT'),
-          h('div', {style:{fontSize:'var(--text-sm)', color:'var(--text-dim)'}}, d.repercussion_leave)
+          h('div', {className:'text-sm-dim'}, d.repercussion_leave)
         ),
         h('div', {style:{padding:'10px 14px', borderRadius:6, border:'1px solid var(--c-blue)44', background:'var(--c-blue)11'}},
           h('div', {style:{fontSize:12, fontWeight:700, color:'var(--c-blue)', letterSpacing:1, marginBottom:4}}, 'DEAL WITH IT'),
-          h('div', {style:{fontSize:'var(--text-sm)', color:'var(--text-dim)'}}, d.repercussion_deal)
+          h('div', {className:'text-sm-dim'}, d.repercussion_deal)
         )
       ),
       d.opposition ? h('div', {style:{fontSize:'var(--text-sm)', color:'var(--text-dim)', marginTop:8}}, 'Opposition (if rolled): ' + d.opposition_label + ' (+' + d.opposition + ')') : null,
@@ -966,13 +995,13 @@ function ObstacleResult(props) {
   }
   return h('div', null,
     h(Lbl, null, 'OBSTACLE'),
-    h('div', {title: typeTip[d.obstacle_type], style: {display:'inline-block', padding:'3px 10px', borderRadius:4, fontSize:12, fontWeight:700, letterSpacing:1, marginBottom:12, color:col, border:'1px solid '+col+'55', background:col+'18'}}, typeLabel[d.obstacle_type]),
-    h('div', {style:{fontSize:22, fontWeight:700, color:'var(--gold)', marginBottom:14}}, d.name),
+    h('div', {title: typeTip[d.obstacle_type], className:'gen-badge', style:{color:col, border:'1px solid '+col+'55', background:col+'18'}}, typeLabel[d.obstacle_type]),
+    h('div', {className:'result-gold-header'}, d.name),
     h(AspectBadge, {text: d.aspect, color: col, label: typeLabel[d.obstacle_type] + ' aspect - invoke or compel as normal'}),
     h('div', {style:{display:'flex', gap:16, flexWrap:'wrap', margin:'12px 0'}},
-      h('div', {style:{fontSize:'var(--text-sm)', color:'var(--text-dim)'}}, 'Rating: ', h('strong', {style:{color:'var(--text)'}}, d.rating_label + ' (+' + d.rating + ')')),
+      h('div', {className:'text-sm-dim'}, 'Rating: ', h('strong', {style:{color:'var(--text)'}}, d.rating_label + ' (+' + d.rating + ')')),
       d.weapon > 0 ? h('div', {style:{fontSize:'var(--text-sm)', color:'var(--c-red)'}}, 'Weapon: ' + d.weapon) : null,
-      d.obstacle_type === 'block' ? h('div', {style:{fontSize:'var(--text-sm)', color:'var(--text-dim)'}}, 'Disable: +' + (d.rating + 2)) : null
+      d.obstacle_type === 'block' ? h('div', {className:'text-sm-dim'}, 'Disable: +' + (d.rating + 2)) : null
     ),
     h(InfoBox, {label:'🔧 HOW TO DISABLE', text:d.disable, color:'var(--c-green)', tip:'How PCs can neutralize this obstacle'}),
     h(GMNote, {text: d.gm_note})
@@ -991,6 +1020,7 @@ function CountdownResult(props) {
     var next = filled === i + 1 ? i : i + 1;
     var wasTriggered = filled >= d.boxes;
     setFilled(next);
+    if (props.onUpdate) props.onUpdate({filled: next, boxes: d.boxes});
     if (next >= d.boxes && !wasTriggered) {
       // Fire particles
       var pts = Array.from({length: 12}, function(_, p) {
@@ -1028,12 +1058,11 @@ function CountdownResult(props) {
             key: i,
             title: isMarked ? 'Click to unmark' : 'Click to mark',
             onClick: function() { markBox(i); },
+            className: 'cd-box',
             style: {
-              width: 32, height: 32, borderRadius: 8, cursor:'pointer', transition:'all 0.2s',
               border: '2px solid ' + (isMarked ? boxColor : 'var(--border)'),
               background: isMarked ? ('color-mix(in srgb, ' + boxColor + ' 25%, transparent)') : 'transparent',
-              display:'flex', alignItems:'center', justifyContent:'center',
-              fontSize:13, fontWeight:800, color: isMarked ? boxColor : 'var(--text-muted)',
+              color: isMarked ? boxColor : 'var(--text-muted)',
             },
           }, isMarked ? '✕' : String(i+1));
         })
@@ -1067,8 +1096,8 @@ function ConstraintResult(props) {
     : 'Resistance - makes the target immune to a category of action until a specific bypass is achieved. Forces Plan B.';
   return h('div', null,
     h(Lbl, null, 'CONSTRAINT'),
-    h('div', {title: tagTip, style: {display:'inline-block', padding:'3px 10px', borderRadius:4, fontSize:12, fontWeight:700, letterSpacing:1, marginBottom:12, color:col, border:'1px solid '+col+'55', background:col+'18'}}, tag),
-    h('div', {style:{fontSize:22, fontWeight:700, color:'var(--gold)', marginBottom:14}}, d.name),
+    h('div', {title: tagTip, className:'gen-badge', style:{color:col, border:'1px solid '+col+'55', background:col+'18'}}, tag),
+    h('div', {className:'result-gold-header'}, d.name),
     isLim
       ? h(Fragment, null,
           h(InfoBox, {label:'🚫 RESTRICTED ACTION', text:d.restricted_action, color:'var(--c-purple)', tip:'What the PCs cannot do freely - announce this before they act'}),
@@ -1086,7 +1115,7 @@ function ConstraintResult(props) {
             },
           },
             h('div', {style:{display:'flex', alignItems:'flex-start', gap:10}},
-              h('div', {style:{width:18, height:18, borderRadius:4, flexShrink:0, marginTop:1, border:'1.5px solid ' + (bypassDone ? 'var(--c-green)' : 'var(--border)'), background: bypassDone ? 'var(--c-green)' : 'transparent', display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, color:'var(--bg)', transition:'all 0.15s'}}, bypassDone ? '✓' : ''),
+              h('div', {className: 'bypass-check', style:{border:'1.5px solid ' + (bypassDone ? 'var(--c-green)' : 'var(--border)'), background: bypassDone ? 'var(--c-green)' : 'transparent'}}, bypassDone ? '✓' : ''),
               h('div', null,
                 h('div', {style:{fontSize:'var(--text-label)', fontWeight:700, color:'var(--c-green)', letterSpacing:'0.06em', textTransform:'uppercase', marginBottom:4}}, '🔓 HOW TO BYPASS' + (bypassDone ? ' - DONE' : '')),
                 h('div', {style:{fontSize:'var(--text-sm)', color: bypassDone ? 'var(--text)' : 'var(--text-dim)', lineHeight:1.55, textDecoration: bypassDone ? 'line-through' : 'none'}}, d.bypass)
@@ -1098,25 +1127,24 @@ function ConstraintResult(props) {
   );
 }
 
-
-
-function renderResult(genId, data) {
+function renderResult(genId, data, onUpdate) {
+  var up = onUpdate || null;
   switch (genId) {
-    case 'npc_minor':    return h(MinorResult,        {data: data});
-    case 'npc_major':    return h(MajorResult,        {data: data});
-    case 'scene':        return h(SceneResult,        {data: data});
+    case 'npc_minor':    return h(MinorResult,        {data: data, onUpdate: up});
+    case 'npc_major':    return h(MajorResult,        {data: data, onUpdate: up});
+    case 'scene':        return h(SceneResult,        {data: data, onUpdate: up});
     case 'campaign':     return h(CampaignResult,     {data: data});
     case 'encounter':    return h(EncounterResult,    {data: data});
     case 'seed':         return h(SeedResult,         {data: data});
     case 'compel':       return h(CompelResult,       {data: data});
     case 'challenge':    return h(ChallengeResult,    {data: data});
-    case 'contest':      return h(ContestResult,      {data: data});
+    case 'contest':      return h(ContestResult,      {data: data, onUpdate: up});
     case 'consequence':  return h(ConsequenceResult,  {data: data});
     case 'faction':      return h(FactionResult,      {data: data});
     case 'complication': return h(ComplicationResult, {data: data});
     case 'backstory':    return h(BackstoryResult,    {data: data});
     case 'obstacle':     return h(ObstacleResult,     {data: data});
-    case 'countdown':    return h(CountdownResult,    {data: data});
+    case 'countdown':    return h(CountdownResult,    {data: data, onUpdate: up});
     case 'constraint':   return h(ConstraintResult,   {data: data});
     default: return null;
   }
@@ -1233,23 +1261,23 @@ function ShareDrawer(props) {
   },
     // ── Row 1: Markdown + file + print ────────────────────────────────
     h('div', {style: {display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: isNpc ? 8 : 0}},
-      h('span', {style: {fontSize: 'var(--text-label)', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginRight: 4}}, 'Export / Print'),
+      h('span', {className: 'section-cap'}, 'Export / Print'),
       h('button', {
         className: 'btn btn-primary' + (copiedFormat === 'md' ? ' export-copied' : ''),
         onClick: function() { copyTo(md, 'md'); },
-        style: {fontSize: 12, padding: '4px 12px', minHeight: 0},
+        className: 'btn-xs',
       }, copiedFormat === 'md' ? '✓ Copied!' : '📋 Copy Markdown'),
       h('button', {
         className: 'btn btn-ghost',
         onClick: downloadFile,
         title: 'Save as .md file',
-        style: {fontSize: 12, padding: '4px 12px', minHeight: 0},
+        className: 'btn-xs',
       }, '💾 Save .md'),
       h('button', {
         className: 'btn btn-ghost',
         onClick: function() { window.print(); },
         title: 'Print or save as PDF',
-        style: {fontSize: 12, padding: '4px 12px', minHeight: 0},
+        className: 'btn-xs',
       }, '🖨 Print'),
       h('button', {
         className: 'btn btn-icon btn-ghost',
@@ -1261,20 +1289,20 @@ function ShareDrawer(props) {
 
     // ── Row 2: VTT exports (NPC generators only) ──────────────────────
     isNpc && h('div', {style: {display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', paddingTop: 8, borderTop: '1px solid var(--border)'}},
-      h('span', {style: {fontSize: 'var(--text-label)', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginRight: 4}}, 'VTT Export'),
+      h('span', {className: 'section-cap'}, 'VTT Export'),
 
       h('button', {
         className: 'btn btn-ghost' + (copiedFormat === 'fari' ? ' export-copied' : ''),
         onClick: function() { copyTo(fariJson, 'fari'); },
         title: 'Fari App: Characters → Import\nFoundry VTT (Fate Core Official): paste into character importer',
-        style: {fontSize: 12, padding: '4px 12px', minHeight: 0},
+        className: 'btn-xs',
       }, copiedFormat === 'fari' ? '✓ Copied!' : '🎲 Fari / Foundry'),
 
       h('button', {
         className: 'btn btn-ghost' + (copiedFormat === 'roll20' ? ' export-copied' : ''),
         onClick: function() { copyTo(roll20Json, 'roll20'); },
         title: 'Roll20: open "Fate by Evil Hat" sheet → Developer Mode → paste into import box',
-        style: {fontSize: 12, padding: '4px 12px', minHeight: 0},
+        className: 'btn-xs',
       }, copiedFormat === 'roll20' ? '✓ Copied!' : '🎲 Roll20'),
 
       h('span', {style: {fontSize: 'var(--text-label)', color: 'var(--text-muted)', fontStyle: 'italic', marginLeft: 4}},
@@ -1283,7 +1311,6 @@ function ShareDrawer(props) {
     )
   );
 }
-
 
 // ════════════════════════════════════════════════════════════════════════
 // HELP MODAL
@@ -1298,6 +1325,8 @@ function KBShortcutsModal(props) {
     ['Space', 'Roll current generator'],
     ['G',     'Cycle to next generator'],
     ['P',     'Pin current result'],
+    ['V',     'Push result to projector screen', '../projector.html'],
+    ['L',     'Copy shareable link for this result'],
     ['Z',     'Undo last pin'],
     ['I',     'Inspiration mode - roll 3, pick one'],
     ['C',     'Copy result as Markdown'],
@@ -1311,7 +1340,16 @@ function KBShortcutsModal(props) {
         shortcuts.map(function(row) {
           return h('div', {key: row[0], className: 'kbd-row'},
             h('kbd', {className: 'kbd-key'}, row[0]),
-            h('span', {className: 'kbd-desc'}, row[1])
+            h('span', {className: 'kbd-desc'},
+              row[1],
+              row[2] && h('a', {
+                href: row[2], target: '_blank', rel: 'noopener',
+                className: 'kbd-sub-link',
+                style: {display:'block', fontSize:'var(--text-label)', color:'var(--accent)',
+                        marginTop:4, textDecoration:'none'},
+                onClick: function(e) { e.stopPropagation(); },
+              }, '↗ Open projector.html on your display screen')
+            )
           );
         })
       )
@@ -1373,12 +1411,16 @@ function HelpModal(props) {
       (hc.invoke_example || hc.compel_example) && h('div', {className: 'help-section gm-guidance', style: {marginTop: 10}},
         h('div', {className: 'help-section-lbl'}, '✦ Invoke & Compel Examples'),
         hc.invoke_example && h('div', {style: {marginBottom: 10}},
-          h('div', {style: {fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 4}}, '✦ Invoke for +2'),
-          h('div', {style: {fontSize: 14, color: 'var(--text)', lineHeight: 1.55, padding: '8px 10px', background: 'var(--inset)', borderRadius: 8, borderLeft: '2px solid var(--accent)'}}, hc.invoke_example)
+          h('div', {className: 'rtp-ic invoke'},
+            h('div', {className: 'rtp-ic-hdr'}, '✦ Invoke for +2'),
+            h('div', {className: 'rtp-ic-body'}, hc.invoke_example)
+          )
         ),
         hc.compel_example && h('div', null,
-          h('div', {style: {fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--c-red)', marginBottom: 4}}, '⊗ Compel for drama'),
-          h('div', {style: {fontSize: 14, color: 'var(--text)', lineHeight: 1.55, padding: '8px 10px', background: 'var(--inset)', borderRadius: 8, borderLeft: '2px solid var(--c-red)'}}, hc.compel_example)
+          h('div', {className: 'rtp-ic compel'},
+            h('div', {className: 'rtp-ic-hdr'}, '⊗ Compel for drama'),
+            h('div', {className: 'rtp-ic-body'}, hc.compel_example)
+          )
         )
       ),
 
@@ -1605,7 +1647,7 @@ function SettingsModal(props) {
               }}),
               h('div', null,
                 h('div', {style: {fontSize: 'var(--text-sm)', fontWeight: 600, color: isActive ? 'var(--text)' : 'var(--text-dim)'}}, opt.label),
-                h('div', {style: {fontSize: 'var(--text-label)', color: 'var(--text-muted)'}}, opt.desc)
+                h('div', {className: 'text-label-muted'}, opt.desc)
               )
             );
           })
@@ -1640,9 +1682,9 @@ function SettingsModal(props) {
         padding: '14px 20px', borderTop: '1px solid var(--border)',
         display: 'flex', gap: 10, flexWrap: 'wrap',
       }},
-        h('a', {href: '../learn.html', className: 'btn btn-ghost', style: {fontSize: 13, textDecoration: 'none', flex: 1, justifyContent: 'center'}}, '📖 Quick Start'),
-        h('a', {href: '../about.html', className: 'btn btn-ghost', style: {fontSize: 13, textDecoration: 'none', flex: 1, justifyContent: 'center'}}, 'About'),
-        h('a', {href: '../license.html', className: 'btn btn-ghost', style: {fontSize: 13, textDecoration: 'none', flex: 1, justifyContent: 'center'}}, 'License')
+        h('a', {href: '../learn.html', className: 'btn btn-ghost btn-nav'}, '📖 Quick Start'),
+        h('a', {href: '../about.html', className: 'btn btn-ghost btn-nav'}, 'About'),
+        h('a', {href: '../license.html', className: 'btn btn-ghost btn-nav'}, 'License')
       )
     )
   );
@@ -1711,13 +1753,19 @@ var CAMPAIGN_INFO = {
 
 function LandingApp() {
   var _t = useState(getTheme()); var theme = _t[0]; var setTheme = _t[1];
+  var landIntroRef = useRef(null);
+  useEffect(function() {
+    var el = landIntroRef.current;
+    if (!el || typeof window.fateInitInline !== 'function') return;
+    window.fateInitInline(el, {worldKey: 'index', titleOnly: true, freeze: true});
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   function toggleTheme() {
     var next = theme === 'dark' ? 'light' : 'dark';
     applyTheme(next); setTheme(next);
   }
   var camps = Object.values(CAMPAIGNS);
 
-  // R-11: Last-used campaign - read from localStorage session data
+  // Last-used campaign — read from localStorage session data
   var lastCamp = (function() {
     try {
       var ids = Object.keys(CAMPAIGN_PAGES);
@@ -1773,6 +1821,11 @@ function LandingApp() {
           h('p', {className: 'land-hero-desc'},
             'Rules-accurate NPCs, scenes, and encounters - generated in one click, ready for the table.'
           ),
+          h('div', {
+            ref: landIntroRef,
+            className: 'land-intro-teaser',
+            'aria-label': 'Ogma introduction',
+          }),
           h('div', {className: 'land-hero-pills'},
             h('span', {className: 'land-hero-pill'}, '📴 Fully offline'),
             h('span', {className: 'land-hero-pill'}, '🔓 Free forever'),
@@ -2193,7 +2246,7 @@ function TableManagerModal(props) {
 }
 
 // ════════════════════════════════════════════════════════════════════════
-// NEXT STEP STRIP (ND-02)
+// Next Step Strip
 // Contextual "What next?" suggestions shown below a generated result.
 // Maps genId → two logical follow-up generators with short prompts.
 // ════════════════════════════════════════════════════════════════════════
@@ -2250,7 +2303,7 @@ function NextStepStrip(props) {
 // ════════════════════════════════════════════════════════════════════════
 
 // ════════════════════════════════════════════════════════════════════════
-// FATE POINT TRACKER (ND-10)
+// Fate Point Tracker
 // Floating panel showing per-PC fate point pools.
 // State persisted to localStorage as fate_fp_state.
 // Default state: 3 PCs, each with refresh=3, current=3.
@@ -2586,11 +2639,76 @@ function FatePointTracker(props) {
       ),
       h('button', {className: 'fp-add-pc', onClick: addPC}, '+ Add PC')
     ),
-    // Tab: Milestones (BL-10)
+    // Tab: Milestones
     fpTab === 'ms' && h(MilestoneTracker, null),
-    // Tab: Popcorn Initiative (BL-35)
+    // Tab: Popcorn Initiative
     fpTab === 'pi' && h(PopcornTracker, {partySize: props.partySize, lastEncounter: props.lastEncounter})
   );
+}
+
+// ── Session Pack — 3-card prep packet (Seed + Countdown + Compel) ──────────────
+function SessionPackCard(props) {
+  var genId = props.genId;
+  var data  = props.data;
+  var gen   = (GENERATORS || []).find(function(g) { return g.id === genId; }) || {};
+  var hc    = HELP_CONTENT[genId] || {};
+  return h('div', {className: 'sp-card'},
+    h('div', {className: 'sp-card-header'},
+      h('span', {className: 'sp-card-icon'}, gen.icon || ''),
+      h('span', {className: 'sp-card-label'}, hc.title || gen.label || genId)
+    ),
+    h('div', {className: 'sp-card-body'},
+      renderResult(genId, data)
+    )
+  );
+}
+
+function SessionPackPanel(props) {
+  var pack     = props.pack;
+  var onPin    = props.onPin;
+  var onClear  = props.onClear;
+  if (!pack) return null;
+
+  return h('div', {className: 'sp-panel fade-up'},
+    h('div', {className: 'sp-header'},
+      h('div', {className: 'sp-header-title'},
+        h('span', {className: 'sp-header-icon'}, h(RaIcon, {n: 'torch'})),
+        ' Full Session Prep'
+      ),
+      h('div', {className: 'sp-header-actions'},
+        h('button', {
+          className: 'btn btn-ghost sp-btn',
+          onClick: onPin,
+          title: 'Pin all three cards to History',
+        }, '📌 Pin all'),
+        h('button', {
+          className: 'btn btn-ghost sp-btn',
+          onClick: onClear,
+          title: 'Clear session pack',
+          style: {color: 'var(--text-muted)'},
+        }, '✕ Clear')
+      )
+    ),
+    h('div', {className: 'sp-meta'},
+      'Seed · Countdown · Compel — three-card prep skeleton from one roll'
+    ),
+    h(SessionPackCard, {genId: 'seed',      data: pack.seed.data}),
+    h(SessionPackCard, {genId: 'countdown', data: pack.countdown.data}),
+    h(SessionPackCard, {genId: 'compel',    data: pack.compel.data})
+  );
+}
+// Returns a short display label for a result — icon + primary name field.
+function getResultLabel(r) {
+  if (!r || !r.data) return '\u2014';
+  var d = r.data;
+  var g = GENERATORS.find(function(g2) { return g2.id === r.genId; });
+  var icon = g ? g.icon + ' ' : '';
+  var name = d.name || d.contest_type || (d.aspects && d.aspects.high_concept) ||
+             (d.current && d.current.name) || (d.location && d.location.slice(0, 30)) ||
+             (d.aspect) || (d.goal && d.goal.slice(0, 30)) ||
+             (d.new_aspect && d.new_aspect.slice(0, 30)) ||
+             (d.questions && 'Backstory') || '\u2014';
+  return icon + name;
 }
 
 // ════════════════════════════════════════════════════════════════════════
@@ -2599,7 +2717,6 @@ function FatePointTracker(props) {
 // ════════════════════════════════════════════════════════════════════════
 
 var LADDER_NAMES = ['','Average','Fair','Good','Great','Superb','Fantastic','Epic','Legendary'];
-
 
 // ── ResultCard — generator identity strip (icon + label + accent line) ──────
 // renderResult() renders the full content below this strip.
@@ -2669,8 +2786,11 @@ function GmTipsPanel(props) {
       h('div', null,
         checklist.map(function(item, i) {
           var done = !!(checks && checks[i]);
-          return h('div', {key:i, className: 'rtp-check', onClick: function(){toggleCheck(i);}},
-            h('div', {className: 'rtp-check-box' + (done ? ' done' : '')}, done ? '✓' : ''),
+          return h('div', {key:i, className: 'rtp-check', onClick: function(){toggleCheck(i);},
+              role: 'checkbox', 'aria-checked': String(!!done), tabIndex: 0,
+              onKeyDown: function(e){ if(e.key===' '||e.key==='Enter'){e.preventDefault();toggleCheck(i);} }
+            },
+            h('div', {className: 'rtp-check-box' + (done ? ' done' : ''), 'aria-hidden': 'true'}, done ? '✓' : ''),
             h('span', null, item)
           );
         })
@@ -2748,8 +2868,18 @@ function CampaignApp(props) {
 
   var _theme = useState(getTheme()); var theme = _theme[0]; var setTheme = _theme[1];
   var _tsz   = useState(getTextSize()); var textSize = _tsz[0]; var setTextSize = _tsz[1];
-  var _gen   = useState('npc_minor'); var activeGen = _gen[0]; var setActiveGen = _gen[1];
+  // ── URL seed params — BL-06 shareable links ─────────────────────────────
+  var _urlParams = (function() {
+    try {
+      var p = new URLSearchParams(window.location.search);
+      var s = p.get('seed'); var g = p.get('gen');
+      return (s && g) ? {seed: parseInt(s, 36), gen: g} : null;
+    } catch(e) { return null; }
+  })();
+  var _gen   = useState(_urlParams ? _urlParams.gen : 'npc_minor'); var activeGen = _gen[0]; var setActiveGen = _gen[1];
   var _res   = useState(null);        var result = _res[0];    var setResult = _res[1];
+  // Seed the initial result from URL params (BL-06)
+  var _seedResult = useState(false); var seedResultDone = _seedResult[0]; var setSeedResultDone = _seedResult[1];
   var _party = useState(3);           var partySize = _party[0]; var setPartySize = _party[1];
   var _roll  = useState(false);       var rolling = _roll[0];  var setRolling = _roll[1];
   var _hist  = useState([]);          var history = _hist[0];  var setHistory = _hist[1];
@@ -2767,6 +2897,10 @@ function CampaignApp(props) {
   function updateFP(next) {
     setFpState(next);
     try { LS.set('fp_state', next); } catch(e) {}
+    // BL-44: push FP pool state to projector footer strip
+    var total = (next.pool || 0) + ((next.pcs || []).reduce(function(s,p){return s+(p.current||0);},0));
+    var maxFP = Math.max(total, (next.pcs||[]).reduce(function(s,p){return s+(p.refresh||0);},0) + 4);
+    pushProjectorUpdate('fp_pool', {pool: total, max: maxFP});
   }
   var _sidebar = useState(false);      var showSidebar = _sidebar[0]; var setShowSidebar = _sidebar[1];
   var _insp  = useState(false);       var inspireMode = _insp[0];  var setInspireMode   = _insp[1];
@@ -2805,12 +2939,12 @@ function CampaignApp(props) {
     if (result) {
       DB.saveSession('fate_' + campId, {result: result, history: history, activeGen: activeGen}).catch(function() {});
     }
-  }, [result]);
+  }, [result, history, activeGen]);
 
   // Save table prefs when they change
   useEffect(function() {
     DB.saveSession('fate_tprefs_' + campId, prefs).catch(function() {});
-  }, [prefs]);
+  }, [prefs, campId]);
 
   // PWA install nudge - capture prompt, show after 2nd visit if not dismissed
   useEffect(function() {
@@ -2829,18 +2963,6 @@ function CampaignApp(props) {
     return function() { window.removeEventListener('beforeinstallprompt', onBeforeInstall); };
   }, [campId]);
 
-  function getResultLabel(r) {
-    if (!r || !r.data) return '\u2014';
-    var d = r.data;
-    var g = GENERATORS.find(function(g2) { return g2.id === r.genId; });
-    var icon = g ? g.icon + ' ' : '';
-    var name = d.name || d.contest_type || (d.aspects && d.aspects.high_concept) ||
-               (d.current && d.current.name) || (d.location && d.location.slice(0, 30)) ||
-               (d.aspect) || (d.goal && d.goal.slice(0, 30)) ||
-               (d.new_aspect && d.new_aspect.slice(0, 30)) ||
-               (d.questions && 'Backstory') || '\u2014';
-    return icon + name;
-  }
 
   // Toast notification
   var _toast = useState(null); var toast = _toast[0]; var setToast = _toast[1];
@@ -2898,6 +3020,7 @@ function CampaignApp(props) {
   }
   var gen = GENERATORS.find(function(g) { return g.id === activeGen; });
 
+
   // Two-tier nav: find which group the active generator belongs to
   function groupForGen(genId) {
     for (var i = 0; i < GENERATOR_GROUPS.length; i++) {
@@ -2927,7 +3050,39 @@ function CampaignApp(props) {
   // Inspire chosen index — for ghost animation
   var _iChosen = useState(null); var inspireChosen = _iChosen[0]; var setInspireChosen = _iChosen[1];
 
-  // ── Online/offline detection (H9)
+  // ── URL seed pre-generation — BL-06 ──────────────────────────────────────
+  useEffect(function() {
+    if (seedResultDone || !_urlParams) return;
+    setSeedResultDone(true);
+    try {
+      var base = universalMerge ? mergeUniversal(t) : t;
+      var eff  = filteredTables(base, prefs);
+      var data = generate(_urlParams.gen, eff, partySize, {}, _urlParams.seed);
+      if (data && typeof data === 'object') {
+        setResult({genId: _urlParams.gen, data: data});
+        setShowIntroModal(false); // skip intro when arriving via link
+      }
+    } catch(e) {}
+  }, [seedResultDone]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Intro modal — large popup over the page, dismissed on click or sequence end ─
+  var _showIntroModal = useState(true);
+  var showIntroModal = _showIntroModal[0]; var setShowIntroModal = _showIntroModal[1];
+  var introModalRef = useRef(null);
+  useEffect(function() {
+    if (!showIntroModal) return;
+    var raf = requestAnimationFrame(function() {
+      var el = introModalRef.current;
+      if (!el) return;
+      if (typeof window.fateInitInline !== 'function') return;
+      window.fateInitInline(el, {
+        onDone: function() { setShowIntroModal(false); },
+      });
+    });
+    return function() { cancelAnimationFrame(raf); };
+  }, [showIntroModal]); // re-runs when modal is reopened
+
+  // ── Online/offline detection
   var _online = useState(typeof navigator !== 'undefined' ? navigator.onLine !== false : true);
   var isOnline = _online[0]; var setIsOnline = _online[1];
 
@@ -2940,7 +3095,7 @@ function CampaignApp(props) {
   };
   var hlMeta = HL_META[helpLevel] || HL_META['new_fate'];
 
-  // First-visit Help Level onboarding prompt (ND-01/UX-02)
+  // First-visit Help Level onboarding prompt
   // Only shown if user has never made an explicit Help Level selection.
   var _onboarding = useState(function() {
     try { return !LS.get('onboarding_done'); } catch(e) { return false; }
@@ -2964,6 +3119,124 @@ function CampaignApp(props) {
   var _rollCount = useState(0); var rollCount = _rollCount[0]; var setRollCount = _rollCount[1];
   var _rAnim = useState(false); var resultAnim = _rAnim[0]; var setResultAnim = _rAnim[1];
   var _streakBadge = useState(false); var showStreakBadge = _streakBadge[0]; var setShowStreakBadge = _streakBadge[1];
+  var _spack = useState(null); var sessionPack = _spack[0]; var setSessionPack = _spack[1];
+  var _packR = useState(false); var packRolling = _packR[0]; var setPackRolling = _packR[1];
+
+  // Full Session — generate Adventure Seed + Countdown + Compel as a prep packet
+  var doFullSession = useCallback(function() {
+    if (packRolling || rolling) return;
+    setPackRolling(true);
+    setSessionPack(null);
+    setResult(null);
+    if (navigator.vibrate) navigator.vibrate(40);
+    var base = universalMerge ? mergeUniversal(t) : t;
+    var eff  = filteredTables(base, prefsRef.current);
+    var seedData     = generate('seed',      eff, partySize, {});
+    var countdownData= generate('countdown', eff, partySize, {});
+    var compelData   = generate('compel',    eff, partySize, {});
+    // Stagger reveal: seed first, then countdown at 350ms, then compel at 650ms
+    setTimeout(function() {
+      var pack = {
+        seed:      {genId: 'seed',      data: seedData},
+        countdown: {genId: 'countdown', data: countdownData},
+        compel:    {genId: 'compel',    data: compelData},
+        ts:        Date.now(),
+      };
+      setSessionPack(pack);
+      setActiveGen('seed');
+      setPackRolling(false);
+    }, 400);
+  }, [t, partySize, universalMerge, rolling, packRolling]);
+
+  // Projector Mode state
+  var _proj = useState(false); var projecting = _proj[0]; var setProjecting = _proj[1];
+  var projBc = useRef(null);
+
+  // Set up BroadcastChannel on mount, tear down on unmount
+  useEffect(function() {
+    try { projBc.current = new BroadcastChannel('ogma-projector'); } catch(e) {}
+    return function() { if (projBc.current) { try { projBc.current.close(); } catch(e) {} } };
+  }, []);
+
+  // ── BL-06: Auto-generate from URL seed on page load ──────────────────────
+  useEffect(function() {
+    try {
+      var params = new URLSearchParams(window.location.search);
+      var urlGen  = params.get('gen');
+      var urlSeed = parseInt(params.get('seed'), 10);
+      if (urlGen && urlSeed && GENERATORS.find(function(g){ return g.id === urlGen; })) {
+        setActiveGen(urlGen);
+        // Small delay so React state (t, universalMerge, prefs) is settled
+        setTimeout(function() {
+          var base = mergeUniversal ? mergeUniversal(CAMPAIGNS[campId].tables) : CAMPAIGNS[campId].tables;
+          var eff  = filteredTables(base, {});
+          var data = generate(urlGen, eff, 3, {}, urlSeed);
+          _lastSeed.current = urlSeed;
+          setResult({genId: urlGen, data: data});
+        }, 150);
+      }
+    } catch(e) {}
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── BL-06: Shareable links ────────────────────────────────────────────────
+  // Generate a seed once per roll, store it, use for Copy Link.
+  var _lastSeed = {current: null};
+
+  function copyShareLink() {
+    if (!result) return;
+    var seed = _lastSeed.current;
+    if (!seed) return;
+    var base = window.location.pathname + window.location.search.split('?')[0];
+    var url = window.location.origin + base.replace(/[?#].*$/, '') +
+              '?gen=' + encodeURIComponent(result.genId) + '&seed=' + seed;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(function() {
+        showToast('🔗 Link copied');
+      }).catch(function() { showToast('🔗 Link ready — copy from address bar'); });
+    } else {
+      showToast('🔗 Link ready — copy from address bar');
+    }
+    // Also update the browser URL so you can copy from address bar
+    try { window.history.replaceState({}, '', '?gen=' + encodeURIComponent(result.genId) + '&seed=' + seed); } catch(e) {}
+  }
+
+  function pushToProjector(genId, data) {
+    var msg = {type: 'result', genId: genId, data: data, campId: campId, ts: Date.now()};
+    if (projBc.current) { try { projBc.current.postMessage(msg); } catch(e) {} }
+    try { localStorage.setItem('ogma_proj_msg', JSON.stringify(msg)); } catch(e) {}
+    setProjecting(true);
+    setTimeout(function() { setProjecting(false); }, 1500);
+    showToast('📺 Placed on table');
+    if (navigator.vibrate) navigator.vibrate(20);
+  }
+
+  // ── BL-41: Push live interaction state to projector ──────────────────────
+  // Called whenever an interactive element changes (countdown box, contest score, etc.)
+  // state: flat object of current values e.g. {filled:3} or {scoreA:2,scoreB:1}
+  function pushProjectorUpdate(genId, state) {
+    var msg = {type: 'update', genId: genId, state: state, campId: campId, ts: Date.now()};
+    if (projBc.current) { try { projBc.current.postMessage(msg); } catch(e) {} }
+    try {
+      var existing = localStorage.getItem('ogma_proj_msg');
+      if (existing) {
+        var parsed = JSON.parse(existing);
+        if (parsed.genId === genId) {
+          // Merge state into existing message
+          var merged = JSON.parse(existing);
+          merged.state = Object.assign({}, merged.state || {}, state);
+          merged.ts = Date.now();
+          localStorage.setItem('ogma_proj_msg', JSON.stringify(merged));
+        }
+      }
+    } catch(e) {}
+  }
+
+  function clearProjector() {
+    var msg = {type: 'clear', ts: Date.now()};
+    if (projBc.current) { try { projBc.current.postMessage(msg); } catch(e) {} }
+    try { localStorage.removeItem('ogma_proj_msg'); } catch(e) {}
+    setProjecting(false);
+  }
 
   var doGenerate = useCallback(function() {
     if (navigator.vibrate) navigator.vibrate(40);
@@ -2982,8 +3255,10 @@ function CampaignApp(props) {
     var eff  = filteredTables(base, prefsRef.current);
     var opts = {};
     if (activeGen === 'consequence' && consequenceSev) opts.severity = consequenceSev;
-    var data = generate(activeGen, eff, partySize, opts);
-    var newResult = {genId: activeGen, data: data};
+    var seed = Math.floor(Math.random() * 0xFFFFFF) + 1;
+    var data = generate(activeGen, eff, partySize, opts, seed);
+    _lastSeed.current = seed;
+    var newResult = {genId: activeGen, data: data, _seed: seed};
     setTimeout(function() {
       setResult(newResult);
       setResultAnim(true);
@@ -3055,7 +3330,7 @@ function CampaignApp(props) {
     if (first) setTimeout(function() { first.focus(); }, 50);
   }, [showSidebar]);
 
-  // R-13: Sticky Roll FAB - appears when Roll button scrolls off-screen
+  // Sticky Roll FAB — appears when Roll button scrolls off-screen
   var rollBtnRef = useRef(null);
   var _fab = useState(false); var showFAB = _fab[0]; var setShowFAB = _fab[1];
   useEffect(function() {
@@ -3068,8 +3343,7 @@ function CampaignApp(props) {
     return function() { obs.disconnect(); };
   }, []);
 
-
-  // ── Online/offline listener (H9) ──────────────────────────────────────────
+  // ── Online/offline listener ──────────────────────────────────────────────
   useEffect(function() {
     function goOnline()  { setIsOnline(true);  }
     function goOffline() { setIsOnline(false); }
@@ -3104,6 +3378,8 @@ function CampaignApp(props) {
       if (e.code === 'Space' && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();
         if (!rolling) doGenerate();
+      } else if (e.key === 'v' || e.key === 'V') {
+        if (result) { pushToProjector(result.genId, result.data); }
       } else if (e.key === 'p' || e.key === 'P') {
         if (result) {
           setPinnedCards(function(prev) {
@@ -3129,6 +3405,8 @@ function CampaignApp(props) {
           setToast('Pin removed ↩');
           return prev.slice(1);
         });
+      } else if (e.key === 'l' || e.key === 'L') {
+        if (result) copyShareLink();
       } else if (e.key === 'c' || e.key === 'C') {
         if (result) {
           var md = toMarkdown(result.genId, result.data, camp.meta.name);
@@ -3144,7 +3422,7 @@ function CampaignApp(props) {
     }
     document.addEventListener('keydown', onKey);
     return function() { document.removeEventListener('keydown', onKey); };
-  }, [rolling, result, activeGen, showHelp, showTables, showSettings, showHistory, showSidebar, showKbShortcuts, doGenerate, doInspire, pinnedCards]);
+  }, [rolling, result, activeGen, showHelp, showTables, showSettings, showHistory, showSidebar, showKbShortcuts, doGenerate, doInspire, pinnedCards, pushToProjector, projecting, copyShareLink]);
 
   var totalEntries = Object.values(t).reduce(function(n, v) { return n + (Array.isArray(v) ? v.length : 0); }, 0);
 
@@ -3183,7 +3461,7 @@ function CampaignApp(props) {
       ),
       // Status zone — always visible, interactive (H1, H4, H6, H9)
       h('div', {className: 'topbar-status'},
-        // Offline indicator (H9)
+        // Offline indicator
         !isOnline && h('span', {
           className: 'topbar-chip topbar-chip-offline',
           role: 'status',
@@ -3337,6 +3615,36 @@ function CampaignApp(props) {
           'aria-label': 'Session tools and settings',
         },
 
+          // ── Full Session prep packet ─────────────────────────
+          h('div', {className: 'sidebar-group-label'}, 'Prep'),
+          h('button', {
+            className: 'sidebar-tool-btn full-session-btn' + (packRolling ? ' rolling' : '') + (sessionPack ? ' active' : ''),
+            onClick: function() {
+              doFullSession();
+              setShowSidebar(false);
+            },
+            disabled: packRolling || rolling,
+            title: 'Generate a full session prep packet: Adventure Seed + Countdown + Compel',
+            'aria-label': 'Full Session prep packet',
+          },
+            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: 'torch'})),
+            h('span', {className: 'sidebar-item-label'}, packRolling ? 'Generating…' : 'Full Session'),
+            !packRolling && h('span', {className: 'full-session-badge'}, '3')
+          ),
+          sessionPack && h('button', {
+            className: 'sidebar-tool-btn',
+            onClick: function() {
+              setSessionPack(null);
+              setResult(null);
+            },
+            className: 'text-label-muted',
+          },
+            h('span', {className: 'sidebar-item-icon'}, '✕'),
+            h('span', {className: 'sidebar-item-label'}, 'Clear session')
+          ),
+
+          h('div', {className: 'sidebar-divider'}),
+
           // ── At the table ──────────────────────────────────────
           h('div', {className: 'sidebar-group-label'}, 'At the table'),
           h('button', {
@@ -3356,6 +3664,20 @@ function CampaignApp(props) {
             h('span', {className: 'sidebar-item-label'},
               pinnedCards.length > 0 ? 'History · ' + pinnedCards.length + ' pinned' : 'History'
             )
+          ),
+          h('a', {
+            href: '../projector.html',
+            target: '_blank',
+            rel: 'noopener',
+            className: 'sidebar-tool-btn',
+            onClick: function() { setShowSidebar(false); },
+            'aria-label': 'Open Projector display (opens in new tab)',
+            title: 'Open on your display screen, then push results with 📺 or V',
+          },
+            h('span', {className: 'sidebar-item-icon'}, '📺'),
+            h('span', {className: 'sidebar-item-label'}, 'Projector'),
+            h('span', {className: 'sidebar-item-ext', 'aria-hidden': 'true',
+                style: {fontSize: 'var(--text-label)', color: 'var(--text-muted)', marginLeft: 'auto'}}, '↗')
           ),
 
           h('div', {className: 'sidebar-divider'}),
@@ -3453,7 +3775,7 @@ function CampaignApp(props) {
           h('div', {className: 'sidebar-group-label'}, 'Navigate'),
           h('button', {
             className: 'sidebar-tool-btn',
-            onClick: function() { setShowSidebar(false); setTimeout(function() { if (window.fateReplayIntro) window.fateReplayIntro(); }, TIMING.INTRO_REPLAY_MS); },
+            onClick: function() { setShowSidebar(false); setShowIntroModal(true); },
           },
             h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.play_intro})),
             h('span', {className: 'sidebar-item-label'}, 'Play Intro')
@@ -3508,7 +3830,7 @@ function CampaignApp(props) {
           h('div', {className: 'main-layout'},
 
         // Result panel
-        h('div', {id: 'result-panel', role: 'region', 'aria-label': result ? 'Generated ' + gen.label + ' result' : 'Ready to generate ' + gen.label, 'aria-live': 'polite', 'aria-atomic': 'true'},
+        h('div', {id: 'result-panel', role: 'region', 'aria-label': sessionPack ? 'Full session prep packet' : (result ? 'Generated ' + gen.label + ' result' : 'Ready to generate ' + gen.label), 'aria-live': 'polite', 'aria-atomic': 'true'},
           h('div', {className: 'result-panel', style: {padding: 0, overflow: 'hidden'}},
 
             // ── Unified action bar: Roll + Inspire + contextual + secondary ──
@@ -3582,6 +3904,20 @@ function CampaignApp(props) {
                   'aria-label': 'Rules reference',
                 }, h(RaIcon, {n: RA_ICONS.rules})),
                 result && h('button', {
+                  className: 'btn btn-ghost action-bar-icon' + (projecting ? ' pinned-active' : ''),
+                  onClick: function() { pushToProjector(result.genId, result.data); },
+                  title: 'Place on table [V] · open projector.html on your display screen first',
+                  'aria-label': 'Place result on table display',
+                  'aria-pressed': String(projecting),
+                }, '📺'),
+
+                result && h('button', {
+                  className: 'btn btn-ghost action-bar-icon',
+                  onClick: copyShareLink,
+                  title: 'Copy shareable link [L]',
+                  'aria-label': 'Copy shareable link for this result',
+                }, '🔗'),
+                result && h('button', {
                   className: 'btn btn-ghost action-bar-icon' + (showExport ? ' active' : ''),
                   onClick: function() { setShowExport(!showExport); },
                   title: showExport ? 'Close share options' : 'Share or export',
@@ -3630,13 +3966,43 @@ function CampaignApp(props) {
               onClose: function() { setShowExport(false); },
             }),
 
+            // ── Session Pack — shown instead of single result ─────────────────────
+            sessionPack && h(SessionPackPanel, {
+              pack: sessionPack,
+              onPin: function() {
+                var ts = Date.now();
+                [
+                  {genId:'seed',      data:sessionPack.seed.data},
+                  {genId:'countdown', data:sessionPack.countdown.data},
+                  {genId:'compel',    data:sessionPack.compel.data},
+                ].forEach(function(c) {
+                  var card = {
+                    id: String(ts + Math.random()),
+                    campId: campId, genId: c.genId,
+                    label: (GENERATORS.find(function(g){return g.id===c.genId;})||{}).label || c.genId,
+                    data: c.data, ts: ts,
+                  };
+                  setPinnedCards(function(prev) { return [card].concat(prev); });
+                  DB.saveCard(campId, card).catch(function() {});
+                });
+                showToast('📌 3 cards pinned');
+                if (navigator.vibrate) navigator.vibrate([30, 40, 30]);
+              },
+              onClear: function() { setSessionPack(null); setResult(null); },
+            }),
+
+            // ── Single result ────────────────────────────────────────────────
+            !sessionPack && h('div', null,
+
             // ── Result card: name, aspects, skills ──────────────────────────
             h('div', {className: resultAnim ? 'result-card-appear' : ''},
               h(ResultCard, {result: result, gen: gen})
             ),
 
             // ── Full generator content: interactive elements ─────────────────
-            result && renderResult(result.genId, result.data),
+            result && renderResult(result.genId, result.data, function(state) {
+              pushProjectorUpdate(result.genId, state);
+            }),
 
             // ── Inspire mode ─────────────────────────────────────────────────
             inspireMode && inspireResults.length > 0 && h('div', {className: 'inspire-wrap'},
@@ -3713,6 +4079,7 @@ function CampaignApp(props) {
                 resultTab==='dnd'   && h(DndPanel,   {genId: activeGen})
               )
             )
+            )   // close !sessionPack wrapper
           )     // close result-panel.class
         )       // close result-panel id
       )         // close main-layout
@@ -3720,7 +4087,7 @@ function CampaignApp(props) {
     ),          // close content-panel child; separator before history panel
 
     // ── History & Pinned slide-over panel ─────────────────────────────
-    showHistory && h('div', {className: 'hist-overlay', onClick: function() { setShowHistory(false); }}),
+    showHistory && h('div', {className: 'hist-overlay', onClick: function() { setShowHistory(false); }, 'aria-hidden': 'true'}),
     showHistory && h('div', {className: 'hist-panel'},
       h('div', {className: 'hist-panel-header'},
         h('span', {style: {fontSize: 'var(--text-md)', fontWeight: 700, color: 'var(--text)'}}, '📋 History & Pinned'),
@@ -3830,7 +4197,7 @@ function CampaignApp(props) {
     // ── Toast notification ───────────────────────────────────────────
     toast && h('div', {className: 'toast'}, toast),
 
-    // ── PERF-04: SW update available toast ───────────────────────────
+    // ── SW update available toast ─────────────────────────────────────
     updateAvailable && h('div', {
       className: 'toast toast-update',
       role: 'status',
@@ -3854,6 +4221,29 @@ function CampaignApp(props) {
         },
         'aria-label': 'Dismiss update notification',
       }, '✕')
+    ),
+
+    // ── Intro modal ──────────────────────────────────────────────────────
+    showIntroModal && h('div', {
+      className: 'modal-overlay intro-modal-overlay',
+      onClick: function() { setShowIntroModal(false); },
+      role: 'dialog',
+      'aria-modal': 'true',
+      'aria-label': 'Campaign introduction',
+    },
+      h('div', {
+        className: 'intro-modal-box',
+        onClick: function(e) { e.stopPropagation(); },
+      },
+        h('div', {
+          ref: introModalRef,
+          className: 'intro-modal-stage',
+          style: {width:'100%', height:'100%'},
+        }),
+        h('div', {className: 'intro-modal-dismiss'},
+          'tap anywhere to dismiss'
+        )
+      )
     ),
 
     // ── Modals ────────────────────────────────────────────────────────

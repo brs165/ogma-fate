@@ -680,6 +680,149 @@
     });
   }
 
+  // ── Inline overlay builder ────────────────────────────────
+  // Like buildOverlay but mounts inside a container, not the body.
+  function buildOverlayInline(worldKey) {
+    var meta = META[worldKey] || META.index;
+    var ov = document.createElement('div');
+    ov.className = 'fate-intro-inline';
+    ov.setAttribute('aria-label', 'Campaign introduction');
+    ov.style.cssText = [
+      'position:relative', 'width:100%', 'height:100%',
+      'background:' + meta.bg,
+      'font-family:\'Courier New\',\'Lucida Console\',Consolas,monospace',
+      'font-size:13px', 'line-height:1.45',
+      'display:flex', 'align-items:center', 'justify-content:center',
+      'cursor:pointer',
+      'border-radius:inherit',
+      'overflow:hidden',
+      'transition:opacity ' + FADE_MS + 'ms ease',
+      'opacity:1',
+    ].join(';');
+
+    var scan = document.createElement('div');
+    scan.style.cssText = 'position:absolute;inset:0;pointer-events:none;' +
+      'background:repeating-linear-gradient(to bottom,transparent 0px,transparent 3px,' +
+      'rgba(0,0,0,0.13) 3px,rgba(0,0,0,0.13) 4px);';
+    ov.appendChild(scan);
+
+    var noMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!noMotion) {
+      var roll = document.createElement('div');
+      roll.className = 'fate-crt-roll';
+      roll.style.cssText = 'position:absolute;inset:0;pointer-events:none;' +
+        'background:linear-gradient(to bottom,' +
+        'transparent 0%,rgba(255,255,255,0.012) 48%,rgba(255,255,255,0.025) 50%,' +
+        'rgba(255,255,255,0.012) 52%,transparent 100%);' +
+        'animation:fate-crt-roll 7s linear infinite;';
+      ov.appendChild(roll);
+    }
+
+    var vig = document.createElement('div');
+    vig.style.cssText = 'position:absolute;inset:0;pointer-events:none;' +
+      'background:radial-gradient(ellipse at 50% 50%,transparent 55%,rgba(0,0,0,0.55) 100%);';
+    ov.appendChild(vig);
+
+    var content = document.createElement('div');
+    content.className = 'fate-intro-content';
+    content.style.cssText = 'position:relative;z-index:2;max-width:560px;width:90%;padding:16px 0;text-align:center;display:flex;flex-direction:column;align-items:center;';
+    ov.appendChild(content);
+
+    var hint = document.createElement('div');
+    hint.style.cssText = 'position:absolute;bottom:10px;left:16px;' +
+      'color:#1e1e1e;font-size:9px;letter-spacing:2px;text-transform:uppercase;';
+    hint.textContent = 'click or press any key to skip';
+    ov.appendChild(hint);
+
+    return {ov: ov, content: content};
+  }
+
+  // Fade-out and remove the inline overlay, then call onDone
+  function dismissInline(inlineEl, onDone) {
+    if (!inlineEl) { if (onDone) onDone(); return; }
+    clearTimers();
+    inlineEl.style.opacity = '0';
+    setTimeout(function() {
+      if (inlineEl && inlineEl.parentNode) inlineEl.parentNode.removeChild(inlineEl);
+      if (onDone) onDone();
+    }, FADE_MS);
+  }
+
+  // ── Public API ────────────────────────────────────────────
+  // window.fateInitInline(containerEl, opts) — inline mode.
+  // Mounts the intro sequence inside containerEl (sized by caller).
+  // opts: { worldKey, titleOnly, freeze, onDone }
+  //   worldKey  — override world detection
+  //   titleOnly — play only the short title card sequence
+  //   freeze    — do NOT auto-dismiss after title card; hold final frame
+  //   onDone    — callback fired when sequence ends or is skipped
+  window.fateInitInline = function(containerEl, opts) {
+    if (!containerEl) return;
+    opts = opts || {};
+    injectCSS();
+
+    var worldKey = opts.worldKey || detectWorld();
+    var seqFn    = SEQUENCES[worldKey];
+
+    var seen = false;
+    // Always play full sequence in inline mode — no seen-gating
+    var seq = (opts.titleOnly || opts.freeze) ? seqTitleCard(worldKey) : (seqFn ? seqFn() : seqTitleCard(worldKey));
+
+    var built    = buildOverlayInline(worldKey);
+    var inlineEl = built.ov;
+    var content  = built.content;
+
+    // Track this overlay in the shared variable so runSequence can check it
+    overlayEl = inlineEl;
+    containerEl.appendChild(inlineEl);
+
+    // Mark seen — skipped in inline mode (always plays full sequence)
+
+    function skip() {
+      done = true;
+      overlayEl = null;
+      dismissInline(inlineEl, opts.onDone);
+      document.removeEventListener('keydown', keySkip);
+    }
+
+    function keySkip(e) {
+      if (['Space','Enter','Escape'].indexOf(e.code) !== -1 || e.key) {
+        skip();
+      }
+    }
+
+    inlineEl.addEventListener('click', skip);
+    document.addEventListener('keydown', keySkip);
+
+    runSequence(seq, content).then(function() {
+      if (!overlayEl) return;
+      document.removeEventListener('keydown', keySkip);
+
+      if (opts.freeze) {
+        // Hold the final frame — used by guide pages and landing teaser
+        inlineEl.removeEventListener('click', skip);
+        inlineEl.style.cursor = 'default';
+        var hint = inlineEl.querySelector('div[style*="bottom:10px"]');
+        if (hint) hint.style.display = 'none';
+        overlayEl = null;
+      } else if (opts.titleOnly) {
+        // Title-card only — auto-dismiss after short pause
+        setTimeout(function() {
+          overlayEl = null;
+          dismissInline(inlineEl, opts.onDone);
+        }, 2200);
+      } else {
+        // Full sequence — show enter prompt, wait for click/key to dismiss
+        showEnterPrompt(content, worldKey);
+        inlineEl.addEventListener('click', function onceDone() {
+          inlineEl.removeEventListener('click', onceDone);
+          overlayEl = null;
+          dismissInline(inlineEl, opts.onDone);
+        });
+      }
+    });
+  };
+
   // ── Public API ────────────────────────────────────────────
   // window.fateReplayIntro() - forces the full sequence regardless
   // of whether the user has seen it before. Called by nav button.
@@ -692,12 +835,16 @@
     setTimeout(init, overlayEl ? FADE_MS + 50 : 0);
   };
 
-  // Run after DOM ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    // Small delay so React app can mount underneath
-    setTimeout(init, 80);
+  // Run after DOM ready — skip on campaign pages and landing page
+  // (React/LandingApp calls fateInitInline directly for those)
+  var isCampaignPage = !!document.documentElement.getAttribute('data-campaign');
+  var isLandingPage  = (typeof detectWorld === 'function') && detectWorld() === 'index';
+  if (!isCampaignPage && !isLandingPage) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      setTimeout(init, 80);
+    }
   }
 
 })();

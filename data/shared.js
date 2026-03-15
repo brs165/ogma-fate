@@ -46,7 +46,12 @@ var HELP_CONTENT = {
       "Their weakness aspect is your best compel lever. Invoke it for +2 to tip a roll, or compel it to create complications - whichever fits the moment.",
       "Minor NPCs don't concede - they break, flee, or get taken out. Describe it cinematically.",
     ],
-    gm_tips: "When a PC rolls well against a mook, skip the dice and narrate the defeat. Save your fate points and attention for what comes next.",
+    gm_tips: [
+      "When a PC rolls well, narrate the defeat and skip the dice — mooks exist to lose with style, not to survive.",
+      "Give each one line of dialogue and one visible motivation. Anything more is wasted prep.",
+      "Invoke or compel the weakness aspect in the first exchange. Every time. Don't explain — just do it.",
+      "In a mob, treat the group as a single entity with one shared stress track. One strong hit clears multiple."
+    ],
     invoke_example: "The mook's aspect is 'Loyalty Chip Still Active.' The PC wants to rush past them. Spend a fate point to invoke it for +2 on Athletics - the chip makes the mook predictably slow to react to anything off-script.",
     compel_example: "The same mook is standing guard over someone the party wants to question. Offer the GM a fate point: the mook's loyalty chip fires and they report the party's approach to their handler before the PCs can act.",
   },
@@ -61,7 +66,12 @@ var HELP_CONTENT = {
       "Major NPCs start each scene with fate points from the GM's shared pool. The pool = 1 per PC facing opposition. Spend to invoke aspects or compel PCs.",
       "A major NPC who concedes escapes - and comes back with more resources and a grudge.",
     ],
-    gm_tips: "Let the villain concede their first conflict. Negotiated terms, a cost, a grudge - they're back next arc with more resources. A villain who dies in session one was an obstacle.",
+    gm_tips: [
+      "Let them concede their first conflict. A villain who escapes with a grudge and earned fate points is worth ten who die in session one.",
+      "Show the high concept in action before the PCs engage. Let them win something off-screen so the players respect the stakes.",
+      "Their trouble aspect is your primary compel lever. Use it in the first scene they appear.",
+      "Let them invoke their own high concept for +2 on their biggest roll. Make the players feel the gap between capable and dangerous."
+    ],
     invoke_example: "The villain's aspect is 'Burned Ex-Corp Fixer with No More Mercy.' They're interrogating a prisoner. Spend a fate point on that aspect to give them +2 on Provoke - years of corp training make the fear feel surgical.",
     compel_example: "The same villain has the party at a disadvantage but could take a clean shot. Offer them a fate point: their trouble aspect fires. They hesitate - not mercy, just something personal they can't finish. The party escapes. They hate themselves for it.",
   },
@@ -76,7 +86,12 @@ var HELP_CONTENT = {
       "Zones limit movement. Moving past opposition into another zone costs an action if contested.",
       "Zone aspects are always true - they define what's possible in the zone. Invoke them for +2 with a fate point, as with any aspect.",
     ],
-    gm_tips: "Two aspects announced up front - the ones any reasonably alert person would see. The rest get discovered through Notice, Investigate, or getting hit. The surprise aspect is always the most interesting one.",
+    gm_tips: [
+      "Announce exactly two aspects up front — the ones any alert person notices. The rest get discovered through Notice, Investigate, or getting hit.",
+      "The hidden aspect is your best tool. Decide before the scene starts which one the players don't know yet — it's your compel setup.",
+      "When a PC fails a roll, check whether a scene aspect just got worse or a new one just appeared.",
+      "Name each zone and give it one aspect. Players will immediately start exploiting them — that's the point."
+    ],
     invoke_example: "The scene has 'Slippery Deck' as a zone aspect. A PC is chasing someone across the boat. Spend a fate point to invoke 'Slippery Deck' - the target loses their footing, giving the PC +2 on their Athletics roll to catch them.",
     compel_example: "The same 'Slippery Deck' is in play when a PC tries to take a precise shot. The GM offers a fate point: the aspect compels a misfire - the PC slips just as they fire, and the shot goes wide. They take the fate point and accept the consequence.",
   },
@@ -91,7 +106,12 @@ var HELP_CONTENT = {
       "Issues have faces (named NPCs) and places - these are ready-made hooks for scenes.",
       "You can compel an issue aspect whenever a PC's goals conflict with the larger threat.",
     ],
-    gm_tips: "Current issue = automatic compel. Every time a PC's goal bumps it, you have a compel. Impending issue = clock. If they ignore it, narrate it getting worse at session end.",
+    gm_tips: [
+      "The current issue is your automatic compel engine. Every time a PC's goal bumps against it, you have a compel ready.",
+      "The impending issue is a clock. Narrate it advancing one step between sessions when the party ignores it. Make the progression visible.",
+      "Setting aspects are always true, always invokable, always compellable. They are not flavour — they are permanent pressure.",
+      "Faces have off-screen agendas. Decide each session what one face did while the party was busy, then show the consequences."
+    ],
     invoke_example: "The setting aspect is 'Chrome and Hunger in Equal Measure.' A PC is negotiating for supplies in the undercity. Invoke the aspect for +2 on Rapport - everyone here understands the price of survival, and the PC speaks that language.",
     compel_example: "A PC is trying to stay low-profile while the current issue is 'Corp Crackdown in District 7.' The GM offers a fate point: the issue compels the situation - a checkpoint springs up on their route. They take the complication and the fate point.",
   },
@@ -110,11 +130,24 @@ var HELP_CONTENT = {
       "Full Defense (p.48): skip your action, get +2 to all defends this round. Use when holding ground or covering someone.",
       "Teamwork (p.32): one rolls, each helper with Average (+1)+ in a relevant skill adds +1. No cap on helpers, just that +1 each.",
     ],
-    gm_tips: "Your first sentence is the victory condition. Say it out loud before dice hit the table. Everything else follows from that.",
+    gm_tips: [
+      "Your first sentence at the table is the victory condition — say it aloud before any dice roll. Everything else follows.",
+      "GM fate points start at 1 per PC. That's your entire compel and invoke budget. Spend it deliberately.",
+      "Hold the twist until the outcome feels settled. Dropping it too early kills the tension it was meant to restore.",
+      "Offer success at a cost before flat failure — it keeps the fiction moving.",
+      "Popcorn initiative: whoever just acted names who goes next. Nobody waits for their turn."
+    ],
     invoke_example: "The scene aspect is 'Emergency Lights Only - Red and Wrong.' An NPC is fleeing. Spend a GM fate point to invoke the aspect against the chasing PC's Notice roll: −2, because the strobing red light keeps destroying their depth perception.",
     compel_example: "A PC has the aspect 'I Always Check the Exits.' The encounter starts in a room with blocked exits. The GM offers a fate point: the compel makes the PC spend the first exchange assessing escape routes instead of acting offensively. Drama, not punishment.",
   },
   seed: {
+    gm_tips: [
+      "Your literal first words at the table are Scene 1's opening description. Read it exactly. No preamble — drop them straight in.",
+      "Prep Scene 1 thoroughly. Prep nothing else. The complication and Scene 2 emerge from where the players go.",
+      "The complication is your mid-session hand grenade — something that demands a PC response without dictating what it should be.",
+      "Know the defeat condition cold before you start. It creates the stakes that make the victory condition matter.",
+      "The three-scene structure is a suggestion, not a script. Good sessions are messier and better than any outline."
+    ],
     title: "Adventure Seed",
     what: "A complete one-page scenario skeleton - location, objective, complication, three-scene structure, opposition, victory and defeat conditions, and a mid-scene twist. Everything needed to run a session from a standing start.",
     output: "Location · Objective · Complication · Scene 1 opening · Scene 2 midpoint · Scene 3 climax · Opposition · Victory/Defeat conditions · Twist · Campaign issue tie-in",
@@ -146,7 +179,13 @@ var HELP_CONTENT = {
       "Refusal costs the player 1 FP. Note it - a drained player is primed to accept the next one.",
       "Remind players they can compel their own aspects. The best player-initiated compels are the ones you didn't see coming.",
     ],
-    gm_tips: "Compel in scene 1 - it signals the mechanic is live. Then 2-3 per session keeps FP moving. If you haven't compelled in an hour, offer one now.",
+    gm_tips: [
+      "Compel in Scene 1. It signals to the players that the mechanic is live and fate points are moving.",
+      "Offer the fate point first, then state the complication. This order makes acceptance feel like agency rather than punishment.",
+      "Two to three compels per session is the right cadence. If an hour passes without one, offer one now.",
+      "Two refusals means you're finding the right aspects. The refusal still costs them a fate point — that's fine.",
+      "Compel the situation, not the character. 'Your aspect means this happens' is stronger than 'your aspect means you fail.'"
+    ],
     invoke_example: "A PC has the aspect 'Loyalty to the Crew Above All.' They're trying to talk a neutral contact into helping. Invoke the aspect for +2 on Rapport - their genuine commitment to protecting people reads as trustworthy, not just desperate.",
     compel_example: "The same PC has gathered intel the crew needs urgently. But the situation aspect 'Every Exit Has Eyes' is in play. The GM offers a fate point: their loyalty compel fires - they can't leave a teammate who's still inside, even though it means walking through the surveillance zone.",
   },
@@ -162,7 +201,13 @@ var HELP_CONTENT = {
       "Failure changes the situation and costs something. It's not a dead end.",
       "Place a free invoke on a scene aspect before the challenge starts. It's a gift the players will remember.",
     ],
-    gm_tips: "Challenges are most useful for extended non-combat sequences where a single roll would feel arbitrary. Keep them to 3–5 rolls maximum - longer and the dramatic tension deflates. The best challenges have an obvious skill path and a clever alternative.",
+    gm_tips: [
+      "A challenge is right when a single roll feels arbitrary but a full conflict would be overkill.",
+      "Declare the primary skill and difficulty before any dice touch the table. Players need the playing field first.",
+      "Let players Create Advantage before the decisive roll — reward preparation with free invokes when it matters.",
+      "Keep it to 3-5 rolls. Past five, the tension deflates. End it decisively.",
+      "Failure changes the situation — it never ends the scene. Ask what failure looks like before the roll."
+    ],
     invoke_example: "The challenge is breaking into a corp server room. A PC set up a scene aspect 'Security Rotation on a Predictable Loop' via Create Advantage earlier. Now they invoke that free invoke for +2 on Burglary for the critical lock bypass.",
     compel_example: "Halfway through the same challenge, a PC has the aspect 'My Tools Are Always Jury-Rigged.' The GM offers a fate point mid-challenge: a critical piece of equipment fails at the worst moment, raising the difficulty of the next roll. They take the fate point. The tension spikes.",
   },
@@ -178,11 +223,24 @@ var HELP_CONTENT = {
       "Creating Advantages in a contest is risky (p.33): if you fail, your side either forfeits its overcome roll OR you give the other side a free invoke to preserve your roll.",
       "In dangerous environments, add a hazard aspect and compel it as normal. The victory track is unchanged.",
     ],
-    gm_tips: "Track on the table, both sides visible. When nobody marks a victory, introduce a new aspect immediately - don't think, just introduce. The tie-twist is where the session stories come from.",
+    gm_tips: [
+      "Put the victory track (first to 3) on the table where everyone can see both sides. The visible score is half the tension.",
+      "Ties are your most powerful tool. When nobody marks a victory, immediately introduce a new situation aspect — don't pause to think.",
+      "Succeed with style (2+ shifts, other side didn't): mark 2 victories. This is the swing moment — watch for it.",
+      "Creating Advantage during a contest costs your action for that exchange. It's a calculated gamble, not a free move.",
+      "The tie-twist is where session stories come from. Treasure it."
+    ],
     invoke_example: "It's a chase, tied at 2–2. The situation aspect 'Gridlock Makes Every Route a Gamble' is in play. The pursuing PC spends a fate point to invoke it: the target is slowed by traffic, giving the PC +2 on Athletics. Victory 3. Chase over.",
     compel_example: "Same chase, at 1–2 against the party. A PC has the trouble 'Can't Pass Up a Score.' They're running through a market district. The GM offers a fate point: a distraction catches their eye - something valuable sitting unattended. They hesitate. The target gains ground. The trade-off is perfect.",
   },
   consequence: {
+    gm_tips: [
+      "Name it specifically — 'Badly Burned Hands,' not 'Injured.' The name is an aspect and needs to work like one.",
+      "Plan at least one compel on it before it heals. A consequence that never gets compelled is wasted narrative weight.",
+      "Remind the player they can invoke their own consequence for +2 when the fiction supports it.",
+      "The GM never decides when a consequence clears. The player initiates recovery with an overcome roll.",
+      "Consequences make the fiction feel real and the recovery feel earned. Let them breathe."
+    ],
     title: "Consequence",
     what: "A consequence is an aspect a character takes to avoid being taken out. It absorbs a hit but creates a new problem that persists - and can be compelled.",
     output: "Severity level (mild/moderate/severe), a named consequence aspect, the context in which it was suffered, and a compel hook to use in the next scene.",
@@ -202,6 +260,12 @@ var HELP_CONTENT = {
     compel_example: "Same consequence, next scene. The PC needs to make a split-second decision. GM offers a fate point: the fragmented memory makes them hesitate - they can't fully trust their recall of what the contact told them. They accept the doubt, take the fate point, and act anyway.",
   },
   faction: {
+    gm_tips: [
+      "Factions exert pressure through NPCs, compels, and scene aspects — not stat blocks. You deal with agents, not the faction itself.",
+      "Advance the faction one step toward its goal off-screen each session the party ignores it. Make the advancement visible.",
+      "The named face is your in-session avatar. Build them out with the Major NPC generator — they need a trouble aspect.",
+      "The weakness is your gift to the players. Make sure a clever PC could find it through Investigate or Contacts."
+    ],
     title: "Faction",
     what: "A group with a unified goal, a consistent method of pursuing it, an exploitable weakness, and a named face NPC who represents it in play.",
     output: "Faction name, goal, method, weakness, and one named face NPC with a role description.",
@@ -221,6 +285,12 @@ var HELP_CONTENT = {
     compel_example: "The party is doing something the faction doesn't control. The GM offers a fate point: the faction's method (protection rackets as maintenance contracts) triggers - the PC's contact goes quiet because they're suddenly 'under review.' The faction isn't attacking. It's just tightening its grip.",
   },
   complication: {
+    gm_tips: [
+      "Deploy when the current scene's outcome feels settled — that's when a complication restores dramatic energy.",
+      "Introduce one element at a time. New aspect, arriving NPC, environment shift — three separate beats, not a pile-on.",
+      "A complication is not a punishment. It is new fictional facts that change what actions are now possible.",
+      "New aspects from complications come with a free invoke — hand it to whoever would most benefit dramatically."
+    ],
     title: "Scene Complication",
     what: "A mid-scene interruption: a new aspect enters the fiction, someone arrives uninvited, or the environment shifts. Use when the scene has settled or the dice produce a failure with interesting consequences.",
     output: "Complication type, new scene aspect, an arriving NPC, an environmental shift, and a spotlight recommendation for which to lead with.",
@@ -240,6 +310,12 @@ var HELP_CONTENT = {
     compel_example: "Same aspect, different PC. A PC with the aspect 'I Don't Leave Without What I Came For' is mid-extraction. The GM offers a fate point: the drones make the clean exit impossible. Accept the complication - they have to pick between leaving empty-handed or being logged by the drones.",
   },
   backstory: {
+    gm_tips: [
+      "Ask the question and shut up. The first answer is the safe one — wait for the second, messier one.",
+      "Every answer should produce at least one aspect. Write them down as the player speaks, not after.",
+      "Relationship web questions matter more than individual backstory. Cross-PC aspects are the foundation of the best compels.",
+      "The opening hook is one sentence that drops the party into the situation. No backstory explanation — straight to the fiction."
+    ],
     title: "PC Backstory",
     what: "Session Zero questions that draw out character history, a relationship web exercise that creates cross-PC connections, and an opening hook that frames the first scene.",
     output: "Three backstory questions, a relationship web prompt, and an opening hook for Session 1.",
@@ -270,7 +346,12 @@ var HELP_CONTENT = {
       "Obstacle vs enemy: enemies can be taken out. Obstacles cannot. Don't let players try.",
       "Use obstacles to accent enemies, not replace them. One obstacle per scene is usually enough. Overuse frustrates players.",
     ],
-    gm_tips: "One obstacle per scene. It splits attention and gives non-combat PCs something to do: disable it while others handle enemies.",
+    gm_tips: [
+      "One obstacle per scene. It splits PC attention and gives non-combat characters something meaningful to contribute.",
+      "Announce the type immediately: hazard (attacks on its turn), block (passive opposition), or distraction (forces a choice).",
+      "A hazard nobody knows exists until it attacks isn't tension — it's an ambush. Announce it upfront.",
+      "Distractions are your most narrative-friendly obstacle. Name both sides of the choice before anyone rolls."
+    ],
     invoke_example: "The obstacle is a hazard: 'Arc-Welder Security Drone.' Its aspect is 'Lock-On Doesn't Distinguish Friend from Target.' A PC uses Create Advantage to get 'Drone Tracking Overloaded' as a new scene aspect, then invoking it for free to get +2 on the disable overcome roll. The drone can't track two things at once.",
     compel_example: "Same drone. A PC has the aspect 'Never Leaves Someone Behind.' A teammate is in the drone's patrol path. The GM offers a fate point: the compel fires - they can't continue toward the objective while their teammate is in danger. They break from the plan. The complication enters play.",
   },
@@ -286,7 +367,12 @@ var HELP_CONTENT = {
       "Stack triggers: one that fires every exchange, one that fires on a specific event. Acceleration is drama.",
       "A visible countdown does more for pacing than three extra enemies.",
     ],
-    gm_tips: "Visible track, no secrets. Check each box, pause a beat, say nothing. The silence does the work.",
+    gm_tips: [
+      "Visible track, no secrets. Put it on the table where everyone can see it from the moment you introduce it.",
+      "Check each box, pause a beat, say nothing. The silence does more work than any description.",
+      "State the trigger once clearly before play starts. Never change it or quietly fudge it — the contract is everything.",
+      "When the last box fills, the outcome happens. No exceptions. Softening it breaks the tool permanently."
+    ],
     invoke_example: "The countdown 'Building Demolition Sequence' has 2 boxes marked. A PC is trying to disable it. They used Create Advantage last exchange to place 'Exposed Control Panel' on the scene. Now they invoke that free invoke for +2 on Crafts to stop the sequence. The urgency makes every +2 feel enormous.",
     compel_example: "Same countdown, 3 of 4 boxes marked. A PC has the trouble 'I Always Make It Personal.' The GM offers a fate point: instead of going straight for the disable panel, the compel pulls them toward confronting the person who set the charges. The last box may fill before they get there.",
   },
@@ -302,7 +388,12 @@ var HELP_CONTENT = {
       "Limitations work best when the players know about them before they act. Hidden limitations feel like punishments; visible ones feel like tactical puzzles.",
       "Every resistance needs a bypass. No bypass = wall, not constraint. Build the bypass before the session.",
     ],
-    gm_tips: "One constraint: interesting. Two: a puzzle. Three: a slog. Stop at two.",
+    gm_tips: [
+      "State limitations before players commit to an action — after the roll is a gotcha. Before the roll is a puzzle.",
+      "Resistances require a bypass. The players need to know a bypass exists, even if they don't know what it is yet.",
+      "One constraint: interesting. Two: a puzzle. Three: a slog. Stop at two per encounter.",
+      "Players figure out bypasses through Investigate, Lore, or the right NPC conversation. Reward the research."
+    ],
     invoke_example: "The constraint is a resistance: 'Hardened Faraday Shell - all wireless blocked.' A PC has found the bypass (physical access to a control panel). They invoke the aspect 'Narrowed to One Approach' that they placed via Create Advantage - for +2 on Burglary to open the panel under pressure.",
     compel_example: "Same Faraday shell. A PC's high concept is 'Netrunner Who Lives in the Signal.' The GM offers a fate point: the constraint physically distresses them - all that silence is wrong, disorienting, like missing a sense. They operate at a disadvantage even on tasks that don't need the network. The limitation becomes character texture.",
   },
@@ -355,6 +446,13 @@ var HELP_CONTENT = {
       dnd_notes: "D&D initiative is fixed order. Fate Popcorn Initiative: whoever acted last passes to any character who has not gone. D&D victory = everything dead. Fate victory = stated objective achieved or opposition concedes. You can win without anyone dying.",
     },
     seed: {
+      gm_tips: [
+        "Your literal first words at the table are Scene 1's opening description. Read it exactly. No preamble — drop them straight in.",
+        "Prep Scene 1 thoroughly. Prep nothing else. The complication and Scene 2 emerge from where the players go.",
+        "The complication is your mid-session hand grenade — something that demands a PC response without dictating what it should be.",
+        "Know the defeat condition cold before you start. It creates the stakes that make the victory condition matter.",
+        "The three-scene structure is a suggestion, not a script. Good sessions are messier and better than any outline."
+      ],
       gm_running: "Scene 1 is your literal opening sentence at the table - read the location description and drop the players into it with no preamble. The complication is your mid-session pivot. The defeat condition is what happens if they do nothing - make sure it's real and visible.",
       gm_checklist: ["Read Scene 1 opening aloud as your first words", "Know the defeat condition cold - it creates the stakes", "Have the complication ready but don't force it", "Let the players redirect after Scene 1 - follow them", "The three-scene structure is a suggestion, not a script"],
       gm_hook: "After the session, check: did the outcome change the campaign issue? If yes, update it. If no, the issue should escalate next time.",
@@ -377,23 +475,48 @@ var HELP_CONTENT = {
       dnd_notes: "D&D chase is usually one Athletics check. Fate contest is tracked exchange by exchange. Ties introduce new situation aspects - not a neutral result. The contest generates story; a single roll ends it.",
     },
     consequence: {
+      gm_tips: [
+        "Name it specifically — 'Badly Burned Hands,' not 'Injured.' The name is an aspect and needs to work like one.",
+        "Plan at least one compel on it before it heals. A consequence that never gets compelled is wasted narrative weight.",
+        "Remind the player they can invoke their own consequence for +2 when the fiction supports it.",
+        "The GM never decides when a consequence clears. The player initiates recovery with an overcome roll.",
+        "Consequences make the fiction feel real and the recovery feel earned. Let them breathe."
+      ],
       gm_checklist: ["Name it specifically - a named aspect, not a severity label","Note who can treat it (Academics for physical, Empathy for mental)","Plan at least one compel on it before it heals","Remind the player they can invoke their own consequence for +2"],
       gm_running: "Name it specifically - 'Badly Burned Hands,' not 'Injured.' That name is an aspect and it needs to work like one. Plan at least one compel on it before it heals. And remind the player: they can invoke their own consequence for +2 when the fiction supports it - broken arm helps sell a desperate grapple.",
       gm_compel: "The scene after a consequence is taken is your compel window. The consequence aspect is fresh, narratively loaded, and mechanically active. Use it before the player forgets it exists.",
       dnd_notes: "D&D hit points are an abstract buffer. Fate consequences are named aspects that persist and can be compelled. \"Badly Burned Hands\" applies in any scene involving delicate work, climbing, or combat - and earns the player a fate point when compelled.",
     },
     faction: {
+      gm_tips: [
+        "Factions exert pressure through NPCs, compels, and scene aspects — not stat blocks. You deal with agents, not the faction itself.",
+        "Advance the faction one step toward its goal off-screen each session the party ignores it. Make the advancement visible.",
+        "The named face is your in-session avatar. Build them out with the Major NPC generator — they need a trouble aspect.",
+        "The weakness is your gift to the players. Make sure a clever PC could find it through Investigate or Contacts."
+      ],
       gm_checklist: ["Use the named face as your in-session avatar for the faction","Advance the faction one step toward its goal - offscreen - each session the party ignores them","Know the weakness before the session ends - even if the players don't","Compel the faction's method, not just its goal"],
       gm_running: "Factions exert pressure through NPCs, compels, and scene aspects - not stat blocks. The named face is your session anchor: build them out with the Major NPC generator. Let factions act between sessions - narrate what they achieved off-screen to make them feel real.",
       gm_hook: "At the end of this session, advance this faction one step toward its goal. Tell the players what changed. Factions that move off-screen create urgency that no encounter can match.",
       dnd_notes: "D&D factions have reputation tracks and mission tables. Fate factions exert pressure through NPCs and aspects - no stat blocks. You defeat a faction by undermining their goal, turning their named face, and exploiting their weakness.",
     },
     complication: {
+      gm_tips: [
+        "Deploy when the current scene's outcome feels settled — that's when a complication restores dramatic energy.",
+        "Introduce one element at a time. New aspect, arriving NPC, environment shift — three separate beats, not a pile-on.",
+        "A complication is not a punishment. It is new fictional facts that change what actions are now possible.",
+        "New aspects from complications come with a free invoke — hand it to whoever would most benefit dramatically."
+      ],
       gm_checklist: ["Pick ONE element to introduce first - new aspect, NPC arrival, or environment shift","New aspects can be invoked immediately with a free invoke","Arriving NPCs have their own agenda - they're not there to help or hinder, they're there","Deploy when the scene feels settled, not at the start"],
       gm_running: "Introduce one element at a time and let the players react. The new aspect, the arriving NPC, and the environment shift are three separate beats - don't stack them. The best moment to deploy a complication is when the outcome of the current scene feels settled.",
       dnd_notes: "D&D wandering monster is a resource drain. Fate complication is a new aspect entering the fiction with a free invoke and an agenda. It changes what is possible in the scene - not what hit points you lose.",
     },
     backstory: {
+      gm_tips: [
+        "Ask the question and shut up. The first answer is the safe one — wait for the second, messier one.",
+        "Every answer should produce at least one aspect. Write them down as the player speaks, not after.",
+        "Relationship web questions matter more than individual backstory. Cross-PC aspects are the foundation of the best compels.",
+        "The opening hook is one sentence that drops the party into the situation. No backstory explanation — straight to the fiction."
+      ],
       gm_checklist: ["Ask the question and shut up - wait for the second, messier answer","Write down every aspect that emerges as the player speaks","Relationship web questions matter more than individual ones - do them","Opening hook: one sentence that drops the party directly into the situation"],
       gm_running: "Ask the questions and then shut up. Let the player think. Their first answer is the safe answer; wait for the second, messier one. Every answer should produce at least one aspect - write them down as the player speaks. The relationship web questions matter more than the individual ones.",
       dnd_notes: "D&D backstory lives in the character sheet background section and is rarely referenced. Fate backstory produces aspects you can invoke and compel. If a detail has never appeared in play, it has not earned mechanical weight yet.",

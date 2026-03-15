@@ -6,19 +6,34 @@
 // Must be loaded before core/ui.js.
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ── Seeded PRNG — mulberry32 ──────────────────────────────────────────────
+// Usage: var rng = mulberry32(seed); rng() returns float in [0,1).
+// When seed is 0 / falsy, falls back to Math.random() — preserving normal rolls.
+function mulberry32(seed) {
+  return function() {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+// Active RNG — replaced by seeded PRNG during seeded generation, restored after.
+var _rng = Math.random.bind(Math);
+
 // ── Random utilities ──────────────────────────────────────────────────────
 function pick(arr) {
   if (!arr || arr.length === 0) return '';
-  return arr[Math.floor(Math.random() * arr.length)];
+  return arr[Math.floor(_rng() * arr.length)];
 }
 function pickN(arr, n) {
   var copy = arr.slice(); var out = [];
   for (var i = 0; i < n && copy.length; i++) {
-    out.push(copy.splice(Math.floor(Math.random() * copy.length), 1)[0]);
+    out.push(copy.splice(Math.floor(_rng() * copy.length), 1)[0]);
   }
   return out;
 }
-function rand(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
+function rand(a, b) { return Math.floor(_rng() * (b - a + 1)) + a; }
 
 // Variety Matrix engine: pick a random template, substitute {Var} tokens from v arrays
 function fillTemplate(tblObj) {
@@ -127,7 +142,6 @@ function generateEncounter(t, partySize) {
     gm_fate_points: partySize,
   };
 }
-
 
 function generateSeed(t) {
   var location     = pick(t.seed_locations);
@@ -247,6 +261,7 @@ var UNIVERSAL_INJECT_KEYS = [
   'hazards', 'blocks', 'distractions', 'countdowns', 'limitations', 'resistances',
 ];
 
+// Merge universal tables into campaign tables (campaign values win on conflict).
 function mergeUniversal(tables) {
   if (!tables) return {};
   var u = (typeof UNIVERSAL !== 'undefined') ? UNIVERSAL : {};
@@ -335,6 +350,7 @@ function entryLabel(entry) {
 // - locked: ONLY those entries roll (+ custom strings)
 // - excluded: removed from pool
 // - custom: appended (string tables only)
+// Apply user table preferences (excluded, locked, custom) to a table set.
 function filteredTables(t, prefs) {
   if (!prefs) return t;
   var excl   = prefs.excluded || {};
@@ -362,7 +378,18 @@ function filteredTables(t, prefs) {
   return result;
 }
 
-function generate(genId, t, partySize, opts) {
+// Main dispatch — returns a result object for the given generator ID.
+function generate(genId, t, partySize, opts, seed) {
+  // If a seed is provided, swap in the seeded PRNG for this call then restore
+  var prevRng = _rng;
+  if (seed !== undefined && seed !== null) {
+    _rng = mulberry32(seed >>> 0);
+  }
+  var result = _generate(genId, t, partySize, opts);
+  _rng = prevRng;
+  return result;
+}
+function _generate(genId, t, partySize, opts) {
   switch (genId) {
     case 'npc_minor':    return generateMinorNPC(t);
     case 'npc_major':    return generateMajorNPC(t);
@@ -383,7 +410,6 @@ function generate(genId, t, partySize, opts) {
     default: return {};
   }
 }
-
 
 // ════════════════════════════════════════════════════════════════════════
 // ADDITIONAL GENERATORS
@@ -538,6 +564,7 @@ function generateConstraint(t) {
 // MARKDOWN EXPORT
 // ════════════════════════════════════════════════════════════════════════
 
+// Serialise a result to a Markdown string for clipboard/export.
 function toMarkdown(genId, data, campName) {
   if (!genId || !data) return '';
   var boxes = function(n) { return Array.from({length: n || 0}).map(function() { return '☐'; }).join(' '); };
@@ -1037,7 +1064,6 @@ function toFariJSON(genId, data, campName) {
   // Fari wraps the character in a container with a type discriminator
   return JSON.stringify({ character: character }, null, 2);
 }
-
 
 // ════════════════════════════════════════════════════════════════════════
 // ROLL20 JSON EXPORT  (BL-33b)

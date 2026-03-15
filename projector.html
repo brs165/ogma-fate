@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Ogma — Projector</title>
+  <link rel="stylesheet" href="assets/css/projector.css">
+</head>
+<body>
+
+  <div id="root"></div>
+
+  <!-- Projector receives pushed results from the GM's campaign page.
+       No generator controls, no GM tips, no action bar.
+       BroadcastChannel primary / localStorage polling fallback. -->
+
+  <script>
+  'use strict';
+
+  var CHANNEL_NAME = 'ogma-projector';
+  var STORAGE_KEY  = 'ogma_proj_msg';
+  var POLL_MS      = 500;
+
+  var root        = document.getElementById('root');
+  var lastTs      = 0;
+  var bc          = null;
+
+  // ── Render ──────────────────────────────────────────────────────────────────
+  function el(tag, attrs, children) {
+    var node = document.createElement(tag);
+    if (attrs) {
+      Object.keys(attrs).forEach(function(k) {
+        if (k === 'className') node.className = attrs[k];
+        else if (k === 'style') Object.assign(node.style, attrs[k]);
+        else node.setAttribute(k, attrs[k]);
+      });
+    }
+    if (children) {
+      (Array.isArray(children) ? children : [children]).forEach(function(c) {
+        if (c == null) return;
+        node.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+      });
+    }
+    return node;
+  }
+
+  function pill(label, value, cls) {
+    var wrap = el('div', {className: 'proj-pill' + (cls ? ' ' + cls : '')});
+    wrap.appendChild(el('span', {className: 'proj-pill-label'}, label));
+    wrap.appendChild(el('span', {className: 'proj-pill-value'}, value));
+    return wrap;
+  }
+
+  function aspect(text, type) {
+    var dot = el('span', {className: 'proj-asp-dot proj-asp-' + (type||'ot')});
+    var tx  = el('span', {className: 'proj-asp-text'}, text);
+    var row = el('div',  {className: 'proj-asp-row'});
+    row.appendChild(dot); row.appendChild(tx);
+    return row;
+  }
+
+  function infoBox(label, value) {
+    if (!value) return null;
+    var box = el('div', {className: 'proj-infobox'});
+    box.appendChild(el('div', {className: 'proj-infobox-label'}, label));
+    box.appendChild(el('div', {className: 'proj-infobox-value'}, value));
+    return box;
+  }
+
+  function renderResult(genId, data) {
+    var wrap = el('div', {className: 'proj-result proj-fade-in'});
+    var d = data || {};
+
+    // Generator badge
+    var hc = (window.HELP_CONTENT && window.HELP_CONTENT[genId]) || {};
+    wrap.appendChild(el('div', {className: 'proj-gen-badge'}, (hc.title || genId).toUpperCase()));
+
+    // ── Per-generator layout ─────────────────────────────────────────────────
+    // ── npc_minor / npc_major ────────────────────────────────────────────────
+    if (genId === 'npc_minor' || genId === 'npc_major') {
+      if (d.name) wrap.appendChild(el('h1', {className: 'proj-name'}, d.name));
+      var asp = d.aspects || {};
+      if (typeof asp === 'object' && !Array.isArray(asp)) {
+        if (asp.high_concept) wrap.appendChild(aspect(asp.high_concept, 'hc'));
+        if (asp.trouble)      wrap.appendChild(aspect(asp.trouble, 'tr'));
+        if (asp.others) asp.others.forEach(function(a){ wrap.appendChild(aspect(a,'ot')); });
+      } else if (Array.isArray(asp)) {
+        asp.forEach(function(a){ wrap.appendChild(aspect(typeof a==='string'?a:a.name,'ot')); });
+      }
+      if (d.skills && d.skills.length) {
+        var sk = el('div', {className: 'proj-skills'});
+        d.skills.slice(0,5).forEach(function(s){
+          sk.appendChild(el('span', {className:'proj-skill'}, '+'+s.r+' '+s.name));
+        });
+        wrap.appendChild(sk);
+      }
+      // Stress tracks — updated live via applyUpdate
+      function stressTrack(label, n) {
+        if (!n) return null;
+        var track = el('div', {'className': 'proj-stress-track',
+          'data-stress-label': label});
+        track.appendChild(el('div', {className: 'proj-stress-label'}, label));
+        var boxes = el('div', {className: 'proj-stress-boxes'});
+        for (var si = 0; si < n; si++) {
+          boxes.appendChild(el('div', {className: 'proj-stress-box'}, String(si+1)));
+        }
+        track.appendChild(boxes);
+        return track;
+      }
+      // Minor NPC: single stress track
+      var minorStress = stressTrack('Stress', d.stress);
+      if (minorStress) wrap.appendChild(minorStress);
+      // Major NPC: physical + mental
+      var physTrack = stressTrack('Physical', d.physical_stress);
+      var mentTrack = stressTrack('Mental', d.mental_stress);
+      if (physTrack) wrap.appendChild(physTrack);
+      if (mentTrack) wrap.appendChild(mentTrack);
+      // Taken-out overlay (hidden until triggered)
+      var takenOutEl = el('div', {className: 'proj-taken-out'});
+      takenOutEl.appendChild(el('div', {className: 'proj-taken-out-icon'}, '⚔'));
+      takenOutEl.appendChild(el('div', {className: 'proj-taken-out-label'}, 'TAKEN OUT'));
+      takenOutEl.appendChild(el('div', {className: 'proj-taken-out-name'}, d.name || ''));
+      wrap.appendChild(takenOutEl);
+    }
+    // ── scene ────────────────────────────────────────────────────────────────
+    else if (genId === 'scene') {
+      wrap.appendChild(el('h1', {className: 'proj-name'}, 'Scene Setup'));
+      if (d.aspects && d.aspects.length) {
+        d.aspects.forEach(function(a){
+          var text = typeof a === 'string' ? a : (a.name || a.text || '');
+          if (text) wrap.appendChild(aspect(text, 'ot'));
+        });
+      }
+      if (d.zones && d.zones.length) {
+        var zw = el('div', {className: 'proj-zones'});
+        d.zones.forEach(function(z){
+          zw.appendChild(el('div',{className:'proj-zone'}, typeof z==='string'?z:(z.name||'')));
+        });
+        wrap.appendChild(zw);
+      }
+    }
+    // ── encounter ────────────────────────────────────────────────────────────
+    else if (genId === 'encounter') {
+      wrap.appendChild(el('h1', {className:'proj-name'}, 'Encounter'));
+      if (d.aspects && d.aspects.length)
+        d.aspects.forEach(function(a){ wrap.appendChild(aspect(String(a),'ot')); });
+      var vic = infoBox('Victory', d.victory);
+      var def = infoBox('Defeat',  d.defeat);
+      if (vic) wrap.appendChild(vic);
+      if (def) wrap.appendChild(def);
+    }
+    // ── countdown ────────────────────────────────────────────────────────────
+    else if (genId === 'countdown') {
+      if (d.name) wrap.appendChild(el('h1', {className:'proj-name'}, d.name));
+      var track = el('div', {className:'proj-track'});
+      for (var i=0; i<(d.boxes||4); i++) {
+        track.appendChild(el('div', {className:'proj-track-box'}, String(i+1)));
+      }
+      wrap.appendChild(track);
+      wrap.appendChild(el('div', {className:'proj-track-unit'}, 'measured in '+(d.unit||'scenes')));
+      if (d.trigger) wrap.appendChild(infoBox('Trigger', d.trigger));
+      if (d.outcome) {
+        var outEl = infoBox('Outcome', d.outcome);
+        if (outEl) outEl.setAttribute('data-role', 'outcome');
+        wrap.appendChild(outEl);
+      }
+    }
+    // ── consequence ──────────────────────────────────────────────────────────
+    else if (genId === 'consequence') {
+      var sev = (d.severity||'mild').toUpperCase();
+      wrap.appendChild(el('div', {className:'proj-severity proj-sev-'+(d.severity||'mild')}, sev));
+      if (d.aspect) wrap.appendChild(el('h1', {className:'proj-name proj-italic'}, '"'+d.aspect+'"'));
+      if (d.context) wrap.appendChild(el('div', {className:'proj-dim'}, 'suffered '+d.context));
+    }
+    // ── faction ──────────────────────────────────────────────────────────────
+    else if (genId === 'faction') {
+      if (d.name) wrap.appendChild(el('h1', {className:'proj-name'}, d.name));
+      if (d.goal)   wrap.appendChild(infoBox('Goal',   d.goal));
+      if (d.method) wrap.appendChild(infoBox('Method', d.method));
+    }
+    // ── compel ───────────────────────────────────────────────────────────────
+    else if (genId === 'compel') {
+      wrap.appendChild(el('h1', {className:'proj-name'}, 'Compel'));
+      if (d.situation)   wrap.appendChild(infoBox('Situation',   d.situation));
+      if (d.consequence) wrap.appendChild(infoBox('If accepted', d.consequence));
+    }
+    // ── seed ─────────────────────────────────────────────────────────────────
+    else if (genId === 'seed') {
+      if (d.location)  wrap.appendChild(el('h1', {className:'proj-name'}, d.location));
+      if (d.objective) wrap.appendChild(el('div',{className:'proj-dim'}, d.objective));
+      if (d.victory) wrap.appendChild(infoBox('Victory', d.victory));
+      if (d.defeat)  wrap.appendChild(infoBox('Defeat',  d.defeat));
+    }
+    // ── challenge ────────────────────────────────────────────────────────────
+    else if (genId === 'challenge') {
+      if (d.name) wrap.appendChild(el('h1', {className:'proj-name'}, d.name));
+      if (d.desc) wrap.appendChild(el('div',{className:'proj-dim'}, d.desc));
+      if (d.success) wrap.appendChild(infoBox('Success', d.success));
+      if (d.failure) wrap.appendChild(infoBox('Failure', d.failure));
+    }
+    // ── contest ──────────────────────────────────────────────────────────────
+    else if (genId === 'contest') {
+      if (d.contest_type) wrap.appendChild(el('h1',{className:'proj-name'}, d.contest_type));
+      if (d.desc)   wrap.appendChild(el('div',{className:'proj-dim'}, d.desc));
+      if (d.aspect) wrap.appendChild(aspect(d.aspect,'hc'));
+      var WIN2 = d.victories_needed || 3;
+      var sides = el('div', {className: 'proj-contest-sides'});
+      var trA = el('div', {className:'proj-track proj-track-a'});
+      var trB = el('div', {className:'proj-track proj-track-b'});
+      if (d.side_a) trA.appendChild(el('div',{className:'proj-side-label proj-side-a'}, '🔵 '+d.side_a));
+      for (var j=0;j<WIN2;j++) trA.appendChild(el('div',{className:'proj-track-box'},String(j+1)));
+      if (d.side_b) trB.appendChild(el('div',{className:'proj-side-label proj-side-b'}, '🔴 '+d.side_b));
+      for (var k=0;k<WIN2;k++) trB.appendChild(el('div',{className:'proj-track-box'},String(k+1)));
+      sides.appendChild(trA); sides.appendChild(trB);
+      wrap.appendChild(sides);
+      wrap.appendChild(el('div', {className:'proj-winner'}));
+    }
+    // ── obstacle ─────────────────────────────────────────────────────────────
+    else if (genId === 'obstacle') {
+      if (d.name)    wrap.appendChild(el('h1',{className:'proj-name'}, d.name));
+      if (d.aspect)  wrap.appendChild(aspect(d.aspect,'ot'));
+      if (d.disable) wrap.appendChild(infoBox('Disable', d.disable));
+    }
+    // ── constraint ───────────────────────────────────────────────────────────
+    else if (genId === 'constraint') {
+      if (d.name) wrap.appendChild(el('h1',{className:'proj-name'}, d.name));
+      if (d.what_resists)      wrap.appendChild(infoBox('Resists',    d.what_resists));
+      if (d.restricted_action) wrap.appendChild(infoBox('Restricted', d.restricted_action));
+      if (d.bypass)            wrap.appendChild(infoBox('Bypass',     d.bypass));
+    }
+    // ── complication ─────────────────────────────────────────────────────────
+    else if (genId === 'complication') {
+      if (d.new_aspect) wrap.appendChild(aspect(d.new_aspect,'ot'));
+      if (d.arrival) wrap.appendChild(infoBox('Arrives', typeof d.arrival==='object'?d.arrival.name:d.arrival));
+      if (d.env)     wrap.appendChild(infoBox('Environment', d.env));
+    }
+    // ── backstory ────────────────────────────────────────────────────────────
+    else if (genId === 'backstory') {
+      wrap.appendChild(el('h1',{className:'proj-name'}, 'PC Backstory'));
+      if (d.questions && d.questions.length)
+        d.questions.slice(0,3).forEach(function(q){
+          wrap.appendChild(el('div',{className:'proj-dim'}, q));
+        });
+    }
+    // ── campaign ─────────────────────────────────────────────────────────────
+    else if (genId === 'campaign') {
+      if (d.current  && d.current.name)   wrap.appendChild(el('h1',{className:'proj-name'}, d.current.name));
+      if (d.current  && d.current.desc)   wrap.appendChild(el('div',{className:'proj-dim'}, d.current.desc));
+      if (d.impending && d.impending.name) wrap.appendChild(infoBox('Impending', d.impending.name));
+    }
+    // ── generic fallback ─────────────────────────────────────────────────────
+    else {
+      var title = d.name || d.title || d.type || genId;
+      wrap.appendChild(el('h1',{className:'proj-name'}, title));
+    }
+    return wrap;
+  }
+
+  function showResult(genId, data, campId) {
+    root.innerHTML = '';
+    root.className = campId ? 'camp-' + campId : '';
+    root.appendChild(renderResult(genId, data));
+  }
+
+  function showWaiting() {
+    root.innerHTML = '';
+    root.className = '';
+    var w = el('div', {className:'proj-waiting'});
+    w.appendChild(el('div', {className:'proj-waiting-icon'}, '📺'));
+    w.appendChild(el('div', {className:'proj-waiting-text'}, 'Ogma Projector'));
+    w.appendChild(el('div', {className:'proj-waiting-sub'}, 'Waiting for GM to push a result…'));
+    root.appendChild(w);
+  }
+
+  // ── Message handler ──────────────────────────────────────────────────────────
+  // ── BL-41: Apply live state update to current display ──────────────────────
+  function applyUpdate(genId, state) {
+    var s = state || {};
+
+    // ── Countdown: fill boxes, trigger animation on completion ──────────────
+    if (genId === 'countdown') {
+      var boxes = root.querySelectorAll('.proj-track-box');
+      var triggered = s.filled >= s.boxes;
+      boxes.forEach(function(box, i) {
+        var filled = i < s.filled;
+        box.classList.toggle('proj-box-filled', filled);
+        box.classList.toggle('proj-box-triggered', triggered && filled);
+      });
+      var container = root.querySelector('.proj-track');
+      if (container) container.classList.toggle('proj-track-triggered', triggered);
+      var nameEl = root.querySelector('.proj-name');
+      if (nameEl) nameEl.classList.toggle('proj-name-triggered', triggered);
+      // Outcome block appears when triggered
+      var outcomeEl = root.querySelector('.proj-infobox[data-role="outcome"]');
+      if (outcomeEl) outcomeEl.classList.toggle('proj-outcome-active', triggered);
+    }
+
+    // ── Contest: update score tracks, show winner ────────────────────────────
+    else if (genId === 'contest') {
+      var WIN = s.WIN || 3;
+      var tracksA = root.querySelectorAll('.proj-track-a .proj-track-box');
+      var tracksB = root.querySelectorAll('.proj-track-b .proj-track-box');
+      tracksA.forEach(function(box, i) { box.classList.toggle('proj-box-filled proj-box-a', i < s.scoreA); });
+      tracksB.forEach(function(box, i) { box.classList.toggle('proj-box-filled proj-box-b', i < s.scoreB); });
+      var winnerEl = root.querySelector('.proj-winner');
+      if (winnerEl) {
+        var wonBy = s.scoreA >= WIN ? root.querySelector('.proj-side-a') : s.scoreB >= WIN ? root.querySelector('.proj-side-b') : null;
+        winnerEl.style.display = wonBy ? 'block' : 'none';
+        if (wonBy) winnerEl.textContent = wonBy.textContent + ' wins!';
+      }
+    }
+
+    // ── Scene: highlight active aspects ──────────────────────────────────────
+    else if (genId === 'scene') {
+      var aspects = root.querySelectorAll('.proj-asp-row');
+      aspects.forEach(function(row, i) {
+        row.classList.toggle('proj-asp-active', (s.active_aspects || []).indexOf(i) !== -1);
+      });
+    }
+
+    // ── NPC stress update ────────────────────────────────────────────────────
+    else if (genId === 'npc_minor' || genId === 'npc_major') {
+      var label = s.label || 'Stress';
+      var stressTrackEl = root.querySelector(
+        '.proj-stress-track[data-stress-label="' + label + '"]');
+      if (stressTrackEl) {
+        var stressBoxes = stressTrackEl.querySelectorAll('.proj-stress-box');
+        stressBoxes.forEach(function(box, i) {
+          box.classList.toggle('proj-stress-filled', i < s.hits);
+        });
+        stressTrackEl.classList.toggle('proj-stress-takenout', !!s.takenOut);
+      }
+      // Show taken-out overlay when any track hits full
+      var takenOutOverlay = root.querySelector('.proj-taken-out');
+      if (takenOutOverlay) {
+        takenOutOverlay.classList.toggle('proj-taken-out-visible', !!s.takenOut);
+      }
+    }
+
+    // ── FP pool update ────────────────────────────────────────────────────────
+    else if (genId === 'fp_pool') {
+      updateFPStrip(s.pool || 0, s.max || 6);
+    }
+  }
+
+  // ── FP dot strip (BL-44) ─────────────────────────────────────────────────
+  var fpStrip = null;
+  function buildFPStrip() {
+    fpStrip = el('div', {className: 'proj-fp-strip'});
+    fpStrip.appendChild(el('span', {className: 'proj-fp-label'}, '◎ FP'));
+    fpStrip.appendChild(el('div', {className: 'proj-fp-dots', id: 'proj-fp-dots'}));
+    document.body.appendChild(fpStrip);
+  }
+  function updateFPStrip(current, max) {
+    var dotsEl = document.getElementById('proj-fp-dots');
+    if (!dotsEl) return;
+    dotsEl.innerHTML = '';
+    for (var i = 0; i < Math.max(current, max || current); i++) {
+      var dot = el('div', {className: 'proj-fp-dot' + (i < current ? ' proj-fp-dot-on' : ' proj-fp-dot-off')});
+      dotsEl.appendChild(dot);
+    }
+  }
+  buildFPStrip();
+
+  function handleMessage(msg) {
+    if (!msg || msg.ts <= lastTs) return;
+    lastTs = msg.ts;
+    if (msg.type === 'result' && msg.genId && msg.data) {
+      showResult(msg.genId, msg.data, msg.campId);
+    } else if (msg.type === 'update' && msg.genId && msg.state) {
+      applyUpdate(msg.genId, msg.state);
+    } else if (msg.type === 'clear') {
+      showWaiting();
+    }
+  }
+
+  // ── Communication setup ──────────────────────────────────────────────────────
+  // 1. BroadcastChannel
+  try {
+    bc = new BroadcastChannel(CHANNEL_NAME);
+    bc.onmessage = function(e) { handleMessage(e.data); };
+  } catch(e) { bc = null; }
+
+  // 2. localStorage polling fallback (also catches same-file file:// cases)
+  setInterval(function() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      var msg = JSON.parse(raw);
+      handleMessage(msg);
+    } catch(e) {}
+  }, POLL_MS);
+
+  // ── Cleanup ──────────────────────────────────────────────────────────────────
+  window.addEventListener('beforeunload', function() {
+    if (bc) { try { bc.close(); } catch(e) {} }
+  });
+
+  // ── Initial state ─────────────────────────────────────────────────────────────
+  showWaiting();
+
+  // Check for a message already in localStorage (page reload case)
+  try {
+    var existing = localStorage.getItem(STORAGE_KEY);
+    if (existing) handleMessage(JSON.parse(existing));
+  } catch(e) {}
+  </script>
+</body>
+</html>
