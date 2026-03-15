@@ -2,7 +2,7 @@
 // Strategy: cache-first for all static assets, network-first for CDN scripts.
 // Safari fix: redirected responses are cloned as non-redirected before caching.
 
-var CACHE_NAME = 'fate-generator-2026.03.36';
+var CACHE_NAME = 'fate-generator-2026.03.42';
 
 var APP_SHELL = [
   './index.html',
@@ -26,6 +26,16 @@ var APP_SHELL = [
   './campaigns/western.html',
   './campaigns/guide-western.html',
   './assets/css/theme.css',
+  './assets/css/rpg-awesome-local.css',
+  './assets/css/campaigns/theme-thelongafter.css',
+  './assets/css/campaigns/theme-cyberpunk.css',
+  './assets/css/campaigns/theme-fantasy.css',
+  './assets/css/campaigns/theme-space.css',
+  './assets/css/campaigns/theme-victorian.css',
+  './assets/css/campaigns/theme-postapoc.css',
+  './assets/css/campaigns/theme-western.css',
+  './assets/fonts/rpg-awesome/rpgawesome-webfont.woff2',
+  './assets/fonts/rpg-awesome/rpgawesome-webfont.woff',
   './core/engine.js',
   './core/ui.js',
   './core/db.js',

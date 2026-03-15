@@ -17,43 +17,41 @@ var Fragment     = React.Fragment;
 // Maps generator IDs and UI keys to RPG Awesome class names.
 // Usage: h(RaIcon, {n:'crossed-swords'}) or RaIcon({n:'trophy'})
 var RA_ICONS = {
-  // Generators
-  npc_minor:    'player',
-  npc_major:    'player-king',
-  scene:        'campfire',
-  campaign:     'scroll-unfurled',
-  encounter:    'crossed-swords',
-  seed:         'trail',
-  compel:       'divert',
-  challenge:    'archery-target',
-  contest:      'trophy',
-  consequence:  'bleeding-hearts',
-  faction:      'castle-flag',
-  complication: 'burst-blob',
-  backstory:    'quill-ink',
-  obstacle:     'barrier',
-  countdown:    'hourglass',
-  constraint:   'locked-fortress',
-  // UI chrome
-  pin:          'rune-stone',
-  gm_mode:      'player-king',
-  fp_tracker:   'diamond',
-  history:      'scroll-unfurled',
-  pin:          'rune-stone',
-  play_intro:   'forward',
-  guide:        'book',
-  rules:        'help',
-  dnd_guide:    'crossed-swords',
-  home:         'castle-emblem',
-  customize:    'cog',
-  settings:     'cog-wheel',
-  theme_light:  'sun',
-  theme_dark:   'snowflake',
-  inspire:      'crystal-ball',
-  // Landing
-  session_zero: 'sprout',
-  learn:        'book',
-  // Generator groups
+  // ── Generators ────────────────────────────────────────────────────────────
+  npc_minor:    'player',          // generic figure = unnamed NPC
+  npc_major:    'player-king',     // crowned figure = major recurring character
+  scene:        'campfire',        // a scene location and gathering point
+  campaign:     'guarded-tower',   // a defended position = campaign forces at work
+  encounter:    'crossed-swords',  // direct conflict = encounter
+  seed:         'acorn',           // acorn grows into a story = adventure seed
+  compel:       'divert',          // redirect fate = compel swerves the story
+  challenge:    'archery-target',  // aim at a goal through multiple rolls
+  contest:      'trophy',          // competition between two sides
+  consequence:  'health-decrease', // health going down = lasting wound/mark
+  faction:      'castle-flag',     // organised power with a banner
+  complication: 'poison-cloud',    // sudden eruption of trouble
+  backstory:    'quill-ink',       // writing your personal history
+  obstacle:     'barrier',         // something physically in the way
+  countdown:    'hourglass',       // time running out
+  constraint:   'metal-gate',      // a gate = blocked passage = can't go through
+  // ── UI chrome ─────────────────────────────────────────────────────────────
+  pin:          'plain-dagger',    // sticking a dagger to pin something in place
+  gm_mode:      'crown',           // GM = king of the table
+  fp_tracker:   'crystals',        // fate energy = magical crystalline resource
+  history:      'scroll-unfurled', // an open log of past events
+  play_intro:   'torch',           // lighting the way into the story
+  guide:        'book',            // reference book / annotated worldbook
+  rules:        'help',            // the rules reference / help system
+  dnd_guide:    'crossed-swords',  // D&D = swords and combat
+  home:         'castle-emblem',   // the home base / keep
+  customize:    'cog-wheel',       // fine-grained customisation control
+  settings:     'cog',             // general settings
+  theme_light:  'sun',             // light mode = sunlight
+  theme_dark:   'moon-sun',        // dark mode = moon obscuring sun
+  inspire:      'crystal-ball',    // seeing possibilities = inspiration
+  session_zero: 'sprout',          // a new beginning
+  learn:        'lighthouse',      // a beacon = quick start = guides you in
+  // ── Generator groups ──────────────────────────────────────────────────────
   characters:   'player',
   scenes:       'campfire',
   pacing:       'hourglass',
@@ -74,13 +72,12 @@ function RaIcon(props) {
 var TIMING = {
   COPY_CONFIRM_MS:  2200,  // "Copied!" badge display duration
   TOAST_MS:         2500,  // Toast notification auto-dismiss
-  ROLL_MIN_MS:      2000,  // Minimum roll animation hold
   INTRO_REPLAY_MS:  150,   // Delay before replaying intro (let sidebar close first)
 };
 
 // ── Theme init (runs immediately, before React render) ───────────────────
 (function initTheme() {
-  var saved = LS.get('theme') || 'dark';
+  var saved = LS.get('theme') || 'light';
   document.documentElement.setAttribute('data-theme', saved);
 })();
 
@@ -89,7 +86,7 @@ function applyTheme(mode) {
   LS.set('theme', mode);
 }
 function getTheme() {
-  return LS.get('theme') || 'dark';
+  return LS.get('theme') || 'light';
 }
 
 function getTextSize() {
@@ -147,23 +144,37 @@ function SkillBar(props) {
 // Interactive stress boxes - tap to mark/clear
 function StressBoxes(props) {
   var _hit = useState(0); var hits = _hit[0]; var setHits = _hit[1];
+  var _shake = useState(false); var shaking = _shake[0]; var setShaking = _shake[1];
   var n = props.n || 0;
+  var takenOut = hits >= n && n > 0;
   var trackTip = (props.label || 'Stress') + ' track - ' + n + ' box' + (n !== 1 ? 'es' : '') + '. Tap a box to mark it. All stress clears at end of scene.';
-  return h('div', {className: 'stress-track', title: trackTip},
-    h('div', {className: 'stress-label-text'}, props.label || 'Stress'),
+  function mark(i) {
+    var next = hits === i + 1 ? i : i + 1;
+    setHits(next);
+    if (next >= n && n > 0) {
+      setShaking(true);
+      setTimeout(function() { setShaking(false); }, 600);
+      if (navigator.vibrate) navigator.vibrate([40, 60, 80]);
+    }
+  }
+  return h('div', {className: 'stress-track' + (takenOut && shaking ? ' taken-out' : ''), title: trackTip},
+    h('div', {style: {display:'flex',alignItems:'center',flexWrap:'wrap',gap:4}},
+      h('div', {className: 'stress-label-text'}, props.label || 'Stress'),
+      takenOut && h('span', {className: 'taken-out-label'}, '⚡ TAKEN OUT')
+    ),
     h('div', {className: 'stress-boxes'},
       Array.from({length: n}, function(_, i) {
         var marked = i < hits;
         return h('div', {
           key: i,
           className: 'stress-box',
-          onClick: function() { setHits(function(h) { return h === i + 1 ? i : i + 1; }); },
+          onClick: function() { mark(i); },
           title: marked ? 'Click to clear' : 'Click to mark hit',
           style: {
             cursor: 'pointer',
-            background: marked ? 'var(--accent)' : 'rgba(255,255,255,0.03)',
-            borderColor: marked ? 'var(--accent)' : 'var(--accent)',
-            transition: 'all 0.15s',
+            background: marked ? (takenOut ? 'var(--c-red)' : 'var(--accent)') : 'rgba(255,255,255,0.03)',
+            borderColor: marked ? (takenOut ? 'var(--c-red)' : 'var(--accent)') : 'var(--accent)',
+            transition: 'all 0.2s',
             position: 'relative',
           },
         }, marked ? h('div', {style: {position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,color:'var(--bg)',fontWeight:800}}, '✕') : null);
@@ -472,8 +483,8 @@ function EncounterResult(props) {
         )
       ),
       h('div', {style: {display: 'flex', flexDirection: 'column', gap: 4}},
-        h('button', {onClick: function() { setGmFP(function(v) { return v + 1; }); }, style: {width: 28, height: 28, borderRadius: 6, border: '1px solid var(--border)', background: 'var(--glass-bg)', color: 'var(--text-dim)', fontSize: 16, cursor: 'pointer', lineHeight: 1}}, '+'),
-        h('button', {onClick: function() { setGmFP(function(v) { return Math.max(0, v - 1); }); }, style: {width: 28, height: 28, borderRadius: 6, border: '1px solid var(--border)', background: 'var(--glass-bg)', color: 'var(--text-dim)', fontSize: 16, cursor: 'pointer', lineHeight: 1}}, '−')
+        h('button', {onClick: function() { setGmFP(function(v) { return v + 1; }); }, style: {width: 28, height: 28, borderRadius: 6, border: '1px solid var(--border)', background: 'var(--panel)', color: 'var(--text-dim)', fontSize: 16, cursor: 'pointer', lineHeight: 1}}, '+'),
+        h('button', {onClick: function() { setGmFP(function(v) { return Math.max(0, v - 1); }); }, style: {width: 28, height: 28, borderRadius: 6, border: '1px solid var(--border)', background: 'var(--panel)', color: 'var(--text-dim)', fontSize: 16, cursor: 'pointer', lineHeight: 1}}, '−')
       )
     ),
     h('div', {style: {marginTop: 10}},
@@ -684,11 +695,11 @@ function ContestResult(props) {
         transition: 'all 0.3s',
       },
     },
-      h('div', {className: 'info-box-label', style: {color: isWinner ? 'var(--accent)' : tprops.colorVar}},
-        tprops.icon + ' ' + tprops.name + (isWinner ? ' 🏆 WINNER' : '')
+      h('div', {className: 'info-box-label', style: {color: isWinner ? 'var(--accent)' : tprops.colorVar, display:'flex', alignItems:'center', gap:4}},
+        tprops.icon + ' ' + tprops.name,
+        isWinner && h('span', {className: 'trophy-pop', key: 'trophy'}, '🏆')
       ),
       h('div', {className: 'info-box-text', style: {marginBottom: 8}}, tprops.skills),
-      // Victory boxes
       h('div', {style: {display: 'flex', gap: 5, marginBottom: 8}},
         Array.from({length: WIN}, function(_, i) {
           var filled = i < score;
@@ -707,7 +718,7 @@ function ContestResult(props) {
         })
       ),
       h('div', {style: {fontSize: 'var(--text-label)', color: isWinner ? 'var(--accent)' : 'var(--text-muted)'}},
-        score + ' / ' + WIN + (isWinner ? ' - First to 3!' : '')
+        score + ' / ' + WIN + (isWinner ? ' — first to 3!' : '')
       )
     );
   }
@@ -780,7 +791,7 @@ function ConsequenceResult(props) {
           onClick: function() { setTreated(function(v) { return !v; }); },
           style: {display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer'},
         },
-          h('div', {style: {width: 20, height: 20, borderRadius: 5, border: '2px solid ' + (treated ? col : 'var(--border)'), background: treated ? col : 'transparent', flexShrink: 0, transition: 'all 0.15s', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: 'var(--bg)'}}, treated ? '✓' : ''),
+          h('div', {className: treated ? 'consequence-marked' : '', style: {width: 20, height: 20, borderRadius: 5, border: '2px solid ' + (treated ? col : 'var(--border)'), background: treated ? col : 'transparent', flexShrink: 0, transition: 'all 0.15s', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: 'var(--bg)'}}, treated ? '✓' : ''),
           h('div', null,
             h('div', {style: {fontSize: 'var(--text-sm)', color: treated ? 'var(--text)' : 'var(--text-dim)', fontWeight: treated ? 600 : 400}}, 'Treatment: overcome ' + recoveryTarget[d.severity]),
             h('div', {style: {fontSize: 'var(--text-label)', color: 'var(--text-muted)'}}, 'Academics (physical) or Empathy (mental) · +2 if self-treating')
@@ -971,16 +982,41 @@ function ObstacleResult(props) {
 function CountdownResult(props) {
   var d = props.data;
   var _filled = useState(0); var filled = _filled[0]; var setFilled = _filled[1];
+  var _particles = useState([]); var particles = _particles[0]; var setParticles = _particles[1];
   var triggered = filled >= d.boxes;
   var pct = d.boxes > 0 ? filled / d.boxes : 0;
-  // Color shifts from accent → warning → red as track fills
   var barColor = pct < 0.5 ? 'var(--accent)' : pct < 0.75 ? 'var(--c-purple)' : 'var(--c-red)';
+
+  function markBox(i) {
+    var next = filled === i + 1 ? i : i + 1;
+    var wasTriggered = filled >= d.boxes;
+    setFilled(next);
+    if (next >= d.boxes && !wasTriggered) {
+      // Fire particles
+      var pts = Array.from({length: 12}, function(_, p) {
+        var angle = p * 30 * (Math.PI / 180);
+        var r = 40 + Math.random() * 25;
+        return {
+          id: p,
+          px: Math.round(Math.cos(angle) * r),
+          py: Math.round(Math.sin(angle) * r),
+        };
+      });
+      setParticles(pts);
+      setTimeout(function() { setParticles([]); }, 700);
+      if (navigator.vibrate) navigator.vibrate([30, 50, 100]);
+    }
+  }
+
   return h('div', null,
     h(Lbl, null, 'COUNTDOWN'),
-    h('div', {style:{fontSize:22, fontWeight:700, color: triggered ? 'var(--c-red)' : 'var(--gold)', marginBottom:14, transition:'color 0.3s'}}, d.name),
-    // Progress bar behind boxes
-    h('div', {style:{position:'relative', padding:'14px 12px', borderRadius:12, marginBottom:10, border:'1px solid ' + (triggered ? 'var(--c-red)66' : 'var(--border)'), background:'var(--inset)', overflow:'hidden', transition:'border-color 0.3s'}},
+    h('div', {className: triggered ? 'cd-name-pop' : '', style:{fontSize:22, fontWeight:700, color: triggered ? 'var(--c-red)' : 'var(--gold)', marginBottom:14, transition:'color 0.3s'}}, d.name),
+    h('div', {className: triggered ? 'cd-triggered-shake' : '', style:{position:'relative', padding:'14px 12px', borderRadius:12, marginBottom:10, border:'1px solid ' + (triggered ? 'var(--c-red)66' : 'var(--border)'), background:'var(--inset)', overflow:'visible', transition:'border-color 0.3s'}},
       h('div', {style:{position:'absolute', top:0, left:0, height:'100%', width: (pct*100)+'%', background:'color-mix(in srgb, ' + barColor + ' 12%, transparent)', transition:'width 0.3s, background 0.3s', pointerEvents:'none', borderRadius:12}}),
+      // Particles
+      particles.map(function(p) {
+        return h('div', {key: p.id, className: 'cd-particle', style: {'--px': p.px+'px', '--py': p.py+'px', animationDelay: (p.id * 0.025) + 's'}});
+      }),
       h('div', {style:{fontSize:'var(--text-label)', color: triggered ? 'var(--c-red)' : barColor, fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:10, position:'relative', transition:'color 0.3s'}},
         triggered ? '⚡ TRIGGERED' : 'TRACK - tap to mark'
       ),
@@ -991,13 +1027,13 @@ function CountdownResult(props) {
           return h('div', {
             key: i,
             title: isMarked ? 'Click to unmark' : 'Click to mark',
-            onClick: function() { setFilled(function(f) { return f === i + 1 ? i : i + 1; }); },
+            onClick: function() { markBox(i); },
             style: {
               width: 32, height: 32, borderRadius: 8, cursor:'pointer', transition:'all 0.2s',
-              border: '2px solid ' + (isMarked ? barColor : 'var(--border)'),
-              background: isMarked ? ('color-mix(in srgb, ' + barColor + ' 25%, transparent)') : 'transparent',
+              border: '2px solid ' + (isMarked ? boxColor : 'var(--border)'),
+              background: isMarked ? ('color-mix(in srgb, ' + boxColor + ' 25%, transparent)') : 'transparent',
               display:'flex', alignItems:'center', justifyContent:'center',
-              fontSize:13, fontWeight:800, color: isMarked ? barColor : 'var(--text-muted)',
+              fontSize:13, fontWeight:800, color: isMarked ? boxColor : 'var(--text-muted)',
             },
           }, isMarked ? '✕' : String(i+1));
         })
@@ -1006,6 +1042,7 @@ function CountdownResult(props) {
     ),
     h(InfoBox, {label:'⚡ TRIGGER', text:d.trigger, color:'var(--c-red)', tip:'The event that marks a box on the countdown track'}),
     h('div', {
+      className: triggered ? 'cd-outcome-appear' : '',
       style:{
         padding:'12px 14px', borderRadius:10, marginTop:4, transition:'all 0.3s',
         border:'1px solid ' + (triggered ? 'var(--c-red)' : 'var(--c-red)44'),
@@ -1143,7 +1180,7 @@ function Modal(props) {
 // ════════════════════════════════════════════════════════════════════════
 
 // ════════════════════════════════════════════════════════════════════════
-// SHARE DRAWER (BL-22) - inline expand below panel toolbar
+// SHARE DRAWER — inline expand below panel toolbar
 // ════════════════════════════════════════════════════════════════════════
 
 function ShareDrawer(props) {
@@ -1332,7 +1369,7 @@ function HelpModal(props) {
         h('div', {className: 'help-gm-tip-label'}, 'GM Tip'),
         h('div', {className: 'help-gm-tip-text'}, hc.gm_tips || '')
       ),
-      // BL-07: Invoke & Compel examples
+      // Invoke & compel examples — shown in GM Tips tab
       (hc.invoke_example || hc.compel_example) && h('div', {className: 'help-section gm-guidance', style: {marginTop: 10}},
         h('div', {className: 'help-section-lbl'}, '✦ Invoke & Compel Examples'),
         hc.invoke_example && h('div', {style: {marginBottom: 10}},
@@ -1499,12 +1536,12 @@ function HelpLevelOnboardingModal(props) {
             style: {
               display: 'flex', alignItems: 'center', gap: 14, padding: '12px 16px',
               borderRadius: 'var(--glass-radius)', border: '1px solid var(--border)',
-              background: 'var(--glass-bg)', cursor: 'pointer', textAlign: 'left',
+              background: 'var(--panel)', cursor: 'pointer', textAlign: 'left',
               fontFamily: 'var(--font-ui)', transition: 'all 0.15s', width: '100%',
             },
             'aria-label': opt.label + ' - ' + opt.desc,
             onMouseEnter: function(e) { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.background = 'color-mix(in srgb, var(--accent) 8%, transparent)'; },
-            onMouseLeave: function(e) { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'var(--glass-bg)'; },
+            onMouseLeave: function(e) { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'var(--panel)'; },
           },
             h('span', {style: {fontSize: 24, flexShrink: 0, width: 32, textAlign: 'center'}}, opt.icon),
             h('div', null,
@@ -2229,7 +2266,7 @@ var DEFAULT_FP_STATE = {
 };
 
 // ════════════════════════════════════════════════════════════════════════
-// BL-10: MILESTONE TRACKER - session-only, no IDB persistence
+// MILESTONE TRACKER — session-only, no persistence
 // Renders as second tab in the FP panel
 // ════════════════════════════════════════════════════════════════════════
 
@@ -2259,6 +2296,7 @@ function MilestoneTracker(props) {
   function Option(oProps) {
     var checked = oProps.arr.includes(oProps.val);
     return h('label', {
+      className: 'milestone-strike' + (checked ? ' done' : ''),
       onClick: function() { toggle(oProps.arr, oProps.setArr, oProps.val); },
       style: {
         display: 'flex', alignItems: 'flex-start', gap: 8,
@@ -2267,14 +2305,17 @@ function MilestoneTracker(props) {
         color: checked ? 'var(--text)' : 'var(--text-dim)',
       },
     },
-      h('div', {style: {
-        width: 16, height: 16, borderRadius: 4, flexShrink: 0, marginTop: 1,
-        border: '1.5px solid ' + (checked ? 'var(--accent)' : 'var(--border)'),
-        background: checked ? 'var(--accent)' : 'transparent',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 10, color: 'var(--bg)', transition: 'all 0.15s',
-      }}, checked ? '✓' : ''),
-      h('span', {style: {fontSize: 'var(--text-sm)', lineHeight: 1.45, textDecoration: checked ? 'line-through' : 'none', opacity: checked ? 0.6 : 1}}, oProps.val)
+      h('div', {
+        className: checked ? 'milestone-check-pop' : '',
+        style: {
+          width: 16, height: 16, borderRadius: 4, flexShrink: 0, marginTop: 1,
+          border: '1.5px solid ' + (checked ? 'var(--accent)' : 'var(--border)'),
+          background: checked ? 'var(--accent)' : 'transparent',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 10, color: 'var(--bg)',
+        }
+      }, checked ? '✓' : ''),
+      h('span', {style: {fontSize: 'var(--text-sm)', lineHeight: 1.45, opacity: checked ? 0.6 : 1}}, oProps.val)
     );
   }
 
@@ -2301,8 +2342,7 @@ function MilestoneTracker(props) {
 }
 
 // ════════════════════════════════════════════════════════════════════════
-// BL-35: POPCORN INITIATIVE TRACKER - session-only, no IDB
-// Wired to last Encounter result's opposition names + party size
+// POPCORN INITIATIVE TRACKER — session-only, wired to last Encounter result
 // ════════════════════════════════════════════════════════════════════════
 
 function PopcornTracker(props) {
@@ -2321,7 +2361,7 @@ function PopcornTracker(props) {
     return list;
   }
 
-  // BL-42: load from sessionStorage, fall back to defaults
+  // Load from sessionStorage, fall back to defaults
   var _parts = useState(function() {
     try {
       var saved = sessionStorage.getItem('ogma_popcorn');
@@ -2332,7 +2372,7 @@ function PopcornTracker(props) {
   var participants = _parts[0]; var setParticipants = _parts[1];
   var _newName = useState(''); var newName = _newName[0]; var setNewName = _newName[1];
 
-  // BL-42: persist to sessionStorage on any change
+  // Persist to sessionStorage on any change
   useEffect(function() {
     try { sessionStorage.setItem('ogma_popcorn', JSON.stringify(participants)); } catch(e) {}
   }, [participants]);
@@ -2433,11 +2473,19 @@ function FatePointTracker(props) {
   var state = props.state || DEFAULT_FP_STATE;
   var update = props.onUpdate;
 
+  var _lastFP = useState(null); var lastFPAnim = _lastFP[0]; var setLastFPAnim = _lastFP[1];
+
   function adjustPC(id, delta) {
+    var pc = state.pcs.find(function(p) { return p.id === id; });
+    if (!pc) return;
+    var newVal = Math.max(0, pc.current + delta);
+    var animDot = delta < 0 ? pc.current - 1 : pc.current; // index of dot changing
+    setLastFPAnim({id: id, dot: animDot, dir: delta > 0 ? 'gain' : 'spend'});
+    setTimeout(function() { setLastFPAnim(null); }, 380);
     var next = Object.assign({}, state, {
-      pcs: state.pcs.map(function(pc) {
-        if (pc.id !== id) return pc;
-        return Object.assign({}, pc, {current: Math.max(0, pc.current + delta)});
+      pcs: state.pcs.map(function(p) {
+        if (p.id !== id) return p;
+        return Object.assign({}, p, {current: newVal});
       })
     });
     update(next);
@@ -2513,7 +2561,14 @@ function FatePointTracker(props) {
               h('button', {className: 'fp-btn fp-minus', onClick: function() { adjustPC(pc.id, -1); }, 'aria-label': 'Spend fate point', disabled: pc.current === 0}, '−'),
               h('div', {className: 'fp-dots'},
                 [0,1,2,3,4,5].map(function(i) {
-                  return h('div', {key: i, className: 'fp-dot' + (i < pc.current ? ' fp-dot-filled' : ''), onClick: function() { adjustPC(pc.id, i < pc.current ? -1 : 1); }});
+                  var filled = i < pc.current;
+                  var isAnimDot = lastFPAnim && lastFPAnim.id === pc.id && lastFPAnim.dot === i;
+                  var animClass = isAnimDot ? (' fp-' + lastFPAnim.dir + 'ing') : '';
+                  return h('div', {
+                    key: i,
+                    className: 'fp-dot' + (filled ? ' fp-dot-filled' : '') + animClass,
+                    onClick: function() { adjustPC(pc.id, i < pc.current ? -1 : 1); },
+                  });
                 })
               ),
               h('button', {className: 'fp-btn fp-plus', onClick: function() { adjustPC(pc.id, 1); }, 'aria-label': 'Gain fate point'}, '+'),
@@ -2542,6 +2597,205 @@ function FatePointTracker(props) {
 // CAMPAIGN APP (used by each campaign HTML page)
 // Each page calls: ReactDOM.createRoot(...).render(h(CampaignApp, {campId: 'thelongafter'}))
 // ════════════════════════════════════════════════════════════════════════
+
+var LADDER_NAMES = ['','Average','Fair','Good','Great','Superb','Fantastic','Epic','Legendary'];
+
+
+// ── ResultCard — top section: name, aspects, skills ─────────────────────────
+function ResultCard(props) {
+  var result = props.result;
+  var gen    = props.gen;
+  if (!result || !result.data) return null;
+  var d    = result.data;
+  var genId = result.genId;
+
+  // Name / title
+  var title = d.name || d.title || d.type || (gen && gen.label) || genId;
+  var sub   = d.high_concept || d.situation || d.aspect || d.core_aspect
+              || d.scene_aspect || d.goal || '';
+
+  // Aspects — normalise to [{text, type, free}]
+  var aspects = [];
+  if (d.aspects) {
+    if (Array.isArray(d.aspects)) {
+      d.aspects.forEach(function(a) {
+        if (typeof a === 'string') aspects.push({text:a, type:'ot'});
+        else if (a && a.name) aspects.push({text:a.name, type:'ot', free:!!a.free_invoke});
+      });
+    } else if (typeof d.aspects === 'object') {
+      if (d.aspects.high_concept) aspects.push({text:d.aspects.high_concept, type:'hc'});
+      if (d.aspects.trouble)      aspects.push({text:d.aspects.trouble,      type:'tr'});
+      if (d.aspects.others) {
+        d.aspects.others.forEach(function(a) { aspects.push({text:a, type:'ot'}); });
+      }
+    }
+  }
+  // For faction — add method/weakness as aspects
+  if (genId === 'faction' || genId === 'seed') {
+    if (d.method)   aspects.push({text:d.method,   type:'ot', badge:'METHOD'});
+    if (d.weakness) aspects.push({text:d.weakness, type:'tr', badge:'WEAKNESS'});
+    if (d.complication) aspects.push({text:d.complication, type:'tr', badge:'COMPLICATION'});
+    if (d.issue)    aspects.push({text:d.issue.replace(/^[^:]+:\s*/,''), type:'ot', badge:'ISSUE'});
+  }
+
+  // Skills
+  var skills = Array.isArray(d.skills) ? d.skills : [];
+
+  return h('div', {className: 'result-card'},
+    h('div', {className: 'result-card-gen'},
+      gen ? gen.icon + ' ' + gen.label : genId,
+      h('div', {className: 'result-card-gen-line'})
+    ),
+    title && h('div', {className: 'result-card-name'}, title),
+    sub   && h('div', {className: 'result-card-sub'},  sub),
+    aspects.length > 0 && h('div', {className: 'result-card-aspects'},
+      aspects.slice(0,6).map(function(a, i) {
+        var cls = 'result-asp asp-' + (a.type || 'ot') + (a.free ? ' asp-free' : '');
+        return h('div', {key:i, className: cls},
+          h('span', {className: 'result-asp-dot'}),
+          h('div', null,
+            a.badge && h('span', {className: 'result-asp-badge'}, a.badge + ' '),
+            a.text
+          )
+        );
+      })
+    ),
+    skills.length > 0 && h('div', {className: 'result-skills'},
+      skills.slice(0,6).map(function(s, i) {
+        return h('div', {key:i, className: 'result-skill'},
+          h('span', {className: 'result-skill-r'}, '+' + s.r),
+          h('span', {className: 'result-skill-n'}, s.name),
+          h('span', {className: 'result-skill-l'}, LADDER_NAMES[s.r] || '')
+        );
+      })
+    )
+  );
+}
+
+// ── GmTipsPanel — invoke/compel + running tips + checklist ─────────────────
+function GmTipsPanel(props) {
+  var genId     = props.genId;
+  var helpLevel = props.helpLevel;
+  var checks    = props.checks;
+  var setChecks = props.setChecks;
+  var hc = HELP_CONTENT[genId] || {};
+
+  function toggleCheck(i) {
+    var next = checks.slice();
+    next[i] = !next[i];
+    setChecks(next);
+  }
+
+  var tips    = Array.isArray(hc.gm_tips)    ? hc.gm_tips    : (hc.gm_tips    ? [hc.gm_tips]    : []);
+  var running = Array.isArray(hc.gm_running) ? hc.gm_running : (hc.gm_running ? [hc.gm_running] : []);
+  var checklist = Array.isArray(hc.gm_checklist) ? hc.gm_checklist : (hc.gm_checklist ? [hc.gm_checklist] : []);
+
+  return h('div', {className: 'result-tab-panel active'},
+    // Invoke example
+    hc.invoke_example && h('div', null,
+      h('div', {className: 'rtp-lbl'}, 'Invoke example'),
+      h('div', {className: 'rtp-ic invoke'},
+        h('div', {className: 'rtp-ic-hdr'}, 'When to spend the fate point'),
+        h('div', {className: 'rtp-ic-body'}, hc.invoke_example)
+      )
+    ),
+    // Compel example
+    hc.compel_example && h('div', null,
+      h('div', {className: 'rtp-lbl'}, 'Compel example'),
+      h('div', {className: 'rtp-ic compel'},
+        h('div', {className: 'rtp-ic-hdr'}, 'When to offer the fate point'),
+        h('div', {className: 'rtp-ic-body'}, hc.compel_example)
+      )
+    ),
+    // GM tips
+    (tips.length > 0 || running.length > 0) && h('div', null,
+      h('div', {className: 'rtp-lbl'}, 'Running this generator'),
+      h('div', null,
+        tips.concat(running).map(function(tip, i) {
+          return h('div', {key:i, className: 'rtp-tip'},
+            h('span', {className: 'rtp-tip-ic'}, '→'),
+            h('span', {className: 'rtp-tip-tx'}, tip)
+          );
+        })
+      )
+    ),
+    // Checklist
+    checklist.length > 0 && h('div', null,
+      h('div', {className: 'rtp-lbl'}, 'Scene checklist'),
+      h('div', null,
+        checklist.map(function(item, i) {
+          var done = !!(checks && checks[i]);
+          return h('div', {key:i, className: 'rtp-check', onClick: function(){toggleCheck(i);}},
+            h('div', {className: 'rtp-check-box' + (done ? ' done' : '')}, done ? '✓' : ''),
+            h('span', null, item)
+          );
+        })
+      )
+    )
+  );
+}
+
+// ── RulesPanel — Fate Condensed reference inline ────────────────────────────
+function RulesPanel(props) {
+  var genId = props.genId;
+  var hc = HELP_CONTENT[genId] || {};
+  var entry = (HELP_ENTRIES || []).find(function(e){ return e.id === genId; });
+  var rules = hc.rules || hc.how || [];
+
+  return h('div', {className: 'result-tab-panel active'},
+    hc.what && h('div', null,
+      h('div', {className: 'rtp-lbl'}, 'What this generates'),
+      h('div', {style:{fontSize:13,color:'var(--text-dim)',lineHeight:1.6}}, hc.what)
+    ),
+    hc.output && h('div', null,
+      h('div', {className: 'rtp-lbl'}, 'Output structure'),
+      h('div', {style:{fontSize:12,color:'var(--text-muted)',lineHeight:1.6}}, hc.output)
+    ),
+    rules.length > 0 && h('div', null,
+      h('div', {className: 'rtp-lbl'}, 'Fate Condensed — rules reference'),
+      h('div', null,
+        rules.map(function(rule, i) {
+          var srdUrl = entry && entry.srd_url;
+          return h('div', {key:i, className: 'rtp-rule'},
+            h('span', {className: 'rtp-rule-dot'}, '◈'),
+            h('span', {className: 'rtp-rule-tx'},
+              rule,
+              i === rules.length - 1 && srdUrl && h(Fragment, null,
+                ' ',
+                h('a', {href:srdUrl, target:'_blank', rel:'noopener noreferrer', className:'rtp-srd'},
+                  '↗ SRD')
+              )
+            )
+          );
+        })
+      )
+    )
+  );
+}
+
+// ── DndPanel — D&D / Pathfinder contrast notes ──────────────────────────────
+function DndPanel(props) {
+  var genId = props.genId;
+  var hc = HELP_CONTENT[genId] || {};
+  if (!hc.dnd_notes) return h('div', {className:'result-tab-panel active'},
+    h('div', {style:{color:'var(--text-muted)',fontSize:13,padding:'8px 0'}},
+      'No D&D comparison notes for this generator.')
+  );
+  return h('div', {className: 'result-tab-panel active'},
+    h('div', {className: 'rtp-dnd'},
+      h('div', {className: 'rtp-dnd-hdr'}, 'Coming from D&D / Pathfinder?'),
+      h('div', {className: 'rtp-dnd-body'}, hc.dnd_notes)
+    ),
+    h('div', {className: 'rtp-rule'},
+      h('span', {className: 'rtp-rule-dot'}, '◈'),
+      h('span', {className: 'rtp-rule-tx'}, 'There are no hit points. Stress tracks how long you can stay in a conflict — not physical damage. When all stress boxes are filled the character is taken out, not necessarily dead.')
+    ),
+    h('div', {className: 'rtp-rule'},
+      h('span', {className: 'rtp-rule-dot'}, '◈'),
+      h('span', {className: 'rtp-rule-tx'}, 'Aspects replace ability checks as the fiction layer. Invoke an aspect to justify a bonus; get compelled on it to introduce a complication.')
+    )
+  );
+}
 
 function CampaignApp(props) {
   var campId = props.campId;
@@ -2586,7 +2840,7 @@ function CampaignApp(props) {
   // F4: Consequence severity selector - '' means random (default)
   var _csev = useState(''); var consequenceSev = _csev[0]; var setConsequenceSev = _csev[1];
 
-  // BL-09: PWA install nudge
+  // PWA install nudge
   var deferredInstallPrompt = useRef(null);
   var _pwa = useState(false); var showPwaNudge = _pwa[0]; var setShowPwaNudge = _pwa[1];
 
@@ -2614,7 +2868,7 @@ function CampaignApp(props) {
     DB.saveSession('fate_tprefs_' + campId, prefs).catch(function() {});
   }, [prefs]);
 
-  // BL-09: PWA install nudge - capture prompt, show after 2nd visit if not dismissed
+  // PWA install nudge - capture prompt, show after 2nd visit if not dismissed
   useEffect(function() {
     var dismissed = false;
     try { dismissed = LS.get('pwa_nudge_dismissed'); } catch(e) {}
@@ -2646,6 +2900,7 @@ function CampaignApp(props) {
 
   // Toast notification
   var _toast = useState(null); var toast = _toast[0]; var setToast = _toast[1];
+  var _upd = useState(false); var updateAvailable = _upd[0]; var setUpdateAvailable = _upd[1];
   var toastTimer = useRef(null);
   function showToast(msg) {
     setToast(msg);
@@ -2653,8 +2908,20 @@ function CampaignApp(props) {
     toastTimer.current = setTimeout(function() { setToast(null); }, TIMING.TOAST_MS);
   }
 
+  // SW update toast — triggered by controllerchange listener in page HTML
+  useEffect(function() {
+    window.__showUpdateToast = function() {
+      setUpdateAvailable(true);
+    };
+    return function() { delete window.__showUpdateToast; };
+  }, []);
+
+  var _pinBounce = useState(false); var pinBouncing = _pinBounce[0]; var setPinBouncing = _pinBounce[1];
+
   function pinResult() {
     if (!result) return;
+    setPinBouncing(true);
+    setTimeout(function() { setPinBouncing(false); }, 400);
     var card = {
       id: String(Date.now()),
       campId: campId, genId: result.genId,
@@ -2664,6 +2931,7 @@ function CampaignApp(props) {
     setPinnedCards(function(prev) { return [card].concat(prev); });
     DB.saveCard(campId, card).catch(function() {});
     showToast('📌 Pinned - find it in 📋 History');
+    if (navigator.vibrate) navigator.vibrate(30);
   }
 
   function unpinCard(cardId) {
@@ -2698,7 +2966,6 @@ function CampaignApp(props) {
   var currentGroup = GENERATOR_GROUPS.find(function(g) { return g.id === activeGroup; }) || GENERATOR_GROUPS[0];
   var groupGens = currentGroup.gens.map(function(gid) { return GENERATORS.find(function(g) { return g.id === gid; }); }).filter(Boolean);
   // History/Pinned drawer
-  var _drawer = useState(false); var showDrawer = _drawer[0]; var setShowDrawer = _drawer[1];
   var _showHist = useState(false); var showHistory = _showHist[0]; var setShowHistory = _showHist[1];
   // Help level preference - controls inline help detail
   var _helpLvl = useState(function() { try { return LS.get('help_level') || 'new_fate'; } catch(e) { return 'new_fate'; } });
@@ -2708,6 +2975,13 @@ function CampaignApp(props) {
   // ── Sidebar tab state (Concept A tabbed sidebar)
   var _sbTab = useState('gen'); var sidebarTab = _sbTab[0]; var setSidebarTab = _sbTab[1];
   var _hlOpen = useState(false); var hlPickerOpen = _hlOpen[0]; var setHlPickerOpen = _hlOpen[1];
+
+  // ── Result panel tab state (GM Tips | Rules | D&D Notes)
+  var _rtab = useState('tips'); var resultTab = _rtab[0]; var setResultTab = _rtab[1];
+  // Checklist state — per-session, cleared on generator change
+  var _chk = useState([]); var checklistState = _chk[0]; var setChecklistState = _chk[1];
+  // Inspire chosen index — for ghost animation
+  var _iChosen = useState(null); var inspireChosen = _iChosen[0]; var setInspireChosen = _iChosen[1];
 
   // ── Online/offline detection (H9)
   var _online = useState(typeof navigator !== 'undefined' ? navigator.onLine !== false : true);
@@ -2737,16 +3011,28 @@ function CampaignApp(props) {
   // GM Mode - surfaces running guidance on results
   var _gmMode = useState(function() { try { return LS.get('gm_mode') !== false; } catch(e) { return true; } });
   var gmMode = _gmMode[0]; var setGmMode = _gmMode[1];
-  var _gmPill = useState(null); var gmPill = _gmPill[0]; var setGmPill = _gmPill[1];
   function toggleGmMode() {
     var next = !gmMode; setGmMode(next);
     try { LS.set('gm_mode', next); } catch(e) {}
     document.documentElement.setAttribute('data-gm-mode', next ? 'on' : 'off');
   }
 
+  var _rollCount = useState(0); var rollCount = _rollCount[0]; var setRollCount = _rollCount[1];
+  var _rAnim = useState(false); var resultAnim = _rAnim[0]; var setResultAnim = _rAnim[1];
+  var _streakBadge = useState(false); var showStreakBadge = _streakBadge[0]; var setShowStreakBadge = _streakBadge[1];
+
   var doGenerate = useCallback(function() {
     if (navigator.vibrate) navigator.vibrate(40);
     setRolling(true);
+    // Streak counter
+    setRollCount(function(n) {
+      var next = n + 1;
+      if (next % 5 === 0) {
+        setShowStreakBadge(true);
+        setTimeout(function() { setShowStreakBadge(false); }, 1200);
+      }
+      return next;
+    });
     // Generate immediately but hold the rolling state for 2s minimum
     var base = universalMerge ? mergeUniversal(t) : t;
     var eff  = filteredTables(base, prefsRef.current);
@@ -2756,7 +3042,6 @@ function CampaignApp(props) {
     var newResult = {genId: activeGen, data: data};
     setTimeout(function() {
       setResult(newResult);
-      setGmPill(null);
       setHistory(function(h) {
         return [{genId: activeGen, data: data, gen: gen}, h[0], h[1], h[2], h[3], h[4], h[5], h[6], h[7]].filter(Boolean).slice(0, 8);
       });
@@ -2764,7 +3049,7 @@ function CampaignApp(props) {
     }, 220);
   }, [activeGen, t, partySize, gen, universalMerge, consequenceSev]);
 
-  // ND-07: Inspiration Mode - generate 3 options, pick one
+              // Inspiration mode — pick one of three options
   var doInspire = useCallback(function() {
     if (rolling) return;
     setRolling(true);
@@ -2786,15 +3071,21 @@ function CampaignApp(props) {
   }, [activeGen, t, partySize, gen, universalMerge, consequenceSev]);
 
   function pickInspireResult(data) {
-    setResult({genId: activeGen, data: data});
-    setInspireMode(false);
-    setInspireResults([]);
+    // Find which index was chosen for ghost animation
+    var chosenIdx = inspireResults.indexOf(data);
+    setInspireChosen(chosenIdx);
+    setTimeout(function() {
+      setResult({genId: activeGen, data: data});
+      setInspireMode(false);
+      setInspireResults([]);
+      setInspireChosen(null);
+    }, 280);
     setHistory(function(h) {
       return [{genId: activeGen, data: data, gen: gen}, h[0], h[1], h[2], h[3], h[4], h[5], h[6], h[7]].filter(Boolean).slice(0, 8);
     });
   }
 
-  function selectGen(id) { setActiveGen(id); setResult(null); setInspireMode(false); setInspireResults([]); setActiveGroup(groupForGen(id)); }
+  function selectGen(id) { setActiveGen(id); setResult(null); setInspireMode(false); setInspireResults([]); setActiveGroup(groupForGen(id)); setResultTab('tips'); setChecklistState([]); }
 
   // Apply campaign data-attribute for CSS accent vars
   useEffect(function() {
@@ -2807,7 +3098,7 @@ function CampaignApp(props) {
     document.documentElement.setAttribute('data-gm-mode', gmMode ? 'on' : 'off');
   }, [gmMode]);
 
-  // TD-10: Sidebar focus management - move focus to first item when drawer opens (mobile a11y)
+  // Sidebar focus management — move focus to first item when drawer opens (mobile a11y)
   var sidebarRef = useRef(null);
   useEffect(function() {
     if (!showSidebar) return;
@@ -2844,7 +3135,7 @@ function CampaignApp(props) {
     };
   }, []);
 
-  // ND-08: Keyboard shortcuts
+  // Keyboard shortcuts
   useEffect(function() {
     function onKey(e) {
       var tag = (e.target || {}).tagName || '';
@@ -3266,8 +3557,6 @@ function CampaignApp(props) {
       // ── Main content panel ───────────────────────────────────────────
       h('div', {className: 'content-panel'},
 
-        // Roll hero removed - actions unified into action-bar inside result panel
-
         // Main layout
         h('main', {id: 'main'},
           h('div', {className: 'main-layout'},
@@ -3280,14 +3569,17 @@ function CampaignApp(props) {
             h('div', {className: 'action-bar', ref: rollBtnRef},
               // PRIMARY: Roll
               h('button', {
-                className: 'btn-roll action-bar-roll' + (rolling ? ' rolling' : ''),
+                className: 'btn-roll action-bar-roll' + (rolling ? ' rolling' : '') + (showStreakBadge ? ' streak-pulse' : ''),
                 onClick: doGenerate,
                 disabled: rolling,
                 'aria-live': 'polite',
+                style: {position: 'relative'},
               },
+                showStreakBadge && h('span', {className: 'streak-badge'}, '+' + rollCount + ' 🎲'),
                 h('span', {className: 'roll-label'},
-                  rolling ? 'Rolling…'
-                  : h(Fragment, null, h(RaIcon, {n: 'perspective-dice-random'}), ' Roll ', gen.label)
+                  rolling
+                    ? h(Fragment, null, h('span', {className: 'dice-spinning'}, h(RaIcon, {n: 'perspective-dice-random'})), ' Rolling…')
+                    : h(Fragment, null, h(RaIcon, {n: 'perspective-dice-random'}), ' Roll ', gen.label)
                 ),
                 h('span', {className: 'roll-fx'})
               ),
@@ -3350,7 +3642,7 @@ function CampaignApp(props) {
                   'aria-label': 'Share',
                 }, h(RaIcon, {n: 'quill-ink'})),
                 result && h('button', {
-                  className: 'btn btn-ghost action-bar-icon',
+                  className: 'btn btn-ghost action-bar-icon' + (pinBouncing ? ' pin-bounce' : ''),
                   onClick: pinResult,
                   title: 'Pin result [P]',
                   'aria-label': pinnedCards.length > 0
@@ -3358,6 +3650,7 @@ function CampaignApp(props) {
                     : 'Pin result',
                   style: {position: 'relative'},
                 },
+                  pinBouncing && h('span', {className: 'pin-ring-el'}),
                   h(RaIcon, {n: RA_ICONS.pin}),
                   pinnedCards.length > 0 && h('span', {
                     'aria-hidden': 'true',
@@ -3378,12 +3671,12 @@ function CampaignApp(props) {
                   'aria-label': 'Export pinned results',
                   style: {fontSize: 'var(--text-sm)', padding: '6px 10px', minHeight: 36},
                 },
-                  h(RaIcon, {n: 'archive'}), ' Export Pinned'
+                  h(RaIcon, {n: 'pouch'}), ' Export Pinned'
                 )
               )
             ),
 
-            // ── BL-22: Inline Share drawer ──────────────────────────────
+            // ── Inline share drawer ────────────────────────────────────
             showExport && result && h(ShareDrawer, {
               genId: result.genId,
               data: result.data,
@@ -3391,9 +3684,12 @@ function CampaignApp(props) {
               onClose: function() { setShowExport(false); },
             }),
 
-            // ── Panel content ───────────────────────────────────────────
-            h('div', {style: {padding: 20}},
-            // ND-07: Inspiration mode - 3 results to choose from
+            // ── Result card: name, aspects, skills ──────────────────────────
+            h('div', {className: resultAnim ? 'result-card-appear' : ''},
+              h(ResultCard, {result: result, gen: gen})
+            ),
+
+            // ── Inspire mode ─────────────────────────────────────────────────
             inspireMode && inspireResults.length > 0 && h('div', {className: 'inspire-wrap'},
               h('div', {className: 'inspire-header'},
                 h('span', {className: 'lbl'}, '✦ Inspiration Mode - pick one'),
@@ -3408,10 +3704,12 @@ function CampaignApp(props) {
                 inspireResults.map(function(data, i) {
                   var title = data.name || data.title || data.type || gen.label;
                   var sub   = data.high_concept || data.aspect || data.situation || data.core_aspect || '';
+                  var ghostClass = inspireChosen !== null && inspireChosen !== i ? ' inspire-ghost' : '';
+                  var chosenClass = inspireChosen === i ? ' inspire-chosen' : '';
                   return h('button', {
                     key: i,
-                    className: 'inspire-card',
-                    onClick: function() { pickInspireResult(data); },
+                    className: 'inspire-card' + ghostClass + chosenClass,
+                    onClick: function() { if (inspireChosen === null) pickInspireResult(data); },
                     'aria-label': 'Pick option ' + (i + 1),
                   },
                     h('div', {className: 'inspire-card-num'}, i + 1),
@@ -3421,162 +3719,56 @@ function CampaignApp(props) {
                 })
               )
             ),
-            !result && !rolling && !inspireMode && (function() {
-              var hc = HELP_CONTENT[activeGen] || {};
-              var lvl = helpLevel;
 
-              // ── Experienced: minimal compact view ──
-              if (lvl === 'experienced') {
-                return h('div', {style: {textAlign: 'center', padding: '48px 20px', animation: 'fadeUp 0.3s ease both'}},
-                  h('div', {style: {fontSize: 36, marginBottom: 10}}, gen.icon),
-                  h('div', {style: {fontSize: 'var(--text-lg)', fontWeight: 700, color: 'var(--text)', marginBottom: 4}}, gen.label),
-                  h('div', {style: {fontSize: 'var(--text-sm)', color: 'var(--text-muted)', marginBottom: 20}}, gen.sub),
-                  h('div', {style: {fontSize: 'var(--text-label)', color: 'var(--text-muted)', letterSpacing: '0.05em'}},
-                    'Press ', h('kbd', {style: {background: 'var(--glass-bg)', border: '1px solid var(--border)', borderRadius: 4, padding: '1px 6px', fontSize: 11}}, 'Space'), ' or Roll to generate'
-                  )
-                );
-              }
-
-              var allRules = hc.rules || hc.how || [];
-              // For new_ttrpg: show max 3 rules and simplify labels
-              var showRules = lvl === 'new_ttrpg' ? allRules.slice(0, 3) : allRules;
-              var rulesLabel = lvl === 'new_ttrpg' ? 'How It Works' : 'Rules - Fate Condensed';
-
-              return h('div', {style: {animation: 'fadeUp 0.3s ease both'}},
-                // Generator title
-                h('div', {style: {display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16}},
-                  h('span', {style: {fontSize: 28}}, gen.icon),
-                  h('div', null,
-                    h('div', {style: {fontSize: 'var(--text-xl)', fontWeight: 700, color: 'var(--gold)'}}, hc.title || gen.label),
-                    h('div', {style: {fontSize: 'var(--text-sm)', color: 'var(--text-muted)', marginTop: 2}}, gen.sub)
-                  )
-                ),
-
-                // New to TTRPGs: friendly preamble
-                lvl === 'new_ttrpg' && h('div', {style: {
-                  background: 'color-mix(in srgb, var(--c-green) 6%, transparent)',
-                  borderLeft: '3px solid var(--c-green)', borderRadius: '0 8px 8px 0',
-                  padding: '10px 14px', marginBottom: 14, fontSize: 'var(--text-sm)', color: 'var(--text-dim)', lineHeight: 1.6,
-                }},
-                  'New to tabletop RPGs? This generator creates ready-to-use game content. You describe what your character does, roll dice to see how well it goes, and the GM (Game Master - the person running the story) uses these results to bring the world to life. ',
-                  h('a', {href: '../learn.html', style: {color: 'var(--c-green)'}}, 'Learn more about how to play →')
-                ),
-
-                // What this generates
-                h('div', {style: {marginBottom: 14}},
-                  h('div', {className: 'lbl'}, lvl === 'new_ttrpg' ? 'What You Get' : 'What this generates'),
-                  h('div', {style: {fontSize: 'var(--text-base)', color: 'var(--text)', lineHeight: 1.65}}, hc.what || '')
-                ),
-                // Output structure (hide for new_ttrpg to reduce noise)
-                lvl !== 'new_ttrpg' && hc.output && h('div', {style: {marginBottom: 14}},
-                  h('div', {className: 'lbl'}, 'Output'),
-                  h('div', {style: {fontSize: 'var(--text-sm)', color: 'var(--text-dim)', lineHeight: 1.6}}, hc.output)
-                ),
-                // Rules
-                showRules.length > 0 && h('div', {style: {marginBottom: 14}},
-                  h('div', {className: 'lbl'}, rulesLabel),
-                  showRules.map(function(r, i) {
-                    return h('div', {key: i, className: 'help-rule-row'},
-                      h('span', {className: 'help-rule-icon'}, '◈'),
-                      h('span', {className: 'help-rule-text'}, r)
-                    );
-                  }),
-                  lvl === 'new_ttrpg' && allRules.length > 3 && h('div', {style: {
-                    fontSize: 'var(--text-label)', color: 'var(--text-muted)', marginTop: 6, fontStyle: 'italic',
-                  }}, 'Change Help Level in ⚙ Settings to see all ' + allRules.length + ' rules.')
-                ),
-                // D&D convert: dedicated comparison note
-                lvl === 'dnd_convert' && hc.dnd_notes && h('div', {style: {
-                  background: 'color-mix(in srgb, var(--c-blue) 6%, transparent)',
-                  borderLeft: '3px solid var(--c-blue)', borderRadius: '0 8px 8px 0',
-                  padding: '10px 14px', marginBottom: 14,
-                }},
-                  h('div', {style: {fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--c-blue)', marginBottom: 5, display: 'flex', alignItems: 'center', gap: 5}},
-                    h(RaIcon, {n: 'crossed-swords'}), ' Vs. D&D / Pathfinder'
-                  ),
-                  h('div', {style: {fontSize: 'var(--text-sm)', color: 'var(--text-dim)', lineHeight: 1.65}}, hc.dnd_notes)
-                ),
-                // GM Tip (gated by GM Mode)
-                gmMode && hc.gm_tips && h('div', {className: 'gm-note', style: {marginTop: 12}},
-                  h('div', {className: 'gm-note-label'}, '💡 GM Tip'),
-                  h('div', {className: 'gm-note-text'}, hc.gm_tips)
-                ),
-                // D&D convert: link to full guide
-                lvl === 'dnd_convert' && h('div', {style: {marginTop: 12, fontSize: 'var(--text-sm)'}},
-                  h('a', {href: '../campaigns/transition.html', style: {color: 'var(--c-blue)'}}, '⚔ Read the full D&D to Fate transition guide →')
-                )
-              );
-            })(),
-            rolling && h('div', {
-              style: {display: 'flex', alignItems: 'center', justifyContent: 'center', height: 240},
-              'aria-label': 'Generating…',
+            // ── Empty state (no result yet) ──────────────────────────────────
+            !result && !rolling && !inspireMode && h('div', {
+              style: {display:'flex',flexDirection:'column',alignItems:'center',
+                      justifyContent:'center',padding:'48px 20px',gap:12,textAlign:'center'}
             },
-              h('div', {
-                'aria-hidden': 'true',
-                style: {fontSize: 32, color: 'var(--gold)', animation: 'roll 0.1s ease-in-out'},
-              }, camp.meta.icon)
+              h('div', {style:{fontSize:36,opacity:.35}}, gen.icon),
+              h('div', {style:{fontSize:'var(--text-lg)',fontWeight:700,color:'var(--text)',opacity:.7}}, gen.label),
+              h('div', {style:{fontSize:'var(--text-sm)',color:'var(--text-muted)'}}, gen.sub || ''),
+              h('div', {style:{fontSize:'var(--text-label)',color:'var(--text-muted)',marginTop:8}},
+                'Press ',
+                h('kbd', {style:{background:'var(--panel)',border:'1px solid var(--border-mid)',
+                  borderRadius:4,padding:'1px 6px',fontSize:11}}, 'Space'),
+                ' or Roll to generate'
+              )
             ),
-            result && !rolling && h('div', null,
-              h('div', {className: 'print-header'},
-                h('div', null,
-                  h('div', {className: 'print-header-title'}, camp.meta.name),
-                  h('div', {style: {fontSize: '10pt', marginTop: '3pt'}},
-                    (GENERATORS.find(function(g){return g.id===result.genId;})||{}).label || ''
-                  )
-                ),
-                h('div', {className: 'print-header-meta'},
-                  'Ogma - A Fate Condensed Generator Suite', h('br', null),
-                  new Date().toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'})
-                )
+
+            // ── GM info tabs: Tips | Rules | D&D Notes ───────────────────────
+            result && h('div', {style:{display:'flex',flexDirection:'column',minHeight:0}},
+              h('div', {className:'result-tab-bar', role:'tablist'},
+                h('button', {
+                  className: 'result-tab-btn' + (resultTab==='tips'?' active':''),
+                  onClick: function(){setResultTab('tips');},
+                  role:'tab', 'aria-selected':String(resultTab==='tips'),
+                }, '◈ GM Tips'),
+                h('button', {
+                  className: 'result-tab-btn' + (resultTab==='rules'?' active':''),
+                  onClick: function(){setResultTab('rules');},
+                  role:'tab', 'aria-selected':String(resultTab==='rules'),
+                }, '⊞ Rules'),
+                gmMode && helpLevel==='dnd_convert' && h('button', {
+                  className: 'result-tab-btn' + (resultTab==='dnd'?' active':''),
+                  onClick: function(){setResultTab('dnd');},
+                  role:'tab', 'aria-selected':String(resultTab==='dnd'),
+                }, '⚔ D&D Notes')
               ),
-
-              // ── GM Mode guidance - Pill Bar (above result) ──────────
-              gmMode && (function() {
-                var hc = HELP_CONTENT[result.genId] || {};
-                var pills = [];
-                if (hc.gm_running) pills.push({id: 'run', icon: '🎬', label: 'Running', content: hc.gm_running});
-                if (hc.gm_checklist) pills.push({id: 'check', icon: '☐', label: 'Checklist', list: hc.gm_checklist});
-                if (hc.gm_compel) pills.push({id: 'compel', icon: '🔄', label: 'Compel', content: hc.gm_compel});
-                if (hc.gm_hook) pills.push({id: 'hook', icon: '→', label: 'Hook', content: hc.gm_hook});
-                if (hc.invoke_example) pills.push({id: 'invoke', icon: '✦', label: 'Invoke', content: hc.invoke_example});
-                if (hc.compel_example) pills.push({id: 'compelx', icon: '⊗', label: 'Compel eg.', content: hc.compel_example});
-                if (pills.length === 0) return null;
-
-                var activePill = pills.find(function(p) { return p.id === gmPill; });
-
-                return h('div', {className: 'gm-pill-wrap'},
-                  h('div', {className: 'gm-pill-bar'},
-                    pills.map(function(p) {
-                      var isActive = gmPill === p.id;
-                      return h('button', {
-                        key: p.id,
-                        className: 'gm-pill' + (isActive ? ' gm-pill-active' : ''),
-                        onClick: function() { setGmPill(isActive ? null : p.id); },
-                        'aria-pressed': isActive ? 'true' : 'false',
-                      }, p.icon + ' ' + p.label);
-                    })
-                  ),
-                  activePill && h('div', {key: activePill.id, className: 'gm-pill-content'},
-                    activePill.list
-                      ? activePill.list.map(function(item, i) {
-                          return h('div', {key: i, className: 'gm-pill-check'},
-                            h('span', {className: 'gm-pill-check-box'}, '☐'),
-                            h('span', null, item)
-                          );
-                        })
-                      : activePill.content
-                  )
-                );
-              })(),
-
-              renderResult(result.genId, result.data),
-              h(NextStepStrip, {genId: result.genId, onSelectGen: selectGen})
+              h('div', {className:'result-tab-content', role:'tabpanel'},
+                resultTab==='tips'  && h(GmTipsPanel, {
+                  genId: activeGen, helpLevel: helpLevel,
+                  checks: checklistState, setChecks: setChecklistState,
+                }),
+                resultTab==='rules' && h(RulesPanel, {genId: activeGen}),
+                resultTab==='dnd'   && h(DndPanel,   {genId: activeGen})
+              )
             )
-          ) // close padding div
-        ) // close result-panel glass card
-        )
-      )
-    ),
+          )     // close result-panel.class
+        )       // close result-panel id
+      )         // close main-layout
+    )           // close main
+    ),          // close content-panel child; separator before history panel
 
     // ── History & Pinned slide-over panel ─────────────────────────────
     showHistory && h('div', {className: 'hist-overlay', onClick: function() { setShowHistory(false); }}),
@@ -3590,7 +3782,7 @@ function CampaignApp(props) {
           style: {fontSize: 18, padding: '4px 8px'},
         }, '✕')
       ),
-      // ND-03: Session Pack - copy all pinned as single Markdown doc
+      // Session pack — copy all pinned results as a single Markdown doc
       pinnedCards.length > 0 && h('button', {
         className: 'btn btn-ghost',
         onClick: function() {
@@ -3611,7 +3803,7 @@ function CampaignApp(props) {
         },
         style: {width: '100%', marginBottom: 4, justifyContent: 'center', fontSize: 'var(--text-sm)'},
       }, '📋 Copy Session Pack (' + pinnedCards.length + ')'),
-      // BL-38: Batch Fari / Foundry export of all pinned
+      // Batch export of all pinned results
       pinnedCards.length > 0 && h('button', {
         className: 'btn btn-ghost',
         onClick: function() {
@@ -3678,15 +3870,42 @@ function CampaignApp(props) {
             );
           })
         )
-      ),
+      ), // close showHistory panel
       // Empty state
       (history.length === 0 && pinnedCards.length === 0) && h('div', {
         style: {textAlign: 'center', padding: '40px 0', color: 'var(--text-muted)', fontSize: 'var(--text-sm)'}
       }, 'Roll a generator to start building history.')
-    ),
+      ), // close content-panel
+    ), // close app-body
 
     // ── Toast notification ───────────────────────────────────────────
     toast && h('div', {className: 'toast'}, toast),
+
+    // ── PERF-04: SW update available toast ───────────────────────────
+    updateAvailable && h('div', {
+      className: 'toast toast-update',
+      role: 'status',
+      'aria-live': 'polite',
+    },
+      '🔄 Update available — ',
+      h('button', {
+        onClick: function() { window.location.reload(); },
+        style: {
+          background: 'none', border: 'none', cursor: 'pointer',
+          color: 'var(--accent)', fontWeight: 700, fontSize: 'inherit',
+          fontFamily: 'inherit', padding: 0, textDecoration: 'underline',
+        },
+      }, 'reload to apply'),
+      h('button', {
+        onClick: function() { setUpdateAvailable(false); },
+        style: {
+          background: 'none', border: 'none', cursor: 'pointer',
+          color: 'var(--text-muted)', fontSize: 16, padding: '0 0 0 10px',
+          fontFamily: 'inherit', lineHeight: 1,
+        },
+        'aria-label': 'Dismiss update notification',
+      }, '✕')
+    ),
 
     // ── Modals ────────────────────────────────────────────────────────
     showHelp && h(HelpModal, {genId: activeGen, onClose: function() { setShowHelp(false); }}),
@@ -3714,7 +3933,7 @@ function CampaignApp(props) {
     // First-visit onboarding - only shown once, surfaces Help Level for C1/C2 users
     showOnboarding && h(HelpLevelOnboardingModal, {onSelect: handleOnboardingSelect}),
 
-    // ND-10: Fate Point / Milestone / Initiative panel (BL-10, BL-35)
+    // Fate Point / Milestone / Initiative panel
     showFP && h('div', {className: 'fp-panel'},
       h(FatePointTracker, {
         state: fpState || DEFAULT_FP_STATE,
@@ -3725,14 +3944,12 @@ function CampaignApp(props) {
       })
     ),
 
-    // BL-09: PWA install nudge - shown after 2nd visit if installable and not dismissed
+    // PWA install nudge — shown after 2nd visit if installable and not dismissed
     showPwaNudge && h('div', {
       style: {
         position: 'fixed', bottom: 80, left: '50%', transform: 'translateX(-50%)',
         zIndex: 1200, display: 'flex', alignItems: 'center', gap: 10,
-        background: 'var(--glass-bg)', backdropFilter: 'var(--glass-blur)',
-        WebkitBackdropFilter: 'var(--glass-blur)',
-        border: '1px solid var(--glass-border)', borderRadius: 12,
+        background: 'var(--panel)', border: '1px solid var(--border)', borderRadius: 12,
         boxShadow: 'var(--glass-shadow)',
         padding: '10px 14px', maxWidth: 340, width: 'calc(100vw - 32px)',
       },
@@ -3766,7 +3983,7 @@ function CampaignApp(props) {
       }, '✕')
     ),
 
-    // R-13: Sticky Roll FAB - mobile only, appears when Roll button scrolls off-screen
+    // Sticky Roll FAB — mobile only, appears when Roll button scrolls off-screen
     showFAB && h('button', {
       className: 'roll-fab',
       onClick: doGenerate,
@@ -3779,10 +3996,8 @@ function CampaignApp(props) {
     h('footer', {className: 'camp-content-footer'},
       'Fate\u2122 trademark of Evil Hat Productions, LLC. \u00b7 ',
       h('a', {href: '../license.html', className: 'camp-content-footer-link'}, 'License & Attribution')
-    )
+    ),
 
-      ) // close content-panel
-    ) // close app-body
   ); // close app-shell
 }
 

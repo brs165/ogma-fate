@@ -1,0 +1,9 @@
+Place RPG Awesome font files here:
+- rpg-awesome.woff2
+- rpg-awesome.woff  
+- rpg-awesome.ttf
+- rpg-awesome.eot
+- rpg-awesome.svg
+
+Source: https://github.com/nagoshiashumari/Rpg-Awesome/archive/master.zip
+Extract: Rpg-Awesome-master/fonts/

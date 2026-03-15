@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark" data-campaign="postapoc">
+<html lang="en" data-theme="light" data-campaign="postapoc">
 <head>
   <script>/* Theme restore - runs before CSS to prevent flash */
   (function(){try{var p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');var t=p.theme||localStorage.getItem('fate_theme')||localStorage.getItem('fate-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})()</script>
@@ -35,8 +35,9 @@
   <meta name="twitter:description" content="Post-apocalyptic survival. Clean water, warlords, and the ruins of the old world.">
   <meta name="twitter:image" content="https://brs165.github.io/ogma-fate/assets/img/og-default.png">
 
-  <link rel="stylesheet" href="https://unpkg.com/rpg-awesome@0.2.0/css/rpg-awesome.min.css">
-  <link rel="stylesheet" href="../assets/css/theme.css?v=36">
+  <link rel="stylesheet" href="../assets/css/rpg-awesome-local.css">
+  <link rel="stylesheet" href="../assets/css/theme.css?v=42">
+  <link rel="stylesheet" href="../assets/css/campaigns/theme-postapoc.css?v=41">
 </head>
 <body>
   <a href="#main" class="skip-link">Skip to main content</a>
@@ -61,12 +62,12 @@
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
-  <script src="../data/shared.js?v=36"></script>
-  <script src="../data/universal.js?v=36"></script>
-  <script src="../data/postapoc.js?v=36"></script>
-  <script src="../core/engine.js?v=36"></script>
-  <script src="../core/db.js?v=36"></script>
-  <script src="../core/ui.js?v=36"></script>
+  <script src="../data/shared.js?v=42"></script>
+  <script src="../data/universal.js?v=42"></script>
+  <script src="../data/postapoc.js?v=42"></script>
+  <script src="../core/engine.js?v=42"></script>
+  <script src="../core/db.js?v=42"></script>
+  <script src="../core/ui.js?v=42"></script>
   <script>
 
     ReactDOM.createRoot(document.getElementById('root')).render(
@@ -76,13 +77,24 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
-        navigator.serviceWorker.register('sw.js').catch(function(err) {
-          // SW registration failed (e.g. file:// protocol) - app still works normally
+        navigator.serviceWorker.register('sw.js').then(function(reg) {
+          // Detect when a new SW has activated (new version deployed)
+          navigator.serviceWorker.addEventListener('controllerchange', function() {
+            // Avoid showing on very first install (no previous controller)
+            if (navigator._swFirstInstall) return;
+            // Show the update toast — let the app handle the message
+            if (window.__showUpdateToast) window.__showUpdateToast();
+          });
+          // Track first install
+          if (!navigator.serviceWorker.controller) {
+            navigator._swFirstInstall = true;
+          }
+        }).catch(function(err) {
           console.info('[SW] Registration skipped:', err.message);
         });
       });
     }
   </script>
-  <script src="../core/intro.js?v=36"></script>
+  <script src="../core/intro.js?v=42"></script>
 </body>
 </html>

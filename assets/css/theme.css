@@ -205,7 +205,6 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 @keyframes bsheet-in{from{transform:translateY(100%)}to{transform:translateY(0)}}
 @keyframes bsheet-fade{from{opacity:0}to{opacity:1}}
 
-
 /* ══ MAIN LAYOUT — single column, full width ══ */
 .main-layout{max-width:760px;margin:0 auto;padding:16px;position:relative;z-index:1}
 
@@ -586,7 +585,6 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
   /* Camp header — icon-only buttons on mobile */
   .site-nav-subtitle{display:none!important}
   /* sheet is full-screen on mobile — panel fills width naturally */
-  
 
   /* Site nav — hide secondary links on mobile */
   .site-nav-hide-mobile{display:none!important}
@@ -605,7 +603,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 }
 
 /* ══ FOOTER ══ */
-.land-footer{text-align:center;padding:28px 20px;color:var(--text-muted);font-size:var(--text-label);border-top:1px solid var(--border);position:relative;z-index:1;line-height:1.8}
+
 .land-footer a{color:var(--text-dim);text-decoration:none}
 .land-footer a:hover{text-decoration:underline}
 
@@ -637,8 +635,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
   .zone-card{border:0.75pt solid #bbb!important;border-radius:3pt;padding:6pt 8pt!important;background:#f8f8f8!important;page-break-inside:avoid}
   .zone-name{font-size:10.5pt!important;font-weight:700}.zone-aspect-text{font-size:9pt!important;color:#555!important}.zone-desc{font-size:9.5pt!important}
   .opp-card{border:0.75pt solid #bbb!important;border-top:2pt solid #444!important;padding:8pt 10pt!important;margin-bottom:7pt!important;background:#f9f9f9!important;page-break-inside:avoid}
-  
-  
+
   .two-col{gap:12pt!important}
   h2,h3{page-break-after:avoid}
   .stunt-row,.opp-card,.info-box,.gm-note{page-break-inside:avoid}
@@ -684,7 +681,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 
 /* ── Topbar ─────────────────────────────────────────────────────────────── */
 .topbar{position:sticky;top:0;z-index:200;height:44px;background:var(--glass-bg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-bottom:1px solid var(--glass-border);display:flex;align-items:center;padding:0 12px;gap:10px;flex-shrink:0;box-shadow:var(--glass-shadow);will-change:filter}
-.topbar-hamburger{flex-shrink:0;font-size:16px;width:44px;height:44px;padding:0;display:flex;align-items:center;justify-content:center}
+
 .topbar-brand{display:flex;align-items:center;gap:6px;text-decoration:none;color:var(--text);font-size:var(--text-sm);flex:1;min-width:0;overflow:hidden}
 .topbar-ogma{color:var(--accent);font-size:13px;font-weight:400;flex-shrink:0;letter-spacing:0.01em;white-space:nowrap}
 .topbar-ogma strong{font-weight:800;font-size:15px;letter-spacing:0}
@@ -744,6 +741,164 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
   
 }
 
+/* ══════════════════════════════════════════════════════════════
+   NEW RESULT RENDER — result card + inline tabs
+   Replaces old result-panel content area
+══════════════════════════════════════════════════════════════ */
+
+/* Result card — top section of result panel */
+.result-card{padding:16px 18px 0;flex-shrink:0;border-bottom:1px solid var(--border)}
+.result-card-gen{font-size:10px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.result-card-gen-line{flex:1;height:1px;background:color-mix(in srgb,var(--accent) 22%,transparent)}
+.result-card-name{font-size:21px;font-weight:600;color:var(--text);line-height:1.2;margin-bottom:3px}
+.result-card-sub{font-size:13px;color:var(--text-dim);margin-bottom:12px;line-height:1.5}
+.result-card-aspects{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
+.result-asp{display:inline-flex;align-items:flex-start;gap:5px;padding:5px 9px;border-radius:6px;border:1px solid var(--border);background:var(--panel);font-size:12px;color:var(--text-dim);line-height:1.4;max-width:300px}
+.result-asp-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.result-asp.asp-hc  .result-asp-dot{background:var(--accent)}
+.result-asp.asp-tr  .result-asp-dot{background:var(--c-red)}
+.result-asp.asp-ot  .result-asp-dot{background:var(--border-bright);opacity:.7}
+.result-asp.asp-free{border-color:color-mix(in srgb,var(--accent) 40%,transparent);background:color-mix(in srgb,var(--accent) 6%,transparent)}
+.result-asp-badge{font-size:9px;font-weight:700;color:var(--accent);letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+.result-skills{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px}
+.result-skill{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--panel)}
+.result-skill-r{font-size:11px;font-weight:700;color:var(--accent)}
+.result-skill-n{font-size:11px;color:var(--text-dim)}
+.result-skill-l{font-size:10px;color:var(--text-muted);margin-left:2px}
+
+/* Result tab bar */
+.result-tab-bar{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.result-tab-btn{flex:1;height:34px;font-size:11px;font-weight:500;border:none;cursor:pointer;font-family:var(--font-ui);background:transparent;color:var(--text-muted);border-bottom:2px solid transparent;transition:color .12s,border-color .12s;display:flex;align-items:center;justify-content:center;gap:4px}
+.result-tab-btn:hover{color:var(--text-dim)}
+.result-tab-btn.active{color:var(--text);border-bottom-color:var(--accent)}
+.result-tab-btn:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+
+/* Tab panel scroll container */
+.result-tab-content{flex:1;overflow-y:auto;min-height:0}
+.result-tab-content::-webkit-scrollbar{width:3px}
+.result-tab-content::-webkit-scrollbar-thumb{background:var(--border-mid);border-radius:2px}
+.result-tab-panel{display:none;padding:14px 18px;flex-direction:column;gap:11px}
+.result-tab-panel.active{display:flex}
+
+/* Panel section label */
+.rtp-lbl{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:5px}
+
+/* Invoke / compel example cards */
+.rtp-ic{border-radius:8px;padding:10px 13px;border:1px solid var(--border)}
+.rtp-ic.invoke{background:color-mix(in srgb,var(--accent) 6%,transparent);border-color:color-mix(in srgb,var(--accent) 25%,transparent)}
+.rtp-ic.compel{background:color-mix(in srgb,var(--c-red) 5%,transparent);border-color:rgba(192,48,48,.18)}
+.rtp-ic-hdr{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:4px}
+.rtp-ic.invoke .rtp-ic-hdr{color:var(--accent)}
+.rtp-ic.compel .rtp-ic-hdr{color:var(--c-red)}
+.rtp-ic-body{font-size:12px;color:var(--text-dim);line-height:1.65;font-style:italic}
+
+/* Tip rows */
+.rtp-tip{display:flex;align-items:flex-start;gap:7px;padding:5px 0;border-top:1px solid var(--border)}
+.rtp-tip-ic{color:var(--accent);font-size:10px;margin-top:3px;flex-shrink:0;opacity:.75}
+.rtp-tip-tx{font-size:12px;color:var(--text-dim);line-height:1.65}
+
+/* Rule rows */
+.rtp-rule{display:flex;align-items:flex-start;gap:7px;padding:5px 0;border-top:1px solid var(--border)}
+.rtp-rule-dot{color:var(--accent);font-size:10px;margin-top:3px;flex-shrink:0}
+.rtp-rule-tx{font-size:12px;color:var(--text-dim);line-height:1.65}
+
+/* Checklist */
+.rtp-check{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12px;color:var(--text-dim);cursor:pointer;user-select:none}
+.rtp-check-box{width:15px;height:15px;border-radius:3px;border:1px solid var(--border-mid);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;transition:all .12s}
+.rtp-check-box.done{background:var(--accent);border-color:var(--accent);color:#000}
+
+/* D&D callout card */
+.rtp-dnd{border-radius:8px;padding:10px 13px;background:color-mix(in srgb,#5b80e0 7%,transparent);border:1px solid rgba(91,128,224,.18)}
+.rtp-dnd-hdr{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#6b90e8;margin-bottom:4px}
+.rtp-dnd-body{font-size:12px;color:var(--text-dim);line-height:1.65}
+
+/* SRD link */
+.rtp-srd{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--accent);text-decoration:none;opacity:.8;margin-top:2px}
+.rtp-srd:hover{opacity:1}
+
+/* ══════════════════════════════════════════════════════════════
+   DELIGHT ANIMATIONS — all 12 moments
+══════════════════════════════════════════════════════════════ */
+
+/* 1. Countdown triggered */
+@keyframes cd-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+@keyframes cd-name-pulse{0%{transform:scale(1)}30%{transform:scale(1.07)}70%{transform:scale(.97)}100%{transform:scale(1)}}
+@keyframes cd-particle{0%{transform:translate(0,0) scale(1.2);opacity:1}100%{transform:translate(var(--px,20px),var(--py,-20px)) scale(0);opacity:0}}
+@keyframes cd-outcome-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.cd-triggered-shake{animation:cd-shake .45s ease both}
+.cd-name-pop{animation:cd-name-pulse .4s ease both}
+.cd-particle{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--c-red);animation:cd-particle .55s ease-out both;pointer-events:none;top:50%;left:50%}
+.cd-outcome-appear{animation:cd-outcome-in .35s ease both}
+
+/* 2. Pin bounce + ring */
+@keyframes pin-bounce{0%{transform:scale(1)}25%{transform:scale(1.5) rotate(-15deg)}55%{transform:scale(.82) rotate(8deg)}75%{transform:scale(1.12) rotate(-4deg)}100%{transform:scale(1) rotate(0deg)}}
+@keyframes pin-ring{0%{transform:scale(.6);opacity:.9;border-width:2px}100%{transform:scale(2.4);opacity:0;border-width:1px}}
+.pin-bounce{animation:pin-bounce .38s cubic-bezier(.34,1.56,.64,1) both}
+.pin-ring-el{position:absolute;inset:-5px;border-radius:50%;border:2px solid var(--accent);animation:pin-ring .42s ease-out both;pointer-events:none;z-index:1}
+
+/* 3. Dice spin + result slide */
+@keyframes dice-spin{0%{transform:rotate(0) scale(1)}25%{transform:rotate(90deg) scale(.88)}50%{transform:rotate(180deg) scale(1.12)}75%{transform:rotate(270deg) scale(.88)}100%{transform:rotate(360deg) scale(1)}}
+@keyframes result-slide{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.dice-spinning{animation:dice-spin .5s ease-in-out both;display:inline-block}
+.result-card-appear{animation:result-slide .28s ease both}
+
+/* 4. Contest trophy */
+@keyframes trophy-spring{0%{transform:scale(0) rotate(-20deg);opacity:0}55%{transform:scale(1.3) rotate(5deg);opacity:1}80%{transform:scale(.92) rotate(-2deg)}100%{transform:scale(1) rotate(0)}  }
+.trophy-pop{animation:trophy-spring .42s cubic-bezier(.34,1.56,.64,1) both;display:inline-block;margin-left:4px}
+
+/* 5. Inspire ghost */
+@keyframes inspire-fade-out{from{opacity:1;transform:scale(1)}to{opacity:.18;transform:scale(.97)}}
+@keyframes inspire-select{0%{transform:scale(1)}30%{transform:scale(.95)}65%{transform:scale(1.03)}100%{transform:scale(1)}}
+.inspire-card.inspire-ghost{animation:inspire-fade-out .25s ease both forwards;pointer-events:none}
+.inspire-card.inspire-chosen{animation:inspire-select .3s ease both}
+
+/* 6. Consequence severity pulse */
+@keyframes sev-pulse{0%,100%{box-shadow:none}40%{box-shadow:0 0 0 4px color-mix(in srgb,var(--c-red) 28%,transparent)}}
+.consequence-marked{animation:sev-pulse .55s ease both}
+
+/* 7. FP spend implosion + gain bloom */
+@keyframes fp-spend{0%{transform:scale(1);opacity:1}30%{transform:scale(1.45);opacity:.8}65%{transform:scale(.4);opacity:.4}100%{transform:scale(0);opacity:0}}
+@keyframes fp-gain{0%{transform:scale(0);opacity:0}60%{transform:scale(1.35);opacity:1}80%{transform:scale(.88)}100%{transform:scale(1);opacity:1}}
+.fp-dot.fp-spending{animation:fp-spend .32s ease both forwards}
+.fp-dot.fp-gaining{animation:fp-gain .35s cubic-bezier(.34,1.56,.64,1) both}
+
+/* 8. Stress taken out flash */
+@keyframes takenout-bg{0%{background:transparent}35%{background:color-mix(in srgb,var(--c-red) 14%,transparent)}100%{background:transparent}}
+@keyframes takenout-label{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+.stress-track.taken-out{animation:takenout-bg .55s ease both}
+.taken-out-label{display:inline-block;font-size:var(--text-label);font-weight:700;color:var(--c-red);letter-spacing:.06em;animation:takenout-label .3s ease both;margin-left:8px}
+
+/* 9. Milestone check spring + strikethrough */
+@keyframes check-spring{0%{transform:scale(0)}55%{transform:scale(1.3)}80%{transform:scale(.9)}100%{transform:scale(1)}}
+@keyframes strike-reveal{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0% 0 0)}}
+.milestone-check-pop{animation:check-spring .28s cubic-bezier(.34,1.56,.64,1) both}
+.milestone-strike span{display:inline;background:linear-gradient(var(--text-muted),var(--text-muted)) no-repeat 0 55%;background-size:0% 1.5px;transition:background-size .3s ease .05s}
+.milestone-strike.done span{background-size:100% 1.5px}
+
+/* 10. Session Zero step complete */
+@keyframes sz-slide{from{opacity:0;transform:translateX(7px)}to{opacity:1;transform:translateX(0)}}
+.sz-step-done{animation:sz-slide .25s ease both}
+
+/* 11. Typewriter cursor blink between sentences */
+@keyframes tw-blink{0%,100%{opacity:1}50%{opacity:0}}
+.tw-cursor{animation:tw-blink .7s step-start infinite;color:var(--accent)}
+
+/* 12. Roll streak pulse */
+@keyframes streak-pulse{0%{box-shadow:none}40%{box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 35%,transparent),0 0 16px color-mix(in srgb,var(--accent) 20%,transparent)}100%{box-shadow:none}}
+@keyframes streak-badge{from{opacity:0;transform:translateY(-6px) scale(.7)}50%{transform:translateY(1px) scale(1.1)}to{opacity:1;transform:translateY(0) scale(1)}}
+.streak-pulse{animation:streak-pulse .6s ease both}
+.streak-badge{position:absolute;top:-8px;right:-8px;font-size:9px;font-weight:700;background:var(--accent);color:#000;border-radius:100px;padding:1px 5px;animation:streak-badge .35s cubic-bezier(.34,1.56,.64,1) both;pointer-events:none}
+
+/* PERF-04: SW update toast — persistent until dismissed */
+.toast-update{
+  bottom:72px; /* above FAB */
+  background:color-mix(in srgb,var(--accent) 15%,var(--panel));
+  border-color:var(--accent);
+  display:flex;align-items:center;gap:4px;
+  animation:toastIn 0.3s ease both;
+  max-width:360px;
+}
+
 /* ── Print: hide topbar and sidebar ──────────────────────────────────────── */
 @media print{
   .topbar,.sidebar,.sidebar-backdrop{display:none!important}
@@ -787,8 +942,8 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .topbar-chip-offline{background:rgba(220,50,50,.18);color:#ff7070;animation:tb-blink 2s ease-in-out infinite}
 @keyframes tb-blink{0%,100%{opacity:1}50%{opacity:.45}}
 
-/* Topbar hamburger raised to 44px (W2) */
-.topbar-hamburger{flex-shrink:0;font-size:16px;width:44px;height:44px;padding:0;display:flex;align-items:center;justify-content:center}
+/* Topbar hamburger raised to 44px (W2) — display controlled by media queries above */
+.topbar-hamburger{flex-shrink:0;font-size:16px;width:44px;height:44px;padding:0;align-items:center;justify-content:center}
 
 /* Nav link inside topbar for static pages */
 .topbar-nav-btn{font-size:12px!important;padding:4px 8px!important;min-height:44px;text-decoration:none}
@@ -796,7 +951,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 @media(min-width:640px){.topbar-nav-hide-sm{display:inline-flex}}
 
 /* Static page topbar — unify land-topnav with React topbar */
-.land-topnav{position:sticky;top:0;z-index:100;display:flex;align-items:center;padding:0 12px;height:44px;gap:8px;background:var(--glass-bg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-bottom:1px solid var(--glass-border);box-shadow:var(--glass-shadow)}
+
 .land-topnav-brand{display:none}
 
 /* ═══════════════════════════════════════════════════════════════
@@ -846,7 +1001,6 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .hl-sb-name{font-size:12px;font-weight:500;color:var(--text-dim);line-height:1.3}
 .hl-sb-opt.selected .hl-sb-name{color:var(--accent)}
 .hl-sb-sub{font-size:10px;color:var(--text-muted);line-height:1.35;margin-top:1px}
-
 
 /* ══ SIDEBAR REDESIGN ════════════════════════════════════════════════════════ */
 .sidebar-divider{height:1px;background:var(--border);margin:4px 0;flex-shrink:0}
@@ -916,7 +1070,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .land-world-genre{display:inline-block;font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);border-radius:100px;padding:2px 8px;margin-top:4px}
 .land-world-hook{font-size:var(--text-sm);color:var(--text-dim);margin-top:4px;line-height:1.4}
 .land-world-arrow{font-size:var(--text-lg);color:var(--text-muted);flex-shrink:0}
-.land-world-vibes{font-size:var(--text-label);color:var(--text-muted);font-style:italic;padding:0 16px 12px;line-height:1.4}
+.land-world-vibes{font-size:var(--text-label);color:var(--text-muted);font-style:italic;line-height:1.4;padding:0 16px 12px;flex:1}
 /* Onboarding paths */
 .land-onboard-section{padding:40px 0;border-top:1px solid var(--border)}
 .land-onboard-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
@@ -937,7 +1091,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .land-gen-group-icon{font-size:16px}
 .land-gen-group-name{font-size:var(--text-sm);font-weight:700;color:var(--text)}
 .land-gen-group-items{display:flex;flex-direction:column;gap:3px}
-.land-gen-item{font-size:var(--text-sm);color:var(--text-dim);padding:2px 0}
+.land-gen-item{display:flex;flex-direction:column;font-size:var(--text-sm);color:var(--text-dim);padding:3px 0;gap:1px}
 /* Footer */
 .land-footer{margin-top:auto;padding:24px 20px;border-top:1px solid var(--border);font-size:var(--text-label);color:var(--text-muted);text-align:center}
 .land-footer-inner{max-width:800px;margin:0 auto}
@@ -957,7 +1111,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 
 /* ── World card guide link ─────────────────────────────────────────────────── */
 .land-world-footer{display:flex;align-items:center;justify-content:space-between;padding:0 16px 12px;gap:8px}
-.land-world-vibes{font-size:var(--text-label);color:var(--text-muted);font-style:italic;line-height:1.4;flex:1}
+
 .land-world-guide-link{font-size:var(--text-label);color:var(--accent);text-decoration:none;white-space:nowrap;opacity:0.8;transition:opacity 0.15s;flex-shrink:0}
 .land-world-guide-link:hover{opacity:1;text-decoration:underline}
 
@@ -981,7 +1135,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .camp-content-footer-link:hover{opacity:1}
 
 /* ══ LANDING GEN ITEM SUB TEXT ══ */
-.land-gen-item{display:flex;flex-direction:column;padding:3px 0;gap:1px}
+
 .land-gen-item-name{font-size:var(--text-sm);color:var(--text-dim)}
 .land-gen-item-sub{font-size:11px;color:var(--text-muted);letter-spacing:0.01em;padding-left:18px}
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,8 +10,8 @@
   <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicons/icon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicons/apple-touch-icon.png">
   <link rel="manifest" href="../manifest.json">
-  <link rel="stylesheet" href="https://unpkg.com/rpg-awesome@0.2.0/css/rpg-awesome.min.css">
-  <link rel="stylesheet" href="../assets/css/theme.css?v=36">
+  <link rel="stylesheet" href="../assets/css/rpg-awesome-local.css">
+  <link rel="stylesheet" href="../assets/css/theme.css?v=42">
   <style>
     /* Session Zero wizard-specific styles */
     .sz-container { max-width: 760px; margin: 0 auto; padding: 24px 20px 80px; }
@@ -85,24 +85,32 @@
       .sz-card, .sz-summary-section { break-inside: avoid; }
     }
   </style>
+  <meta property="og:type"        content="website">
+  <meta property="og:url"         content="https://brs165.github.io/ogma-fate/campaigns/sessionzero.html">
+  <meta property="og:title"       content="Session Zero Wizard — Ogma">
+  <meta property="og:description" content="Step-by-step Fate Condensed character creation wizard for your whole table.">
+  <meta property="og:image"       content="https://brs165.github.io/ogma-fate/assets/favicons/icon.svg">
+  <meta name="twitter:card"       content="summary">
+  <meta name="twitter:title"      content="Session Zero Wizard — Ogma">
+  <meta name="twitter:description" content="Step-by-step Fate Condensed character creation wizard for your whole table.">
 </head>
 <body>
   <a href="#main" class="skip-link">Skip to main content</a>
     <div id="root"></div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
-  <script src="../data/shared.js?v=36"></script>
-  <script src="../data/universal.js?v=36"></script>
-  <script src="../data/thelongafter.js?v=36"></script>
-  <script src="../data/cyberpunk.js?v=36"></script>
-  <script src="../data/fantasy.js?v=36"></script>
-  <script src="../data/space.js?v=36"></script>
-  <script src="../data/victorian.js?v=36"></script>
-  <script src="../data/postapoc.js?v=36"></script>
-  <script src="../data/western.js?v=36"></script>
-  <script src="../core/engine.js?v=36"></script>
-  <script src="../core/db.js?v=36"></script>
-  <script src="../core/ui.js?v=36"></script>
+  <script src="../data/shared.js?v=42"></script>
+  <script src="../data/universal.js?v=42"></script>
+  <script src="../data/thelongafter.js?v=42"></script>
+  <script src="../data/cyberpunk.js?v=42"></script>
+  <script src="../data/fantasy.js?v=42"></script>
+  <script src="../data/space.js?v=42"></script>
+  <script src="../data/victorian.js?v=42"></script>
+  <script src="../data/postapoc.js?v=42"></script>
+  <script src="../data/western.js?v=42"></script>
+  <script src="../core/engine.js?v=42"></script>
+  <script src="../core/db.js?v=42"></script>
+  <script src="../core/ui.js?v=42"></script>
   <script>
   (function() {
     var h = React.createElement;
@@ -764,7 +772,9 @@
           h('div', {className:'sz-subtitle'}, 'Fate Condensed Character Creation Wizard')
         ) : null,
         counter,
-        content,
+        h('div', {key: step, style:{animation:'fadeUp 0.22s ease both'}},
+          content
+        ),
         nav
       ) // close sz-container
       ,h('footer', {style:{textAlign:'center',padding:'20px',fontSize:'12px',color:'var(--text-muted)',borderTop:'1px solid var(--border)',marginTop:20}},
