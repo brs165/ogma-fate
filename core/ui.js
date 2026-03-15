@@ -3042,6 +3042,8 @@ function CampaignApp(props) {
     var newResult = {genId: activeGen, data: data};
     setTimeout(function() {
       setResult(newResult);
+      setResultAnim(true);
+      setTimeout(function() { setResultAnim(false); }, 320);
       setHistory(function(h) {
         return [{genId: activeGen, data: data, gen: gen}, h[0], h[1], h[2], h[3], h[4], h[5], h[6], h[7]].filter(Boolean).slice(0, 8);
       });
