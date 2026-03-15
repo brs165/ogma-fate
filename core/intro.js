@@ -479,7 +479,7 @@
     // Content
     var content = document.createElement('div');
     content.className = 'fate-intro-content';
-    content.style.cssText = 'position:relative;z-index:2;max-width:640px;width:100%;';
+    content.style.cssText = 'position:relative;z-index:2;max-width:640px;width:100%;text-align:left;';
     ov.appendChild(content);
 
     // Skip hint
@@ -725,7 +725,7 @@
 
     var content = document.createElement('div');
     content.className = 'fate-intro-content';
-    content.style.cssText = 'position:relative;z-index:2;max-width:560px;width:90%;padding:16px 0;text-align:center;display:flex;flex-direction:column;align-items:center;';
+    content.style.cssText = 'position:relative;z-index:2;max-width:560px;width:90%;padding:16px 0;text-align:left;display:flex;flex-direction:column;align-items:flex-start;';
     ov.appendChild(content);
 
     var hint = document.createElement('div');

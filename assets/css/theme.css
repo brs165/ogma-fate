@@ -2,7 +2,7 @@
    iOS 26 / macOS Tahoe inspired. Translucent surfaces, backdrop blur, specular highlights.
    Dark mode default. Light mode: [data-theme="light"]. Campaign accents: [data-campaign]. */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap');
+/* Google Fonts removed — system font stack used: see --font-ui and --font-mono below */
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
@@ -1075,10 +1075,10 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 /* ── Centering for all inline intro containers ─────────────────────────────── */
 .fate-intro-inline .fate-intro-content,
 .intro-modal-stage .fate-intro-content {
-  text-align: center;
+  text-align: left;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
 }
 
 /* ── Print: hide topbar and sidebar ──────────────────────────────────────── */

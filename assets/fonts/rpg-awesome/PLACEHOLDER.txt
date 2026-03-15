@@ -7,3 +7,6 @@ Place RPG Awesome font files here:
 
 Source: https://github.com/nagoshiashumari/Rpg-Awesome/archive/master.zip
 Extract: Rpg-Awesome-master/fonts/
+
+Direct woff2 download:
+  curl -sL "https://unpkg.com/rpg-awesome@0.2.0/fonts/rpgawesome-webfont.woff2" -o assets/fonts/rpg-awesome/rpgawesome-webfont.woff2

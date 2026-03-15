@@ -1758,7 +1758,7 @@ function LandingApp() {
   useEffect(function() {
     var el = landIntroRef.current;
     if (!el || typeof window.fateInitInline !== 'function') return;
-    window.fateInitInline(el, {worldKey: 'index', titleOnly: true, freeze: true});
+    window.fateInitInline(el, {worldKey: 'index'});
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   function toggleTheme() {
     var next = theme === 'dark' ? 'light' : 'dark';

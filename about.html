@@ -9,7 +9,7 @@
   <meta name="description" content="About Ogma - how it was built, what's inside, and how to use it offline.">
   <link rel="icon" type="image/svg+xml" href="assets/favicons/icon.svg">
   <link rel="stylesheet" href="assets/css/rpg-awesome-local.css">
-  <link rel="stylesheet" href="assets/css/theme.css?v=70">
+  <link rel="stylesheet" href="assets/css/theme.css?v=73">
   <style>
     .about{max-width:680px;margin:0 auto;padding:24px 20px 80px;position:relative;z-index:1}
     .about h1{font-size:var(--text-hero);font-weight:800;color:var(--text);margin-bottom:8px;letter-spacing:-0.02em}
@@ -75,10 +75,10 @@
 <h1 id="main-content">About Ogma</h1>
 
 <div class="about-version" role="status" aria-label="Suite version information">
-  <span class="about-version-badge">2026.03.70</span>
+  <span class="about-version-badge">2026.03.73</span>
   <div class="about-version-meta">
     <strong style="color:var(--text)">Ogma - A Fate Condensed Generator Suite</strong><br>
-    March 2026 · Cache: <code>fate-generator-2026.03.70</code> · 16 generators · 7 campaign worlds · 9,750+ table entries
+    March 2026 · Cache: <code>fate-generator-2026.03.73</code> · 16 generators · 7 campaign worlds · 9,750+ table entries
   </div>
   <div class="about-version-qa">✓ 96/96 smoke · 19,200 stress · 19 named assertions · toMarkdown 96/96</div>
 </div>
@@ -420,38 +420,48 @@ When reviewing code, flag any interactive element missing an accessible name, an
 
 <h2 id="help-wiki">Help &amp; Wiki</h2>
 <p>The <strong>Ogma Help &amp; Wiki</strong> is a comprehensive reference covering every feature — from the local-first data philosophy to live projector sync at the table. Whether you're new to Fate or a veteran GM, it has something for you.</p>
-<div class="about-card" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;padding:16px">
-  <a href="wiki/getting-started.html" style="text-decoration:none;display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:var(--glass-radius-sm);border:1px solid var(--glass-border);background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);transition:background 0.12s" onmouseover="this.style.background='color-mix(in srgb,var(--accent) 8%,transparent)'" onmouseout="this.style.background='var(--glass-bg)'">
-    <div style="font-size:18px">🚀</div>
+<style>.wiki-card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0;margin:12px 0 0}@media(max-width:500px){.wiki-card-grid{grid-template-columns:repeat(2,1fr)}}.wiki-card-grid a{text-decoration:none;display:flex;flex-direction:column;gap:3px;padding:10px 12px;border-radius:var(--glass-radius-sm);border:1px solid var(--glass-border);background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);transition:background 0.12s;min-width:0}.wiki-card-grid a:hover{background:color-mix(in srgb,var(--accent) 8%,transparent)}</style><div class="wiki-card-grid">
+  <a href="wiki/getting-started.html">
+    <div style="font-size:18px">📖</div>
     <div style="font-size:var(--text-sm);font-weight:700;color:var(--text)">Getting Started</div>
     <div style="font-size:var(--text-label);color:var(--text-muted)">Local-first data, first roll, backup guide</div>
   </a>
-  <a href="wiki/generators.html" style="text-decoration:none;display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:var(--glass-radius-sm);border:1px solid var(--glass-border);background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);transition:background 0.12s" onmouseover="this.style.background='color-mix(in srgb,var(--accent) 8%,transparent)'" onmouseout="this.style.background='var(--glass-bg)'">
+  <a href="wiki/generators.html">
     <div style="font-size:18px">🎲</div>
     <div style="font-size:var(--text-sm);font-weight:700;color:var(--text)">Generator Suite</div>
     <div style="font-size:var(--text-label);color:var(--text-muted)">All 16 generators, 112 combinations</div>
   </a>
-  <a href="wiki/fate-mechanics.html" style="text-decoration:none;display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:var(--glass-radius-sm);border:1px solid var(--glass-border);background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);transition:background 0.12s" onmouseover="this.style.background='color-mix(in srgb,var(--accent) 8%,transparent)'" onmouseout="this.style.background='var(--glass-bg)'">
+  <a href="wiki/fate-mechanics.html">
     <div style="font-size:18px">♾</div>
     <div style="font-size:var(--text-sm);font-weight:700;color:var(--text)">Fate Mechanics</div>
     <div style="font-size:var(--text-label);color:var(--text-muted)">Stress, Consequences, Aspects, FP</div>
   </a>
-  <a href="wiki/at-the-table.html" style="text-decoration:none;display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:var(--glass-radius-sm);border:1px solid var(--glass-border);background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);transition:background 0.12s" onmouseover="this.style.background='color-mix(in srgb,var(--accent) 8%,transparent)'" onmouseout="this.style.background='var(--glass-bg)'">
+  <a href="wiki/at-the-table.html">
     <div style="font-size:18px">📺</div>
     <div style="font-size:var(--text-sm);font-weight:700;color:var(--text)">At the Table</div>
     <div style="font-size:var(--text-label);color:var(--text-muted)">Projector, FP Tracker, Inspiration</div>
   </a>
-  <a href="wiki/export-share.html" style="text-decoration:none;display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:var(--glass-radius-sm);border:1px solid var(--glass-border);background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);transition:background 0.12s" onmouseover="this.style.background='color-mix(in srgb,var(--accent) 8%,transparent)'" onmouseout="this.style.background='var(--glass-bg)'">
+  <a href="wiki/export-share.html">
     <div style="font-size:18px">🔗</div>
     <div style="font-size:var(--text-sm);font-weight:700;color:var(--text)">Export &amp; Share</div>
     <div style="font-size:var(--text-label);color:var(--text-muted)">Markdown, Fari JSON, shareable links</div>
   </a>
-  <a href="wiki/customise.html" style="text-decoration:none;display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:var(--glass-radius-sm);border:1px solid var(--glass-border);background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);transition:background 0.12s" onmouseover="this.style.background='color-mix(in srgb,var(--accent) 8%,transparent)'" onmouseout="this.style.background='var(--glass-bg)'">
+  <a href="wiki/customise.html">
     <div style="font-size:18px">⚙</div>
     <div style="font-size:var(--text-sm);font-weight:700;color:var(--text)">Customise</div>
     <div style="font-size:var(--text-label);color:var(--text-muted)">Help Levels, GM Mode, Table Manager</div>
   </a>
-  <a href="wiki/faq.html" style="text-decoration:none;display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:var(--glass-radius-sm);border:1px solid var(--glass-border);background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);transition:background 0.12s" onmouseover="this.style.background='color-mix(in srgb,var(--accent) 8%,transparent)'" onmouseout="this.style.background='var(--glass-bg)'">
+  <a href="wiki/new-to-ogma.html">
+    <div style="font-size:18px">🚀</div>
+    <div style="font-size:var(--text-sm);font-weight:700;color:var(--text)">New to Ogma?</div>
+    <div style="font-size:var(--text-label);color:var(--text-muted)">Pick your background — newbie, D&amp;D, or veteran</div>
+  </a>
+  <a href="wiki/dnd-transition.html">
+    <div style="font-size:18px">⚔</div>
+    <div style="font-size:var(--text-sm);font-weight:700;color:var(--text)">D&amp;D Transition</div>
+    <div style="font-size:var(--text-label);color:var(--text-muted)">Side-by-side comparison of every major difference</div>
+  </a>
+  <a href="wiki/faq.html">
     <div style="font-size:18px">❓</div>
     <div style="font-size:var(--text-sm);font-weight:700;color:var(--text)">FAQ</div>
     <div style="font-size:var(--text-label);color:var(--text-muted)">Cache, offline, data loss, browsers</div>
