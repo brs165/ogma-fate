@@ -2,7 +2,7 @@
 ## Backlog
 
 > **Source of truth.** Update this file whenever items are added, completed, or re-prioritised.
-> Current version: **2026.03.22** · Cache: `fate-generator-2026.03.22`
+> Current version: **2026.03.26** · Cache: `fate-generator-2026.03.26`
 
 ---
 

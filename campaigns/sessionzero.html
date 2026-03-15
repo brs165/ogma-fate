@@ -11,7 +11,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicons/apple-touch-icon.png">
   <link rel="manifest" href="../manifest.json">
   <link rel="stylesheet" href="https://unpkg.com/rpg-awesome@0.2.0/css/rpg-awesome.min.css">
-  <link rel="stylesheet" href="../assets/css/theme.css?v=22">
+  <link rel="stylesheet" href="../assets/css/theme.css?v=26">
   <style>
     /* Session Zero wizard-specific styles */
     .sz-container { max-width: 760px; margin: 0 auto; padding: 24px 20px 80px; }
@@ -90,16 +90,16 @@
   <div id="root"></div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
-  <script src="../data/shared.js?v=22"></script>
-  <script src="../data/universal.js?v=22"></script>
-  <script src="../data/thelongafter.js?v=22"></script>
-  <script src="../data/cyberpunk.js?v=22"></script>
-  <script src="../data/fantasy.js?v=22"></script>
-  <script src="../data/space.js?v=22"></script>
-  <script src="../data/victorian.js?v=22"></script>
-  <script src="../data/postapoc.js?v=22"></script>
-  <script src="../core/engine.js?v=22"></script>
-  <script src="../core/ui.js?v=22"></script>
+  <script src="../data/shared.js?v=26"></script>
+  <script src="../data/universal.js?v=26"></script>
+  <script src="../data/thelongafter.js?v=26"></script>
+  <script src="../data/cyberpunk.js?v=26"></script>
+  <script src="../data/fantasy.js?v=26"></script>
+  <script src="../data/space.js?v=26"></script>
+  <script src="../data/victorian.js?v=26"></script>
+  <script src="../data/postapoc.js?v=26"></script>
+  <script src="../core/engine.js?v=26"></script>
+  <script src="../core/ui.js?v=26"></script>
   <script>
   (function() {
     var h = React.createElement;
@@ -291,7 +291,14 @@
           : null
       );
       var navBar = h('nav', {className:'land-topnav', role:'navigation', 'aria-label':'Site navigation'},
-        h('a', {href:'../index.html', className:'land-topnav-brand', style:{textDecoration:'none'}}, '🎲 Ogma'),
+        h('a', {href:'../index.html', className:'land-topnav-brand', 'aria-label':'Ogma home'},
+          h('span', {className:'topbar-ogma'},
+            h('strong',null,'O'),'n-demand ',
+            h('strong',null,'G'),'enerator for ',
+            h('strong',null,'M'),'asterful ',
+            h('strong',null,'A'),'dventures'
+          )
+        ),
         h('div', {className:'land-topnav-actions'},
           h('a', {href:'../learn.html', className:'btn btn-ghost land-topnav-btn', style:{fontSize:13, textDecoration:'none'}}, '📖 Quick Start'),
           h('a', {href:'transition.html', className:'btn btn-ghost land-topnav-btn', style:{fontSize:13, textDecoration:'none'}}, '⚔ D&D Guide'),

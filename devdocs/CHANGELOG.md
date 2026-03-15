@@ -4,6 +4,131 @@
 
 ---
 
+## 2026.03.26 - Rules rework + action bar
+
+**KB Shortcuts modal, Rules modal cleaned, unified action bar**
+
+### Item 1 - Rules button fixed
+- Toolbar Rules button was calling undefined `showPanel()` function (openPanel refactor was never fully applied to this backup) - fixed to `setShowHelp(true)`
+
+### Item 2 - KB Shortcuts sidebar entry
+- `KBShortcutsModal` component added: small modal with all 6 keyboard shortcuts
+- Sidebar now shows "KB Shortcuts" (ra-keyboard icon) instead of "Rules"
+- `?` key opens KB Shortcuts modal (was opening Rules)
+- `showKbShortcuts` state added
+
+### Item 3 - Rules modal cleaned
+- Quick Reference grid (all 16 generators) removed from Rules modal
+- Keyboard Shortcuts section removed from Rules modal
+- Rules modal now contains only: What this generates, Output structure, Rules reference (Fate Condensed), Invoke/Compel examples, GM Tip, D&D callout
+
+### Item 4 - Unified action bar (spike implemented)
+- `roll-hero` section (floating above result panel) replaced
+- `panel-toolbar` replaced
+- New `.action-bar`: Roll + Inspire + contextual (severity/party) + secondary (Rules/Share/Pin)
+- Roll stays accent-coloured pill; Inspire now clearly labelled with crystal-ball icon + Inspire text
+- Secondary actions (Rules, Share, Pin) use RPG Awesome icons only, pushed right
+- Mobile: Roll fills row, rest wraps below
+- FAB still appears when action-bar scrolls off-screen (ref moved to action-bar)
+
+---
+
+## 2026.03.25 - Tier 1 cleanup (BL-52, BL-53)
+
+**Sidebar icon sizing, dead CSS removal**
+
+- **BL-52**: `sidebar-item-icon` font-size raised from 13px to 16px - RPG Awesome glyphs at 13px were clipping; 16px renders cleanly at all sidebar sizes
+- **BL-53**: 10 tombstoned dead CSS classes removed from `theme.css`: `.camp-card`, `.camp-hero`, `.camp-hero-genre`, `.camp-hero-name`, `.camp-hero-vibes`, `.camp-name`, `.consequence-table`, `.hist-badge`, `.hist-badge-btn`, `.land-camp-list`. Tombstoned in 2026.03.17, confirmed unused.
+
+---
+
+## 2026.03.24 - OGMA brand + license sweep
+
+**OGMA acronym applied to all static pages; license links confirmed everywhere**
+
+### OGMA brand
+- All 9 static HTML pages (`about.html`, `learn.html`, `license.html`, `campaigns/transition.html`, all 6 guide pages) updated: hardcoded `🎲 Ogma` replaced with `<span class="topbar-ogma"><strong>O</strong>n-demand...` markup
+- `campaigns/sessionzero.html` inline React topnav: `'🎲 Ogma'` → `topbar-ogma` span component
+- All 6 campaign React pages already rendered OGMA brand via `core/ui.js` at runtime (correct)
+
+### License links
+- All 6 campaign React pages (`thelongafter`, `cyberpunk`, `fantasy`, `space`, `victorian`, `postapoc`): `license.html` link added to `<noscript>` fallback — visible without JavaScript
+- `about.html` footer: dead link to deleted `CONTRIBUTING.md` removed; replaced with "License & Attribution" link
+
+### Root cause documented
+- `team-memory.md` updated: static HTML pages require direct markup changes — `core/ui.js` changes only affect React-rendered pages
+- CHANGELOG sprint entries were previously going to root stub `CHANGELOG.md` instead of `devdocs/CHANGELOG.md` — confirmed fixed
+
+---
+
+## 2026.03.23 - Bug fix sprint (continuation of .22)
+
+**Syntax fix, missing features from .bak restore, full re-verification**
+
+- Restored `.bak` file (from sprint .17) overwrote sprints .18–.22 from `core/ui.js`; re-applied all missing changes
+- License footer (`camp-content-footer`) placement fixed: was incorrectly placed as sibling to `content-panel` in `app-body` flex row (renders as third column); moved to last child inside `content-panel`
+- Syntax error fixed: extra `)` in `CampaignApp` return statement after footer insertion
+- Re-applied all .20/.21/.22 ui.js features: SRD per-row links, Rules button, Quick Reference simplified, sidebar-legal links, landing gen sub text, dnd_notes D&D callout, inline rules clean render
+- OGMA landing topnav confirmed (was only in CampaignApp; re-verified on LandingApp too)
+- NPC SRD URLs confirmed pointing to `being-game-master` (were already fixed in .bak)
+
+---
+
+## 2026.03.22 - Polish sprint + .x2 devdocs review
+
+**Versioning rule, topbar rebrand, dnd_convert restored, devdocs refresh**
+
+- Versioning rule added to `devdocs/team-memory.md`: when patch ends in `.2`, review all devdocs before shipping
+- Topbar brand: "🎲 Ogma" replaced with full OGMA acronym in `var(--accent)` — **O**n-demand **G**enerator for **M**asterful **A**dventures; bold initials 15px, body 13px, inherits campaign accent color
+- `dnd_notes` field added to all 16 generators in `data/shared.js` GM_DATA block; `dnd_convert` help level now shows a blue "Vs. D&D / Pathfinder" callout per generator
+- All four help levels now cleanly differentiated: `experienced` (minimal), `new_fate`/`dnd_convert`/`new_ttrpg` (full, with level-specific additions)
+- `.x2 devdocs review`: fixed stale 18/18 assertion counts, bump-version.sh paths, CONTRIBUTING.md refs in `virtualteamroles.md`, `architecture.md`, `data-schema.md`, `BACKLOG.md`, `prompts.md`, `team-memory.md`
+
+---
+
+## 2026.03.21 - Inline help, license links, theme, Rules rename
+
+**Theme flash fix, license audit, help content tone, landing sub text, Rules panel**
+
+- Theme restore script moved to top of `<head>` in all 6 campaign React pages (was after CSS link, causing flash on navigation)
+- License & Attribution link audit: every page now has a visible link. Added `camp-content-footer` to campaign content panel (always visible on mobile); `sidebar-legal` now links to `license.html`
+- Help content tone pass: 13 `D&D contrast:` items removed from all rules arrays (lecture content, wrong for mid-session GM). 54 rewrites across rules bullets, tips, `gm_tips`, `gm_running` — "here is how this works" → "do this now"
+- Landing generator items: `sub` field (e.g. `1–2 aspects · skills · stress`) now renders below each generator name in the "16 generators" section
+- `?` toolbar button renamed to `Rules` with RPG Awesome icon; sidebar `Rules` item removed; Quick Reference heading simplified to "Quick Reference"
+- HelpModal title changed from "Help - Minor NPC" to "Rules - Minor NPC"
+- Inline help-level `dnd_convert` note: removed stale "D&D differences highlighted" label (those items were removed)
+
+---
+
+## 2026.03.20 - SRD inline links
+
+**Option A: trailing SRD ↗ icon per rules row in HelpModal**
+
+- Per-row `SRD ↗` link added to all rules bullets in HelpModal rules section
+- Link is `var(--accent)` at 55% opacity, fades to full on hover; `white-space: nowrap`; `title="Read on fate-srd.com"`
+- Removed the now-redundant `📖 Read the SRD rule →` block at the bottom of the modal
+- 3 generators without sub-anchors (`/conflicts`, `/getting-started`, `/fate-system-toolkit/factions`) link to their section page — this is the maximum granularity the SRD provides
+- `help-rule-row` CSS updated: `justify-content: space-between`; `help-rule-text` gets `flex: 1`; new `.help-rule-srd` class
+
+---
+
+## 2026.03.19 - Various fixes
+
+**Branding, license links, section rename, devdocs moves**
+
+- "Fate Condensed Campaign Generator" replaced with "Ogma - On-demand Generator for Masterful Adventures" in 19 `toMarkdown()` footer strings (`core/engine.js`) and `sw.js` comment
+- `learn.html`: "Just Show Me Fate's Core" renamed to "What Makes Fate Different" to avoid confusion with the Fate Core product name
+- `campaigns/sessionzero.html`: footer with License & Attribution link added
+- `BACKLOG.md`, `CHANGELOG.md`, `bump-version.sh` moved to `devdocs/`; root stubs forward transparently
+- `CONTRIBUTING.md` deleted; unique content migrated to `devdocs/content-authoring.md`
+- `devdocs/prompts.md`: hard-coded version numbers and backlog state replaced with file references
+- `devdocs/team-memory.md` created: living project memory for AI session bootstrapping
+- `devdocs/content-authoring.md` created: practical step-by-step content authoring guide
+- `devdocs/README.md`: updated reading order and document index
+
+---
+
+
 ## 2026.03.18 - Housekeeping Sprint
 
 **Branding fixes, devdocs restructure, team-memory, CONTRIBUTING.md retirement**

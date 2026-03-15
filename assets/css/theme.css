@@ -144,7 +144,6 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
   background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);
   border:1px solid var(--glass-border);border-radius:var(--glass-radius-sm);padding:14px 16px
 }
-.land-camp-list{display:flex;flex-direction:column;gap:8px}
 .land-camp-row{text-decoration:none;color:inherit}
 .land-camp-row:hover,.land-camp-row:focus-visible{border-color:var(--accent)}
 .land-cta-card{
@@ -196,10 +195,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .next-step-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .next-step-btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:10px 14px;min-height:44px;border-radius:var(--glass-radius-pill);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);background:color-mix(in srgb,var(--accent) 6%,transparent);color:var(--accent);font-size:var(--text-sm);font-family:var(--font-ui);font-weight:600;cursor:pointer;transition:all 0.15s;width:100%}
 .next-step-btn:hover{background:color-mix(in srgb,var(--accent) 14%,transparent);border-color:var(--accent)}
-.camp-card{background:var(--glass-bg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);border-radius:var(--glass-radius);padding:22px 20px;cursor:pointer;transition:all 0.25s cubic-bezier(0.4,0,0.2,1);text-decoration:none;display:block;color:inherit;box-shadow:var(--glass-inset),var(--glass-shadow)}
-.camp-card:hover,.camp-card:focus-visible{border-color:var(--accent);transform:translateY(-3px);box-shadow:var(--glass-inset),0 12px 40px rgba(0,0,0,0.35);background:rgba(255,255,255,0.10)}
-[data-theme="light"] .camp-card:hover{background:rgba(255,255,255,0.70)}
-.camp-card:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+[data-theme="light"] 
 
 /* ══ CAMPAIGN HEADER — Glass bar ══ */
 
@@ -207,7 +203,6 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 @keyframes bsheet-in{from{transform:translateY(100%)}to{transform:translateY(0)}}
 @keyframes bsheet-fade{from{opacity:0}to{opacity:1}}
 
-.camp-name{font-size:clamp(14px,3vw,18px);font-weight:700;color:var(--gold);letter-spacing:0.03em;line-height:1}
 
 /* ══ MAIN LAYOUT — single column, full width ══ */
 .main-layout{max-width:760px;margin:0 auto;padding:16px;position:relative;z-index:1}
@@ -215,10 +210,6 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 /* ══ TWO-TIER GENERATOR NAV ══ */
 [data-theme="light"][data-theme="light"]
 /* ══ CAMPAIGN HERO — Editorial genre + name ══ */
-.camp-hero{max-width:760px;margin:0 auto;padding:16px 20px 4px;position:relative;z-index:1}
-.camp-hero-genre{font-size:var(--text-label);font-weight:700;letter-spacing:0.12em;color:var(--accent);text-transform:uppercase;margin-bottom:4px}
-.camp-hero-name{font-size:clamp(28px,5vw,38px);font-weight:800;letter-spacing:-0.03em;line-height:1.05;color:var(--text);margin-bottom:4px}
-.camp-hero-vibes{font-size:var(--text-sm);color:var(--text-muted);font-style:italic}
 
 /* ══ ROLL HERO — Primary action button ══ */
 .roll-hero{text-align:center;padding:10px 16px 6px;position:relative;z-index:1;max-width:760px;margin:0 auto}
@@ -432,14 +423,6 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
   display:flex;align-items:center;justify-content:space-between;
   padding:16px 16px 12px;border-bottom:1px solid var(--border);flex-shrink:0
 }
-.hist-badge-btn{position:relative}
-.hist-badge{
-  position:absolute;top:-4px;right:-6px;
-  background:var(--accent);color:#fff;font-size:10px;font-weight:700;
-  min-width:18px;height:18px;border-radius:9px;
-  display:flex;align-items:center;justify-content:center;
-  padding:0 5px;line-height:1;pointer-events:none
-}
 
 /* ══ TOAST ══ */
 .toast{
@@ -534,9 +517,6 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .gm-note-text{font-size:var(--text-sm);color:var(--text-dim);font-style:italic;line-height:1.6}
 
 /* ══ CONSEQUENCE TABLE ══ */
-.consequence-table{width:100%;border-collapse:collapse;font-size:var(--text-sm)}
-.consequence-table th,.consequence-table td{border:1px solid var(--border);padding:6px 12px;text-align:left;color:var(--text-dim)}
-.consequence-table th{color:var(--text-muted);font-size:var(--text-label);letter-spacing:0.06em;text-transform:uppercase;font-weight:600}
 
 /* ══ LAYOUTS ══ */
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -655,8 +635,8 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
   .zone-card{border:0.75pt solid #bbb!important;border-radius:3pt;padding:6pt 8pt!important;background:#f8f8f8!important;page-break-inside:avoid}
   .zone-name{font-size:10.5pt!important;font-weight:700}.zone-aspect-text{font-size:9pt!important;color:#555!important}.zone-desc{font-size:9.5pt!important}
   .opp-card{border:0.75pt solid #bbb!important;border-top:2pt solid #444!important;padding:8pt 10pt!important;margin-bottom:7pt!important;background:#f9f9f9!important;page-break-inside:avoid}
-  .consequence-table,.consequence-table th,.consequence-table td{border:0.75pt solid #bbb!important;font-size:9.5pt!important}
-  .consequence-table th{background:#efefef!important;font-size:7.5pt!important}
+  
+  
   .two-col{gap:12pt!important}
   h2,h3{page-break-after:avoid}
   .stunt-row,.opp-card,.info-box,.gm-note{page-break-inside:avoid}
@@ -734,7 +714,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 
 /* ── Content panel ──────────────────────────────────────────────────────── */
 .content-panel{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
-.content-panel .camp-hero{max-width:none;padding:12px 20px 4px}
+.content-panel 
 .content-panel.content-panel .roll-hero{max-width:none;padding:8px 20px 6px}
 .content-panel .main-layout{max-width:none;padding:12px 20px 20px}
 
@@ -755,11 +735,11 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
   /* Backdrop */
   .sidebar-backdrop{display:block;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:299;animation:bsheet-fade 0.2s ease both}
   /* Content panel fills full width on mobile */
-  .content-panel .camp-hero{padding:10px 14px 2px}
+  .content-panel 
   .content-panel .roll-hero{padding:6px 14px 4px}
   .content-panel .main-layout{padding:8px 14px 20px}
   /* Camp hero condensed on mobile */
-  .camp-hero-name{font-size:clamp(22px,6vw,32px)}
+  
 }
 
 /* ── Print: hide topbar and sidebar ──────────────────────────────────────── */
@@ -779,7 +759,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 /* ══ SIDEBAR REDESIGN ════════════════════════════════════════════════════════ */
 .sidebar-divider{height:1px;background:var(--border);margin:4px 0;flex-shrink:0}
 .sidebar-group-label{font-size:var(--text-label);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);padding:8px 14px 4px;display:block}
-.sidebar-item-icon{width:20px;text-align:center;flex-shrink:0;font-size:13px}
+.sidebar-item-icon{width:20px;text-align:center;flex-shrink:0;font-size:16px}
 .sidebar-item-label{flex:1;font-size:var(--text-sm);color:var(--text-dim)}
 .sidebar-tool-btn{display:flex;align-items:center;gap:8px;width:100%;padding:12px 14px;min-height:44px;background:transparent;border:1px solid transparent;border-radius:6px;cursor:pointer;text-align:left;transition:all 0.12s;text-decoration:none}
 .sidebar-tool-btn:hover{background:var(--glass-bg);color:var(--text)}
@@ -804,7 +784,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .land-shell{min-height:100vh;display:flex;flex-direction:column;background:var(--bg)}
 /* Top nav */
 .land-topnav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:52px;background:var(--glass-bg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-bottom:1px solid var(--glass-border);box-shadow:var(--glass-shadow)}
-.land-topnav-brand{font-size:var(--text-base);font-weight:800;color:var(--accent);text-decoration:none;letter-spacing:0.02em}
+.land-topnav-brand{font-size:var(--text-sm);font-weight:400;color:var(--accent);text-decoration:none;letter-spacing:0.01em;display:flex;align-items:center}
 .land-topnav-actions{display:flex;align-items:center;gap:6px;position:relative}
 .land-topnav-btn{font-size:13px;text-decoration:none}
 .land-topnav-btn-active{color:var(--accent)!important;border-color:color-mix(in srgb,var(--accent) 40%,transparent)!important}
@@ -903,15 +883,6 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
   body::before, body::after { display: none; }
 }
 
-/* ══ DEAD CLASS REMOVAL NOTICE ══
-   The following classes were in a previous version and are no longer
-   referenced by any HTML or JS. They are kept here as tombstones
-   for one release cycle, then may be deleted:
-   .camp-card  .camp-hero  .camp-hero-genre  .camp-hero-name
-   .camp-hero-vibes  .camp-name  .consequence-table
-   .hist-badge  .hist-badge-btn  .land-camp-list
-   Review date: 2026.09.01 */
-
 /* ══ CAMPAIGN PAGE CONTENT FOOTER ══ */
 .camp-content-footer{text-align:center;padding:20px 16px 32px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--border);margin-top:auto;flex-shrink:0}
 .camp-content-footer-link{color:var(--text-muted);text-decoration:underline;opacity:0.7}
@@ -921,3 +892,36 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .land-gen-item{display:flex;flex-direction:column;padding:3px 0;gap:1px}
 .land-gen-item-name{font-size:var(--text-sm);color:var(--text-dim)}
 .land-gen-item-sub{font-size:11px;color:var(--text-muted);letter-spacing:0.01em;padding-left:18px}
+
+/* ══ UNIFIED ACTION BAR (replaces roll-hero + panel-toolbar) ══
+   Roll + Inspire are primary; Rules / Share / Pin secondary pushed right.
+   Works on desktop (row) and mobile (wraps cleanly). */
+.action-bar{
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  padding:10px 14px;border-bottom:1px solid var(--border);
+  background:rgba(255,255,255,0.02);
+}
+/* Roll button inside action-bar: fills natural width, no min-width */
+.action-bar-roll{
+  flex-shrink:0;padding:10px 24px;min-height:44px;min-width:0;
+  font-size:var(--text-base);
+}
+/* Inspire: explicit label, accent on active */
+.action-bar-inspire{
+  flex-shrink:0;min-height:44px;padding:6px 14px;
+  display:inline-flex;align-items:center;gap:5px;
+}
+.action-bar-label{font-size:var(--text-sm);font-weight:500}
+/* Contextual pills (consequence severity / party size) */
+.action-bar-ctx{font-size:11px!important;padding:3px 9px!important;min-height:0!important;border-radius:100px!important}
+/* Divider between groups */
+.action-bar-divider{width:1px;height:20px;background:var(--border);flex-shrink:0;margin:0 2px}
+/* Secondary group pushed to right */
+.action-bar-secondary{margin-left:auto;display:flex;align-items:center;gap:4px}
+/* Icon-only secondary buttons */
+.action-bar-icon{min-height:36px!important;padding:6px 8px!important;font-size:16px!important;line-height:1}
+/* Mobile: Roll takes full row, rest wraps below */
+@media(max-width:480px){
+  .action-bar-roll{flex:1;min-width:0}
+  .action-bar-secondary{margin-left:0}
+}
