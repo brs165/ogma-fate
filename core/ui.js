@@ -2601,73 +2601,17 @@ function FatePointTracker(props) {
 var LADDER_NAMES = ['','Average','Fair','Good','Great','Superb','Fantastic','Epic','Legendary'];
 
 
-// ── ResultCard — top section: name, aspects, skills ─────────────────────────
+// ── ResultCard — generator identity strip (icon + label + accent line) ──────
+// renderResult() renders the full content below this strip.
 function ResultCard(props) {
   var result = props.result;
   var gen    = props.gen;
   if (!result || !result.data) return null;
-  var d    = result.data;
-  var genId = result.genId;
-
-  // Name / title
-  var title = d.name || d.title || d.type || (gen && gen.label) || genId;
-  var sub   = d.high_concept || d.situation || d.aspect || d.core_aspect
-              || d.scene_aspect || d.goal || '';
-
-  // Aspects — normalise to [{text, type, free}]
-  var aspects = [];
-  if (d.aspects) {
-    if (Array.isArray(d.aspects)) {
-      d.aspects.forEach(function(a) {
-        if (typeof a === 'string') aspects.push({text:a, type:'ot'});
-        else if (a && a.name) aspects.push({text:a.name, type:'ot', free:!!a.free_invoke});
-      });
-    } else if (typeof d.aspects === 'object') {
-      if (d.aspects.high_concept) aspects.push({text:d.aspects.high_concept, type:'hc'});
-      if (d.aspects.trouble)      aspects.push({text:d.aspects.trouble,      type:'tr'});
-      if (d.aspects.others) {
-        d.aspects.others.forEach(function(a) { aspects.push({text:a, type:'ot'}); });
-      }
-    }
-  }
-  // For faction — add method/weakness as aspects
-  if (genId === 'faction' || genId === 'seed') {
-    if (d.method)   aspects.push({text:d.method,   type:'ot', badge:'METHOD'});
-    if (d.weakness) aspects.push({text:d.weakness, type:'tr', badge:'WEAKNESS'});
-    if (d.complication) aspects.push({text:d.complication, type:'tr', badge:'COMPLICATION'});
-    if (d.issue)    aspects.push({text:d.issue.replace(/^[^:]+:\s*/,''), type:'ot', badge:'ISSUE'});
-  }
-
-  // Skills
-  var skills = Array.isArray(d.skills) ? d.skills : [];
 
   return h('div', {className: 'result-card'},
     h('div', {className: 'result-card-gen'},
-      gen ? gen.icon + ' ' + gen.label : genId,
+      gen ? gen.icon + ' ' + gen.label : result.genId,
       h('div', {className: 'result-card-gen-line'})
-    ),
-    title && h('div', {className: 'result-card-name'}, title),
-    sub   && h('div', {className: 'result-card-sub'},  sub),
-    aspects.length > 0 && h('div', {className: 'result-card-aspects'},
-      aspects.slice(0,6).map(function(a, i) {
-        var cls = 'result-asp asp-' + (a.type || 'ot') + (a.free ? ' asp-free' : '');
-        return h('div', {key:i, className: cls},
-          h('span', {className: 'result-asp-dot'}),
-          h('div', null,
-            a.badge && h('span', {className: 'result-asp-badge'}, a.badge + ' '),
-            a.text
-          )
-        );
-      })
-    ),
-    skills.length > 0 && h('div', {className: 'result-skills'},
-      skills.slice(0,6).map(function(s, i) {
-        return h('div', {key:i, className: 'result-skill'},
-          h('span', {className: 'result-skill-r'}, '+' + s.r),
-          h('span', {className: 'result-skill-n'}, s.name),
-          h('span', {className: 'result-skill-l'}, LADDER_NAMES[s.r] || '')
-        );
-      })
     )
   );
 }
@@ -3690,6 +3634,9 @@ function CampaignApp(props) {
             h('div', {className: resultAnim ? 'result-card-appear' : ''},
               h(ResultCard, {result: result, gen: gen})
             ),
+
+            // ── Full generator content: interactive elements ─────────────────
+            result && renderResult(result.genId, result.data),
 
             // ── Inspire mode ─────────────────────────────────────────────────
             inspireMode && inspireResults.length > 0 && h('div', {className: 'inspire-wrap'},
