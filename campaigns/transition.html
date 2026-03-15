@@ -13,7 +13,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicons/apple-touch-icon.png">
   <link rel="manifest" href="../manifest.json">
   <link rel="stylesheet" href="https://unpkg.com/rpg-awesome@0.2.0/css/rpg-awesome.min.css">
-  <link rel="stylesheet" href="../assets/css/theme.css?v=26">
+  <link rel="stylesheet" href="../assets/css/theme.css?v=33">
   <style>
     .tg{max-width:680px;margin:0 auto;padding:24px 20px 80px;position:relative;z-index:1}
     .tg h1{font-size:var(--text-hero);font-weight:800;letter-spacing:-0.02em;color:var(--text);line-height:1.1;margin-bottom:10px}
@@ -55,30 +55,35 @@
     @media print{.land-topnav,.tg-toc,.tg-ft,.tg-cta{display:none!important}body{background:#fff!important;color:#111!important}.tg{max-width:100%;padding:0}.tg-s h2{color:#111!important;border-color:#ccc!important}.tg-b,.tg-b p{color:#333!important}.tg-dnd,.tg-fate,.tg-ex,.tg-tip,.tg-c{background:#f5f5f5!important;border-color:#ccc!important;backdrop-filter:none!important}}
   </style>
 </head>
+<a href="#main-content" class="skip-link">Skip to main content</a>
 <body>
-<nav class="land-topnav" role="navigation" aria-label="Site navigation">
-  <a href="../index.html" class="land-topnav-brand" aria-label="Ogma home"><span class="topbar-ogma"><strong>O</strong>n-demand <strong>G</strong>enerator for <strong>M</strong>asterful <strong>A</strong>dventures</span></a>
-  <div class="land-topnav-actions">
-      <a href="../learn.html" class="btn btn-ghost land-topnav-btn" style="font-size:13px;text-decoration:none">📖 Quick Start</a>
-      <a href="transition.html" class="btn btn-ghost land-topnav-btn land-topnav-btn-active" style="font-size:13px;text-decoration:none">⚔ D&D Guide</a>
-      <a href="sessionzero.html" class="btn btn-ghost land-topnav-btn" style="font-size:13px;text-decoration:none">🎭 Session Zero</a>
-      <a href="../about.html" class="btn btn-ghost land-topnav-btn" style="font-size:13px;text-decoration:none">About</a>
-      <button class="btn btn-ghost land-topnav-btn" onclick="window.print()" style="font-size:13px" title="Print">🖨 Print</button>
-      <button class="btn btn-icon btn-ghost" onclick="var n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var _p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');_p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p));}catch(_e){}" title="Toggle theme">◑</button>
-  
-    <button class="land-topnav-hamburger" id="topnav-hbg" aria-label="Open navigation" aria-expanded="false" aria-haspopup="true">☰</button>
-    <div class="land-topnav-dropdown" id="topnav-dd">
-        <a href="../learn.html">📖 Quick Start</a>
-        <a href="sessionzero.html">🎭 Session Zero</a>
-        <a href="../about.html">About</a>
-        <a href="../license.html">License</a>
-        <button onclick="window.print()">🖨 Print</button>
-        <button onclick="var n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var _p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');_p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p));}catch(_e){}" id="dd-theme">◑ Theme</button>
-      </div></div>
-</nav>
+<header class="land-topnav" role="banner">
+  <a href="../index.html" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
+  <div class="topbar-sep" aria-hidden="true"></div>
+  <nav class="topbar-crumb" aria-label="Breadcrumb">
+    <a href="../index.html" class="topbar-crumb-item">Home</a><span class="topbar-crumb-sep" aria-hidden="true">&#8250;</span><span class="topbar-crumb-item current" aria-current="page">D&amp;D Guide</span>
+  </nav>
+  <div class="topbar-status">
+    <a href="../learn.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">📖 Quick Start</a>
+    <a href="sessionzero.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#127917; Session Zero</a>
+    <a href="../about.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">About</a>
+    <button class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" onclick="window.print()" style="font-size:13px" title="Print">&#128424; Print</button>
+    <button class="btn btn-icon btn-ghost" onclick="(function(){var n=document.documentElement.getAttribute('data-theme')=='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var _p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}}');_p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p));}catch(_e){}this.setAttribute('aria-label',n==='dark'?'Switch to light mode':'Switch to dark mode');})()" title="Toggle theme" aria-label="Switch to dark mode" id="theme-toggle-btn">◑</button>
+    <button class="topbar-hamburger btn btn-icon btn-ghost" id="topnav-hbg-new"
+      aria-label="Open navigation" aria-expanded="false" aria-haspopup="true"
+      onclick="(function(btn){var dd=btn.nextElementSibling;var open=dd.classList.toggle('open');btn.setAttribute('aria-expanded',open);})(this)">&#9776;</button>
+    <div class="land-topnav-dropdown" id="topnav-dd-new">
+      <a href="../learn.html">📖 Quick Start</a>
+      <a href="sessionzero.html">&#127917; Session Zero</a>
+      <a href="../about.html">About</a>
+      <button onclick="window.print()">Print</button>
+      <button class="btn btn-icon btn-ghost" onclick="(function(){var n=document.documentElement.getAttribute('data-theme')=='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var _p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}}');_p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p));}catch(_e){}this.setAttribute('aria-label',n==='dark'?'Switch to light mode':'Switch to dark mode');})()" title="Toggle theme" aria-label="Switch to dark mode" id="theme-toggle-btn">◑</button>
+    </div>
+  </div>
+</header>
 <div class="tg">
 
-<h1>Coming from D&D 5e?</h1>
+<h1 id="main-content">Coming from D&D 5e?</h1>
 <p class="tg-lead">Fate Condensed isn't better or worse than D&D - it's a genuinely different kind of game. This guide covers the conceptual shifts that trip up experienced D&D players and GMs, with side-by-side comparisons and concrete examples. Read it before your first session and you'll be ahead of the curve.</p>
 
 <nav class="tg-toc">

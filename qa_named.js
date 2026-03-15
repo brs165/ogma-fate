@@ -132,6 +132,31 @@ assert('NA-09 intro desktop media query 900px', introSrc.includes('min-width:900
 assert('NA-09 intro wide media query 1400px', introSrc.includes('min-width:1400px'), '1400px wide breakpoint missing');
 assert('NA-09 intro em-based title size', introSrc.includes('1.57em'), 'title font-size not in em');
 
+
+// NA-10: Modal component — trapTab focus trap within boundary
+// UX-11: trapTab confirmed implemented; this asserts it's present and wired
+var uiSrc = fs.readFileSync('core/ui.js','utf8');
+assert('NA-10 Modal trapTab focus trap implemented', uiSrc.includes('function trapTab'), 'trapTab function missing from Modal');
+assert('NA-10 Modal trapTab addEventListener', uiSrc.includes("addEventListener('keydown', trapTab)"), 'trapTab not wired to keydown');
+assert('NA-10 Modal aria-modal attribute', uiSrc.includes("'aria-modal'"), 'aria-modal attribute missing from Modal');
+
+// NA-11: result-panel has aria-live="polite" and aria-atomic="true"
+assert('NA-11 result-panel aria-live polite', uiSrc.includes("'aria-live': 'polite'"), 'aria-live polite missing from result-panel');
+assert('NA-11 result-panel aria-atomic true', uiSrc.includes("'aria-atomic': 'true'"), 'aria-atomic true missing from result-panel');
+
+// NA-12: theme-toggle aria-label present on static pages and React components
+var staticPages = ['about.html','learn.html','license.html','campaigns/transition.html',
+  'campaigns/guide-cyberpunk.html','campaigns/guide-fantasy.html','campaigns/guide-postapoc.html',
+  'campaigns/guide-space.html','campaigns/guide-thelongafter.html','campaigns/guide-victorian.html'];
+var na12Fail = staticPages.filter(function(p) {
+  try {
+    var c = fs.readFileSync(p, 'utf8');
+    return !c.includes('aria-label') || !c.includes('Toggle theme') && !c.includes('Switch to');
+  } catch(e) { return true; }
+});
+assert('NA-12 theme-toggle aria-label on static pages', na12Fail.length === 0, 'missing on: ' + na12Fail.join(', '));
+assert('NA-12 React theme-toggle aria-label dynamic', uiSrc.includes("'Switch to light mode'") && uiSrc.includes("'Switch to dark mode'"), 'dynamic aria-label missing from React theme toggle');
+
 // Summary
 console.log('Named assertions: '+(pass+fail)+' total  pass:'+pass+'  fail:'+fail);
 results.forEach(function(r){console.log(r);});

@@ -1261,11 +1261,13 @@ function KBShortcutsModal(props) {
     ['Space', 'Roll current generator'],
     ['G',     'Cycle to next generator'],
     ['P',     'Pin current result'],
+    ['Z',     'Undo last pin'],
     ['I',     'Inspiration mode - roll 3, pick one'],
+    ['C',     'Copy result as Markdown'],
     ['?',     'Open this shortcuts panel'],
     ['Esc',   'Close any open panel or sidebar'],
   ];
-  return h(Modal, {onClose: props.onClose, ariaLabel: 'Keyboard shortcuts'},
+  return h(Modal, {onClose: props.onClose, label: 'Keyboard shortcuts'},
     h(ModalHeader, {title: 'KB Shortcuts', onClose: props.onClose}),
     h('div', {className: 'modal-body'},
       h('div', {className: 'kbd-grid', style: {marginTop: 4}},
@@ -1284,7 +1286,7 @@ function HelpModal(props) {
   var genId = props.genId;
   var hc = HELP_CONTENT[genId] || {};
 
-  return h(Modal, {onClose: props.onClose, ariaLabel: 'Help - ' + (hc.title || genId)},
+  return h(Modal, {onClose: props.onClose, label: 'Help - ' + (hc.title || genId)},
     h('div', {className: 'modal-header'},
       h('div', {className: 'modal-title'}, 'Help - ' + (hc.title || 'Generator')),
       h('button', {className: 'btn btn-icon btn-ghost', onClick: props.onClose, 'aria-label': 'Close'}, '✕')
@@ -1691,25 +1693,23 @@ function LandingApp() {
   return h('div', {className: 'land-shell'},
     h('a', {href: '#main', className: 'skip-link'}, 'Skip to main content'),
 
-    // ── Minimal top nav ────────────────────────────────────────────────
-    h('nav', {className: 'land-topnav', role: 'navigation'},
-      h('a', {href: 'index.html', className: 'land-topnav-brand', 'aria-label': 'Ogma home'},
-        h('span', {className: 'topbar-ogma'},
-          h('strong', null, 'O'), 'n-demand ',
-          h('strong', null, 'G'), 'enerator for ',
-          h('strong', null, 'M'), 'asterful ',
-          h('strong', null, 'A'), 'dventures'
-        )
+    // ── Topbar — unified chrome (wordmark + breadcrumb + nav) ────────────
+    h('header', {className: 'land-topnav topbar', role: 'banner'},
+      h('a', {href: 'index.html', className: 'topbar-wordmark', 'aria-label': 'Ogma home'}, 'OGMA'),
+      h('div', {className: 'topbar-sep', 'aria-hidden': 'true'}),
+      h('nav', {className: 'topbar-crumb', 'aria-label': 'Breadcrumb'},
+        h('span', {className: 'topbar-crumb-item current', 'aria-current': 'page'}, 'Campaign Select')
       ),
-      h('div', {className: 'land-topnav-actions'},
-        h('a', {href: 'learn.html', className: 'btn btn-ghost land-topnav-btn'}, '📖 Quick Start'),
-        h('a', {href: 'campaigns/transition.html', className: 'btn btn-ghost land-topnav-btn'}, '⚔ D&D Guide'),
-        h('a', {href: 'about.html', className: 'btn btn-ghost land-topnav-btn land-topnav-hide-sm'}, 'About'),
+      h('div', {className: 'topbar-status'},
+        h('a', {href: 'learn.html', className: 'btn btn-ghost topbar-nav-btn topbar-nav-hide-sm', style: {textDecoration: 'none'}}, '📖 Quick Start'),
+        h('a', {href: 'campaigns/transition.html', className: 'btn btn-ghost topbar-nav-btn topbar-nav-hide-sm', style: {textDecoration: 'none'}}, '⚔ D&D Guide'),
+        h('a', {href: 'about.html', className: 'btn btn-ghost topbar-nav-btn topbar-nav-hide-sm', style: {textDecoration: 'none'}}, 'About'),
         h('button', {
           className: 'btn btn-icon btn-ghost',
           onClick: toggleTheme,
           'aria-label': theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode',
           title: theme === 'dark' ? 'Light mode' : 'Dark mode',
+          style: {width: 44, height: 44},
         }, theme === 'dark' ? '☀️' : '🌙')
       )
     ),
@@ -2702,6 +2702,23 @@ function CampaignApp(props) {
   var helpLevel = _helpLvl[0]; var setHelpLevel = _helpLvl[1];
   function changeHelpLevel(lvl) { setHelpLevel(lvl); try { LS.set('help_level', lvl); } catch(e) {} }
 
+  // ── Sidebar tab state (Concept A tabbed sidebar)
+  var _sbTab = useState('gen'); var sidebarTab = _sbTab[0]; var setSidebarTab = _sbTab[1];
+  var _hlOpen = useState(false); var hlPickerOpen = _hlOpen[0]; var setHlPickerOpen = _hlOpen[1];
+
+  // ── Online/offline detection (H9)
+  var _online = useState(typeof navigator !== 'undefined' ? navigator.onLine !== false : true);
+  var isOnline = _online[0]; var setIsOnline = _online[1];
+
+  // Help level display metadata
+  var HL_META = {
+    experienced: {icon: '🎭', label: 'Experienced'},
+    new_fate:    {icon: '🎲', label: 'Other RPGs'},
+    dnd_convert: {icon: '⚔',  label: 'D&D player'},
+    new_ttrpg:   {icon: '🌱', label: 'New here'},
+  };
+  var hlMeta = HL_META[helpLevel] || HL_META['new_fate'];
+
   // First-visit Help Level onboarding prompt (ND-01/UX-02)
   // Only shown if user has never made an explicit Help Level selection.
   var _onboarding = useState(function() {
@@ -2811,6 +2828,19 @@ function CampaignApp(props) {
     return function() { obs.disconnect(); };
   }, []);
 
+
+  // ── Online/offline listener (H9) ──────────────────────────────────────────
+  useEffect(function() {
+    function goOnline()  { setIsOnline(true);  }
+    function goOffline() { setIsOnline(false); }
+    window.addEventListener('online',  goOnline);
+    window.addEventListener('offline', goOffline);
+    return function() {
+      window.removeEventListener('online',  goOnline);
+      window.removeEventListener('offline', goOffline);
+    };
+  }, []);
+
   // ND-08: Keyboard shortcuts
   useEffect(function() {
     function onKey(e) {
@@ -2852,11 +2882,29 @@ function CampaignApp(props) {
         if (!rolling) doInspire();
       } else if (e.key === '?') {
         setShowKbShortcuts(true);
+      } else if (e.key === 'z' || e.key === 'Z') {
+        // Undo last pin (H3)
+        setPinnedCards(function(prev) {
+          if (prev.length === 0) return prev;
+          setToast('Pin removed ↩');
+          return prev.slice(1);
+        });
+      } else if (e.key === 'c' || e.key === 'C') {
+        if (result) {
+          var md = toMarkdown(result.genId, result.data, camp.meta.name);
+          if (md && navigator.clipboard) {
+            navigator.clipboard.writeText(md).then(function() {
+              setToast('Copied ✓');
+            }).catch(function() {
+              setToast('Copy failed - use Share button');
+            });
+          }
+        }
       }
     }
     document.addEventListener('keydown', onKey);
     return function() { document.removeEventListener('keydown', onKey); };
-  }, [rolling, result, activeGen, showHelp, showTables, showSettings, showHistory, showSidebar, doGenerate, doInspire]);
+  }, [rolling, result, activeGen, showHelp, showTables, showSettings, showHistory, showSidebar, showKbShortcuts, doGenerate, doInspire, pinnedCards]);
 
   var totalEntries = Object.values(t).reduce(function(n, v) { return n + (Array.isArray(v) ? v.length : 0); }, 0);
 
@@ -2869,8 +2917,9 @@ function CampaignApp(props) {
     // Mobile:  sticky topbar + off-canvas drawer + full-width content
     // ════════════════════════════════════════════════════════════════
 
-    // ── Top bar - brand + campaign identity only ─────────────────────
+    // ── Top bar — unified chrome: wordmark + breadcrumb + status chips ──
     h('header', {className: 'topbar', role: 'banner'},
+      // Hamburger — 44px touch target (W2), mobile only
       h('button', {
         className: 'topbar-hamburger btn btn-icon btn-ghost',
         onClick: function() { setShowSidebar(!showSidebar); },
@@ -2878,20 +2927,54 @@ function CampaignApp(props) {
         'aria-expanded': String(showSidebar),
         title: 'Menu',
       }, showSidebar ? '✕' : '☰'),
-      h('a', {href: '../index.html', className: 'topbar-brand', 'aria-label': 'Ogma home'},
-        h('span', {className: 'topbar-ogma'},
-          h('strong', null, 'O'), 'n-demand ',
-          h('strong', null, 'G'), 'enerator for ',
-          h('strong', null, 'M'), 'asterful ',
-          h('strong', null, 'A'), 'dventures'
-        ),
-        h('span', {className: 'topbar-brand-sep'}, '·'),
-        h('span', {className: 'topbar-brand-world'},
-          camp.meta.name,
-          h('span', {className: 'topbar-genre-tag'},
-            (CAMPAIGN_INFO[campId] || {}).genre || ''
-          )
-        )
+      // OGMA wordmark — replaces full acronym (H8)
+      h('a', {href: '../index.html', className: 'topbar-wordmark', 'aria-label': 'Ogma home'}, 'OGMA'),
+      h('div', {className: 'topbar-sep', 'aria-hidden': 'true'}),
+      // Breadcrumb trail — IA3, present on every page
+      h('nav', {className: 'topbar-crumb', 'aria-label': 'Breadcrumb'},
+        h('a', {href: '../index.html', className: 'topbar-crumb-item'}, 'Home'),
+        h('span', {className: 'topbar-crumb-sep', 'aria-hidden': 'true'}, '›'),
+        h('span', {className: 'topbar-crumb-item'}, camp.meta.name),
+        h('span', {className: 'topbar-crumb-sep', 'aria-hidden': 'true'}, '›'),
+        h('span', {
+          className: 'topbar-crumb-item current',
+          'aria-current': 'page',
+        }, (GENERATORS.find(function(g) { return g.id === activeGen; }) || {}).label || activeGen)
+      ),
+      // Status zone — always visible, interactive (H1, H4, H6, H9)
+      h('div', {className: 'topbar-status'},
+        // Offline indicator (H9)
+        !isOnline && h('span', {
+          className: 'topbar-chip topbar-chip-offline',
+          role: 'status',
+          'aria-live': 'polite',
+          title: 'You are offline. Ogma is running from cached data.',
+        }, '⚡ Offline'),
+        // GM Mode chip — clickable toggle (H1, H4)
+        h('button', {
+          className: 'topbar-chip ' + (gmMode ? 'topbar-chip-gm' : 'topbar-chip-gm-off'),
+          onClick: toggleGmMode,
+          'aria-pressed': String(gmMode),
+          title: gmMode ? 'GM Mode on — click to disable coaching overlays' : 'GM Mode off — click to enable coaching overlays',
+        }, gmMode ? 'GM ON' : 'GM OFF'),
+        // Help Level chip — shows current level, opens Session tab picker (H6)
+        h('button', {
+          className: 'topbar-chip topbar-chip-hl',
+          onClick: function() {
+            setSidebarTab('sess');
+            setHlPickerOpen(true);
+            if (!showSidebar) setShowSidebar(true);
+          },
+          title: 'Help level: ' + (hlMeta.label) + ' — click to change',
+        }, hlMeta.icon + ' ' + hlMeta.label),
+        // Theme toggle
+        h('button', {
+          className: 'btn btn-icon btn-ghost',
+          onClick: toggleTheme,
+          'aria-label': theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode',
+          title: theme === 'dark' ? 'Light mode' : 'Dark mode',
+          style: {width: 44, height: 44},
+        }, h(RaIcon, {n: theme === 'dark' ? RA_ICONS.theme_light : RA_ICONS.theme_dark}))
       )
     ),
 
@@ -2904,30 +2987,118 @@ function CampaignApp(props) {
         'aria-hidden': 'true',
       }),
 
-      // ── Sidebar ─────────────────────────────────────────────────────
+      // ── Sidebar — Concept A: tabbed Generate / Session ──────────────────
       h('nav', {
         ref: sidebarRef,
         className: 'sidebar' + (showSidebar ? ' sidebar-open' : ''),
         'aria-label': 'Generators and tools',
       },
 
-        // ── GM Mode + FP + History ───────────────────────────────────
-        h('div', {className: 'sidebar-section'},
+        // Visually-hidden ARIA live region — announces tab name on switch (W7, H1)
+        h('div', {className: 'sidebar-aria-live', 'aria-live': 'polite', 'aria-atomic': 'true', id: 'sb-tab-announce', role: 'status'}),
+
+        // ── Tab bar ─────────────────────────────────────────────────
+        h('div', {className: 'sidebar-tab-bar', role: 'tablist'},
           h('button', {
-            className: 'sidebar-tool-btn sidebar-gm-mode-btn' + (gmMode ? ' active' : ''),
-            onClick: toggleGmMode,
-            'aria-pressed': String(gmMode),
-            title: 'Toggle GM Mode',
-          },
-            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.gm_mode})),
-            h('span', {className: 'sidebar-item-label'}, 'GM Mode'),
-            h('span', {className: 'sidebar-gm-badge'}, gmMode ? 'ON' : 'OFF')
-          )
+            className: 'sidebar-tab-btn' + (sidebarTab === 'gen' ? ' active' : ''),
+            onClick: function() {
+              setSidebarTab('gen');
+              var el = document.getElementById('sb-tab-announce');
+              if (el) el.textContent = 'Generate tab';
+            },
+            role: 'tab',
+            'aria-selected': String(sidebarTab === 'gen'),
+            'aria-controls': 'sb-panel-gen',
+          }, 'Generate'),
+          h('button', {
+            className: 'sidebar-tab-btn' + (sidebarTab === 'sess' ? ' active' : ''),
+            onClick: function() {
+              setSidebarTab('sess');
+              var el = document.getElementById('sb-tab-announce');
+              if (el) el.textContent = 'Session tab';
+            },
+            role: 'tab',
+            'aria-selected': String(sidebarTab === 'sess'),
+            'aria-controls': 'sb-panel-sess',
+          }, 'Session')
         ),
 
-        h('div', {className: 'sidebar-divider'}),
+        // ══════════════════════════════════════════════════════════
+        // GENERATE PANEL — 16 generators in 4 groups
+        // ══════════════════════════════════════════════════════════
+        h('div', {
+          id: 'sb-panel-gen',
+          className: 'sidebar-panel' + (sidebarTab === 'gen' ? ' active' : ''),
+          role: 'tabpanel',
+          'aria-label': 'Generator list',
+        },
+          h('div', {className: 'sidebar-group-label'}, 'Characters'),
+          ['npc_minor','npc_major','backstory'].map(function(gid) {
+            var g = GENERATORS.find(function(x) { return x.id === gid; });
+            if (!g) return null;
+            return h('button', {
+              key: gid,
+              className: 'sidebar-gen-item' + (activeGen === gid ? ' active' : ''),
+              onClick: function() { selectGen(gid); setShowSidebar(false); },
+            },
+              h('span', {className: 'sidebar-item-icon'}, RA_ICONS[gid] ? h(RaIcon, {n: RA_ICONS[gid]}) : g.icon),
+              h('span', {className: 'sidebar-item-label'}, g.label)
+            );
+          }),
+          h('div', {className: 'sidebar-group-label'}, 'Scenes'),
+          ['scene','encounter','complication'].map(function(gid) {
+            var g = GENERATORS.find(function(x) { return x.id === gid; });
+            if (!g) return null;
+            return h('button', {
+              key: gid,
+              className: 'sidebar-gen-item' + (activeGen === gid ? ' active' : ''),
+              onClick: function() { selectGen(gid); setShowSidebar(false); },
+            },
+              h('span', {className: 'sidebar-item-icon'}, RA_ICONS[gid] ? h(RaIcon, {n: RA_ICONS[gid]}) : g.icon),
+              h('span', {className: 'sidebar-item-label'}, g.label)
+            );
+          }),
+          h('div', {className: 'sidebar-group-label'}, 'Pacing'),
+          ['challenge','contest','obstacle','countdown','constraint'].map(function(gid) {
+            var g = GENERATORS.find(function(x) { return x.id === gid; });
+            if (!g) return null;
+            return h('button', {
+              key: gid,
+              className: 'sidebar-gen-item' + (activeGen === gid ? ' active' : ''),
+              onClick: function() { selectGen(gid); setShowSidebar(false); },
+            },
+              h('span', {className: 'sidebar-item-icon'}, RA_ICONS[gid] ? h(RaIcon, {n: RA_ICONS[gid]}) : g.icon),
+              h('span', {className: 'sidebar-item-label'}, g.label)
+            );
+          }),
+          h('div', {className: 'sidebar-group-label'}, 'World'),
+          ['campaign','seed','faction','compel','consequence'].map(function(gid) {
+            var g = GENERATORS.find(function(x) { return x.id === gid; });
+            if (!g) return null;
+            return h('button', {
+              key: gid,
+              className: 'sidebar-gen-item' + (activeGen === gid ? ' active' : ''),
+              onClick: function() { selectGen(gid); setShowSidebar(false); },
+            },
+              h('span', {className: 'sidebar-item-icon'}, RA_ICONS[gid] ? h(RaIcon, {n: RA_ICONS[gid]}) : g.icon),
+              h('span', {className: 'sidebar-item-label'}, g.label)
+            );
+          }),
+          h('div', {style: {height: 8, flexShrink: 0}})
+        ),
 
-        h('div', {className: 'sidebar-section'},
+        // ══════════════════════════════════════════════════════════
+        // SESSION PANEL — at-table tools + GM Mode/Help Level + nav
+        // ══════════════════════════════════════════════════════════
+        h('div', {
+          id: 'sb-panel-sess',
+          className: 'sidebar-panel' + (sidebarTab === 'sess' ? ' active' : ''),
+          role: 'tabpanel',
+          'aria-label': 'Session tools and settings',
+        },
+
+          // ── At the table ──────────────────────────────────────
+          h('div', {className: 'sidebar-group-label'}, 'At the table'),
           h('button', {
             className: 'sidebar-tool-btn' + (showFP ? ' active' : ''),
             onClick: function() { setShowFP(!showFP); setShowSidebar(false); },
@@ -2945,96 +3116,75 @@ function CampaignApp(props) {
             h('span', {className: 'sidebar-item-label'},
               pinnedCards.length > 0 ? 'History · ' + pinnedCards.length + ' pinned' : 'History'
             )
-          )
-        ),
-
-        h('div', {className: 'sidebar-divider'}),
-
-        // ── Characters ───────────────────────────────────────────────
-        h('div', {className: 'sidebar-section'},
-          h('div', {className: 'sidebar-group-label'}, 'Characters'),
-          ['npc_minor','npc_major','backstory'].map(function(gid) {
-            var g = GENERATORS.find(function(x) { return x.id === gid; });
-            if (!g) return null;
-            return h('button', {
-              key: gid,
-              className: 'sidebar-gen-item' + (activeGen === gid ? ' active' : ''),
-              onClick: function() { selectGen(gid); setShowSidebar(false); },
-            },
-              h('span', {className: 'sidebar-item-icon'}, RA_ICONS[gid] ? h(RaIcon, {n: RA_ICONS[gid]}) : g.icon),
-              h('span', {className: 'sidebar-item-label'}, g.label)
-            );
-          })
-        ),
-
-        h('div', {className: 'sidebar-divider'}),
-
-        // -- Scenes -----------------------------------------------------
-        h('div', {className: 'sidebar-section'},
-          h('div', {className: 'sidebar-group-label'}, 'Scenes'),
-          ['scene','encounter','complication'].map(function(gid) {
-            var g = GENERATORS.find(function(x) { return x.id === gid; });
-            if (!g) return null;
-            return h('button', {
-              key: gid,
-              className: 'sidebar-gen-item' + (activeGen === gid ? ' active' : ''),
-              onClick: function() { selectGen(gid); setShowSidebar(false); },
-            },
-              h('span', {className: 'sidebar-item-icon'}, RA_ICONS[gid] ? h(RaIcon, {n: RA_ICONS[gid]}) : g.icon),
-              h('span', {className: 'sidebar-item-label'}, g.label)
-            );
-          })
-        ),
-
-        h('div', {className: 'sidebar-divider'}),
-
-        // -- Pacing -----------------------------------------------------
-        h('div', {className: 'sidebar-section'},
-          h('div', {className: 'sidebar-group-label'}, 'Pacing'),
-          ['challenge','contest','obstacle','countdown','constraint'].map(function(gid) {
-            var g = GENERATORS.find(function(x) { return x.id === gid; });
-            if (!g) return null;
-            return h('button', {
-              key: gid,
-              className: 'sidebar-gen-item' + (activeGen === gid ? ' active' : ''),
-              onClick: function() { selectGen(gid); setShowSidebar(false); },
-            },
-              h('span', {className: 'sidebar-item-icon'}, RA_ICONS[gid] ? h(RaIcon, {n: RA_ICONS[gid]}) : g.icon),
-              h('span', {className: 'sidebar-item-label'}, g.label)
-            );
-          })
-        ),
-
-        h('div', {className: 'sidebar-divider'}),
-
-        // -- World ------------------------------------------------------
-        h('div', {className: 'sidebar-section'},
-          h('div', {className: 'sidebar-group-label'}, 'World'),
-          h('a', {
-            href: '../campaigns/guide-' + campId + '.html',
-            className: 'sidebar-gen-item',
-          },
-            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.guide})),
-            h('span', {className: 'sidebar-item-label'}, 'Campaign Guide')
           ),
-          ['campaign','seed','faction','compel','consequence'].map(function(gid) {
-            var g = GENERATORS.find(function(x) { return x.id === gid; });
-            if (!g) return null;
-            return h('button', {
-              key: gid,
-              className: 'sidebar-gen-item' + (activeGen === gid ? ' active' : ''),
-              onClick: function() { selectGen(gid); setShowSidebar(false); },
+
+          h('div', {className: 'sidebar-divider'}),
+
+          // ── GM Mode + Help Level (Variant 2 from mocks) ───────
+          h('div', {className: 'gm-sidebar-block'},
+            h('div', {className: 'gm-sidebar-main'},
+              h('div', {className: 'gm-sidebar-left'},
+                h('div', {className: 'gm-sidebar-title'}, 'GM Mode'),
+                gmMode && h('div', {className: 'gm-sidebar-subrow'},
+                  h('span', {className: 'gm-sidebar-sublabel'}, 'Help level:'),
+                  h('button', {
+                    className: 'hl-sb-pill',
+                    onClick: function() { setHlPickerOpen(!hlPickerOpen); },
+                    'aria-expanded': String(hlPickerOpen),
+                    'aria-controls': 'hl-sb-drawer',
+                  },
+                    h('span', {'aria-hidden': 'true'}, hlMeta.icon),
+                    ' ', hlMeta.label,
+                    h('span', {className: 'hl-sb-caret' + (hlPickerOpen ? ' open' : ''), 'aria-hidden': 'true'}, '▾')
+                  )
+                ),
+                !gmMode && h('div', {className: 'gm-sidebar-off-note'}, 'Help level saved — still affects inline cards.')
+              ),
+              h('button', {
+                className: 'sidebar-tog-wrap',
+                onClick: toggleGmMode,
+                'aria-pressed': String(gmMode),
+                'aria-label': gmMode ? 'Disable GM Mode' : 'Enable GM Mode',
+                title: 'Toggle GM Mode',
+              },
+                h(ToggleSwitch, {value: gmMode, label: '', onToggle: toggleGmMode})
+              )
+            ),
+            h('div', {
+              id: 'hl-sb-drawer',
+              className: 'hl-sb-drawer' + (hlPickerOpen && gmMode ? ' open' : ' closed'),
+              'aria-hidden': String(!(hlPickerOpen && gmMode)),
             },
-              h('span', {className: 'sidebar-item-icon'}, RA_ICONS[gid] ? h(RaIcon, {n: RA_ICONS[gid]}) : g.icon),
-              h('span', {className: 'sidebar-item-label'}, g.label)
-            );
-          })
-        ),
+              h('div', {className: 'hl-sb-inner'},
+                [
+                  {id: 'experienced', icon: '🎭', label: 'I know Fate well',        sub: 'Minimal help — just the output'},
+                  {id: 'new_fate',    icon: '🎲', label: 'I play other RPGs',        sub: 'Fate mechanics, no jargon'},
+                  {id: 'dnd_convert', icon: '⚔',  label: 'I play D&D / Pathfinder',  sub: 'Rules + D&D comparison notes'},
+                  {id: 'new_ttrpg',   icon: '🌱', label: 'New to tabletop RPGs',      sub: 'Gentle intro from scratch'},
+                ].map(function(opt) {
+                  return h('button', {
+                    key: opt.id,
+                    className: 'hl-sb-opt' + (helpLevel === opt.id ? ' selected' : ''),
+                    onClick: function() {
+                      changeHelpLevel(opt.id);
+                      setHlPickerOpen(false);
+                    },
+                    'aria-pressed': String(helpLevel === opt.id),
+                  },
+                    h('span', {className: 'hl-sb-icon', 'aria-hidden': 'true'}, opt.icon),
+                    h('div', null,
+                      h('div', {className: 'hl-sb-name'}, opt.label),
+                      h('div', {className: 'hl-sb-sub'}, opt.sub)
+                    )
+                  );
+                })
+              )
+            )
+          ),
 
-        h('div', {className: 'sidebar-divider'}),
-
-        // ── Settings row ─────────────────────────────────────────────
-        h('div', {className: 'sidebar-section sidebar-settings-row'},
+          // ── Settings ──────────────────────────────────────────
+          h('div', {className: 'sidebar-divider'}),
+          h('div', {className: 'sidebar-group-label'}, 'Settings'),
           h('button', {
             className: 'sidebar-tool-btn',
             onClick: function() { setShowTables(true); setShowSidebar(false); },
@@ -3052,17 +3202,15 @@ function CampaignApp(props) {
           h('button', {
             className: 'sidebar-tool-btn',
             onClick: toggleTheme,
+            'aria-label': theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode',
           },
             h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: theme === 'dark' ? RA_ICONS.theme_light : RA_ICONS.theme_dark})),
-            h('span', {className: 'sidebar-item-label'}, theme === 'dark' ? 'Light' : 'Dark')
-          )
-        ),
+            h('span', {className: 'sidebar-item-label'}, theme === 'dark' ? 'Light mode' : 'Dark mode')
+          ),
 
-        h('div', {className: 'sidebar-divider'}),
-
-        // ── Help ─────────────────────────────────────────────────────
-        h('div', {className: 'sidebar-section'},
-          h('div', {className: 'sidebar-group-label'}, 'Help'),
+          // ── Navigate ──────────────────────────────────────────
+          h('div', {className: 'sidebar-divider'}),
+          h('div', {className: 'sidebar-group-label'}, 'Navigate'),
           h('button', {
             className: 'sidebar-tool-btn',
             onClick: function() { setShowSidebar(false); setTimeout(function() { if (window.fateReplayIntro) window.fateReplayIntro(); }, TIMING.INTRO_REPLAY_MS); },
@@ -3086,6 +3234,10 @@ function CampaignApp(props) {
             h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.dnd_guide})),
             h('span', {className: 'sidebar-item-label'}, 'D&D Guide')
           ),
+          h('a', {href: '../campaigns/sessionzero.html', className: 'sidebar-tool-btn'},
+            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.learn || 'player'})),
+            h('span', {className: 'sidebar-item-label'}, 'Session Zero')
+          ),
           h('a', {href: '../learn.html', className: 'sidebar-tool-btn'},
             h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.learn})),
             h('span', {className: 'sidebar-item-label'}, 'Quick Start')
@@ -3093,30 +3245,18 @@ function CampaignApp(props) {
           h('a', {href: '../index.html', className: 'sidebar-tool-btn'},
             h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.home})),
             h('span', {className: 'sidebar-item-label'}, 'Home')
-          )
-        ),
-
-        h('div', {className: 'sidebar-divider'}),
-
-        // ── About ────────────────────────────────────────────────────
-        h('div', {className: 'sidebar-section'},
-          h('div', {className: 'sidebar-group-label'}, 'About'),
+          ),
           h('a', {href: '../about.html', className: 'sidebar-tool-btn'},
             h('span', {className: 'sidebar-item-icon'}, 'ℹ'),
-            h('span', {className: 'sidebar-item-label'}, 'Ogma')
+            h('span', {className: 'sidebar-item-label'}, 'About')
           ),
-          h('a', {href: '../license.html', className: 'sidebar-tool-btn'},
-            h('span', {className: 'sidebar-item-icon'}, '⚖'),
-            h('span', {className: 'sidebar-item-label'}, 'License')
-          )
-        ),
 
-        // ── Legal footer ─────────────────────────────────────────────
-        h('div', {className: 'sidebar-legal'},
-          'Fate™ is a trademark of Evil Hat Productions, LLC.',
-          h('br', null),
-          h('a', {href: '../license.html', style: {color: 'inherit', textDecoration: 'underline', opacity: 0.7}},
-            'License & Attribution (CC BY 3.0)')
+          h('div', {className: 'sidebar-legal'},
+            'Fate™ is a trademark of Evil Hat Productions, LLC.',
+            h('br', null),
+            h('a', {href: '../license.html', style: {color: 'inherit', textDecoration: 'underline', opacity: 0.7}},
+              'License & Attribution (CC BY 3.0)')
+          )
         )
       ),
 
@@ -3130,7 +3270,7 @@ function CampaignApp(props) {
           h('div', {className: 'main-layout'},
 
         // Result panel
-        h('div', {id: 'result-panel', role: 'region', 'aria-label': 'Generated result', 'aria-live': 'polite'},
+        h('div', {id: 'result-panel', role: 'region', 'aria-label': result ? 'Generated ' + gen.label + ' result' : 'Ready to generate ' + gen.label, 'aria-live': 'polite', 'aria-atomic': 'true'},
           h('div', {className: 'result-panel', style: {padding: 0, overflow: 'hidden'}},
 
             // ── Unified action bar: Roll + Inspire + contextual + secondary ──
@@ -3210,8 +3350,33 @@ function CampaignApp(props) {
                   className: 'btn btn-ghost action-bar-icon',
                   onClick: pinResult,
                   title: 'Pin result [P]',
-                  'aria-label': 'Pin result',
-                }, h(RaIcon, {n: RA_ICONS.pin}))
+                  'aria-label': pinnedCards.length > 0
+                    ? 'Pin result (' + pinnedCards.length + ' pinned)'
+                    : 'Pin result',
+                  style: {position: 'relative'},
+                },
+                  h(RaIcon, {n: RA_ICONS.pin}),
+                  pinnedCards.length > 0 && h('span', {
+                    'aria-hidden': 'true',
+                    style: {
+                      position: 'absolute', top: 1, right: 1,
+                      width: 14, height: 14, borderRadius: '50%',
+                      background: 'var(--accent)', color: '#fff',
+                      fontSize: 9, fontWeight: 700,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      lineHeight: 1, pointerEvents: 'none',
+                    },
+                  }, pinnedCards.length > 9 ? '9+' : String(pinnedCards.length))
+                ),
+                pinnedCards.length > 0 && h('button', {
+                  className: 'btn btn-ghost action-bar-secondary-export',
+                  onClick: function() { setShowHistory(true); },
+                  title: 'Export ' + pinnedCards.length + ' pinned result' + (pinnedCards.length === 1 ? '' : 's'),
+                  'aria-label': 'Export pinned results',
+                  style: {fontSize: 'var(--text-sm)', padding: '6px 10px', minHeight: 36},
+                },
+                  h(RaIcon, {n: 'archive'}), ' Export Pinned'
+                )
               )
             ),
 

@@ -9,7 +9,7 @@
   <meta name="description" content="About Ogma - how it was built, what's inside, and how to use it offline.">
   <link rel="icon" type="image/svg+xml" href="assets/favicons/icon.svg">
   <link rel="stylesheet" href="https://unpkg.com/rpg-awesome@0.2.0/css/rpg-awesome.min.css">
-  <link rel="stylesheet" href="assets/css/theme.css?v=26">
+  <link rel="stylesheet" href="assets/css/theme.css?v=33">
   <style>
     .about{max-width:680px;margin:0 auto;padding:24px 20px 80px;position:relative;z-index:1}
     .about h1{font-size:var(--text-hero);font-weight:800;color:var(--text);margin-bottom:8px;letter-spacing:-0.02em}
@@ -38,34 +38,41 @@
     @media print{.land-topnav,.about-ft{display:none!important}body{background:#fff!important;color:#111!important}}
   </style>
 </head>
+<a href="#main-content" class="skip-link">Skip to main content</a>
 <body>
-<nav class="land-topnav" role="navigation" aria-label="Site navigation">
-  <a href="index.html" class="land-topnav-brand" aria-label="Ogma home"><span class="topbar-ogma"><strong>O</strong>n-demand <strong>G</strong>enerator for <strong>M</strong>asterful <strong>A</strong>dventures</span></a>
-  <div class="land-topnav-actions">
-      <a href="learn.html" class="btn btn-ghost land-topnav-btn" style="font-size:13px;text-decoration:none">📖 Quick Start</a>
-      <a href="campaigns/transition.html" class="btn btn-ghost land-topnav-btn" style="font-size:13px;text-decoration:none">⚔ D&D Guide</a>
-      <a href="campaigns/sessionzero.html" class="btn btn-ghost land-topnav-btn" style="font-size:13px;text-decoration:none">🎭 Session Zero</a>
-      <a href="about.html" class="btn btn-ghost land-topnav-btn land-topnav-btn-active" style="font-size:13px;text-decoration:none">About</a>
-      <button class="btn btn-icon btn-ghost" onclick="var n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var _p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');_p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p));}catch(_e){}" title="Toggle theme">◑</button>
-  
-    <button class="land-topnav-hamburger" id="topnav-hbg" aria-label="Open navigation" aria-expanded="false" aria-haspopup="true">☰</button>
-    <div class="land-topnav-dropdown" id="topnav-dd">
-        <a href="learn.html">📖 Quick Start</a>
-        <a href="campaigns/transition.html">⚔ D&D Guide</a>
-        <a href="campaigns/sessionzero.html">🎭 Session Zero</a>
-        <a href="license.html">License</a>
-        <button onclick="var n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var _p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');_p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p));}catch(_e){}" id="dd-theme">◑ Theme</button>
-      </div></div>
-</nav>
+<header class="land-topnav" role="banner">
+  <a href="index.html" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
+  <div class="topbar-sep" aria-hidden="true"></div>
+  <nav class="topbar-crumb" aria-label="Breadcrumb">
+    <a href="index.html" class="topbar-crumb-item">Home</a><span class="topbar-crumb-sep" aria-hidden="true">&#8250;</span><span class="topbar-crumb-item current" aria-current="page">About</span>
+  </nav>
+  <div class="topbar-status">
+    <a href="learn.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">📖 Quick Start</a>
+    <a href="campaigns/transition.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#9876; D&D Guide</a>
+    <a href="campaigns/sessionzero.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#127917; Session Zero</a>
+    <a href="about.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">About</a>
+    <button class="btn btn-icon btn-ghost" onclick="(function(){var n=document.documentElement.getAttribute('data-theme')=='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var _p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}}');_p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p));}catch(_e){}this.setAttribute('aria-label',n==='dark'?'Switch to light mode':'Switch to dark mode');})()" title="Toggle theme" aria-label="Switch to dark mode" id="theme-toggle-btn">◑</button>
+    <button class="topbar-hamburger btn btn-icon btn-ghost" id="topnav-hbg-new"
+      aria-label="Open navigation" aria-expanded="false" aria-haspopup="true"
+      onclick="(function(btn){var dd=btn.nextElementSibling;var open=dd.classList.toggle('open');btn.setAttribute('aria-expanded',open);})(this)">&#9776;</button>
+    <div class="land-topnav-dropdown" id="topnav-dd-new">
+      <a href="learn.html">📖 Quick Start</a>
+      <a href="campaigns/transition.html">&#9876; D&D Guide</a>
+      <a href="campaigns/sessionzero.html">&#127917; Session Zero</a>
+      <a href="about.html">About</a>
+      <button class="btn btn-icon btn-ghost" onclick="(function(){var n=document.documentElement.getAttribute('data-theme')=='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var _p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}}');_p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p));}catch(_e){}this.setAttribute('aria-label',n==='dark'?'Switch to light mode':'Switch to dark mode');})()" title="Toggle theme" aria-label="Switch to dark mode" id="theme-toggle-btn">◑</button>
+    </div>
+  </div>
+</header>
 
 <div class="about">
-<h1>About Ogma</h1>
+<h1 id="main-content">About Ogma</h1>
 
 <div class="about-version" role="status" aria-label="Suite version information">
-  <span class="about-version-badge">2026.03.26</span>
+  <span class="about-version-badge">2026.03.33</span>
   <div class="about-version-meta">
     <strong style="color:var(--text)">Ogma - A Fate Condensed Generator Suite</strong><br>
-    March 2026 · Cache: <code>fate-generator-2026.03.26</code> · 16 generators · 6 campaign worlds · 9,750+ table entries
+    March 2026 · Cache: <code>fate-generator-2026.03.33</code> · 16 generators · 6 campaign worlds · 9,750+ table entries
   </div>
   <div class="about-version-qa">✓ 96/96 smoke · 19,200 stress · 19 named assertions · toMarkdown 96/96</div>
 </div>
@@ -96,11 +103,11 @@
 <p><strong>Option 1 - Install as a PWA.</strong> Visit the site in Chrome or Edge, then use the browser's install option (address bar or menu → "Install Fate Condensed Generator"). The app installs to your device and runs from the home screen with no internet required.</p>
 <p><strong>Option 2 - Download the zip.</strong> Download the complete suite as a standalone zip, unzip it anywhere, and open <code>index.html</code> directly in your browser. No server required. Works on any machine, no installation needed.</p>
 <div class="about-card" style="text-align:center;padding:24px;">
-  <div style="font-size:var(--text-base);font-weight:700;color:var(--text);margin-bottom:6px;">Download for Offline Use</div>
+  <div id="download" style="font-size:var(--text-base);font-weight:700;color:var(--text);margin-bottom:6px;">Download for Offline Use</div>
   <div style="font-size:var(--text-sm);color:var(--text-dim);line-height:1.6;margin-bottom:16px;max-width:400px;margin-left:auto;margin-right:auto;">Complete suite · No internet required · Works from USB or local folder</div>
-  <a href="fate-generator-2026.03.26.zip" download
+  <a href="fate-generator-2026.03.33.zip" download
      style="display:inline-block;padding:12px 32px;background:var(--accent,#d4a832);color:#000;font-weight:700;font-size:var(--text-sm);border-radius:100px;text-decoration:none;letter-spacing:0.02em;">
-    ⬇ Download fate-generator-2026.03.26.zip
+    ⬇ Download fate-generator-2026.03.33.zip
   </a>
   <div style="font-size:var(--text-label);color:var(--text-muted);margin-top:10px;">2026.03.13 · 6 worlds · 16 generators · ~500 KB</div>
 </div>

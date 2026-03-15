@@ -36,25 +36,37 @@
   <meta name="twitter:image" content="https://brs165.github.io/ogma-fate/assets/img/og-default.png">
 
   <link rel="stylesheet" href="https://unpkg.com/rpg-awesome@0.2.0/css/rpg-awesome.min.css">
-  <link rel="stylesheet" href="../assets/css/theme.css?v=26">
+  <link rel="stylesheet" href="../assets/css/theme.css?v=33">
 </head>
 <body>
-  <div id="root">
+  <a href="#main" class="skip-link">Skip to main content</a>
+    <div id="root">
     <noscript>
-      <p style="padding:40px;text-align:center;font-family:sans-serif;">
-        JavaScript is required. <a href="../index.html">Return to campaign list.</a>
-        · <a href="../license.html">License &amp; Attribution</a>
-      </p>
+      <header style="background:#1a1a2e;border-bottom:1px solid #333;padding:12px 20px">
+        <strong style="font-size:16px;color:#c47b0a">Ogma</strong>
+      </header>
+      <main id="noscript-main" style="max-width:560px;margin:40px auto;padding:0 20px;font-family:sans-serif;color:#ddd">
+        <h1 style="font-size:20px;margin-bottom:8px">JavaScript Required</h1>
+        <p style="color:#aaa;margin-bottom:16px">This campaign generator requires JavaScript. Enable it and reload.</p>
+        <nav aria-label="Available resources">
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px">
+            <li><a href="../index.html" style="color:#c47b0a">← Back to campaign list</a></li>
+            <li><a href="../learn.html" style="color:#c47b0a">📖 Quick Start Guide</a></li>
+            <li><a href="../about.html#download" style="color:#c47b0a">⬇ Download offline ZIP</a></li>
+            <li><a href="../license.html" style="color:#c47b0a">License &amp; Attribution</a></li>
+          </ul>
+        </nav>
+      </main>
     </noscript>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
-  <script src="../data/shared.js?v=26"></script>
-  <script src="../data/universal.js?v=26"></script>
-  <script src="../data/space.js?v=26"></script>
-  <script src="../core/engine.js?v=26"></script>
-  <script src="../core/db.js?v=26"></script>
-  <script src="../core/ui.js?v=26"></script>
+  <script src="../data/shared.js?v=33"></script>
+  <script src="../data/universal.js?v=33"></script>
+  <script src="../data/space.js?v=33"></script>
+  <script src="../core/engine.js?v=33"></script>
+  <script src="../core/db.js?v=33"></script>
+  <script src="../core/ui.js?v=33"></script>
   <script>
 
     ReactDOM.createRoot(document.getElementById('root')).render(
@@ -71,6 +83,6 @@
       });
     }
   </script>
-  <script src="../core/intro.js?v=26"></script>
+  <script src="../core/intro.js?v=33"></script>
 </body>
 </html>

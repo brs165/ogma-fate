@@ -9,7 +9,7 @@
   <meta name="description" content="Quick-Start Guide for Fate Condensed. Paths for complete beginners, D&D players, experienced RPG players, and GMs ready to run masterful sessions.">
   <link rel="icon" type="image/svg+xml" href="assets/favicons/icon.svg">
   <link rel="stylesheet" href="https://unpkg.com/rpg-awesome@0.2.0/css/rpg-awesome.min.css">
-  <link rel="stylesheet" href="assets/css/theme.css?v=26">
+  <link rel="stylesheet" href="assets/css/theme.css?v=33">
   <style>
     .ln{max-width:700px;margin:0 auto;padding:24px 20px 80px;position:relative;z-index:1}
     .ln h1{font-size:var(--text-hero);font-weight:800;color:var(--text);margin-bottom:6px;letter-spacing:-0.02em}
@@ -55,30 +55,37 @@
     @media print{.land-topnav,.ln-ft,.ln-prompt-copy{display:none!important}body{background:#fff!important;color:#111!important}}
   </style>
 </head>
+<a href="#main-content" class="skip-link">Skip to main content</a>
 <body>
-<nav class="land-topnav" role="navigation" aria-label="Site navigation">
-  <a href="index.html" class="land-topnav-brand" aria-label="Ogma home"><span class="topbar-ogma"><strong>O</strong>n-demand <strong>G</strong>enerator for <strong>M</strong>asterful <strong>A</strong>dventures</span></a>
-  <div class="land-topnav-actions">
-      <a href="learn.html" class="btn btn-ghost land-topnav-btn land-topnav-btn-active" style="font-size:13px;text-decoration:none">📖 Quick Start</a>
-      <a href="campaigns/transition.html" class="btn btn-ghost land-topnav-btn" style="font-size:13px;text-decoration:none">⚔ D&D Guide</a>
-      <a href="campaigns/sessionzero.html" class="btn btn-ghost land-topnav-btn" style="font-size:13px;text-decoration:none">🎭 Session Zero</a>
-      <a href="about.html" class="btn btn-ghost land-topnav-btn" style="font-size:13px;text-decoration:none">About</a>
-      <button class="btn btn-ghost land-topnav-btn" onclick="window.print()" style="font-size:13px" title="Print">🖨 Print</button>
-      <button class="btn btn-icon btn-ghost" onclick="var n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var _p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');_p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p));}catch(_e){}" title="Toggle theme">◑</button>
-  
-    <button class="land-topnav-hamburger" id="topnav-hbg" aria-label="Open navigation" aria-expanded="false" aria-haspopup="true">☰</button>
-    <div class="land-topnav-dropdown" id="topnav-dd">
-        <a href="campaigns/transition.html">⚔ D&D Guide</a>
-        <a href="campaigns/sessionzero.html">🎭 Session Zero</a>
-        <a href="about.html">About</a>
-        <a href="license.html">License</a>
-        <button onclick="window.print()">🖨 Print</button>
-        <button onclick="var n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var _p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');_p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p));}catch(_e){}" id="dd-theme">◑ Theme</button>
-      </div></div>
-</nav>
+<header class="land-topnav" role="banner">
+  <a href="index.html" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
+  <div class="topbar-sep" aria-hidden="true"></div>
+  <nav class="topbar-crumb" aria-label="Breadcrumb">
+    <a href="index.html" class="topbar-crumb-item">Home</a><span class="topbar-crumb-sep" aria-hidden="true">&#8250;</span><span class="topbar-crumb-item current" aria-current="page">Quick Start</span>
+  </nav>
+  <div class="topbar-status">
+    <a href="learn.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">📖 Quick Start</a>
+    <a href="campaigns/transition.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#9876; D&D Guide</a>
+    <a href="campaigns/sessionzero.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#127917; Session Zero</a>
+    <a href="about.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">About</a>
+    <button class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" onclick="window.print()" style="font-size:13px" title="Print">&#128424; Print</button>
+    <button class="btn btn-icon btn-ghost" onclick="(function(){var n=document.documentElement.getAttribute('data-theme')=='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var _p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}}');_p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p));}catch(_e){}this.setAttribute('aria-label',n==='dark'?'Switch to light mode':'Switch to dark mode');})()" title="Toggle theme" aria-label="Switch to dark mode" id="theme-toggle-btn">◑</button>
+    <button class="topbar-hamburger btn btn-icon btn-ghost" id="topnav-hbg-new"
+      aria-label="Open navigation" aria-expanded="false" aria-haspopup="true"
+      onclick="(function(btn){var dd=btn.nextElementSibling;var open=dd.classList.toggle('open');btn.setAttribute('aria-expanded',open);})(this)">&#9776;</button>
+    <div class="land-topnav-dropdown" id="topnav-dd-new">
+      <a href="learn.html">📖 Quick Start</a>
+      <a href="campaigns/transition.html">&#9876; D&D Guide</a>
+      <a href="campaigns/sessionzero.html">&#127917; Session Zero</a>
+      <a href="about.html">About</a>
+      <button onclick="window.print()">Print</button>
+      <button class="btn btn-icon btn-ghost" onclick="(function(){var n=document.documentElement.getAttribute('data-theme')=='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var _p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}}');_p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p));}catch(_e){}this.setAttribute('aria-label',n==='dark'?'Switch to light mode':'Switch to dark mode');})()" title="Toggle theme" aria-label="Switch to dark mode" id="theme-toggle-btn">◑</button>
+    </div>
+  </div>
+</header>
 
 <div class="ln">
-<h1>Quick-Start Guide</h1>
+<h1 id="main-content">Quick-Start Guide</h1>
 <p class="ln-lead">Everything you need to run Fate Condensed - from your first session to your first great campaign. Pick your path.</p>
 
 <div class="ln-paths">
@@ -418,5 +425,10 @@ Treatment = overcome roll: Fair+2 mild, Great+4 moderate, Fantastic+6 severe. +2
   }
 })();
 </script>
+<footer style="text-align:center;padding:32px 20px;border-top:1px solid var(--border);margin-top:40px">
+  <a href="../index.html" class="btn btn-ghost" style="font-size:14px;text-decoration:none">🎲 Open Ogma Generator →</a>
+  <span style="margin:0 12px;color:var(--text-muted)">·</span>
+  <a href="about.html#download" style="font-size:14px;color:var(--text-muted)">⬇ Download offline ZIP</a>
+</footer>
 </body>
 </html>

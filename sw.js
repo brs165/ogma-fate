@@ -2,7 +2,7 @@
 // Strategy: cache-first for all static assets, network-first for CDN scripts.
 // Safari fix: redirected responses are cloned as non-redirected before caching.
 
-var CACHE_NAME = 'fate-generator-2026.03.26';
+var CACHE_NAME = 'fate-generator-2026.03.33';
 
 var APP_SHELL = [
   './index.html',
@@ -28,6 +28,7 @@ var APP_SHELL = [
   './core/ui.js',
   './core/db.js',
   './core/intro.js',
+  './data/campaigns-meta.js',
   './data/shared.js',
   './data/universal.js',
   './data/thelongafter.js',

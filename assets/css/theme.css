@@ -40,7 +40,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
   --bg:#000000;--camp-bg:#000000;
   --panel:rgba(255,255,255,0.06); --panel-raised:rgba(255,255,255,0.09);
   --border:rgba(255,255,255,0.08); --border-mid:rgba(255,255,255,0.14); --border-bright:rgba(255,255,255,0.22);
-  --text:#FFFFFF; --text-dim:rgba(255,255,255,0.60); --text-muted:rgba(255,255,255,0.50);
+  --text:#FFFFFF; --text-dim:rgba(255,255,255,0.65); --text-muted:rgba(255,255,255,0.55);
   --overlay:rgba(0,0,0,0.6); --inset:rgba(255,255,255,0.04);
   --glass-bg:rgba(255,255,255,0.08); --glass-border:rgba(255,255,255,0.12);
   --glass-shadow:0 12px 40px rgba(0,0,0,0.35);
@@ -682,7 +682,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 
 /* ── Topbar ─────────────────────────────────────────────────────────────── */
 .topbar{position:sticky;top:0;z-index:200;height:44px;background:var(--glass-bg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-bottom:1px solid var(--glass-border);display:flex;align-items:center;padding:0 12px;gap:10px;flex-shrink:0;box-shadow:var(--glass-shadow);will-change:filter}
-.topbar-hamburger{flex-shrink:0;font-size:18px;width:36px;height:36px;padding:0;display:flex;align-items:center;justify-content:center}
+.topbar-hamburger{flex-shrink:0;font-size:16px;width:44px;height:44px;padding:0;display:flex;align-items:center;justify-content:center}
 .topbar-brand{display:flex;align-items:center;gap:6px;text-decoration:none;color:var(--text);font-size:var(--text-sm);flex:1;min-width:0;overflow:hidden}
 .topbar-ogma{color:var(--accent);font-size:13px;font-weight:400;flex-shrink:0;letter-spacing:0.01em;white-space:nowrap}
 .topbar-ogma strong{font-weight:800;font-size:15px;letter-spacing:0}
@@ -756,6 +756,96 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .topbar-genre-tag{font-size:var(--text-label);color:var(--text-muted);font-weight:400;margin-left:5px}
 .topbar-brand-world{color:var(--accent);font-weight:700}
 
+/* ═══════════════════════════════════════════════════════════════
+   TOPBAR — Unified chrome for all 18 pages (React + static)
+   All findings: W1 skip, W2 44px, H1 status, H4 consistency,
+   H8 wordmark, H9 offline, IA2 nav, IA3 breadcrumb
+═══════════════════════════════════════════════════════════════ */
+
+/* Wordmark replaces full OGMA acronym (H8) */
+.topbar-wordmark{font-size:13px;font-weight:800;color:var(--accent);letter-spacing:.06em;flex-shrink:0;text-decoration:none;white-space:nowrap;padding:0 2px}
+
+/* Thin separator */
+.topbar-sep{width:1px;height:16px;background:var(--border-bright);flex-shrink:0;margin:0 2px}
+
+/* Breadcrumb trail (IA3) */
+.topbar-crumb{flex:1;min-width:0;display:flex;align-items:center;gap:4px;overflow:hidden}
+.topbar-crumb-item{font-size:11px;color:var(--text-muted);white-space:nowrap;text-decoration:none;transition:color .12s;overflow:hidden;text-overflow:ellipsis}
+.topbar-crumb-item:hover{color:var(--text-dim)}
+.topbar-crumb-item.current{color:var(--text-dim);font-weight:500}
+.topbar-crumb-sep{font-size:9px;color:var(--border-bright);flex-shrink:0;pointer-events:none;user-select:none}
+
+/* Status zone — chips on the right (H1, H4, H6, H9) */
+.topbar-status{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.topbar-chip{font-size:10px;font-weight:700;height:28px;padding:0 8px;border-radius:5px;cursor:pointer;border:none;font-family:var(--font-ui);letter-spacing:.03em;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;transition:opacity .12s}
+.topbar-chip:hover{opacity:.8}
+.topbar-chip-gm{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent)}
+.topbar-chip-gm-off{background:rgba(255,255,255,.07);color:var(--text-muted)}
+.topbar-chip-hl{background:rgba(255,255,255,.07);color:var(--text-muted)}
+.topbar-chip-offline{background:rgba(220,50,50,.18);color:#ff7070;animation:tb-blink 2s ease-in-out infinite}
+@keyframes tb-blink{0%,100%{opacity:1}50%{opacity:.45}}
+
+/* Topbar hamburger raised to 44px (W2) */
+.topbar-hamburger{flex-shrink:0;font-size:16px;width:44px;height:44px;padding:0;display:flex;align-items:center;justify-content:center}
+
+/* Nav link inside topbar for static pages */
+.topbar-nav-btn{font-size:12px!important;padding:4px 8px!important;min-height:44px;text-decoration:none}
+.topbar-nav-hide-sm{display:none}
+@media(min-width:640px){.topbar-nav-hide-sm{display:inline-flex}}
+
+/* Static page topbar — unify land-topnav with React topbar */
+.land-topnav{position:sticky;top:0;z-index:100;display:flex;align-items:center;padding:0 12px;height:44px;gap:8px;background:var(--glass-bg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-bottom:1px solid var(--glass-border);box-shadow:var(--glass-shadow)}
+.land-topnav-brand{display:none}
+
+/* ═══════════════════════════════════════════════════════════════
+   SIDEBAR TABS — Generate / Session (Concept A)
+═══════════════════════════════════════════════════════════════ */
+.sidebar-tab-bar{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.sidebar-tab-btn{flex:1;height:44px;font-size:12px;font-weight:500;border:none;cursor:pointer;font-family:var(--font-ui);background:transparent;color:var(--text-muted);border-bottom:2px solid transparent;transition:all .12s}
+.sidebar-tab-btn:hover{color:var(--text-dim)}
+.sidebar-tab-btn.active{color:var(--text);border-bottom-color:var(--accent);background:var(--panel-raised)}
+.sidebar-tab-btn:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.sidebar-panel{display:none;flex-direction:column;flex:1;overflow-y:auto;overflow-x:hidden}
+.sidebar-panel.active{display:flex}
+.sidebar-panel::-webkit-scrollbar{width:3px}
+.sidebar-panel::-webkit-scrollbar-thumb{background:var(--border-bright);border-radius:2px}
+.sidebar-aria-live{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;pointer-events:none}
+
+/* ── GM block inside Session tab ─────────────────────────────── */
+.gm-sidebar-block{border-bottom:1px solid var(--border);flex-shrink:0}
+.gm-sidebar-main{display:flex;align-items:center;gap:8px;padding:9px 14px 6px}
+.gm-sidebar-left{flex:1;min-width:0}
+.gm-sidebar-title{font-size:12px;font-weight:600;color:var(--text)}
+.gm-sidebar-subrow{display:flex;align-items:center;gap:5px;margin-top:3px}
+.gm-sidebar-sublabel{font-size:11px;color:var(--text-muted)}
+.gm-sidebar-off-note{font-size:10px;color:var(--text-muted);padding:2px 14px 8px;font-style:italic;flex-shrink:0}
+
+/* ── ToggleSwitch inside sidebar — 44px tap target wrapper (W2) */
+.sidebar-tog-wrap{width:44px;height:44px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:transparent;border:none;cursor:pointer;padding:0}
+.sidebar-tog-wrap:focus-visible{outline:2px solid var(--accent);border-radius:4px}
+
+/* ── Help level pill in sidebar ──────────────────────────────── */
+.hl-sb-pill{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:500;color:var(--text-dim);background:var(--panel-raised);border:1px solid var(--border-bright);border-radius:5px;padding:2px 7px;cursor:pointer;transition:border-color .12s;white-space:nowrap;min-height:24px}
+.hl-sb-pill:hover{border-color:var(--accent)}
+.hl-sb-pill:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hl-sb-caret{font-size:8px;color:var(--text-muted);margin-left:2px;display:inline-block;transition:transform .2s;line-height:1}
+.hl-sb-caret.open{transform:rotate(180deg)}
+
+/* ── Help level picker drawer ────────────────────────────────── */
+.hl-sb-drawer{overflow:hidden;transition:max-height .22s ease,opacity .18s ease;flex-shrink:0}
+.hl-sb-drawer.open{max-height:280px;opacity:1}
+.hl-sb-drawer.closed{max-height:0;opacity:0;pointer-events:none}
+.hl-sb-inner{padding:3px 10px 10px}
+.hl-sb-opt{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:7px;cursor:pointer;border:1px solid transparent;transition:background .1s;min-height:44px;flex-shrink:0;width:100%;background:transparent;font-family:var(--font-ui);text-align:left}
+.hl-sb-opt:hover{background:var(--panel-raised)}
+.hl-sb-opt.selected{background:color-mix(in srgb,var(--accent) 12%,transparent);border-color:var(--border-bright)}
+.hl-sb-opt:focus-visible{outline:2px solid var(--accent);outline-offset:-1px}
+.hl-sb-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+.hl-sb-name{font-size:12px;font-weight:500;color:var(--text-dim);line-height:1.3}
+.hl-sb-opt.selected .hl-sb-name{color:var(--accent)}
+.hl-sb-sub{font-size:10px;color:var(--text-muted);line-height:1.35;margin-top:1px}
+
+
 /* ══ SIDEBAR REDESIGN ════════════════════════════════════════════════════════ */
 .sidebar-divider{height:1px;background:var(--border);margin:4px 0;flex-shrink:0}
 .sidebar-group-label{font-size:var(--text-label);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);padding:8px 14px 4px;display:block}
@@ -789,7 +879,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .land-topnav-btn{font-size:13px;text-decoration:none}
 .land-topnav-btn-active{color:var(--accent)!important;border-color:color-mix(in srgb,var(--accent) 40%,transparent)!important}
 /* R-03: Static page mobile nav — hamburger + dropdown */
-.land-topnav-hamburger{display:none;background:none;border:1px solid var(--border-mid);border-radius:6px;color:var(--text-dim);cursor:pointer;padding:6px 10px;font-size:16px;line-height:1;min-width:36px;min-height:36px;align-items:center;justify-content:center}
+.land-topnav-hamburger{display:none;background:none;border:1px solid var(--border-mid);border-radius:6px;color:var(--text-dim);cursor:pointer;padding:6px 10px;font-size:16px;line-height:1;min-width:44px;min-height:44px;align-items:center;justify-content:center}
 .land-topnav-dropdown{display:none;position:absolute;top:calc(100% + 8px);right:0;background:var(--glass-bg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);border-radius:var(--glass-radius);padding:6px;min-width:180px;z-index:200;box-shadow:0 8px 32px rgba(0,0,0,0.4);flex-direction:column;gap:2px}
 .land-topnav-dropdown.open{display:flex}
 .land-topnav-dropdown a,.land-topnav-dropdown button{display:flex;align-items:center;padding:10px 12px;border-radius:6px;font-size:13px;color:var(--text-dim);text-decoration:none;background:none;border:none;cursor:pointer;width:100%;text-align:left;transition:background 0.12s;font-family:var(--font-ui)}
@@ -919,7 +1009,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 /* Secondary group pushed to right */
 .action-bar-secondary{margin-left:auto;display:flex;align-items:center;gap:4px}
 /* Icon-only secondary buttons */
-.action-bar-icon{min-height:36px!important;padding:6px 8px!important;font-size:16px!important;line-height:1}
+.action-bar-icon{min-height:44px!important;padding:6px 8px!important;font-size:16px!important;line-height:1}
 /* Mobile: Roll takes full row, rest wraps below */
 @media(max-width:480px){
   .action-bar-roll{flex:1;min-width:0}

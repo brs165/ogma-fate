@@ -6,7 +6,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Neon Abyss - Campaign Guide</title>
 <link rel="icon" type="image/svg+xml" href="../assets/favicons/icon.svg">
-<link rel="stylesheet" href="../assets/css/theme.css?v=26">
+<link rel="stylesheet" href="../assets/css/theme.css?v=33">
 <style>
 .cg{max-width:680px;margin:0 auto;padding:24px 20px 80px;position:relative;z-index:1}
 .cg h1{font-size:var(--text-hero);font-weight:800;color:var(--text);margin-bottom:4px;letter-spacing:-0.02em}
@@ -33,27 +33,36 @@
   .cg-guide-nav a:hover{text-decoration:underline}
 </style>
 </head>
+<a href="#main-content" class="skip-link">Skip to main content</a>
 <body>
-<nav class="land-topnav" role="navigation" aria-label="Site navigation">
-  <a href="../index.html" class="land-topnav-brand" aria-label="Ogma home"><span class="topbar-ogma"><strong>O</strong>n-demand <strong>G</strong>enerator for <strong>M</strong>asterful <strong>A</strong>dventures</span></a>
-  <div class="land-topnav-actions">
-    <a href="../campaigns/cyberpunk.html" class="btn btn-ghost land-topnav-btn" style="font-size:13px;text-decoration:none">🎲 Open Generator</a>
-    <a href="../learn.html" class="btn btn-ghost land-topnav-btn" style="font-size:13px;text-decoration:none">📖 Quick Start</a>
-    <a href="../about.html" class="btn btn-ghost land-topnav-btn land-topnav-hide-sm" style="font-size:13px;text-decoration:none">About</a>
-    <button class="btn btn-icon btn-ghost" onclick="var n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var _p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');_p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p));}catch(_e){}" title="Toggle theme">◑</button>
-  
-    <button class="land-topnav-hamburger" id="topnav-hbg" aria-label="Open navigation" aria-expanded="false">☰</button>
-    <div class="land-topnav-dropdown" id="topnav-dd">
-        <a href="../campaigns/cyberpunk.html">🎲 Open Generator</a>
-        <a href="../learn.html">📖 Quick Start</a>
-        <a href="../campaigns/transition.html">⚔ D&D Guide</a>
-        <a href="../about.html">About</a>
-        <button onclick="window.print()">🖨 Print</button>
-        <button onclick="var n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var _p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');_p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p));}catch(_e){}" >◑ Theme</button>
-      </div></div>
-</nav>
+<header class="land-topnav" role="banner">
+  <a href="../index.html" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
+  <div class="topbar-sep" aria-hidden="true"></div>
+  <nav class="topbar-crumb" aria-label="Breadcrumb">
+    <a href="../index.html" class="topbar-crumb-item">Home</a><span class="topbar-crumb-sep" aria-hidden="true">&#8250;</span><a href="cyberpunk.html" class="topbar-crumb-item">Neon Abyss</a><span class="topbar-crumb-sep" aria-hidden="true">&#8250;</span><span class="topbar-crumb-item current" aria-current="page">Campaign Guide</span>
+  </nav>
+  <div class="topbar-status">
+    <a href="cyberpunk.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">🎲 Open Generator</a>
+    <a href="../learn.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">📖 Quick Start</a>
+    <a href="transition.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#9876; D&D Guide</a>
+    <a href="sessionzero.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#127917; Session Zero</a>
+    <a href="../about.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">About</a>
+    <button class="btn btn-icon btn-ghost" onclick="(function(){var n=document.documentElement.getAttribute('data-theme')=='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var _p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}}');_p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p));}catch(_e){}this.setAttribute('aria-label',n==='dark'?'Switch to light mode':'Switch to dark mode');})()" title="Toggle theme" aria-label="Switch to dark mode" id="theme-toggle-btn">◑</button>
+    <button class="topbar-hamburger btn btn-icon btn-ghost" id="topnav-hbg-new"
+      aria-label="Open navigation" aria-expanded="false" aria-haspopup="true"
+      onclick="(function(btn){var dd=btn.nextElementSibling;var open=dd.classList.toggle('open');btn.setAttribute('aria-expanded',open);})(this)">&#9776;</button>
+    <div class="land-topnav-dropdown" id="topnav-dd-new">
+      <a href="cyberpunk.html">🎲 Open Generator</a>
+      <a href="../learn.html">📖 Quick Start</a>
+      <a href="transition.html">&#9876; D&D Guide</a>
+      <a href="sessionzero.html">&#127917; Session Zero</a>
+      <a href="../about.html">About</a>
+      <button class="btn btn-icon btn-ghost" onclick="(function(){var n=document.documentElement.getAttribute('data-theme')=='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var _p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}}');_p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p));}catch(_e){}this.setAttribute('aria-label',n==='dark'?'Switch to light mode':'Switch to dark mode');})()" title="Toggle theme" aria-label="Switch to dark mode" id="theme-toggle-btn">◑</button>
+    </div>
+  </div>
+</header>
 <div class="cg">
-<h1>⬡ Neon Abyss</h1>
+<h1 id="main-content">⬡ Neon Abyss</h1>
 <div class="cg-sub">Corporate Dystopia in Meridian</div>
 <p>Meridian is a vertical city where altitude equals wealth. Corporations own the infrastructure, the law, and increasingly the bodies of their employees through augmentation contracts. The street economy runs on fixers, black clinics, and data brokerage. The net is throttled by district. The augments have kill switches.</p>
 <div class="cg-stats">
