@@ -991,6 +991,56 @@ function getResultLabel(r) {
   return icon + name;
 }
 
+// ── TABLE SYNC MODULE ─────────────────────────────────────────────────────
+// Mirrors the sync layer in run.html. Solo mode when tableSyncRef===null.
+var TABLE_SYNC_HOST = null;
+try{var _tsp=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');TABLE_SYNC_HOST=_tsp.syncHost||null;}catch(e){}
+var OGMA_DEFAULT_SYNC_HOST = 'ogma-sync.brs165.workers.dev';
+
+function generateTableRoomCode(){
+  var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var code='';
+  for(var i=0;i<4;i++)code+=chars[Math.floor(Math.random()*chars.length)];
+  return code;
+}
+
+function createTableSync(roomCode,role,onStateUpdate,onRoll,onToast,onPresence){
+  var host=TABLE_SYNC_HOST||OGMA_DEFAULT_SYNC_HOST;
+  if(typeof PartySocket==='undefined'){console.warn('PartySocket not loaded');return null;}
+  var ws=new PartySocket({host:host,room:roomCode.toLowerCase(),query:{role:role}});
+  var sync={ws:ws,role:role,roomCode:roomCode,connected:false,
+    broadcastState:function(state){
+      if(sync.role!=='gm'||!sync.connected)return;
+      var clean=Object.assign({},state);
+      clean.cards=(state.cards||[]).filter(function(c){return !c.gmOnly;});
+      ws.send(JSON.stringify({type:'state',payload:clean}));
+    },
+    sendAction:function(playerId,action,patch){
+      if(sync.role!=='player'||!sync.connected)return;
+      ws.send(JSON.stringify({type:'player_action',playerId:playerId,action:action,patch:patch}));
+    },
+    disconnect:function(){ws.close();sync.connected=false;}
+  };
+  ws.addEventListener('open',function(){sync.connected=true;});
+  ws.addEventListener('close',function(){sync.connected=false;});
+  ws.addEventListener('message',function(event){
+    var data;try{data=JSON.parse(event.data);}catch(e){return;}
+    switch(data.type){
+      case 'welcome':
+        if(data.state&&sync.role==='player')onStateUpdate(data.state);
+        break;
+      case 'state':
+        if(sync.role==='player')onStateUpdate(data.payload);
+        break;
+      case 'toast': onToast(data.msg); break;
+      case 'presence': onPresence(data.connections); break;
+      case 'player_action':
+        if(sync.role==='gm')onStateUpdate({type:'player_action',playerId:data.playerId,patch:data.patch});
+        break;
+    }
+  });
+  return sync;
+}
 // ════════════════════════════════════════════════════════════════════════
 // CAMPAIGN APP (used by each campaign HTML page)
 // Each page calls: ReactDOM.createRoot(...).render(h(CampaignApp, {campId: 'thelongafter'}))
@@ -1372,6 +1422,49 @@ function CampaignApp(props) {
   // History/Pinned drawer
   const [showHistory, setShowHistory] = useState(false);
   const [prepView, setPrepView] = useState(false);
+  // Table multiplayer sync
+  const tableSyncRef = React.useRef(null);
+  const [tableRoomCode, setTableRoomCode] = useState(function(){
+    try{var p=new URLSearchParams(window.location.search);return p.get('room')||null;}catch(e){return null;}
+  });
+  const [tableIsRemote, setTableIsRemote] = useState(false);
+  const [tablePresence, setTablePresence] = useState([]);
+
+  function hostTable(){
+    var code=generateTableRoomCode();
+    setTableRoomCode(code);
+    var s=createTableSync(code,'gm',
+      function(data){},
+      function(){},
+      function(msg){showToast(msg);},
+      function(conns){setTablePresence(conns);}
+    );
+    tableSyncRef.current=s;
+    if(!s){showToast('Sync unavailable');return;}
+    showToast('Table hosted: '+code);
+  }
+  function joinTable(code){
+    var s=createTableSync(code,'player',
+      function(data){if(data.type==='player_action')return;setTableIsRemote(true);},
+      function(){},
+      function(msg){showToast(msg);},
+      function(conns){setTablePresence(conns);}
+    );
+    tableSyncRef.current=s;
+    setTableRoomCode(code);
+    setTableIsRemote(true);
+  }
+  function disconnectTable(){
+    if(tableSyncRef.current)tableSyncRef.current.disconnect();
+    tableSyncRef.current=null;
+    setTableRoomCode(null);setTableIsRemote(false);setTablePresence([]);
+    showToast('Table disconnected');
+  }
+  // Auto-join if URL has ?room= param (remote player following a link)
+  useEffect(function(){
+    if(tableRoomCode&&!tableSyncRef.current)joinTable(tableRoomCode);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tableRoomCode]);
   // Help level preference - controls inline help detail
   const [helpLevel, setHelpLevel] = useState(function() { try { return LS.get('help_level') || 'new_fate'; } catch(e) { return 'new_fate'; } });
   function changeHelpLevel(lvl) { setHelpLevel(lvl); try { LS.set('help_level', lvl); } catch(e) {} }
@@ -2124,6 +2217,14 @@ function CampaignApp(props) {
           DB: DB,
           // TC-21: open the FP+Milestone floater from Table toolbar
           onShowMilestones: function() { setActivePanel('fp'); },
+          // Table sync props
+          tableSync: tableSyncRef.current,
+          tableRoomCode: tableRoomCode,
+          tableIsRemote: tableIsRemote,
+          tablePresence: tablePresence,
+          onHostTable: hostTable,
+          onJoinTable: joinTable,
+          onDisconnectTable: disconnectTable,
         }),
 
         // ── NORMAL GENERATE VIEW ───────────────────────────────────────────

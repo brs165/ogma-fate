@@ -1799,11 +1799,75 @@ function TpTurnBar(props){
 
 // ── PrepCanvas ───────────────────────────────────────────────────────────────────────────
 var TP_CANVAS_KEY_PREFIX='tp_canvas_';
+// Option D: category dropdown component for generate sub-bar
+function TpGenDropdown(props){
+  var label=props.label,icon=props.icon,items=props.items,onAdd=props.onAdd;
+  var _open=React.useState(false);var open=_open[0];var setOpen=_open[1];
+  var btnRef=React.useRef(null);var menuRef=React.useRef(null);
+  // Close on outside click
+  React.useEffect(function(){
+    if(!open)return;
+    function handler(e){
+      if(btnRef.current&&btnRef.current.contains(e.target))return;
+      if(menuRef.current&&menuRef.current.contains(e.target))return;
+      setOpen(false);
+    }
+    document.addEventListener("mousedown",handler);
+    return function(){document.removeEventListener('mousedown',handler);};
+  },[open]);
+  // Close on Escape
+  function onKeyDown(e){
+    if(e.key==='Escape')setOpen(false);
+    if(e.key==='ArrowDown'&&!open)setOpen(true);
+  }
+  return h('div',{className:'tp-dd-wrap'},
+    h('button',{
+      className:'tp-dd-btn',
+      ref:btnRef,
+      'aria-haspopup':'menu',
+      'aria-expanded':String(open),
+      onClick:function(){setOpen(function(v){return !v;});},
+      onKeyDown:onKeyDown,
+    },
+      h('span',null,icon+' '+label),
+      h('span',{className:'chevron','aria-hidden':'true'},'▾')
+    ),
+    h('div',{
+      className:'tp-dd-menu',
+      ref:menuRef,
+      role:'menu',
+      hidden:!open,
+      'aria-label':label+' generators',
+    },
+      items.map(function(item,i){
+        if(item.sep)return h("div",{key:"sep"+i,className:"tp-dd-sep","aria-hidden":"true"});
+        return h('button',{
+          key:item.id||i,
+          className:'tp-dd-item',
+          role:'menuitem',
+          onClick:function(){onAdd(item);setOpen(false);},
+          onKeyDown:function(e){if(e.key==='Escape'){setOpen(false);btnRef.current&&btnRef.current.focus();}}
+        },
+          h('span',{'aria-hidden':'true'},item.icon),
+          h('span',null,item.label)
+        );
+      })
+    )
+  );
+}
 function PrepCanvas(props){
   var campId=props.campId,campName=props.campName;
   var pinnedCards=props.pinnedCards,setPinnedCards=props.setPinnedCards;
   var onBack=props.onBack,onExport=props.onExport,showToast=props.showToast,DB=props.DB;
-  var onShowMilestones=props.onShowMilestones; // TC-21
+  var onShowMilestones=props.onShowMilestones;
+  // Sync props
+  var tableSync=props.tableSync;
+  var tableRoomCode=props.tableRoomCode;
+  var tableIsRemote=props.tableIsRemote;
+  var tablePresence=props.tablePresence||[];
+  var onHostTable=props.onHostTable;
+  var onJoinTable=props.onJoinTable;
+  var onDisconnectTable=props.onDisconnectTable;
   var _loaded=useState(false);var loaded=_loaded[0];var setLoaded=_loaded[1];
   var _scale=useState(1);var scale=_scale[0];var setScale=_scale[1];
   var _ox=useState(40);var ox=_ox[0];var setOx=_ox[1];
@@ -1840,6 +1904,12 @@ function PrepCanvas(props){
     saveTimer.current=setTimeout(function(){
       var s={scale:scale,ox:ox,oy:oy,players:players,order:order,round:round,scene:scene,gmFP:gmFP,editMode:editMode,extras:extras,ts:Date.now()};
       if(DB)DB.saveSession(SAVE_KEY,s).catch(function(){});
+      // Broadcast to remote players if hosting
+      if(tableSync&&tableSync.role==='gm'&&tableSync.connected){
+        var broadcast=Object.assign({},s);
+        broadcast.cards=(pinnedCards||[]).filter(function(c){var ex=extras[c.id]||{};return !ex.gmOnly;});
+        tableSync.broadcastState(broadcast);
+      }
     },400);
   }
   useEffect(function(){
@@ -2148,6 +2218,40 @@ function PrepCanvas(props){
         // TC-21: Milestone tracker
         onShowMilestones&&h('button',{className:'btn btn-ghost',onClick:onShowMilestones,title:'Open Milestone Tracker',style:{fontSize:12}},'⚡ Miles.'),
 
+        // Table sync controls
+        tableSync&&h('div',{style:{display:'flex',alignItems:'center',gap:4,background:'var(--inset)',
+          border:'1px solid var(--c-green)',borderRadius:6,padding:'2px 8px',fontSize:11,
+          color:'var(--c-green)',fontFamily:'var(--font-ui)',flexShrink:0}},
+          h('span',{style:{fontWeight:700}},tableRoomCode),
+          h('span',{style:{color:'var(--text-muted)',margin:'0 3px'}},'·'),
+          h('span',null,tablePresence.filter(function(p){return p.connected;}).length+' online'),
+          h('button',{style:{background:'none',border:'none',cursor:'pointer',color:'var(--text-muted)',
+            fontSize:11,padding:'0 2px',fontFamily:'var(--font-ui)'},
+            title:'Copy join link',
+            onClick:function(){
+              var path=(window.location.pathname).replace(/\.html$/,'');
+              var url=window.location.origin+path+'?room='+tableRoomCode;
+              navigator.clipboard.writeText(url).then(function(){if(showToast)showToast('Join link copied!');}).catch(function(){if(showToast)showToast('Room: '+tableRoomCode);});
+            }},'📋'),
+          h('button',{style:{background:'none',border:'none',cursor:'pointer',color:'var(--c-red)',
+            fontSize:11,padding:'0 2px',fontFamily:'var(--font-ui)'},
+            onClick:onDisconnectTable},tableIsRemote?'Leave':'Stop')
+        ),
+        !tableSync&&!tableIsRemote&&onHostTable&&h('button',{
+          className:'btn btn-ghost',
+          onClick:onHostTable,
+          style:{fontSize:12,fontWeight:700,color:'var(--c-green)',flexShrink:0},
+          title:'Host this Table canvas online',
+        },'🌐 Host'),
+        !tableSync&&!tableIsRemote&&onJoinTable&&h('button',{
+          className:'btn btn-ghost',
+          onClick:function(){
+            var code=prompt('Enter room code:');
+            if(code&&code.trim())onJoinTable(code.trim().toUpperCase());
+          },
+          style:{fontSize:12,flexShrink:0},
+          title:'Join a hosted Table session',
+        },'📶 Join'),
         // Start Party Play
         campId&&h('a',{
           href:'../campaigns/run.html?world='+campId,className:'btn',
@@ -2165,31 +2269,61 @@ function PrepCanvas(props){
         ),
         h('button',{className:'rs-drawer-close',onClick:function(){setDrawerOpen(false);},'aria-label':'Close'},'\u00D7')
       ),
-      drawerTab==='gen'&&h('div',{className:'tp-sub-bar-body'},
-        h('div',{className:'rs-gen-grid',style:{gridTemplateColumns:'repeat(5,1fr)'}},
-          TP_GEN_MENU.map(function(g){
-            return h('button',{key:g.id,className:'rs-gen-btn',onClick:function(){addGeneratedCard(g.id);}},
-              h('div',{className:'rs-gen-icon'},g.icon),
-              h('div',{className:'rs-gen-label'},g.label)
-            );
-          }),
-          // TC-07: Zone
-          h('button',{className:'rs-gen-btn',onClick:function(){
-            var n=prompt('Zone name (e.g. The Docks, Burning Tower):');
-            if(!n||!n.trim())return;
-            var a=prompt('Zone aspect (optional, e.g. Shrouded in Fog):');
-            var m=prompt('Movement cost (optional, e.g. 1 action):');
-            addZone(n.trim(),a||'',m||'');
-          }},h('div',{className:'rs-gen-icon'},'□'),h('div',{className:'rs-gen-label'},'Zone')),
-          // TC-03: Situation aspect
-          h('button',{className:'rs-gen-btn',onClick:function(){
-            var n=prompt('Aspect name (e.g. On Fire, Distracted):');
-            if(n&&n.trim())addAspectCard(n.trim());
-          }},h('div',{className:'rs-gen-icon'},'\u25C8'),h('div',{className:'rs-gen-label'},'Aspect')),
-          // TC-09: GM Note
-          h('button',{className:'rs-gen-btn',style:{opacity:.8},onClick:addGMNote},
-            h('div',{className:'rs-gen-icon'},'\uD83D\uDD12'),h('div',{className:'rs-gen-label'},'GM Note'))
-        )
+      drawerTab==='gen'&&h('div',{className:'tp-gen-bar',role:'toolbar','aria-label':'Generate and add to canvas'},
+        // Characters
+        h(TpGenDropdown,{
+          label:'Characters',icon:'\u25C6',
+          items:[
+            {id:'npc_major',label:'Major NPC',icon:'\u25C6'},
+            {id:'npc_minor',label:'Minor NPC',icon:'\u25C8'},
+            {sep:true},
+            {id:'faction',label:'Faction',icon:'\u2691'},
+            {id:'encounter',label:'Encounter',icon:'\u2694'},
+          ],
+          onAdd:function(item){addGeneratedCard(item.id);}
+        }),
+        // Scene
+        h(TpGenDropdown,{
+          label:'Scene',icon:'\u25C9',
+          items:[
+            {id:'scene',label:'Scene',icon:'\u25C9'},
+            {id:'seed',label:'Seed',icon:'\u2726'},
+            {sep:true},
+            {id:'zone',label:'Zone',icon:'\u25A1'},
+            {id:'aspect',label:'Aspect',icon:'\u25C8'},
+          ],
+          onAdd:function(item){
+            if(item.id==='zone'){
+              var n=prompt('Zone name (e.g. The Docks):');if(!n||!n.trim())return;
+              var a=prompt('Zone aspect (optional):');
+              var m=prompt('Movement cost (optional):');
+              addZone(n.trim(),a||'',m||'');
+            }else if(item.id==='aspect'){
+              var na=prompt('Aspect name (e.g. On Fire):');
+              if(na&&na.trim())addAspectCard(na.trim());
+            }else{addGeneratedCard(item.id);}
+          }
+        }),
+        // Mechanics
+        h(TpGenDropdown,{
+          label:'Mechanics',icon:'\u2297',
+          items:[
+            {id:'compel',label:'Compel',icon:'\u2297'},
+            {id:'countdown',label:'Countdown',icon:'\u23F1'},
+            {sep:true},
+            {id:'complication',label:'Complication',icon:'\u26A0'},
+            {id:'obstacle',label:'Obstacle',icon:'\u25B2'},
+          ],
+          onAdd:function(item){addGeneratedCard(item.id);}
+        }),
+        // GM Note standalone
+        h('button',{
+          className:'tp-dd-btn',
+          onClick:addGMNote,
+          title:'Add a GM-only sticky note',
+          'aria-label':'Add GM note',
+          style:{opacity:.85}
+        },'\uD83D\uDD12 GM Note')
       ),
       drawerTab==='dice'&&h('div',{className:'tp-sub-bar-body'},
         h(TpDicePanel,{players:players,selId:selPlayer,spendFP:spendFP,
@@ -2210,7 +2344,7 @@ function PrepCanvas(props){
               color:gmFP===0?'var(--c-red)':'var(--c-green)'}},
             '\u25C6\u00A0'+gmFP)
         ),
-        h('div',{className:'rs-sidebar-body'},
+        h('div',{className:'rs-sidebar-body',role:'list','aria-label':'Players'},
           players.map(function(p){
             return h(TpPlayerRow,{key:p.id,player:p,sel:selPlayer===p.id,
               onUpd:function(patch){updPlayer(p.id,patch);},
@@ -2254,6 +2388,7 @@ function PrepCanvas(props){
       // Canvas — cards + empty state only, no drawer, no zoom
       h('div',{
         className:'tp-canvas-wrap'+(editMode?' edit-mode':''),
+        role:'region','aria-label':'Session canvas',
         ref:canvasRef,onMouseDown:onCanvasMouseDown,onWheel:onWheel,
         style:{touchAction:'none'},
       },

@@ -2,13 +2,14 @@
 <html lang="en" data-theme="dark">
 <head>
   <script>(function(){try{var p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');var t=p.theme||localStorage.getItem('fate_theme')||'dark';if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})()</script>
+  <base href="/">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ogma — Run Session</title>
   <meta name="description" content="Infinite canvas session surface for Fate Condensed. Drag cards freely, zoom in/out, zone containers, GM/Player modes.">
   <link rel="icon" type="image/svg+xml" href="../assets/favicons/icon.svg">
   <link rel="manifest" href="../manifest.json">
-  <link rel="stylesheet" href="../assets/css/theme.css?v=203">
+  <link rel="stylesheet" href="../assets/css/theme.css?v=207">
   <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   html,body,#root{height:100%;overflow:hidden}
@@ -238,20 +239,20 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
-<script src="../data/shared.js?v=203"></script>
-<script src="../data/universal.js?v=203"></script>
-<script src="../data/thelongafter.js?v=203"></script>
-<script src="../data/cyberpunk.js?v=203"></script>
-<script src="../data/fantasy.js?v=203"></script>
-<script src="../data/space.js?v=203"></script>
-<script src="../data/victorian.js?v=203"></script>
-<script src="../data/postapoc.js?v=203"></script>
-<script src="../data/western.js?v=203"></script>
-<script src="../data/dVentiRealm.js?v=203"></script>
-<script src="../core/engine.js?v=203"></script>
+<script src="../data/shared.js?v=207"></script>
+<script src="../data/universal.js?v=207"></script>
+<script src="../data/thelongafter.js?v=207"></script>
+<script src="../data/cyberpunk.js?v=207"></script>
+<script src="../data/fantasy.js?v=207"></script>
+<script src="../data/space.js?v=207"></script>
+<script src="../data/victorian.js?v=207"></script>
+<script src="../data/postapoc.js?v=207"></script>
+<script src="../data/western.js?v=207"></script>
+<script src="../data/dVentiRealm.js?v=207"></script>
+<script src="../core/engine.js?v=207"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dexie/4.0.10/dexie.min.js" crossorigin="anonymous"></script>
-<script src="../core/db.js?v=203"></script>
-<script src="../core/ui-primitives.js?v=203"></script>
+<script src="../core/db.js?v=207"></script>
+<script src="../core/ui-primitives.js?v=207"></script>
 
 <!-- MP-03: PartyKit client — auto-reconnect WebSocket (~8KB gz) -->
 <!-- partysocket: vendored locally — no UMD CDN build exists for this package -->
@@ -1492,7 +1493,9 @@ function RunApp(){
           fontSize:11,padding:'0 2px',fontFamily:'var(--font-ui)'},
           title:'Copy join link',
           onClick:function(){
-            var url=window.location.origin+window.location.pathname+'?room='+roomCode;
+            // Use canonical path (CF Pages strips .html) so link works for remote players
+            var path=window.location.pathname.replace(/\.html$/,'');
+            var url=window.location.origin+path+'?room='+roomCode;
             navigator.clipboard.writeText(url).then(function(){showToast('Join link copied!');}).catch(function(){showToast('Room: '+roomCode);});
           }},'📋'),
         h('button',{style:{background:'none',border:'none',cursor:'pointer',color:'var(--c-red)',
