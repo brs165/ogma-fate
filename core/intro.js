@@ -829,16 +829,22 @@
   }
 
   // Clean up timers if user navigates away mid-sequence
-  document.addEventListener('visibilitychange', function() {
+  function onVisChange() {
     if (document.visibilityState === 'hidden' && overlayEl) {
       done = true;
       clearTimers();
+      document.removeEventListener('visibilitychange', onVisChange);
+      window.removeEventListener('pagehide', onPageHide);
     }
-  });
-  window.addEventListener('pagehide', function() {
+  }
+  function onPageHide() {
     done = true;
     clearTimers();
-  });
+    document.removeEventListener('visibilitychange', onVisChange);
+    window.removeEventListener('pagehide', onPageHide);
+  }
+  document.addEventListener('visibilitychange', onVisChange);
+  window.addEventListener('pagehide', onPageHide);
 
   function makeDelay(ms) {
     return new Promise(function(res) {

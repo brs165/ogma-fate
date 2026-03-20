@@ -721,6 +721,11 @@ function SessionDoc(props) {
   const [loading, setLoading] = useState(true);
   const debounceRef           = useRef(null);
 
+  // Clear debounce on unmount (leak fix)
+  useEffect(function() {
+    return function() { clearTimeout(debounceRef.current); };
+  }, []);
+
   // Load on mount
   useEffect(function() {
     DB.loadSession(IDB_KEY).then(function(d) {

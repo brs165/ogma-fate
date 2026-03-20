@@ -156,9 +156,13 @@
 
   // ── Dexie instance ────────────────────────────────────────────────────────
   var dx = null;
+  var dxOpening = null; // in-progress open promise (concurrent guard)
+  var dxFailed  = false; // permanent failure flag — stop retrying
 
   function getDB() {
-    if (dx) return Promise.resolve(dx);
+    if (dx)        return Promise.resolve(dx);
+    if (dxFailed)  return Promise.reject(new Error('IDB unavailable'));
+    if (dxOpening) return dxOpening;
     if (typeof Dexie === 'undefined') return Promise.reject(new Error('Dexie not loaded'));
     try {
       var db = new Dexie(DB_NAME);
@@ -166,15 +170,16 @@
         sessions: 'key, ts',
         cards:    'key, ts',
       });
-      dx = db;
-      return db.open()
+      dxOpening = db.open()
         .then(function() { return runMigration(db); })
-        .then(function() { return db; })
+        .then(function() { dx = db; dxOpening = null; return db; })
         .catch(function(err) {
-          dx = null;
+          dxFailed = true; dxOpening = null;
           throw err;
         });
+      return dxOpening;
     } catch(err) {
+      dxFailed = true;
       return Promise.reject(err);
     }
   }
@@ -213,6 +218,9 @@
           Promise.all(pending).then(function() {
             legacyDb.close();
             try { localStorage.setItem(MIGRATED_KEY, '1'); } catch(e) {}
+            resolve();
+          }).catch(function() {
+            legacyDb.close(); // ensure close on failure path
             resolve();
           });
         };
@@ -283,7 +291,7 @@
       var prefix = 'card_' + campId + '_';
       return dxKeys('cards', prefix).then(function(keys) {
         return Promise.all(keys.map(function(k) {
-          return dxGet('cards', k).then(function(r) { return r ? r.value : null; });
+          return dxGet('cards', k).then(function(r) { return r ? r.value : null; }).catch(function() { return null; });
         }));
       }).then(function(cards) {
         return cards.filter(Boolean).sort(function(a, b) { return (b.ts || 0) - (a.ts || 0); });
@@ -328,7 +336,7 @@
     vaultList: function() {
       return dxKeys('sessions', 'vault_').then(function(keys) {
         return Promise.all(keys.map(function(k) {
-          return dxGet('sessions', k).then(function(r) { return r ? r.value : null; });
+          return dxGet('sessions', k).then(function(r) { return r ? r.value : null; }).catch(function() { return null; });
         }));
       }).then(function(sessions) {
         return sessions.filter(Boolean).sort(function(a, b) {
@@ -356,7 +364,7 @@
       var a = document.createElement('a');
       a.href = url;
       a.download = (session.name || 'ogma-session').replace(/[^a-zA-Z0-9_-]/g, '_') + '.json';
-      a.click();
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
       setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
     },
 
@@ -367,7 +375,7 @@
       var a = document.createElement('a');
       a.href = url;
       a.download = (card.label || card.genId || 'ogma-card').replace(/[^a-zA-Z0-9_-]/g, '_') + '.json';
-      a.click();
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
       setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
     },
 
@@ -376,8 +384,11 @@
         var input = document.createElement('input');
         input.type = 'file';
         input.accept = '.json';
+        input.style.display = 'none';
+        document.body.appendChild(input);
         input.onchange = function(e) {
           var file = e.target.files[0];
+          document.body.removeChild(input);
           if (!file) return reject(new Error('No file selected'));
           var reader = new FileReader();
           reader.onload = function(ev) {

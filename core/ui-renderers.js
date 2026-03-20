@@ -1408,9 +1408,20 @@ function TpCardBody(props){
 })),
       (phyHit.length>0||menHit.length>0)&&h('div',{className:'cc-stress'},
         phyHit.length>0&&h('span',null,'PHY'),
-        phyHit.map(function(v,i){return h('div',{key:'p'+i,className:'cc-sbox'+(v?' hit':''),onClick:function(e){e.stopPropagation();var a=phyHit.slice();a[i]=!a[i];onUpd({phyHit:a});}});}),
+        phyHit.map(function(v,i){return h('div',{key:'p'+i,className:'cc-sbox'+(v?' hit':''),
+        role:'checkbox','aria-checked':String(!!v),'aria-label':'Physical stress '+(i+1),
+        tabIndex:0,
+        onClick:function(e){e.stopPropagation();var a=phyHit.slice();a[i]=!a[i];onUpd({phyHit:a});},
+        onKeyDown:function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();var a=phyHit.slice();a[i]=!a[i];onUpd({phyHit:a});}}
+      });}),
         menHit.length>0&&h('span',{style:{marginLeft:4}},'MEN'),
-        menHit.map(function(v,i){return h('div',{key:'m'+i,className:'cc-sbox'+(v?' hit':''),style:{borderColor:'var(--c-purple)'},onClick:function(e){e.stopPropagation();var a=menHit.slice();a[i]=!a[i];onUpd({menHit:a});}});})
+        menHit.map(function(v,i){return h('div',{key:'m'+i,className:'cc-sbox'+(v?' hit':''),
+        style:{borderColor:'var(--c-purple)'},
+        role:'checkbox','aria-checked':String(!!v),'aria-label':'Mental stress '+(i+1),
+        tabIndex:0,
+        onClick:function(e){e.stopPropagation();var a=menHit.slice();a[i]=!a[i];onUpd({menHit:a});},
+        onKeyDown:function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();var a=menHit.slice();a[i]=!a[i];onUpd({menHit:a});}}
+      });}),
       )
     );
   }
@@ -1419,7 +1430,13 @@ function TpCardBody(props){
     return h('div',{className:'cc-body'},
       h('div',{className:'cc-title'},d.name||card.title),
       d.trigger&&h('div',{className:'cc-asp'},d.trigger),
-      h('div',{className:'cc-cd-track'},Array.from({length:total},function(_,i){return h('div',{key:i,className:'cc-cdbox'+(i<filled?' tick':''),onClick:function(e){e.stopPropagation();onUpd({cdFilled:i<filled?i:i+1});}},i+1);})),
+      h('div',{className:'cc-cd-track','role':'group','aria-label':'Countdown track'},Array.from({length:total},function(_,i){
+      return h('div',{key:i,className:'cc-cdbox'+(i<filled?' tick':''),
+        role:'checkbox','aria-checked':String(i<filled),'aria-label':'Box '+(i+1),
+        tabIndex:0,
+        onClick:function(e){e.stopPropagation();onUpd({cdFilled:i<filled?i:i+1});},
+        onKeyDown:function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();onUpd({cdFilled:i<filled?i:i+1});}}
+      },i+1);})),
       filled>=total&&h('div',{className:'cc-trigger'},'\u26A1 TRIGGERED')
     );
   }
@@ -1467,7 +1484,13 @@ function TpPlayerRow(props){
   return h('div',{className:'rs-player'+(sel?' selected':''),style:{borderLeftColor:p.color||'var(--accent)',borderLeftWidth:3}},
 
     // ── Top row: dot + name + expand toggle + acted ──
-    h('div',{className:'rs-player-top',onClick:function(){onSel(sel?null:p.id);}},
+    h('div',{className:'rs-player-top',
+      role:'button',tabIndex:0,
+      'aria-expanded':String(!!sel),
+      'aria-label':(sel?'Collapse ':'Expand ')+p.name,
+      onClick:function(){onSel(sel?null:p.id);},
+      onKeyDown:function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();onSel(sel?null:p.id);}}
+    },
       h('div',{className:'rs-player-dot',style:{background:p.color||'var(--accent)'}}),
       h('div',{className:'rs-player-name'},p.name),
       h('button',{style:{background:'none',border:'none',cursor:'pointer',fontSize:11,
@@ -1649,6 +1672,8 @@ function TpDicePanel(props){
   var _boost=useState(false);var boosted=_boost[0];var setBoosted=_boost[1];
   var _hist=useState([]);var history=_hist[0];var setHistory=_hist[1];
   var _diff=useState(0);var diff=_diff[0];var setDiff=_diff[1]; // TC-20: opposition difficulty
+  var rollTimerRef=useRef(null); // leak fix: cancel on unmount
+  useEffect(function(){return function(){if(rollTimerRef.current)clearTimeout(rollTimerRef.current);};},[]);
   var player=players.find(function(p){return p.id===selId;});
   var mod=activeSk?activeSk.v:0;
   var final=result!=null?result+mod+(boosted?2:0):null;
@@ -1657,7 +1682,7 @@ function TpDicePanel(props){
   function doRoll(sk){
     if(spinning)return;
     setActiveSk(sk);setBoosted(false);setResult(null);setSpinning(true);
-    setTimeout(function(){
+    rollTimerRef.current=setTimeout(function(){
       var r=[tpRollDF(),tpRollDF(),tpRollDF(),tpRollDF()];
       var s=r.reduce(function(a,b){return a+b;},0);
       setDice(r);setSpinning(false);setResult(s);
@@ -2497,15 +2522,21 @@ function PrepCanvas(props){
                   editMode&&h('button',{className:'cc-ibtn'+(ex.gmOnly?' active':''),
                     onClick:function(e){e.stopPropagation();updExtra(card.id,{gmOnly:!ex.gmOnly});},
                     title:ex.gmOnly?'GM only':'Make GM only',
+                    'aria-label':ex.gmOnly?'Make visible to players':'Make GM only',
+                    'aria-pressed':String(!!ex.gmOnly),
                     style:{color:ex.gmOnly?'var(--c-amber,#f4b942)':null,fontSize:10},
                   },ex.gmOnly?'GM':'—'),
                   h('button',{className:'cc-ibtn'+(ex.freeInvoke?' active':''),
                     onClick:function(e){e.stopPropagation();updExtra(card.id,{freeInvoke:!ex.freeInvoke});},
-                    title:'Free invoke',style:{color:ex.freeInvoke?'var(--c-green)':null,fontSize:11},
+                    title:'Free invoke',
+                    'aria-label':ex.freeInvoke?'Remove free invoke':'Add free invoke',
+                    'aria-pressed':String(!!ex.freeInvoke),
                   },'★'),
                   ['sm','md','full'].map(function(s){
                     return h('button',{key:s,className:'cc-ibtn'+(sz===s?' active':''),
                       title:s==='sm'?'Compact':s==='md'?'Medium':'Full',
+                      'aria-label':(s==='sm'?'Compact':s==='md'?'Medium':'Full')+' size',
+                      'aria-pressed':String(sz===s),
                       onClick:function(e){e.stopPropagation();updExtra(card.id,{size:s});}
                     },s==='sm'?'□':s==='md'?'▣':'■');
                   }),
@@ -2516,7 +2547,9 @@ function PrepCanvas(props){
                   // TC-07: remove from zone button
                   ex.zoneId&&editMode&&h('button',{className:'cc-ibtn',
                     onClick:function(e){e.stopPropagation();assignToZone(card.id,null);},
-                    title:'Remove from zone',style:{fontSize:9},
+                    title:'Remove from zone',
+                    'aria-label':'Remove from zone',
+                    style:{fontSize:10},
                   },'↵'),
                   h('button',{className:'cc-ibtn danger',
                     onClick:function(e){e.stopPropagation();removeCard(card.id);},
@@ -2526,6 +2559,14 @@ function PrepCanvas(props){
               sz!=='sm'&&card.genId!=='zone'&&h('div',{
                 className:'tp-card-expand-btn',
                 title:'Tap to expand',
+                role:'button',
+                tabIndex:0,
+                'aria-label':'Expand card',
+                onKeyDown:function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();
+                  setHeroCard(card);
+                  if(tableSync&&tableSync.role==='gm'&&tableSync.connected)
+                    tableSync.ws.send(JSON.stringify({type:'card_expand',cardId:card.id}));
+                }},
                 onClick:function(e){
                   if(e.target.closest('button'))return;
                   setHeroCard(card);

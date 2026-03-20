@@ -9,7 +9,7 @@
   <meta name="description" content="Infinite canvas session surface for Fate Condensed. Drag cards freely, zoom in/out, zone containers, GM/Player modes.">
   <link rel="icon" type="image/svg+xml" href="../assets/favicons/icon.svg">
   <link rel="manifest" href="../manifest.json">
-  <link rel="stylesheet" href="../assets/css/theme.css?v=212">
+  <link rel="stylesheet" href="../assets/css/theme.css?v=223">
   <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   html,body,#root{height:100%;overflow:hidden}
@@ -239,20 +239,20 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
-<script src="../data/shared.js?v=212"></script>
-<script src="../data/universal.js?v=212"></script>
-<script src="../data/thelongafter.js?v=212"></script>
-<script src="../data/cyberpunk.js?v=212"></script>
-<script src="../data/fantasy.js?v=212"></script>
-<script src="../data/space.js?v=212"></script>
-<script src="../data/victorian.js?v=212"></script>
-<script src="../data/postapoc.js?v=212"></script>
-<script src="../data/western.js?v=212"></script>
-<script src="../data/dVentiRealm.js?v=212"></script>
-<script src="../core/engine.js?v=212"></script>
+<script src="../data/shared.js?v=223"></script>
+<script src="../data/universal.js?v=223"></script>
+<script src="../data/thelongafter.js?v=223"></script>
+<script src="../data/cyberpunk.js?v=223"></script>
+<script src="../data/fantasy.js?v=223"></script>
+<script src="../data/space.js?v=223"></script>
+<script src="../data/victorian.js?v=223"></script>
+<script src="../data/postapoc.js?v=223"></script>
+<script src="../data/western.js?v=223"></script>
+<script src="../data/dVentiRealm.js?v=223"></script>
+<script src="../core/engine.js?v=223"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dexie/4.0.10/dexie.min.js" crossorigin="anonymous"></script>
-<script src="../core/db.js?v=212"></script>
-<script src="../core/ui-primitives.js?v=212"></script>
+<script src="../core/db.js?v=223"></script>
+<script src="../core/ui-primitives.js?v=223"></script>
 
 <!-- MP-03: PartyKit client — auto-reconnect WebSocket (~8KB gz) -->
 <!-- partysocket: vendored locally — no UMD CDN build exists for this package -->
@@ -380,7 +380,7 @@ function EditModal(props){
   var card=props.card,onSave=props.onSave,onClose=props.onClose;
   var _t=useState(card.title);var title=_t[0];var setTitle=_t[1];
   var _n=useState(card.notes);var notes=_n[0];var setNotes=_n[1];
-  return h('div',{className:'rs-overlay',onClick:function(e){if(e.target===e.currentTarget)onClose();}},
+  return h('div',{className:'rs-overlay',role:'dialog','aria-modal':'true',onClick:function(e){if(e.target===e.currentTarget)onClose();}},
     h('div',{className:'rs-modal'},
       h('div',{style:{fontSize:13,fontWeight:700,color:'var(--text)',marginBottom:4}},'Edit card'),
       h('div',null,h('div',{className:'rs-edit-label'},'Title'),
@@ -399,7 +399,7 @@ function MdModal(props){
   var card=props.card,campName=props.campName,onClose=props.onClose;
   var md='';try{md=toMarkdown(card.genId,card.data,campName);}catch(e){md='# '+card.title+'\n\n'+card.notes;}
   if(!md)md='# '+card.title+'\n\n'+card.notes;
-  return h('div',{className:'rs-overlay',onClick:function(e){if(e.target===e.currentTarget)onClose();}},
+  return h('div',{className:'rs-overlay',role:'dialog','aria-modal':'true',onClick:function(e){if(e.target===e.currentTarget)onClose();}},
     h('div',{className:'rs-modal'},
       h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}},
         h('span',{style:{fontSize:13,fontWeight:700,color:'var(--text)'}},card.title),
@@ -455,7 +455,12 @@ function CanvasCard(props){
           skills.map(function(s,i){return h('span',{key:i,className:'cc-sk'},h('strong',null,'+'+s.r),' '+s.name);})),
         (phyBoxes.length>0||menBoxes.length>0)&&h('div',{className:'cc-stress'},
           phyBoxes.length>0&&h('span',null,'PHY'),
-          phyBoxes.map(function(v,i){return h('div',{key:i,className:'cc-sbox'+(v?' hit':''),onClick:function(){var a=phyBoxes.slice();a[i]=!a[i];onUpd({phyHit:a});}});}),
+          phyBoxes.map(function(v,i){return h('div',{key:i,className:'cc-sbox'+(v?' hit':''),
+            role:'checkbox','aria-checked':String(!!v),'aria-label':'Physical stress '+(i+1),
+            tabIndex:0,
+            onClick:function(){var a=phyBoxes.slice();a[i]=!a[i];onUpd({phyHit:a});},
+            onKeyDown:function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();var a=phyBoxes.slice();a[i]=!a[i];onUpd({phyHit:a});}}
+          });}),
           menBoxes.length>0&&h('span',{style:{marginLeft:4}},'MEN'),
           menBoxes.map(function(v,i){return h('div',{key:i,className:'cc-sbox'+(v?' hit':''),style:{borderColor:'var(--c-purple)'},onClick:function(){var a=menBoxes.slice();a[i]=!a[i];onUpd({menHit:a});}});})
         ),
@@ -483,7 +488,12 @@ function CanvasCard(props){
         d.trigger&&h('div',{className:'cc-asp'},d.trigger),
         h('div',{className:'cc-cd-track'},
           Array.from({length:total},function(_,i){
-            return h('div',{key:i,className:'cc-cdbox'+(i<filled?' tick':''),onClick:function(){onUpd({cdFilled:i<filled?i:i+1});}},i+1);
+            return h('div',{key:i,className:'cc-cdbox'+(i<filled?' tick':''),
+              role:'checkbox','aria-checked':String(i<filled),'aria-label':'Box '+(i+1),
+              tabIndex:0,
+              onClick:function(){onUpd({cdFilled:i<filled?i:i+1});},
+              onKeyDown:function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();onUpd({cdFilled:i<filled?i:i+1});}}
+            },i+1);
           })
         ),
         triggered&&h('div',{className:'cc-trigger'},'⚡ TRIGGERED'),
@@ -714,7 +724,13 @@ function PlayerRow(props){
   }
   function setConseq(i,val){var n=conseq.slice();n[i]=val;act({conseq:n});}
   return h('div',{className:'rs-player'+(sel?' selected':''),style:{borderLeftColor:p.color||'var(--accent)',borderLeftWidth:3}},
-    h('div',{className:'rs-player-top',onClick:function(){onSel(sel?null:p.id);}},
+    h('div',{className:'rs-player-top',
+      role:'button',tabIndex:0,
+      'aria-expanded':String(!!sel),
+      'aria-label':(sel?'Collapse ':'Expand ')+p.name,
+      onClick:function(){onSel(sel?null:p.id);},
+      onKeyDown:function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();onSel(sel?null:p.id);}}
+    },
       h('div',{className:'rs-player-dot',style:{background:p.color||'var(--accent)'}}),
       h('div',{className:'rs-player-name'},p.name),
       sel&&h('button',{style:{background:'none',border:'none',cursor:'pointer',fontSize:10,color:'var(--text-muted)',padding:'0 2px',flexShrink:0},
@@ -732,11 +748,22 @@ function PlayerRow(props){
     h('div',{className:'rs-stress-row'},
       h('span',{className:'rs-fp-label'},'PHY'),
       h('div',{style:{display:'flex',gap:2}},
-        p.phy.map(function(v,i){return h('div',{key:i,className:'rs-stress-box'+(v?' filled':''),onClick:isReadOnly?null:function(){var a=p.phy.slice();a[i]=!a[i];act({phy:a});},style:isReadOnly?{cursor:'default'}:null});})
+        p.phy.map(function(v,i){return h('div',{key:i,className:'rs-stress-box'+(v?' filled':''),
+            role:'checkbox','aria-checked':String(!!v),'aria-label':'Physical stress '+(i+1),
+            tabIndex:isReadOnly?-1:0,
+            onClick:isReadOnly?null:function(){var a=p.phy.slice();a[i]=!a[i];act({phy:a});},
+            onKeyDown:isReadOnly?null:function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();var a=p.phy.slice();a[i]=!a[i];act({phy:a});}},
+            style:isReadOnly?{cursor:'default'}:null});})
       ),
       h('span',{className:'rs-fp-label',style:{marginLeft:4}},'MEN'),
       h('div',{style:{display:'flex',gap:2}},
-        p.men.map(function(v,i){return h('div',{key:i,className:'rs-stress-box'+(v?' filled':''),style:{borderColor:'var(--c-purple)'},onClick:isReadOnly?null:function(){var a=p.men.slice();a[i]=!a[i];act({men:a});}});})
+        p.men.map(function(v,i){return h('div',{key:i,className:'rs-stress-box'+(v?' filled':''),
+            style:{borderColor:'var(--c-purple)'},
+            role:'checkbox','aria-checked':String(!!v),'aria-label':'Mental stress '+(i+1),
+            tabIndex:isReadOnly?-1:0,
+            onClick:isReadOnly?null:function(){var a=p.men.slice();a[i]=!a[i];act({men:a});},
+            onKeyDown:isReadOnly?null:function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();var a=p.men.slice();a[i]=!a[i];act({men:a});}}
+          });})
       )
     ),
     expanded&&h('div',{style:{padding:'0 8px 7px'}},
@@ -779,7 +806,7 @@ function DicePanel(props){
   function doRoll(sk){
     if(spinning)return;
     setActiveSk(sk);setBoosted(false);setResult(null);setSpinning(true);
-    setTimeout(function(){
+    rollTimerRef.current=setTimeout(function(){
       var r=[rollDF(),rollDF(),rollDF(),rollDF()];
       var s=r.reduce(function(a,b){return a+b;},0);
       setDice(r);setSpinning(false);setResult(s);
@@ -823,7 +850,12 @@ function DicePanel(props){
       h('div',{style:{fontSize:8,fontWeight:700,color:'var(--text-muted)',textTransform:'uppercase',letterSpacing:'.08em',marginBottom:4}},'Skills'),
       player.skills.map(function(sk){
         var isSel=activeSk&&activeSk.l===sk.l;
-        return h('div',{key:sk.l,className:'rs-skill-row'+(isSel?' sel':''),onClick:function(){doRoll(sk);}},
+        return h('div',{key:sk.l,className:'rs-skill-row'+(isSel?' sel':''),
+          role:'button',tabIndex:0,
+          'aria-label':'Roll '+sk.l+' '+sk.v,
+          onClick:function(){doRoll(sk);},
+          onKeyDown:function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();doRoll(sk);}}
+        },
           h('span',{style:{fontSize:10,color:'var(--text)',fontWeight:600}},sk.l),
           h('div',{style:{display:'flex',gap:5,alignItems:'center'}},
             h('span',{style:{fontSize:9,color:'var(--text-muted)'}},lbl(sk.v)),
@@ -1056,7 +1088,6 @@ function JoinModal(props){
 // ── MAIN APP ──────────────────────────────────────────────────────
 function RunApp(){
   var _cards=useState([]);var cards=_cards[0];var setCards=_cards[1];
-  var cardsRef=useRef([]);
   var _players=useState([]);var players=_players[0];var setPlayers=_players[1];
   var _round=useState(1);var round=_round[0];var setRound=_round[1];
   var _order=useState([]);var order=_order[0];var setOrder=_order[1];
@@ -1160,7 +1191,7 @@ function RunApp(){
     var s=createSync(code,role||'player',
       function(data){
         if(data.type==='player_action'||data.type==='player_boost')return;
-        if(data.cards)setCards(function(){cardsRef.current=data.cards;return data.cards;});
+        if(data.cards)setCards(function(){return data.cards;});
         if(data.players)setPlayers(data.players);
         if(data.round)setRound(data.round);
         if(data.campId)setCampId(data.campId);
@@ -1186,11 +1217,16 @@ function RunApp(){
       partySize:partySize,order:order,scale:scale,ox:ox,oy:oy,ts:Date.now()};
     Object.assign(state,patch);
     DB.saveSession(RUN_IDB_KEY,state).catch(function(){});
-    if(sync&&sync.role==='gm')sync.broadcastState(state); // MP-05
+    if(sync&&sync.role==='gm'){
+      var broadcastState=Object.assign({},state,{
+        cards:(state.cards||[]).filter(function(c){return !c.gmOnly;}) // never send gmOnly to players
+      });
+      sync.broadcastState(broadcastState);
+    } // MP-05
   }
   function showToast(msg){clearTimeout(toastRef.current);setToast(msg);toastRef.current=setTimeout(function(){setToast(null);},3000);}
   function updCard(id,patch,noPersist){
-    setCards(function(cs){var next=cs.map(function(c){return c.id===id?Object.assign({},c,patch):c;});cardsRef.current=next;if(!noPersist)persist({cards:next});return next;});
+    setCards(function(cs){var next=cs.map(function(c){return c.id===id?Object.assign({},c,patch):c;});if(!noPersist)persist({cards:next});return next;});
   }
   function addCard(card){
     // Place near canvas centre accounting for pan/zoom
@@ -1200,6 +1236,7 @@ function RunApp(){
     showToast('Added: '+card.title);
   }
   var _lastRemoved=useRef(null);
+  var fitAllRef=useRef(null); // always-fresh ref for keyboard shortcut
   function removeCard(id){
     setCards(function(cs){
       var removing=cs.find(function(c){return c.id===id;});
@@ -1278,7 +1315,8 @@ function RunApp(){
     DB.loadSession('quick_prep_pack_'+cid).then(function(qpp){
       if(!qpp||!qpp.pack)return;
       var toAdd=[];var i=0;
-      ['seed','countdown','compel'].forEach(function(k){
+      // Keys match CampaignApp QPP save: seed, scene, npcMajor
+      ['seed','scene','npcMajor'].forEach(function(k){
         if(qpp.pack[k]&&qpp.pack[k].genId&&qpp.pack[k].data){
           var card=cardFromResult(qpp.pack[k].genId,qpp.pack[k].data);
           card.x=80+i*220;card.y=80;i++;toAdd.push(card);
@@ -1302,7 +1340,9 @@ function RunApp(){
     cards.forEach(function(c){lines.push('## '+c.title);if(c.notes)lines.push(c.notes);lines.push('');});
     var blob=new Blob([lines.join('\n')],{type:'text/markdown'});
     var url=URL.createObjectURL(blob);var a=document.createElement('a');
-    a.href=url;a.download='session-notes.md';a.click();URL.revokeObjectURL(url);
+    a.href=url;a.download='session-notes.md';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    URL.revokeObjectURL(url);
     showToast('Exported');
   }
 
@@ -1401,6 +1441,8 @@ function RunApp(){
     setOy(20 - minY*newScale);
   }
 
+  fitAllRef.current=fitAll; // keep ref current — used by keyboard handler
+
   // Zone drop
   function onZoneDrop(zoneId,cardId){
     if(!dragState.current&&!cardId)return;
@@ -1437,7 +1479,7 @@ function RunApp(){
       if(e.key==='g'||e.key==='G'){setDrawerOpen(true);setDrawerTab('gen');}
       if(e.key==='d'||e.key==='D'){setDrawerOpen(true);setDrawerTab('dice');}
       if(e.key==='e'||e.key==='E')setEditMode(function(m){return !m;});
-      if(e.key==='f'||e.key==='F')fitAll();
+      if(e.key==='f'||e.key==='F'){if(fitAllRef.current)fitAllRef.current();}
       if((e.key==='='||e.key==='+')&&!e.metaKey)setScale(function(s){return Math.min(s*1.15,3);});
       if(e.key==='-'&&!e.metaKey)setScale(function(s){return Math.max(s/1.15,0.2);});
     }

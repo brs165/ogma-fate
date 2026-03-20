@@ -1514,7 +1514,9 @@ function CampaignApp(props) {
     document.documentElement.setAttribute('data-gm-mode', next ? 'on' : 'off');
   }
 
-  var rollCountRef = useRef(0); // useRef: count doesn't need to drive re-renders
+  var rollCountRef = useRef(0);
+  var isMountedRef = useRef(true); // leak fix: prevent setState after unmount
+  useEffect(function() { return function() { isMountedRef.current = false; }; }, []); // useRef: count doesn't need to drive re-renders
   const [resultAnim, setResultAnim] = useState(false);
   const [showStreakBadge, setShowStreakBadge] = useState(false);
   const [sessionPack, setSessionPack] = useState(null);
@@ -1589,9 +1591,10 @@ function CampaignApp(props) {
       _lastSeed.current = seed;
       var newResult = {genId: activeGen, data: data, _seed: seed, _ts: Date.now()};
       setTimeout(function() {
+        if (!isMountedRef.current) return;
         setResult(newResult);
         setResultAnim(true);
-        setTimeout(function() { setResultAnim(false); }, 320);
+        setTimeout(function() { if(isMountedRef.current) setResultAnim(false); }, 320);
         setHistory(function(h) {
           return [{genId: activeGen, data: data, gen: gen}].concat(h).slice(0, 8);
         });

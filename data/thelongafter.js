@@ -679,7 +679,7 @@ CAMPAIGNS["thelongafter"] = {
         "Deep Spore Exposure - Respiratory Function Reduced, Timeline Measurable",
         "Symbiont Tendril Breach - Withdrew but Left Something at the Contact Site",
         "War Engine Kinetic Strike - Rib Involvement, Movement Taxed",
-        "Alzabo Proximity - Heard a Voice You Recognised. The Voice Knew Things.",
+        "Alzabo Proximity — Heard a Voice You Recognised, and It Knew Things",
         "Monofilament Wire Cut - Clean, Deep, Requires Immediate Attention"
       
       ],
@@ -696,10 +696,10 @@ CAMPAIGNS["thelongafter"] = {
         "Blinded in One Eye - Depth Perception Gone",
         "Internal Damage - Managed Only by Sheer Refusal",
         "Shattered Shoulder - That Arm Is Done for Now",
-        "Full Phade Field Immersion - Something Has Been Added to the Signal. It Has Not Identified Itself.",
-        "Spore Network Integration - The Biome Knows Where You Are. It Is Not Neutral About This.",
-        "The Alzabo Has Your Scent - It Will Find You. It Will Speak With Voices You Know.",
-        "Transit Interface Partial Passage - You Arrived. Part of You May Still Be in Transit."
+        "Full Phade Field Immersion — Something Has Been Added to the Signal",
+        "Spore Network Integration — The Biome Knows Where You Are and Has Opinions",
+        "The Alzabo Has Your Scent and Will Speak With Voices You Know",
+        "Transit Interface Partial Passage — Part of You May Still Be in Transit"
       
       ],
       consequence_contexts: [

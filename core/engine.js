@@ -37,7 +37,8 @@ function rand(a, b) { return Math.floor(_rng() * (b - a + 1)) + a; }
 
 // Variety Matrix engine: pick a random template, substitute {Var} tokens from v arrays
 function fillTemplate(tblObj) {
-  if (!tblObj || !tblObj.t) return pick(Array.isArray(tblObj) ? tblObj : [String(tblObj)]);
+  if (!tblObj) return '';
+  if (!tblObj.t) return Array.isArray(tblObj) ? pick(tblObj) : '';
   var tmpl = pick(tblObj.t);
   if (!tmpl) return '';
   return tmpl.replace(/\{(\w+)\}/g, function(match, key) {
@@ -65,7 +66,7 @@ function generateMinorNPC(t) {
   var rating = rand(2, 3);
   var skills = chosenSkills.map(function(s, i) { return {name: s, r: Math.max(1, rating - i)}; });
   var hasStunt = _rng() > 0.5;
-  var bonusStunts = t.stunts.filter(function(s) { return s.type === 'bonus'; });
+  var bonusStunts = (t.stunts || []).filter(function(s) { return s.type === 'bonus'; });
   var stunt = hasStunt && bonusStunts.length > 0 ? pick(bonusStunts) : null;
   var stress = rand(1, 3);
   return {name: name, aspects: aspects, skills: skills, stunt: stunt, stress: stress};
@@ -106,7 +107,7 @@ function generateMajorNPC(t) {
     {name: chosen[1], r: peak - 1}, {name: chosen[2], r: peak - 1},
     {name: chosen[3], r: peak - 2}, {name: chosen[4], r: peak - 2}, {name: chosen[5], r: peak - 2},
   ].filter(function(s) { return s.r > 0; });
-  var stunts = pickN(t.stunts, 2);
+  var stunts = pickN(t.stunts || [], 2);
   // Calculate stress from assigned Physique/Will ratings (default +0 if not assigned)
   var physR = 0, willR = 0;
   skills.forEach(function(s) {
@@ -136,15 +137,16 @@ function generateScene(t) {
   var cats = ['scene_tone', 'scene_movement', 'scene_cover', 'scene_danger', 'scene_usable'];
   var chosen = pickN(cats, rand(3, 5));
   var aspects = chosen.map(function(cat) {
+    if (!t[cat]) return null;
     var catKey = cat.replace('scene_', '');
     var weights = SENSE_WEIGHTS[catKey] || SENSE_WEIGHTS.tone;
     var sense = weights[Math.floor(_rng() * weights.length)];
-    // WS-16c: capitalise at assembly — template variables are lowercase by design
     var aspectName = fillTemplate(t[cat]);
     aspectName = aspectName.charAt(0).toUpperCase() + aspectName.slice(1);
+    if (!aspectName || aspectName === 'Undefined') return null;
     return {name: aspectName, category: catKey, sense: sense, free_invoke: _rng() > 0.6};
-  });
-  var zones = pickN(t.zones, rand(2, 4)).map(function(z) {
+  }).filter(Boolean);
+  var zones = pickN(t.zones || [], rand(2, 4)).map(function(z) {
     return {name: z[0], aspect: z[1], description: z[2]};
   });
   // Scene framing questions - injected via mergeUniversal when toggle is on
@@ -161,9 +163,9 @@ function generateEncounter(t, partySize) {
   var allCats = ['scene_tone', 'scene_movement', 'scene_cover', 'scene_danger', 'scene_usable'];
   var chosenCats = pickN(allCats, rand(3, 4));
   var aspects = chosenCats.map(function(cat) { return fillTemplate(t[cat]); });
-  var zones = pickN(t.zones, rand(2, 3)).map(function(z) { return {name: z[0], aspect: z[1]}; });
-  var minors = t.opposition.filter(function(o) { return o.type === 'minor'; });
-  var majors = t.opposition.filter(function(o) { return o.type === 'major'; });
+  var zones = pickN(t.zones || [], rand(2, 3)).map(function(z) { return {name: z[0], aspect: z[1]}; });
+  var minors = (t.opposition || []).filter(function(o) { return o.type === 'minor'; });
+  var majors = (t.opposition || []).filter(function(o) { return o.type === 'major'; });
   // NA-60: pick minor without replacement to prevent duplicate names in one encounter
   var usedMinorNames = {};
   function pickUniqueMinor() {
@@ -178,6 +180,7 @@ function generateEncounter(t, partySize) {
   }
   var opp = [pickUniqueMinor()];
   if (_rng() > 0.4 && majors.length) opp.push(pick(majors));
+  opp = opp.filter(Boolean);
   return {
     aspects: aspects, zones: zones, opposition: opp,
     twist: pick(t.twists), victory: pick(t.victory), defeat: pick(t.defeat),
@@ -199,10 +202,11 @@ function generateSeed(t) {
   var twist        = pick(t.twists);
 
   // Opposition - same logic as encounter
-  var minors = t.opposition.filter(function(o) { return o.type === 'minor'; });
-  var majors = t.opposition.filter(function(o) { return o.type === 'major'; });
+  var minors = (t.opposition || []).filter(function(o) { return o.type === 'minor'; });
+  var majors = (t.opposition || []).filter(function(o) { return o.type === 'major'; });
   var opp = [pick(minors)];
   if (_rng() > 0.4 && majors.length) opp.push(pick(majors));
+  opp = opp.filter(Boolean); // guard: pick([]) returns ''
 
   // Three scene sketch - constructed from generated elements
   var scenes = [
@@ -249,6 +253,7 @@ function generateCompel(t) {
 
 function generateChallenge(t) {
   var ch = pick(t.challenge_types);
+  if (!ch || typeof ch !== 'object') ch = {name:'Overcome', desc:'A difficult obstacle.', primary:'Appropriate skill', opposing:'Passive opposition', success:'Goal achieved.', failure:'Complication introduced.'};
   var stakes_good = pick(t.victory);
   var stakes_bad  = pick(t.defeat);
   return {
@@ -505,6 +510,7 @@ function generateComplication(t) {
 }
 
 function generateBackstory(t) {
+  if (!t.backstory_questions || !t.backstory_questions.length) return {questions: [], hooks: []};
   // Pick 3 distinct questions
   var pool = t.backstory_questions.slice();
   var q1 = pool.splice(Math.floor(_rng() * pool.length), 1)[0];
