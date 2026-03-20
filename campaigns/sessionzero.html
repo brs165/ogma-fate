@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <script>(function(){try{var p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');var t=p.theme||localStorage.getItem('fate_theme')||localStorage.getItem('fate-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})()</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prep Wizard — Ogma</title>
+  <meta name="description" content="10-minute GM prep wizard for Fate Condensed. Start with a world, end with a session.">
+  <meta name="theme-color" content="#00e5ff">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicons/icon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicons/icon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicons/apple-touch-icon.png">
+  <link rel="manifest" href="../manifest.json">
+  <link rel="stylesheet" href="../assets/css/theme.css?v=191">
+  <style>
+    /* ── PREP WIZARD SHELL ──────────────────────────────────────── */
+    .pw-root{min-height:100vh;display:flex;flex-direction:column;background:var(--bg)}
+    .pw-main{flex:1;display:flex;flex-direction:column;align-items:center;padding:24px 16px 80px}
+    .pw-card{width:100%;max-width:600px}
+
+    /* ── PROGRESS TRACK ─────────────────────────────────────────── */
+    .pw-track{display:flex;align-items:center;gap:0;margin-bottom:32px;width:100%;max-width:600px}
+    .pw-track-step{display:flex;flex-direction:column;align-items:center;flex:1;position:relative}
+    .pw-track-step::after{content:'';position:absolute;top:14px;left:50%;width:100%;height:2px;background:var(--border);z-index:0}
+    .pw-track-step:last-child::after{display:none}
+    .pw-track-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text-muted);z-index:1;transition:all .2s;flex-shrink:0}
+    .pw-track-step.done .pw-track-dot{background:var(--c-green);border-color:var(--c-green);color:#fff}
+    .pw-track-step.active .pw-track-dot{background:var(--accent);border-color:var(--accent);color:var(--bg);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 20%,transparent)}
+    .pw-track-step.done::after{background:var(--c-green)}
+    .pw-track-label{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-top:5px;text-align:center;white-space:nowrap}
+    .pw-track-step.active .pw-track-label{color:var(--accent)}
+    .pw-track-step.done .pw-track-label{color:var(--c-green)}
+
+    /* ── STEP HEADER ─────────────────────────────────────────────── */
+    .pw-step-eyebrow{font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+    .pw-step-title{font-size:26px;font-weight:800;letter-spacing:-.025em;color:var(--text);margin-bottom:8px;line-height:1.2}
+    .pw-step-desc{font-size:13px;color:var(--text-dim);line-height:1.65;margin-bottom:24px}
+
+    /* ── WORLD GRID ──────────────────────────────────────────────── */
+    .pw-worlds{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:8px}
+    .pw-world-btn{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--glass-radius,10px);padding:14px;cursor:pointer;transition:all .15s;text-align:left;font-family:var(--font-ui)}
+    .pw-world-btn:hover{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 6%,transparent)}
+    .pw-world-btn.selected{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 15%,transparent)}
+    .pw-world-icon{font-size:22px;margin-bottom:6px}
+    .pw-world-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px}
+    .pw-world-genre{font-size:10px;color:var(--text-muted)}
+
+    /* ── PLAYER COUNT ────────────────────────────────────────────── */
+    .pw-player-row{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+    .pw-count-btn{width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:var(--inset);color:var(--text);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:var(--font-ui);transition:all .12s}
+    .pw-count-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+    .pw-count-btn:disabled{opacity:.3;cursor:not-allowed}
+    .pw-count-num{font-size:36px;font-weight:800;color:var(--text);min-width:48px;text-align:center}
+    .pw-count-label{font-size:12px;color:var(--text-muted)}
+
+    /* ── RESULT CARD (wizard variant) ───────────────────────────── */
+    .pw-result{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--glass-radius,10px);overflow:hidden;margin-bottom:16px;animation:pwFadeIn .2s ease both}
+    @keyframes pwFadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+    .pw-result-top{display:flex;align-items:center;gap:10px;padding:10px 14px 9px;border-bottom:1px solid var(--border)}
+    .pw-result-badge{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 20%,transparent);padding:2px 8px;border-radius:10px}
+    .pw-result-name{font-size:15px;font-weight:700;color:var(--text);flex:1}
+    .pw-result-body{padding:12px 14px}
+    .pw-aspect-row{margin-bottom:6px}
+    .pw-aspect-lbl{font-size:8px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:2px}
+    .pw-aspect{font-size:12px;font-style:italic;color:var(--text);padding:5px 8px;border-radius:5px;background:color-mix(in srgb,var(--accent) 6%,transparent);border:1px solid color-mix(in srgb,var(--accent) 15%,transparent)}
+    .pw-aspect.tr{background:color-mix(in srgb,var(--c-red) 5%,transparent);border-color:color-mix(in srgb,var(--c-red) 18%,transparent)}
+    .pw-scene-asp{font-size:11px;font-style:italic;color:var(--text-dim);padding:3px 7px;border-radius:4px;background:var(--inset);border:1px solid var(--border);display:inline-flex;align-items:center;gap:5px;margin:2px}
+    .pw-scene-sense{font-size:9px;color:var(--text-muted)}
+    .pw-scene-grid{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+    .pw-gm-note{font-size:10px;color:var(--text-muted);padding:7px 14px;border-top:1px solid var(--border);background:var(--inset);font-style:italic}
+
+    /* ── REROLL + KEEP ACTIONS ───────────────────────────────────── */
+    .pw-actions{display:flex;gap:10px;margin-top:8px}
+    .pw-reroll-btn{background:none;border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-size:12px;font-weight:600;color:var(--text-muted);cursor:pointer;font-family:var(--font-ui);transition:all .12s}
+    .pw-reroll-btn:hover{border-color:var(--accent);color:var(--accent)}
+    .pw-keep-btn{flex:1;background:var(--accent);border:none;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:700;color:var(--bg);cursor:pointer;font-family:var(--font-ui);transition:opacity .12s}
+    .pw-keep-btn:hover{opacity:.88}
+    .pw-kept-check{display:flex;align-items:center;gap:8px;padding:10px 14px;background:color-mix(in srgb,var(--c-green) 8%,transparent);border:1px solid color-mix(in srgb,var(--c-green) 20%,transparent);border-radius:8px;font-size:12px;font-weight:700;color:var(--c-green);margin-top:8px;animation:pwFadeIn .2s ease both}
+
+    /* ── BACKSTORY CARDS ─────────────────────────────────────────── */
+    .pw-backstory-list{display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
+    .pw-backstory-card{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--glass-radius,10px);padding:14px}
+    .pw-backstory-player{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px}
+    .pw-backstory-q{font-size:12px;color:var(--text-dim);line-height:1.6;margin-bottom:8px;font-style:italic}
+    .pw-backstory-aspect{font-size:13px;color:var(--text);font-style:italic;padding:6px 10px;border-radius:5px;background:color-mix(in srgb,var(--accent) 6%,transparent);border:1px solid color-mix(in srgb,var(--accent) 15%,transparent);margin-bottom:6px}
+
+    /* ── SUMMARY / READY ─────────────────────────────────────────── */
+    .pw-ready{text-align:center;padding:32px 20px;animation:pwFadeIn .3s ease both}
+    .pw-ready-badge{display:inline-flex;align-items:center;gap:8px;background:color-mix(in srgb,var(--c-green) 12%,transparent);border:1px solid color-mix(in srgb,var(--c-green) 25%,transparent);border-radius:100px;padding:8px 20px;font-size:14px;font-weight:800;color:var(--c-green);margin-bottom:20px;letter-spacing:.04em}
+    .pw-ready-title{font-size:24px;font-weight:800;color:var(--text);margin-bottom:8px;letter-spacing:-.02em}
+    .pw-ready-desc{font-size:13px;color:var(--text-dim);line-height:1.65;margin-bottom:24px;max-width:440px;margin-left:auto;margin-right:auto}
+    .pw-summary-items{display:flex;flex-direction:column;gap:8px;margin-bottom:24px;text-align:left}
+    .pw-summary-item{display:flex;align-items:baseline;gap:10px;padding:10px 14px;background:var(--inset);border:1px solid var(--border);border-radius:8px}
+    .pw-summary-gen{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);min-width:80px;flex-shrink:0}
+    .pw-summary-text{font-size:12px;font-style:italic;color:var(--text);flex:1}
+    .pw-open-btn{display:inline-flex;align-items:center;gap:8px;background:var(--accent);border:none;border-radius:8px;padding:13px 28px;font-size:14px;font-weight:800;color:var(--bg);cursor:pointer;font-family:var(--font-ui);letter-spacing:.02em;transition:opacity .12s}
+    .pw-open-btn:hover{opacity:.88}
+    .pw-restart-btn{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;font-family:var(--font-ui);margin-top:12px;text-decoration:underline}
+    .pw-restart-btn:hover{color:var(--text)}
+
+    /* ── NAV FOOTER ──────────────────────────────────────────────── */
+    .pw-nav{display:flex;align-items:center;justify-content:space-between;margin-top:24px;padding-top:20px;border-top:1px solid var(--border)}
+    .pw-back-btn{background:none;border:1px solid var(--border);border-radius:8px;padding:9px 16px;font-size:12px;font-weight:600;color:var(--text-muted);cursor:pointer;font-family:var(--font-ui);transition:all .12s}
+    .pw-back-btn:hover{border-color:var(--text-dim);color:var(--text)}
+    .pw-skip{font-size:11px;color:var(--text-muted);text-decoration:none;padding:4px}
+    .pw-skip:hover{color:var(--text)}
+    .pw-next-btn{background:var(--accent);border:none;border-radius:8px;padding:10px 24px;font-size:13px;font-weight:700;color:var(--bg);cursor:pointer;font-family:var(--font-ui);transition:opacity .12s}
+    .pw-next-btn:hover:not(:disabled){opacity:.88}
+    .pw-next-btn:disabled{opacity:.35;cursor:not-allowed}
+
+    /* ── LOADING ─────────────────────────────────────────────────── */
+    .pw-loading{display:flex;align-items:center;gap:10px;padding:20px;font-size:13px;color:var(--text-muted)}
+    .pw-spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:pwSpin .6s linear infinite;flex-shrink:0}
+    @keyframes pwSpin{to{transform:rotate(360deg)}}
+
+    @media(max-width:480px){.pw-worlds{grid-template-columns:1fr 1fr}.pw-step-title{font-size:22px}}
+    .pw-action-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+    .pw-print-btn{display:inline-flex;align-items:center;gap:7px;background:none;border:1px solid var(--border);border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700;color:var(--text-dim);cursor:pointer;font-family:var(--font-ui);transition:all .12s}
+    .pw-print-btn:hover{border-color:var(--text);color:var(--text)}
+    @media print {
+      .land-topnav,.pw-track,.pw-action-row,.pw-restart-btn,.pw-ready-badge{display:none!important}
+      body{background:#fff!important;color:#111!important}
+      .pw-main{padding:0}
+      .pw-ready{text-align:left;padding:16px 0;animation:none}
+      .pw-ready-title{font-size:20px;margin-bottom:4px}
+      .pw-ready-desc{display:none}
+      .pw-summary-items{gap:6px}
+      .pw-summary-item{background:#f5f5f5!important;border:1px solid #ccc!important;break-inside:avoid;padding:8px 12px}
+      .pw-summary-gen{color:#555!important}
+      .pw-summary-text{color:#111!important}
+    }
+    .pw-print-btn{display:inline-flex;align-items:center;gap:7px;background:none;border:1px solid var(--border);border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700;color:var(--text-dim);cursor:pointer;font-family:var(--font-ui);transition:all .12s}
+    .pw-print-btn:hover{border-color:var(--text);color:var(--text)}
+    @media print {
+      .land-topnav,.pw-track,.pw-action-row,.pw-restart-btn,.pw-ready-badge{display:none!important}
+      body{background:#fff!important;color:#111!important}
+      .pw-main{padding:0}
+      .pw-ready{text-align:left;padding:16px 0;animation:none}
+      .pw-ready-title{font-size:20px;margin-bottom:4px}
+      .pw-ready-desc{display:none}
+      .pw-summary-items{gap:6px}
+      .pw-summary-item{background:#f5f5f5!important;border:1px solid #ccc!important;break-inside:avoid;padding:8px 12px}
+      .pw-summary-gen{color:#555!important}
+      .pw-summary-text{color:#111!important}
+    }
+  </style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<header class="land-topnav" role="banner">
+  <a href="../index.html" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
+  <div class="topbar-sep" aria-hidden="true"></div>
+  <nav class="topbar-crumb" aria-label="Breadcrumb">
+    <span class="topbar-crumb-item current" aria-current="page">Prep Wizard</span>
+  </nav>
+  <div class="topbar-status">
+    <a href="run.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">▶ Run</a>
+    <a href="character-creation.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">🎭 Character Creation</a>
+    <a href="../help/index.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">📖 Help</a>
+    <button class="btn btn-icon btn-ghost" onclick="(function(){var n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(p));}catch(e){}})()" title="Toggle theme" aria-label="Toggle theme">◑</button>
+  </div>
+</header>
+
+<div id="main" class="pw-root">
+  <div id="root"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+<script src="../data/shared.js?v=191"></script>
+<script src="../data/universal.js?v=191"></script>
+<script src="../data/thelongafter.js?v=191"></script>
+<script src="../data/cyberpunk.js?v=191"></script>
+<script src="../data/fantasy.js?v=191"></script>
+<script src="../data/space.js?v=191"></script>
+<script src="../data/victorian.js?v=191"></script>
+<script src="../data/postapoc.js?v=191"></script>
+<script src="../data/western.js?v=191"></script>
+<script src="../data/dVentiRealm.js?v=191"></script>
+<script src="../core/engine.js?v=191"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dexie/4.0.10/dexie.min.js" crossorigin="anonymous"></script>
+<script src="../core/db.js?v=191"></script>
+<script src="../core/ui-primitives.js?v=191"></script>
+<script src="../core/ui-renderers.js?v=191"></script>
+
+<script>
+(function() {
+  var h = React.createElement;
+  var useState = React.useState;
+  var useEffect = React.useEffect;
+  var useCallback = React.useCallback;
+
+  var IDB_KEY = 'prep_wizard_v1';
+  var IDB_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+  // ── STEP CONFIG ─────────────────────────────────────────────────
+  var STEPS = [
+    {id:'world',   n:1, label:'World',   icon:'🌍'},
+    {id:'players', n:2, label:'Players', icon:'👥'},
+    {id:'seed',    n:3, label:'Seed',    icon:'◎'},
+    {id:'scene',   n:4, label:'Scene',   icon:'◉'},
+    {id:'npc',     n:5, label:'NPC',     icon:'◆'},
+    {id:'bundle',  n:6, label:'Bundle',  icon:'✚'},
+  ];
+
+  // ── WORLD INFO ──────────────────────────────────────────────────
+  var WORLD_META = {
+    thelongafter: {name:'The Long After',      icon:'◈', genre:'Sword & Planet'},
+    cyberpunk:    {name:'Neon Abyss',          icon:'⬡', genre:'Cyberpunk'},
+    fantasy:      {name:'Shattered Kingdoms',  icon:'✦', genre:'Dark Fantasy'},
+    space:        {name:'Void Runners',         icon:'◯', genre:'Space Western'},
+    victorian:    {name:'The Gaslight Chronicles', icon:'⊕', genre:'Gothic Horror'},
+    postapoc:     {name:'The Long Road',       icon:'◻', genre:'Post-Apocalypse'},
+    western:      {name:'Dust and Iron',       icon:'◈', genre:'Frontier Western'},
+  };
+
+  // ── HELPERS ─────────────────────────────────────────────────────
+  function roll(genId, campId, partySize) {
+    var camp = CAMPAIGNS[campId];
+    if (!camp) return null;
+    var base = mergeUniversal(camp.tables);
+    var eff = filteredTables(base, {});
+    try { return generate(genId, eff, partySize || 4); }
+    catch(e) { console.error(e); return null; }
+  }
+
+  // ── STEP COMPONENTS ─────────────────────────────────────────────
+
+  // Step 1 — World Selector
+  function StepWorld(props) {
+    var campId = props.campId;
+    var onSelect = props.onSelect;
+    var worlds = Object.keys(WORLD_META);
+
+    return h('div', null,
+      h('div', {className:'pw-step-eyebrow'}, 'Step 1 of 5'),
+      h('div', {className:'pw-step-title'}, 'Which world are you running?'),
+      h('div', {className:'pw-step-desc'}, 'Pick a campaign setting. Everything after this is tailored to your world.'),
+      h('div', {className:'pw-worlds'},
+        worlds.map(function(id) {
+          var m = WORLD_META[id];
+          return h('button', {
+            key: id,
+            className: 'pw-world-btn' + (campId === id ? ' selected' : ''),
+            onClick: function() { onSelect(id); },
+            'aria-pressed': String(campId === id),
+          },
+            h('div', {className:'pw-world-icon'}, m.icon),
+            h('div', {className:'pw-world-name'}, m.name),
+            h('div', {className:'pw-world-genre'}, m.genre)
+          );
+        })
+      )
+    );
+  }
+
+  // Step 2 — Player Count + Backstory Cards
+  function StepPlayers(props) {
+    var count = props.count;
+    var setCount = props.setCount;
+    var campId = props.campId;
+    var backstories = props.backstories;
+    var setBackstories = props.setBackstories;
+
+    useEffect(function() {
+      if (!campId || backstories.length === count) return;
+      var next = [];
+      for (var i = 0; i < count; i++) {
+        next.push(backstories[i] || roll('backstory', campId, count));
+      }
+      setBackstories(next);
+    }, [count, campId]);
+
+    function rerollOne(i) {
+      var next = backstories.slice();
+      next[i] = roll('backstory', campId, count);
+      setBackstories(next);
+    }
+
+    return h('div', null,
+      h('div', {className:'pw-step-eyebrow'}, 'Step 2 of 5'),
+      h('div', {className:'pw-step-title'}, 'How many players?'),
+      h('div', {className:'pw-step-desc'}, 'This sets the opposition scale and generates a backstory hook for each player to kick off the session.'),
+      h('div', {className:'pw-player-row'},
+        h('button', {
+          className:'pw-count-btn', disabled: count <= 1,
+          onClick: function() { setCount(count - 1); },
+          'aria-label': 'Decrease player count',
+        }, '−'),
+        h('div', {style:{textAlign:'center'}},
+          h('div', {className:'pw-count-num'}, count),
+          h('div', {className:'pw-count-label'}, count === 1 ? 'player' : 'players')
+        ),
+        h('button', {
+          className:'pw-count-btn', disabled: count >= 6,
+          onClick: function() { setCount(count + 1); },
+          'aria-label': 'Increase player count',
+        }, '+')
+      ),
+      backstories.length > 0 && h('div', null,
+        h('div', {style:{fontSize:11,fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',color:'var(--text-muted)',marginBottom:10}},
+          'Backstory hooks — one per player'
+        ),
+        h('div', {className:'pw-backstory-list'},
+          backstories.map(function(b, i) {
+            if (!b) return null;
+            return h('div', {key:i, className:'pw-backstory-card'},
+              h('div', {className:'pw-backstory-player'}, 'Player ' + (i+1)),
+              b.question && h('div', {className:'pw-backstory-q'}, '"' + b.question + '"'),
+              b.aspect && h('div', {className:'pw-backstory-aspect'}, b.aspect),
+              h('button', {
+                className:'pw-reroll-btn', style:{fontSize:11,padding:'4px 10px'},
+                onClick: function() { rerollOne(i); },
+              }, '↻ New hook')
+            );
+          })
+        )
+      )
+    );
+  }
+
+  // Step 3 — Adventure Seed
+  function StepSeed(props) {
+    var campId = props.campId;
+    var partySize = props.partySize;
+    var data = props.data;
+    var kept = props.kept;
+    var setData = props.setData;
+    var onKeep = props.onKeep;
+
+    useEffect(function() {
+      if (!data) setData(roll('seed', campId, partySize));
+    }, []);
+
+    if (!data) return h('div', {className:'pw-loading'}, h('div', {className:'pw-spinner'}), 'Rolling your Adventure Seed…');
+
+    return h('div', null,
+      h('div', {className:'pw-step-eyebrow'}, 'Step 3 of 5'),
+      h('div', {className:'pw-step-title'}, 'What\'s the situation?'),
+      h('div', {className:'pw-step-desc'}, 'This is your scenario skeleton — the location, objective, and complication. Prep Scene 1 in full. Follow the players after that.'),
+      h('div', {className:'pw-result'},
+        h('div', {className:'pw-result-top'},
+          h('span', {className:'pw-result-badge'}, 'Adventure Seed'),
+          h('span', {className:'pw-result-name'}, data.location || '')
+        ),
+        h('div', {className:'pw-result-body'},
+          data.objective && h('div', {className:'pw-aspect-row'},
+            h('div', {className:'pw-aspect-lbl'}, 'Objective'),
+            h('div', {className:'pw-aspect'}, data.objective)
+          ),
+          data.complication && h('div', {className:'pw-aspect-row'},
+            h('div', {className:'pw-aspect-lbl'}, 'Complication'),
+            h('div', {className:'pw-aspect tr'}, data.complication)
+          ),
+          data.twist && h('div', {className:'pw-aspect-row'},
+            h('div', {className:'pw-aspect-lbl'}, 'Twist — reveal late'),
+            h('div', {className:'pw-aspect', style:{borderColor:'color-mix(in srgb,var(--c-purple) 25%,transparent)',background:'color-mix(in srgb,var(--c-purple) 5%,transparent)'}}, data.twist)
+          )
+        ),
+        h('div', {className:'pw-gm-note'}, 'Prep Scene 1 only. The rest follows the players.')
+      ),
+      kept
+        ? h('div', {className:'pw-kept-check'}, '✓ Seed kept')
+        : h('div', {className:'pw-actions'},
+            h('button', {className:'pw-reroll-btn', onClick: function() { setData(roll('seed', campId, partySize)); }}, '↻ Reroll'),
+            h('button', {className:'pw-keep-btn', onClick: onKeep}, 'Keep this seed →')
+          )
+    );
+  }
+
+  // Step 4 — Scene Setup
+  function StepScene(props) {
+    var campId = props.campId;
+    var partySize = props.partySize;
+    var data = props.data;
+    var kept = props.kept;
+    var setData = props.setData;
+    var onKeep = props.onKeep;
+
+    useEffect(function() {
+      if (!data) setData(roll('scene', campId, partySize));
+    }, []);
+
+    if (!data) return h('div', {className:'pw-loading'}, h('div', {className:'pw-spinner'}), 'Setting the scene…');
+
+    var aspects = data.aspects || [];
+    return h('div', null,
+      h('div', {className:'pw-step-eyebrow'}, 'Step 4 of 5'),
+      h('div', {className:'pw-step-title'}, 'Where does Session 1 open?'),
+      h('div', {className:'pw-step-desc'}, 'Read zone names aloud when you describe the scene. Reveal visible aspects now — keep hidden ones for discovery rolls.'),
+      h('div', {className:'pw-result'},
+        h('div', {className:'pw-result-top'},
+          h('span', {className:'pw-result-badge'}, 'Scene Setup')
+        ),
+        h('div', {className:'pw-result-body'},
+          aspects.length > 0 && h('div', null,
+            h('div', {className:'pw-aspect-lbl', style:{marginBottom:6}}, 'Situation aspects'),
+            h('div', {className:'pw-scene-grid'},
+              aspects.map(function(a, i) {
+                return h('span', {key:i, className:'pw-scene-asp'},
+                  a.sense && h('span', {className:'pw-scene-sense'}, a.sense === 'sight' ? '👁' : a.sense === 'sound' ? '👂' : a.sense === 'smell' ? '👃' : a.sense === 'touch' ? '🖐' : ''),
+                  a.name || a
+                );
+              })
+            )
+          ),
+          data.zones && data.zones.length > 0 && h('div', null,
+            h('div', {className:'pw-aspect-lbl', style:{marginBottom:5,marginTop:8}}, 'Zones'),
+            h('div', {style:{display:'flex',flexDirection:'column',gap:4}},
+              data.zones.slice(0,3).map(function(z, i) {
+                return h('div', {key:i, style:{fontSize:11,color:'var(--text-dim)'}},
+                  h('strong', {style:{color:'var(--text)',marginRight:6}}, z.name || z[0]),
+                  h('span', null, z.aspect || z[1] || '')
+                );
+              })
+            )
+          )
+        ),
+        h('div', {className:'pw-gm-note'}, 'Put at least one usable aspect in reach — players love having options.')
+      ),
+      kept
+        ? h('div', {className:'pw-kept-check'}, '✓ Scene kept')
+        : h('div', {className:'pw-actions'},
+            h('button', {className:'pw-reroll-btn', onClick: function() { setData(roll('scene', campId, partySize)); }}, '↻ Reroll'),
+            h('button', {className:'pw-keep-btn', onClick: onKeep}, 'Keep this scene →')
+          )
+    );
+  }
+
+  // Step 5 — Major NPC
+  function StepNPC(props) {
+    var campId = props.campId;
+    var partySize = props.partySize;
+    var data = props.data;
+    var kept = props.kept;
+    var setData = props.setData;
+    var onKeep = props.onKeep;
+
+    useEffect(function() {
+      if (!data) setData(roll('npc_major', campId, partySize));
+    }, []);
+
+    if (!data) return h('div', {className:'pw-loading'}, h('div', {className:'pw-spinner'}), 'Generating your opening NPC…');
+
+    var asp = data.aspects || {};
+    var skills = data.skills || [];
+    return h('div', null,
+      h('div', {className:'pw-step-eyebrow'}, 'Step 5 of 5'),
+      h('div', {className:'pw-step-title'}, 'Who do the players meet first?'),
+      h('div', {className:'pw-step-desc'}, 'Your opening NPC — the face of the session\'s conflict. Introduce them through what they\'re doing, not who they are.'),
+      h('div', {className:'pw-result'},
+        h('div', {className:'pw-result-top'},
+          h('span', {className:'pw-result-badge'}, 'Major NPC'),
+          h('span', {className:'pw-result-name'}, data.name || '')
+        ),
+        h('div', {className:'pw-result-body'},
+          asp.high_concept && h('div', {className:'pw-aspect-row'},
+            h('div', {className:'pw-aspect-lbl'}, 'High Concept'),
+            h('div', {className:'pw-aspect'}, asp.high_concept)
+          ),
+          asp.trouble && h('div', {className:'pw-aspect-row'},
+            h('div', {className:'pw-aspect-lbl'}, 'Trouble'),
+            h('div', {className:'pw-aspect tr'}, asp.trouble)
+          ),
+          skills.length > 0 && h('div', {style:{marginTop:8}},
+            h('div', {className:'pw-aspect-lbl', style:{marginBottom:5}}, 'Top skills'),
+            h('div', {style:{display:'flex',gap:6,flexWrap:'wrap'}},
+              skills.slice(0,4).map(function(s, i) {
+                return h('span', {key:i, style:{fontSize:11,color:'var(--text-dim)',background:'var(--inset)',border:'1px solid var(--border)',borderRadius:4,padding:'2px 7px'}},
+                  h('strong', {style:{color:'var(--accent)',fontFamily:'var(--font-mono)',marginRight:4}}, '+'+s.rating),
+                  s.name
+                );
+              })
+            )
+          )
+        ),
+        h('div', {className:'pw-gm-note'}, 'Introduce them through action, not exposition. Starts with ' + (data.refresh || 3) + ' fate points.')
+      ),
+      kept
+        ? h('div', {className:'pw-kept-check'}, '✓ NPC kept')
+        : h('div', {className:'pw-actions'},
+            h('button', {className:'pw-reroll-btn', onClick: function() { setData(roll('npc_major', campId, partySize)); }}, '↻ Reroll'),
+            h('button', {className:'pw-keep-btn', onClick: onKeep}, 'Keep this NPC →')
+          )
+    );
+  }
+
+  // Step 5 — Bundle (configurable extras)
+  function StepBundle(props) {
+    var campId = props.campId;
+    var partySize = props.partySize;
+    var extras = props.extras;
+    var onAdd = props.onAdd;
+    var onRemove = props.onRemove;
+    var onDone = props.onDone;
+
+    var _preview = useState(null); var preview = _preview[0]; var setPreview = _preview[1];
+
+    var EXTRAS_MENU = [
+      {id:'npc_minor',    label:'Minor NPC',      icon:'◈', desc:'A quick scene NPC — 1–2 aspects, skills'},
+      {id:'faction',      label:'Faction',         icon:'⚑', desc:'A group with a goal and a face NPC'},
+      {id:'compel',       label:'Compel',          icon:'⊗', desc:'A ready-to-offer fate point moment'},
+      {id:'consequence',  label:'Consequence',     icon:'⚡', desc:'A named injury aspect for the session'},
+      {id:'countdown',    label:'Countdown',       icon:'⏱', desc:'A ticking pressure track'},
+      {id:'encounter',    label:'Encounter',       icon:'⚔', desc:'Opposition, stakes, and a twist'},
+    ];
+
+    function rollPreview(genId) {
+      var d = roll(genId, campId, partySize);
+      if (d) setPreview({genId: genId, data: d});
+    }
+
+    function commitPreview() {
+      if (!preview) return;
+      onAdd(preview.genId, preview.data);
+      setPreview(null);
+    }
+
+    // Preview panel
+    var previewPanel = preview && (function() {
+      var m = EXTRAS_MENU.find(function(x){ return x.id === preview.genId; }) || {label:preview.genId,icon:'◈'};
+      var d = preview.data;
+      var summaryText = d.name || d.location || d.situation || m.label;
+      var detailText = '';
+      if (d.aspect) detailText = d.aspect;
+      else if (d.aspects && d.aspects.high_concept) detailText = d.aspects.high_concept;
+      else if (d.goal) detailText = d.goal;
+      else if (d.objective) detailText = d.objective;
+      return h('div', {style:{background:'color-mix(in srgb,var(--accent) 5%,transparent)',border:'1px solid color-mix(in srgb,var(--accent) 20%,transparent)',borderRadius:8,padding:12,marginBottom:14,animation:'pwFadeIn .18s ease both'}},
+        h('div', {style:{fontSize:9,fontWeight:800,letterSpacing:'.1em',textTransform:'uppercase',color:'var(--accent)',marginBottom:5}}, m.icon + ' ' + m.label + ' — Preview'),
+        h('div', {style:{fontSize:13,fontWeight:700,color:'var(--text)',marginBottom:detailText?4:0}}, summaryText),
+        detailText && h('div', {style:{fontSize:11,fontStyle:'italic',color:'var(--text-dim)'} }, detailText),
+        h('div', {style:{display:'flex',gap:8,marginTop:10}},
+          h('button', {
+            className:'pw-keep-btn',
+            style:{flex:1,padding:'8px 12px',fontSize:12},
+            onClick: commitPreview,
+          }, '+ Add this card'),
+          h('button', {
+            className:'pw-reroll-btn',
+            style:{fontSize:11,padding:'6px 12px'},
+            onClick: function(){ rollPreview(preview.genId); },
+          }, '↻ Re-roll'),
+          h('button', {
+            className:'pw-reroll-btn',
+            style:{fontSize:11,padding:'6px 12px'},
+            onClick: function(){ setPreview(null); },
+          }, 'Skip')
+        )
+      );
+    })();
+
+    return h('div', null,
+      h('div', {className:'pw-step-eyebrow'}, 'Step 6 — Optional'),
+      h('div', {className:'pw-step-title'}, 'Anything else you need?'),
+      h('div', {className:'pw-step-desc'},
+        'You\'re already ready to play. Add more cards if you want extra prep — or click "Done, I\'m ready" right now.'
+      ),
+
+      // Existing extras
+      extras.length > 0 && h('div', {style:{marginBottom:16}},
+        h('div', {style:{fontSize:10,fontWeight:800,letterSpacing:'.1em',textTransform:'uppercase',color:'var(--text-muted)',marginBottom:8}}, 'Added cards'),
+        h('div', {style:{display:'flex',flexDirection:'column',gap:6}},
+          extras.map(function(e) {
+            var menuItem = EXTRAS_MENU.find(function(m){return m.id===e.genId;}) || {label:e.genId,icon:'◈'};
+            var label = e.data && (e.data.name || e.data.location || menuItem.label);
+            return h('div', {key:e.id, style:{display:'flex',alignItems:'center',gap:10,padding:'8px 12px',background:'var(--inset)',border:'1px solid var(--border)',borderRadius:7}},
+              h('span', {style:{fontSize:13}}, menuItem.icon),
+              h('div', {style:{flex:1,minWidth:0}},
+                h('div', {style:{fontSize:11,fontWeight:700,color:'var(--text)',textTransform:'uppercase',letterSpacing:'.06em',fontSize:9}}, menuItem.label),
+                h('div', {style:{fontSize:12,color:'var(--text-dim)',fontStyle:'italic',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}, label)
+              ),
+              h('button', {
+                style:{background:'none',border:'none',color:'var(--text-muted)',cursor:'pointer',fontSize:14,padding:'0 4px',fontFamily:'var(--font-ui)'},
+                onClick: function(){ onRemove(e.id); },
+                'aria-label': 'Remove ' + menuItem.label,
+              }, '✕')
+            );
+          })
+        )
+      ),
+
+      // Preview panel (shown after clicking a generator button)
+      previewPanel,
+
+      // Generator grid
+      !preview && h('div', {style:{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(150px,1fr))',gap:8,marginBottom:20}},
+        EXTRAS_MENU.map(function(m) {
+          return h('button', {
+            key: m.id,
+            className: 'pw-world-btn',
+            onClick: function(){ rollPreview(m.id); },
+            title: m.desc,
+          },
+            h('div', {className:'pw-world-icon'}, m.icon),
+            h('div', {className:'pw-world-name'}, '+ ' + m.label),
+            h('div', {className:'pw-world-genre'}, m.desc)
+          );
+        })
+      ),
+
+      h('div', {className:'pw-nav'},
+        h('button', {className:'pw-back-btn', onClick: function(){
+          if (props.onBack) props.onBack();
+        }}, '← Back'),
+        h('button', {
+          className:'pw-keep-btn',
+          style:{padding:'10px 24px',fontSize:13,fontWeight:700},
+          onClick: onDone,
+        }, 'Done, I\'m ready →')
+      )
+    );
+  }
+
+  // ── MAIN APP ────────────────────────────────────────────────────
+  function PrepWizardApp() {
+    var _step  = useState(0);      var step = _step[0];     var setStep = _step[1];
+    var _camp  = useState(null);   var campId = _camp[0];   var setCampId = _camp[1];
+    var _pc    = useState(4);      var playerCount = _pc[0]; var setPlayerCount = _pc[1];
+    var _bstrs = useState([]);     var backstories = _bstrs[0]; var setBackstories = _bstrs[1];
+    var _seed  = useState(null);   var seedData = _seed[0]; var setSeedData = _seed[1];
+    var _scene = useState(null);   var sceneData = _scene[0]; var setSceneData = _scene[1];
+    var _npc   = useState(null);   var npcData = _npc[0];   var setNpcData = _npc[1];
+    var _kSeed = useState(false);  var keptSeed = _kSeed[0]; var setKeptSeed = _kSeed[1];
+    var _kScen = useState(false);  var keptScene = _kScen[0]; var setKeptScene = _kScen[1];
+    var _kNpc  = useState(false);  var keptNpc = _kNpc[0];  var setKeptNpc = _kNpc[1];
+    var _done  = useState(false);  var done = _done[0];     var setDone = _done[1];
+    var _extras = useState([]);     var extras = _extras[0]; var setExtras = _extras[1];
+
+    // Load saved progress from IDB on mount
+    useEffect(function() {
+      DB.loadSession(IDB_KEY).then(function(saved) {
+        if (!saved) return;
+        var age = Date.now() - (saved.ts || 0);
+        if (age > IDB_TTL) { DB.clearSession(IDB_KEY); return; }
+        if (saved.campId) { setCampId(saved.campId); setStep(saved.step || 0); }
+        if (saved.playerCount) setPlayerCount(saved.playerCount);
+        if (saved.backstories) setBackstories(saved.backstories);
+        if (saved.seedData) setSeedData(saved.seedData);
+        if (saved.sceneData) setSceneData(saved.sceneData);
+        if (saved.npcData) setNpcData(saved.npcData);
+        if (saved.keptSeed) setKeptSeed(saved.keptSeed);
+        if (saved.keptScene) setKeptScene(saved.keptScene);
+        if (saved.keptNpc) setKeptNpc(saved.keptNpc);
+        if (saved.done) setDone(saved.done);
+        if (saved.extras) setExtras(saved.extras);
+      }).catch(function(){});
+    }, []);
+
+    // Persist on every state change
+    function persist(patch) {
+      var state = {
+        campId: campId, step: step, playerCount: playerCount,
+        backstories: backstories, seedData: seedData, sceneData: sceneData,
+        npcData: npcData, keptSeed: keptSeed, keptScene: keptScene,
+        keptNpc: keptNpc, done: done, extras: extras, ts: Date.now(),
+      };
+      Object.assign(state, patch);
+      DB.saveSession(IDB_KEY, state).catch(function(){});
+    }
+
+    function next()  { var s = step + 1; setStep(s); persist({step:s}); }
+    function back()  { var s = Math.max(0,step-1); setStep(s); persist({step:s}); }
+
+    function restart() {
+      setCampId(null); setStep(0); setBackstories([]); setSeedData(null);
+      setSceneData(null); setNpcData(null); setKeptSeed(false);
+      setKeptScene(false); setKeptNpc(false); setDone(false);
+      DB.clearSession(IDB_KEY).catch(function(){});
+    }
+
+    // Derive open URL for the chosen world
+    var campUrl = campId ? ('campaigns/' + campId + '.html') : '../index.html';
+
+    // ── RENDER ──────────────────────────────────────────────────────
+    return h('div', {className:'pw-main', id:'main'},
+
+      // Progress track
+      h('div', {className:'pw-track', 'aria-label':'Wizard progress', role:'progressbar'},
+        STEPS.map(function(s, i) {
+          var effectiveStep = step >= 6 ? 6 : step;
+          var state = i < effectiveStep ? 'done' : i === effectiveStep ? 'active' : '';
+          return h('div', {key:s.id, className:'pw-track-step ' + state},
+            h('div', {className:'pw-track-dot'}, i < effectiveStep ? '✓' : s.n),
+            h('div', {className:'pw-track-label'}, s.label)
+          );
+        })
+      ),
+
+      // Step content
+      h('div', {className:'pw-card'},
+
+        // Step 0 — World
+        step === 0 && h(StepWorld, {
+          campId: campId,
+          onSelect: function(id) { setCampId(id); persist({campId:id}); },
+        }),
+
+        // Step 1 — Players
+        step === 1 && campId && h(StepPlayers, {
+          count: playerCount, setCount: function(n) { setPlayerCount(n); persist({playerCount:n}); },
+          campId: campId,
+          backstories: backstories,
+          setBackstories: function(b) { setBackstories(b); persist({backstories:b}); },
+        }),
+
+        // Step 2 — Seed
+        step === 2 && campId && h(StepSeed, {
+          campId: campId, partySize: playerCount,
+          data: seedData, kept: keptSeed,
+          setData: function(d) { setSeedData(d); persist({seedData:d}); },
+          onKeep: function() { setKeptSeed(true); persist({keptSeed:true}); },
+        }),
+
+        // Step 3 — Scene
+        step === 3 && campId && h(StepScene, {
+          campId: campId, partySize: playerCount,
+          data: sceneData, kept: keptScene,
+          setData: function(d) { setSceneData(d); persist({sceneData:d}); },
+          onKeep: function() { setKeptScene(true); persist({keptScene:true}); },
+        }),
+
+        // Step 4 — NPC
+        step === 4 && campId && h(StepNPC, {
+          campId: campId, partySize: playerCount,
+          data: npcData, kept: keptNpc,
+          setData: function(d) { setNpcData(d); persist({npcData:d}); },
+          onKeep: function() {
+            setKeptNpc(true); setStep(5); persist({keptNpc:true, step:5});
+          },
+        }),
+
+        // Step 5 — Bundle (add/swap extra cards)
+        step === 5 && keptNpc && h(StepBundle, {
+          campId: campId, partySize: playerCount,
+          extras: extras,
+          onAdd: function(genId, data) {
+            var next = extras.concat([{genId:genId, data:data, id:Date.now()}]);
+            setExtras(next); persist({extras:next});
+          },
+          onRemove: function(id) {
+            var next = extras.filter(function(e){return e.id!==id;});
+            setExtras(next); persist({extras:next});
+          },
+          onBack: function() { setStep(4); persist({step:4}); },
+          onDone: function() { setDone(true); setStep(6); persist({done:true,step:6}); },
+        }),
+
+        // Done screen (step 6)
+        (step === 6 || (step === 5 && done)) && h('div', {className:'pw-ready'},
+          h('div', {className:'pw-ready-badge'}, '✓ Ready to play'),
+          h('div', {className:'pw-ready-title'}, 'You have a session.'),
+          h('div', {className:'pw-ready-desc'},
+            'Seed, scene, NPC' + (extras.length > 0 ? ', and ' + extras.length + ' extra card' + (extras.length > 1 ? 's' : '') : '') + '. That\'s everything you need for Session 1.'
+          ),
+          h('div', {className:'pw-summary-items'},
+            keptSeed && seedData && h('div', {className:'pw-summary-item'},
+              h('span', {className:'pw-summary-gen'}, 'Seed'),
+              h('span', {className:'pw-summary-text'}, seedData.location + ' — ' + (seedData.objective || ''))
+            ),
+            keptScene && sceneData && h('div', {className:'pw-summary-item'},
+              h('span', {className:'pw-summary-gen'}, 'Scene'),
+              h('span', {className:'pw-summary-text'}, (sceneData.aspects && sceneData.aspects[0]) ? (sceneData.aspects[0].name || sceneData.aspects[0]) : 'Scene ready')
+            ),
+            keptNpc && npcData && h('div', {className:'pw-summary-item'},
+              h('span', {className:'pw-summary-gen'}, 'NPC'),
+              h('span', {className:'pw-summary-text'}, npcData.name + (npcData.aspects && npcData.aspects.high_concept ? ' — ' + npcData.aspects.high_concept : ''))
+            ),
+            extras.map(function(e) {
+              return h('div', {key:e.id, className:'pw-summary-item'},
+                h('span', {className:'pw-summary-gen'}, e.genId.replace('npc_','').replace('_',' ')),
+                h('span', {className:'pw-summary-text'}, e.data && (e.data.name || e.data.location || e.genId))
+              );
+            })
+          ),
+          h('div', {className:'pw-action-row'},
+            h('a', {
+              href: '../' + campUrl,
+              className:'pw-open-btn',
+            }, '🎲 Open ' + (WORLD_META[campId] ? WORLD_META[campId].name : 'Generator')),
+            h('button', {
+              className:'pw-print-btn',
+              onClick: function() { window.print(); },
+              title: 'Print your session sheet',
+            }, '🖨 Print')
+          ),
+          h('div', null,
+            h('button', {className:'pw-restart-btn', onClick: restart}, 'Start over')
+          )
+        ),
+
+        // Nav buttons (steps 0-4 only; bundle screen has its own nav)
+        step < 5 && h('div', {className:'pw-nav'},
+          step > 0
+            ? h('button', {className:'pw-back-btn', onClick: back}, '← Back')
+            : h('a', {href:'../index.html', className:'pw-skip'}, 'Skip wizard'),
+          step < 4 && h('button', {
+            className:'pw-next-btn',
+            disabled: (step === 0 && !campId) || (step === 2 && !keptSeed) || (step === 3 && !keptScene) || (step === 4 && !keptNpc),
+            onClick: next,
+          }, step === 1 ? 'Roll my seed →' : step === 0 ? 'Set players →' : 'Continue →')
+        )
+      )
+    );
+  }
+
+  // ── MOUNT ────────────────────────────────────────────────────────
+  (function() {
+    var raw = localStorage.getItem('fate_prefs_v1');
+    var t = (raw ? JSON.parse(raw).theme : null) || localStorage.getItem('fate_theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+  ReactDOM.createRoot(document.getElementById('root')).render(h(PrepWizardApp));
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-campaign="dVentiRealm">
+<head>
+  <script>/* Theme restore - must run before CSS to prevent flash of unstyled dark mode */
+  (function(){try{var p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');var t=p.theme||localStorage.getItem('fate_theme')||localStorage.getItem('fate-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})()</script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>dVenti Realm - Campaign Guide</title>
+<link rel="icon" type="image/svg+xml" href="../assets/favicons/icon.svg">
+<link rel="stylesheet" href="../assets/css/theme.css?v=191">
+<style>
+.cg{max-width:680px;margin:0 auto;padding:24px 20px 80px;position:relative;z-index:1}
+.cg h1{font-size:var(--text-hero);font-weight:800;color:var(--text);margin-bottom:4px;letter-spacing:-0.02em}
+.cg-sub{font-size:var(--text-md);color:var(--accent,var(--text-dim));font-weight:600;margin-bottom:16px}
+.cg h2{font-size:var(--text-xl);font-weight:800;color:var(--text);margin:32px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.cg p{font-size:var(--text-base);color:var(--text-dim);line-height:1.75;margin-bottom:14px}
+.cg strong{color:var(--text);font-weight:600}
+.cg a{color:var(--c-blue);text-decoration:none}.cg a:hover{text-decoration:underline}
+.cg-card{background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);border:1px solid var(--glass-border);border-radius:var(--glass-radius);padding:20px;margin:18px 0}
+.cg-stats{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.cg-stat{flex:1;min-width:90px;text-align:center;padding:12px 8px;background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);border:1px solid var(--glass-border);border-radius:var(--glass-radius-sm)}
+.cg-stat b{display:block;font-size:var(--text-xl);font-weight:800;color:var(--accent,var(--text))}
+.cg-stat span{font-size:var(--text-label);color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em}
+.cg-sample{border-left:3px solid var(--accent,var(--gold,#888));padding:10px 16px;margin:8px 0;font-style:italic;color:var(--text-dim);font-size:var(--text-sm);border-radius:0 var(--glass-radius-sm) var(--glass-radius-sm) 0;background:var(--inset)}
+.cg-cta{text-align:center;margin-top:32px}.cg-cta a{display:inline-block;padding:12px 28px;border-radius:100px;text-decoration:none;font-weight:700;font-size:var(--text-sm);margin:4px}
+.cg-ft{text-align:center;padding:28px 20px;font-size:var(--text-label);color:var(--text-muted);border-top:1px solid var(--border)}.cg-ft a{color:var(--text-dim);text-decoration:none}
+@media print{.land-topnav,.cg-ft,.cg-cta{display:none!important}body{background:#fff!important;color:#111!important}}
+
+  .cg-guide-nav{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+    margin:32px 0 0;padding:16px 20px;
+    background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);
+    border:1px solid var(--glass-border);border-radius:var(--glass-radius);font-size:var(--text-sm)}
+  .cg-guide-nav a{color:var(--accent);text-decoration:none;font-weight:600}
+  .cg-guide-nav a:hover{text-decoration:underline}
+</style>
+</head>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<body>
+<header class="land-topnav" role="banner">
+  <a href="../index.html" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
+  <div class="topbar-sep" aria-hidden="true"></div>
+  <nav class="topbar-crumb" aria-label="Breadcrumb">
+    <a href="../index.html" class="topbar-crumb-item">Home</a><span class="topbar-crumb-sep" aria-hidden="true">&#8250;</span><a href="dVentiRealm.html" class="topbar-crumb-item">dVenti Realm</a><span class="topbar-crumb-sep" aria-hidden="true">&#8250;</span><span class="topbar-crumb-item current" aria-current="page">Campaign Guide</span>
+  </nav>
+  <div class="topbar-status">
+    <a href="../help/index.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#128218; Help</a>
+    <a href="sessionzero.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#127917; Session Zero</a>
+    <a href="../about.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">About</a>
+    <button class="btn btn-icon btn-ghost" onclick="(function(){var n=document.documentElement.getAttribute('data-theme')=='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var _p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}}');_p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p));}catch(_e){}this.setAttribute('aria-label',n==='dark'?'Switch to light mode':'Switch to dark mode');})()" title="Toggle theme" aria-label="Switch to dark mode" id="theme-toggle-btn">◑</button>
+    <button class="topbar-hamburger btn btn-icon btn-ghost" id="topnav-hbg-new"
+      aria-label="Open navigation" aria-expanded="false" aria-haspopup="true"
+      onclick="(function(btn){var dd=btn.nextElementSibling;var open=dd.classList.toggle('open');btn.setAttribute('aria-expanded',open);})(this)">&#9776;</button>
+    <div class="land-topnav-dropdown" id="topnav-dd-new">
+      <a href="../help/index.html">&#128218; Help &amp; Wiki</a>
+      <a href="sessionzero.html">&#127917; Session Zero</a>
+      <a href="../about.html">About</a>
+      <button class="btn btn-icon btn-ghost" onclick="(function(){var n=document.documentElement.getAttribute('data-theme')=='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var _p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}}');_p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p));}catch(_e){}this.setAttribute('aria-label',n==='dark'?'Switch to light mode':'Switch to dark mode');})()" title="Toggle theme" aria-label="Switch to dark mode" id="theme-toggle-btn">◑</button>
+    </div>
+  </div>
+</header>
+<div class="cg">
+<h1 id="main-content">⚔ dVenti Realm</h1>
+<div class="cg-sub">The Senate Collapsed. The Vaults Are Still Here.</div>
+<p>The Arcane Senate fell thirty years ago. The dungeon licences expired. The constructs are still running thirty-year-old directives. The phylactery registry is sealed and nobody knows where the key went. Kobolds, dragons, liches, guilds, and void-corruption — everything D&amp;D players recognise, run on Fate Condensed. The world is legally complicated and physically dangerous in equal measure.</p>
+<div class="cg-stats">
+<div class="cg-stat"><b>900+</b><span>Entries</span></div>
+<div class="cg-stat"><b>12</b><span>Opposition</span></div>
+<div class="cg-stat"><b>28</b><span>Stunts</span></div>
+<div class="cg-stat"><b>130</b><span>Names</span></div>
+<div class="cg-stat"><b>12</b><span>Challenges</span></div>
+</div>
+<div id="guide-intro-teaser" aria-label="Campaign introduction"></div>
+<script>(function(){
+  function tryInit(){
+    // Scroll to top so the intro teaser is visible from the beginning
+    if(document.getElementById('guide-intro-teaser')) {
+      document.getElementById('guide-intro-teaser').scrollIntoView({behavior:'instant',block:'start'});
+    }
+    if(typeof window.fateInitInline==='function'){
+      window.fateInitInline(document.getElementById('guide-intro-teaser'),
+        {worldKey:'dVentiRealm',titleOnly:true,freeze:true});
+    } else { setTimeout(tryInit,50); }
+  }
+  tryInit();
+})()</script>
+<h2>Tone &amp; Atmosphere</h2>
+<p>High fantasy for D&amp;D converts. The Senate's collapse created a legal and institutional vacuum that guilds, temples, dragons, and liches are all filling in incompatible ways. Everything D&amp;D players recognise — dungeon delving, guild contracts, arcane magic, monster treaties — runs on Fate Condensed's aspect/stunt/stress framework. The dungeons are real. The contracts are binding. The d20 has twenty sides for a reason.</p>
+<h2>For Players</h2>
+<p>You are dungeon delvers, guild contractors, void-touched mercenaries, and kobold crew bosses navigating a world where every job has a contract and every contract has a penalty clause. Your class is your High Concept. Your spell is a stunt. Your dungeon licence covers you for the first three floors.</p>
+<h2>Coming from D&amp;D?</h2>
+<p>This world was built for you. Sneak Attack, Divine Smite, Bardic Inspiration, Wild Shape, Counterspell — all 28 stunts are named after D&amp;D class features and translated to Fate mechanics. The vocabulary is the same. The system underneath is leaner. No action economy. No hit points. Just aspects, stress, and consequences.</p>
+<h2>Key Factions</h2>
+<p>The Guild Network (contracts, licences, arbitration), the Temple Compact (divine authority filling the Senate's administrative void), Dragon Flight Territories (treaty rights, tribute, and very long memories), the Lich Underground (post-Senate magicians operating outside the licensing system), Goblin Mercenary Unions (organised, opinionated, contractually protected).</p>
+<h2>Inspirations</h2>
+<div class="cg-card"><p style="margin:0">D&amp;D 5e (any setting), Pathfinder, Dragon Age, The Dresden Files, Discworld, Critical Role</p></div>
+<h2>Sample Troubles</h2>
+<p>Every PC has a Trouble — the thing that makes their life complicated:</p>
+<div class="cg-sample">Guild Debt — Still Running and the Interest Is Not Theoretical</div>
+<div class="cg-sample">The Void-Bond Grows Stronger Every Time I Use It</div>
+<div class="cg-sample">The Contract Is Still Active. The Employer Is Not.</div>
+<div class="cg-sample">The Dragon Remembers the Original Treaty Terms. In Detail.</div>
+<h2>Sample Locations</h2>
+<p>Adventure seeds start here. Each suggests a situation, not just a place:</p>
+<div class="cg-sample">A Senate Vault rated Class Seven, thirty years sealed, now with the door open from the inside</div>
+<div class="cg-sample">A city where three guilds claim jurisdiction over the same district and all three are legally correct</div>
+<div class="cg-sample">A dragon whose territory includes two cities that have been paying tribute to the wrong faction</div>
+<div class="cg-sample">A Senate Enforcement post on the border, abandoned for thirty years, that just sent a legal notice</div>
+<h2>Content Overview</h2>
+<div class="cg-card"><p style="margin:0;font-size:var(--text-sm);line-height:2;color:var(--text-dim)">
+<strong>NPCs:</strong> 80 first names, 50 epithets, variety-matrix concepts, 40 troubles, 28 stunts<br>
+<strong>Scenes:</strong> 12 zones, 16 movement, 16 cover, 15 objects<br>
+<strong>Adventures:</strong> 25 locations, 22 objectives, 24 complications<br>
+<strong>Encounters:</strong> 12 opposition, 25 twists, 14 victories, 15 defeats<br>
+<strong>Factions:</strong> 12 goals, 12 methods, 12 face roles<br>
+<strong>Compels:</strong> 25 situations · <strong>Backstory:</strong> 25 questions, 8 hooks
+</p></div>
+
+<div class="cg-card" style="margin-top:20px;border-color:color-mix(in srgb,var(--accent) 25%,transparent)">
+  <h2 style="margin:0 0 8px;font-size:15px;color:var(--accent)">📄 Print &amp; Play — Coming Soon</h2>
+  <p style="margin:0 0 0;font-size:13px;color:var(--text-dim);line-height:1.6">
+    A print-ready world digest for this campaign is in the works — world lore, stat blocks, factions, and a starter scenario in one printable PDF. For now, use the generator above and jot it down the old-fashioned way.
+  </p>
+</div>
+
+<div class="cg-cta">
+<a href="dVentiRealm.html" style="background:var(--accent,var(--c-blue));color:#fff">🎲 Open Generator</a>
+<a href="sessionzero.html" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
+</div>
+</div></div>
+
+<div class="cg-guide-nav">
+  <a href="../index.html">🌍 All Worlds</a>
+  <a href="dVentiRealm.html">⚔ Open dVenti Realm Generator</a>
+</div>
+<footer class="cg-ft"><div>Fate™ is a trademark of <a href="https://www.evilhat.com" target="_blank" rel="noreferrer">Evil Hat Productions, LLC</a>.</div>
+<div><a href="../license.html">CC BY 3.0</a> · <a href="../about.html">About</a></div></footer>
+<script>
+(function(){
+  var btn=document.getElementById('topnav-hbg');
+  var dd=document.getElementById('topnav-dd');
+  if(!btn||!dd) return;
+  btn.addEventListener('click',function(e){e.stopPropagation();dd.classList.toggle('open');btn.setAttribute('aria-expanded',dd.classList.contains('open'));});
+  document.addEventListener('click',function(){dd.classList.remove('open');btn.setAttribute('aria-expanded','false');});
+})();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dexie/4.0.10/dexie.min.js" crossorigin="anonymous"></script>
+  <script src="../core/db.js?v=191"></script>
+<script src="../core/intro.js?v=191"></script>
+</body>
+</html>

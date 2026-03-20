@@ -1,0 +1,139 @@
+{
+  "name": "Ogma \u2014 A Fate Condensed Generator Suite",
+  "short_name": "Ogma",
+  "description": "Offline GM prep tool for six Fate Condensed campaign settings. No internet required after first load.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#1a1a2e",
+  "theme_color": "#d4a832",
+  "lang": "en",
+  "scope": "./",
+  "categories": [
+    "games",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "assets/favicons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/favicons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/favicons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Session Zero",
+      "short_name": "Ogma",
+      "url": "./campaigns/sessionzero.html",
+      "icons": [
+        {
+          "src": "assets/favicons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Coming from D&D",
+      "short_name": "Ogma",
+      "url": "./campaigns/transition.html",
+      "icons": [
+        {
+          "src": "assets/favicons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "The Long After",
+      "short_name": "Ogma",
+      "url": "./campaigns/thelongafter.html",
+      "icons": [
+        {
+          "src": "assets/favicons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Neon Abyss",
+      "short_name": "Ogma",
+      "url": "./campaigns/cyberpunk.html",
+      "icons": [
+        {
+          "src": "assets/favicons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Shattered Kingdoms",
+      "short_name": "Ogma",
+      "url": "./campaigns/fantasy.html",
+      "icons": [
+        {
+          "src": "assets/favicons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Void Runners",
+      "short_name": "Ogma",
+      "url": "./campaigns/space.html",
+      "icons": [
+        {
+          "src": "assets/favicons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "The Gaslight Chronicles",
+      "short_name": "Ogma",
+      "url": "./campaigns/victorian.html",
+      "icons": [
+        {
+          "src": "assets/favicons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "The Long Road",
+      "short_name": "Ogma",
+      "url": "./campaigns/postapoc.html",
+      "icons": [
+        {
+          "src": "assets/favicons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Dust and Iron",
+      "short_name": "Western",
+      "description": "Frontier Western Fate Condensed Generator",
+      "url": "./campaigns/western.html",
+      "icons": [
+        {
+          "src": "assets/favicons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}
