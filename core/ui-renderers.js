@@ -1855,6 +1855,56 @@ function TpGenDropdown(props){
     )
   );
 }
+// ── TpHeroModal: full-screen FlipCard on canvas card tap ─────────────────
+function TpHeroModal(props){
+  var card=props.card,campId=props.campId,onClose=props.onClose;
+  var _in=useState(false);var animIn=_in[0];var setAnimIn=_in[1];
+  var overlayRef=useRef(null);
+  useEffect(function(){
+    var t=requestAnimationFrame(function(){
+      requestAnimationFrame(function(){setAnimIn(true);});
+    });
+    return function(){cancelAnimationFrame(t);};
+  },[]);
+  useEffect(function(){
+    function onKey(e){if(e.key==='Escape')onClose();}
+    document.addEventListener('keydown',onKey);
+    return function(){document.removeEventListener('keydown',onKey);};
+  },[onClose]);
+  useEffect(function(){
+    if(!animIn)return;
+    if(window.ogmaMountDiceRollers){
+      var mts=document.querySelectorAll('.tp-hero-dice-mount');
+      if(mts.length)window.ogmaMountDiceRollers(mts);
+    }
+  },[animIn]);
+  var skillLabel='Roll 4dF';
+  var skillVal=0;
+  if(card.data&&card.data.skills&&card.data.skills.length){
+    skillLabel=(card.data.name||card.title)+' — '+(card.data.skills[0].name||'Roll');
+    skillVal=card.data.skills[0].r||0;
+  }
+  return h('div',{
+    ref:overlayRef,
+    className:'tp-hero-overlay'+(animIn?' in':''),
+    onClick:function(e){if(e.target===overlayRef.current)onClose();},
+    role:'dialog','aria-modal':'true','aria-label':card.title||'Card',
+  },
+    h('div',{className:'tp-hero-shell'+(animIn?' in':'')},
+      h('button',{className:'tp-hero-close',onClick:onClose,'aria-label':'Close'},'×'),
+      h('div',{className:'tp-hero-card-wrap'},
+        renderCard(card.genId, card.data||{}, campId||'', function(){}, [], null)
+      ),
+      h('div',{
+        className:'tp-hero-dice-mount',
+        'data-mode':'skill',
+        'data-skill':String(skillVal),
+        'data-label':skillLabel,
+      })
+    )
+  );
+}
+
 function PrepCanvas(props){
   var campId=props.campId,campName=props.campName;
   var pinnedCards=props.pinnedCards,setPinnedCards=props.setPinnedCards;
@@ -1882,6 +1932,8 @@ function PrepCanvas(props){
   var _drawerOpen=useState(false);var drawerOpen=_drawerOpen[0];var setDrawerOpen=_drawerOpen[1];
   var _drawerTab=useState('gen');var drawerTab=_drawerTab[0];var setDrawerTab=_drawerTab[1];
   var _editingCard=useState(null);var editingCard=_editingCard[0];var setEditingCard=_editingCard[1];
+  var _heroCard=useState(null);var heroCard=_heroCard[0];var setHeroCard=_heroCard[1];
+  var newCardRef=useRef(null); // ID of most recently added card for entrance anim
   var _extras=useState(function(){
     var ex={};var COL_W=240,COL_H=260,COLS=4,PAD=20;
     pinnedCards.forEach(function(card,i){
@@ -1981,6 +2033,7 @@ function PrepCanvas(props){
   }
   function spendFP(playerId){updPlayer(playerId,{fp:Math.max(0,(players.find(function(p){return p.id===playerId;})||{fp:0}).fp-1)});}
   function addGeneratedCard(genId){
+    newCardRef.current='pending';
     var camp=typeof CAMPAIGNS!=='undefined'&&CAMPAIGNS[campId];
     if(!camp){if(showToast)showToast('No campaign loaded');return;}
     var eff=filteredTables(mergeUniversal(camp.tables),{});
@@ -2269,7 +2322,9 @@ function PrepCanvas(props){
         ),
         h('button',{className:'rs-drawer-close',onClick:function(){setDrawerOpen(false);},'aria-label':'Close'},'\u00D7')
       ),
-      drawerTab==='gen'&&h('div',{className:'tp-gen-bar',role:'toolbar','aria-label':'Generate and add to canvas'},
+      drawerTab==='gen'&&h('div',{className:'tp-gen-callout'},
+        h('div',{className:'tp-gen-callout-title'},'➕ Generate & Add to Canvas'),
+        h('div',{className:'tp-gen-bar',role:'toolbar','aria-label':'Generate and add to canvas'},
         // Characters
         h(TpGenDropdown,{
           label:'Characters',icon:'\u25C6',
@@ -2324,6 +2379,7 @@ function PrepCanvas(props){
           'aria-label':'Add GM note',
           style:{opacity:.85}
         },'\uD83D\uDD12 GM Note')
+        )
       ),
       drawerTab==='dice'&&h('div',{className:'tp-sub-bar-body'},
         h(TpDicePanel,{players:players,selId:selPlayer,spendFP:spendFP,
@@ -2416,7 +2472,8 @@ function PrepCanvas(props){
             var genMeta=(typeof GENERATORS!=='undefined'?GENERATORS:[]).find(function(g){return g.id===card.genId;})||{};
             var zoneChildren=card.genId==='zone'?inZone.filter(function(ch){return (extras[ch.id]||{}).zoneId===card.id;}):[];
             return h('div',{key:card.id,
-              className:'cc cc-'+sz+(ex._dragging?' drag-active':'')+(ex.gmOnly?' cc-gm-only':'')+(ex.freeInvoke?' cc-free-invoke':'')+(card.genId==='zone'?' cc-zone-card':''),
+              className:'cc cc-'+sz+(ex._dragging?' drag-active':'')+(ex.gmOnly?' cc-gm-only':'')+(ex.freeInvoke?' cc-free-invoke':'')+(card.genId==='zone'?' cc-zone-card':'')+(newCardRef.current===card.id?' tp-card-new':''),
+              ref:newCardRef.current===card.id?function(el){if(el){setTimeout(function(){newCardRef.current=null;},400);}}:null,
               style:{left:ex.x+'px',top:ex.y+'px',zIndex:ex._dragging?1000:(card.genId==='zone'?1:2)},
               onDragOver:card.genId==='zone'?function(e){e.preventDefault();}:null,
               onDrop:card.genId==='zone'?function(e){
@@ -2466,18 +2523,28 @@ function PrepCanvas(props){
                     'aria-label':'Remove card'},'×')
                 )
               ),
-              sz!=='sm'&&card.genId!=='zone'&&h(TpCardBody,{
-                card:Object.assign({},card,{size:sz,phyHit:ex.phyHit,menHit:ex.menHit,cdFilled:ex.cdFilled||0,
-                  // TC-08: use edited title/notes from extras if set
-                  title:ex.title!=null?ex.title:card.title,
-                  _notes:ex.notes||''}), // _notes passed separately to avoid data shape conflicts
-                onUpd:function(patch){updExtra(card.id,patch);},
-                onRollSkill:function(sk){
-                  setSelPlayer(selPlayer||(players[0]&&players[0].id)||null);
-                  setDrawerOpen(true);setDrawerTab('dice');
-                  if(showToast)showToast('Rolling '+sk.l+' +'+sk.v+' — select player to roll');
-                }
-              }),
+              sz!=='sm'&&card.genId!=='zone'&&h('div',{
+                className:'tp-card-expand-btn',
+                title:'Tap to expand',
+                onClick:function(e){
+                  if(e.target.closest('button'))return;
+                  setHeroCard(card);
+                  if(tableSync&&tableSync.role==='gm'&&tableSync.connected)
+                    tableSync.ws.send(JSON.stringify({type:'card_expand',cardId:card.id}));
+                },
+              },
+                h(TpCardBody,{
+                  card:Object.assign({},card,{size:sz,phyHit:ex.phyHit,menHit:ex.menHit,cdFilled:ex.cdFilled||0,
+                    title:ex.title!=null?ex.title:card.title,
+                    _notes:ex.notes||''}),
+                  onUpd:function(patch){updExtra(card.id,patch);},
+                  onRollSkill:function(sk){
+                    setSelPlayer(selPlayer||(players[0]&&players[0].id)||null);
+                    setDrawerOpen(true);setDrawerTab('dice');
+                    if(showToast)showToast('Rolling '+sk.l+' +'+sk.v+' — select player to roll');
+                  }
+                })
+              ),
               // TC-07: Zone body with children list + drop hint
               card.genId==='zone'&&h('div',{className:'cc-zone-body'},
                 h('div',{style:{fontSize:12,fontWeight:700,color:'var(--text)',marginBottom:3}},
@@ -2520,6 +2587,15 @@ function PrepCanvas(props){
     }),
 
     // TC-08: Edit card modal
+        heroCard&&h(TpHeroModal,{
+      card:heroCard,
+      campId:campId,
+      onClose:function(){
+        setHeroCard(null);
+        if(tableSync&&tableSync.role==='gm'&&tableSync.connected)
+          tableSync.ws.send(JSON.stringify({type:'card_collapse'}));
+      },
+    }),
     editingCard&&(function(){
       var card=pinnedCards.find(function(c){return c.id===editingCard;});
       var ex=extras[editingCard]||{};

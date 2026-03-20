@@ -1011,9 +1011,8 @@ function createTableSync(roomCode,role,onStateUpdate,onRoll,onToast,onPresence){
   var sync={ws:ws,role:role,roomCode:roomCode,connected:false,
     broadcastState:function(state){
       if(sync.role!=='gm'||!sync.connected)return;
-      var clean=Object.assign({},state);
-      clean.cards=(state.cards||[]).filter(function(c){return !c.gmOnly;});
-      ws.send(JSON.stringify({type:'state',payload:clean}));
+      // PrepCanvas already filtered gmOnly cards before calling this
+      ws.send(JSON.stringify({type:'state',payload:state}));
     },
     sendAction:function(playerId,action,patch){
       if(sync.role!=='player'||!sync.connected)return;
@@ -1858,7 +1857,7 @@ function CampaignApp(props) {
           title: 'You are offline. Ogma is running from cached data.',
         }, '⚡ Offline'),
         // Run button — links to Run session surface pre-loaded with this world
-        pinnedCards.length > 0 && h('button', {
+        h('button', {
           className: 'btn btn-ghost topbar-nav-btn topbar-nav-hide-sm' + (prepView ? ' active' : ''),
           onClick: function() { setPrepView(function(v) { return !v; }); },
           title: prepView ? 'Back to generator' : 'View Table (' + pinnedCards.length + ' cards)',
@@ -1873,12 +1872,6 @@ function CampaignApp(props) {
             borderRadius: '100px', padding: '1px 5px', lineHeight: 1.4,
           }}, String(pinnedCards.length))
         ),
-        campId && h('a', {
-          href: '../campaigns/run.html?world=' + campId,
-          className: 'btn btn-ghost topbar-nav-btn topbar-nav-hide-sm',
-          style: {fontSize: 13, textDecoration: 'none'},
-          title: 'Open Run session surface for ' + (camp && camp.meta ? camp.meta.name : campId),
-        }, '▶ Run'),
         // Theme toggle
         h('button', {
           className: 'btn btn-icon btn-ghost',
@@ -1997,80 +1990,8 @@ function CampaignApp(props) {
               h('span', {className: 'sidebar-item-label'}, g.label)
             );
           }),
-          h('div', {style: {height: 8, flexShrink: 0}})
-        ),
-
-        // ══════════════════════════════════════════════════════════
-        // SESSION PANEL — at-table tools + GM Mode/Help Level + nav
-        // ══════════════════════════════════════════════════════════
-        h('div', {
-          id: 'sb-panel-sess',
-          className: 'sidebar-panel' + (sidebarTab === 'sess' ? ' active' : ''),
-          role: 'tabpanel',
-          'aria-label': 'Prep tools and settings',
-        },
-
-          // ── Quick Prep Pack ────────────────────────────────────
-          h('div', {className: 'sidebar-group-label'}, 'Prep'),
-          h('button', {
-            className: 'sidebar-tool-btn full-session-btn' + (packRolling ? ' rolling' : '') + (sessionPack ? ' active' : ''),
-            onClick: function() {
-              doFullSession();
-              setShowSidebar(false);
-            },
-            disabled: packRolling || rolling,
-            title: 'Quick Prep Pack — generates Adventure Seed + Scene Setup + Major NPC in one click',
-            'aria-label': 'Quick Prep Pack — Adventure Seed + Scene Setup + Major NPC',
-          },
-            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: 'play_intro'})),
-            h('span', {className: 'sidebar-item-label'}, packRolling ? 'Generating…' : 'Quick Prep Pack'),
-            !packRolling && h('span', {className: 'full-session-badge'}, '3')
-          ),
-          sessionPack && h('button', {
-            className: 'sidebar-tool-btn',
-            onClick: function() {
-              setSessionPack(null);
-              setResult(null);
-            },
-            className: 'sidebar-tool-btn',
-          },
-            h('span', {className: 'sidebar-item-icon'}, '✕'),
-            h('span', {className: 'sidebar-item-label'}, 'Clear session')
-          ),
-          // ── Vault ─────────────────────────────────────────────
-          h('button', {
-            className: 'sidebar-tool-btn',
-            onClick: function() { setShowVault(true); setShowSidebar(false); },
-          },
-            h('span', {className: 'sidebar-item-icon'}, '🗄'),
-            h('span', {className: 'sidebar-item-label'}, 'Table Prep'),
-            pinnedCards.length > 0 && h('span', {className: 'full-session-badge'}, String(pinnedCards.length))
-          ),
-
-          h('div', {className: 'sidebar-divider'}),
-
-          // ── Tools ──────────────────────────────────────
           h('div', {className: 'sidebar-group-label'}, 'Tools'),
-          h('button', {
-            id: 'sidebar-btn-fp',
-            className: 'sidebar-tool-btn' + (showFP ? ' active' : ''),
-            onClick: function() { setShowFP(!showFP); setShowSidebar(false); },
-            'aria-pressed': String(showFP),
-            'aria-controls': 'floater-fp',
-          },
-            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.fp_tracker})),
-            h('span', {className: 'sidebar-item-label'}, 'FP Tracker')
-          ),
-          h('button', {
-            id: 'sidebar-btn-cd',
-            className: 'sidebar-tool-btn' + (showCD ? ' active' : ''),
-            onClick: function() { setShowCD(!showCD); setShowSidebar(false); },
-            'aria-pressed': String(showCD),
-            'aria-controls': 'floater-cd',
-          },
-            h('span', {className: 'sidebar-item-icon'}, '⏱'),
-            h('span', {className: 'sidebar-item-label'}, 'Countdown Tracker')
-          ),
+          
           h('button', {
             id: 'sidebar-btn-doc',
             className: 'sidebar-tool-btn' + (showDoc ? ' active' : ''),
@@ -2082,33 +2003,13 @@ function CampaignApp(props) {
             h('span', {className: 'sidebar-item-label'}, 'Session Notes')
           ),
           h('button', {
-            className: 'sidebar-tool-btn' + (showHistory ? ' active' : ''),
-            onClick: function() { setShowHistory(!showHistory); setShowSidebar(false); },
-            'aria-pressed': String(showHistory),
+            className: 'sidebar-tool-btn',
+            onClick: function() { setShowKbShortcuts(true); setShowSidebar(false); },
+            title: 'Keyboard shortcuts',
           },
-            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.history})),
-            h('span', {className: 'sidebar-item-label'},
-              pinnedCards.length > 0 ? 'History · ' + pinnedCards.length + ' pinned' : 'History'
-            ),
-            (function() {
-              // UX-09: Session ready signal — seed + npc + scene all present
-              var genIds = pinnedCards.map(function(c) { return c.genId; });
-              var hasSeed  = genIds.some(function(g) { return g === 'seed'; });
-              var hasNpc   = genIds.some(function(g) { return g === 'npc_minor' || g === 'npc_major'; });
-              var hasScene = genIds.some(function(g) { return g === 'scene'; });
-              if (hasSeed && hasNpc && hasScene) {
-                return h('span', {
-                  className: 'session-ready-badge',
-                  title: 'You have a seed, NPC, and scene — that\'s a session. Ready to play.',
-                  'aria-label': 'Session ready',
-                }, '✓ Ready');
-              }
-              return null;
-            })()
+            h('span', {className: 'sidebar-item-icon'}, h('span', {'aria-hidden':'true'}, '⌨')),
+            h('span', {className: 'sidebar-item-label'}, 'KB Shortcuts')
           ),
-
-          // ── Settings ──────────────────────────────────────────
-          h('div', {className: 'sidebar-divider'}),
           h('div', {className: 'sidebar-group-label'}, 'Settings'),
           h('button', {
             className: 'sidebar-tool-btn',
@@ -2132,55 +2033,39 @@ function CampaignApp(props) {
             h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: theme === 'dark' ? RA_ICONS.theme_light : RA_ICONS.theme_dark})),
             h('span', {className: 'sidebar-item-label'}, theme === 'dark' ? 'Light mode' : 'Dark mode')
           ),
+          h('div', {style: {height: 8, flexShrink: 0}})
+        ),
 
-          // ── Navigate ──────────────────────────────────────────
+        // ══════════════════════════════════════════════════════════
+        // SESSION PANEL — at-table tools + GM Mode/Help Level + nav
+        // ══════════════════════════════════════════════════════════
+        h('div', {
+          id: 'sb-panel-sess',
+          className: 'sidebar-panel' + (sidebarTab === 'sess' ? ' active' : ''),
+          role: 'tabpanel',
+          'aria-label': 'Prep tools and settings',
+        },
+
+          // ── Vault ─────────────────────────────────────────────
+          
+
           h('div', {className: 'sidebar-divider'}),
-          h('div', {className: 'sidebar-group-label'}, 'Navigate'),
+
+          // ── Tools ──────────────────────────────────────
+          h('div', {className: 'sidebar-group-label'}, 'Tools'),
+          
           h('button', {
-            className: 'sidebar-tool-btn',
-            onClick: function() { setShowSidebar(false); setShowIntroModal(true); },
+            id: 'sidebar-btn-cd',
+            className: 'sidebar-tool-btn' + (showCD ? ' active' : ''),
+            onClick: function() { setShowCD(!showCD); setShowSidebar(false); },
+            'aria-pressed': String(showCD),
+            'aria-controls': 'floater-cd',
           },
-            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.play_intro})),
-            h('span', {className: 'sidebar-item-label'}, 'Play Intro')
-          ),
-          h('a', {href: '../campaigns/guide-' + campId + '.html', className: 'sidebar-tool-btn'},
-            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.guide})),
-            h('span', {className: 'sidebar-item-label'}, 'Campaign Guide')
-          ),
-          h('button', {
-            className: 'sidebar-tool-btn',
-            onClick: function() { setShowKbShortcuts(true); setShowSidebar(false); },
-            title: 'Keyboard shortcuts reference',
-          },
-            h('span', {className: 'sidebar-item-icon'}, h('span', {'aria-hidden':'true'}, '⌨')),
-            h('span', {className: 'sidebar-item-label'}, 'KB Shortcuts')
-          ),
-          h('a', {href: '../help/dnd-transition.html', className: 'sidebar-tool-btn'},
-            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.dnd_guide})),
-            h('span', {className: 'sidebar-item-label'}, 'D&D Guide')
-          ),
-          h('a', {href: '../campaigns/sessionzero.html', className: 'sidebar-tool-btn'},
-            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.learn || 'player'})),
-            h('span', {className: 'sidebar-item-label'}, 'Session Zero')
-          ),
-          h('a', {href: '../help/new-to-ogma.html', className: 'sidebar-tool-btn'},
-            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.learn})),
-            h('span', {className: 'sidebar-item-label'}, 'Quick Start')
-          ),
-          h('a', {href: '../index.html', className: 'sidebar-tool-btn'},
-            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.home})),
-            h('span', {className: 'sidebar-item-label'}, 'Home')
-          ),
-          h('a', {href: '../help/index.html', className: 'sidebar-tool-btn'},
-            h('span', {className: 'sidebar-item-icon'}, '📖'),
-            h('span', {className: 'sidebar-item-label'}, 'Help & Wiki')
-          ),
-          h('a', {href: '../about.html', className: 'sidebar-tool-btn'},
-            h('span', {className: 'sidebar-item-icon'}, 'ℹ'),
-            h('span', {className: 'sidebar-item-label'}, 'About')
+            h('span', {className: 'sidebar-item-icon'}, '⏱'),
+            h('span', {className: 'sidebar-item-label'}, 'Countdown Tracker')
           ),
 
-          h('div', {className: 'sidebar-legal'},
+                    h('div', {className: 'sidebar-legal'},
             'Fate™ is a trademark of Evil Hat Productions, LLC.',
             h('br', null),
             h('a', {href: '../license.html', style: {color: 'inherit', textDecoration: 'underline', opacity: 0.7}},

@@ -176,3 +176,8 @@
     initAll();
   }
 })();
+
+// Global bridge for dynamic mounting (hero modal etc)
+window.ogmaMountDiceRollers = function(nodes) {
+  Array.prototype.forEach.call(nodes, buildWidget);
+};
