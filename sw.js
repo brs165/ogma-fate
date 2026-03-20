@@ -2,7 +2,7 @@
 // Strategy: cache-first for all static assets, network-first for CDN scripts.
 // Safari fix: redirected responses are cloned as non-redirected before caching.
 
-var CACHE_NAME = 'fate-generator-2026.03.191';
+var CACHE_NAME = 'fate-generator-2026.03.203';
 
 var APP_SHELL = [
   './index.html',
@@ -22,6 +22,7 @@ var APP_SHELL = [
   './help/dnd-transition.html',
   './help/faq.html',
   './help/hosting.html',
+  './assets/js/partysocket.js',
   './campaigns/thelongafter.html',
   './campaigns/sessionzero.html',
   './campaigns/transition.html',
@@ -92,7 +93,6 @@ var CDN_SCRIPTS = [
   'https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/dexie/4.0.10/dexie.min.js',
-  'https://cdn.jsdelivr.net/npm/partysocket@0.0.25/dist/index.global.js', // MP-03
 ];
 
 // Safari throws "Response served by service worker has redirections" if a
@@ -111,6 +111,7 @@ function cleanResponse(response) {
 
 // ── Install ─────────────────────────────────────────────────────────────
 self.addEventListener('install', function(event) {
+  self.skipWaiting(); // take over immediately, don't wait for old tabs to close
   event.waitUntil(
     caches.open(CACHE_NAME).then(function(cache) {
       var shellPromise = Promise.allSettled(
@@ -125,14 +126,7 @@ self.addEventListener('install', function(event) {
           });
         })
       );
-      var cdnPromise = Promise.allSettled(
-        CDN_SCRIPTS.map(function(url) {
-          return fetch(url, { cache: 'no-cache' }).then(function(response) {
-            if (response.ok) return cleanResponse(response).then(function(c) { return cache.put(url, c); });
-          }).catch(function() {});
-        })
-      );
-      return Promise.all([shellPromise, cdnPromise]);
+      return shellPromise;
     }).then(function() {
       return self.skipWaiting();
     })
@@ -158,27 +152,10 @@ self.addEventListener('fetch', function(event) {
   var url = event.request.url;
   if (event.request.method !== 'GET') return;
 
-  // CDN scripts: cache-first
+  // CDN scripts: do NOT intercept — let the browser handle with its own HTTP cache
+  // SW interception strips CORS headers and causes 'Loading failed' errors
   var isCDN = CDN_SCRIPTS.some(function(cdn) { return url.indexOf(cdn) === 0; });
-  if (isCDN) {
-    event.respondWith(
-      caches.match(event.request).then(function(cached) {
-        if (cached) return cached;
-        return fetch(event.request).then(function(response) {
-          if (response.ok) {
-            var r2 = response.clone();
-            cleanResponse(r2).then(function(clean) {
-              caches.open(CACHE_NAME).then(function(cache) { cache.put(event.request, clean); });
-            });
-          }
-          return response;
-        }).catch(function() {
-          return new Response('', { status: 503, statusText: 'CDN unavailable' });
-        });
-      })
-    );
-    return;
-  }
+  if (isCDN) return;
 
   // Navigation requests: cache-first, fall back to index.html for SPA-like behavior
   if (event.request.mode === 'navigate') {
@@ -225,6 +202,9 @@ self.addEventListener('fetch', function(event) {
           });
         }
         return response;
+      }).catch(function() {
+        // Stale versioned asset not on network — return empty 404 rather than rejecting
+        return new Response('', { status: 404, statusText: 'Not found (stale cache)' });
       });
     })
   );

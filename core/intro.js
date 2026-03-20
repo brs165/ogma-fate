@@ -1329,10 +1329,10 @@
   // Run after DOM ready.
   // Skip on campaign generator pages (React app handles those via CampaignApp).
   // Skip on landing page (LandingApp handles it).
-  // Guide pages (guide-*.html) have data-campaign but still need the fullscreen overlay.
+  // Guide pages: no fullscreen intro — fateInitInline handles their teaser only.
   var isCampaignPage = !!document.documentElement.getAttribute('data-campaign') && !isGuidePage();
   var isLandingPage  = (typeof detectWorld === 'function') && detectWorld() === 'index';
-  if (!isCampaignPage && !isLandingPage) {
+  if (!isCampaignPage && !isLandingPage && !isGuidePage()) {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', init);
     } else {

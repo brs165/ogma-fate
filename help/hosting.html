@@ -7,9 +7,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hosting — Ogma Help</title>
   <link rel="icon" type="image/svg+xml" href="../assets/favicons/icon.svg">
-  <link rel="stylesheet" href="../assets/css/help-shared.css?v=191">
-  <link rel="stylesheet" href="../assets/css/theme.css?v=191">
-  <script src="../assets/js/help-shared.js?v=191"></script>
+  <link rel="stylesheet" href="../assets/css/help-shared.css?v=203">
+  <link rel="stylesheet" href="../assets/css/theme.css?v=203">
+  <script src="../assets/js/help-shared.js?v=203"></script>
   <link rel="canonical" href="https://brs165.github.io/ogma-fate/help/hosting.html">
 </head>
 <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -182,13 +182,41 @@ git push -u origin main</code></pre>
 </div>
 
 <h3>Step 3 — Push to main</h3>
-<p>The repo includes a GitHub Action at <code>.github/workflows/deploy.yml</code>. As soon as you push to <code>main</code> it runs automatically — no configuration needed. It takes about 30 seconds. When it finishes, the Actions log shows your live worker URL:</p>
-<pre><code>Deployed to https://ogma-sync.your-subdomain.workers.dev</code></pre>
-<p>You can also trigger it manually any time: go to the <strong>Actions</strong> tab in your repo → <strong>Deploy to Cloudflare Workers</strong> → <strong>Run workflow</strong>.</p>
+<p>The repo includes a GitHub Action at <code>.github/workflows/deploy.yml</code> that runs <code>wrangler deploy</code> directly. Here's what it contains:</p>
+<pre><code>name: Deploy to Cloudflare Workers
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Wrangler
+        run: npm install -g wrangler@4
+      - name: Deploy
+        run: wrangler deploy --config wrangler.toml
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}</code></pre>
+<p>It's already committed in the repo — just push and it runs. As soon as you push to <code>main</code> it runs automatically — no configuration needed. It takes about 30 seconds. When it finishes, look for this line in the Actions log:</p>
+<pre><code>https://ogma-sync.&lt;your-subdomain&gt;.workers.dev</code></pre>
+<p>That's your sync server URL — copy it, you'll need it in Step 4. You can also trigger the deploy manually any time: Actions tab → <strong>Deploy to Cloudflare Workers</strong> → <strong>Run workflow</strong>.</p>
 
 <div class="callout callout-tip">
   <div class="callout-title">&#128161; Tip: custom domain</div>
   <p>If ogma.net is on Cloudflare, add a CNAME DNS record: name <code>sync</code>, target <code>ogma-sync.your-subdomain.workers.dev</code>, proxy <strong>off</strong> (grey cloud — WebSockets don't work through the Cloudflare proxy). Then set your sync server to <code>sync.ogma.net</code>.</p>
+</div>
+
+<div class="callout callout-warning">
+  <div class="callout-title">&#9888; Free tier requires <code>new_sqlite_classes</code></div>
+  <p>The <code>wrangler.toml</code> in the repo uses <code>new_sqlite_classes</code> (not <code>new_classes</code>) in the <code>[[migrations]]</code> block. Cloudflare's free tier changed to SQLite-backed Durable Objects in 2024 — the old key returns error <code>10097</code> and the deploy fails silently.</p>
 </div>
 
 <h3>Step 4 — Point Ogma at your server</h3>

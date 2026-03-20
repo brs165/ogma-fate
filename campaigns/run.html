@@ -8,7 +8,7 @@
   <meta name="description" content="Infinite canvas session surface for Fate Condensed. Drag cards freely, zoom in/out, zone containers, GM/Player modes.">
   <link rel="icon" type="image/svg+xml" href="../assets/favicons/icon.svg">
   <link rel="manifest" href="../manifest.json">
-  <link rel="stylesheet" href="../assets/css/theme.css?v=191">
+  <link rel="stylesheet" href="../assets/css/theme.css?v=203">
   <style>
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   html,body,#root{height:100%;overflow:hidden}
@@ -238,23 +238,24 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
-<script src="../data/shared.js?v=191"></script>
-<script src="../data/universal.js?v=191"></script>
-<script src="../data/thelongafter.js?v=191"></script>
-<script src="../data/cyberpunk.js?v=191"></script>
-<script src="../data/fantasy.js?v=191"></script>
-<script src="../data/space.js?v=191"></script>
-<script src="../data/victorian.js?v=191"></script>
-<script src="../data/postapoc.js?v=191"></script>
-<script src="../data/western.js?v=191"></script>
-<script src="../data/dVentiRealm.js?v=191"></script>
-<script src="../core/engine.js?v=191"></script>
+<script src="../data/shared.js?v=203"></script>
+<script src="../data/universal.js?v=203"></script>
+<script src="../data/thelongafter.js?v=203"></script>
+<script src="../data/cyberpunk.js?v=203"></script>
+<script src="../data/fantasy.js?v=203"></script>
+<script src="../data/space.js?v=203"></script>
+<script src="../data/victorian.js?v=203"></script>
+<script src="../data/postapoc.js?v=203"></script>
+<script src="../data/western.js?v=203"></script>
+<script src="../data/dVentiRealm.js?v=203"></script>
+<script src="../core/engine.js?v=203"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dexie/4.0.10/dexie.min.js" crossorigin="anonymous"></script>
-<script src="../core/db.js?v=191"></script>
-<script src="../core/ui-primitives.js?v=191"></script>
+<script src="../core/db.js?v=203"></script>
+<script src="../core/ui-primitives.js?v=203"></script>
 
 <!-- MP-03: PartyKit client — auto-reconnect WebSocket (~8KB gz) -->
-<script src="https://cdn.jsdelivr.net/npm/partysocket@0.0.25/dist/index.global.js" crossorigin="anonymous"></script>
+<!-- partysocket: vendored locally — no UMD CDN build exists for this package -->
+<script src="../assets/js/partysocket.js?v=203"></script>
 
 <script>
 (function() {
@@ -958,7 +959,7 @@ function TurnOrderBar(props){
 // Opt-in multiplayer via PartyKit. Offline/solo when sync===null.
 var SYNC_HOST = null;
 try{var _sp=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}'  );SYNC_HOST=_sp.syncHost||null;}catch(e){}
-var OGMA_DEFAULT_SYNC_HOST = 'ogma-sync.brs165.partykit.dev';
+var OGMA_DEFAULT_SYNC_HOST = 'ogma-sync.brs165.workers.dev';
 
 function generateRoomCode(){
   var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
