@@ -78,10 +78,23 @@ Sprint 1 shipped v266–278. Sprint 2 wires the at-table tools into the board su
 
 | ID | Title | Size | Notes |
 |----|-------|------|-------|
-| **BL-01** | localStorage schema | S | Long-pending — enables PWA install nudge + milestone tracker tab |
-| **MOB-05** | run.html safe area bottom padding | XS | Sticky topbar has no env(safe-area-inset-*) padding |
-| **EXP-04** | Export board canvas as JSON | S | DB.exportCanvasState() exists — needs UI trigger in board topbar |
-| **WS-11** | r/FATErpg launch post | — | Repo must be public first. Highest-leverage non-code action. |
+| **WS-11** | r/FATErpg launch post | — | Repo must be public first. Highest-leverage non-code action. Draft in gtm-launch-copy.md. |
+| **WS-15** | Rebuild learn-fate.html as 7-step journey | M | ✅ Shipped v302. Further depth items follow. |
+| **WS-16** | Fiction-first principle + worked exchange | S | ✅ Shipped v302 |
+| **WS-17** | Create Advantage deep-dive | S | ✅ Shipped v302 |
+| **WS-18** | What does the GM prepare | S | ✅ Shipped v302 |
+| **WS-19** | Fate point economy GM guide | S | ✅ Shipped v302 |
+| **WS-20** | End-to-end worked conflict | M | ✅ Shipped v302 |
+| **WS-21** | FAQ — top 10 community questions | S | ✅ Shipped v302 |
+| **WS-22** | Permission to play imperfectly | XS | ✅ Shipped v302 |
+| **WS-23** | Book of Hanz reference + further reading | S | ✅ Shipped v302 |
+| **WS-24** | Common errors + how to fix them | M | ✅ Shipped v302 |
+| **BRD-01** | Play mode visual distinction | S | Play mode looks identical to Prep. Needs topbar accent + visible multiplayer controls. |
+| **BRD-04** | Scene/encounter dossier GM tips | S | Non-NPC dossier shows sparse content. Add invoke guidance per generator type. |
+| **BRD-06** | Board section labels | S | Drag text headers on canvas ("Scene 1", "NPCs") — new card type. |
+| **BRD-07** | Pin count → tappable Table link | XS | bt-table topbar button should nav to run.html; count updates live from IDB. |
+| **TBL-03** | New round visual confirmation | XS | Brief highlight on round counter tick; clear acted status feedback. |
+| **TBL-04** | World name in run.html topbar | XS | No world context shown. Read campName, add to topbar. |
 
 ---
 
@@ -150,4 +163,4 @@ Sprint 1 shipped v266–278. Sprint 2 wires the at-table tools into the board su
 | v2026.03.229 | Code quality Tier 3: ui-table.js split, 59 unit tests, ErrorBoundary, JSDoc |
 | v2026.03.224–226 | OSS readiness: LICENSE, SRI, CI, CONTRIBUTING, ARCHITECTURE, ADRs |
 
-*Last updated: 2026.03.294*
+*Last updated: 2026.03.303*
