@@ -839,15 +839,15 @@ assert('NA-12 React theme-toggle aria-label dynamic', uiSrc.includes("'Switch to
 })();
 
 
-// NA-62: run.html loads all 7 campaign data files
+// NA-62: board.html loads all 8 campaign data files (run.html is now a redirect to board.html)
 (function() {
   var fs = require('fs');
-  var html = fs.readFileSync('campaigns/run.html', 'utf8');
+  var html = fs.readFileSync('campaigns/board.html', 'utf8');
   var REQUIRED = ['thelongafter','cyberpunk','fantasy','space','victorian','postapoc','western','dVentiRealm'];
   var missing = REQUIRED.filter(function(w) {
     return html.indexOf('data/' + w + '.js') === -1;
   });
-  assert('NA-62: run.html loads all 8 campaign data files',
+  assert('NA-62: board.html loads all 8 campaign data files',
     missing.length === 0, 'Missing: ' + missing.join(', '));
 })();
 
@@ -929,10 +929,10 @@ assert('NA-12 React theme-toggle aria-label dynamic', uiSrc.includes("'Switch to
 // React JSX uses 'aria-label': (colon) not aria-label= (equals)
 (function() {
   var fs = require('fs');
-  var runSrc = fs.readFileSync('campaigns/run.html', 'utf8') +
-                fs.readFileSync('core/ui-run.js', 'utf8');
+  var runSrc = fs.readFileSync('campaigns/board.html', 'utf8') +
+                fs.readFileSync('core/ui-board.js', 'utf8');
   var count = (runSrc.match(/'aria-label':/g) || []).length;
-  assert('NA-67: run surface has >=15 aria-label attributes (accessibility pass)',
+  assert('NA-67: board surface has >=15 aria-label attributes (accessibility pass)',
     count >= 15, 'Found: ' + count + ' (need >=15)');
 })();
 
@@ -1010,27 +1010,24 @@ assert('NA-12 React theme-toggle aria-label dynamic', uiSrc.includes("'Switch to
 
 // ── NA-80: partysocket CDN tag present in run.html ────────────────────────
 (function() {
-  var run = fs.readFileSync('campaigns/run.html', 'utf8');
-  assert('NA-80: partysocket CDN script tag in run.html',
+  var run = fs.readFileSync('campaigns/board.html', 'utf8');
+  assert('NA-80: partysocket script tag in board.html',
     run.includes('partysocket.js') || run.includes('PartySocket'),
-    'partysocket CDN tag missing from run.html');
+    'partysocket tag missing from board.html');
 })();
 
-// ── NA-81: createSync function defined in run.html ────────────────────────
+// ── NA-81: createSync function defined in ui-run.js (still used by board via ui.js) ──────
 (function() {
-  var run = fs.readFileSync('campaigns/run.html', 'utf8');
   var uiRun = fs.readFileSync('core/ui-run.js', 'utf8');
-  var runFull = run + uiRun;
   assert('NA-81: createSync function defined in ui-run.js',
     uiRun.includes('function createSync('),
-    'createSync missing from run.html sync module');
+    'createSync missing from ui-run.js sync module');
 })();
 
-// ── NA-82: persist() calls sync.broadcastState in run.html ───────────────
+// ── NA-82: persist() calls sync.broadcastState (sync module in ui-run.js) ─────────────
 (function() {
-  var run = fs.readFileSync('campaigns/run.html', 'utf8');
   var uiRun = fs.readFileSync('core/ui-run.js', 'utf8');
-  var runFull = run + uiRun;
+  var runFull = uiRun;
   assert('NA-82: persist() wired to sync.broadcastState',
     uiRun.includes('sync.broadcastState('),
     'sync.broadcastState not called from persist()');
@@ -1038,19 +1035,17 @@ assert('NA-12 React theme-toggle aria-label dynamic', uiSrc.includes("'Switch to
 
 // ── NA-83: gmOnly cards filtered before broadcast ────────────────────────
 (function() {
-  var run = fs.readFileSync('campaigns/run.html', 'utf8');
   var uiRun = fs.readFileSync('core/ui-run.js', 'utf8');
-  var runFull = run + uiRun;
+  var runFull = uiRun;
   assert('NA-83: gmOnly cards filtered in broadcastState',
     runFull.includes('gmOnly') && runFull.includes('clean.cards'),
     'gmOnly filter missing from broadcastState');
 })();
 
-// ── NA-84: run.html works without partysocket (graceful fallback) ─────────
+// ── NA-84: createSync guards against missing PartySocket (ui-run.js sync module) ─────────
 (function() {
-  var run = fs.readFileSync('campaigns/run.html', 'utf8');
   var uiRun = fs.readFileSync('core/ui-run.js', 'utf8');
-  var runFull = run + uiRun;
+  var runFull = uiRun;
   assert('NA-84: createSync guards against missing PartySocket',
     runFull.includes("typeof PartySocket==='undefined'"),
     'No fallback guard when PartySocket is unavailable');
@@ -1114,23 +1109,23 @@ assert('NA-12 React theme-toggle aria-label dynamic', uiSrc.includes("'Switch to
     'Context menu missing role=menu or role=menuitem');
 })();
 
-// ── NA-92: run.html cc-ibtn has min touch target ─────────────────────────
+// ── NA-92: cc-ibtn has min touch target in theme.css ─────────────────────────
 (function() {
-  var run = fs.readFileSync('campaigns/run.html', 'utf8');
+  var css = fs.readFileSync('assets/css/theme.css', 'utf8');
   assert('NA-92: cc-ibtn has min-width/height for touch (WCAG 2.5.8 + HIG)',
-    run.includes('min-width:44px') || run.includes('min-width: 44px'),
-    'cc-ibtn missing 44px touch target');
+    css.includes('min-width:44px') || css.includes('min-width: 44px') || css.includes('min-height:44px'),
+    'cc-ibtn missing 44px touch target in theme.css');
 })();
 
 // ── NA-93: no font-size:8px anywhere ─────────────────────────────────────
 (function() {
-  var run = fs.readFileSync('campaigns/run.html', 'utf8');
+  var uiBoard = fs.readFileSync('core/ui-board.js', 'utf8');
   var uiRun = fs.readFileSync('core/ui-run.js', 'utf8');
-  var combined = run + uiRun;
+  var combined = uiBoard + uiRun;
   var found8 = (combined.match(/font-size:8px|fontSize:8[,}]|fontSize: 8[,}]/g) || []).length;
-  assert('NA-93: No font-size:8px in run.html (WCAG 1.4.4 + NA-68 floor)',
+  assert('NA-93: No font-size:8px in ui-board.js/ui-run.js (WCAG 1.4.4 + NA-68 floor)',
     found8 === 0,
-    'Found ' + found8 + ' occurrence(s) of font-size:8px in run.html/ui-run.js');
+    'Found ' + found8 + ' occurrence(s) of font-size:8px in ui-board.js/ui-run.js');
 })();
 
 // ── NA-94: Victorian VtAdj has ≥20 entries ────────────────────────────────
@@ -1151,12 +1146,12 @@ assert('NA-12 React theme-toggle aria-label dynamic', uiSrc.includes("'Switch to
     'Section label card type missing from board (BRD-06)');
 })();
 
-// ── NA-96: run.html round number has aria-live ───────────────────────────
+// ── NA-96: round number has aria-live in ui-board.js BoardTurnBar ───────────────────────
 (function() {
-  var uiRun = fs.readFileSync('core/ui-run.js', 'utf8');
+  var uiBoard = fs.readFileSync('core/ui-board.js', 'utf8');
   assert('NA-96: round number has aria-live (WCAG 4.1.3)',
-    uiRun.includes("'aria-live':'polite'") || uiRun.includes('"aria-live":"polite"'),
-    'Round number missing aria-live — screen readers won\'t announce new rounds');
+    uiBoard.includes("'aria-live':'polite'") || uiBoard.includes("'aria-live': 'polite'") || uiBoard.includes('"aria-live":"polite"'),
+    'Round number missing aria-live in ui-board.js BoardTurnBar');
 })();
 
 // ── NA-97: board mode toggle has aria-pressed ────────────────────────────

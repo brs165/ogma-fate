@@ -62,7 +62,7 @@ Sprint 1 shipped v266–278. Sprint 2 wires the at-table tools into the board su
 
 ---
 
-## Table / run.html — UX debt from playtest
+## Board Play mode — UX debt (run.html merged into Board)
 
 | ID | Title | Size | Notes |
 |----|-------|------|-------|
@@ -94,7 +94,7 @@ Sprint 1 shipped v266–278. Sprint 2 wires the at-table tools into the board su
 | **BRD-06** | Board section labels | S | Drag text headers on canvas ("Scene 1", "NPCs") — new card type. |
 | **BRD-07** | Pin count → tappable Table link | XS | bt-table topbar button should nav to run.html; count updates live from IDB. |
 | **TBL-03** | New round visual confirmation | XS | Brief highlight on round counter tick; clear acted status feedback. |
-| **TBL-04** | World name in run.html topbar | XS | No world context shown. Read campName, add to topbar. |
+| **TBL-04** | ~~World name in run.html topbar~~ | XS | ✅ Board topbar already shows world name via world picker |
 
 ---
 
@@ -163,4 +163,4 @@ Sprint 1 shipped v266–278. Sprint 2 wires the at-table tools into the board su
 | v2026.03.229 | Code quality Tier 3: ui-table.js split, 59 unit tests, ErrorBoundary, JSDoc |
 | v2026.03.224–226 | OSS readiness: LICENSE, SRI, CI, CONTRIBUTING, ARCHITECTURE, ADRs |
 
-*Last updated: 2026.03.303*
+*Last updated: 2026.03.306*

@@ -359,6 +359,183 @@ function BoardCard(props) {
   );
 }
 
+// ── BoardPlayerRow — player card for Play mode ───────────────────────────────
+function BoardPlayerRow(props) {
+  var p = props.player;
+  var sel = props.sel;
+  var onUpd = props.onUpd;
+  var onSel = props.onSel;
+  var _exp = useState(false); var expanded = _exp[0]; var setExpanded = _exp[1];
+  var fpCol = p.fp === 0 ? 'var(--c-red)' : p.fp < p.ref ? 'var(--c-amber,#f4b942)' : 'var(--c-green)';
+  var conseq = p.conseq || ['', '', ''];
+  function setConseq(i, val) { var n = conseq.slice(); n[i] = val; onUpd({conseq: n}); }
+  return h('div', {className: 'rs-player' + (sel ? ' selected' : ''),
+    style: {borderLeftColor: p.color || 'var(--accent)', borderLeftWidth: 3}},
+    h('div', {className: 'rs-player-top',
+      role: 'button', tabIndex: 0,
+      'aria-expanded': String(!!sel),
+      'aria-label': (sel ? 'Collapse ' : 'Expand ') + p.name,
+      onClick: function() { onSel(sel ? null : p.id); },
+      onKeyDown: function(e) { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); onSel(sel ? null : p.id); } }
+    },
+      h('div', {className: 'rs-player-dot', style: {background: p.color || 'var(--accent)'}}),
+      h('div', {className: 'rs-player-name'}, p.name),
+      sel && h('button', {style: {background: 'none', border: 'none', cursor: 'pointer', fontSize: 10,
+        color: 'var(--text-muted)', padding: '0 2px', flexShrink: 0},
+        onClick: function(e) { e.stopPropagation(); setExpanded(!expanded); }
+      }, expanded ? '▲' : '▼'),
+      h('button', {style: {background: 'none', border: 'none', cursor: 'pointer', fontSize: 12,
+        color: p.acted ? 'var(--c-green)' : 'var(--border-mid)', padding: '0 2px', flexShrink: 0, lineHeight: 1},
+        onClick: function(e) { e.stopPropagation(); onUpd({acted: !p.acted}); },
+        'aria-label': p.acted ? 'Mark unacted' : 'Mark acted'
+      }, p.acted ? '●' : '○')
+    ),
+    p.hc && h('div', {className: 'rs-player-hc'}, p.hc),
+    h('div', {className: 'rs-fp-row'},
+      h('span', {className: 'rs-fp-label'}, 'FP'),
+      h('button', {className: 'rs-fp-btn', onClick: function() { onUpd({fp: Math.max(0, p.fp - 1)}); }, 'aria-label': 'Spend FP'}, '−'),
+      h('span', {className: 'rs-fp-num', style: {color: fpCol}}, p.fp),
+      h('button', {className: 'rs-fp-btn', onClick: function() { onUpd({fp: p.fp + 1}); }, 'aria-label': 'Gain FP'}, '+')
+    ),
+    h('div', {className: 'rs-stress-row'},
+      h('span', {className: 'rs-fp-label'}, 'PHY'),
+      h('div', {style: {display: 'flex', gap: 2}},
+        p.phy.map(function(v, i) {
+          return h('div', {key: i, className: 'rs-stress-box' + (v ? ' filled' : ''),
+            role: 'checkbox', 'aria-checked': String(!!v), 'aria-label': 'Physical stress ' + (i + 1),
+            tabIndex: 0,
+            onClick: function() { var a = p.phy.slice(); a[i] = !a[i]; onUpd({phy: a}); },
+            onKeyDown: function(e) { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); var a = p.phy.slice(); a[i] = !a[i]; onUpd({phy: a}); } }
+          });
+        })
+      ),
+      h('span', {className: 'rs-fp-label', style: {marginLeft: 4}}, 'MEN'),
+      h('div', {style: {display: 'flex', gap: 2}},
+        p.men.map(function(v, i) {
+          return h('div', {key: i, className: 'rs-stress-box' + (v ? ' filled' : ''),
+            style: {borderColor: 'var(--c-purple)'},
+            role: 'checkbox', 'aria-checked': String(!!v), 'aria-label': 'Mental stress ' + (i + 1),
+            tabIndex: 0,
+            onClick: function() { var a = p.men.slice(); a[i] = !a[i]; onUpd({men: a}); },
+            onKeyDown: function(e) { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); var a = p.men.slice(); a[i] = !a[i]; onUpd({men: a}); } }
+          });
+        })
+      )
+    ),
+    expanded && h('div', {style: {padding: '0 8px 7px'}},
+      h('div', {style: {fontSize: 11, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase',
+        color: 'var(--text-muted)', marginBottom: 3}}, 'Consequences'),
+      ['Mild', 'Moderate', 'Severe'].map(function(sev, i) {
+        return h('div', {key: i, style: {display: 'flex', alignItems: 'center', gap: 3, marginBottom: 3}},
+          h('span', {style: {fontSize: 11, color: 'var(--text-muted)', width: 46, flexShrink: 0}}, sev),
+          h('input', {type: 'text', value: conseq[i] || '', placeholder: 'empty',
+            onChange: function(e) { setConseq(i, e.target.value); },
+            style: {flex: 1, background: 'var(--inset)',
+              border: '1px solid ' + (conseq[i] ? 'var(--c-amber,#f4b942)' : 'var(--border)'),
+              borderRadius: 4, padding: '2px 5px', fontSize: 10, color: 'var(--text)',
+              fontFamily: 'var(--font-ui)', outline: 'none'}})
+        );
+      })
+    )
+  );
+}
+
+// ── BoardTurnBar — turn order strip for Play mode ─────────────────────────────
+function BoardTurnBar(props) {
+  var players = props.players;
+  var order = props.order;
+  var setOrder = props.setOrder;
+  var onToggleActed = props.onToggleActed;
+  var round = props.round;
+  var onNewRound = props.onNewRound;
+  var onPrevRound = props.onPrevRound;
+  var roundFlash = props.roundFlash;
+  var _drag = useState(null); var dragId = _drag[0]; var setDragId = _drag[1];
+  var _over = useState(null); var overId = _over[0]; var setOverId = _over[1];
+  var allActed = players.length > 0 && players.every(function(p) { return p.acted; });
+  var orderedPlayers = order.map(function(id) {
+    return players.find(function(p) { return p.id === id; });
+  }).filter(Boolean);
+  players.forEach(function(p) { if (order.indexOf(p.id) < 0) orderedPlayers.push(p); });
+
+  return h('div', {className: 'board-turn-bar'},
+    h('div', {className: 'rs-round-pill' + (roundFlash ? ' rs-round-flash' : ''),
+      style: {flexShrink: 0}},
+      h('button', {className: 'rs-round-btn',
+        onClick: onPrevRound, 'aria-label': 'Prev round'}, '−'),
+      h('span', {style: {fontSize: 11, color: 'var(--text-muted)', marginRight: 2}}, 'Rnd'),
+      h('span', {className: 'rs-round-num', 'aria-live': 'polite', 'aria-atomic': 'true',
+        'aria-label': 'Round ' + round}, round),
+      h('button', {className: 'rs-round-btn',
+        onClick: onNewRound, 'aria-label': 'New round'}, '+')
+    ),
+    h('span', {className: 'rs-turn-label', style: {flexShrink: 0}}, 'Turn:'),
+    orderedPlayers.map(function(p) {
+      return h('div', {key: p.id,
+        className: 'rs-turn-pill' + (p.acted ? ' acted' : '') +
+          (dragId === p.id ? ' dragging' : '') + (overId === p.id ? ' drag-over' : ''),
+        draggable: true,
+        onDragStart: function(e) { setDragId(p.id); e.dataTransfer.effectAllowed = 'move'; },
+        onDragOver: function(e) { e.preventDefault(); if (p.id !== dragId) setOverId(p.id); },
+        onDrop: function(e) {
+          e.preventDefault();
+          if (dragId && dragId !== p.id) {
+            setOrder(function(o) {
+              var a = o.slice();
+              var fi = a.indexOf(dragId); var ti = a.indexOf(p.id);
+              if (fi < 0 || ti < 0) return o;
+              a.splice(fi, 1); a.splice(ti, 0, dragId); return a;
+            });
+          }
+          setDragId(null); setOverId(null);
+        },
+        onDragEnd: function() { setDragId(null); setOverId(null); },
+        onClick: function() { onToggleActed(p.id); },
+      },
+        h('div', {className: 'rs-turn-dot', style: {background: p.color || 'var(--accent)'}}),
+        h('span', {style: {fontSize: 10, fontWeight: 700,
+          color: p.acted ? 'var(--c-green)' : 'var(--text)'}}, p.name),
+        p.acted && h('span', {style: {fontSize: 10, color: 'var(--c-green)'}}, ' ✓')
+      );
+    }),
+    allActed && h('div', {className: 'rs-all-acted'}, '✦ All acted — new round?')
+  );
+}
+
+// ── BoardPlayPanel — left panel content in Play mode ─────────────────────────
+function BoardPlayPanel(props) {
+  var players = props.players;
+  var selPlayer = props.selPlayer;
+  var onSel = props.onSel;
+  var onUpd = props.onUpd;
+  var onAdd = props.onAdd;
+
+  return h('div', {className: 'blp'},
+    h('div', {className: 'blp-tabs'},
+      h('span', {className: 'blp-tab active', style: {pointerEvents: 'none'}}, '▶ Players')
+    ),
+    h('div', {className: 'blp-body'},
+      players.length === 0 && h('div', {style: {padding: '16px 8px', textAlign: 'center',
+        color: 'var(--text-muted)', fontSize: 12}},
+        h('div', {style: {marginBottom: 8}}, '👥'),
+        h('div', null, 'No players yet.'),
+        h('div', {style: {fontSize: 11, marginTop: 4}}, 'Add players to track FP and stress.')
+      ),
+      players.map(function(p) {
+        return h(BoardPlayerRow, {
+          key: p.id,
+          player: p,
+          sel: selPlayer === p.id,
+          onSel: onSel,
+          onUpd: function(patch) { onUpd(p.id, patch); },
+        });
+      }),
+      h('button', {className: 'rs-add-player', 'aria-label': 'Add player',
+        onClick: onAdd}, '+ Add Player')
+    )
+  );
+}
+
 // ── BoardLeftPanel ────────────────────────────────────────────────────────────
 
 function BoardLeftPanel(props) {
@@ -796,7 +973,19 @@ function BoardTopbar(props) {
       mode === 'play' && syncStatus === 'connected' && h('span', {className: 'bt-chip bt-play-chip'}, '\u25B6 Live'),
       mode === 'play' && syncStatus === 'connecting' && h('span', {className: 'bt-chip bt-offline'}, '\u29D7 Connecting…'),
       !isOnline && h('span', {className: 'bt-chip bt-offline'}, '\u26A1 Offline'),
-      // BRD-02: Dice floater toggle
+      // ── Play mode: turn order bar at bottom of canvas ──────────────────────────
+    mode === 'play' && h(BoardTurnBar, {
+      players: players,
+      order: order,
+      setOrder: setOrder,
+      onToggleActed: toggleActed,
+      round: round,
+      onNewRound: newRound,
+      onPrevRound: prevRound,
+      roundFlash: roundFlash,
+    }),
+
+    // BRD-02: Dice floater toggle
       h('button', {
         className: 'bt-icon-btn' + (showDice ? ' active' : ''),
         onClick: onToggleDice,
@@ -830,7 +1019,7 @@ function BoardTopbar(props) {
       h('a', {href: 'help/index.html', className: 'bt-nav bt-nav-hide-xs', 'aria-label': 'Help'},
         h('span', {'aria-hidden': 'true'}, '\u2753'),
         h('span', {className: 'bt-nav-text'}, '\u00a0Help')),
-      h('a', {href: 'campaigns/run.html', className: 'bt-nav bt-table', 'aria-label': 'Open Table' + (pinCount > 0 ? ' (' + pinCount + ' cards)' : '')},
+      h('a', {href: 'campaigns/board.html?mode=play', className: 'bt-nav bt-table', 'aria-label': 'Play mode' + (pinCount > 0 ? ' (' + pinCount + ' cards)' : '')},
         h('span', {'aria-hidden': 'true'}, '\uD83D\uDED2'),
         h('span', {className: 'bt-nav-text'}, '\u00a0Table'),
         pinCount > 0 && h('span', {className: 'bt-count'}, String(pinCount))
@@ -855,7 +1044,9 @@ function BoardTopbar(props) {
 // ── BoardApp — root component ─────────────────────────────────────────────────
 
 function BoardApp(props) {
-  var campId = props.campId || 'fantasy';
+  var campId       = props.campId || 'fantasy';
+  var initialMode  = props.initialMode || 'prep';
+  var initialRoom  = props.initialRoom || null;
 
   // ── State ──────────────────────────────────────────────────────────────────
   var _cards = useState([]);
@@ -870,7 +1061,7 @@ function BoardApp(props) {
   var leftTab = _leftTab[0];
   var setLeftTab = _leftTab[1];
 
-  var _mode = useState('prep');
+  var _mode = useState(initialMode);
   var mode = _mode[0];
   var setMode = _mode[1];
 
@@ -905,6 +1096,14 @@ function BoardApp(props) {
   // MOB-02: left panel collapsed state (default open on desktop, closed on mobile)
   var _leftOpen = useState(function() { return window.innerWidth > 520; });
   var leftOpen = _leftOpen[0]; var setLeftOpen = _leftOpen[1];
+
+  // ── Play mode: player roster, round tracker, turn order ──────────────────
+  var _players = useState([]); var players = _players[0]; var setPlayers = _players[1];
+  var _round = useState(1); var round = _round[0]; var setRound = _round[1];
+  var _order = useState([]); var order = _order[0]; var setOrder = _order[1];
+  var _selPlayer = useState(null); var selPlayer = _selPlayer[0]; var setSelPlayer = _selPlayer[1];
+  var _roundFlash = useState(false); var roundFlash = _roundFlash[0]; var setRoundFlash = _roundFlash[1];
+  var roundFlashTimer = useRef(null);
 
   var _pan = useState({x: 0, y: 0});
   var pan = _pan[0];
@@ -960,6 +1159,16 @@ function BoardApp(props) {
       }
       setLoaded(true);
     }).catch(function() { setLoaded(true); });
+    // Also load play session state (players, round, order)
+    var playKey = 'board_play_session_' + campId;
+    if (typeof DB !== 'undefined') {
+      DB.loadSession(playKey).then(function(ps) {
+        if (!ps) return;
+        if (Array.isArray(ps.players)) setPlayers(ps.players);
+        if (typeof ps.round === 'number') setRound(ps.round);
+        if (Array.isArray(ps.order)) setOrder(ps.order);
+      }).catch(function() {});
+    }
   }, [campCanvasKey]);
 
   // Load pin count from IDB
@@ -974,6 +1183,85 @@ function BoardApp(props) {
   function persistFP(next) {
     if (typeof DB === 'undefined' || !DB) return;
     DB.saveSession(BOARD_FP_KEY + '_' + campId, next).catch(function() {});
+  }
+
+  // ── Load play state (players/round/order) when entering play mode ──────────
+  useEffect(function() {
+    if (mode !== 'play' || !loaded) return;
+    if (!DB) return;
+    DB.loadSession('board_play_session_' + campId).then(function(saved) {
+      if (!saved) return;
+      if (Array.isArray(saved.players) && saved.players.length > 0) setPlayers(saved.players);
+      if (typeof saved.round === 'number') setRound(saved.round);
+      if (Array.isArray(saved.order) && saved.order.length > 0) setOrder(saved.order);
+    }).catch(function() {});
+  }, [mode, loaded]);
+
+  // ── Player helpers ────────────────────────────────────────────────────────
+  function updPlayer(id, patch) {
+    setPlayers(function(ps) {
+      var next = ps.map(function(p) { return p.id === id ? Object.assign({}, p, patch) : p; });
+      persistPlayState(next, null, null);
+      return next;
+    });
+  }
+
+  function addPlayer() {
+    var name = prompt('Player name:');
+    if (!name) return;
+    var COLORS = ['var(--accent)', 'var(--c-purple)', 'var(--c-blue)', 'var(--c-green)', 'var(--c-red)'];
+    var np = {
+      id: 'bp' + Date.now() + Math.random().toString(36).slice(2, 5),
+      name: name, hc: '', fp: 3, ref: 3,
+      phy: [false, false, false], men: [false, false],
+      color: COLORS[players.length % COLORS.length],
+      acted: false, conseq: ['', '', '']
+    };
+    var nextP = players.concat([np]);
+    var nextO = order.concat([np.id]);
+    setPlayers(nextP); setOrder(nextO);
+    persistPlayState(nextP, null, nextO);
+  }
+
+  function newRound() {
+    var next = round + 1;
+    setRound(next);
+    setPlayers(function(ps) {
+      var cleared = ps.map(function(p) { return Object.assign({}, p, {acted: false}); });
+      persistPlayState(cleared, next, null);
+      return cleared;
+    });
+    setRoundFlash(true);
+    if (roundFlashTimer.current) clearTimeout(roundFlashTimer.current);
+    roundFlashTimer.current = setTimeout(function() { setRoundFlash(false); }, 600);
+  }
+
+  function prevRound() {
+    if (round <= 1) return;
+    var next = round - 1;
+    setRound(next);
+    persistPlayState(null, next, null);
+  }
+
+  function toggleActed(playerId) {
+    setPlayers(function(ps) {
+      var next = ps.map(function(p) { return p.id === playerId ? Object.assign({}, p, {acted: !p.acted}) : p; });
+      persistPlayState(next, null, null);
+      return next;
+    });
+  }
+
+  function persistPlayState(pl, rnd, ord) {
+    if (!DB) return;
+    var key = 'board_play_session_' + campId;
+    var payload = {
+      players: pl !== null ? pl : players,
+      round: rnd !== null ? rnd : round,
+      order: ord !== null ? ord : order,
+    };
+    DB.saveSession(key, payload).catch(function(err) {
+      console.warn('[Ogma] board play state save failed:', err);
+    });
   }
 
   // ── Persist canvas to IDB ─────────────────────────────────────────────────
@@ -1397,13 +1685,40 @@ if (genId === 'sticky') {
       }),
       // MOB-02: Left panel — hidden on mobile when leftOpen is false
       h('div', {className: 'blp-wrap' + (leftOpen ? '' : ' blp-hidden')},
-      h(BoardLeftPanel, {
-        activeGen: activeGen,
-        onSelectGen: selectGen,
-        activeTab: leftTab,
-        onTabChange: setLeftTab,
-        campName: campMeta.name,
-      })),
+        mode === 'play'
+          ? h(BoardPlayPanel, {
+              players: players,
+              selPlayer: selPlayer,
+              onSel: setSelPlayer,
+              onUpd: updPlayer,
+              onAdd: addPlayer,
+            })
+          : h(BoardLeftPanel, {
+              activeGen: activeGen,
+              onSelectGen: selectGen,
+              activeTab: leftTab,
+              onTabChange: setLeftTab,
+              campName: campMeta.name,
+            })
+      ),
+
+      // Right column: TurnBar (play mode) + canvas
+      h('div', {className: 'board-canvas-col'},
+        // Play mode turn bar
+        mode === 'play' && players.length > 0 && h(BoardTurnBar, {
+          players: players,
+          order: order,
+          setOrder: function(fn) {
+            var next = typeof fn === 'function' ? fn(order) : fn;
+            setOrder(next);
+            persistPlayState(null, null, next);
+          },
+          onToggleActed: toggleActed,
+          round: round,
+          onNewRound: newRound,
+          onPrevRound: prevRound,
+          roundFlash: roundFlash,
+        }),
 
       // Canvas area
       h('div', {
@@ -1537,6 +1852,7 @@ if (genId === 'sticky') {
         // Toast
         toast && h('div', {className: 'board-toast', key: toast}, toast)
       )
+      ) // end board-canvas-col
     ),
 
     // BRD-02: Dice floater

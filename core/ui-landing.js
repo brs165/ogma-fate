@@ -64,7 +64,7 @@ function JoinTableCard() {
     if (clean.length < 4) { setErr('Enter the 4-character code your GM shared.'); return; }
     setErr('');
     // Navigate to the run surface with the room code — run.html handles join flow
-    window.location.href = 'campaigns/run.html?room=' + clean;
+    window.location.href = 'campaigns/board.html?mode=play&room=' + clean;
   }
 
   function handleKey(e) {

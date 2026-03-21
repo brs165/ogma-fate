@@ -2254,6 +2254,17 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 
 
 /* ── Board UI (ui-board.js) ─────────────────────────────────────────────── */
+/* board-turn-bar — Play mode turn order strip, full width below canvas */
+.board-turn-bar{
+  display:flex;align-items:center;gap:5px;
+  padding:5px 10px;
+  background:color-mix(in srgb,var(--c-green) 4%,transparent);
+  border-top:2px solid color-mix(in srgb,var(--c-green) 30%,transparent);
+  flex-shrink:0;overflow-x:auto;scrollbar-width:none;
+  position:absolute;bottom:0;left:0;right:0;z-index:10;
+}
+.board-turn-bar::-webkit-scrollbar{display:none}
+
 /* Suppress body orb pseudo-elements on board pages */
 .board-app~*,.board-root body::before,.board-root body::after{display:none}
 /* #root and body must fill viewport for board-app height:100vh to work */
@@ -2312,7 +2323,10 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .bh-rule:last-child{border:none}
 
 /* Canvas wrap */
+.board-canvas-col{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .board-canvas-wrap{flex:1;position:relative;overflow:hidden;background:var(--bg)}
+.board-turn-bar{display:flex;align-items:center;gap:6px;padding:4px 10px;background:var(--glass-bg);border-bottom:1px solid var(--border);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);flex-shrink:0;overflow-x:auto;scrollbar-width:none;min-height:36px}
+.board-turn-bar::-webkit-scrollbar{display:none}
 .board-dot-grid{position:absolute;inset:0;background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:24px 24px;pointer-events:none;opacity:.6}
 .board-canvas-layer{position:absolute;inset:0;transform-origin:0 0}
 

@@ -122,7 +122,7 @@ Ogma has three distinct session surfaces, each a separate HTML page:
 |---------|------|---------------|---------|
 | **Generator** | `campaigns/[world].html` | `CampaignApp` (ui.js) | Roll generators, pin results, FP tracker, table settings |
 | **Board** | `campaigns/board.html` | `BoardApp` (ui-board.js) | Prep/Play canvas — drag cards, dice floater, FP floater, multiplayer |
-| **Run** | `campaigns/run.html` | `RunApp` (ui-run.js) | At-table session surface — zones, player roster, stress/FP, round tracker |
+| **Run** | `campaigns/run.html` | Redirect | Now redirects to `board.html?mode=play`. `ui-run.js` retained for sync module (`createSync`). |
 
 The Board and Run surfaces share sync infrastructure (`createTableSync` in ui.js) and the `PrepCanvas` component (`ui-table.js`).
 
