@@ -1,0 +1,43 @@
+{
+  "description": "CDN dependencies loaded by Ogma HTML pages. All versions are pinned. SRI hashes must be verified before updating versions.",
+  "dependencies": {
+    "react": {
+      "version": "18.2.0",
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js",
+      "integrity": "sha384-tMH8h3BGESGckSAVGZ82T9n90ztNXxvdwvdM6UoR56cYcf+0iGXBliJ29D+wZ/x8",
+      "crossorigin": "anonymous",
+      "vendored": "assets/js/react.production.min.js",
+      "homepage": "https://reactjs.org",
+      "notes": "Vendored copy kept for SW offline cache. Must match CDN version."
+    },
+    "react-dom": {
+      "version": "18.2.0",
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js",
+      "integrity": "sha384-bm7MnzvK++ykSwVJ2tynSE5TRdN+xL418osEVF2DE/L/gfWHj91J2Sphe582B1Bh",
+      "crossorigin": "anonymous",
+      "vendored": "assets/js/react-dom.production.min.js",
+      "homepage": "https://reactjs.org",
+      "notes": "Vendored copy kept for SW offline cache. Must match CDN version."
+    },
+    "dexie": {
+      "version": "4.0.10",
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/dexie/4.0.10/dexie.min.js",
+      "integrity": "sha384-3VWLzUTczDc/wazaoH+b5qG4iME0duPONRO281rRiaFkfpV/b3w5uxrvod7rCHcW",
+      "crossorigin": "anonymous",
+      "vendored": null,
+      "homepage": "https://dexie.org",
+      "notes": "Hash verified 2026.03.248 — sha384-3VWLzUTczDc/wazaoH+b5qG4iME0duPONRO281rRiaFkfpV/b3w5uxrvod7rCHcW confirmed correct against live CDN."
+    }
+  },
+  "verification": "node scripts/verify-cdn-deps.js",
+  "updating": "When upgrading a dependency: 1) Update version+url here. 2) Compute new SRI hash. 3) Update all HTML files. 4) Update vendored copy if applicable. 5) Run verify-cdn-deps.js.",
+  "vendored": {
+    "partysocket": {
+      "version": "1.x-compatible API",
+      "path": "assets/js/partysocket.js",
+      "license": "MIT",
+      "source": "https://github.com/partykit/partykit",
+      "notes": "Clean-room 86-line implementation of the partysocket API. Not a copy of original source. No CDN URL — must remain vendored (original package has no UMD/IIFE build)."
+    }
+  }
+}

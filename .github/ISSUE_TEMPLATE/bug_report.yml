@@ -1,0 +1,73 @@
+name: Bug Report
+description: Something isn't working correctly
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for filing a bug. Please be specific — include world, generator, and what you expected vs what happened.
+  - type: dropdown
+    id: world
+    attributes:
+      label: Campaign World
+      options:
+        - The Long After
+        - Neon Abyss
+        - Shattered Kingdoms
+        - Void Runners
+        - The Gaslight Chronicles
+        - The Long Road
+        - Dust and Iron
+        - The dVenti Realm
+        - All worlds / not world-specific
+    validations:
+      required: true
+  - type: dropdown
+    id: generator
+    attributes:
+      label: Generator
+      options:
+        - Minor NPC
+        - Major NPC
+        - Scene Setup
+        - Campaign Frame
+        - Encounter
+        - Adventure Seed
+        - Compel Offer
+        - Challenge
+        - Contest
+        - Consequence
+        - Faction
+        - Complication
+        - PC Backstory
+        - Obstacle
+        - Countdown
+        - Constraint
+        - Table canvas / Run surface
+        - Not generator-specific
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: For rules accuracy issues, cite the Fate Condensed SRD page number.
+      placeholder: "The Major NPC generator produced a stress track with 4 boxes, but FCon p.12 says the default is 3 boxes."
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and version
+      placeholder: "Chrome 122, Safari 17, Firefox 123"
+  - type: input
+    id: version
+    attributes:
+      label: Ogma version (check the About page)

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <script>/* Theme restore */(function(){try{var p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');var t=p.theme||localStorage.getItem('fate_theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})()</script>
+  <meta charset="UTF-8">
+  <base href="/">
+  <meta name="description" content="Complete reference for all 16 Ogma generators — NPCs, scenes, encounters, compels, countdowns, and more.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Generator Suite — Ogma Help</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/favicons/icon.svg">
+  <link rel="stylesheet" href="../assets/css/help-shared.css?v=297">
+  <link rel="stylesheet" href="../assets/css/theme.css?v=297">
+<script src="../assets/js/help-shared.js?v=297"></script>
+  <link rel="canonical" href="https://ogma.net/help/generators.html">
+</head>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<header class="land-topnav" role="banner">
+  <a href="../index.html" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
+  <div class="topbar-sep" aria-hidden="true"></div>
+  <nav class="topbar-crumb" aria-label="Breadcrumb">
+    <a href="../index.html" class="topbar-crumb-item">Home</a>
+    <span class="topbar-crumb-sep" aria-hidden="true">&#8250;</span>
+    <a href="/help/index.html" class="topbar-crumb-item">Help &amp; Wiki</a>
+    <span class="topbar-crumb-sep" aria-hidden="true">&#8250;</span>
+    <span class="topbar-crumb-item current" aria-current="page">Generator Suite</span>
+  </nav>
+  <div class="topbar-status">
+    <a href="/help/index.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#128218; Help</a>
+    <a href="../learn.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#128218; Quick Start</a>
+    <a href="../about.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">About</a>
+    <button class="btn btn-icon btn-ghost" onclick="(function(){{var n=document.documentElement.getAttribute('data-theme')=='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{{var p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{{}}');p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(p));}}catch(e){{}}}})()" title="Toggle theme" aria-label="Switch to dark mode">&#9680;</button>
+    <button class="topbar-hamburger btn btn-icon btn-ghost" id="topnav-hbg" aria-label="Open navigation" aria-expanded="false" aria-haspopup="true" onclick="(function(b){{var d=document.getElementById('topnav-dd');var o=d.classList.toggle('open');b.setAttribute('aria-expanded',o);}})(this)">&#9776;</button>
+    <div class="land-topnav-dropdown" id="topnav-dd">
+      <a href="/help/index.html">&#128218; Help Home</a>
+      <a href="/help/getting-started.html">&#128640; Getting Started</a>
+      <a href="/help/generators.html">&#127922; Generators</a>
+      <a href="/help/fate-mechanics.html">&#127922; Fate Mechanics</a>
+      <a href="/help/at-the-table.html">&#127481; At the Table</a>
+      <a href="/help/export-share.html">&#128279; Export &amp; Share</a>
+      <a href="/help/customise.html">&#9881; Customise</a>
+      <a href="/help/faq.html">&#10067; FAQ</a>
+    </div>
+  </div>
+</header>
+<div class="wiki-shell">
+  <aside class="wiki-sidebar" role="navigation" aria-label="Help navigation">
+  
+  <div class="wiki-sidebar-section">
+    <div class="wiki-sidebar-label">Getting Started</div>
+    <a href="/help/index.html" class="wiki-sidebar-link"><span class="icon">&#127968;</span>Wiki Home</a>
+    <a href="/help/new-to-ogma.html" class="wiki-sidebar-link"><span class="icon">&#128075;</span>New to Ogma?</a>
+    <a href="/help/getting-started.html" class="wiki-sidebar-link"><span class="icon">&#128640;</span>Getting Started</a>
+  </div>
+  <div class="wiki-sidebar-divider"></div>
+  <div class="wiki-sidebar-section">
+    <div class="wiki-sidebar-label">Learn</div>
+    <a href="/help/learn-fate.html" class="wiki-sidebar-link"><span class="icon">&#127922;</span>Learn Fate</a>
+    <a href="/help/how-to-use-ogma.html" class="wiki-sidebar-link"><span class="icon">&#128218;</span>How to Use Ogma</a>
+    <a href="/help/dnd-transition.html" class="wiki-sidebar-link"><span class="icon">&#9876;</span>D&amp;D Transition</a>
+  </div>
+  <div class="wiki-sidebar-divider"></div>
+  <div class="wiki-sidebar-section">
+    <div class="wiki-sidebar-label">Prep &amp; Play</div>
+        <button class="wiki-sidebar-parent active" aria-expanded="true" data-children="gen-nav" onclick="toggleSideNav(this)">
+      <span class="wiki-sidebar-parent-label"><span class="icon">&#127922;</span>Generator Suite</span>
+      <span class="wiki-sidebar-chevron" aria-hidden="true">&#8250;</span>
+    </button>
+    <div id="gen-nav" class="wiki-sidebar-children open">
+      <a class="wiki-sidebar-child" href="#characters">People</a>
+      <a class="wiki-sidebar-child" href="#scenes">Scene</a>
+      <a class="wiki-sidebar-child" href="#world">Story</a>
+      <a class="wiki-sidebar-child" href="#pacing">Mechanics</a>
+      <a class="wiki-sidebar-child" href="#the-result-panel">Result panel</a>
+      <a class="wiki-sidebar-child" href="#quick-prep-pack-prep">Quick Prep Pack</a>
+    </div>
+    <a href="/help/fate-mechanics.html" class="wiki-sidebar-link"><span class="icon">&#127922;</span>Fate Mechanics</a>
+    <a href="/help/at-the-table.html" class="wiki-sidebar-link"><span class="icon">&#127481;</span>At the Table</a>
+  </div>
+  <div class="wiki-sidebar-divider"></div>
+  <div class="wiki-sidebar-section">
+    <div class="wiki-sidebar-label">Advanced</div>
+    <a href="/help/export-share.html" class="wiki-sidebar-link"><span class="icon">&#128279;</span>Export &amp; Share</a>
+    <a href="/help/customise.html" class="wiki-sidebar-link"><span class="icon">&#9881;</span>Customise</a>
+  </div>
+  <div class="wiki-sidebar-divider"></div>
+  <div class="wiki-sidebar-divider"></div>
+  <div class="wiki-sidebar-section">
+    <div class="wiki-sidebar-label">Hosting</div>
+    <a href="/help/hosting.html" class="wiki-sidebar-link"><span class="icon">&#127760;</span>Hosting &amp; Multiplayer</a>
+  </div>
+  <div class="wiki-sidebar-divider"></div>
+  <div class="wiki-sidebar-section">
+    <div class="wiki-sidebar-label">Help</div>
+    <a href="/help/faq.html" class="wiki-sidebar-link"><span class="icon">&#10067;</span>FAQ</a>
+  </div>
+  </aside>
+  <main class="wiki-content" id="main-content">
+    
+<div class="wiki-page-eyebrow">Generator Suite</div>
+<h1>16 generators. 8 worlds. 128 combinations.</h1>
+<p class="wiki-page-desc">Every generator produces a mechanically complete, thematically correct Fate Condensed result. Each one is tuned to its campaign world — a Minor NPC in Shattered Kingdoms gets dark fantasy names and aspects; the same generator in Neon Abyss gets chrome and neon.</p>
+
+<h2>How generators and campaigns combine</h2>
+<p>When you roll, Ogma pulls from <strong>two table layers</strong>:</p>
+<ul>
+  <li><strong>Campaign-specific tables</strong> — names, aspects, factions, and world details tuned to your chosen world (e.g. Shattered Kingdoms' "Blight-touched" aspects).</li>
+  <li><strong>Universal tables</strong> — shared mechanical content that works in any genre (stress thresholds, consequence severity, skill ladders). The <em>Universal Merge</em> toggle in Settings controls whether these supplement or replace campaign tables.</li>
+</ul>
+
+<h2 id="characters">Characters</h2>
+<div class="gen-grid">
+  <div class="gen-card"><div class="gen-card-icon">&#128100;</div><div class="gen-card-name">Minor NPC</div><div class="gen-card-desc">Name, 2 aspects (high concept + weakness), 1 skill, stress track. Ready in one roll — no prep needed.</div></div>
+  <div class="gen-card"><div class="gen-card-icon">&#128081;</div><div class="gen-card-name">Major NPC</div><div class="gen-card-desc">Full character: HC, Trouble, 3 aspects, 5 skills, 2 stunts, physical/mental stress, consequences, refresh.</div></div>
+  <div class="gen-card"><div class="gen-card-icon">&#128221;</div><div class="gen-card-name">PC Backstory</div><div class="gen-card-desc">Session Zero questions that generate aspects organically. Also includes a relationship web prompt and an opening hook.</div></div>
+</div>
+
+<div class="callout callout-scenario">
+  <div class="callout-title">&#127914; Scenario: Building a recurring villain</div>
+  <p>Select <em>Major NPC</em> and roll. You get a complete character: maybe "The Archivist of Broken Oaths" (high concept), "Debts I Cannot Repay" (trouble), three supporting aspects, ranked skills with ladder labels, two stunts (one +2 bonus, one once-per-scene), and a refresh of 2. The GM Tips tab tells you to show their high concept in action before the PCs engage — let them win something small first so the stakes feel real.</p>
+</div>
+
+<h2 id="scenes">Scenes</h2>
+<div class="gen-grid">
+  <div class="gen-card"><div class="gen-card-icon">&#127775;</div><div class="gen-card-name">Scene Setup</div><div class="gen-card-desc">2–4 situation aspects in categories (tone, cover, movement, danger, usable), plus 3–5 named zones. Tap aspects to mark them active during play.</div></div>
+  <div class="gen-card"><div class="gen-card-icon">&#9876;</div><div class="gen-card-name">Encounter</div><div class="gen-card-desc">Victory condition, defeat condition, situation aspect, 3–5 opposition NPCs with stress. Designed to run the whole encounter from one card.</div></div>
+  <div class="gen-card"><div class="gen-card-icon">&#9889;</div><div class="gen-card-name">Complication</div><div class="gen-card-desc">A new aspect + optional new arrival + environmental shift. For when the scene needs a surprise mid-conflict.</div></div>
+</div>
+
+<h2 id="pacing">Pacing</h2>
+<div class="gen-grid">
+  <div class="gen-card"><div class="gen-card-icon">&#9889;</div><div class="gen-card-name">Challenge</div><div class="gen-card-desc">Named challenge, description, success condition, failure condition, optional scene aspect. The full Fate Challenge structure in one card.</div></div>
+  <div class="gen-card"><div class="gen-card-icon">&#9876;</div><div class="gen-card-name">Contest</div><div class="gen-card-desc">Two sides, victory track (first to 3), situation aspect, 3 twist aspects for tied exchanges. Live score tracking — tap boxes to fill them.</div></div>
+  <div class="gen-card"><div class="gen-card-icon">&#128683;</div><div class="gen-card-name">Obstacle</div><div class="gen-card-desc">Named obstacle, aspect, type (hazard/block/distraction), disable/bypass condition, opposition rating.</div></div>
+  <div class="gen-card"><div class="gen-card-icon">&#9200;</div><div class="gen-card-name">Countdown</div><div class="gen-card-desc">Named clock, 4–8 boxes, trigger condition, outcome. Tap boxes to fill them — particles fire when the clock hits zero.</div></div>
+  <div class="gen-card"><div class="gen-card-icon">&#128683;</div><div class="gen-card-name">Constraint</div><div class="gen-card-desc">Limitation or resistance. Limitations restrict an action; resistances require a bypass. Each includes a how-to-bypass.</div></div>
+</div>
+
+<h2 id="world">World</h2>
+<div class="gen-grid">
+  <div class="gen-card"><div class="gen-card-icon">&#127758;</div><div class="gen-card-name">Campaign Frame</div><div class="gen-card-desc">Current issue + impending issue + 3 setting aspects. Your campaign's backbone in one roll.</div></div>
+  <div class="gen-card"><div class="gen-card-icon">&#127760;</div><div class="gen-card-name">Adventure Seed</div><div class="gen-card-desc">Location, objective, complication, victory condition, defeat condition, 3-scene sketch. Run Session 1 from this card.</div></div>
+  <div class="gen-card"><div class="gen-card-icon">&#127942;</div><div class="gen-card-name">Faction</div><div class="gen-card-desc">Name, goal, method, weakness, named face NPC. Gives you a faction you can immediately compel.</div></div>
+  <div class="gen-card"><div class="gen-card-icon">&#128161;</div><div class="gen-card-name">Compel</div><div class="gen-card-desc">Situation + consequence. Hands the GM a ready-to-offer compel for any scene.</div></div>
+  <div class="gen-card"><div class="gen-card-icon">&#129657;</div><div class="gen-card-name">Consequence</div><div class="gen-card-desc">Severity (Mild/Moderate/Severe), named aspect, context. Includes recovery guidance and treatment difficulty.</div></div>
+</div>
+
+<h2 id="the-result-panel">The result panel</h2>
+<p>Every result card has a two-column reference sheet directly below it — always visible, no click required:</p>
+<ul>
+  <li><strong>What it is</strong> (left column) — what this generator produces and the relevant Fate Condensed rule with a direct SRD link.</li>
+  <li><strong>For GM</strong> (right column) — imperative running tips, invoke and compel examples from the FCon SRD and Book of Hanz.</li>
+</ul>
+<p>Three tabs let you switch the reference content:</p>
+<ul>
+  <li><strong>What · For GM</strong> — the default 2-column view above.</li>
+  <li><strong>🌱 New here?</strong> — plain-language explanation for players new to Fate, with key term definitions.</li>
+  <li><strong>⚔ D&amp;D?</strong> — side-by-side comparison of Fate and D&amp;D mechanics for GMs switching systems.</li>
+</ul>
+
+<h2>Pinning results</h2>
+<p>Press <kbd>P</kbd> or click the Save to Table Prep button on any result to save it to History. The history ring holds your last 8 rolls plus all saved cards. Open it with the 📋 button in the action bar.</p>
+<p>From History you can: re-view any card, copy or download as Markdown, export your whole session as an Ogma JSON file, or import a previously saved <code>.ogma.json</code> file.</p>
+
+<h2>Shareable links</h2>
+<p>Press <kbd>L</kbd> or click the 🔗 button to copy a shareable URL for the current result. The URL encodes a seed that reproduces the exact same result — share it in Discord, paste it into session notes, or send it to your co-GM. Anyone who opens the link sees the same card.</p>
+
+<h2>Inspiration mode</h2>
+<p>Press <kbd>I</kbd> to roll three results at once and pick the one you want. The other two fade as ghost cards. Great when a single roll isn't sparking anything — seeing three options simultaneously often unlocks the right direction.</p>
+
+<h2 id="quick-prep-pack-prep">Quick Prep Pack prep</h2>
+<p>In the Prep tab of the sidebar, click <strong>Quick Prep Pack</strong> to generate an Adventure Seed + Countdown + Compel as a stacked 3-card packet. This is your Session 1 prep in one click — location, first threat, and a ready-to-offer complication.</p>
+
+<h2>Table Manager</h2>
+<p>Click the ⊞ icon in the action bar to open the Table Manager. You can:</p>
+<ul>
+  <li><strong>Exclude</strong> any table from generation (e.g. if you've already used that faction name)</li>
+  <li><strong>Lock</strong> a table to always use that entry (e.g. fix a PC's name)</li>
+  <li><strong>Add custom entries</strong> that sit alongside the built-in content</li>
+</ul>
+
+    <div class="wiki-footer">
+  <div>
+    <a href="/help/index.html">Wiki Home</a> &nbsp;·&nbsp;
+    <a href="../index.html">Open Ogma</a> &nbsp;·&nbsp;
+    <a href="../about.html">About</a> &nbsp;·&nbsp;
+    <a href="../license.html">Full Attribution</a> &nbsp;·&nbsp;
+    <!-- FARI_PARKED_2026.03.154 fari.app link --> &nbsp;·&nbsp;
+    <a href="https://fate-srd.com/" target="_blank" rel="noreferrer">fate-srd.com</a>
+  </div>
+  <div style="font-size:var(--text-label);color:var(--text-muted)">
+    Fate&#8482; is a trademark of Evil Hat Productions, LLC &nbsp;·&nbsp;
+    D&amp;D&#174; is a trademark of Wizards of the Coast LLC &nbsp;·&nbsp;
+    Released under <a href="../license.html">CC BY 3.0</a>
+  </div>
+</div>
+  </main>
+</div>
+<script>
+(function() {
+  var btn = document.getElementById('topnav-hbg');
+  if (btn) {
+    document.addEventListener('click', function(e) {
+      var dd = document.getElementById('topnav-dd');
+      if (dd && !btn.contains(e.target) && !dd.contains(e.target)) {
+        dd.classList.remove('open');
+        btn.setAttribute('aria-expanded','false');
+      }
+    });
+  }
+})();
+</script>
+</html>

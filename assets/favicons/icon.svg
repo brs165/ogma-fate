@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#1a1a2e"/>
+  <!-- Fate dice — four-pointed diamond shape -->
+  <polygon points="256,80 340,256 256,432 172,256" fill="none" stroke="#d4a832" stroke-width="18" stroke-linejoin="round"/>
+  <!-- Inner diamond -->
+  <polygon points="256,152 308,256 256,360 204,256" fill="#d4a832" opacity="0.15"/>
+  <!-- Four dots on diamond faces -->
+  <circle cx="256" cy="116" r="10" fill="#d4a832"/>
+  <circle cx="324" cy="256" r="10" fill="#d4a832"/>
+  <circle cx="256" cy="396" r="10" fill="#d4a832"/>
+  <circle cx="188" cy="256" r="10" fill="#d4a832"/>
+  <!-- Centre mark -->
+  <circle cx="256" cy="256" r="14" fill="#d4a832"/>
+</svg>

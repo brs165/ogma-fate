@@ -1,0 +1,28 @@
+{
+  "name": "ogma-fate",
+  "description": "Offline GM prep tool for Fate Condensed — no build step required",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "lint": "eslint core/ data/ --config eslint.config.cjs",
+    "lint:fix": "eslint core/ data/ --config eslint.config.cjs --fix",
+    "format": "prettier --write \"core/**/*.js\" \"data/**/*.js\"",
+    "format:check": "prettier --check \"core/**/*.js\" \"data/**/*.js\"",
+    "qa": "node tests/qa_named.js",
+    "smoke": "node -e \"var fs=require('fs');eval(fs.readFileSync('data/shared.js','utf8'));eval(fs.readFileSync('data/universal.js','utf8'));['thelongafter','cyberpunk','fantasy','space','victorian','postapoc','western','dVentiRealm'].forEach(function(c){eval(fs.readFileSync('data/'+c+'.js','utf8'));});eval(fs.readFileSync('core/engine.js','utf8'));var e=[],t=0;['thelongafter','cyberpunk','fantasy','space','victorian','postapoc','western','dVentiRealm'].forEach(function(camp){var tables=filteredTables(mergeUniversal(CAMPAIGNS[camp].tables),{});['npc_minor','npc_major','scene','campaign','encounter','seed','compel','challenge','contest','consequence','faction','complication','backstory','obstacle','countdown','constraint'].forEach(function(g){try{var r=generate(g,tables,4);if(!r||typeof r!=='object')e.push(camp+'/'+g);t++;}catch(ex){e.push(camp+'/'+g+': '+ex.message);}});});console.log('Smoke: '+t+'/128 errors:'+e.length);if(e.length){e.forEach(function(i){console.error('FAIL:',i);});process.exit(1);}\"",
+    "test": "npm run qa && npm run smoke && node tests/engine.test.js && npm run check-cdn",
+    "verify-cdn": "node scripts/verify-cdn-deps.js",
+    "serve": "npx serve . -l 8080",
+    "test:unit": "node tests/engine.test.js",
+    "check-cdn": "node scripts/check-cdn-versions.js"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "eslint": "^9.0.0",
+    "prettier": "^3.3.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "CC-BY-3.0"
+}

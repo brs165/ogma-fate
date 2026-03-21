@@ -1,0 +1,1705 @@
+// core/ui-run.js — Run session surface components
+// Extracted from campaigns/run.html (CQ-02).
+// Load AFTER ui-table.js and BEFORE the run.html mount script.
+// All React globals (h, useState, etc.) must be available from ui-primitives.js.
+// All engine/db globals must be available from earlier script loads.
+// ─────────────────────────────────────────────────────────────────────────────
+'use strict';
+var h = React.createElement;
+var useState = React.useState;
+var useEffect = React.useEffect;
+var useCallback = React.useCallback;
+var useRef = React.useRef;
+
+// ── CONSTANTS ──────────────────────────────────────────────────────
+var RUN_IDB_KEY = 'run_session_v2';
+var LADDER = [{v:8,l:'Legendary'},{v:7,l:'Epic'},{v:6,l:'Fantastic'},{v:5,l:'Superb'},
+  {v:4,l:'Great'},{v:3,l:'Good'},{v:2,l:'Fair'},{v:1,l:'Average'},
+  {v:0,l:'Mediocre'},{v:-1,l:'Poor'},{v:-2,l:'Terrible'}];
+function lbl(v){var e=LADDER.find(function(x){return x.v===v;});return e?e.l:(v>8?'Legendary+':'Abysmal');}
+function lcol(v){return v>=3?'var(--c-green)':v>=1?'var(--accent)':v>=0?'var(--c-amber,#f4b942)':'var(--c-red)';}
+function rollDF(){return Math.floor(Math.random()*3)-1;}
+function uid(){return 'c'+Date.now()+Math.random().toString(36).slice(2,6);}
+
+var GEN_MENU = [
+  {id:'npc_major',  label:'Major NPC',    icon:'◆'},
+  {id:'npc_minor',  label:'Minor NPC',    icon:'◈'},
+  {id:'scene',      label:'Scene',        icon:'◉'},
+  {id:'faction',    label:'Faction',      icon:'⚑'},
+  {id:'compel',     label:'Compel',       icon:'⊗'},
+  {id:'countdown',  label:'Countdown',    icon:'⏱'},
+  {id:'encounter',  label:'Encounter',    icon:'⚔'},
+  {id:'complication',label:'Complication',icon:'⚠'},
+  {id:'seed',       label:'Seed',         icon:'✦'},
+  {id:'obstacle',   label:'Obstacle',     icon:'🏔'},
+];
+
+// Type → badge colour class
+var TYPE_CLS = {
+  zone:'cct-zone',scene:'cct-scene',aspect:'cct-scene',seed:'cct-scene',
+  npc:'cct-npc',faction:'cct-faction',
+  countdown:'cct-mechanic',compel:'cct-mechanic',consequence:'cct-mechanic',
+  challenge:'cct-mechanic',contest:'cct-mechanic',obstacle:'cct-mechanic',
+  constraint:'cct-mechanic',complication:'cct-mechanic',gm:'cct-gm',
+  other:'cct-mechanic',encounter:'cct-npc',backstory:'cct-gm',
+};
+var TYPE_LBL = {
+  zone:'ZONE',scene:'SCENE',aspect:'ASPECT',seed:'SEED',npc:'NPC',
+  faction:'FACTION',countdown:'COUNTDOWN',compel:'COMPEL',consequence:'CONSEQUENCE',
+  challenge:'CHALLENGE',contest:'CONTEST',obstacle:'OBSTACLE',constraint:'CONSTRAINT',
+  complication:'COMPLICATION',gm:'GM ONLY',other:'CARD',encounter:'ENCOUNTER',backstory:'BACKSTORY',
+};
+
+function cardFromResult(genId, data) {
+  var typeMap={npc_major:'npc',npc_minor:'npc',scene:'scene',seed:'seed',
+    faction:'faction',compel:'compel',countdown:'countdown',encounter:'npc',
+    complication:'aspect',challenge:'gm',contest:'gm',consequence:'aspect',
+    backstory:'gm',obstacle:'aspect',constraint:'gm'};
+  var title=data.name||data.location||data.situation||data.title||genId;
+  var notes='';
+  if(genId==='npc_major'||genId==='npc_minor'){
+    notes=(data.aspects&&data.aspects.high_concept)||'';
+    if(data.aspects&&data.aspects.trouble)notes+=(notes?'\n':'')+'Trouble: '+data.aspects.trouble;
+  }else if(genId==='scene'){
+    notes=(data.aspects||[]).slice(0,3).map(function(a){return a.name||a;}).join(' · ');
+  }else if(genId==='seed'){
+    notes=(data.objective||'')+(data.complication?'\nComplication: '+data.complication:'');
+  }else if(genId==='countdown'){
+    notes=(data.trigger||'')+(data.outcome?'\n→ '+data.outcome:'');
+  }else if(genId==='faction'){
+    notes=(data.goal||'')+(data.weakness?'\nWeakness: '+data.weakness:'');
+  }else if(genId==='compel'){
+    notes=(data.situation||'')+(data.consequence?'\n→ '+data.consequence:'');
+  }else if(data.type&&data.type.aspect){
+    notes=data.type.aspect;
+  }
+  return {
+    id:uid(),genId:genId,type:typeMap[genId]||'other',
+    title:title,notes:notes.trim(),data:data,
+    pinned:false,gmOnly:false,revealed:false,
+    cdFilled:0,zoneId:null,size:'md',
+    x: 60 + (Math.floor(Math.random()*4))*180 + Math.random()*30, y: 60 + (Math.floor(Math.random()*3))*170 + Math.random()*30,
+    ts:Date.now(),
+  };
+}
+
+function rollGen(genId,campId,partySize){
+  var camp=CAMPAIGNS[campId];if(!camp)return null;
+  var eff=filteredTables(mergeUniversal(camp.tables),{});
+  try{return generate(genId,eff,partySize||4);}catch(e){return null;}
+}
+
+// ── PARSE OGMA CHARACTER ──────────────────────────────────────────
+function parseOgmaCharacter(jsonStr){
+  var COLORS=['var(--accent)','var(--c-purple)','var(--c-blue)','var(--c-green)','var(--c-red)'];
+  var obj;try{obj=JSON.parse(jsonStr);}catch(e){return null;}
+  if(!obj||obj.format!=='ogma')return null;
+  var d=null,genId=null;
+  if(obj.generator&&obj.data){genId=obj.generator;d=obj.data;}
+  else if(Array.isArray(obj.results)){
+    var hit=obj.results.find(function(r){return r.generator==='npc_major'||r.generator==='npc_minor';});
+    if(hit){genId=hit.generator;d=hit.data;}
+  }
+  if(!d||!genId)return null;
+  var name,aspects,skills,phy,men;
+  if(genId==='npc_minor'){
+    name=d.name||'Imported';aspects=(d.aspects||[]).slice();
+    skills=(d.skills||[]).map(function(s){return{l:s.name,v:s.r||0,name:s.name,r:s.r||0};});
+    phy=Array.from({length:Math.min(d.stress||2,3)},function(){return false;});men=[false,false];
+  }else{
+    name=d.name||'Imported';
+    aspects=[d.aspects.high_concept,d.aspects.trouble].concat(d.aspects.others||[]).filter(Boolean);
+    skills=(d.skills||[]).map(function(s){return{l:s.name,v:s.r||0,name:s.name,r:s.r||0};});
+    phy=Array.from({length:Math.min(d.physical_stress||3,6)},function(){return false;});
+    men=Array.from({length:Math.min(d.mental_stress||3,6)},function(){return false;});
+  }
+  return{id:uid(),name:name,hc:aspects[0]||'',fp:d.refresh||3,ref:d.refresh||3,
+    phy:phy.length?phy:[false,false,false],men:men.length?men:[false,false],
+    color:COLORS[Math.floor(Math.random()*COLORS.length)],acted:false,
+    skills:skills.slice(0,10),conseq:['','',''],aspects:aspects};
+}
+
+// ── EDIT MODAL ────────────────────────────────────────────────────
+function EditModal(props){
+  var card=props.card,onSave=props.onSave,onClose=props.onClose;
+  var _t=useState(card.title);var title=_t[0];var setTitle=_t[1];
+  var _n=useState(card.notes);var notes=_n[0];var setNotes=_n[1];
+  return h('div',{className:'rs-overlay',role:'dialog','aria-modal':'true',onClick:function(e){if(e.target===e.currentTarget)onClose();}},
+    h('div',{className:'rs-modal'},
+      h('div',{style:{fontSize:13,fontWeight:700,color:'var(--text)',marginBottom:4}},'Edit card'),
+      h('div',null,h('div',{className:'rs-edit-label'},'Title'),
+        h('input',{className:'rs-edit-input',type:'text',value:title,onChange:function(e){setTitle(e.target.value);},autoFocus:true})),
+      h('div',null,h('div',{className:'rs-edit-label'},'Notes'),
+        h('textarea',{className:'rs-edit-input',rows:5,value:notes,onChange:function(e){setNotes(e.target.value);}})),
+      h('div',{className:'rs-edit-actions'},
+        h('button',{className:'rs-edit-cancel',onClick:onClose},'Cancel'),
+        h('button',{className:'rs-edit-save',onClick:function(){onSave({title:title,notes:notes});onClose();}},'Save')
+      )
+    )
+  );
+}
+
+function MdModal(props){
+  var card=props.card,campName=props.campName,onClose=props.onClose;
+  var md='';try{md=toMarkdown(card.genId,card.data,campName);}catch(e){md='# '+card.title+'\n\n'+card.notes;}
+  if(!md)md='# '+card.title+'\n\n'+card.notes;
+  return h('div',{className:'rs-overlay',role:'dialog','aria-modal':'true',onClick:function(e){if(e.target===e.currentTarget)onClose();}},
+    h('div',{className:'rs-modal'},
+      h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}},
+        h('span',{style:{fontSize:13,fontWeight:700,color:'var(--text)'}},card.title),
+        h('button',{style:{background:'none',border:'none',cursor:'pointer',color:'var(--text-muted)',fontSize:16,fontFamily:'var(--font-ui)'},onClick:onClose},'✕')
+      ),
+      h('pre',{className:'rs-md-pre'},md),
+      h('div',{style:{display:'flex',gap:8,justifyContent:'flex-end',marginTop:8}},
+        h('button',{className:'rs-edit-save',onClick:function(){navigator.clipboard.writeText(md).catch(function(){});onClose();}},'📋 Copy'),
+        h('button',{className:'rs-edit-cancel',onClick:onClose},'Close')
+      )
+    )
+  );
+}
+
+// ── CANVAS CARD ───────────────────────────────────────────────────
+function CanvasCard(props){
+  var card=props.card,editMode=props.editMode,campId=props.campId,partySize=props.partySize;
+  var onUpd=props.onUpd,onRemove=props.onRemove,onEdit=props.onEdit,onMd=props.onMd;
+  var onNpcRoll=props.onNpcRoll;
+  var onDragStart=props.onDragStart,onZoneDrop=props.onZoneDrop,onRemoveFromZone=props.onRemoveFromZone;
+  var zoneChildren=props.zoneChildren||[];
+  var isZoneTarget=props.isZoneTarget;
+
+  var d=card.data||{};
+  var typeKey=TYPE_CLS[card.type]||'cct-mechanic';
+  var typeLabel=TYPE_LBL[card.type]||'CARD';
+  var sizeClass='cc-'+(card.size||'md');
+
+  // Compact body by type + size
+  function renderBody(){
+    var sz=card.size||'md';
+    if(sz==='sm'){
+      return h('div',{className:'cc-body'},
+        h('div',{className:'cc-title'},card.title)
+      );
+    }
+    var type=card.type;
+    // NPC
+    if(type==='npc'||type==='encounter'){
+      var asp=d.aspects||{};
+      var hc=asp.high_concept||(Array.isArray(d.aspects)?d.aspects[0]:'')||card.title;
+      var tr=asp.trouble||(Array.isArray(d.aspects)?d.aspects[1]:'');
+      var skills=(d.skills||[]).slice(0,sz==='full'?6:2);
+      var phyMax=d.physical_stress||d.stress||2;
+      var menMax=d.mental_stress||0;
+      var phyBoxes=card.phyHit||Array(typeof phyMax==='number'?phyMax:2).fill(false);
+      var menBoxes=card.menHit||Array(typeof menMax==='number'?menMax:0).fill(false);
+      return h('div',{className:'cc-body'},
+        h('div',{className:'cc-title'},d.name||card.title),
+        hc&&hc!==(d.name||card.title)&&h('div',{className:'cc-asp hc'},hc),
+        tr&&h('div',{className:'cc-asp tr'},tr),
+        skills.length>0&&h('div',{className:'cc-skrow'},
+          skills.map(function(s,i){return h('span',{key:i,className:'cc-sk'},h('strong',null,'+'+s.r),' '+s.name);})),
+        (phyBoxes.length>0||menBoxes.length>0)&&h('div',{className:'cc-stress'},
+          phyBoxes.length>0&&h('span',null,'PHY'),
+          phyBoxes.map(function(v,i){return h('div',{key:i,className:'cc-sbox'+(v?' hit':''),
+            role:'checkbox','aria-checked':String(!!v),'aria-label':'Physical stress '+(i+1),
+            tabIndex:0,
+            onClick:function(){var a=phyBoxes.slice();a[i]=!a[i];onUpd({phyHit:a});},
+            onKeyDown:function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();var a=phyBoxes.slice();a[i]=!a[i];onUpd({phyHit:a});}}
+          });}),
+          menBoxes.length>0&&h('span',{style:{marginLeft:4}},'MEN'),
+          menBoxes.map(function(v,i){return h('div',{key:i,className:'cc-sbox'+(v?' hit':''),style:{borderColor:'var(--c-purple)'},
+            role:'checkbox','aria-checked':String(!!v),'aria-label':'Mental stress '+(i+1),
+            tabIndex:0,
+            onClick:function(){var a=menBoxes.slice();a[i]=!a[i];onUpd({menHit:a});},
+            onKeyDown:function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();var a=menBoxes.slice();a[i]=!a[i];onUpd({menHit:a});}}});})
+        ),
+        (sz==='md'||sz==='full')&&skills.length>0&&h('div',{className:'cc-npc-roll'},
+          skills.map(function(s,i){
+            return h('button',{key:i,className:'cc-ibtn',style:{fontSize:11,padding:'2px 5px',minWidth:'auto'},
+              title:'Roll 4dF + '+s.name,
+              onClick:function(e){
+                e.stopPropagation();
+                var r=[rollDF(),rollDF(),rollDF(),rollDF()];
+                var dice=r.reduce(function(a,b){return a+b;},0);
+                var total=dice+s.r;
+                if(onNpcRoll)onNpcRoll(d.name||card.title,s.name,s.r,total);
+              }
+            },h('strong',null,'+'+s.r),' '+s.name);
+          })
+        )
+      );
+    }
+    // Countdown
+    if(type==='countdown'){
+      var total=d.boxes||4;var filled=card.cdFilled||0;var triggered=filled>=total;
+      return h('div',{className:'cc-body'},
+        h('div',{className:'cc-title'},d.name||card.title),
+        d.trigger&&h('div',{className:'cc-asp'},d.trigger),
+        h('div',{className:'cc-cd-track'},
+          Array.from({length:total},function(_,i){
+            return h('div',{key:i,className:'cc-cdbox'+(i<filled?' tick':''),
+              role:'checkbox','aria-checked':String(i<filled),'aria-label':'Box '+(i+1),
+              tabIndex:0,
+              onClick:function(){onUpd({cdFilled:i<filled?i:i+1});},
+              onKeyDown:function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();onUpd({cdFilled:i<filled?i:i+1});}}
+            },i+1);
+          })
+        ),
+        triggered&&h('div',{className:'cc-trigger'},'⚡ TRIGGERED'),
+        !triggered&&h('div',{style:{fontSize:11,color:'var(--text-muted)',marginTop:2}},filled+'/'+total)
+      );
+    }
+    // Zone — handled separately in renderZone
+    if(type==='zone'){
+      return h('div',{className:'cc-body'},
+        h('div',{className:'cc-title'},d.name||card.title),
+        (d.aspect||card.notes)&&h('div',{className:'cc-asp'},d.aspect||card.notes.split('\n')[0]),
+        d.movement&&h('div',{style:{fontSize:11,color:'var(--text-muted)',marginTop:2}},'Movement: '+d.movement)
+      );
+    }
+    // Scene / seed
+    if(type==='scene'||type==='aspect'||type==='seed'){
+      var aspects=d.aspects||[];
+      var loc=d.location||d.name||card.title;
+      return h('div',{className:'cc-body'},
+        h('div',{className:'cc-title'},type==='seed'?(d.hook||loc):loc),
+        type==='seed'
+          ? [
+              (sz==='full'||sz==='md')&&d.objective&&h('div',{key:'obj',className:'cc-asp hc'},d.objective),
+              (sz==='full'||sz==='md')&&d.complication&&h('div',{key:'cmp',className:'cc-asp tr'},d.complication),
+              sz==='full'&&d.twist&&h('div',{key:'twt',className:'cc-asp'},'\uD83C\uDF00 '+d.twist)
+            ]
+          : (sz==='full'?aspects.slice(0,5):aspects.slice(0,2)).map(function(a,i){
+              var txt=a.name||a;
+              return h('div',{key:i,className:'cc-asp'+(i===0?' hc':'')},txt);
+            }),
+        type==='scene'&&sz==='full'&&d.objective&&h('div',{className:'cc-asp hc'},d.objective)
+      );
+    }
+    // Faction
+    if(type==='faction'){
+      return h('div',{className:'cc-body'},
+        h('div',{className:'cc-title'},d.name||card.title),
+        d.goal&&h('div',{className:'cc-asp hc'},d.goal),
+        sz==='full'&&d.face&&h('div',{className:'cc-line'},d.face.name||d.face),
+        d.weakness&&h('div',{className:'cc-asp tr'},d.weakness)
+      );
+    }
+    // Compel
+    if(type==='compel'){
+      return h('div',{className:'cc-body'},
+        h('div',{className:'cc-title'},d.situation||card.title),
+        d.consequence&&h('div',{className:'cc-asp tr',style:{fontStyle:'normal'}},'If accepted: '+d.consequence)
+      );
+    }
+    // Consequence
+    if(type==='consequence'||card.genId==='consequence'){
+      var sev=d.severity||'';
+      return h('div',{className:'cc-body'},
+        sev&&h('div',{style:{fontSize:11,fontWeight:800,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--c-amber,#f4b942)',marginBottom:2}},sev),
+        h('div',{className:'cc-title'},d.aspect||d.name||card.title),
+        d.context&&h('div',{className:'cc-asp'},d.context)
+      );
+    }
+    // Challenge
+    if(card.genId==='challenge'){
+      return h('div',{className:'cc-body'},
+        h('div',{className:'cc-title'},d.name||card.title),
+        d.desc&&h('div',{className:'cc-asp'},d.desc),
+        (sz==='full'||sz==='md')&&d.primary&&h('div',{className:'cc-asp hc'},'\u2692 '+d.primary),
+        (sz==='full'||sz==='md')&&d.opposing&&h('div',{className:'cc-asp tr'},'\u2605 '+d.opposing)
+      );
+    }
+    // Contest
+    if(card.genId==='contest'){
+      return h('div',{className:'cc-body'},
+        h('div',{className:'cc-title'},d.contest_type||card.title),
+        d.desc&&h('div',{className:'cc-asp'},d.desc),
+        (sz==='full'||sz==='md')&&d.side_a&&h('div',{className:'cc-asp hc'},d.side_a+' \u2694 '+d.side_b),
+        (sz==='full')&&d.aspect&&h('div',{className:'cc-asp'},'\u2605 '+d.aspect)
+      );
+    }
+    // Complication
+    if(card.genId==='complication'){
+      return h('div',{className:'cc-body'},
+        d.new_aspect&&h('div',{className:'cc-asp hc',style:{marginTop:0}},d.new_aspect),
+        d.arrival&&h('div',{className:'cc-asp'},'\u2794 '+d.arrival),
+        (sz==='full')&&d.env&&h('div',{className:'cc-asp'},'\u{1F30D} '+d.env)
+      );
+    }
+    // Obstacle
+    if(card.genId==='obstacle'){
+      return h('div',{className:'cc-body'},
+        d.obstacle_type&&h('div',{style:{fontSize:11,fontWeight:800,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--text-muted)',marginBottom:2}},d.obstacle_type),
+        h('div',{className:'cc-title'},d.name||card.title),
+        (sz==='full'||sz==='md')&&d.choice&&h('div',{className:'cc-asp'},'\u2666 '+d.choice),
+        sz==='full'&&d.repercussion_deal&&h('div',{className:'cc-asp hc'},'Deal: '+d.repercussion_deal)
+      );
+    }
+    // Constraint
+    if(card.genId==='constraint'){
+      var ctype=d.constraint_type==='resistance'?'Resistance':'Limitation';
+      var cbody=d.what_resists||d.restricted_action||'';
+      return h('div',{className:'cc-body'},
+        h('div',{style:{fontSize:11,fontWeight:800,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--text-muted)',marginBottom:2}},ctype),
+        h('div',{className:'cc-title'},d.name||card.title),
+        cbody&&h('div',{className:'cc-asp tr'},cbody),
+        (sz==='full')&&d.consequence&&h('div',{className:'cc-asp hc'},'If triggered: '+d.consequence)
+      );
+    }
+    // Backstory
+    if(card.genId==='backstory'){
+      var bqs=(d.questions||[]);
+      return h('div',{className:'cc-body'},
+        d.hook&&h('div',{className:'cc-asp hc',style:{marginTop:0}},d.hook),
+        (sz==='full'||sz==='md')&&bqs.slice(0,sz==='full'?3:2).map(function(q,i){
+          return h('div',{key:i,className:'cc-asp',style:{fontStyle:'normal'}},'\u2014 '+q);
+        })
+      );
+    }
+    // Campaign
+    if(card.genId==='campaign'){
+      var cur=d.current&&(typeof d.current==='object'?d.current.name:d.current);
+      var imp=d.impending&&(typeof d.impending==='object'?d.impending.name:d.impending);
+      return h('div',{className:'cc-body'},
+        cur&&h('div',{className:'cc-asp hc',style:{marginTop:0}},'\u26A1 '+cur),
+        imp&&h('div',{className:'cc-asp tr'},'\uD83C\uDF11 '+imp),
+        sz==='full'&&(d.setting||[]).slice(0,2).map(function(a,i){
+          return h('div',{key:i,className:'cc-asp'},a);
+        })
+      );
+    }
+    // Default
+    return h('div',{className:'cc-body'},
+      h('div',{className:'cc-title'},card.title),
+      card.notes&&sz!=='sm'&&h('div',{className:'cc-asp'},card.notes.split('\n')[0])
+    );
+  }
+
+  function renderZoneChildren(){
+    if(card.type!=='zone')return null;
+    return h('div',{className:'cc-zone-body',
+      onDragOver:function(e){e.preventDefault();e.stopPropagation();},
+      onDrop:function(e){e.preventDefault();e.stopPropagation();if(props.onZoneDrop)props.onZoneDrop(card.id);}
+    },
+      h('div',{className:'cc-zone-children'},
+        zoneChildren.map(function(child){
+          return h('div',{key:child.id,className:'cc-zone-child'},
+            h('span',{className:'cc-type '+typeClass(child.type),style:{fontSize:11,padding:'1px 4px',borderRadius:2}},
+              TYPE_LBL[child.type]||'CARD'),
+            h('span',{style:{fontSize:10,flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}},child.title),
+            editMode&&h('button',{className:'cc-zone-child-remove',
+              onClick:function(e){e.stopPropagation();if(onRemoveFromZone)onRemoveFromZone(child.id);},
+              title:'Remove from zone'},'✕')
+          );
+        }),
+        editMode&&h('div',{className:'cc-zone-drop-hint'},'Drop cards here'),
+        editMode&&campId&&h('button',{className:'cc-zone-gen-btn',
+          onClick:function(e){e.stopPropagation();
+            var data=rollGen('scene',campId,partySize||4);
+            if(data&&data.aspects&&data.aspects.length>0){
+              var asp=data.aspects[0].name||data.aspects[0]||'';
+              if(asp&&props.onAddAspect)props.onAddAspect(asp);
+            }
+          }
+        },'+ Generate Zone Aspect')
+      )
+    );
+  }
+
+  function typeClass(t){return TYPE_CLS[t]||'cct-mechanic';}
+  var SIZES=['sm','md','full'];
+
+  return h('div',{
+    className:'cc '+sizeClass
+      +(card.pinned?' pinned':'')
+      +(card.gmOnly&&editMode?' gm-only':'')
+      +(card.gmOnly&&!editMode?' gm-only-hidden':'')
+      +(card._dragging?' drag-active':'')
+      +(isZoneTarget?' zone-hover':''),
+    'data-card-id':card.id,
+    'data-card-type':card.type,
+    style:{left:card.x+'px',top:card.y+'px'},
+    onMouseDown:function(e){e.stopPropagation();if(editMode&&onDragStart)onDragStart(e,card.id);},
+    onDragOver:function(e){e.preventDefault();e.stopPropagation();},
+    onDrop:function(e){e.preventDefault();e.stopPropagation();if(card.type==='zone'&&onZoneDrop)onZoneDrop(card.id);}
+  },
+    // Header
+    h('div',{className:'cc-hdr'},
+      h('span',{className:'cc-type '+typeKey},typeLabel+(card.gmOnly?' 🔒':'')),
+      h('div',{className:'cc-hdr-acts'},
+        h('button',{className:'cc-ibtn'+(card.pinned?' active':''),'aria-label':card.pinned?'Unpin':'Pin',onClick:function(e){e.stopPropagation();onUpd({pinned:!card.pinned});}},card.pinned?'📌':'📎'),
+        editMode&&h('button',{
+          className:'cc-ibtn'+(card.revealed?' active':''),'aria-label':card.revealed?'Revealed':'Hidden from players',
+          title:card.revealed?'Revealed to players — click to hide':'Hidden from players — click to reveal',
+          onClick:function(e){e.stopPropagation();onUpd({revealed:!card.revealed});},
+          style:{color:card.revealed?'var(--c-green)':'var(--text-muted)'}
+        },card.revealed?'👁':'🙈'),
+        h('button',{className:'cc-ibtn','aria-label':'Edit',onClick:function(e){e.stopPropagation();onEdit(card);}},'\u270F'),
+        h('button',{className:'cc-ibtn','aria-label':'Markdown',onClick:function(e){e.stopPropagation();onMd(card);}},'\uD83D\uDCCB'),
+        editMode&&h('button',{className:'cc-ibtn danger','aria-label':'Remove',onClick:function(e){e.stopPropagation();onRemove();}},'\u2715')
+      )
+    ),
+    // Body
+    renderBody(),
+    // Zone container
+    card.type==='zone'&&renderZoneChildren(),
+    // Size dots
+    h('div',{className:'cc-size-row'},
+      SIZES.map(function(s){
+        return h('div',{key:s,className:'cc-size-dot'+(card.size===s?' on':''),
+          title:s,onClick:function(e){e.stopPropagation();onUpd({size:s});},
+          'aria-label':'Size: '+s});
+      }),
+      card.zoneId&&h('span',{style:{fontSize:11,color:'var(--c-green)',marginLeft:'auto'}},'\u2B24 In zone')
+    )
+  );
+}
+
+// ── PLAYER ROW ────────────────────────────────────────────────────
+function PlayerRow(props){
+  var p=props.player,sel=props.sel,onUpd=props.onUpd,onSel=props.onSel,onRollSkill=props.onRollSkill;
+  // MP-08: remote player guards
+  var isOwner=props.isOwner; // true if this is the remote player's own character
+  var isReadOnly=props.isReadOnly&&!isOwner; // read-only for other players
+  var onSendAction=props.onSendAction; // function(patch) for remote player
+  var _exp=useState(false);var expanded=_exp[0];var setExpanded=_exp[1];
+  var fpCol=p.fp===0?'var(--c-red)':p.fp<p.ref?'var(--c-amber,#f4b942)'  :'var(--c-green)';
+  var conseq=p.conseq||[''  ,''  ,''  ];
+  // MP-09: send action if remote owner, else normal updPlayer
+  function act(patch){
+    if(isOwner&&onSendAction)onSendAction(patch);
+    else if(!isReadOnly)onUpd(patch);
+  }
+  function setConseq(i,val){var n=conseq.slice();n[i]=val;act({conseq:n});}
+  return h('div',{className:'rs-player'+(sel?' selected':''),style:{borderLeftColor:p.color||'var(--accent)',borderLeftWidth:3}},
+    h('div',{className:'rs-player-top',
+      role:'button',tabIndex:0,
+      'aria-expanded':String(!!sel),
+      'aria-label':(sel?'Collapse ':'Expand ')+p.name,
+      onClick:function(){onSel(sel?null:p.id);},
+      onKeyDown:function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();onSel(sel?null:p.id);}}
+    },
+      h('div',{className:'rs-player-dot',style:{background:p.color||'var(--accent)'}}),
+      h('div',{className:'rs-player-name'},p.name),
+      sel&&h('button',{style:{background:'none',border:'none',cursor:'pointer',fontSize:10,color:'var(--text-muted)',padding:'0 2px',flexShrink:0},
+        onClick:function(e){e.stopPropagation();setExpanded(!expanded);}},expanded?'▲':'▼'),
+      h('button',{style:{background:'none',border:'none',cursor:'pointer',fontSize:12,color:p.acted?'var(--c-green)':'var(--border-mid)',padding:'0 2px',flexShrink:0,lineHeight:1},
+        onClick:function(e){e.stopPropagation();onUpd({acted:!p.acted});}},p.acted?'●':'○')
+    ),
+    p.hc&&h('div',{className:'rs-player-hc'},p.hc),
+    h('div',{className:'rs-fp-row'},
+      h('span',{className:'rs-fp-label'},'FP'),
+      h('button',{className:'rs-fp-btn',onClick:function(){act({fp:Math.max(0,p.fp-1)});},'aria-label':'Spend FP',disabled:isReadOnly},'-'),
+      h('span',{className:'rs-fp-num',style:{color:fpCol}},p.fp),
+      h('button',{className:'rs-fp-btn',onClick:function(){act({fp:p.fp+1});},'aria-label':'Gain FP',disabled:isReadOnly},'+')
+    ),
+    h('div',{className:'rs-stress-row'},
+      h('span',{className:'rs-fp-label'},'PHY'),
+      h('div',{style:{display:'flex',gap:2}},
+        p.phy.map(function(v,i){return h('div',{key:i,className:'rs-stress-box'+(v?' filled':''),
+            role:'checkbox','aria-checked':String(!!v),'aria-label':'Physical stress '+(i+1),
+            tabIndex:isReadOnly?-1:0,
+            onClick:isReadOnly?null:function(){var a=p.phy.slice();a[i]=!a[i];act({phy:a});},
+            onKeyDown:isReadOnly?null:function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();var a=p.phy.slice();a[i]=!a[i];act({phy:a});}},
+            style:isReadOnly?{cursor:'default'}:null});})
+      ),
+      h('span',{className:'rs-fp-label',style:{marginLeft:4}},'MEN'),
+      h('div',{style:{display:'flex',gap:2}},
+        p.men.map(function(v,i){return h('div',{key:i,className:'rs-stress-box'+(v?' filled':''),
+            style:{borderColor:'var(--c-purple)'},
+            role:'checkbox','aria-checked':String(!!v),'aria-label':'Mental stress '+(i+1),
+            tabIndex:isReadOnly?-1:0,
+            onClick:isReadOnly?null:function(){var a=p.men.slice();a[i]=!a[i];act({men:a});},
+            onKeyDown:isReadOnly?null:function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();var a=p.men.slice();a[i]=!a[i];act({men:a});}}
+          });})
+      )
+    ),
+    expanded&&h('div',{style:{padding:'0 8px 7px'}},
+      (p.skills||[]).length>0&&h('div',{style:{marginBottom:6}},
+        h('div',{style:{fontSize:11,fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--text-muted)',marginBottom:3}},'Skills'),
+        (p.skills||[]).map(function(sk,i){
+          return h('div',{key:i,className:'rs-skill-row',style:{marginBottom:2},
+            onClick:function(){if(onRollSkill)onRollSkill(p,sk);}},
+            h('span',{style:{fontSize:10,color:'var(--text)',fontWeight:600}},sk.l||sk.name),
+            h('span',{style:{fontSize:11,fontWeight:800,color:lcol(sk.v||sk.r||0)}},'+' +(sk.v||sk.r||0))
+          );
+        })
+      ),
+      h('div',{style:{fontSize:11,fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',color:'var(--text-muted)',marginBottom:3}},'Consequences'),
+      ['Mild','Moderate','Severe'].map(function(sev,i){
+        return h('div',{key:i,style:{display:'flex',alignItems:'center',gap:3,marginBottom:3}},
+          h('span',{style:{fontSize:11,color:'var(--text-muted)',width:46,flexShrink:0}},sev),
+          h('input',{type:'text',value:conseq[i]||'',placeholder:'empty',
+            onChange:function(e){setConseq(i,e.target.value);},
+            style:{flex:1,background:'var(--inset)',border:'1px solid '+(conseq[i]?'var(--c-amber,#f4b942)':'var(--border)'),
+              borderRadius:4,padding:'2px 5px',fontSize:10,color:'var(--text)',fontFamily:'var(--font-ui)',outline:'none'}})
+        );
+      })
+    )
+  );
+}
+
+// ── DICE PANEL ────────────────────────────────────────────────────
+function DicePanel(props){
+  var players=props.players,selId=props.selId;
+  var _dice=useState([0,0,0,0]);var dice=_dice[0];var setDice=_dice[1];
+  var _spin=useState(false);var spinning=_spin[0];var setSpinning=_spin[1];
+  var _res=useState(null);var result=_res[0];var setResult=_res[1];
+  var _sk=useState(null);var activeSk=_sk[0];var setActiveSk=_sk[1];
+  var _boost=useState(false);var boosted=_boost[0];var setBoosted=_boost[1];
+  var _hist=useState([]);var history=_hist[0];var setHistory=_hist[1];
+  var rollTimerRef=useRef(null);
+  useEffect(function(){return function(){if(rollTimerRef.current)clearTimeout(rollTimerRef.current);};},[]);
+  var player=players.find(function(p){return p.id===selId;});
+  var mod=activeSk?activeSk.v:0;
+  var final=result!=null?result+mod+(boosted?2:0):null;
+  function doRoll(sk){
+    if(spinning)return;
+    setActiveSk(sk);setBoosted(false);setResult(null);setSpinning(true);
+    rollTimerRef.current=setTimeout(function(){
+      var r=[rollDF(),rollDF(),rollDF(),rollDF()];
+      var s=r.reduce(function(a,b){return a+b;},0);
+      setDice(r);setSpinning(false);setResult(s);
+      var total=s+sk.v;
+      setHistory(function(h){return [{who:player?player.name:'?',skill:sk.l,total:total}].concat(h).slice(0,5);});
+      props.onRoll({who:player?player.name:'?',skill:sk.l,total:total});
+    },600);
+  }
+  function boost(){
+    if(!player||boosted||result==null)return;
+    props.spendFP(selId);setBoosted(true);
+    setHistory(function(h){return h.map(function(r,i){return i===0?Object.assign({},r,{total:r.total+2}):r;});});
+  }
+  var DFMT={'-1':'\u2212',0:'\u25CB',1:'+'};
+  return h('div',{style:{display:'flex',flexDirection:'column',gap:0}},
+    h('div',{style:{padding:'7px 10px',borderBottom:'1px solid var(--border)',marginBottom:7}},
+      h('div',{style:{fontSize:11,textTransform:'uppercase',letterSpacing:'.08em',color:'var(--text-muted)',marginBottom:2}},'Rolling as'),
+      h('div',{style:{fontSize:11,fontWeight:700,color:player?player.color||'var(--accent)':'var(--border-mid)'}},
+        player?player.name:'\u2014 select player in roster \u2014')
+    ),
+    h('div',{className:'rs-dice-row'},
+      dice.map(function(v,i){
+        return h('div',{key:i,className:'rs-die'+(spinning?' spin':v>0?' pos':v<0?' neg':' zero')},
+          spinning?'\u25C8':DFMT[v]||'\u25CB');
+      })
+    ),
+    result!=null&&!spinning&&h('div',{className:'rs-roll-result'},
+      activeSk&&h('div',{style:{fontSize:11,color:'var(--text-muted)',marginBottom:2}},activeSk.l+' +'+activeSk.v+(boosted?' +2 boost':'')+' = '),
+      h('div',{className:'rs-roll-total',style:{color:lcol(final)}},final>=0?'+'+final:String(final)),
+      h('div',{className:'rs-roll-label',style:{color:lcol(final)}},lbl(final)),
+      h('button',{className:'rs-fp-spend-btn'+(boosted?' rs-fp-spent':''),'aria-label':'Spend FP +2',
+        disabled:!player||player.fp<=0||boosted,onClick:boost},
+        boosted?'\u2705 Spent (+2)':player&&player.fp>0?'\u29BF Spend FP +2':'No Fate Points')
+    ),
+    result==null&&!spinning&&h('div',{style:{textAlign:'center',fontSize:10,color:'var(--border-mid)',padding:'6px 0'}},
+      player?'\u2190 click a skill to roll':'select a player first'),
+    h('button',{className:'rs-roll-btn',style:{margin:'3px 10px',width:'calc(100% - 20px)'},
+      disabled:spinning,onClick:function(){doRoll({l:'4dF',v:0});}},
+      '\uD83C\uDFB2 Roll 4dF'),
+    player&&(player.skills||[]).length>0&&h('div',{style:{marginTop:5}},
+      h('div',{style:{fontSize:11,fontWeight:700,color:'var(--text-muted)',textTransform:'uppercase',letterSpacing:'.08em',marginBottom:4}},'Skills'),
+      player.skills.map(function(sk){
+        var isSel=activeSk&&activeSk.l===sk.l;
+        return h('div',{key:sk.l,className:'rs-skill-row'+(isSel?' sel':''),
+          role:'button',tabIndex:0,
+          'aria-label':'Roll '+sk.l+' '+sk.v,
+          onClick:function(){doRoll(sk);},
+          onKeyDown:function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();doRoll(sk);}}
+        },
+          h('span',{style:{fontSize:10,color:'var(--text)',fontWeight:600}},sk.l),
+          h('div',{style:{display:'flex',gap:5,alignItems:'center'}},
+            h('span',{style:{fontSize:11,color:'var(--text-muted)'}},lbl(sk.v)),
+            h('span',{style:{fontSize:11,fontWeight:800,color:lcol(sk.v)}},'+'+sk.v),
+            h('span',{style:{fontSize:11,opacity:isSel?1:.3}},'\uD83C\uDFB2')
+          )
+        );
+      })
+    ),
+    history.length>0&&h('div',{className:'rs-roll-history'},
+      h('div',{style:{fontSize:11,fontWeight:700,color:'var(--text-muted)',textTransform:'uppercase',letterSpacing:'.08em',marginBottom:4}},'History'),
+      history.map(function(r,i){
+        return h('div',{key:i,style:{display:'flex',alignItems:'center',gap:5,padding:'2px 0',borderBottom:'1px solid var(--border)',fontSize:10}},
+          h('span',{style:{color:'var(--text-dim)',flex:1}},r.who+' \u00B7 '+r.skill),
+          h('span',{style:{fontWeight:800,color:lcol(r.total)}},r.total>=0?'+'+r.total:String(r.total)),
+          h('span',{style:{fontSize:11,color:'var(--text-muted)'}},lbl(r.total))
+        );
+      })
+    )
+  );
+}
+
+// ── GENERATOR DRAWER ─────────────────────────────────────────────
+function GeneratorDrawer(props){
+  var campId=props.campId,partySize=props.partySize,onAdd=props.onAdd,onAddPlayer=props.onAddPlayer;
+  var _tab=useState('gen');var tab=_tab[0];var setTab=_tab[1];
+  var _zName=useState('');var zName=_zName[0];var setZName=_zName[1];
+  var _zAsp=useState('');var zAsp=_zAsp[0];var setZAsp=_zAsp[1];
+  var _zCost=useState('');var zCost=_zCost[0];var setZCost=_zCost[1];
+  var _showZ=useState(false);var showZ=_showZ[0];var setShowZ=_showZ[1];
+
+  function rollAndAdd(genId){
+    var data=rollGen(genId,campId,partySize);
+    if(data)onAdd(cardFromResult(genId,data));
+  }
+  function addZone(){
+    if(!zName.trim())return;
+    onAdd({id:uid(),genId:'zone',type:'zone',title:zName.trim(),
+      notes:(zAsp.trim()||'')+(zCost.trim()?'\nMovement: '+zCost.trim():''),
+      data:{name:zName,aspect:zAsp,movement:zCost},
+      pinned:false,gmOnly:false,revealed:false,cdFilled:0,zoneId:null,size:'full',
+      x:80+Math.random()*300,y:80+Math.random()*200,ts:Date.now()});
+    setZName('');setZAsp('');setZCost('');setShowZ(false);
+  }
+  function addGMNote(){
+    onAdd({id:uid(),genId:'gm',type:'gm',title:'GM Note',notes:'',data:{},
+      pinned:false,gmOnly:true,revealed:false,cdFilled:0,zoneId:null,size:'md',
+      x:100+Math.random()*200,y:100+Math.random()*200,ts:Date.now()});
+  }
+
+  return h('div',{className:'rs-drawer-body'},
+    h('div',{className:'rs-gen-section'},'Generate & Add'),
+    h('div',{className:'rs-gen-grid'},
+      GEN_MENU.map(function(g){
+        return h('button',{key:g.id,className:'rs-gen-btn',onClick:function(){rollAndAdd(g.id);}},
+          h('div',{className:'rs-gen-icon'},g.icon),
+          h('div',{className:'rs-gen-label'},g.label)
+        );
+      })
+    ),
+    h('div',{className:'rs-gen-section'},'Manual'),
+    h('div',{style:{display:'flex',gap:5}},
+      h('button',{className:'rs-btn',style:{flex:1,fontSize:10},onClick:function(){setShowZ(!showZ);}},'\u25A1 Zone'),
+      h('button',{className:'rs-btn',style:{flex:1,fontSize:10},onClick:addGMNote},'\uD83D\uDD12 GM Note')
+    ),
+    showZ&&h('div',{className:'rs-zone-form'},
+      h('input',{className:'rs-zone-input',placeholder:'Zone name',value:zName,onChange:function(e){setZName(e.target.value);}}),
+      h('input',{className:'rs-zone-input',placeholder:'Zone aspect (optional)',value:zAsp,onChange:function(e){setZAsp(e.target.value);}}),
+      h('input',{className:'rs-zone-input',placeholder:'Movement cost (optional)',value:zCost,onChange:function(e){setZCost(e.target.value);}}),
+      h('button',{className:'rs-zone-submit',onClick:addZone},'+ Add Zone')
+    ),
+    h('div',{className:'rs-gen-section'},'Import Player'),
+    h('label',{className:'rs-import-label'},
+      '\uD83D\uDCC2 Import from Ogma (.ogma.json)',
+      h('input',{type:'file',accept:'.json,.ogma.json',style:{display:'none'},
+        onChange:function(e){
+          var file=e.target.files[0];if(!file)return;
+          var reader=new FileReader();
+          reader.onload=function(ev){
+            var player=parseOgmaCharacter(ev.target.result);
+            if(player)onAddPlayer(player);
+            else alert('Not a valid Ogma NPC file.');
+          };
+          reader.readAsText(file);e.target.value='';
+        }
+      })
+    )
+  );
+}
+
+// ── TURN ORDER BAR ────────────────────────────────────────────────
+function TurnOrderBar(props){
+  var players=props.players,order=props.order,setOrder=props.setOrder,onToggleActed=props.onToggleActed;
+  var _drag=useState(null);var dragId=_drag[0];var setDragId=_drag[1];
+  var _over=useState(null);var overId=_over[0];var setOverId=_over[1];
+  var allActed=players.length>0&&players.every(function(p){return p.acted;});
+  function onDragStart(e,id){setDragId(id);e.dataTransfer.effectAllowed='move';}
+  function onDragOver(e,id){e.preventDefault();if(id!==dragId)setOverId(id);}
+  function onDrop(e,id){
+    e.preventDefault();
+    if(dragId&&dragId!==id){
+      setOrder(function(o){
+        var a=o.slice();var fi=a.indexOf(dragId);var ti=a.indexOf(id);
+        if(fi<0||ti<0)return o;a.splice(fi,1);a.splice(ti,0,dragId);return a;
+      });
+    }
+    setDragId(null);setOverId(null);
+  }
+  function onDragEnd(){setDragId(null);setOverId(null);}
+  var orderedPlayers=order.map(function(id){return players.find(function(p){return p.id===id;});}).filter(Boolean);
+  players.forEach(function(p){if(order.indexOf(p.id)<0)orderedPlayers.push(p);});
+  return h('div',{className:'rs-turn-bar','aria-label':'Turn order'},
+    h('span',{className:'rs-turn-label'},'Turn Order'),
+    orderedPlayers.map(function(p){
+      return h('div',{key:p.id,
+        className:'rs-turn-pill'+(p.acted?' acted':'')+(dragId===p.id?' dragging':'')+(overId===p.id?' drag-over':''),
+        draggable:true,
+        onDragStart:function(e){onDragStart(e,p.id);},
+        onDragOver:function(e){onDragOver(e,p.id);},
+        onDrop:function(e){onDrop(e,p.id);},
+        onDragEnd:onDragEnd,
+        onClick:function(){onToggleActed(p.id);},
+      },
+        h('div',{className:'rs-turn-dot',style:{background:p.color||'var(--accent)'}}),
+        h('span',{style:{fontSize:10,fontWeight:700,color:p.acted?'var(--c-green)':'var(--text)'}},p.name),
+        p.acted&&h('span',{style:{fontSize:10,color:'var(--c-green)'}},' \u2713')
+      );
+    }),
+    allActed&&h('div',{className:'rs-all-acted'},'\u2756 All acted \u2014 new round?')
+  );
+}
+
+// ── SYNC MODULE (MP-04) ────────────────────────────────────────────────────────────────────
+// Opt-in multiplayer via PartyKit. Offline/solo when sync===null.
+var SYNC_HOST = null;
+try{var _sp=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}'  );SYNC_HOST=_sp.syncHost||null;}catch(e){}
+var OGMA_DEFAULT_SYNC_HOST = (typeof OGMA_CONFIG !== 'undefined' && OGMA_CONFIG.DEFAULT_SYNC_HOST) ? OGMA_CONFIG.DEFAULT_SYNC_HOST : 'ogma-sync.brs165.workers.dev';
+
+function generateRoomCode(){
+  var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var code='';
+  for(var i=0;i<4;i++)code+=chars[Math.floor(Math.random()*chars.length)];
+  return code;
+}
+
+function createSync(roomCode,role,onStateUpdate,onRoll,onToast,onPresence){
+  var host=SYNC_HOST||OGMA_DEFAULT_SYNC_HOST;
+  if(typeof PartySocket==='undefined'){console.warn('PartySocket not loaded — sync disabled');return null;}
+  var ws=new PartySocket({host:host,room:roomCode.toLowerCase(),query:{role:role}});
+  var sync={ws:ws,role:role,roomCode:roomCode,connected:false,gmConnected:false,
+    broadcastState:function(state){
+      if(sync.role!=='gm'||!sync.connected)return;
+      var clean=Object.assign({},state);
+      clean.cards=(state.cards||[]).filter(function(c){return !c.gmOnly;});
+      ws.send(JSON.stringify({type:'state',payload:clean}));
+    },
+    broadcastRoll:function(data){
+      if(sync.role!=='gm'||!sync.connected)return;
+      ws.send(JSON.stringify(Object.assign({type:'roll'},data)));
+    },
+    broadcastLog:function(event,actor,detail){
+      if(sync.role!=='gm'||!sync.connected)return;
+      ws.send(JSON.stringify({type:'log_event',event:event,actor:actor||null,detail:detail||null}));
+    },
+    broadcastToast:function(msg){
+      if(sync.role!=='gm'||!sync.connected)return;
+      ws.send(JSON.stringify({type:'toast',msg:msg}));
+    },
+    sendAction:function(playerId,action,patch){
+      if(sync.role!=='player'||!sync.connected)return;
+      ws.send(JSON.stringify({type:'player_action',playerId:playerId,action:action,patch:patch}));
+    },
+    sendRoll:function(playerId,data){
+      if(sync.role!=='player'||!sync.connected)return;
+      ws.send(JSON.stringify(Object.assign({type:'player_roll',playerId:playerId},data)));
+    },
+    disconnect:function(){ws.close();sync.connected=false;}
+  };
+  ws.addEventListener('open',function(){sync.connected=true;});
+  ws.addEventListener('close',function(){sync.connected=false;});
+  ws.addEventListener('message',function(event){
+    var data;try{data=JSON.parse(event.data);}catch(e){return;}
+    switch(data.type){
+      case 'welcome':
+        sync.gmConnected=data.gmConnected;
+        if(data.state&&sync.role==='player')onStateUpdate(data.state);
+        break;
+      case 'state':
+        if(sync.role==='player')onStateUpdate(data.payload);
+        break;
+      case 'roll': onRoll(data); break;
+      case 'toast': onToast(data.msg); break;
+      case 'presence': onPresence(data.connections); break;
+      case 'player_action':
+        if(sync.role==='gm')onStateUpdate({type:'player_action',playerId:data.playerId,action:data.action,patch:data.patch});
+        break;
+      case 'player_roll':
+        if(sync.role==='gm')onRoll(data);
+        break;
+      case 'player_boost':
+        if(sync.role==='gm')onStateUpdate({type:'player_boost',playerId:data.playerId});
+        break;
+    }
+  });
+  return sync;
+}
+// MP-23: SessionLogPanel — GM session transcript
+function SessionLogPanel(props){
+  var entries=props.entries||[];
+  var loading=props.loading;
+  var onRefresh=props.onRefresh,onClear=props.onClear,onExport=props.onExport,onClose=props.onClose;
+
+  var EVENT_LABELS={
+    'connect':    '🔗 Connected',
+    'disconnect': '🔌 Disconnected',
+    'roll':       '🎲 Roll',
+    'player_roll':'🎲 Player Roll',
+    'player_action':'⚡ Action',
+    'card_add':   '➕ Card Added',
+    'card_remove':'✕ Card Removed',
+    'round':      '🔔 New Round',
+  };
+
+  return h('div',{style:{
+    position:'fixed',top:52,right:0,width:320,bottom:0,
+    background:'var(--panel)',borderLeft:'1px solid var(--border)',
+    zIndex:400,display:'flex',flexDirection:'column',
+    boxShadow:'-4px 0 24px rgba(0,0,0,0.4)',
+  }},
+    // Header
+    h('div',{style:{
+      display:'flex',alignItems:'center',justifyContent:'space-between',
+      padding:'8px 12px',borderBottom:'1px solid var(--border)',flexShrink:0,
+    }},
+      h('div',{style:{fontSize:12,fontWeight:800,color:'var(--text)',letterSpacing:'0.04em'}},'📋 Session Log'),
+      h('div',{style:{display:'flex',gap:4}},
+        h('button',{className:'rs-btn',style:{fontSize:10,padding:'2px 8px'},onClick:onRefresh,title:'Refresh',disabled:loading},'↻'),
+        h('button',{className:'rs-btn',style:{fontSize:10,padding:'2px 8px'},onClick:onExport,disabled:!entries.length},'⬇ MD'),
+        h('button',{className:'rs-btn danger',style:{fontSize:10,padding:'2px 8px'},onClick:onClear,disabled:!entries.length},'Clear'),
+        h('button',{className:'rs-btn',style:{fontSize:10,padding:'2px 8px'},onClick:onClose,title:'Close'},'✕')
+      )
+    ),
+    // Body
+    h('div',{style:{flex:1,overflowY:'auto',padding:'8px 0'}},
+      loading&&h('div',{style:{padding:'20px 12px',fontSize:12,color:'var(--text-muted)',textAlign:'center'}},'Loading…'),
+      !loading&&entries.length===0&&h('div',{style:{padding:'20px 12px',fontSize:12,color:'var(--text-muted)',textAlign:'center',lineHeight:1.65}},
+        'No events yet.',h('br',null),'Events are logged when players connect, dice are rolled, and actions are taken.'
+      ),
+      !loading&&entries.map(function(e){
+        var label=EVENT_LABELS[e.event]||e.event;
+        var t=new Date(e.ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+        var isRoll=e.event==='roll'||e.event==='player_roll';
+        var isConnect=e.event==='connect'||e.event==='disconnect';
+        return h('div',{key:e.id,style:{
+          display:'flex',gap:8,padding:'5px 12px',
+          borderBottom:'1px solid var(--border)',
+          background:isRoll?'color-mix(in srgb,var(--accent) 4%,transparent)':'transparent',
+        }},
+          h('div',{style:{fontSize:11,color:'var(--text-muted)',fontFamily:'var(--font-mono,monospace)',flexShrink:0,paddingTop:2,minWidth:58}},t),
+          h('div',{style:{flex:1,minWidth:0}},
+            h('div',{style:{fontSize:11,fontWeight:700,color:isConnect?'var(--text-muted)':isRoll?'var(--accent)':'var(--text)'}},label),
+            e.actor&&h('div',{style:{fontSize:10,color:'var(--text-muted)'}},e.actor),
+            e.detail&&h('div',{style:{fontSize:11,fontStyle:'italic',color:'var(--text-dim)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}},e.detail)
+          )
+        );
+      })
+    )
+  );
+}
+// MP-11: JoinModal — name prompt when arriving via ?room=
+function JoinModal(props){
+  var roomCode=props.roomCode,joinName=props.joinName,setJoinName=props.setJoinName;
+  var onJoin=props.onJoin,onDismiss=props.onDismiss;
+  return h('div',{style:{position:'fixed',inset:0,background:'rgba(0,0,0,0.72)',zIndex:900,
+    display:'flex',alignItems:'center',justifyContent:'center',padding:20}},
+    h('div',{style:{background:'var(--panel-raised)',border:'1px solid var(--border)',
+      borderRadius:12,padding:24,width:'min(400px,90vw)',display:'flex',flexDirection:'column',gap:14}},
+      h('div',{style:{fontSize:18,fontWeight:800,color:'var(--accent)'}},'🌐 Joining Room '+roomCode),
+      h('div',{style:{fontSize:13,color:'var(--text-muted)',lineHeight:1.5}},
+        'You’ve been invited to a live Ogma session. Enter your name to join as a player.'),
+      h('input',{type:'text',value:joinName,placeholder:'Your name',autoFocus:true,
+        style:{background:'var(--inset)',border:'1px solid var(--border)',borderRadius:7,
+          padding:'10px 12px',fontSize:14,color:'var(--text)',fontFamily:'var(--font-ui)',outline:'none'},
+        onChange:function(e){setJoinName(e.target.value);},
+        onKeyDown:function(e){if(e.key==='Enter'&&joinName.trim())onJoin();}}),
+      h('div',{style:{display:'flex',gap:10}},
+        h('button',{style:{flex:1,background:'none',border:'1px solid var(--border)',
+          borderRadius:7,padding:'9px',fontSize:13,color:'var(--text-muted)',cursor:'pointer',fontFamily:'var(--font-ui)'},
+          onClick:onDismiss},'Watch only'),
+        h('button',{style:{flex:2,background:'var(--c-green)',border:'none',
+          borderRadius:7,padding:'9px',fontSize:14,fontWeight:800,color:'#000',cursor:'pointer',fontFamily:'var(--font-ui)'},
+          onClick:onJoin,disabled:!joinName.trim()},'Join Session')
+      )
+    )
+  );
+}
+// ── MAIN APP ──────────────────────────────────────────────────────
+function RunApp(){
+  var _cards=useState([]);var cards=_cards[0];var setCards=_cards[1];
+  var _players=useState([]);var players=_players[0];var setPlayers=_players[1];
+  var _round=useState(1);var round=_round[0];var setRound=_round[1];
+  var _order=useState([]);var order=_order[0];var setOrder=_order[1];
+  var _loaded=useState(false);var loaded=_loaded[0];var setLoaded=_loaded[1];
+
+  function getWorldParam(){
+    try{var p=new URLSearchParams(window.location.search).get('world');return p&&CAMPAIGNS[p]?p:null;}catch(e){return null;}
+  }
+  var _campId=useState(getWorldParam);var campId=_campId[0];var setCampId=_campId[1];
+  var _campName=useState(function(){
+    var wp=getWorldParam();return wp&&CAMPAIGNS[wp]?(CAMPAIGNS[wp].meta&&CAMPAIGNS[wp].meta.name?CAMPAIGNS[wp].meta.name:wp):'';
+  });var campName=_campName[0];var setCampName=_campName[1];
+  var _partySize=useState(4);var partySize=_partySize[0];var setPartySize=_partySize[1];
+  var _selPlayer=useState(null);var selPlayer=_selPlayer[0];var setSelPlayer=_selPlayer[1];
+
+
+  // MP: Sync state
+  var _sync=useState(null);var sync=_sync[0];var setSync=_sync[1];
+  var _roomCode=useState(function(){
+    try{var p=new URLSearchParams(window.location.search);return p.get('room')||null;}catch(e){return null;}
+  });var roomCode=_roomCode[0];var setRoomCode=_roomCode[1];
+  var _isRemotePlayer=useState(false);var isRemotePlayer=_isRemotePlayer[0];var setIsRemotePlayer=_isRemotePlayer[1];
+  var _presence=useState([]);var presence=_presence[0];var setPresence=_presence[1];
+  // MP-12: which player the remote user has claimed as "this is me"
+  var _claimedPlayer=useState(null);var claimedPlayer=_claimedPlayer[0];var setClaimedPlayer=_claimedPlayer[1];
+  // MP-11: show join name modal when arriving as player
+  var _showJoinModal=useState(function(){
+    try{return !!new URLSearchParams(window.location.search).get('room');}catch(e){return false;}
+  });var showJoinModal=_showJoinModal[0];var setShowJoinModal=_showJoinModal[1];
+  var _joinName=useState('');var joinName=_joinName[0];var setJoinName=_joinName[1];
+  // Edit mode (GM) vs Play mode
+  var _editMode=useState(true);var editMode=_editMode[0];var setEditMode=_editMode[1];
+
+  var _editCard=useState(null);var editCard=_editCard[0];var setEditCard=_editCard[1];
+  var _mdCard=useState(null);var mdCard=_mdCard[0];var setMdCard=_mdCard[1];
+  var _toast=useState(null);var toast=_toast[0];var setToast=_toast[1];
+  var _drawerOpen=useState(false);var drawerOpen=_drawerOpen[0];var setDrawerOpen=_drawerOpen[1];
+  var _drawerTab=useState('gen');var drawerTab=_drawerTab[0];var setDrawerTab=_drawerTab[1];
+  var _diceFloat=useState(false);var diceFloat=_diceFloat[0];var setDiceFloat=_diceFloat[1]; // TBL-02: floater on small/touch screens
+  function useDiceFloater(){return window.matchMedia('(max-width:900px),(pointer:coarse)').matches;}
+  function openDice(){if(useDiceFloater()){setDiceFloat(true);}else{setDrawerOpen(true);setDrawerTab('dice');}}
+
+  // Import banners
+  var _hasPrepImport=useState(false);var hasPrepImport=_hasPrepImport[0];var setHasPrepImport=_hasPrepImport[1];
+  var _hasSavedPrep=useState(false);var hasSavedPrep=_hasSavedPrep[0];var setHasSavedPrep=_hasSavedPrep[1];
+  var _hasQpp=useState(false);var hasQpp=_hasQpp[0];var setHasQpp=_hasQpp[1];
+  var _hasBoardPins=useState(false);var hasBoardPins=_hasBoardPins[0];var setHasBoardPins=_hasBoardPins[1];
+  var _sidebarOpen=useState(false);var sidebarOpen=_sidebarOpen[0];var setSidebarOpen=_sidebarOpen[1];
+  var _showLog=useState(false);var showLog=_showLog[0];var setShowLog=_showLog[1];
+  var _roundFlash=useState(false);var roundFlash=_roundFlash[0];var setRoundFlash=_roundFlash[1];
+  var _logEntries=useState([]);var logEntries=_logEntries[0];var setLogEntries=_logEntries[1];
+  var _logLoading=useState(false);var logLoading=_logLoading[0];var setLogLoading=_logLoading[1];
+
+  // Canvas zoom / pan
+  var _scale=useState(1);var scale=_scale[0];var setScale=_scale[1];
+  var _ox=useState(40);var ox=_ox[0];var setOx=_ox[1];
+  var _oy=useState(40);var oy=_oy[0];var setOy=_oy[1];
+
+  // Pointer-based card drag
+  var dragState=useRef(null); // {cardId, startX, startY, origX, origY, type:'card'|'pan'}
+  var _hoverZone=useState(null);var hoverZone=_hoverZone[0];var setHoverZone=_hoverZone[1];
+
+  var toastRef=useRef(null);
+  useEffect(function(){return function(){if(toastRef.current)clearTimeout(toastRef.current);};},[]);
+
+  // Load
+  useEffect(function(){
+    // MP: Auto-join if URL has ?room=
+    if(roomCode)joinRoom(roomCode,'player');
+    DB.loadSession(RUN_IDB_KEY).then(function(saved){
+      if(saved){
+        if(saved.cards)setCards(saved.cards);
+        if(saved.players){setPlayers(saved.players);if(!saved.order)setOrder(saved.players.map(function(p){return p.id;}));}
+        if(saved.round)setRound(saved.round);
+        if(saved.campId)setCampId(saved.campId);
+        if(saved.campName)setCampName(saved.campName);
+        if(saved.partySize)setPartySize(saved.partySize);
+        if(saved.order)setOrder(saved.order);
+        if(saved.scale)setScale(saved.scale);
+        if(saved.ox!=null)setOx(saved.ox);
+        if(saved.oy!=null)setOy(saved.oy);
+      }
+      setLoaded(true);
+    }).catch(function(){setLoaded(true);});
+    DB.loadSession('prep_wizard_v1').then(function(pw){if(pw&&(pw.seedData||pw.sceneData||pw.npcData))setHasPrepImport(true);}).catch(function(){});
+    var wpCamp=getWorldParam();
+    if(wpCamp){
+      DB.loadCards(wpCamp).then(function(sc){if(sc&&sc.length>0)setHasSavedPrep(true);}).catch(function(){});
+      DB.loadSession('quick_prep_pack_'+wpCamp).then(function(qpp){if(qpp&&qpp.pack)setHasQpp(true);}).catch(function(){});
+      // Board pins — set by board.html pinCard()
+      DB.loadSession('prep_table_pinned_'+wpCamp).then(function(pins){if(pins&&pins.length>0)setHasBoardPins(true);}).catch(function(){});
+    }
+  },[]);
+
+  // MP-06: Host / Join / Disconnect
+  function hostOnline(){
+    var code=generateRoomCode();
+    setRoomCode(code);
+    var s=createSync(code,'gm',
+      function(data){
+        if(data.type==='player_action')updPlayer(data.playerId,data.patch);
+        else if(data.type==='player_boost')spendFP(data.playerId);
+      },
+      function(rollData){showToast((rollData.who||'?')+' · '+(rollData.skill||'?')+' → '+(rollData.label||rollData.total));},
+      function(){},
+      function(conns){setPresence(conns);}
+    );
+    if(!s){showToast('Sync unavailable offline');return;}
+    setSync(s);
+    showToast('Hosting room: '+code+' — share the link!');
+  }
+  function joinRoom(code,role){
+    var s=createSync(code,role||'player',
+      function(data){
+        if(data.type==='player_action'||data.type==='player_boost')return;
+        if(data.cards)setCards(function(){return data.cards;});
+        if(data.players)setPlayers(data.players);
+        if(data.round)setRound(data.round);
+        if(data.campId)setCampId(data.campId);
+        if(data.campName)setCampName(data.campName);
+        if(data.order)setOrder(data.order);
+        setIsRemotePlayer(true);
+        setEditMode(false);
+      },
+      function(rollData){showToast((rollData.who||'?')+' · '+(rollData.skill||'?')+' → '+(rollData.label||rollData.total));},
+      function(msg){showToast(msg);},
+      function(conns){setPresence(conns);}
+    );
+    if(!s)return;
+    setSync(s);
+  }
+  function disconnectSync(){
+    if(sync)sync.disconnect();
+    setSync(null);setRoomCode(null);setIsRemotePlayer(false);setPresence([]);
+    showToast('Disconnected');
+  }
+  function persist(patch){
+    var state={cards:cards,players:players,round:round,campId:campId,campName:campName,
+      partySize:partySize,order:order,scale:scale,ox:ox,oy:oy,ts:Date.now()};
+    Object.assign(state,patch);
+    DB.saveSession(RUN_IDB_KEY,state).catch(function(err){console.warn('[Ogma] run session save failed:',err);});
+    if(sync&&sync.role==='gm'){
+      var broadcastState=Object.assign({},state,{
+        cards:(state.cards||[]).filter(function(c){return !c.gmOnly;}) // never send gmOnly to players
+      });
+      sync.broadcastState(broadcastState);
+    } // MP-05
+  }
+  function showToast(msg){clearTimeout(toastRef.current);setToast(msg);toastRef.current=setTimeout(function(){setToast(null);},3000);}
+  function updCard(id,patch,noPersist){
+    setCards(function(cs){var next=cs.map(function(c){return c.id===id?Object.assign({},c,patch):c;});if(!noPersist)persist({cards:next});return next;});
+  }
+  function addCard(card){
+    setCards(function(cs){
+      var next=cs.concat([card]);persist({cards:next});return next;
+    });
+    if(sync)sync.broadcastLog('card_add','GM',card.title||card.genId);
+    showToast('Added: '+card.title);
+  }
+  var _lastRemoved=useRef(null);
+  var fitAllRef=useRef(null); // always-fresh ref for keyboard shortcut
+  function removeCard(id){
+    setCards(function(cs){
+      var removing=cs.find(function(c){return c.id===id;});
+      var orphans=cs.filter(function(c){return c.zoneId===id;});
+      if(removing){
+        _lastRemoved.current={card:removing,orphans:orphans};
+        if(sync)sync.broadcastLog('card_remove','GM',removing.title||removing.genId);
+      }
+      var next=cs.filter(function(c){return c.id!==id;}).map(function(c){return c.zoneId===id?Object.assign({},c,{zoneId:null}):c;});
+      persist({cards:next});return next;
+    });
+    showToast('Removed — Ctrl+Z to undo');
+  }
+  function undoRemove(){
+    if(!_lastRemoved.current)return;
+    var lr=_lastRemoved.current;_lastRemoved.current=null;
+    setCards(function(cs){
+      var next=cs.concat([lr.card]).concat(lr.orphans.map(function(o){return Object.assign({},o,{zoneId:lr.card.id});}));
+      persist({cards:next});return next;
+    });
+    showToast('Undone');
+  }
+  function updPlayer(id,patch){
+    setPlayers(function(ps){var next=ps.map(function(p){return p.id===id?Object.assign({},p,patch):p;});persist({players:next});return next;});
+  }
+  function spendFP(id){
+    var p=players.find(function(p){return p.id===id;});if(!p)return;
+    updPlayer(id,{fp:Math.max(0,p.fp-1)});
+  }
+  function newRound(){
+    var nr=round+1;setRound(nr);
+    setRoundFlash(true);setTimeout(function(){setRoundFlash(false);},700);
+    setPlayers(function(ps){var next=ps.map(function(p){return Object.assign({},p,{acted:false});});persist({round:nr,players:next});return next;});
+    if(sync)sync.broadcastLog('round','GM','Round '+nr);
+    showToast('\u23F0 Round '+nr+' — stress cleared, acted reset');
+  }
+
+  // Import functions
+  function importFromWizard(){
+    DB.loadSession('prep_wizard_v1').then(function(pw){
+      if(!pw)return;
+      var toAdd=[];var cId=pw.campId||null;
+      var cName=cId&&CAMPAIGNS[cId]?CAMPAIGNS[cId].meta.name:'';
+      if(pw.seedData)toAdd.push(cardFromResult('seed',pw.seedData));
+      if(pw.sceneData)toAdd.push(cardFromResult('scene',pw.sceneData));
+      if(pw.npcData)toAdd.push(cardFromResult('npc_major',pw.npcData));
+      if(pw.extras)pw.extras.forEach(function(e){toAdd.push(cardFromResult(e.genId,e.data));});
+      // Stagger positions
+      toAdd.forEach(function(c,i){c.x=80+i%3*220;c.y=80+Math.floor(i/3)*200;});
+      var newPlayers=[];
+      if(pw.backstories&&pw.backstories.length>0){
+        var COLORS=['var(--accent)','var(--c-purple)','var(--c-blue)','var(--c-green)','var(--c-red)'];
+        pw.backstories.forEach(function(b,i){
+          newPlayers.push({id:'p'+(i+1),name:'Player '+(i+1),hc:b?(b.aspect||''):'',
+            fp:3,ref:3,phy:[false,false,false],men:[false,false],
+            color:COLORS[i%COLORS.length],acted:false,skills:[],conseq:['','','']});
+        });
+      }
+      setCards(function(cs){
+        var next=cs.concat(toAdd);
+        var newP=newPlayers.length>0?newPlayers:players;
+        persist({cards:next,campId:cId,campName:cName,players:newP});
+        setCampId(cId);setCampName(cName);
+        if(newPlayers.length>0){setPlayers(newPlayers);var imp_order=newPlayers.map(function(p){return p.id;});setOrder(imp_order);}
+        return next;
+      });
+      setHasPrepImport(false);showToast(toAdd.length+' cards imported from Session Zero');
+    }).catch(function(err){console.warn('[Ogma] prep import load failed:',err);});
+  }
+  function importFromSavedPrep(){
+    var cid=campId||getWorldParam();if(!cid)return;
+    DB.loadCards(cid).then(function(sc){
+      if(!sc||!sc.length)return;
+      var toAdd=sc.map(function(c,i){var card=cardFromResult(c.genId||'other',c.data||{});card.x=80+i%4*200;card.y=80+Math.floor(i/4)*180;return card;});
+      setCards(function(cs){var next=cs.concat(toAdd);persist({cards:next});return next;});
+      setHasSavedPrep(false);showToast(toAdd.length+' cards imported');
+    }).catch(function(err){console.warn('[Ogma] saved prep load failed:',err);});
+  }
+  function importFromQpp(){
+    var cid=campId||getWorldParam();if(!cid)return;
+    DB.loadSession('quick_prep_pack_'+cid).then(function(qpp){
+      if(!qpp||!qpp.pack)return;
+      var toAdd=[];var i=0;
+      // Keys match CampaignApp QPP save: seed, scene, npcMajor
+      ['seed','scene','npcMajor'].forEach(function(k){
+        if(qpp.pack[k]&&qpp.pack[k].genId&&qpp.pack[k].data){
+          var card=cardFromResult(qpp.pack[k].genId,qpp.pack[k].data);
+          card.x=80+i*220;card.y=80;i++;toAdd.push(card);
+        }
+      });
+      if(!toAdd.length)return;
+      setCards(function(cs){var next=cs.concat(toAdd);persist({cards:next});return next;});
+      setHasQpp(false);showToast(toAdd.length+' cards imported');
+    }).catch(function(err){console.warn('[Ogma] QPP load failed:',err);});
+  }
+
+  function importFromBoardPins(){
+    var cid=campId||getWorldParam();if(!cid)return;
+    DB.loadSession('prep_table_pinned_'+cid).then(function(pins){
+      if(!pins||!pins.length)return;
+      var toAdd=pins.map(function(pin,i){
+        var card=cardFromResult(pin.genId||'other',pin.data||{});
+        card.x=80+i%4*200;card.y=80+Math.floor(i/4)*180;
+        return card;
+      });
+      setCards(function(cs){var next=cs.concat(toAdd);persist({cards:next});return next;});
+      DB.clearSession('prep_table_pinned_'+cid).catch(function(err){console.warn('[Ogma] board pins clear failed:',err);});
+      setHasBoardPins(false);
+      showToast(toAdd.length+' board cards imported');
+    }).catch(function(err){console.warn('[Ogma] board pins load failed:',err);});
+  }
+
+  function clearSession(){
+    if(!confirm('Clear all cards and start fresh?'))return;
+    setCards([]);setPlayers([]);setRound(1);setScale(1);setOx(40);setOy(40);
+    DB.clearSession(RUN_IDB_KEY).catch(function(err){console.warn('[Ogma] run session clear failed:',err);});
+    showToast('Session cleared');
+  }
+
+  function exportSession(){
+    var lines=['# Session Notes','**World:** '+(campName||campId||'Unknown'),'**Round:** '+round,''];
+    cards.forEach(function(c){lines.push('## '+c.title);if(c.notes)lines.push(c.notes);lines.push('');});
+    var blob=new Blob([lines.join('\n')],{type:'text/markdown'});
+    var url=URL.createObjectURL(blob);var a=document.createElement('a');
+    a.href=url;a.download='session-notes.md';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Exported');
+  }
+
+  // ── Session Log (MP-23) ───────────────────────────────────────
+  function getLogUrl() {
+    var host = SYNC_HOST || OGMA_DEFAULT_SYNC_HOST;
+    var code = (roomCode || '').toLowerCase();
+    return 'https://' + host + '/log/' + code;
+  }
+
+  function fetchLog() {
+    if (!roomCode) return;
+    setLogLoading(true);
+    fetch(getLogUrl())
+      .then(function(r) { return r.json(); })
+      .then(function(d) { setLogEntries(d.log || []); setLogLoading(false); })
+      .catch(function() { setLogLoading(false); });
+  }
+
+  function clearLog() {
+    if (!roomCode || !confirm('Clear the session log? This cannot be undone.')) return;
+    fetch(getLogUrl(), { method: 'DELETE' })
+      .then(function() { setLogEntries([]); showToast('Log cleared'); })
+      .catch(function() { showToast('Failed to clear log'); });
+  }
+
+  function exportLog() {
+    if (!logEntries.length) return;
+    var lines = ['# Session Log', '**World:** ' + (campName || campId || 'Unknown'), '**Room:** ' + (roomCode || ''), ''];
+    logEntries.forEach(function(e) {
+      var t = new Date(e.ts).toLocaleTimeString();
+      var actor = e.actor ? '[' + e.actor + '] ' : '';
+      var detail = e.detail ? ' — ' + e.detail : '';
+      lines.push(t + '  ' + actor + e.event + detail);
+    });
+    var blob = new Blob([lines.join('\n')], {type: 'text/markdown'});
+    var url = URL.createObjectURL(blob); var a = document.createElement('a');
+    a.href = url; a.download = 'session-log.md';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function() { URL.revokeObjectURL(url); }, 30000);
+    showToast('Log exported');
+  }
+
+  // ── Canvas pointer drag ───────────────────────────────────────
+  var canvasRef=useRef(null);
+
+  function onCanvasMouseDown(e){
+    // Only pan if clicking the canvas directly (not a card)
+    if(e.target!==canvasRef.current&&!e.target.classList.contains('rs-canvas-inner'))return;
+    dragState.current={type:'pan',startX:e.clientX,startY:e.clientY,origOx:ox,origOy:oy};
+    canvasRef.current&&canvasRef.current.classList.add('panning');
+  }
+  function onCardDragStart(e,cardId){
+    if(!editMode)return;
+    e.stopPropagation();
+    e.preventDefault(); // prevent text selection during drag
+    var card=cards.find(function(c){return c.id===cardId;});if(!card)return;
+    if(card.pinned)return;
+    dragState.current={type:'card',cardId:cardId,startX:e.clientX,startY:e.clientY,origX:card.x,origY:card.y};
+    updCard(cardId,{_dragging:true});
+  }
+
+  function onMouseMove(e){
+    var ds=dragState.current;if(!ds)return;
+    if(ds.type==='pan'){
+      var dx=e.clientX-ds.startX;var dy=e.clientY-ds.startY;
+      setOx(ds.origOx+dx);setOy(ds.origOy+dy);
+    }else if(ds.type==='card'){
+      var dx=(e.clientX-ds.startX)/scale;var dy=(e.clientY-ds.startY)/scale;
+      updCard(ds.cardId,{x:ds.origX+dx,y:ds.origY+dy},true);
+      // Highlight zone under cursor
+      var dragEl=canvasRef.current&&canvasRef.current.querySelector('[data-card-id="'+ds.cardId+'"]');
+      if(dragEl)dragEl.style.pointerEvents='none';
+      var target=document.elementFromPoint(e.clientX,e.clientY);
+      if(dragEl)dragEl.style.pointerEvents='';
+      var found=null;var el=target;
+      while(el&&el!==canvasRef.current){
+        if(el.dataset&&el.dataset.cardType==='zone'&&el.dataset.cardId!==ds.cardId){found=el.dataset.cardId;break;}
+        el=el.parentElement;
+      }
+      if(found!==hoverZone)setHoverZone(found);
+    }
+  }
+  function onMouseUp(e){
+    var ds=dragState.current;
+    if(ds&&ds.type==='card'){
+      var hz=hoverZone;
+      if(hz&&hz!==ds.cardId){
+        updCard(ds.cardId,{zoneId:hz,_dragging:false});
+        showToast('Dropped into zone');
+      }else{
+        updCard(ds.cardId,{_dragging:false});
+      }
+    }
+    if(ds&&ds.type==='pan'){
+      persist({ox:ox,oy:oy});
+    }
+    dragState.current=null;
+    setHoverZone(null);
+    canvasRef.current&&canvasRef.current.classList.remove('panning');
+  }
+
+  function onWheel(e){
+    e.preventDefault();
+    var rect=canvasRef.current.getBoundingClientRect();
+    var mx=e.clientX-rect.left;var my=e.clientY-rect.top;
+    var delta=e.deltaY<0?1.08:0.93;
+    var newScale=Math.min(Math.max(scale*delta,0.2),3);
+    // Zoom toward cursor
+    var newOx=mx-(mx-ox)*(newScale/scale);
+    var newOy=my-(my-oy)*(newScale/scale);
+    setScale(newScale);setOx(newOx);setOy(newOy);
+  }
+
+  function resetView(){setScale(1);setOx(40);setOy(40);}
+
+  function fitAll(){
+    if(cards.length===0){resetView();return;}
+    var CARD_W=240,CARD_H=200; // generous card size estimate
+    var minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+    cards.forEach(function(card){
+      if(!card.zoneId){
+        minX=Math.min(minX,card.x);minY=Math.min(minY,card.y);
+        maxX=Math.max(maxX,card.x+CARD_W);maxY=Math.max(maxY,card.y+CARD_H);
+      }
+    });
+    if(minX===Infinity){resetView();return;}
+    var canvas=canvasRef.current;
+    if(!canvas)return;
+    var vw=canvas.clientWidth-40,vh=canvas.clientHeight-40;
+    var contentW=maxX-minX,contentH=maxY-minY;
+    var newScale=Math.min(Math.min(vw/contentW,vh/contentH),1.5);
+    newScale=Math.max(newScale,0.2);
+    setScale(newScale);
+    setOx(20 - minX*newScale);
+    setOy(20 - minY*newScale);
+  }
+
+  fitAllRef.current=fitAll; // keep ref current — used by keyboard handler
+
+  // Zone drop
+  function onZoneDrop(zoneId,cardId){
+    if(!dragState.current&&!cardId)return;
+    var cid=cardId||(dragState.current&&dragState.current.cardId);
+    if(!cid)return;
+    if(cid===zoneId)return;
+    updCard(cid,{zoneId:zoneId});
+    // Auto-expand zone to 'full' if it isn't already
+    var zone=cards.find(function(z){return z.id===zoneId;});
+    if(zone&&zone.size!=='full'){updCard(zoneId,{size:'full'});}
+    showToast('Card added to zone');
+  }
+  function onRemoveFromZone(cardId){
+    updCard(cardId,{zoneId:null});
+  }
+  function onAddAspectToZone(zoneId,aspect){
+    var zone=cards.find(function(c){return c.id===zoneId;});
+    if(!zone)return;
+    var aspectCard={id:uid(),genId:'aspect',type:'aspect',title:aspect,notes:'',
+      data:{aspects:[{name:aspect}]},pinned:false,gmOnly:false,revealed:false,
+      cdFilled:0,zoneId:zoneId,size:'sm',
+      x:zone.x+20+Math.random()*60,y:zone.y+20+Math.random()*40,ts:Date.now()};
+    addCard(aspectCard);
+    showToast('Zone aspect added');
+  }
+
+  // Keyboard shortcuts
+  useEffect(function(){
+    function onKey(e){
+      // Don't fire when typing in an input/textarea
+      if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.isContentEditable)return;
+      if(e.key==='Escape')setDrawerOpen(false);
+      if((e.key==='z'||e.key==='Z')&&(e.ctrlKey||e.metaKey)){e.preventDefault();undoRemove();}
+      if(e.key==='g'||e.key==='G'){setDrawerOpen(true);setDrawerTab('gen');}
+      if(e.key==='d'||e.key==='D'){openDice();}
+      if(e.key==='e'||e.key==='E')setEditMode(function(m){return !m;});
+      if(e.key==='f'||e.key==='F'){if(fitAllRef.current)fitAllRef.current();}
+      if((e.key==='='||e.key==='+')&&!e.metaKey)setScale(function(s){return Math.min(s*1.15,3);});
+      if(e.key==='-'&&!e.metaKey)setScale(function(s){return Math.max(s/1.15,0.2);});
+    }
+    window.addEventListener('keydown',onKey);
+    return function(){window.removeEventListener('keydown',onKey);};
+  },[]);
+
+  if(!loaded)return h('div',{style:{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh',color:'var(--text-muted)',fontSize:13}},'Loading\u2026');
+
+  var standaloneCards=cards.filter(function(c){return !c.zoneId;});
+  var visibleCards=standaloneCards.filter(function(c){return editMode||(!c.gmOnly||c.revealed);});
+
+  return h('div',{className:'rs-shell',onMouseMove:onMouseMove,onMouseUp:onMouseUp},
+    // ── TOPBAR ──────────────────────────────────────────────────
+    h('div',{className:'rs-topbar'},
+      h('button',{className:'rs-sidebar-toggle',onClick:function(){setSidebarOpen(function(o){return !o;});},'aria-label':'Toggle player sidebar'},sidebarOpen?'◀ Players':'▶ Players'),
+      h('a',{href:'../index.html',className:'rs-wordmark'},'OGMA'),
+      h('div',{className:'rs-sep'}),
+      h('span',{className:'rs-session-name'},campName||'Run Session'),
+      h('div',{className:'rs-round-pill'+(roundFlash?' rs-round-flash':'')},
+        h('button',{className:'rs-round-btn',onClick:function(){if(round>1)setRound(function(r){var n=r-1;persist({round:n});return n;});},'aria-label':'Prev round'},'\u2212'),
+        h('span',{style:{fontSize:11,color:'var(--text-muted)',marginRight:2}},'Rnd'),
+        h('span',{className:'rs-round-num','aria-live':'polite','aria-atomic':'true','aria-label':'Round '+round},round),
+        h('button',{className:'rs-round-btn',onClick:newRound,'aria-label':'New round'},'+')
+      ),
+      h('div',{style:{flex:1}}),
+      // Edit/Play mode toggle
+      h('div',{className:'rs-mode-badge '+(editMode?'rs-mode-edit':'rs-mode-play')},
+        editMode?'\u270F Edit Mode':'\u25B6 Play Mode'),
+      h('button',{className:'rs-btn '+(editMode?'on':''),
+        onClick:function(){setEditMode(!editMode);},
+        title:editMode?'Switch to Play Mode (player view)':'Switch to Edit Mode (GM view)',
+        'aria-pressed':String(editMode)},
+        editMode?'\u25B6 Play Mode':'\u270F Edit Mode'),
+      editMode&&h('button',{
+        className:'rs-btn',title:'Reveal all non-GM cards to players',
+        onClick:function(){
+          var allRev=cards.filter(function(c){return !c.gmOnly;}).every(function(c){return c.revealed;});
+          setCards(function(cs){var next=cs.map(function(c){return c.gmOnly?c:Object.assign({},c,{revealed:!allRev});});persist({cards:next});return next;});
+          showToast(allRev?'All hidden':'All revealed');
+        }},
+        cards.filter(function(c){return!c.gmOnly;}).every(function(c){return c.revealed;})?'\uD83D\uDE48 Hide All':'\uD83D\uDC41 Reveal All'),
+      !isRemotePlayer&&!isRemotePlayer&&h('button',{className:'rs-btn '+(drawerOpen?'on':''),
+        onClick:function(){setDrawerOpen(!drawerOpen);setDrawerTab('gen');},'aria-label':'Toggle generator drawer'},
+        '\u2795 Generate'),
+      // MP-06: Sync controls
+      sync&&h('div',{style:{display:'flex',alignItems:'center',gap:4,background:'var(--inset)',
+        border:'1px solid var(--c-green)',borderRadius:6,padding:'2px 8px',fontSize:11,
+        color:'var(--c-green)',fontFamily:'var(--font-ui)',flexShrink:0}},
+        h('span',{style:{fontWeight:700}},roomCode),
+        h('span',{style:{color:'var(--text-muted)',margin:'0 3px'}},'·'),
+        h('span',null,presence.filter(function(p){return p.connected;}).length+' online'),
+        h('button',{style:{background:'none',border:'none',cursor:'pointer',color:'var(--text-muted)',
+          fontSize:11,padding:'0 2px',fontFamily:'var(--font-ui)'},
+          title:'Copy join link',
+          onClick:function(){
+            // Use canonical path (CF Pages strips .html) so link works for remote players
+            var path=window.location.pathname.replace(/\.html$/,'');
+            var url=window.location.origin+path+'?room='+roomCode;
+            navigator.clipboard.writeText(url).then(function(){showToast('Join link copied!');}).catch(function(){showToast('Room: '+roomCode);});
+          }},'📋'),
+        h('button',{style:{background:'none',border:'none',cursor:'pointer',color:'var(--c-red)',
+          fontSize:11,padding:'0 2px',fontFamily:'var(--font-ui)'},
+          onClick:disconnectSync,title:'Disconnect'},(isRemotePlayer?'Leave':'Stop'))
+      ),
+      campId&&h('a',{
+        href:'campaigns/board.html?world='+campId,
+        className:'rs-btn',
+        style:{textDecoration:'none',fontSize:11},
+        title:'Back to Board prep view',
+      },'📄 Board'),
+      !sync&&!isRemotePlayer&&h('button',{className:'rs-btn',onClick:hostOnline,
+        title:'Host a multiplayer session online',
+        style:{background:'var(--c-green)',color:'#000',border:'none',fontWeight:700}},'🌐 Host'),
+      !sync&&!isRemotePlayer&&h('button',{className:'rs-btn',
+        onClick:function(){
+          var code=prompt('Enter room code:');
+          if(code&&code.trim())joinRoom(code.trim().toUpperCase());
+        },
+        title:'Join a hosted session'},'📶 Join'),
+      // MP-18: custom sync server
+      !sync&&!isRemotePlayer&&h('button',{className:'rs-btn',style:{opacity:.5,fontSize:10},
+        title:'Change sync server',
+        onClick:function(){
+          var host=prompt('Custom sync server URL (blank=official):',SYNC_HOST||OGMA_DEFAULT_SYNC_HOST);
+          if(host===null)return;
+          SYNC_HOST=host.trim()||null;
+          try{var pf=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');pf.syncHost=SYNC_HOST;localStorage.setItem('fate_prefs_v1',JSON.stringify(pf));}catch(e){}
+          showToast('Sync: '+(SYNC_HOST||'default'));
+        }},'⚙'),
+      h('button',{className:'rs-btn',onClick:exportSession},'⬇ MD'),
+      !isRemotePlayer&&h('button',{className:'rs-btn danger',onClick:clearSession},'↺ Clear'),
+      sync&&sync.role==='gm'&&h('button',{
+        className:'rs-btn '+(showLog?'on':''),
+        onClick:function(){
+          var next=!showLog;
+          setShowLog(next);
+          if(next)fetchLog();
+        },
+        'aria-label':'Session log',
+        title:'Session log',
+      },'📋 Log'),
+      h('button',{className:'rs-btn',onClick:function(){var n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(p));}catch(e){}}},'◑'),
+      h('a',{href:'../index.html',className:'rs-btn',style:{textDecoration:'none'}},'← Back')
+    ),
+
+    // ── MAIN ────────────────────────────────────────────────────
+    h('div',{className:'rs-main'},
+
+      // Left: players
+      h('div',{className:'rs-left'+(sidebarOpen?' open':'')},
+        h('div',{className:'rs-sidebar-hdr'},
+          h('span',null,isRemotePlayer&&!claimedPlayer?'\uD83D\uDC64 Who are you?':'Players & FP'),
+          !isRemotePlayer&&h('button',{className:'rs-btn',style:{padding:'2px 7px',fontSize:11},
+            onClick:function(){setDrawerOpen(true);setDrawerTab('dice');}},'\uD83C\uDFB2 Dice')
+        ),
+        isRemotePlayer&&!claimedPlayer&&players.length===0&&h('div',{className:'rs-waiting-state'},
+          h('div',{className:'rs-waiting-icon'},'\u23F3'),
+          h('div',{className:'rs-waiting-title'},'Waiting for GM'),
+          h('div',{className:'rs-waiting-desc'},'The GM hasn\u2019t added players yet. You can still see the canvas when cards are placed.')
+        ),
+        isRemotePlayer&&!claimedPlayer&&players.length>0&&h('div',{className:'rs-waiting-state rs-waiting-claim'},
+          h('div',{className:'rs-waiting-icon'},'\u2B07'),
+          h('div',{className:'rs-waiting-title'},'Tap \u201CThis is me\u201D'),
+          h('div',{className:'rs-waiting-desc'},'Click the button next to your character to claim it.')
+        ),
+        h('div',{className:'rs-sidebar-body'},
+          players.map(function(p){
+            // MP-08: pass ownership flags to PlayerRow
+            var isOwner=isRemotePlayer&&claimedPlayer===p.id;
+            var isReadOnly=isRemotePlayer&&!isOwner;
+            return h('div',{key:p.id,style:{position:'relative'}},
+              isRemotePlayer&&!claimedPlayer&&h('button',{
+                style:{position:'absolute',top:4,right:4,zIndex:10,background:'var(--c-blue)',
+                  border:'none',borderRadius:4,padding:'2px 7px',fontSize:10,color:'#fff',
+                  cursor:'pointer',fontFamily:'var(--font-ui)',fontWeight:700},
+                onClick:function(){setClaimedPlayer(p.id);},
+                title:'Claim this character as yours',
+              },'This is me'),
+              h(PlayerRow,{player:p,sel:selPlayer===p.id,
+              isOwner:isOwner,isReadOnly:isReadOnly,
+              // MP-09: remote owner sends action instead of mutating local state
+              onSendAction:isOwner&&sync?function(patch){sync.sendAction(p.id,'updPlayer',patch);}:null,
+              onUpd:function(patch){updPlayer(p.id,patch);},
+              onSel:function(id){setSelPlayer(id);},
+              onRollSkill:function(player,sk){setSelPlayer(player.id);openDice();}
+            })
+            );
+          }),
+          !isRemotePlayer&&h('button',{className:'rs-add-player','aria-label':'Add player',onClick:function(){
+            var name=prompt('Player name:');if(!name)return;
+            var COLORS=['var(--accent)','var(--c-purple)','var(--c-blue)','var(--c-green)','var(--c-red)'];
+            var np={id:uid(),name:name,hc:'',fp:3,ref:3,phy:[false,false,false],men:[false,false],
+              color:COLORS[players.length%COLORS.length],acted:false,skills:[],conseq:['','','']};
+            var next=players.concat([np]);var nextOrder=order.concat([np.id]);
+            setPlayers(next);setOrder(nextOrder);persist({players:next,order:nextOrder});
+          }},'+ Add Player')
+        )
+      ),
+
+      // Center: infinite canvas
+      h('div',{className:'rs-canvas-wrap'+(editMode?' edit-mode':''),
+        ref:canvasRef,
+        onMouseDown:onCanvasMouseDown,
+        onWheel:onWheel,
+        style:{touchAction:'none'}
+      },
+        // Import banners
+        (hasPrepImport||hasSavedPrep||hasQpp||hasBoardPins)&&h('div',{className:'rs-import-strip'},
+          hasBoardPins&&h('div',{className:'rs-import-banner rs-import-board'},
+            h('span',null,'📄 Board prep ready'),
+            h('button',{className:'rs-import-btn',onClick:importFromBoardPins},'Load')),
+          hasPrepImport&&h('div',{className:'rs-import-banner'},
+            h('span',null,'\u26A1 Prep Wizard'),
+            h('button',{className:'rs-import-btn',onClick:importFromWizard},'Import')),
+          hasSavedPrep&&h('div',{className:'rs-import-banner'},
+            h('span',null,'\uD83D\uDDC4 Table Prep'),
+            h('button',{className:'rs-import-btn',onClick:importFromSavedPrep},'Import')),
+          hasQpp&&h('div',{className:'rs-import-banner'},
+            h('span',null,'\u2756 Quick Prep Pack'),
+            h('button',{className:'rs-import-btn',onClick:importFromQpp},'Import'))
+        ),
+
+        // Canvas inner (transforms)
+        h('div',{className:'rs-canvas-inner',
+          style:{transform:'translate('+ox+'px,'+oy+'px) scale('+scale+')'}
+        },
+          visibleCards.map(function(card){
+            var zoneChildren=card.type==='zone'
+              ? cards.filter(function(c){return c.zoneId===card.id;})
+              : [];
+            return h(CanvasCard,{
+              key:card.id,card:card,editMode:editMode,
+              campId:campId,partySize:partySize,
+              zoneChildren:zoneChildren,
+              isZoneTarget:hoverZone===card.id,
+              onUpd:function(patch){updCard(card.id,patch);},
+              onRemove:function(){removeCard(card.id);},
+              onEdit:function(c){setEditCard(c);},
+              onMd:function(c){setMdCard(c);},
+              onDragStart:function(e,id){onCardDragStart(e,id);},
+              onZoneDrop:function(zoneId){
+                var ds=dragState.current;
+                if(ds&&ds.type==='card')onZoneDrop(zoneId,ds.cardId);
+              },
+              onRemoveFromZone:function(childId){onRemoveFromZone(childId);},
+              onAddAspect:function(asp){onAddAspectToZone(card.id,asp);},
+              onNpcRoll:function(name,skill,mod,total){showToast(name+' \u00B7 '+skill+' +'+mod+' \u2192 '+lbl(total)+' ('+(total>=0?'+':'')+total+')');},
+            });
+          })
+        ),
+
+        // Empty state
+        isRemotePlayer&&!claimedPlayer&&cards.length===0&&h('div',{className:'rs-empty'},
+          h('div',{className:'rs-empty-icon'},'\uD83C\uDFB2'),
+          h('div',{className:'rs-empty-title'},'Session not started yet'),
+          h('div',{className:'rs-empty-desc'},'Connected to room. Waiting for the GM to set up the session. Cards will appear here when the session begins.'),
+        ),
+        !isRemotePlayer&&cards.length===0&&h('div',{className:'rs-empty'},
+          h('div',{className:'rs-empty-icon'},'\uD83C\uDFB2'),
+          h('div',{className:'rs-empty-title'},'Canvas is empty'),
+          h('div',{className:'rs-empty-desc'},'Generate cards from the toolbar, or start from the Prep Wizard.'),
+          h('a',{href:'/campaigns/sessionzero.html',className:'rs-empty-cta',style:{pointerEvents:'all'}},'\uD83C\uDFB2 Open Prep Wizard'),
+          h('button',{className:'rs-empty-cta',style:{marginTop:8,pointerEvents:'all'},
+            onClick:function(){setDrawerOpen(true);setDrawerTab('gen');}},
+            '\u2795 Generate a card'),
+          h('div',{style:{fontSize:10,color:'var(--text-muted)',marginTop:12,fontFamily:'var(--font-mono,monospace)',letterSpacing:'0.05em'}},
+            'G = generate  \u00B7  D = dice  \u00B7  E = mode  \u00B7  F = fit  \u00B7  Esc = close')
+        ),
+
+        // Zoom controls
+        h('div',{className:'rs-zoom-controls'},
+          h('button',{className:'rs-zoom-btn',onClick:function(){setScale(function(s){return Math.min(s*1.2,3);});},'aria-label':'Zoom in'},'+'),
+          h('div',{className:'rs-zoom-label'},Math.round(scale*100)+'%'),
+          h('button',{className:'rs-zoom-btn',onClick:function(){setScale(function(s){return Math.max(s/1.2,0.2);});},'aria-label':'Zoom out'},'\u2212'),
+          h('button',{className:'rs-zoom-btn',style:{fontSize:11},onClick:fitAll,'aria-label':'Fit all cards'},'⋞'),
+          h('button',{className:'rs-zoom-btn',style:{fontSize:11},onClick:resetView,'aria-label':'Reset view'},'\u2B1C')
+        ),
+
+        // TBL-02: Dice floater — position:fixed, doesn't cover canvas on small screens
+        diceFloat&&h('div',{className:'rs-dice-floater',onClick:function(e){e.stopPropagation();}},
+          h('div',{className:'rs-dice-floater-hdr'},
+            h('span',{style:{fontSize:12,fontWeight:700,color:'var(--text)'}},'\uD83C\uDFB2 Dice'),
+            h('button',{className:'rs-drawer-close',onClick:function(){setDiceFloat(false);},'aria-label':'Close dice roller'},'\u2715')
+          ),
+          h(DicePanel,{players:players,selId:selPlayer,spendFP:spendFP,
+            onRoll:function(r){
+              showToast(r.who+' \u00b7 '+r.skill+' \u2192 '+lbl(r.total)+' ('+(r.total>=0?'+':'')+r.total+')');
+              if(sync&&sync.connected){if(sync.role==='gm')sync.broadcastRoll(r);else sync.sendRoll(selPlayer,r);}
+            }
+          })
+        ),
+
+        // Generator drawer (inside canvas area for positioning)
+        h('div',{className:'rs-drawer '+(drawerOpen?'open':''),'aria-label':'Generator and dice'},
+          h('div',{className:'rs-sidebar-hdr'},
+            h('div',{className:'rs-drawer-tabs'},
+              h('button',{className:'rs-drawer-tab '+(drawerTab==='gen'?'on':''),onClick:function(){setDrawerTab('gen');}},'\u2795 Generate'),
+              h('button',{className:'rs-drawer-tab '+(drawerTab==='dice'?'on':''),onClick:function(){setDrawerTab('dice');}},'\uD83C\uDFB2 Dice')
+            ),
+            h('button',{className:'rs-drawer-close',onClick:function(){setDrawerOpen(false);},'aria-label':'Close drawer'},'\u2715')
+          ),
+          drawerTab==='gen'&&h(GeneratorDrawer,{
+            campId:campId,partySize:partySize,
+            onAdd:function(card){addCard(card);},
+            onAddPlayer:function(player){
+              var next=players.concat([player]);
+              var nextOrder=order.concat([player.id]);
+              setPlayers(next);setOrder(nextOrder);persist({players:next,order:nextOrder});
+              showToast('Player imported: '+player.name);
+            }
+          }),
+          drawerTab==='dice'&&h('div',{className:'rs-drawer-body'},
+            h(DicePanel,{players:players,selId:selPlayer,spendFP:spendFP,
+              onRoll:function(data){
+                showToast(data.who+' \u00B7 '+data.skill+' \u2192 '+lbl(data.total)+' ('+(data.total>=0?'+':'')+data.total+')');
+                // MP-20: GM broadcasts roll result to all players
+                // MP-21: Player sends roll to GM
+                if(sync&&sync.connected){
+                  if(sync.role==='gm')sync.broadcastRoll(data);
+                  else sync.sendRoll(selPlayer,data);
+                }
+              }
+            })
+          )
+        )
+      )
+    ),
+
+    // Turn order bar
+    players.length>0&&h(TurnOrderBar,{players:players,order:order,
+      setOrder:function(fn){var next=typeof fn==='function'?fn(order):fn;setOrder(next);persist({order:next});},
+      onToggleActed:function(id){updPlayer(id,{acted:!(players.find(function(p){return p.id===id;})||{}).acted});},
+    }),
+
+    // Modals
+    editCard&&h(EditModal,{card:editCard,
+      onSave:function(patch){updCard(editCard.id,patch);showToast('Card updated');},
+      onClose:function(){setEditCard(null);}}),
+    mdCard&&h(MdModal,{card:mdCard,campName:campName,onClose:function(){setMdCard(null);}}),
+    toast&&h('div',{className:'rs-toast',key:toast},toast)
+    ,
+    // MP-23: Session log panel
+    showLog&&h(SessionLogPanel,{
+      entries:logEntries,
+      loading:logLoading,
+      onRefresh:fetchLog,
+      onClear:clearLog,
+      onExport:exportLog,
+      onClose:function(){setShowLog(false);},
+    }),
+    // MP-11: Join modal
+    showJoinModal&&isRemotePlayer&&h(JoinModal,{
+      roomCode:roomCode||''  ,
+      joinName:joinName,setJoinName:setJoinName,
+      onJoin:function(){
+        if(!joinName.trim()){setShowJoinModal(false);return;}
+        var existing=players.find(function(p){return p.name.toLowerCase()===joinName.trim().toLowerCase();});
+        if(existing)setClaimedPlayer(existing.id);
+        setShowJoinModal(false);
+      },
+      onDismiss:function(){setShowJoinModal(false);},
+    })
+  );
+}
+
+(function(){
+  try {
+    var raw=localStorage.getItem('fate_prefs_v1');
+    var t=(raw?JSON.parse(raw).theme:null)||localStorage.getItem('fate_theme')||'dark';
+    document.documentElement.setAttribute('data-theme',t);
+  } catch(e) {}
+})();
