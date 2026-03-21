@@ -1,6 +1,6 @@
 # Ogma — Testing Reference
 
-> **Last updated:** 2026.03.282 — assertion count updated to 113, all QA commands current.
+> **Last updated:** 2026.03.299 — assertion count 113/113, NA-29 search window widened to 500 chars (QA-01).
 
 ---
 
@@ -87,7 +87,7 @@ Or use `npm test` which runs steps 2–5 in sequence.
 | NA-65–NA-68 | SW APP_SHELL coverage, font size floor (9px prohibited), prefers-color-scheme |
 | NA-69–NA-85 | Multiplayer, sync, gmOnly filter, partysocket guards |
 | NA-86–NA-97 | Board: SW coverage, no globals redeclaration, ARIA roles, touch targets, round aria-live |
-| NA-98–NA-113 | (reserved for future assertions) |
+| NA-98–NA-113 | Reserved — next assertion is NA-114 |
 
 ---
 

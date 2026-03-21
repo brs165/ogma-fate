@@ -49,7 +49,7 @@ When any new UI work creates a conflict between WCAG and HIG, **stop and raise i
 ### System integration (HIG)
 
 21. **First load respects `prefers-color-scheme`** (enforced by NA-69). New users on dark OS see dark theme, not light.
-22. **iOS safe area insets** on any `position:fixed` element near the bottom of the viewport. Use `env(safe-area-inset-bottom, 0px)`. Currently applied to: Floater body max-height, PWA nudge bottom position.
+22. **iOS safe area insets** on any `position:fixed` element near the bottom of the viewport. Use `env(safe-area-inset-bottom, 0px)`. Currently applied to (v293+): roll FAB (`bottom`), board floaters (dice, FP), `rs-dice-floater` in run.html, `rs-topbar` (left/right insets), `rs-left` mobile sidebar (bottom). All pages have `viewport-fit=cover` in their viewport meta tag.
 23. **`-webkit-tap-highlight-color: transparent`** should be set on all interactive elements that have custom tap states, to prevent the default grey flash on iOS conflicting with the component's own feedback.
 
 ### Resolving WCAG vs HIG conflicts
@@ -409,7 +409,7 @@ Output: specific ROADMAP.md changes with tier placement and rationale.
 ```
 For this session, lead as the Senior JS Developer building interactive result renderers.
 
-CURRENT UI ARCHITECTURE (2026.03.26):
+CURRENT UI ARCHITECTURE (2026.03.299):
 - action-bar replaces roll-hero + panel-toolbar: div.action-bar with btn-roll, inspire, ctx pills, secondary icons
 - KBShortcutsModal: separate component, opened by ? key and sidebar button
 - showKbShortcuts: boolean state alongside showHelp, showSettings, etc.
@@ -654,9 +654,11 @@ grep -n "^function ContestResult\|^function CountdownResult" core/ui.js
 | What you need | Where it lives |
 |---|---|
 | Generator output shapes (all 16) | `core/engine.js` - `generate()` function, lines ~365–540 |
-| All result renderers | `core/ui.js` - lines 53–852 (shared components + 16 renderers) |
+| All result renderers | `core/ui-renderers.js` - all 16 renderers + renderResult() dispatch |
 | CampaignApp component | `core/ui.js` - search `function CampaignApp` |
-| ShareDrawer | `core/ui.js` - search `function ShareDrawer` |
+| BoardApp component | `core/ui-board.js` - search `function BoardApp` |
+| RunApp component | `core/ui-run.js` - search `function RunApp` |
+| ShareDrawer | `core/ui-modals.js` - search `function ShareDrawer` |
 | VTT export functions | `core/engine.js` - `toFariJSON()` at the end |
 | Campaign CSS tokens | `assets/css/theme.css` - `[data-campaign="X"]` blocks |
 | HELP_CONTENT (all 16 generators) | `data/shared.js` - `var HELP_CONTENT = {` |

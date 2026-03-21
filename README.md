@@ -17,7 +17,7 @@ An offline, browser-based random content generator for **Fate Condensed** tablet
 3. Pick a campaign world
 4. Pick a generator and click **Roll**
 
-Hosted on GitHub Pages. Works fully offline after first load via service worker.
+Live at **ogma.net** (Cloudflare Pages). Works fully offline after first load via service worker.
 
 
 ---
@@ -94,6 +94,12 @@ Each world has deep thematic table content. The same 16 generators produce tonal
 
 **Coming from D&D?** - `campaigns/transition.html` is a side-by-side guide covering every major conceptual difference between D&D 5e and Fate Condensed.
 
+**Export / Import** - Download pinned cards as `.json` or full table state (players, cards, round, FP) for backup and transfer. Import from any Ogma export file.
+
+**Board** - `campaigns/board.html` — a free-form canvas for prep and play. Generate cards directly onto the canvas, drag to arrange, label sections. Includes dice floater, Fate Point tracker, and multiplayer host/join.
+
+**Run Session** - `campaigns/run.html` — at-table session surface with player roster, stress/consequence tracking, zone map, round tracker, and live multiplayer sync.
+
 **Export** - ↓ MD copies results as formatted Markdown. 🖨 Print hides all UI chrome and formats cleanly for A4/Letter.
 
 **Pinned Results** - 📌 saves any result to a persistent pinned list (IndexedDB). Survives reloads.
@@ -128,15 +134,18 @@ fate-suite/
 │   ├── guide-thelongafter.html   │
 │   ├── guide-victorian.html      ┘
 │   ├── sessionzero.html          ← Session Zero character creation wizard
-│   └── transition.html           ← Coming from D&D? guide
+│   ├── transition.html           ← Coming from D&D? guide
+│   ├── board.html                ← Board prep/play canvas surface
+│   └── run.html                  ← At-table run session surface
 │
 ├── core/
 │   ├── engine.js                 ← Pure logic - generators, table prefs, markdown export
 │   │                               Zero React/DOM dependencies - testable in Node
 │   ├── ui.js                     ← CampaignApp shell, sync, all campaign components
 │   ├── ui-renderers.js           ← 16 result renderers (dossier cards)
-│   ├── ui-table.js               ← PrepCanvas + Table canvas components
-│   ├── ui-run.js                 ← Run session surface components
+│   ├── ui-table.js               ← PrepCanvas, TpDicePanel, FatePointTracker + Table components
+│   ├── ui-run.js                 ← RunApp — run session surface components
+│   ├── ui-board.js               ← BoardApp — board prep/play canvas components
 │   ├── ui-modals.js              ← Modal, ShareDrawer, Settings, Vault, QuickFind
 │   ├── ui-primitives.js          ← React aliases (h), FD primitives, ErrorBoundary
 │   ├── ui-landing.js             ← Landing page components
@@ -184,13 +193,17 @@ Each campaign page loads scripts in this exact order:
 <script src="../data/shared.js?v=N"></script>
 <script src="../data/universal.js?v=N"></script>
 <script src="../data/[campaign].js?v=N"></script>
+<script src="../core/config.js?v=1"></script>
 <script src="../core/engine.js?v=N"></script>
+<script src="https://cdnjs.cloudflare.com/.../dexie.min.js"></script>
+<script src="../core/db.js?v=N"></script>
+<script src="../core/ui-primitives.js?v=N"></script>
+<script src="../assets/js/partysocket.js?v=N"></script>
 <script src="../core/ui-renderers.js?v=N"></script>
 <script src="../core/ui-table.js?v=N"></script>
 <script src="../core/ui-modals.js?v=N"></script>
 <script src="../core/ui-landing.js?v=N"></script>
 <script src="../core/ui.js?v=N"></script>
-<script src="../core/db.js?v=N"></script>
 <script src="../core/intro.js?v=N"></script>
 ```
 
@@ -201,7 +214,7 @@ Each campaign page loads scripts in this exact order:
 ## Architecture Notes
 
 - **No build step.** Raw JavaScript via `<script>` tags. React 18 via CDN UMD.
-- Currently var-only — migrating to ES Modules in a future sprint.
+- `const`/`let` in `ui-primitives.js`, `ui-modals.js`, and `ui-landing.js`. `var` everywhere else. No ES modules, no bundler.
 - **Pure random tables.** Deterministic, instant, offline - no network calls of any kind.
 - **Variety Matrix.** Tables using `{t:[...], v:{...}}` produce thousands of unique combinations from compact data. `fillTemplate()` picks a template and substitutes `{VarName}` tokens.
 - **Universal layer.** `mergeUniversal()` concatenates setting-agnostic entries into campaign tables without mutating the originals.
@@ -211,7 +224,7 @@ Each campaign page loads scripts in this exact order:
 
 ## Smoke Test
 
-Verify all 96 generator/campaign combinations after editing data files:
+Verify all 128 generator/campaign combinations (16 generators × 8 worlds) after editing data files:
 
 ```bash
 node -e "
@@ -219,11 +232,11 @@ var CAMPAIGNS={};
 var fs=require('fs');
 eval(fs.readFileSync('data/shared.js','utf8'));
 eval(fs.readFileSync('data/universal.js','utf8'));
-['thelongafter','cyberpunk','fantasy','space','victorian','postapoc'].forEach(function(c){
+['thelongafter','cyberpunk','fantasy','space','victorian','postapoc','western','dVentiRealm'].forEach(function(c){
   eval(fs.readFileSync('data/'+c+'.js','utf8'));
 });
 eval(fs.readFileSync('core/engine.js','utf8'));
-var camps=['thelongafter','cyberpunk','fantasy','space','victorian','postapoc'];
+var camps=['thelongafter','cyberpunk','fantasy','space','victorian','postapoc','western','dVentiRealm'];
 var gens=['npc_minor','npc_major','scene','campaign','encounter','seed','compel','challenge','contest','consequence','faction','complication','backstory','obstacle','countdown','constraint'];
 var errs=[];var total=0;
 camps.forEach(function(camp){
@@ -237,7 +250,7 @@ console.log('Smoke: '+total+'/96  errors:'+errs.length);
 "
 ```
 
-Expected: `Smoke: 96/96  errors:0`
+Expected: `Smoke: 128/128  errors:0`
 
 For the full named assertion suite, run `node qa_named.js` from the project root.
 

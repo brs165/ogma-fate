@@ -2,7 +2,7 @@
 
 > Technical deep-dive for contributors. Covers the execution model, data flow, React patterns, IndexedDB persistence, the service worker, Cloudflare Pages deployment, and the Table canvas multiplayer system. Read this before touching `core/*.js`.
 >
-> **Last updated:** 2026.03.241
+> **Last updated:** 2026.03.299
 
 ---
 
@@ -12,10 +12,10 @@
 
 - Raw JavaScript via `<script>` tags — no bundler, no transpiler
 - React 18 via CDN UMD — no JSX. `React.createElement` aliased as `h`.
-- `const`/`let` in `ui-primitives.js`, `ui-renderers.js`, `ui-table.js`, `ui-modals.js`, `ui-landing.js`. Mixed in `ui-table.js` and `ui-renderers.js` (module-level `var` constants remain). `ui.js`, `ui-board.js`, `ui-run.js`, `engine.js`, and `data/*.js` use `var` only. See `docs/code-quality.md` for the full split rationale.
-- Global variables — `CAMPAIGNS`, `GENERATORS`, `UNIVERSAL`, `HELP_CONTENT`
+- `const`/`let` in `ui-primitives.js`, `ui-modals.js`, `ui-landing.js`. Mixed in `ui-renderers.js` and `ui-table.js` (module-level `var` constants coexist with function-scoped `var`). `ui.js`, `ui-board.js`, `ui-run.js`, `engine.js`, `db.js`, `config.js`, `intro.js`, and `data/*.js` use `var` only. See `docs/code-quality.md` for the full split rationale and ESLint enforcement.
+- Global variables — `CAMPAIGNS`, `GENERATORS`, `UNIVERSAL`, `HELP_CONTENT`, `DB`, `LS`
 - Service worker (`sw.js`) caches `APP_SHELL` for full offline use
-- IDB (Dexie 4) for all persistence — no localStorage for data (only prefs)
+- IDB (Dexie 4) for all data persistence — localStorage only for user preferences (via `LS` wrapper in `db.js`)
 - Multiplayer via Cloudflare Workers Durable Objects — optional, opt-in, offline mode unchanged
 
 ---
@@ -23,34 +23,52 @@
 ## Script load order (campaign pages)
 
 ```html
-<!-- React 18 via CDN UMD -->
-<script src="https://cdnjs.cloudflare.com/.../react.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/.../react-dom.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/.../dexie.min.js"></script>
+<!-- React 18 + ReactDOM via CDN UMD -->
+<script src="https://cdnjs.cloudflare.com/.../react.production.min.js" integrity="..."></script>
+<script src="https://cdnjs.cloudflare.com/.../react-dom.production.min.js" integrity="..."></script>
 
 <!-- Data layer -->
-<script src="../data/shared.js?v=N"></script>
-<script src="../data/universal.js?v=N"></script>
-<script src="../data/[campaign].js?v=N"></script>
-
-<!-- Multiplayer client (same-origin vendored) -->
-<script src="../assets/js/partysocket.js?v=N"></script>
+<script src="../data/shared.js?v=N"></script>     <!-- CAMPAIGNS={}, GENERATORS, HELP_CONTENT, ALL_SKILLS -->
+<script src="../data/universal.js?v=N"></script>  <!-- Cross-world tables -->
+<script src="../data/[world].js?v=N"></script>    <!-- Campaign-specific tables -->
 
 <!-- Logic layer -->
-<script src="../core/engine.js?v=N"></script>
-<script src="../core/db.js?v=N"></script>
+<script src="../core/config.js?v=1"></script>     <!-- OGMA_CONFIG: REPO_BASE, DEFAULT_SYNC_HOST -->
+<script src="../core/engine.js?v=N"></script>     <!-- generate(), filteredTables(), toMarkdown(), etc. -->
 
-<!-- UI layer -->
-<script src="../core/ui-primitives.js?v=N"></script>  <!-- React aliases, globals: h, useState, etc. -->
+<!-- Dexie IDB library (CDN) -->
+<script src="https://cdnjs.cloudflare.com/.../dexie.min.js" integrity="..."></script>
+
+<!-- Storage + multiplayer client -->
+<script src="../core/db.js?v=N"></script>         <!-- DB (IDB wrapper), LS (localStorage wrapper) -->
+<script src="../assets/js/partysocket.js?v=N"></script>  <!-- PartySocket — same-origin vendored, no CDN -->
+
+<!-- UI layer (strict order — each depends on the previous) -->
+<script src="../core/ui-primitives.js?v=N"></script>  <!-- h, useState, useEffect…, ErrorBoundary, SVG icons -->
 <script src="../core/ui-renderers.js?v=N"></script>   <!-- 16 result renderers, renderResult() -->
 <script src="../core/ui-table.js?v=N"></script>       <!-- PrepCanvas + Table canvas components -->
-<script src="../core/ui-modals.js?v=N"></script>      <!-- Modal, ShareDrawer, Settings, Vault -->
-<script src="../core/ui-landing.js?v=N"></script>     <!-- LandingApp -->
-<script src="../core/ui.js?v=N"></script>             <!-- CampaignApp shell -->
+<script src="../core/ui-modals.js?v=N"></script>      <!-- Modal, ShareDrawer, Settings, Vault, QuickFind -->
+<script src="../core/ui-landing.js?v=N"></script>     <!-- LandingApp, CAMPAIGN_PAGES, JoinTableCard -->
+<script src="../core/ui.js?v=N"></script>             <!-- CampaignApp shell — main campaign page component -->
 <script src="../core/intro.js?v=N"></script>          <!-- Campaign intro animation (DOM, not React) -->
+```
 
-<!-- Board page only (board.html) -->
-<!-- ui-board.js loaded instead of ui.js on board pages -->
+**Board page (`board.html`)** loads a different tail — no `ui-landing.js`, no `intro.js`, but adds board-specific scripts:
+```html
+<!-- After ui-primitives.js and partysocket.js... -->
+<script src="../core/ui-renderers.js?v=N"></script>
+<script src="../core/ui-table.js?v=N"></script>   <!-- TpDicePanel, FatePointTracker -->
+<script src="../core/ui-modals.js?v=N"></script>
+<script src="../core/ui.js?v=N"></script>         <!-- createTableSync, DEFAULT_FP_STATE, FatePointTracker -->
+<script src="../core/ui-board.js?v=N"></script>   <!-- BoardApp — board-specific root component -->
+```
+
+**Run page (`run.html`)** loads all 8 world data files (any world can be run), then:
+```html
+<!-- After ui-primitives.js and partysocket.js... -->
+<script src="../core/ui-renderers.js?v=N"></script>
+<script src="../core/ui-table.js?v=N"></script>
+<script src="../core/ui-run.js?v=N"></script>     <!-- RunApp — run session surface components -->
 ```
 
 `<base href="/">` is required on all campaign pages (Cloudflare Pages Pretty URLs strip `.html`; without it, `../core/` resolves to `/campaigns/core/`).
@@ -59,10 +77,12 @@
 
 ## Cloudflare Pages deployment
 
+- **No `_redirects` file.** CF Pages Pretty URLs handles `.html` stripping automatically. The file was removed in v290 — it caused redirect conflicts. Do not re-add it.
+- **`_headers` file** sets CSP for all pages. `script-src` allows `cdnjs.cloudflare.com` and `static.cloudflareinsights.com` (CF injects their analytics beacon). `connect-src` allows `wss://*.workers.dev`. CF Pages consumes `_headers` at deploy time — it is never served as a URL and must NOT be in SW APP_SHELL.
 - **CDN scripts must NOT be in SW CDN_SCRIPTS.** The SW intercept strips CORS headers. `if (isCDN) return` in the fetch handler lets the browser handle CDN scripts natively with full CORS support.
-- **`_headers` file** sets CSP for all pages. `script-src` allows `cdnjs.cloudflare.com` and `static.cloudflareinsights.com`. `connect-src` allows `wss://*.workers.dev`. CF Pages consumes `_headers` at deploy time — it is never served as a URL and must NOT be in SW APP_SHELL.
-- **Pretty URLs** — CF Pages strips `.html` from URLs. `<base href="/">` on every campaign page prevents relative path breakage. Join links must use `window.location.pathname.replace(/\.html$/, '')`.
+- **Pretty URLs** — CF Pages strips `.html` from URLs. `<base href="/">` on every campaign page prevents relative path breakage.
 - **SW skipWaiting** — `self.skipWaiting()` on install forces immediate takeover so users on old SW versions get the new SW on next visit without closing tabs.
+- **CF Beacon SRI warning** — CF Pages auto-injects their Web Analytics beacon script. If the beacon URL updates before CF updates the injected hash, a console SRI warning appears. This is on CF's side and does not affect functionality.
 
 ---
 
@@ -94,6 +114,20 @@ setResult(data)  →  renderResult(genId, data)  ← ui-renderers.js
 
 ---
 
+## Three surfaces
+
+Ogma has three distinct session surfaces, each a separate HTML page:
+
+| Surface | File | Root component | Purpose |
+|---------|------|---------------|---------|
+| **Generator** | `campaigns/[world].html` | `CampaignApp` (ui.js) | Roll generators, pin results, FP tracker, table settings |
+| **Board** | `campaigns/board.html` | `BoardApp` (ui-board.js) | Prep/Play canvas — drag cards, dice floater, FP floater, multiplayer |
+| **Run** | `campaigns/run.html` | `RunApp` (ui-run.js) | At-table session surface — zones, player roster, stress/FP, round tracker |
+
+The Board and Run surfaces share sync infrastructure (`createTableSync` in ui.js) and the `PrepCanvas` component (`ui-table.js`).
+
+---
+
 ## Table canvas architecture
 
 `PrepCanvas` (in `core/ui-table.js`) is the full-screen interactive session surface, used both in campaign pages and `run.html`.
@@ -113,40 +147,31 @@ PrepCanvas local state:
 
 ### IDB persistence
 
-`SAVE_KEY = 'tp_canvas_' + campId`. `persistCanvas(patch)` merges state and saves on every change. Also calls `tableSync.broadcastState()` if GM is hosting.
-
-### Card rendering
-
-Canvas cards are positioned absolutely (`left: ex.x, top: ex.y`) inside `tp-canvas-inner` which is scaled/translated for zoom/pan. Cards have compact `cc-` CSS with glass backdrop-filter.
-
-Tapping card body (`.tp-card-expand-btn`) sets `heroCard` and opens `TpHeroModal` — a full-screen modal with the existing `FlipCard` (`rc-*` components), blur backdrop, and a dice roller strip.
+`SAVE_KEY = 'tp_canvas_' + campId`. `persistCanvas()` debounces 400ms and saves on every state change. Also calls `tableSync.broadcastState()` if GM is hosting.
 
 ### Multiplayer sync flow
 
 ```
 GM side:
   persistCanvas() → tableSync.broadcastState(state)
-                    (gmOnly cards filtered before send)
+                    (gmOnly cards filtered before send — extras also filtered to prevent position leaks)
 
 Player side:
-  useEffect on tableSync → listen for 'welcome'/'state' messages
-  → apply: setPinnedCards, setPlayers, setExtras, setRound, setScene
-  → 'welcome': showToast('Canvas synced')
+  onRemoteState callback (registered via props.onRemoteState) ← MP-07 fix (v288)
+  → apply: setPinnedCards, setPlayers, setExtras, setRound, setScene, scale, pan
 
-Card expand sync:
-  GM taps card → setHeroCard(card) + ws.send({type:'card_expand', cardId})
-  Player receives → setHeroCard(matching card from pinnedCards)
-  GM closes → ws.send({type:'card_collapse'})
-  Player receives → setHeroCard(null)
+Auto-rebroadcast:
+  On 'presence' message (player joins) → GM re-broadcasts _lastState after 300ms delay
+  (300ms allows player WS 'open' event to fire and state to settle before receiving)
 ```
 
 ---
 
 ## Multiplayer server (ogma-sync)
 
-**Repo:** separate `ogma-sync/` directory (NOT in fate-suite-new)
-**Deployed:** `ogma-sync.brs165.workers.dev`
-**Deploy:** GitHub Action with `wrangler deploy --config wrangler.toml` (not `npx partykit deploy`)
+**Repo:** separate `ogma-sync/` directory (NOT in fate-suite-new)  
+**Deployed:** `ogma-sync.brs165.workers.dev`  
+**Deploy:** GitHub Action with `wrangler deploy --config wrangler.toml`  
 **Auth:** `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` as GitHub secrets
 
 ```toml
@@ -172,10 +197,12 @@ new_sqlite_classes = ["OgmaRoom"]
 |-------------|---------|
 | APP_SHELL (same-origin HTML/JS/CSS) | Cache-first, network fallback |
 | CDN scripts (cdnjs, etc.) | **Pass through — do NOT intercept.** `if (isCDN) return;` |
-| Navigation requests | Cache-first, fallback to index.html |
+| Navigation requests | Network-first, fallback to cached page, then offline error page |
 | All other same-origin assets | Cache-first, network fallback, 404 on miss (never reject) |
 
 `self.skipWaiting()` on install + `clients.claim()` on activate = immediate takeover on update.
+
+**Offline URL resolution:** `CLEAN_URL_MAP` in the SW offline handler maps top-level world slugs (e.g. `/thelongafter`) to their cached campaign HTML files. This handles bookmarks created before the `_redirects` file was removed, without any server-side routing.
 
 ---
 
@@ -183,15 +210,29 @@ new_sqlite_classes = ["OgmaRoom"]
 
 ```javascript
 db.version(1).stores({
-  sessions: 'key',        // key-value store: prep_wizard_v1, run_session_v1, tp_canvas_[campId]
-  cards: '[campId+id]',   // pinned cards per campaign
+  sessions: 'key',        // key-value store: tp_canvas_[campId], run_session_v2, board_canvas_v1_[campId], board_fp_v1_[campId]
+  cards: 'key',           // pinned cards per campaign: key = 'card_[campId]_[id]'
 });
 ```
 
 Key constants:
-- `RUN_IDB_KEY = 'run_session_v1'` (run.html)
+- `RUN_IDB_KEY = 'run_session_v2'` (run.html)
 - `TP_CANVAS_KEY_PREFIX = 'tp_canvas_'` (PrepCanvas, appended with campId)
-- `PREP_WIZARD_KEY = 'prep_wizard_v1'` (Session Zero Wizard)
+- `BOARD_CANVAS_PREP_KEY = 'board_canvas_v1'` + `_[campId]`
+- `BOARD_CANVAS_PLAY_KEY = 'board_play_v1'` + `_[campId]`
+- `BOARD_FP_KEY = 'board_fp_v1'` + `_[campId]`
+
+**Export/import (EXP-02/04):** `DB.exportCards()` downloads pinned cards as JSON. `DB.exportCanvasState()` downloads full canvas state (players, cards, round, FP, extras, pan/zoom). Both accept via `DB.importFile()` which handles `type:'cards'`, `type:'canvas'`, and `type:'card'`.
+
+---
+
+## localStorage schema (BL-01)
+
+All user preferences are stored under a single versioned JSON key `fate_prefs_v1`. Access via `window.LS.get(key)` / `window.LS.set(key, value)` — defined in `core/db.js`.
+
+Current schema keys: `theme`, `textsize`, `fp_state`, `universal_merge`, `help_level`, `onboarding_done`, `gm_mode`, `intro_seen` (object keyed by worldKey), `pwa_nudge_dismissed`, `visit_count_[campId]`, `ios_install_dismissed`, `safari_warn_dismissed`.
+
+On first load, old flat keys (`fate_theme`, `fate_textsize`, etc.) are migrated to the new schema and removed.
 
 ---
 
@@ -204,7 +245,7 @@ var useEffect = React.useEffect;
 // etc. — all aliased in ui-primitives.js
 ```
 
-**useEffect dep arrays** — NA-28 assertion enforces all useEffects in CampaignApp have dep arrays (`}, [...])`). Violating this breaks the QA gate.
+**useEffect dep arrays** — NA-28 assertion enforces all useEffects in CampaignApp have dep arrays (`}, [...])`). NA-29 enforces the session-save effect uses `[result]` only (history/activeGen are snapshot values — over-specifying would cause stale data bugs). Violating either breaks the QA gate.
 
 **No JSX** — all elements created with `h(type, props, ...children)`.
 
@@ -214,31 +255,52 @@ var useEffect = React.useEffect;
 
 ## Design system
 
-`assets/css/theme.css` (~2200 lines). Key namespaces:
+`assets/css/theme.css` (~2600 lines). Key namespaces:
 
 | Prefix | Used for |
-|--------|---------|
+|--------|---------| 
 | `cc-` | Canvas cards on Table (compact, draggable) |
 | `tp-` | Table canvas shell, hero modal, gen callout, dropdowns, turn bar |
 | `rs-` | Run session surface (run.html) + Table player roster |
 | `rc-` | Result card (MTG FlipCard — spine, face, back) |
 | `fd-` | Field Dossier result renderers |
 | `dr-` | Dice roller widget |
-| `rtp-` | Result help panel |
+| `bt-` | Board topbar |
+| `blp-` | Board left panel (collapsible on mobile) |
+| `board-` | Board canvas, cards, floaters, dossier |
+| `land-` | Landing page sections and cards |
 | `.callout-*` | Help page callout boxes (scenario/info/warning/dnd/tip) |
 
 **CSS variables:** `--accent`, `--text`, `--text-dim`, `--text-muted`, `--border`, `--border-mid`, `--glass-bg`, `--glass-blur`, `--glass-border`, `--panel`, `--panel-raised`, `--inset`, `--c-red`, `--c-green`, `--c-blue`, `--c-purple`, `--c-amber`, `--focus-ring`.
 
+**Safe area insets** — applied to all `position:fixed` elements near screen edges: roll FAB, board floaters (dice, FP), `rs-dice-floater`, `rs-topbar`, `rs-left` sidebar. All pages have `viewport-fit=cover` in their viewport meta tag (added v293).
+
 **Animation keyframes defined in theme.css:**
-- `fadeUp` — cards, panel entries
+- `fadeUp` — cards, panel entries, floaters
+- `fadeIn` — overlays, backdrops
 - `cc-pop-in` — new canvas card bounce entrance
 - `tp-shell-rise` / `tp-overlay-in` / `tp-close-spin` — hero modal sequence
 - `dr-pop` / `dr-spin` — dice face animations
 - `result-slide` — result card entrance
 - World-specific: `tla-idle`, `neo-scan`, `fan-rune`, `sp-idle`, `vic-flicker`, `pa-blink`
 
-
+---
 
 ## ErrorBoundary
 
-`ErrorBoundary` in `core/ui-primitives.js` is the sole class component in the codebase — required because React error boundaries cannot be implemented as hooks. Wraps all 12 `createRoot` mount points. Displays a recovery UI with "Reload" and "Clear session & reload" buttons instead of a blank white page.
+`ErrorBoundary` in `core/ui-primitives.js` is the sole class component in the codebase — required because React error boundaries cannot be implemented as hooks. Wraps all `createRoot` mount points. Displays a recovery UI with "Reload" and "Clear session & reload" buttons instead of a blank white page. The error message is displayed in the UI for debugging.
+
+---
+
+## Icon system
+
+SVG icons are defined as React components in `core/ui-primitives.js`:
+
+| Component | Icon | Used for |
+|-----------|------|---------|
+| `FaShareIcon` | arrow-up-from-bracket | Export options (share drawer toggle) |
+| `FaCartPlusIcon` | cart-plus | Save to Table Prep (pin result) |
+| `FaFileArrowDownIcon` | file-arrow-down | Download/export actions |
+| `FaFileArrowUpIcon` | file-arrow-up | Upload/import actions |
+
+All icons use `fill: currentColor`, `aria-hidden: true`, and `display: inline-block; verticalAlign: middle`.

@@ -79,7 +79,7 @@ These are not preferences — they're load-bearing walls. Any PR that violates t
 
 | Constraint | Why |
 |------------|-----|
-| **No build step** | Must work as static files served from GitHub Pages |
+| **No build step** | Must work as static files served from any static host (deployed at ogma.net via Cloudflare Pages) |
 | **No TypeScript** | Same |
 | **React 18 via CDN UMD only** | `React.createElement` aliased as `h`. No JSX, no import maps yet. |
 | **`var`-only in `core/*.js`** | ES Modules migration is planned for Sprint 3 — don't get ahead of it |

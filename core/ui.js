@@ -2342,13 +2342,13 @@ function CampaignApp(props) {
                   onClick: exportCards,
                   title: 'Export ' + pinnedCards.length + ' pinned card' + (pinnedCards.length === 1 ? '' : 's') + ' as JSON',
                   'aria-label': 'Export pinned cards as JSON',
-                }, '⬇'),
+                }, h(FaFileArrowDownIcon, {size: 14})),
                 h('button', {
                   className: 'btn btn-ghost action-bar-icon',
                   onClick: importCards,
                   title: 'Import cards from Ogma JSON file',
                   'aria-label': 'Import cards from file',
-                }, '⬆')
+                }, h(FaFileArrowUpIcon, {size: 14}))
               )
             ),
 

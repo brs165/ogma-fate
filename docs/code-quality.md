@@ -110,7 +110,13 @@ style: {position: 'fixed', top: pos.top + 'px'}
 style: {position: 'fixed', top: pos.top + 'px'}
 ```
 
-**TODO comments:** Allowed with a backlog ID reference. `// TODO BL-02: stunt data spec needed before this can render`. No orphan TODOs without an ID.
+**TODO comments:** Allowed with a backlog ID reference.
+
+---
+
+## Known footguns
+
+**Self-referential var assignment.** In `var`-only files, destructuring component props manually (`var foo = props.foo`) is correct. Writing `var foo = foo` (referencing the var being declared) does not throw a SyntaxError — JavaScript hoists the `var` declaration, so the right-hand side resolves to `undefined`. The component then receives `undefined` for that prop and any usage of it will be a `ReferenceError` at render time. This produced the `showDice is not defined` ErrorBoundary crash in v298. Always write `var foo = props.foo`. `// TODO BL-02: stunt data spec needed before this can render`. No orphan TODOs without an ID.
 
 ---
 
@@ -168,6 +174,7 @@ For any PR or contribution:
 
 - [ ] `node --check` passes on all modified `.js` files
 - [ ] `node tests/qa_named.js` passes (113/113)
+- [ ] `node --check core/ui-run.js && node --check core/ui-board.js` — these are var-only and not covered by some IDE checkers
 - [ ] `node tests/engine.test.js` passes (59/59)
 - [ ] Smoke test passes (128/128)
 - [ ] No `font-size:8px` or `font-size:9px` in any new CSS (enforced by NA-68)

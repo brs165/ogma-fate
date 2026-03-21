@@ -735,6 +735,17 @@ function BoardTopbar(props) {
   var campId = props.campId;
   var onCampChange = props.onCampChange;
   var isOnline = props.isOnline;
+  var showDice = props.showDice;
+  var onToggleDice = props.onToggleDice;
+  var showFP = props.showFP;
+  var onToggleFP = props.onToggleFP;
+  var syncStatus = props.syncStatus;
+  var roomCode = props.roomCode;
+  var onHost = props.onHost;
+  var onDisconnect = props.onDisconnect;
+  var onExportCanvas = props.onExportCanvas;
+  var leftOpen = props.leftOpen;
+  var onToggleLeft = props.onToggleLeft;
 
   var worlds = typeof CAMPAIGNS !== 'undefined'
     ? Object.keys(CAMPAIGNS).map(function(id) { return {id: id, name: (CAMPAIGNS[id].meta || {}).name || id}; })
@@ -760,11 +771,11 @@ function BoardTopbar(props) {
     // MOB-02: Left panel toggle (visible on mobile only)
     h('button', {
       className: 'bt-icon-btn bt-panel-toggle',
-      onClick: props.onToggleLeft,
-      title: props.leftOpen ? 'Hide generators' : 'Show generators',
-      'aria-label': props.leftOpen ? 'Hide generator panel' : 'Show generator panel',
-      'aria-expanded': String(!!props.leftOpen),
-    }, props.leftOpen ? '\u25C0' : '\u25B6'),
+      onClick: onToggleLeft,
+      title: leftOpen ? 'Hide generators' : 'Show generators',
+      'aria-label': leftOpen ? 'Hide generator panel' : 'Show generator panel',
+      'aria-expanded': String(!!leftOpen),
+    }, leftOpen ? '\u25C0' : '\u25B6'),
     h('div', {className: 'bt-mode'},
       h('button', {
         className: 'bt-mode-btn' + (mode === 'prep' ? ' active' : ''),
@@ -830,7 +841,7 @@ function BoardTopbar(props) {
         onClick: props.onExportCanvas,
         title: 'Export board as JSON',
         'aria-label': 'Export board canvas as JSON file',
-      }, '\u2B07'),
+      }, h(FaFileArrowDownIcon, {size: 14})),
       h('button', {
         className: 'bt-icon-btn',
         onClick: onToggleTheme,

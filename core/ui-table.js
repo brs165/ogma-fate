@@ -789,7 +789,7 @@ function TpExportModal(props){
   },
     h('div',{className:'tp-export-modal'},
       h('div',{className:'tp-export-header'},
-        h('div',{style:{fontWeight:700,fontSize:14}},'💾 Export Cards as JSON'),
+        h('div',{style:{fontWeight:700,fontSize:14,display:'flex',alignItems:'center',gap:6}},h(FaFileArrowDownIcon,{size:14}),' Export Cards as JSON'),
         h('button',{className:'rs-drawer-close',onClick:onClose,'aria-label':'Close'},'×')
       ),
       h('div',{className:'tp-export-body'},
@@ -830,7 +830,7 @@ function TpExportModal(props){
           onClick:doExport,
           disabled:selectedCount===0&&!incPlayers,
           style:{background:'var(--accent)',color:'#000',border:'none',fontWeight:700,fontSize:13,padding:'8px 20px'},
-        },'💾 Download JSON'),
+        },h(FaFileArrowDownIcon,{size:13}),' Download JSON'),
         h('button',{
           className:'btn btn-ghost',
           onClick:onClose,
@@ -1283,8 +1283,66 @@ function PrepCanvas(props){
           style:{fontSize:12},
           title:'Show/hide dice roller',
         },'\uD83C\uDFB2 Dice'),
-        // Export
-        h('button',{className:'btn btn-ghost',onClick:function(){setShowExportModal(true);},title:'Export cards as JSON',style:{fontSize:12},'aria-label':'Export cards'},'💾'),
+        // EXP-02: Export cards (pinned card list)
+        h('button',{className:'btn btn-ghost',onClick:function(){setShowExportModal(true);},
+          title:'Export cards as JSON',style:{fontSize:12},'aria-label':'Export cards'},
+          h(FaFileArrowDownIcon,{size:13})),
+        // EXP-04: Export whole table state (canvas + players + round + FP)
+        h('button',{className:'btn btn-ghost',
+          onClick:function(){
+            if(!DB||!DB.exportCanvasState){if(showToast)showToast('Export unavailable');return;}
+            var key=TP_CANVAS_KEY_PREFIX+(campId||'default');
+            var fname=(campName||'table').replace(/\s+/g,'-').toLowerCase()+'-table';
+            DB.exportCanvasState(key,fname).then(function(){if(showToast)showToast('Table exported');}).catch(function(err){if(showToast)showToast(err&&err.message?err.message:'Export failed');});
+          },
+          title:'Export full table state (canvas, players, round, FP)',
+          style:{fontSize:12},'aria-label':'Export full table state'},
+          h(FaFileArrowDownIcon,{size:13}),h('span',{style:{fontSize:10,marginLeft:2}},'all')),
+        // EXP-02: Import cards or full table state from file
+        h('button',{className:'btn btn-ghost',
+          onClick:function(){
+            if(!DB||!DB.importFile){if(showToast)showToast('Import unavailable');return;}
+            DB.importFile().then(function(data){
+              if(data.type==='canvas'&&data.state){
+                // Full table restore
+                var s=data.state;
+                if(Array.isArray(s.players))setPlayers(s.players);
+                if(Array.isArray(s.order))setOrder(s.order);
+                if(typeof s.round==='number')setRound(s.round);
+                if(typeof s.scene==='number')setScene(s.scene);
+                if(typeof s.gmFP==='number')setGmFP(s.gmFP);
+                if(s.extras&&typeof s.extras==='object')setExtras(s.extras);
+                if(typeof s.scale==='number')setScale(s.scale);
+                if(typeof s.ox==='number')setOx(s.ox);
+                if(typeof s.oy==='number')setOy(s.oy);
+                if(Array.isArray(s.cards)){
+                  s.cards.forEach(function(card){
+                    var c2=Object.assign({},card,{id:String(Date.now()+Math.random()),ts:Date.now()});
+                    setPinnedCards(function(prev){return prev.concat([c2]);});
+                    if(DB)DB.saveCard(campId,c2).catch(function(err){console.warn('[Ogma] import card save failed:',err);});
+                  });
+                }
+                if(showToast)showToast('Table imported');
+              } else if(data.type==='cards'&&Array.isArray(data.cards)){
+                data.cards.forEach(function(card){
+                  var c2=Object.assign({},card,{id:String(Date.now()+Math.random()),ts:Date.now()});
+                  setPinnedCards(function(prev){return prev.concat([c2]);});
+                  if(DB)DB.saveCard(campId,c2).catch(function(err){console.warn('[Ogma] import card save failed:',err);});
+                });
+                if(showToast)showToast('Imported '+data.cards.length+' card'+(data.cards.length===1?'':'s'));
+              } else if(data.type==='card'&&data.card){
+                var c3=Object.assign({},data.card,{id:String(Date.now()+Math.random()),ts:Date.now()});
+                setPinnedCards(function(prev){return prev.concat([c3]);});
+                if(DB)DB.saveCard(campId,c3).catch(function(err){console.warn('[Ogma] import card save failed:',err);});
+                if(showToast)showToast('Card imported');
+              } else{
+                if(showToast)showToast('Unrecognised file format');
+              }
+            }).catch(function(err){if(showToast)showToast('Import failed: '+(err&&err.message?err.message:'unknown'));});
+          },
+          title:'Import cards or table state from file',
+          style:{fontSize:12},'aria-label':'Import from file'},
+          h(FaFileArrowUpIcon,{size:13})),
         // TC-21: Milestone tracker
         
 

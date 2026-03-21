@@ -8,6 +8,46 @@
 
 ---
 
+## 2026.03.293–299 — Mobile sprint, code review merge, icon system, crash fix
+
+**v299** — Critical bugfix: `showDice is not defined` crash on board page. Root cause: `var leftOpen = leftOpen` (self-referential assignment) in `BoardTopbar` props destructuring — JavaScript hoists the `var` declaration so right-hand side was `undefined`, throwing `ReferenceError` before any component rendered. Fixed to `var leftOpen = props.leftOpen`. CF beacon SRI warning documented as CF-side issue.
+
+**v298** — Icon system: `FaFileArrowDownIcon` and `FaFileArrowUpIcon` added to `ui-primitives.js`. All export buttons now use file-arrow-down, all import buttons use file-arrow-up. Whole-table export/import added to PrepCanvas toolbar (exports players + cards + round + FP + extras + pan/zoom as JSON; imports handles `type:canvas`, `type:cards`, `type:card`). Save-to-prep button confirmed as cart-plus.
+
+**v297** — Landing page reorder: "New here?" and "Join a Table" sections moved above "Choose your world" — onboarding paths now appear before the world grid.
+
+**v296** — MOB-06: board mobile backdrop scoped to canvas strip only (`left: min(80vw, 260px)`) — panel area no longer blocked. Canvas `onMouseDown` closes panel on mobile. QA-01: NA-29 search window widened 300→500 chars with explanatory comment.
+
+**v295** — Tier 1: MOB-05 run.html safe area (topbar left/right insets, dice floater bottom, mobile sidebar bottom). EXP-04 board canvas export button in topbar (`DB.exportCanvasState()` wired to ⬇ button). BL-01 confirmed already fully shipped.
+
+**v294** — Code review merge (external v292 review): EH-1 `console.warn` on all DB writes, EH-2/3 SW promise chain fixes + activate catch, EH-4 IDB retry budget (2 failures before permanent disable, not 1), EH-5 migration path `console.warn`. PB-1 timer cleanup returns on 4 timers — `rollTimerRef` declaration missing in `DicePanel` was a real `ReferenceError` in dev mode (fixed). PB-2 `getAppShell()` lazy cache. NA-29 regression fixed (session-save warn strings shortened to fit 500-char assertion window). TBL-02 re-applied after merge.
+
+**v293** — Mobile sprint: MOB-01 `viewport-fit=cover` added to all 36 HTML files. MOB-04 `env(safe-area-inset-bottom)` on roll FAB and all floaters. MOB-03 board topbar responsive at 520px (`bt-nav-text` spans hide at mobile, Worlds/Help hide at 400px). MOB-02 board left panel collapsible — `leftOpen` state, `blp-wrap`/`blp-hidden` CSS, `blp-backdrop` dismiss, `bt-panel-toggle` button (visible on mobile only, hidden on desktop).
+
+---
+
+## 2026.03.289–292 — Tier 1 sprint + XSS fix
+
+**v292** — Security: `assets/js/dice-roller.js` XSS fix (CWE-79/116 via CodeQL). Complete rewrite from `innerHTML` string interpolation to DOM construction. `el()` helper added — zero `innerHTML` calls remain. `data-label` attribute was the vulnerable injection point.
+
+**v291** — Bugfix: `exportCards` and `importCards` were referenced in action bar but never defined (`ReferenceError` on click). Both functions now defined in `CampaignApp`. `exportCanvasState` `.catch()` added. 300ms sync rebroadcast timeout documented.
+
+**v290** — `_redirects` deleted. CF Pages Pretty URLs handles `.html` stripping. References cleaned from BOOTSTRAP, ROADMAP, sw.js, index.html. CHANGELOG preserved as history.
+
+**v289** — Tier 1 complete: TBL-02 dice drawer → floater on narrow/touch screens (`useDiceFloater()` + `openDice()` helper + `rs-dice-floater` CSS). TBL-05 empty canvas state now has "➕ Generate a card" direct CTA button. EXP-02 JSON export/import for pinned cards (action bar ⬇/⬆ buttons, `DB.exportCards()`). EXP-03 copy-link button promoted to action bar with ✅ feedback.
+
+---
+
+## 2026.03.286–288 — Multiplayer sync fix, Board Sprint 2, roll button
+
+**v288** — MP-07 sync fix: player state now applies on join via `remoteStateCbRef` pattern (mirrors `tableCursorCbRef`). `createTableSync` caches `_lastState` and rebroadcasts on `presence` message. `gmOnly` card extras stripped from broadcast — card positions/notes no longer leak to players.
+
+**v287** — Board Sprint 2: BRD-02 dice floater (`TpDicePanel`, FP-spend bridge, sync broadcast), BRD-03 FP tracker floater (`FatePointTracker`, IDB persist per world via `board_fp_v1_[campId]`), BRD-05 board multiplayer (Host button in Play mode, room code display, Join modal, `createTableSync` wired). `ui-table.js` + `ui.js` added to board.html and SW APP_SHELL.
+
+**v286** — Roll button vertical stack: `action-bar` → `flex-direction:column`. Roll 56→44px. Inspire full-width with descriptive label ("Inspire — roll 3 options to pick from"). Contextual pill rows (severity/party size) with `action-bar-ctx-label`. Secondaries full-width row.
+
+---
+
 ## 2026.03.266 — Board Sprint 1: spatial GM workspace
 
 New files: `campaigns/board.html` + `core/ui-board.js` (1156 lines). Zero overlap with `ui.js` — parallel, not a replacement. Safe to kill by deleting 2 files and removing 6 lines across 3 existing files.

@@ -138,7 +138,7 @@ function ShareDrawer(props) {
         onClick: downloadMd,
         title: 'Save as .md file',
         'aria-label': 'Download as Markdown file',
-      }, '💾 Save .md'),
+      }, h(FaFileArrowDownIcon, {size: 12}), ' Save .md'),
       h('button', {
         className: 'btn-xs',
         onClick: function() { window.print(); },
@@ -167,7 +167,7 @@ function ShareDrawer(props) {
         onClick: downloadOgma,
         title: 'Save as .ogma.json file — import later in Ogma',
         'aria-label': 'Download as Ogma JSON file',
-      }, '💾 Save .ogma.json'),
+      }, h(FaFileArrowDownIcon, {size: 12}), ' Save .ogma.json'),
       h('span', {style: {fontSize: 'var(--text-label)', color: 'var(--text-muted)', fontStyle: 'italic', marginLeft: 4}},
         'Re-importable in Ogma'
       )
@@ -394,7 +394,7 @@ function VaultModal(props) {
           className: 'btn btn-ghost',
           onClick: handleImport,
           style: {fontSize: 12, padding: '5px 12px'},
-        }, '📁 Import from file'),
+        }, h(FaFileArrowUpIcon, {size: 13}), ' Import from file'),
       ),
 
       // ── Session list ──────────────────────────────────────────────

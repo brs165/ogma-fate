@@ -42,9 +42,11 @@ Offline-first browser PWA for Fate Condensed GMs. 16 generators × 8 worlds. No 
 | `core/ui-renderers.js` | 16 result renderers (dossier cards) |
 | `core/ui-table.js` | `PrepCanvas` + all Table canvas components |
 | `core/ui-run.js` | Run session surface components |
-| `core/ui-modals.js` | Modal, ShareDrawer, Settings, Vault, QuickFind |
+| `core/ui-modals.js` | Modal, ShareDrawer, Settings, Vault, QuickFind, KBShortcuts |
 | `core/ui-primitives.js` | React aliases (`h`), FD card primitives, `ErrorBoundary`, `scoreAspect()` |
 | `core/ui-landing.js` | Landing page components |
+| `core/ui-board.js` | `BoardApp` — board prep/play canvas root component |
+| `core/ui-run.js` | `RunApp` — run session surface root component |
 | `core/db.js` | Dexie 4 IDB wrapper, memStore fallback, `navigator.storage.persist()` |
 | `core/config.js` | `OGMA_CONFIG`: `REPO_BASE` (auto-detect), `DEFAULT_SYNC_HOST` |
 | `core/intro.js` | Campaign intro animation (DOM, not React) |
@@ -66,12 +68,13 @@ Offline-first browser PWA for Fate Condensed GMs. 16 generators × 8 worlds. No 
 | Python `open()` → `encoding='utf-8'` | Default codec corrupts emoji |
 | Emoji in JS strings written from Python → unicode escapes | Raw chars become surrogate pairs |
 | Large JS replacements → `fs.writeFileSync` in Node | Node owns encoding |
-| Never redeclare `h`, `useState`, `useEffect`, `useRef`, `useCallback`, `Fragment` | All declared as `const` in `ui-primitives.js` — re-declaring with `var` in any other file is a `SyntaxError`. Full list of globals from `ui-primitives.js`: `h`, `useState`, `useCallback`, `useEffect`, `useRef`, `Fragment`, `RA_ICONS`, `TIMING` |
+| Never redeclare `h`, `useState`, `useEffect`, `useRef`, `useCallback`, `Fragment` | All declared as `const` in `ui-primitives.js` — re-declaring with `var` in any other file is a `SyntaxError`. Full list of globals from `ui-primitives.js`: `h`, `useState`, `useCallback`, `useEffect`, `useRef`, `Fragment`, `RA_ICONS`, `TIMING`, `FaShareIcon`, `FaCartPlusIcon`, `FaFileArrowDownIcon`, `FaFileArrowUpIcon` |
 | After every write: `node --check <file> && echo OK` | Catch syntax before QA |
 | Never replace `assets/js/partysocket.js` with a CDN tag | No UMD build exists |
 | `_headers` must NOT be in SW `APP_SHELL` | Cloudflare Pages consumes it server-side |
 | CDN scripts must NOT be SW-intercepted | SW intercept strips CORS headers |
 | `<base href="/">` on all campaign HTML pages | CF Pages Pretty URLs strip `.html` |
+| No `_redirects` file in repo | File removed v290 — caused redirect conflicts. CF Pages Pretty URLs handles `.html` stripping. Do not re-add. |
 
 ---
 
@@ -111,10 +114,12 @@ bash scripts/bump-version.sh
 
 **Script load order** (enforced by `<script>` tag sequence in every campaign HTML):
 ```
-config.js → shared.js → universal.js → [world].js →
-partysocket.js → engine.js → db.js →
-ui-primitives.js → ui-renderers.js → ui-table.js → ui-modals.js → ui-landing.js → ui.js → intro.js
+[React CDN] → [ReactDOM CDN] → shared.js → universal.js → [world].js →
+config.js → engine.js → [Dexie CDN] → db.js → ui-primitives.js → partysocket.js →
+ui-renderers.js → ui-table.js → ui-modals.js → ui-landing.js → ui.js → intro.js
 ```
+Board page: same up to ui-primitives.js, then: ui-renderers.js → ui-table.js → ui-modals.js → ui.js → ui-board.js (no ui-landing.js, no intro.js)
+Run page: same up to ui-primitives.js, then: ui-renderers.js → ui-table.js → ui-run.js
 
 ---
 
@@ -143,8 +148,8 @@ See `docs/sri-update.md` for how to update hashes when bumping versions.
 ## Stack context for AI sessions
 
 - **No JSX, no transpilation.** All React is `React.createElement` aliased as `h()`.
-- **No ES modules.** All files use global script tags in declared load order.
-- **No npm at runtime.** `package.json` exists for dev tools (ESLint, Prettier) only.
+- **No ES modules.** All files use global script tags in declared load order. `const`/`let` are used in some UI files (see code-quality.md var/const split) but there are no `import`/`export` statements anywhere.
+- **No npm at runtime.** `package.json` exists for dev tools (ESLint) only.
 - **Globals matter.** `CAMPAIGNS`, `GENERATORS`, `DB`, `LS`, `h`, `useState` etc. are globals — not imports.
 - **Test harness is Node + `eval()`.** `qa_named.js` and `engine.test.js` run in Node using `eval()` to load files. Top-level `eval()` in Node leaks into scope; `'use strict'` blocks this — never add it to test files.
 - **Emoji in Python writes must be unicode escapes.** `'\uD83C\uDFB2'` not `'🎲'`.
