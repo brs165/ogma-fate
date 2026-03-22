@@ -1572,8 +1572,27 @@ function BoardApp(props) {
   var _showDice = useState(false); var showDice = _showDice[0]; var setShowDice = _showDice[1];
   var _showFP = useState(false); var showFP = _showFP[0]; var setShowFP = _showFP[1];
 
+  // Toast — declared before useBoardSync so showToast can be passed as a callback
+  var toastTimerRef = useRef(null);
+  function showToast(msg) {
+    setToast(msg);
+    clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = setTimeout(function() { setToast(null); }, 1800);
+  }
+
   // ── BRD-05: Multiplayer sync state ───────────────────────────────────────
+  // Sync state extracted to useBoardSync
+  var _sync = useBoardSync(showToast);
+  var syncObj = _sync.syncObj; var setSyncObj = _sync.setSyncObj;
+  var syncStatus = _sync.syncStatus; var setSyncStatus = _sync.setSyncStatus;
+  var roomCode = _sync.roomCode; var setRoomCode = _sync.setRoomCode;
+  var showJoin = _sync.showJoin; var setShowJoin = _sync.setShowJoin;
+  var joinInput = _sync.joinInput; var setJoinInput = _sync.setJoinInput;
+  var connectAsHost = _sync.connectAsHost;
+  var disconnectSync = _sync.disconnectSync;
+
   // TBL-01: GM handles player_hello — auto-create player slot with incoming name
+  // Effect placed here so syncObj, addPlayer, showToast are all declared above
   useEffect(function() {
     if (!syncObj || !syncObj.ws || syncObj.role !== 'gm') return;
     function onMessage(event) {
@@ -1588,15 +1607,6 @@ function BoardApp(props) {
     return function() { syncObj.ws.removeEventListener('message', onMessage); };
   }, [syncObj]);
 
-  // Sync state extracted to useBoardSync
-  var _sync = useBoardSync(showToast);
-  var syncObj = _sync.syncObj; var setSyncObj = _sync.setSyncObj;
-  var syncStatus = _sync.syncStatus; var setSyncStatus = _sync.setSyncStatus;
-  var roomCode = _sync.roomCode; var setRoomCode = _sync.setRoomCode;
-  var showJoin = _sync.showJoin; var setShowJoin = _sync.setShowJoin;
-  var joinInput = _sync.joinInput; var setJoinInput = _sync.setJoinInput;
-  var connectAsHost = _sync.connectAsHost;
-  var disconnectSync = _sync.disconnectSync;
   // MOB-15: mobile list view toggle
   var _mob = useState(false); var mobileListView = _mob[0]; var setMobileListView = _mob[1];
 
@@ -1624,7 +1634,6 @@ function BoardApp(props) {
   var lastRemovedRef = useRef(null);
   var lastRerolledRef = useRef(null); // {id, prev} — undo last reroll
   var lastPlacedRef = useRef({x: 60, y: 60, col: 0}); // cascade placement
-  var toastTimerRef = useRef(null);
   var cardsRef = useRef(cards);
   cardsRef.current = cards;
 
@@ -1704,12 +1713,6 @@ function BoardApp(props) {
     DB.saveSession(campCanvasKey, {cards: nextCards, ts: Date.now()}).catch(function() {});
   }
 
-  // ── Toast ─────────────────────────────────────────────────────────────────
-  function showToast(msg) {
-    setToast(msg);
-    clearTimeout(toastTimerRef.current);
-    toastTimerRef.current = setTimeout(function() { setToast(null); }, 1800);
-  }
 
   // ── Theme toggle ──────────────────────────────────────────────────────────
   function toggleTheme() {

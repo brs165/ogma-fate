@@ -1715,6 +1715,24 @@ function CampaignApp(props) {
       return (s && g) ? {seed: parseInt(s, 36), gen: g} : null;
     } catch(e) { return null; }
   })[0]; // [0] = current value only; no setter needed (URL never changes)
+  // Chrome state (toast, PWA, Safari, SW, online) — must be before useGeneratorSession
+  var _chrome = useChromeHooks(campId);
+  var toast = _chrome.toast; var setToast = _chrome.setToast; var showToast = _chrome.showToast;
+  var updateAvailable = _chrome.updateAvailable; var setUpdateAvailable = _chrome.setUpdateAvailable;
+  var showSafariWarn = _chrome.showSafariWarn; var setShowSafariWarn = _chrome.setShowSafariWarn;
+  var showIosInstall = _chrome.showIosInstall; var setShowIosInstall = _chrome.setShowIosInstall;
+  var showPwaNudge = _chrome.showPwaNudge;
+  var dismissPwaNudge = _chrome.dismissPwaNudge; var installPwa = _chrome.installPwa;
+  var isOnline = _chrome.isOnline;
+  var deferredInstallPrompt = _chrome.deferredInstallPrompt;
+  // Table prefs + universal merge — must be before useGeneratorSession
+  const [prefs, setPrefs] = useState({excluded:{}, locked:{}, custom:{}});
+  const [universalMerge, setUniversalMerge] = useState(function() { try { return LS.get('universal_merge') !== false; } catch(e) { return true; } });
+  function toggleUniversalMerge() {
+    var next = !universalMerge;
+    setUniversalMerge(next);
+    try { LS.set('universal_merge', next); } catch(e) {}
+  }
   // Generator session state (result, history, rolling, pinned, inspire, etc.)
   var _gs = useGeneratorSession(campId, camp, t, universalMerge, prefs, showToast);
   var activeGen = _gs.activeGen; var setActiveGen = _gs.setActiveGen;
@@ -1753,7 +1771,6 @@ function CampaignApp(props) {
   const [showQuickFind, setShowQuickFind] = useState(false);
   const [showExport, setShowExport] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false); // EXP-03: copy-link feedback
-  const [prefs, setPrefs] = useState({excluded:{}, locked:{}, custom:{}});
   // ── Modal panels — one active at a time ─────────────────────────────────
   // Replaces 7 separate boolean state vars with a single discriminated union.
   // activePanel: 'tables'|'settings'|'vault'|'fp'|'cd'|'doc'|null
@@ -1779,26 +1796,9 @@ function CampaignApp(props) {
     try { LS.set('fp_state', next); } catch(e) {}
   }
   const [showSidebar, setShowSidebar] = useState(false);
-  // Universal merge toggle - default on, persisted globally in localStorage
-  const [universalMerge, setUniversalMerge] = useState(function() { try { return LS.get('universal_merge') !== false; } catch(e) { return true; } });
-  function toggleUniversalMerge() {
-    var next = !universalMerge;
-    setUniversalMerge(next);
-    try { LS.set('universal_merge', next); } catch(e) {}
-  }
   // F4: Consequence severity selector - '' means random (default)
   // Card view toggle — MTG-style result card vs dossier
 
-  // Chrome state (toast, PWA, Safari, SW, online) extracted to useChromeHooks
-  var _chrome = useChromeHooks(campId);
-  var toast = _chrome.toast; var setToast = _chrome.setToast; var showToast = _chrome.showToast;
-  var updateAvailable = _chrome.updateAvailable; var setUpdateAvailable = _chrome.setUpdateAvailable;
-  var showSafariWarn = _chrome.showSafariWarn; var setShowSafariWarn = _chrome.setShowSafariWarn;
-  var showIosInstall = _chrome.showIosInstall; var setShowIosInstall = _chrome.setShowIosInstall;
-  var showPwaNudge = _chrome.showPwaNudge;
-  var dismissPwaNudge = _chrome.dismissPwaNudge; var installPwa = _chrome.installPwa;
-  var isOnline = _chrome.isOnline;
-  var deferredInstallPrompt = _chrome.deferredInstallPrompt;
   // Interaction state
   // Navigation
   const [activeGroup, setActiveGroup] = useState(function() { return groupForGen('npc_minor'); });
