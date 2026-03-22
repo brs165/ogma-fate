@@ -22,6 +22,24 @@
 
 
 
+
+---
+
+## 2026.03.336–337 — Hotfix + order-of-operations audit
+
+**v336 — Production ReferenceError hotfix:**
+- `CampaignApp` called `useGeneratorSession(campId, camp, t, universalMerge, prefs, showToast)` at line ~1719 but all three arguments were declared *after* that call: `universalMerge` (const, line 1783), `prefs` (const, line 1756), `showToast` (from `useChromeHooks`, line 1793). `const` is not hoisted → `ReferenceError: can't access lexical declaration before initialization` on every campaign page load.
+- Fix: hoisted `useChromeHooks`, `prefs`, and `universalMerge` to immediately before `useGeneratorSession`.
+
+**v337 — Broad order-of-operations audit:**
+- Systematic check: every `const` declaration across `CampaignApp`, `BoardApp`, `useGeneratorSession`, `useChromeHooks`, `ExportMenu`, `useBoardSync`, `useBoardPlayState`, `BoardTopbar`, `cv4Card`, and all landing/modal/table components.
+- `BoardApp`: `useBoardSync(showToast)` called before `showToast` and `toastTimerRef` were defined. Safe at runtime (function hoisting) but fragile. Fixed: moved both before `useBoardSync`.
+- `BoardApp`: `useEffect([syncObj])` referencing `syncObj` placed before `var syncObj = _sync.syncObj`. Fixed: moved effect after `_sync` destructure.
+- All other components clean. `LandingApp` false positive: `info` at two different scopes, not a real issue.
+
+113/113 · 59/59
+
+---
 ---
 
 ## 2026.03.335 — TBL-01 player join UX + MOB-15 mobile list view + ROADMAP cleanup

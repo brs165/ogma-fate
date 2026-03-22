@@ -1360,12 +1360,12 @@ function ExportMenu(props) {
       role: 'menu',
       'aria-label': 'Export options',
       style: {
-        position: 'absolute', bottom: 'calc(100% + 6px)', right: 0,
+        position: 'absolute', top: 'calc(100% + 6px)', right: 0,
         background: 'var(--panel-raised)', border: '1px solid var(--border)',
         borderRadius: 10, padding: '6px 0', minWidth: 210,
         boxShadow: '0 8px 32px rgba(0,0,0,.35), 0 0 0 1px rgba(0,0,0,.08)',
-        zIndex: 300,
-        animation: 'fadeUp .14s ease',
+        zIndex: 500,
+        animation: 'fadeDown .14s ease',
       },
     },
       h('div', {

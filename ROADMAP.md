@@ -2,7 +2,7 @@
 
 > **Source of truth** for all planned work. Update whenever items change.
 > **Current version:** 2026.03.335 · QA: 113/113 named · 59/59 unit
-> **Last revised:** 2026.03.335 — TBL-01 player join UX; MOB-15 mobile list view; ROADMAP cleanup
+> **Last revised:** 2026.03.337 — v336 hotfix (universalMerge ReferenceError); v337 order-of-ops audit (BoardApp showToast/syncObj hoisting)
 
 ---
 
@@ -86,6 +86,7 @@
 
 | Version | What |
 |---------|------|
+| v2026.03.336–337 | **Hotfix + order-of-ops audit.** v336: `universalMerge`/`prefs`/`useChromeHooks` hoisted before `useGeneratorSession` (production ReferenceError). v337: `showToast`+`toastTimerRef` hoisted before `useBoardSync`; TBL-01 useEffect moved after `_sync` destructure; full const use-before-declare audit across all UI files — clean. |
 | v2026.03.335 | **TBL-01** player join UX (name prompt → auto-add to GM roster). **MOB-15** Board mobile list view (toggle button, scrollable card stack, tap-to-open, remove). ROADMAP cleanup. |
 | v2026.03.334 | **BL-05** Stunt browser (Board left panel, filter by skill/tag/text, click-to-copy). **WS-12** Stunt guide expanded (weak/strong table, 8-world examples). EXP-07 image pack offline guard. A11Y-01 BoardCard role=region. QA-02 contest tie wording. |
 | v2026.03.330–333 | **Architecture refactor** (9/10): 4 custom hooks (useChromeHooks, useGeneratorSession, useBoardPlayState, useBoardSync). CampaignApp 63→28 state vars. ui-run.js stripped. Export menu unified. MD doc pass. |

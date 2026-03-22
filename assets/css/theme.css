@@ -93,6 +93,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 
 /* ══ ANIMATIONS ══ */
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
 @keyframes roll{0%,100%{opacity:0.3}50%{opacity:1}}
 
 /* ══ BUTTONS ══ */
@@ -1014,7 +1015,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
   display:flex;align-items:center;gap:6px;flex-wrap:wrap;
   padding:10px 14px;border-bottom:1px solid var(--border);
   background:rgba(255,255,255,0.02);
-}
+;overflow:visible}
 /* Roll button inside action-bar: fills natural width, no min-width */
   flex-shrink:0;padding:10px 24px;min-height:44px;min-width:0;
   font-size:var(--text-base);
@@ -1336,7 +1337,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 
 /* ── Action bar chrome ────────────────────────────────────────────────── */
 .action-bar-icon{padding:0 8px!important}
-.action-bar-secondary{display:flex;align-items:center;gap:4px;width:100%}
+.action-bar-secondary{display:flex;align-items:center;gap:4px;width:100%;overflow:visible}
 .action-bar-ctx-row{display:flex;align-items:center;gap:5px;flex-wrap:wrap;width:100%}
 .action-bar-ctx-label{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);flex-shrink:0}
 .action-bar-ctx{background:none;border:1px solid var(--border);border-radius:6px;padding:4px 9px;font-size:var(--text-label);cursor:pointer;font-family:var(--font-ui);transition:all .12s}
