@@ -326,7 +326,7 @@ function BoardCard(props) {
     className: 'board-card',
     style: {left: card.x + 'px', top: card.y + 'px', zIndex: card.z || 1},
     tabIndex: 0,
-    role: 'article',
+    role: 'region',
     'aria-label': (genLabel ? genLabel.label : card.genId) + ': ' + title,
     onMouseDown: function(e) {
       if (e.target.closest('.bc-actions')) return;
@@ -550,6 +550,7 @@ function BoardPlayPanel(props) {
 function BoardLeftPanel(props) {
   var activeGen = props.activeGen;
   var onSelectGen = props.onSelectGen;
+  var campId = props.campId;
   var activeTab = props.activeTab;
   var onTabChange = props.onTabChange;
   var campName = props.campName;
@@ -560,6 +561,10 @@ function BoardLeftPanel(props) {
         className: 'blp-tab' + (activeTab === 'gen' ? ' active' : ''),
         onClick: function() { onTabChange('gen'); },
       }, 'Generate'),
+      h('button', {
+        className: 'blp-tab' + (activeTab === 'stunts' ? ' active' : ''),
+        onClick: function() { onTabChange('stunts'); },
+      }, 'Stunts'),
       h('button', {
         className: 'blp-tab' + (activeTab === 'help' ? ' active' : ''),
         onClick: function() { onTabChange('help'); },
@@ -585,8 +590,159 @@ function BoardLeftPanel(props) {
       })
     ),
 
+    // Stunts panel
+    activeTab === 'stunts' && h(BoardStuntPanel, {
+      campId: props.campId,
+    }),
+
     // Help panel
     activeTab === 'help' && h(BoardHelpPanel, null)
+  );
+}
+
+// ── BoardStuntPanel — BL-05 stunt browser ──────────────────────────────────
+// Shows world + universal stunts. Filter by skill or tag. Click to copy.
+function BoardStuntPanel(props) {
+  var campId = props.campId;
+
+  var _filter  = useState('');    var filter  = _filter[0];  var setFilter  = _filter[1];
+  var _skill   = useState('all'); var skill   = _skill[0];   var setSkill   = _skill[1];
+  var _tag     = useState('all'); var tag     = _tag[0];     var setTag     = _tag[1];
+  var _copied  = useState(null);  var copied  = _copied[0];  var setCopied  = _copied[1];
+  var copyTimer = useRef(null);
+
+  // Gather stunts: world pool + universal pool
+  var worldStunts = (typeof CAMPAIGNS !== 'undefined' && CAMPAIGNS[campId] &&
+    CAMPAIGNS[campId].tables && CAMPAIGNS[campId].tables.stunts)
+    ? CAMPAIGNS[campId].tables.stunts : [];
+  var uniStunts = (typeof UNIVERSAL !== 'undefined' && UNIVERSAL.stunts) ? UNIVERSAL.stunts : [];
+  var allStunts = worldStunts.concat(uniStunts);
+
+  // Collect unique skills and tags for filter dropdowns
+  var skills = ['all'].concat(
+    allStunts.map(function(s){return s.skill;})
+    .filter(function(v,i,a){return a.indexOf(v)===i && v && v !== 'varies';})
+    .sort()
+  );
+  var tags = ['all'].concat(
+    allStunts.reduce(function(acc,s){
+      (s.tags||[]).forEach(function(t){ if(acc.indexOf(t)===-1) acc.push(t); });
+      return acc;
+    },[]).sort()
+  );
+
+  // Apply filters
+  var filtered = allStunts.filter(function(s) {
+    if (skill !== 'all' && s.skill !== skill) return false;
+    if (tag !== 'all' && (s.tags||[]).indexOf(tag) === -1) return false;
+    if (filter) {
+      var q = filter.toLowerCase();
+      return (s.name||'').toLowerCase().includes(q) ||
+             (s.skill||'').toLowerCase().includes(q) ||
+             (s.desc||'').toLowerCase().includes(q);
+    }
+    return true;
+  });
+
+  function copyStunt(s) {
+    var text = s.name + ' (' + s.skill + '): ' + s.desc;
+    function confirm() {
+      setCopied(s.name);
+      if (copyTimer.current) clearTimeout(copyTimer.current);
+      copyTimer.current = setTimeout(function() { setCopied(null); }, 1500);
+    }
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(confirm).catch(function() {
+        fallbackCopy(text); confirm();
+      });
+    } else { fallbackCopy(text); confirm(); }
+  }
+
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  var SKILL_COLOR = 'var(--accent)';
+  var TYPE_COLOR = {'bonus':'var(--c-blue,#60a5fa)', 'special':'var(--c-purple,#a78bfa)'};
+
+  return h('div', {className: 'blp-body blp-stunts'},
+
+    // ── Search + filters ──────────────────────────────────────────────────
+    h('div', {className: 'bs-filters'},
+      h('input', {
+        type: 'text',
+        className: 'bs-search',
+        placeholder: 'Search stunts…',
+        value: filter,
+        onChange: function(e) { setFilter(e.target.value); },
+        'aria-label': 'Search stunts',
+      }),
+      h('div', {className: 'bs-selects'},
+        h('select', {
+          className: 'bs-select',
+          value: skill,
+          onChange: function(e) { setSkill(e.target.value); },
+          'aria-label': 'Filter by skill',
+        }, skills.map(function(sk) {
+          return h('option', {key: sk, value: sk}, sk === 'all' ? 'All skills' : sk);
+        })),
+        h('select', {
+          className: 'bs-select',
+          value: tag,
+          onChange: function(e) { setTag(e.target.value); },
+          'aria-label': 'Filter by tag',
+        }, tags.map(function(tg) {
+          return h('option', {key: tg, value: tg}, tg === 'all' ? 'All tags' : tg);
+        }))
+      ),
+      h('div', {className: 'bs-count', 'aria-live': 'polite'},
+        filtered.length + ' of ' + allStunts.length + ' stunts'
+        + (worldStunts.length ? ' \u00b7 ' + worldStunts.length + ' world' : '')
+      )
+    ),
+
+    // ── Stunt list ────────────────────────────────────────────────────────
+    filtered.length === 0
+      ? h('div', {className: 'bs-empty'}, 'No stunts match your filters.')
+      : h('div', {className: 'bs-list'},
+          filtered.map(function(s, i) {
+            var isCopied = copied === s.name;
+            var typeCol = TYPE_COLOR[s.type] || TYPE_COLOR.bonus;
+            return h('div', {
+              key: (s.name || i),
+              className: 'bs-card' + (isCopied ? ' bs-copied' : ''),
+              role: 'button',
+              tabIndex: 0,
+              'aria-label': 'Copy stunt: ' + s.name,
+              onClick: function() { copyStunt(s); },
+              onKeyDown: function(e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); copyStunt(s); }
+              },
+            },
+              h('div', {className: 'bs-card-header'},
+                h('span', {className: 'bs-name'}, s.name),
+                h('span', {
+                  className: 'bs-type',
+                  style: {color: typeCol, borderColor: typeCol + '55'},
+                }, s.type === 'special' ? 'ONCE/SCENE' : '+2')
+              ),
+              h('div', {className: 'bs-skill', style: {color: SKILL_COLOR}}, s.skill),
+              h('p', {className: 'bs-desc'}, s.desc),
+              h('div', {className: 'bs-footer'},
+                (s.tags||[]).map(function(tg) {
+                  return h('span', {key: tg, className: 'bs-tag'}, tg);
+                }),
+                h('span', {className: 'bs-copy-hint'},
+                  isCopied ? '\u2713 Copied' : '\u2398 Copy'
+                )
+              )
+            );
+          })
+        )
   );
 }
 
@@ -905,6 +1061,88 @@ function BoardDossierStress(props) {
 
 // ── BoardTopbar ───────────────────────────────────────────────────────────────
 
+// ── BoardExportMenu — export dropdown for Board topbar ──────────────────────
+function BoardExportMenu(props) {
+  var cards        = props.cards || [];
+  var campName     = props.campName || '';
+  var onExportCanvas = props.onExportCanvas;
+  var onPrint      = props.onPrint;
+  var mode         = props.mode || 'prep';
+  var hasCards     = cards.filter(function(c){return c.genId && c.genId !== 'sticky' && c.genId !== 'label';}).length > 0;
+
+  var _open = useState(false); var open = _open[0]; var setOpen = _open[1];
+  var menuRef = useRef(null);
+
+  useEffect(function() {
+    if (!open) return;
+    function handler(e) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener('mousedown', handler);
+    return function() { document.removeEventListener('mousedown', handler); };
+  }, [open]);
+
+  function doImagePack() {
+    setOpen(false);
+    if (!hasCards) return;
+    var printable = cards.filter(function(card) { return card.genId && card.genId !== 'sticky' && card.genId !== 'label' && card.data; });
+    if (typeof DB === 'undefined' || !DB.exportCardsAsPng) return;
+    DB.exportCardsAsPng(printable, campName);
+  }
+
+  function doPrint() {
+    setOpen(false);
+    if (onPrint) onPrint();
+  }
+
+  function doExportCanvas() {
+    setOpen(false);
+    if (onExportCanvas) onExportCanvas();
+  }
+
+  var items = [
+    hasCards && {key:'img', icon:'\uD83D\uDDBC\uFE0F', label:'Image Pack', sub:'PNG zip for Miro / Figma', action:doImagePack},
+    mode !== 'play' && hasCards && {key:'print', icon:'\uD83D\uDDA8', label:'Print', sub:'Printable HTML', action:doPrint},
+    {key:'json', icon:'\u2193', label:'Export Board', sub:'Canvas state JSON', action:doExportCanvas},
+  ].filter(Boolean);
+
+  return h('div', {ref: menuRef, style: {position:'relative', display:'inline-flex'}},
+    h('button', {
+      className: 'bt-icon-btn' + (open ? ' active' : ''),
+      onClick: function() { setOpen(function(v){ return !v; }); },
+      title: 'Export options',
+      'aria-label': 'Export options',
+      'aria-expanded': String(open),
+      'aria-haspopup': 'menu',
+    }, h(FaFileArrowDownIcon, {size: 14})),
+    open && h('div', {
+      role: 'menu',
+      style: {
+        position:'absolute', top:'calc(100% + 6px)', right:0,
+        background:'var(--panel-raised)', border:'1px solid var(--border)',
+        borderRadius:10, padding:'6px 0', minWidth:210,
+        boxShadow:'0 8px 32px rgba(0,0,0,.35)',
+        zIndex:300, animation:'fadeUp .14s ease',
+      },
+    },
+      h('div', {style:{padding:'4px 14px 7px', fontSize:10, fontWeight:700, letterSpacing:'.12em', color:'var(--text-muted)', textTransform:'uppercase'}}, 'Export'),
+      items.map(function(item) {
+        return h('button', {
+          key: item.key, role:'menuitem',
+          onClick: item.action,
+          className:'export-menu-item',
+        },
+          h('span',{style:{fontSize:16,width:22,textAlign:'center',flexShrink:0}},item.icon),
+          h('div',{style:{flex:1,minWidth:0}},
+            h('div',{style:{fontSize:13,fontWeight:600,lineHeight:1.2}},item.label),
+            h('div',{style:{fontSize:11,color:'var(--text-muted)',marginTop:1}},item.sub)
+          )
+        );
+      })
+    )
+  );
+}
+
 function BoardTopbar(props) {
   var campMeta = props.campMeta;
   var mode = props.mode;
@@ -924,6 +1162,9 @@ function BoardTopbar(props) {
   var onHost = props.onHost;
   var onDisconnect = props.onDisconnect;
   var onExportCanvas = props.onExportCanvas;
+  var cards = props.cards || [];
+  var campName = props.campName || (props.campMeta && props.campMeta.name) || '';
+  var mobileListView = props.mobileListView || false;
   var leftOpen = props.leftOpen;
   var onToggleLeft = props.onToggleLeft;
 
@@ -1016,20 +1257,23 @@ function BoardTopbar(props) {
         h('span', {className: 'bt-nav-text'}, '\u00a0Table'),
         pinCount > 0 && h('span', {className: 'bt-count'}, String(pinCount))
       ),
-      // EXP-04: Export board canvas
-      h('button', {
-        className: 'bt-icon-btn',
-        onClick: props.onExportCanvas,
-        title: 'Export board as JSON',
-        'aria-label': 'Export board canvas as JSON file',
-      }, h(FaFileArrowDownIcon, {size: 14})),
-      // EXP-05: Print canvas cards
-      props.mode !== 'play' && props.onPrint && h('button', {
-        className: 'bt-icon-btn',
-        onClick: props.onPrint,
-        title: 'Print cards',
-        'aria-label': 'Print canvas cards',
-      }, '\uD83D\uDDA8'),
+      // EXP-06: Export menu (Image Pack / Print / JSON canvas export)
+      h(BoardExportMenu, {
+        cards: props.cards || [],
+        campName: props.campName || '',
+        onExportCanvas: props.onExportCanvas,
+        onPrint: props.onPrint,
+        mode: props.mode,
+      }),
+      // MOB-15: canvas/list toggle (mobile only)
+      props.onToggleMobileList && h('button', {
+        className: 'bt-icon-btn bt-mob-view-toggle',
+        onClick: props.onToggleMobileList,
+        title: props.mobileListView ? 'Switch to canvas' : 'Switch to card list',
+        'aria-label': props.mobileListView ? 'Canvas view' : 'List view',
+        'aria-pressed': String(!!props.mobileListView),
+      }, props.mobileListView ? '\u25A6' : '\u2261'),
+
       h('button', {
         className: 'bt-icon-btn',
         onClick: onToggleTheme,
@@ -1041,6 +1285,222 @@ function BoardTopbar(props) {
 }
 
 // ── BoardApp — root component ─────────────────────────────────────────────────
+
+// ── useBoardPlayState — play-mode player roster, rounds, turn order ─────────
+// Extracted from BoardApp. Call inside BoardApp; destructure returned values.
+function useBoardPlayState(campId, mode, loaded) {
+  var _players    = useState([]); var players = _players[0]; var setPlayers = _players[1];
+  var _round      = useState(1);  var round   = _round[0];   var setRound   = _round[1];
+  var _order      = useState([]); var order   = _order[0];   var setOrder   = _order[1];
+  var _selPlayer  = useState(null); var selPlayer = _selPlayer[0]; var setSelPlayer = _selPlayer[1];
+  var _roundFlash = useState(false); var roundFlash = _roundFlash[0]; var setRoundFlash = _roundFlash[1];
+  var roundFlashTimer = useRef(null);
+
+  function persistPlayState(pl, rnd, ord) {
+    if (!DB) return;
+    var key = 'board_play_session_' + campId;
+    DB.saveSession(key, {
+      players: pl  !== null ? pl  : players,
+      round:   rnd !== null ? rnd : round,
+      order:   ord !== null ? ord : order,
+    }).catch(function(err) { console.warn('[Ogma] board play state save failed:', err); });
+  }
+
+  function newRound() {
+    var next = round + 1;
+    setRound(next);
+    setPlayers(function(ps) {
+      var cleared = ps.map(function(p) { return Object.assign({}, p, {acted: false}); });
+      persistPlayState(cleared, next, null);
+      return cleared;
+    });
+    setRoundFlash(true);
+    if (roundFlashTimer.current) clearTimeout(roundFlashTimer.current);
+    roundFlashTimer.current = setTimeout(function() { setRoundFlash(false); }, 600);
+  }
+
+  function prevRound() {
+    if (round <= 1) return;
+    var next = round - 1;
+    setRound(next);
+    persistPlayState(null, next, null);
+  }
+
+  function toggleActed(playerId) {
+    setPlayers(function(ps) {
+      var next = ps.map(function(p) { return p.id === playerId ? Object.assign({}, p, {acted: !p.acted}) : p; });
+      persistPlayState(next, null, null);
+      return next;
+    });
+  }
+
+  function updPlayer(id, patch) {
+    setPlayers(function(ps) {
+      var next = ps.map(function(p) { return p.id === id ? Object.assign({}, p, patch) : p; });
+      persistPlayState(next, null, null);
+      return next;
+    });
+  }
+
+  function addPlayer(nameArg) {
+    var name = nameArg || prompt('Player name:');
+    if (!name) return;
+    var COLORS = ['var(--accent)', 'var(--c-purple)', 'var(--c-blue)', 'var(--c-green)', 'var(--c-red)'];
+    var np = {
+      id: 'bp' + Date.now() + Math.random().toString(36).slice(2, 5),
+      name: name, hc: '', fp: 3, ref: 3,
+      phy: [false, false, false], men: [false, false],
+      color: COLORS[players.length % COLORS.length],
+      acted: false, conseq: ['', '', '']
+    };
+    var nextP = players.concat([np]);
+    var nextO = order.concat([np.id]);
+    setPlayers(nextP); setOrder(nextO);
+    persistPlayState(nextP, null, nextO);
+  }
+
+  function removePlayer(id) {
+    var nextP = players.filter(function(p) { return p.id !== id; });
+    var nextO = order.filter(function(oid) { return oid !== id; });
+    setPlayers(nextP); setOrder(nextO);
+    persistPlayState(nextP, null, nextO);
+    if (selPlayer === id) setSelPlayer(null);
+  }
+
+  // Load play state on mount and when entering play mode
+  useEffect(function() {
+    if (!DB || !loaded) return;
+    DB.loadSession('board_play_session_' + campId).then(function(saved) {
+      if (!saved) return;
+      if (Array.isArray(saved.players) && saved.players.length > 0) setPlayers(saved.players);
+      if (typeof saved.round === 'number') setRound(saved.round);
+      if (Array.isArray(saved.order) && saved.order.length > 0) setOrder(saved.order);
+    }).catch(function() {});
+  }, [campId, mode, loaded]);
+
+  return {
+    players: players, setPlayers: setPlayers,
+    round: round,
+    order: order, setOrder: setOrder,
+    selPlayer: selPlayer, setSelPlayer: setSelPlayer,
+    roundFlash: roundFlash,
+    newRound: newRound, prevRound: prevRound,
+    toggleActed: toggleActed,
+    updPlayer: updPlayer, addPlayer: addPlayer, removePlayer: removePlayer,
+    persistPlayState: persistPlayState,
+  };
+}
+
+// ── useBoardSync — multiplayer sync state for BoardApp ──────────────────────
+function useBoardSync(showToast) {
+  var _syncObj    = useState(null);       var syncObj    = _syncObj[0];    var setSyncObj    = _syncObj[1];
+  var _syncStatus = useState('offline');  var syncStatus = _syncStatus[0]; var setSyncStatus = _syncStatus[1];
+  var _roomCode   = useState(function() {
+    try { return new URLSearchParams(location.search).get('room') || ''; } catch(e) { return ''; }
+  });
+  var roomCode = _roomCode[0]; var setRoomCode = _roomCode[1];
+  var _showJoin  = useState(false); var showJoin  = _showJoin[0];  var setShowJoin  = _showJoin[1];
+  var _joinInput = useState('');    var joinInput = _joinInput[0]; var setJoinInput = _joinInput[1];
+
+  function connectAsHost() {
+    if (typeof createTableSync === 'undefined') { showToast('\u26a0 Sync not available offline'); return; }
+    var code = roomCode && roomCode.length === 4 ? roomCode : generateBoardRoomCode();
+    setRoomCode(code);
+    var s = createTableSync(code, 'gm',
+      function() {},
+      function(roll) { showToast(roll.who + ' \u00b7 ' + (roll.total >= 0 ? '+' : '') + roll.total); },
+      function(msg) { showToast(msg); },
+      function() {}
+    );
+    if (!s) { showToast('\u26a0 Could not connect'); return; }
+    setSyncObj(s);
+    setSyncStatus('connecting');
+    s.ws.addEventListener('open', function() { setSyncStatus('connected'); showToast('\u2705 Live \u2014 room: ' + code); });
+    s.ws.addEventListener('close', function() { setSyncStatus('offline'); });
+  }
+
+
+  return {
+    syncObj: syncObj, setSyncObj: setSyncObj,
+    syncStatus: syncStatus, setSyncStatus: setSyncStatus,
+    roomCode: roomCode, setRoomCode: setRoomCode,
+    showJoin: showJoin, setShowJoin: setShowJoin,
+    joinInput: joinInput, setJoinInput: setJoinInput,
+    connectAsHost: connectAsHost,
+    disconnectSync: disconnectSync,
+  };
+}
+
+// ── BoardMobileList — MOB-15: card list view for mobile ──────────────────────
+// Renders board cards as a scrollable list instead of the drag canvas.
+// Shown on ≤640px when user taps the list/canvas toggle.
+function BoardMobileList(props) {
+  var cards    = props.cards || [];
+  var campId   = props.campId;
+  var onOpen   = props.onOpen || function(){};
+  var onRemove = props.onRemove || function(){};
+
+  var genCards = cards.filter(function(c) {
+    return c.genId && c.genId !== 'sticky' && c.genId !== 'label' && c.data;
+  });
+  var stickyCards = cards.filter(function(c) { return c.genId === 'sticky'; });
+  var labelCards  = cards.filter(function(c) { return c.genId === 'label'; });
+
+  if (cards.length === 0) {
+    return h('div', {className: 'bml-empty'},
+      h('div', {style:{fontSize:32,marginBottom:10}}, '\uD83C\uDFB2'),
+      h('div', {style:{fontSize:14,fontWeight:700,color:'var(--text)'}}, 'Canvas is empty'),
+      h('div', {style:{fontSize:12,color:'var(--text-muted)',marginTop:4}}, 'Use Generate tab to add cards.')
+    );
+  }
+
+  function cardTypeLabel(genId) {
+    var map = {npc_minor:'Minor NPC',npc_major:'Major NPC',scene:'Scene',campaign:'Campaign',
+      encounter:'Encounter',seed:'Seed',compel:'Compel',challenge:'Challenge',
+      contest:'Contest',consequence:'Consequence',faction:'Faction',complication:'Complication',
+      backstory:'Backstory',obstacle:'Obstacle',countdown:'Countdown',constraint:'Constraint'};
+    return map[genId] || genId;
+  }
+
+  function cardTitle(card) {
+    var d = card.data || {};
+    return card.title || d.name || d.location || d.situation || d.track_name || card.genId || '—';
+  }
+
+  var CAT_COLOR = {
+    npc_minor:'var(--c-blue,#60a5fa)', npc_major:'var(--c-blue,#60a5fa)', faction:'var(--c-blue,#60a5fa)',
+    scene:'var(--gold,#fbbf24)', campaign:'var(--gold,#fbbf24)', encounter:'var(--gold,#fbbf24)', seed:'var(--gold,#fbbf24)',
+    compel:'var(--c-red,#f87171)', challenge:'var(--c-red,#f87171)', contest:'var(--c-red,#f87171)', consequence:'var(--c-red,#f87171)',
+    complication:'var(--c-purple,#a78bfa)', backstory:'var(--c-purple,#a78bfa)',
+    obstacle:'var(--c-green,#34d399)', countdown:'var(--c-green,#34d399)', constraint:'var(--c-green,#34d399)',
+  };
+
+  return h('div', {className: 'bml-list'},
+    genCards.map(function(card) {
+      var col = CAT_COLOR[card.genId] || 'var(--accent)';
+      return h('div', {
+        key: card.id,
+        className: 'bml-card',
+        style: {borderLeft: '3px solid ' + col},
+        role: 'button',
+        tabIndex: 0,
+        'aria-label': cardTypeLabel(card.genId) + ': ' + cardTitle(card),
+        onClick: function() { onOpen(card); },
+        onKeyDown: function(e) { if(e.key==='Enter'||e.key===' '){e.preventDefault();onOpen(card);} },
+      },
+        h('div', {className: 'bml-card-type', style:{color:col}}, cardTypeLabel(card.genId)),
+        h('div', {className: 'bml-card-title'}, cardTitle(card)),
+        h('button', {
+          className: 'bml-remove',
+          onClick: function(e) { e.stopPropagation(); onRemove(card.id); },
+          'aria-label': 'Remove ' + cardTitle(card),
+        }, '\u2715')
+      );
+    }),
+    stickyCards.length > 0 && h('div', {className: 'bml-section'}, '\uD83D\uDCCC Sticky notes (' + stickyCards.length + ')'),
+    labelCards.length > 0 && h('div', {className: 'bml-section'}, '\uD83C\uDFF7 Labels (' + labelCards.length + ')')
+  );
+}
 
 function BoardApp(props) {
   var campId       = props.campId || 'fantasy';
@@ -1096,26 +1556,53 @@ function BoardApp(props) {
   var _leftOpen = useState(function() { return window.innerWidth > 520; });
   var leftOpen = _leftOpen[0]; var setLeftOpen = _leftOpen[1];
 
-  // ── Play mode: player roster, round tracker, turn order ──────────────────
-  var _players = useState([]); var players = _players[0]; var setPlayers = _players[1];
-  var _round = useState(1); var round = _round[0]; var setRound = _round[1];
-  var _order = useState([]); var order = _order[0]; var setOrder = _order[1];
-  var _selPlayer = useState(null); var selPlayer = _selPlayer[0]; var setSelPlayer = _selPlayer[1];
-  var _roundFlash = useState(false); var roundFlash = _roundFlash[0]; var setRoundFlash = _roundFlash[1];
-  var roundFlashTimer = useRef(null);
+  // ── Play mode: player roster, round tracker, turn order (useBoardPlayState) ──
+  var _play = useBoardPlayState(campId, mode, loaded);
+  var players = _play.players; var setPlayers = _play.setPlayers;
+  var round = _play.round;
+  var order = _play.order; var setOrder = _play.setOrder;
+  var selPlayer = _play.selPlayer; var setSelPlayer = _play.setSelPlayer;
+  var roundFlash = _play.roundFlash;
+  var newRound = _play.newRound; var prevRound = _play.prevRound;
+  var toggleActed = _play.toggleActed;
+  var updPlayer = _play.updPlayer; var addPlayer = _play.addPlayer; var removePlayer = _play.removePlayer;
+  var persistPlayState = _play.persistPlayState;
 
   // ── BRD-02/03: Dice floater + FP floater visibility ──────────────────────
   var _showDice = useState(false); var showDice = _showDice[0]; var setShowDice = _showDice[1];
   var _showFP = useState(false); var showFP = _showFP[0]; var setShowFP = _showFP[1];
 
   // ── BRD-05: Multiplayer sync state ───────────────────────────────────────
-  var _syncObj = useState(null); var syncObj = _syncObj[0]; var setSyncObj = _syncObj[1];
-  var _syncStatus = useState('offline'); var syncStatus = _syncStatus[0]; var setSyncStatus = _syncStatus[1];
-  var _roomCode = useState(function() {
-    try { return new URLSearchParams(location.search).get('room') || ''; } catch(e) { return ''; }
-  }); var roomCode = _roomCode[0]; var setRoomCode = _roomCode[1];
-  var _showJoin = useState(false); var showJoin = _showJoin[0]; var setShowJoin = _showJoin[1];
-  var _joinInput = useState(''); var joinInput = _joinInput[0]; var setJoinInput = _joinInput[1];
+  // TBL-01: GM handles player_hello — auto-create player slot with incoming name
+  useEffect(function() {
+    if (!syncObj || !syncObj.ws || syncObj.role !== 'gm') return;
+    function onMessage(event) {
+      var data; try { data = JSON.parse(event.data); } catch(e) { return; }
+      if (data.type === 'player_hello' && data.name) {
+        var name = String(data.name).slice(0, 30);
+        addPlayer(name);
+        showToast('\uD83D\uDC4B ' + name + ' joined');
+      }
+    }
+    syncObj.ws.addEventListener('message', onMessage);
+    return function() { syncObj.ws.removeEventListener('message', onMessage); };
+  }, [syncObj]);
+
+  // Sync state extracted to useBoardSync
+  var _sync = useBoardSync(showToast);
+  var syncObj = _sync.syncObj; var setSyncObj = _sync.setSyncObj;
+  var syncStatus = _sync.syncStatus; var setSyncStatus = _sync.setSyncStatus;
+  var roomCode = _sync.roomCode; var setRoomCode = _sync.setRoomCode;
+  var showJoin = _sync.showJoin; var setShowJoin = _sync.setShowJoin;
+  var joinInput = _sync.joinInput; var setJoinInput = _sync.setJoinInput;
+  var connectAsHost = _sync.connectAsHost;
+  var disconnectSync = _sync.disconnectSync;
+  // MOB-15: mobile list view toggle
+  var _mob = useState(false); var mobileListView = _mob[0]; var setMobileListView = _mob[1];
+
+  // TBL-01: player-side name for waiting banner
+  var _pjn = useState(''); var playerJoinName = _pjn[0]; var setPlayerJoinName = _pjn[1];
+  var _pjSent = useState(false); var playerJoinSent = _pjSent[0]; var setPlayerJoinSent = _pjSent[1];
 
   // ── BRD-03: FP tracker state (loaded from IDB) ────────────────────────────
   var _fpState = useState(null); var fpState = _fpState[0]; var setFpState = _fpState[1];
@@ -1186,16 +1673,6 @@ function BoardApp(props) {
       }
       setLoaded(true);
     }).catch(function() { setLoaded(true); });
-    // Also load play session state (players, round, order)
-    var playKey = 'board_play_session_' + campId;
-    if (typeof DB !== 'undefined') {
-      DB.loadSession(playKey).then(function(ps) {
-        if (!ps) return;
-        if (Array.isArray(ps.players)) setPlayers(ps.players);
-        if (typeof ps.round === 'number') setRound(ps.round);
-        if (Array.isArray(ps.order)) setOrder(ps.order);
-      }).catch(function() {});
-    }
   }, [campCanvasKey]);
 
   // Load pin count from IDB
@@ -1220,84 +1697,6 @@ function BoardApp(props) {
     DB.saveSession(BOARD_FP_KEY + '_' + campId, next).catch(function() {});
   }
 
-  // ── Load play state (players/round/order) when entering play mode ──────────
-  useEffect(function() {
-    if (mode !== 'play' || !loaded) return;
-    if (!DB) return;
-    DB.loadSession('board_play_session_' + campId).then(function(saved) {
-      if (!saved) return;
-      if (Array.isArray(saved.players) && saved.players.length > 0) setPlayers(saved.players);
-      if (typeof saved.round === 'number') setRound(saved.round);
-      if (Array.isArray(saved.order) && saved.order.length > 0) setOrder(saved.order);
-    }).catch(function() {});
-  }, [mode, loaded]);
-
-  // ── Player helpers ────────────────────────────────────────────────────────
-  function updPlayer(id, patch) {
-    setPlayers(function(ps) {
-      var next = ps.map(function(p) { return p.id === id ? Object.assign({}, p, patch) : p; });
-      persistPlayState(next, null, null);
-      return next;
-    });
-  }
-
-  function addPlayer() {
-    var name = prompt('Player name:');
-    if (!name) return;
-    var COLORS = ['var(--accent)', 'var(--c-purple)', 'var(--c-blue)', 'var(--c-green)', 'var(--c-red)'];
-    var np = {
-      id: 'bp' + Date.now() + Math.random().toString(36).slice(2, 5),
-      name: name, hc: '', fp: 3, ref: 3,
-      phy: [false, false, false], men: [false, false],
-      color: COLORS[players.length % COLORS.length],
-      acted: false, conseq: ['', '', '']
-    };
-    var nextP = players.concat([np]);
-    var nextO = order.concat([np.id]);
-    setPlayers(nextP); setOrder(nextO);
-    persistPlayState(nextP, null, nextO);
-  }
-
-  function newRound() {
-    var next = round + 1;
-    setRound(next);
-    setPlayers(function(ps) {
-      var cleared = ps.map(function(p) { return Object.assign({}, p, {acted: false}); });
-      persistPlayState(cleared, next, null);
-      return cleared;
-    });
-    setRoundFlash(true);
-    if (roundFlashTimer.current) clearTimeout(roundFlashTimer.current);
-    roundFlashTimer.current = setTimeout(function() { setRoundFlash(false); }, 600);
-  }
-
-  function prevRound() {
-    if (round <= 1) return;
-    var next = round - 1;
-    setRound(next);
-    persistPlayState(null, next, null);
-  }
-
-  function toggleActed(playerId) {
-    setPlayers(function(ps) {
-      var next = ps.map(function(p) { return p.id === playerId ? Object.assign({}, p, {acted: !p.acted}) : p; });
-      persistPlayState(next, null, null);
-      return next;
-    });
-  }
-
-  function persistPlayState(pl, rnd, ord) {
-    if (!DB) return;
-    var key = 'board_play_session_' + campId;
-    var payload = {
-      players: pl !== null ? pl : players,
-      round: rnd !== null ? rnd : round,
-      order: ord !== null ? ord : order,
-    };
-    DB.saveSession(key, payload).catch(function(err) {
-      console.warn('[Ogma] board play state save failed:', err);
-    });
-  }
 
   // ── Persist canvas to IDB ─────────────────────────────────────────────────
   function persistCanvas(nextCards) {
@@ -1325,22 +1724,6 @@ function BoardApp(props) {
   }
 
   // ── BRD-05: Multiplayer sync ───────────────────────────────────────────────
-  function connectAsHost() {
-    if (typeof createTableSync === 'undefined') { showToast('⚠ Sync not available offline'); return; }
-    var code = roomCode && roomCode.length === 4 ? roomCode : generateBoardRoomCode();
-    setRoomCode(code);
-    var s = createTableSync(code, 'gm',
-      function() {},
-      function(roll) { showToast(roll.who + ' · ' + (roll.total >= 0 ? '+' : '') + roll.total); },
-      function(msg) { showToast(msg); },
-      function() {}
-    );
-    if (!s) { showToast('⚠ Could not connect'); return; }
-    setSyncObj(s);
-    setSyncStatus('connecting');
-    s.ws.addEventListener('open', function() { setSyncStatus('connected'); showToast('✅ Live — room: ' + code); });
-    s.ws.addEventListener('close', function() { setSyncStatus('offline'); });
-  }
 
   // EXP-04: Export board canvas as JSON file
   function exportCanvas() {
@@ -1353,11 +1736,6 @@ function BoardApp(props) {
     });
   }
 
-  function disconnectSync() {
-    if (syncObj) { syncObj.disconnect(); setSyncObj(null); }
-    setSyncStatus('offline');
-    showToast('Disconnected');
-  }
 
   // ── Generate card ─────────────────────────────────────────────────────────
   function generateCard(genId, x, y) {
@@ -1710,6 +2088,10 @@ if (genId === 'sticky') {
       onHost: connectAsHost,
       onDisconnect: disconnectSync,
       onExportCanvas: exportCanvas,
+      cards: cards,
+      campName: campMeta.name,
+      mobileListView: mobileListView,
+      onToggleMobileList: function() { setMobileListView(function(v) { return !v; }); },
       onPrint: function() {
         if (typeof DB === 'undefined' || !DB.printCards) return;
         var printable = cards.filter(function(card) {
@@ -1719,7 +2101,7 @@ if (genId === 'sticky') {
         });
         if (!printable.length) { showToast('No cards to print'); return; }
         DB.printCards(printable, campMeta.name);
-        showToast('Opening print view\u2026');
+        showToast('Opening print view…');
       },
     }),
 
@@ -1739,6 +2121,7 @@ if (genId === 'sticky') {
           : h(BoardLeftPanel, {
               activeGen: activeGen,
               onSelectGen: selectGen,
+              campId: campId,
               activeTab: leftTab,
               onTabChange: setLeftTab,
               campName: campMeta.name,
@@ -1746,7 +2129,16 @@ if (genId === 'sticky') {
       ),
 
       // Right column: TurnBar (play mode) + canvas
-      h('div', {className: 'board-canvas-col'},
+      h('div', {className: 'board-canvas-col' + (mobileListView ? ' bcol-list-mode' : '')},
+
+        // MOB-15: mobile list view
+        mobileListView && h(BoardMobileList, {
+          cards: cards,
+          campId: campId,
+          onOpen: function(card) { setDossierCard(card); },
+          onRemove: deleteCard,
+        }),
+
         // Play mode turn bar
         mode === 'play' && players.length > 0 && h(BoardTurnBar, {
           players: players,
@@ -1831,6 +2223,50 @@ if (genId === 'sticky') {
         ),
 
         // Empty state
+        // TBL-01: Waiting banner for player who just joined
+        syncObj && syncObj.role === 'player' && syncStatus === 'connected' && !playerJoinSent &&
+          h('div', {className: 'board-waiting-banner'},
+            h('div', {className: 'bwb-icon'}, '\uD83C\uDF10'),
+            h('div', {className: 'bwb-title'}, 'Connected to GM'),
+            h('div', {className: 'bwb-sub'}, 'Enter your name so the GM can add you to the tracker:'),
+            h('div', {className: 'bwb-row'},
+              h('input', {
+                type: 'text',
+                className: 'bwb-input',
+                placeholder: 'Your name\u2026',
+                value: playerJoinName,
+                'aria-label': 'Your player name',
+                autoFocus: true,
+                maxLength: 30,
+                onChange: function(e) { setPlayerJoinName(e.target.value); },
+                onKeyDown: function(e) {
+                  if (e.key === 'Enter' && playerJoinName.trim()) {
+                    syncObj.ws.send(JSON.stringify({type:'player_hello',name:playerJoinName.trim()}));
+                    setPlayerJoinSent(true);
+                    showToast('\uD83D\uDC4B Sent your name to the GM');
+                  }
+                },
+              }),
+              h('button', {
+                className: 'bwb-btn',
+                disabled: !playerJoinName.trim(),
+                onClick: function() {
+                  if (!playerJoinName.trim()) return;
+                  syncObj.ws.send(JSON.stringify({type:'player_hello',name:playerJoinName.trim()}));
+                  setPlayerJoinSent(true);
+                  showToast('\uD83D\uDC4B Sent your name to the GM');
+                },
+              }, 'Join')
+            )
+          ),
+
+        syncObj && syncObj.role === 'player' && syncStatus === 'connected' && playerJoinSent &&
+          h('div', {className: 'board-waiting-banner board-waiting-sent'},
+            h('div', {className: 'bwb-icon'}, '\u23F3'),
+            h('div', {className: 'bwb-title'}, 'Waiting for GM\u2026'),
+            h('div', {className: 'bwb-sub'}, 'The GM will add you to the tracker shortly.')
+          ),
+
         cards.length === 0 && loaded && h('div', {className: 'board-empty'},
           h('div', {className: 'board-empty-icon'}, '\uD83C\uDFB2'),
           h('div', {className: 'board-empty-title'}, 'Canvas is empty'),

@@ -679,6 +679,175 @@
       }
     },
 
+    // EXP-06: Export cards as PNG image pack (for Miro, Figma, etc.)
+    exportCardsAsPng: function(cards, campName) {
+      if (!cards || cards.length === 0) { alert('No cards to export.'); return; }
+
+      function esc(s) {
+        if (!s) return '';
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      }
+
+      var CAT_COLORS = {character:'#60a5fa',world:'#fbbf24',mechanics:'#f87171',tool:'#a78bfa',pressure:'#34d399'};
+      var CAT_MAP = {npc_minor:'character',npc_major:'character',faction:'character',scene:'world',campaign:'world',encounter:'world',seed:'world',compel:'mechanics',challenge:'mechanics',contest:'mechanics',consequence:'mechanics',complication:'tool',backstory:'tool',obstacle:'pressure',countdown:'pressure',constraint:'pressure'};
+      var GEN_LABELS = {npc_minor:'MINOR NPC',npc_major:'MAJOR NPC',faction:'FACTION',scene:'SCENE',campaign:'CAMPAIGN',encounter:'ENCOUNTER',seed:'SEED',compel:'COMPEL',challenge:'CHALLENGE',contest:'CONTEST',consequence:'CONSEQUENCE',complication:'COMPLICATION',backstory:'BACKSTORY',obstacle:'OBSTACLE',countdown:'COUNTDOWN',constraint:'CONSTRAINT'};
+
+      function cardHtml(card, idx) {
+        var genId = card.genId || 'other';
+        var d = card.data || {};
+        var title = card.title || d.name || d.location || d.situation || genId;
+        var color = CAT_COLORS[CAT_MAP[genId]] || '#f87171';
+        var label = GEN_LABELS[genId] || genId.toUpperCase().replace(/_/g,' ');
+        var rows = [];
+        var asp = d.aspects || {};
+        if (genId === 'npc_minor' || genId === 'npc_major') {
+          if (asp.high_concept) rows.push('<div class="row hc"><span class="badge">HC</span>' + esc(asp.high_concept) + '</div>');
+          if (asp.trouble)      rows.push('<div class="row tr"><span class="badge">TR</span>' + esc(asp.trouble) + '</div>');
+          if (d.skills && d.skills.length) rows.push('<div class="chips">' + d.skills.slice(0,5).map(function(s){return '<span class="chip">+'+s.r+' '+esc(s.name)+'</span>';}).join('') + '</div>');
+          var phy=d.physical_stress||d.stress||0, men=d.mental_stress||0, boxes='';
+          for(var i=0;i<phy;i++) boxes+='<span class="sbox phy"></span>';
+          for(var j=0;j<men;j++) boxes+='<span class="sbox men"></span>';
+          if(boxes) rows.push('<div class="stress">'+boxes+'</div>');
+        } else if (genId==='scene') {
+          (Array.isArray(d.aspects)?d.aspects:[]).slice(0,4).forEach(function(a){var n=typeof a==='string'?a:(a.name||'');rows.push('<div class="row asp">“'+esc(n)+'”</div>');});
+          if(d.zones&&d.zones.length) rows.push('<div class="row muted">Zones: '+d.zones.slice(0,3).map(function(z){return typeof z==='string'?esc(z):esc(z.name||'');}).join(' · ')+'</div>');
+        } else if (genId==='encounter') {
+          (Array.isArray(d.opposition)?d.opposition:[]).slice(0,3).forEach(function(o){rows.push('<div class="row">×'+(o.qty||1)+' '+esc(o.name||o)+'</div>');});
+          if(d.victory) rows.push('<div class="row win">✓ '+esc(d.victory)+'</div>');
+          if(d.defeat)  rows.push('<div class="row lose">✗ '+esc(d.defeat)+'</div>');
+        } else if (genId==='faction') {
+          if(d.goal)    rows.push('<div class="row"><b>Goal:</b> '+esc(d.goal)+'</div>');
+          if(d.method)  rows.push('<div class="row"><b>Method:</b> '+esc(d.method)+'</div>');
+          if(d.weakness)rows.push('<div class="row warn"><b>Weakness:</b> '+esc(d.weakness)+'</div>');
+        } else if (genId==='seed') {
+          if(d.objective)    rows.push('<div class="row"><b>Objective:</b> '+esc(d.objective)+'</div>');
+          if(d.complication) rows.push('<div class="row warn"><b>Complication:</b> '+esc(d.complication)+'</div>');
+          if(d.twist)        rows.push('<div class="row muted"><b>Twist:</b> '+esc(d.twist)+'</div>');
+        } else if (genId==='compel') {
+          if(d.situation)   rows.push('<div class="row hc">'+esc(d.situation)+'</div>');
+          if(d.consequence) rows.push('<div class="row muted"><b>If accepted:</b> '+esc(d.consequence||d.complication)+'</div>');
+        } else if (genId==='challenge') {
+          if(d.name||d.title) rows.push('<div class="row hc">'+esc(d.name||d.title)+'</div>');
+          if(d.primary||d.primary_skill) rows.push('<div class="row"><b>Skill:</b> '+esc(d.primary||d.primary_skill)+'</div>');
+          if(d.success) rows.push('<div class="row win">✓ '+esc(d.success)+'</div>');
+          if(d.failure) rows.push('<div class="row lose">✗ '+esc(d.failure)+'</div>');
+        } else if (genId==='contest') {
+          if(d.contest_type) rows.push('<div class="row hc">'+esc(d.contest_type)+'</div>');
+          if(d.side_a&&d.side_b) rows.push('<div class="row">'+esc(d.side_a)+' ⚔ '+esc(d.side_b)+'</div>');
+          if(d.victories_needed) rows.push('<div class="row muted">First to '+d.victories_needed+' victories</div>');
+        } else if (genId==='consequence') {
+          var sev=(d.severity||'mild').toUpperCase();
+          rows.push('<div class="row hc badge-row"><span class="badge sev">'+esc(sev)+'</span>'+esc(d.aspect||d.mild||d.moderate||d.severe||'')+'</div>');
+          if(d.compel_hook) rows.push('<div class="row muted"><b>Hook:</b> '+esc(d.compel_hook)+'</div>');
+        } else if (genId==='countdown') {
+          if(d.trigger) rows.push('<div class="row"><b>Trigger:</b> '+esc(d.trigger)+'</div>');
+          var bc=d.boxes||4,bs='';for(var bi=0;bi<bc;bi++) bs+='<span class="sbox"></span>';
+          rows.push('<div class="stress">'+bs+'</div>');
+          if(d.outcome) rows.push('<div class="row warn"><b>When full:</b> '+esc(d.outcome)+'</div>');
+        } else if (genId==='campaign') {
+          var cur=d.current||{},imp=d.impending||{};
+          if(cur.name) rows.push('<div class="row hc">'+esc(cur.name)+'</div>');
+          if(imp.name) rows.push('<div class="row warn"><b>Impending:</b> '+esc(imp.name)+'</div>');
+        } else if (genId==='complication') {
+          if(d.new_aspect) rows.push('<div class="row hc">“'+esc(d.new_aspect)+'”</div>');
+          if(d.arrival)    rows.push('<div class="row muted">'+esc(d.arrival)+'</div>');
+        } else if (genId==='obstacle') {
+          rows.push('<div class="row"><span class="badge">'+esc((d.obstacle_type||'obstacle').toUpperCase())+'</span> '+esc(d.name||d.title||'')+'</div>');
+          if(d.bypass) rows.push('<div class="row muted"><b>Bypass:</b> '+esc(d.bypass)+'</div>');
+        } else if (genId==='constraint') {
+          if(d.what_resists||d.what) rows.push('<div class="row hc">'+esc(d.what_resists||d.what||'')+'</div>');
+          if(d.bypass) rows.push('<div class="row win"><b>Bypass:</b> '+esc(d.bypass)+'</div>');
+        } else if (genId==='backstory') {
+          (Array.isArray(d.questions)?d.questions:[]).slice(0,3).forEach(function(q,i){rows.push('<div class="row">'+(i+1)+'. '+esc(q)+'</div>');});
+        } else {
+          var fb=card.summary||d.situation||d.description||d.text||'';
+          if(fb) rows.push('<div class="row">'+esc(fb)+'</div>');
+        }
+        return '<div class="card"><div class="card-hdr" style="background:'+color+'22;border-bottom:2px solid '+color+'44"><span class="gen-label" style="color:'+color+'">'+label+'</span>'+(campName?'<span class="world">'+esc(campName)+'</span>':'')+'</div><div class="card-title">'+esc(title)+'</div>'+(rows.length?'<div class="card-body">'+rows.join('')+'</div>':'')+'<div class="card-footer" style="border-top:1px solid '+color+'33;color:'+color+'">'+label+'</div></div>';
+      }
+
+      var safecamp = (campName||'ogma').replace(/[^a-zA-Z0-9_-]/g,'_');
+      var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Ogma Image Pack</title>'
+        +'<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous"><\/script>'
+        +'<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous"><\/script>'
+        +'<style>'
+        +'body{font-family:system-ui,sans-serif;background:#0f1012;margin:0;padding:20px;color:#f0f0f0}'
+        +'h1{font-size:12px;font-weight:700;letter-spacing:.15em;color:#555;margin:0 0 10px;text-transform:uppercase;font-family:"Courier New",monospace}'
+        +'#status{padding:10px 14px;background:#16181c;border-radius:8px;margin-bottom:12px;font-size:13px;color:#c0c0c0;border:1px solid #2a2d35}'
+        +'.done{color:#34d399;font-weight:700}.err{color:#f87171}'
+        +'.controls{display:flex;gap:8px;margin-bottom:20px}'
+        +'button{padding:9px 22px;border-radius:6px;border:none;cursor:pointer;font-size:13px;font-weight:700;font-family:inherit;transition:opacity .15s}'
+        +'.btn-dl{background:#3b82f6;color:#fff}.btn-dl:hover{opacity:.85}'
+        +'.btn-cl{background:#2a2d35;color:#888}.btn-cl:hover{background:#333}'
+        +'.grid{display:grid;grid-template-columns:repeat(auto-fill,600px);gap:16px}'
+        +'.card{width:600px;background:#1e1e2a;border:1px solid #2a2d35;border-radius:10px;overflow:hidden;display:flex;flex-direction:column}'
+        +'.card-hdr{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;flex-shrink:0}'
+        +'.gen-label{font-size:11px;font-weight:800;letter-spacing:.2em;font-family:"Courier New",monospace}'
+        +'.world{font-size:11px;color:#555;letter-spacing:.05em}'
+        +'.card-title{font-size:16px;font-weight:800;padding:10px 14px 6px;color:#f0f0f0;font-family:"Courier New",monospace;letter-spacing:-.02em;line-height:1.25}'
+        +'.card-body{flex:1;padding:4px 14px 12px;display:flex;flex-direction:column;gap:5px}'
+        +'.card-footer{height:22px;display:flex;align-items:center;justify-content:center;font-size:9px;letter-spacing:.2em;font-family:"Courier New",monospace;font-weight:700;opacity:.35;flex-shrink:0}'
+        +'.row{font-size:12px;color:#b0b0b0;line-height:1.45}'
+        +'.row.hc{font-style:italic;color:#f0f0f0;font-weight:600}'
+        +'.row.tr{font-style:italic;color:#f87171}'
+        +'.row.asp{font-style:italic;color:#d0d0d0}'
+        +'.row.win{color:#34d399}.row.lose{color:#f87171}.row.warn{color:#fbbf24}.row.muted{color:#666}'
+        +'.row.badge-row{display:flex;align-items:center;gap:5px}'
+        +'.badge{font-size:9px;font-weight:800;letter-spacing:.12em;padding:1px 5px;border-radius:3px;background:rgba(255,255,255,.06);font-family:"Courier New",monospace}'
+        +'.badge.sev{background:rgba(248,113,113,.18);color:#f87171}'
+        +'.chips{display:flex;flex-wrap:wrap;gap:3px;margin:2px 0}'
+        +'.chip{font-size:11px;padding:2px 6px;border:1px solid #333;border-radius:3px;color:#909090;white-space:nowrap}'
+        +'.stress{display:flex;gap:4px;align-items:center;margin:3px 0;flex-wrap:wrap}'
+        +'.sbox{display:inline-block;width:14px;height:14px;border-radius:2px;border:2px solid #555;flex-shrink:0}'
+        +'.sbox.phy{border-color:#fbbf24}.sbox.men{border-color:#a78bfa}'
+        +'</style></head><body>'
+        +'<h1>Ogma — '+esc(campName||'Image Pack')+' — '+cards.length+' card'+(cards.length===1?'':'s')+'</h1>'
+        +'<div id="status">Loaded. Click “Download ZIP” to capture and package all cards as PNG images.</div>'
+        +'<div class="controls">'
+        +'<button class="btn-dl" id="dlBtn" onclick="doExport()">📥 Download ZIP</button>'
+        +'<button class="btn-cl" onclick="window.close()">✕ Close</button>'
+        +'</div>'
+        +'<div class="grid" id="grid">'+cards.map(function(card,i){return cardHtml(card,i);}).join('')+'</div>'
+        +'<script>'
+        +'async function doExport(){'
+        +'if(typeof html2canvas==="undefined"||typeof JSZip==="undefined"){'
+        +'document.getElementById("status").innerHTML="<span class=\\"err\\">⚠ Export needs an internet connection to load image libraries. Connect and reload to try again.</span>";'
+        +'return;}'
+        +'var btn=document.getElementById("dlBtn"),status=document.getElementById("status");'
+        +'btn.disabled=true;btn.textContent="⏳ Rendering…";'
+        +'var els=document.querySelectorAll(".card");'
+        +'var zip=new JSZip(),folder=zip.folder("'+safecamp+'_cards");'
+        +'for(var i=0;i<els.length;i++){'
+        +'status.textContent="Rendering card "+(i+1)+" of "+els.length+"…";'
+        +'try{'
+        +'var cv=await html2canvas(els[i],{scale:2,backgroundColor:"#0f1012",logging:false,useCORS:true});'
+        +'var img=cv.toDataURL("image/png").split(",")[1];'
+        +'var lbl=(els[i].querySelector(".gen-label")||{}).textContent||("card_"+(i+1));'
+        +'var fn=lbl.toLowerCase().replace(/[^a-z0-9]+/g,"_")+"_"+(i+1).toString().padStart(3,"0")+".png";'
+        +'folder.file(fn,img,{base64:true});'
+        +'}catch(e){status.innerHTML+="<br><span class=\"err\">Card "+(i+1)+" failed: "+e.message+"</span>";}'
+        +'}'
+        +'status.textContent="Packaging ZIP…";'
+        +'var blob=await zip.generateAsync({type:"blob"});'
+        +'var url=URL.createObjectURL(blob);'
+        +'var a=document.createElement("a");a.href=url;a.download="'+safecamp+'_cards.zip";'
+        +'document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);'
+        +'status.innerHTML="<span class=\"done\">✓ "+els.length+" card"+(els.length===1?"":"s")+" exported as PNG. Drag the ZIP into Miro, Figma, or any canvas app.</span>";'
+        +'btn.disabled=false;btn.textContent="✓ Done";'
+        +'}'
+        +'<\/script></body></html>';
+
+      var blob = new Blob([html], {type:'text/html;charset=utf-8'});
+      var url = URL.createObjectURL(blob);
+      var w = window.open(url, '_blank', 'width=740,height=640,scrollbars=yes');
+      if (!w) {
+        var a = document.createElement('a');
+        a.href = url; a.download = safecamp + '-image-pack.html';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      }
+      setTimeout(function() { URL.revokeObjectURL(url); }, 60000);
+    },
+
   };
 
 })();

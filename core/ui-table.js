@@ -848,15 +848,17 @@ function PrepCanvas(props){
   var onBack=props.onBack,onExport=props.onExport,showToast=props.showToast,DB=props.DB;
   var onShowMilestones=props.onShowMilestones;
   // Sync props
-  var tableSync=props.tableSync;
-  var onRemoteCursor=props.onRemoteCursor; // MP-22: called when a remote cursor arrives
-  var onRemoteState=props.onRemoteState;   // MP-07 fix: called when GM broadcasts full state
-  var tableRoomCode=props.tableRoomCode;
-  var tableIsRemote=props.tableIsRemote;
-  var tablePresence=props.tablePresence||[];
-  var onHostTable=props.onHostTable;
-  var onJoinTable=props.onJoinTable;
-  var onDisconnectTable=props.onDisconnectTable;
+  // Sync context — single object replaces 9 drilled props
+  var _sc=props.tableSyncCtx||{};
+  var tableSync=_sc.sync||null;
+  var onRemoteCursor=_sc.onCursor||null;
+  var onRemoteState=_sc.onState||null;
+  var tableRoomCode=_sc.roomCode||null;
+  var tableIsRemote=_sc.isRemote||false;
+  var tablePresence=_sc.presence||[];
+  var onHostTable=_sc.host||function(){};
+  var onJoinTable=_sc.join||function(){};
+  var onDisconnectTable=_sc.disconnect||function(){};
   var _loaded=useState(false);var loaded=_loaded[0];var setLoaded=_loaded[1];
   var _scale=useState(1);var scale=_scale[0];var setScale=_scale[1];
   var _ox=useState(40);var ox=_ox[0];var setOx=_ox[1];

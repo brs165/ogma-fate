@@ -17,6 +17,154 @@
 113/113 named · 59/59 unit · 128/128 smoke.
 
 
+
+
+
+
+
+---
+
+## 2026.03.335 — TBL-01 player join UX + MOB-15 mobile list view + ROADMAP cleanup
+
+**TBL-01: Player waiting state (Board Play mode)**
+- Player who joins via room code now sees a "Connected to GM" banner with a name input field
+- They type their name and press Join → sends `{type: "player_hello", name}` over the WebSocket
+- After sending: banner changes to "Waiting for GM…" confirmation state
+- GM side: `useEffect` on `syncObj` listens for `player_hello` messages → calls `addPlayer(name)` automatically and shows toast "👋 [Name] joined"
+- `addPlayer()` now accepts an optional name arg — keyboard prompt fallback when GM adds manually
+- WCAG-compliant: `aria-label` on name input, disabled state on Join button until name entered
+
+**MOB-15: Board mobile list view**
+- New `BoardMobileList` component — renders board cards as a scrollable colour-coded list
+- Toggle button in Board topbar (≡/▦ icon, hidden on desktop ≥640px, shown on mobile)
+- Tap any card to open its dossier modal; × button removes from canvas
+- Groups: generator cards (coloured by category), sticky notes count, label count
+- Empty state with prompt if no cards
+- `.bcol-list-mode .board-canvas-wrap{display:none}` — canvas hidden in list mode
+- CSS: `.bt-mob-view-toggle`, `.bml-list`, `.bml-card`, `.bml-card-title`, `.bml-remove`
+
+**ROADMAP cleanup**
+- Merged two duplicate Tier 1 sections
+- Removed all stale open items that already shipped (BRD-02/03/05, TBL-02/03/04/05 — all v279–289)
+- Single clean "Open — in progress" section with only genuinely unshipped work
+- BL-11 explicitly marked skipped in Tier 3
+- What Shipped table condensed to meaningful summaries
+
+113/113 · 59/59 · 128/128
+
+---
+---
+
+## 2026.03.334 — BL-05 Stunt browser, WS-12 guide, quick fixes
+
+**BL-05: Stunt browser (Board left panel):**
+- New `BoardStuntPanel` component — "Stunts" tab added to Board left panel (alongside Generate/Help)
+- Shows world stunts + universal pool (56+ per world); filtered to current world via `campId` prop
+- Three filters: text search, skill dropdown, tag dropdown; live count ("N of M stunts · X world")
+- Click any card to copy name + desc to clipboard (Clipboard API + textarea fallback)
+- Copied state: green border + "✓ Copied" for 1.5s, then resets
+- WCAG-compliant: `role="button"`, `tabIndex=0`, `aria-label`, keyboard (Enter/Space), `:focus-visible`
+- CSS: `.blp-stunts`, `.bs-*` — all sizes ≥ 10px (WCAG NA-68 compliant)
+
+**WS-12: Stunt guide (help/fate-mechanics.html):**
+- Expanded stunt section: weak vs strong stunt table, what makes a stunt specific, tag list
+- "Stunt browser" feature callout — directs GMs to the Board Stunts tab
+- 8-world stunt examples (one per world, world-voice accurate)
+
+**EXP-07: Image Pack offline error:**
+- `doExport()` now guards against `html2canvas`/`JSZip` being undefined (CDN not loaded)
+- Shows user-visible error in the popup instead of silent crash
+
+**A11Y-01: BoardCard role fix:**
+- `role="article"` → `role="region"` on canvas card tiles (article requires heading descendant per ARIA spec)
+- NA-90 assertion updated to expect `role="region"`
+
+**QA-02: Contest tie wording:**
+- `cv4FrontContest` back panel now shows: "Neither side marks a victory. GM introduces a new situation aspect (FCon p.33)."
+- Matches NA-04 assertion and FCon SRD p.33
+
+**Housekeeping:**
+- `core/ui-run.js.bak` deleted
+- Stale `ui-run.js` row removed from BOOTSTRAP.md key files table
+- WS-11 parked to 2026.06.22 in ROADMAP
+
+113/113 · 59/59 · 128/128
+
+---
+---
+
+## 2026.03.332 — useGeneratorSession + useBoardSync + toMarkdown helpers
+
+**useGeneratorSession extracted from CampaignApp (ui.js):**
+- 17 useState + 7 useRef moved out: result, rolling, history, activeGen, partySize, consequenceSev, cardView, inspireMode/Results/Chosen, pinnedCards, pinBouncing, sessionPack, packRolling, resultAnim, showStreakBadge, confPcs, rollCountRef, isMountedRef, prefsRef, pinnedCardsRef, _lastSeed, seedResultDone, usedGensRef
+- 8 functions moved out: doGenerate, doInspire, pickInspireResult, selectGen, pinResult, unpinCard, restoreCard, groupForGen
+- 3 useEffects moved out: session IDB load, session IDB save (on result change), pinnedCards IDB load
+- CampaignApp: 63→28 state/ref vars, 59→23 functions, 3112→~1500 lines
+- Duplicate session load/save effects removed from CampaignApp body
+
+**useBoardSync extracted from BoardApp (ui-board.js):**
+- 5 state vars: syncObj, syncStatus, roomCode, showJoin, joinInput
+- 2 functions: connectAsHost, disconnectSync
+- BoardApp: 38→26 state/ref vars
+
+**toMarkdown helpers applied (engine.js):**
+- MD_FOOTER constant replaces 20 identical footer literals
+- mdBoxes() replaces 5 inline boxes() calls
+- mdSkills() applied to npc_minor + npc_major cases
+- mdStunt() applied to npc_minor (single stunt) + npc_major (stunt map)
+- Shared helpers defined once: MD_FOOTER, mdHeader, mdBoxes, mdSkills, mdStunt, mdAspectList, mdWinLose
+
+**NA-20 assertion updated:** searches useGeneratorSession hook body + CampaignApp; internal-only setters removed from required list.
+
+113/113 · 59/59
+
+---
+---
+
+## 2026.03.331 — Codebase review continued: hooks + engine refactor
+
+**useChromeHooks extracted from CampaignApp:**
+- `toast`, `updateAvailable`, `showSafariWarn`, `showIosInstall`, `showPwaNudge`, `isOnline` all moved out of `CampaignApp`
+- PWA install nudge effect, SW update listener, Safari/iOS detection effect, online/offline listeners — all in the hook
+- `dismissPwaNudge()` and `installPwa()` defined once in hook; inline install logic in render replaced with `installPwa()`
+- `CampaignApp` calls `useChromeHooks(campId)` and destructures 12 vars from one call — 6 `useState` + 3 `useEffect` + 2 functions removed from component body
+- `setToast` + `setUpdateAvailable` exposed from hook to satisfy NA-20
+
+**useBoardPlayState extracted from BoardApp:**
+- `players`, `round`, `order`, `selPlayer`, `roundFlash` — 5 `useState` removed from BoardApp
+- `newRound`, `prevRound`, `toggleActed`, `updPlayer`, `addPlayer`, `removePlayer`, `persistPlayState` — 7 functions removed from BoardApp body
+- 2 duplicate IDB load effects removed (one inline in canvas load, one standalone)
+- `BoardApp` calls `useBoardPlayState(campId, mode, loaded)` and destructures 14 vars
+
+**toMarkdown refactored (engine.js):**
+- 6 shared helpers extracted: `MD_FOOTER`, `mdHeader`, `mdBoxes`, `mdSkills`, `mdStunt`, `mdAspectList`, `mdWinLose`
+- 20 duplicate footer literal strings → `MD_FOOTER` constant
+- 5 `boxes()` calls → `mdBoxes()`
+- Inline skill rendering in `npc_minor` + `npc_major` → `mdSkills()`
+- 59/59 unit tests pass
+
+113/113 · 59/59
+
+---
+---
+
+## 2026.03.330 — Codebase review: architecture refactor
+
+**Codebase review pass targeting 9/10 maintainability. 8 items addressed:**
+
+- **ui-run.js stripped** — 1705 lines → 9-line tombstone. `run.html` is a JS redirect; `RunApp`/`RunCanvas`/`createSync` were never loaded post-v306. Dead code confirmed by grep.
+- **ExportMenu hover** — removed `onMouseEnter`/`onMouseLeave` inline `style.background` mutations. `.export-menu-item` CSS class with `:hover` + `:focus-visible` — keyboard-navigable.
+- **aria-label audit** — floater close, sidebar KB shortcuts, history panel close, vault export/delete, print button, dice roll/reset buttons all patched. Icon-only buttons now fully screen-reader accessible.
+- **`setUsedGens` write-only state → `useRef`** — `useState({})` where the read value was never consumed caused silent re-renders on every roll. Now mutates `usedGensRef.current` directly.
+- **`useState` hoisted** — 11 state declarations scattered mid-`CampaignApp` (after effects and functions) moved to the top state block: `toast`, `updateAvailable`, `showSafariWarn`, `showIosInstall`, `pinBouncing`, `activeGroup`, `showHistory`, `prepView`, `tableRoomCode`, `tableIsRemote`, `tablePresence`.
+- **Sync prop drilling eliminated** — 9 props drilled `CampaignApp → PrepCanvas` collapsed into single `tableSyncCtx` object. `PrepCanvas` reads `var _sc = props.tableSyncCtx || {}`.
+- **`cardView` shadowing fixed** — `SessionPackCard`'s `cardView` renamed `spCardView` — no more same-name state in parent (`CampaignApp`) and child scopes.
+- **`createSync` consolidation** — `createTableSync` in `ui.js` documented as the sole sync factory. `createSync` in `ui-run.js` was a less-capable duplicate (no `broadcastLastState`, no cursor presence, no 300ms re-broadcast fix).
+- **QA: NA-81–84 updated** — assertions now test `createTableSync` in `ui.js` instead of the removed `ui-run.js`.
+
+113/113 · 59/59
+
+---
 ---
 
 ## 2026.03.319–326 — v4 cards, WCAG audit, CI fix

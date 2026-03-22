@@ -2,7 +2,7 @@
 
 > Technical deep-dive for contributors. Covers the execution model, data flow, React patterns, IndexedDB persistence, the service worker, Cloudflare Pages deployment, and the Table canvas multiplayer system. Read this before touching `core/*.js`.
 >
-> **Last updated:** 2026.03.326
+> **Last updated:** 2026.03.330
 
 ---
 
@@ -131,7 +131,7 @@ Ogma has three distinct session surfaces, each a separate HTML page:
 |---------|------|---------------|---------|
 | **Generator** | `campaigns/[world].html` | `CampaignApp` (ui.js) | Roll generators, pin results, FP tracker, table settings |
 | **Board** | `campaigns/board.html` | `BoardApp` (ui-board.js) | Unified prep/play canvas. Prep mode: generate + arrange cards. Play mode: player roster, stress/FP, round tracker, turn order. |
-| **Run** | `campaigns/run.html` | Redirect | Now redirects to `board.html?mode=play`. `ui-run.js` retained for sync module (`createSync`). |
+| **Run** | `campaigns/run.html` | Redirect | JS redirect to `board.html?mode=play`. `ui-run.js` stripped v330 — tombstone only. |
 
 The Board and Run surfaces share sync infrastructure (`createTableSync` in ui.js) and the `PrepCanvas` component (`ui-table.js`).
 
@@ -174,6 +174,50 @@ Auto-rebroadcast:
   On 'presence' message (player joins) → GM re-broadcasts _lastState after 300ms delay
   (300ms allows player WS 'open' event to fire and state to settle before receiving)
 ```
+
+---
+
+## Custom hooks
+
+Four plain functions defined above their parent component, each owning a distinct concern. No React Context API — each returns a plain object that the parent destructures.
+
+| Hook | File | Owns |
+|------|------|------|
+| `useChromeHooks(campId)` | `ui.js` | Toast, PWA nudge, Safari/iOS warn, SW update, online/offline |
+| `useGeneratorSession(campId, campMeta, t, universalMerge, prefs, showToast)` | `ui.js` | result, rolling, history, activeGen, pinned cards, inspire, confetti, doGenerate, selectGen, pinResult |
+| `useBoardPlayState(campId, mode, loaded)` | `ui-board.js` | players, round, order, selPlayer, roundFlash, newRound, toggleActed, persistPlayState |
+| `useBoardSync(showToast)` | `ui-board.js` | syncObj, syncStatus, roomCode, showJoin, connectAsHost, disconnectSync |
+
+**Pattern:**
+```js
+// In parent component:
+var _gs = useGeneratorSession(campId, camp, t, universalMerge, prefs, showToast);
+var result = _gs.result; var doGenerate = _gs.doGenerate; // etc.
+```
+
+---
+
+## Sync architecture (createTableSync)
+
+`createTableSync(roomCode, role, onStateUpdate, onRoll, onToast, onPresence)` in `core/ui.js` is the sole sync factory (v330+). It replaced `createSync` in the removed `ui-run.js`.
+
+**tableSyncCtx object** — `CampaignApp` passes sync infrastructure to `PrepCanvas` as a single context object (v330 refactor, replaces 9 drilled props):
+
+```js
+tableSyncCtx: {
+  sync,       // PartySocket wrapper
+  roomCode,   // current room code
+  isRemote,   // player is viewing a remote GM session
+  presence,   // connected player list
+  onCursor,   // PrepCanvas registers cursor handler
+  onState,    // PrepCanvas registers state applier
+  host,       // hostTable()
+  join,       // joinTable()
+  disconnect, // disconnectTable()
+}
+```
+
+`PrepCanvas` reads `var _sc = props.tableSyncCtx || {}` — all 9 vars destructured from one prop.
 
 ---
 

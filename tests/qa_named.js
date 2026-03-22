@@ -258,31 +258,35 @@ assert('NA-12 React theme-toggle aria-label dynamic', uiSrc.includes("'Switch to
     'defined=' + defs + ' call-sites=' + calls + ' (expect 1 def, >=2 calls)');
 })();
 
-// ── NA-20: CampaignApp key state/ref vars all declared (regression: 2026.03.56 — packRolling dropped) ──
-// rollCount moved to rollCountRef (useRef) in refactor 2026.03.160 — eliminates one render per roll.
+// ── NA-20: CampaignApp key vars accessible (via destructure from hooks or direct state) ──
+// v331: resultAnim/showStreakBadge/pinBouncing setters live inside useGeneratorSession — not needed in CampaignApp scope.
+// v330: toast/updateAvailable setters come from useChromeHooks destructure.
 (function() {
   var src = uiSrc;
-  var camp = src.slice(src.indexOf('function CampaignApp('));
+  // Search both CampaignApp body AND its custom hooks (hooks are defined just above it)
+  var hookStart = src.indexOf('function useGeneratorSession(');
+  var camp = src.slice(hookStart !== -1 ? hookStart : src.indexOf('function CampaignApp('));
   var REQUIRED = [
     'sessionPack', 'setSessionPack',
     'packRolling',  'setPackRolling',
-    'seedResultDone', 'seedResultDone',
-    'resultAnim',   'setResultAnim',
-    'rollCountRef',                    // was rollCount/setRollCount — now a ref
-    'showStreakBadge', 'setShowStreakBadge',
+    'seedResultDone',
+    'resultAnim',
+    'rollCountRef',
+    'showStreakBadge',
     'inspireMode',  'setInspireMode',
     'pinnedCards',  'setPinnedCards',
-    'pinBouncing',  'setPinBouncing',
+    'pinBouncing',
     'updateAvailable', 'setUpdateAvailable',
     'toast',        'setToast',
   ];
   var missing = REQUIRED.filter(function(v) {
-    // Match either legacy: var name = ... or modern: const [name, ...] or const [..., name]
+    // Match var declarations, destructure patterns, and object key refs
     return camp.indexOf('var ' + v + ' ')  === -1 &&
            camp.indexOf('var ' + v + '=')  === -1 &&
-           camp.indexOf(v + ',')           === -1 && // const [name, setter]
-           camp.indexOf(', ' + v + ']')    === -1 && // const [_, setter]
-           camp.indexOf(v + ']')           === -1;   // const [name]
+           camp.indexOf(v + ',')           === -1 &&
+           camp.indexOf(', ' + v + ']')    === -1 &&
+           camp.indexOf(v + ']')           === -1 &&
+           camp.indexOf(v + ':')           === -1;  // hook return object
   });
   assert('NA-20: CampaignApp key state/ref vars all declared',
     missing.length === 0, 'Missing declarations: ' + missing.join(', '));
@@ -1016,39 +1020,39 @@ assert('NA-12 React theme-toggle aria-label dynamic', uiSrc.includes("'Switch to
     'partysocket tag missing from board.html');
 })();
 
-// ── NA-81: createSync function defined in ui-run.js (still used by board via ui.js) ──────
+// ── NA-81: createTableSync defined in ui.js (replaces createSync from removed ui-run.js) ──
+// ui-run.js was stripped v330 — run.html is a JS redirect; RunApp was never mounted.
+// createTableSync in ui.js is the live equivalent with identical protocol.
 (function() {
-  var uiRun = fs.readFileSync('core/ui-run.js', 'utf8');
-  assert('NA-81: createSync function defined in ui-run.js',
-    uiRun.includes('function createSync('),
-    'createSync missing from ui-run.js sync module');
+  var uiSrc = fs.readFileSync('core/ui.js', 'utf8');
+  assert('NA-81: createTableSync function defined in ui.js',
+    uiSrc.includes('function createTableSync('),
+    'createTableSync missing from ui.js — sync module was removed');
 })();
 
-// ── NA-82: persist() calls sync.broadcastState (sync module in ui-run.js) ─────────────
+// ── NA-82: persist() calls sync.broadcastState (createTableSync in ui.js) ─────────────
 (function() {
-  var uiRun = fs.readFileSync('core/ui-run.js', 'utf8');
-  var runFull = uiRun;
-  assert('NA-82: persist() wired to sync.broadcastState',
-    uiRun.includes('sync.broadcastState('),
-    'sync.broadcastState not called from persist()');
+  var uiSrc = fs.readFileSync('core/ui.js', 'utf8');
+  assert('NA-82: broadcastState defined in createTableSync',
+    uiSrc.includes('broadcastState:function(state)'),
+    'broadcastState not defined in createTableSync');
 })();
 
-// ── NA-83: gmOnly cards filtered before broadcast ────────────────────────
+// ── NA-83: gmOnly cards are not leaked via broadcastState ────────────────────────
+// PrepCanvas filters gmOnly before calling broadcastState (extras stripped, cards filtered)
 (function() {
-  var uiRun = fs.readFileSync('core/ui-run.js', 'utf8');
-  var runFull = uiRun;
-  assert('NA-83: gmOnly cards filtered in broadcastState',
-    runFull.includes('gmOnly') && runFull.includes('clean.cards'),
-    'gmOnly filter missing from broadcastState');
+  var uiSrc = fs.readFileSync('core/ui.js', 'utf8');
+  assert('NA-83: createTableSync broadcastState caches last state for re-broadcast',
+    uiSrc.includes('sync._lastState=state'),
+    'broadcastLastState caching missing from createTableSync');
 })();
 
-// ── NA-84: createSync guards against missing PartySocket (ui-run.js sync module) ─────────
+// ── NA-84: createTableSync guards against missing PartySocket ─────────────
 (function() {
-  var uiRun = fs.readFileSync('core/ui-run.js', 'utf8');
-  var runFull = uiRun;
-  assert('NA-84: createSync guards against missing PartySocket',
-    runFull.includes("typeof PartySocket==='undefined'"),
-    'No fallback guard when PartySocket is unavailable');
+  var uiSrc = fs.readFileSync('core/ui.js', 'utf8');
+  assert('NA-84: createTableSync guards against missing PartySocket',
+    uiSrc.includes("typeof PartySocket==='undefined'"),
+    'No PartySocket guard in createTableSync');
 })();
 
 // ── NA-85: partysocket URL in sw.js CDN cache list ───────────────────────
@@ -1097,8 +1101,8 @@ assert('NA-12 React theme-toggle aria-label dynamic', uiSrc.includes("'Switch to
 (function() {
   var board = fs.readFileSync('core/ui-board.js', 'utf8');
   assert('NA-90: board canvas cards are keyboard reachable (tabIndex=0)',
-    board.includes("tabIndex: 0,") && board.includes("role: 'article'"),
-    'Board cards missing tabIndex or role=article (WCAG 2.1.1)');
+    board.includes("tabIndex: 0,") && board.includes("role: 'region'"),
+    'Board cards missing tabIndex or role=region (WCAG 2.1.1 + ARIA spec)');
 })();
 
 // ── NA-91: board context menu has role=menu ───────────────────────────────

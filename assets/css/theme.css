@@ -2253,6 +2253,64 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 
 /* Help panel */
 .blp-help{padding:0}
+
+/* ── BL-05: Stunt browser panel ──────────────────────────────────────────── */
+.blp-stunts{padding:8px 0 0;display:flex;flex-direction:column;gap:0;height:100%;box-sizing:border-box}
+.bs-filters{padding:0 10px 8px;display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.bs-search{width:100%;padding:6px 10px;background:var(--inset);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none;transition:border .15s}
+.bs-search:focus{border-color:var(--accent)}
+.bs-search::placeholder{color:var(--text-muted)}
+.bs-selects{display:flex;gap:6px}
+.bs-select{flex:1;padding:5px 6px;background:var(--inset);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;font-family:inherit;cursor:pointer;outline:none}
+.bs-select:focus{border-color:var(--accent)}
+.bs-count{font-size:10px;color:var(--text-muted);letter-spacing:.04em;text-align:right;padding:0 2px}
+.bs-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:4px;padding:0 8px 8px}
+.bs-empty{padding:24px 16px;text-align:center;color:var(--text-muted);font-size:12px}
+.bs-card{background:var(--inset);border:1px solid var(--border);border-radius:8px;padding:8px 10px;cursor:pointer;transition:border-color .12s,background .12s;user-select:none;-webkit-tap-highlight-color:transparent}
+.bs-card:hover,.bs-card:focus-visible{border-color:var(--accent);outline:none;background:var(--hover)}
+.bs-card.bs-copied{border-color:var(--c-green,#34d399);background:color-mix(in srgb,var(--c-green,#34d399) 8%,var(--inset))}
+.bs-card-header{display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:2px}
+.bs-name{font-size:12px;font-weight:700;color:var(--text);line-height:1.2;font-family:"Courier New",monospace}
+.bs-type{font-size:10px;font-weight:800;letter-spacing:.1em;padding:1px 5px;border-radius:3px;border:1px solid;font-family:"Courier New",monospace;flex-shrink:0}
+.bs-skill{font-size:10px;font-weight:600;margin-bottom:4px;letter-spacing:.04em;text-transform:uppercase}
+.bs-desc{margin:0 0 5px;font-size:11px;color:var(--text-dim);line-height:1.4}
+.bs-footer{display:flex;flex-wrap:wrap;gap:3px;align-items:center}
+.bs-tag{font-size:10px;padding:1px 5px;border-radius:3px;background:rgba(255,255,255,.06);color:var(--text-muted);font-family:"Courier New",monospace;letter-spacing:.05em}
+.bs-copy-hint{margin-left:auto;font-size:10px;color:var(--text-muted);font-family:"Courier New",monospace}
+.bs-card.bs-copied .bs-copy-hint{color:var(--c-green,#34d399)}
+
+
+/* ── MOB-15: Board mobile list view ─────────────────────────────────────── */
+/* Toggle button — hidden on desktop, shown on mobile */
+.bt-mob-view-toggle{display:none}
+@media(max-width:640px){
+  .bt-mob-view-toggle{display:flex}
+}
+/* When list mode active — hide canvas, show list */
+.bcol-list-mode .board-canvas-wrap{display:none}
+/* List container */
+.bml-list{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px}
+.bml-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center;color:var(--text-muted)}
+.bml-card{background:var(--inset);border:1px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;display:flex;flex-direction:column;gap:3px;position:relative;transition:border-color .12s;-webkit-tap-highlight-color:transparent;min-height:44px}
+.bml-card:hover,.bml-card:focus-visible{border-color:var(--accent);outline:none;background:var(--hover)}
+.bml-card-type{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-family:"Courier New",monospace}
+.bml-card-title{font-size:13px;font-weight:700;color:var(--text);line-height:1.3;padding-right:28px;font-family:"Courier New",monospace}
+.bml-remove{position:absolute;top:10px;right:10px;width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:var(--text-muted);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:background .1s}
+.bml-remove:hover{background:var(--hover);color:var(--text)}
+.bml-section{font-size:11px;color:var(--text-muted);padding:4px 4px 0;font-weight:600;letter-spacing:.05em}
+
+/* ── TBL-01: Player waiting banner ──────────────────────────────────────── */
+.board-waiting-banner{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--panel-raised);border:1px solid var(--border);border-radius:14px;padding:24px 28px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.3);z-index:50;max-width:320px;width:calc(100% - 48px);box-sizing:border-box}
+.board-waiting-sent{border-color:var(--accent)}
+.bwb-icon{font-size:32px;margin-bottom:10px}
+.bwb-title{font-size:16px;font-weight:800;color:var(--text);font-family:"Courier New",monospace;margin-bottom:6px}
+.bwb-sub{font-size:12px;color:var(--text-muted);line-height:1.5;margin-bottom:14px}
+.bwb-row{display:flex;gap:8px;align-items:center}
+.bwb-input{flex:1;padding:9px 12px;background:var(--inset);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;font-family:inherit;outline:none;min-width:0;transition:border .15s}
+.bwb-input:focus{border-color:var(--accent)}
+.bwb-btn{padding:9px 18px;background:var(--accent);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0;transition:opacity .15s}
+.bwb-btn:disabled{opacity:.4;cursor:default}
+.bwb-btn:not(:disabled):hover{opacity:.85}
 .bh-section{border-bottom:1px solid var(--border)}
 .bh-head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;cursor:pointer;font-size:11px;font-weight:700;color:var(--text);letter-spacing:.04em;text-transform:uppercase;border:none;background:transparent;width:100%;text-align:left;font-family:inherit}
 .bh-head:hover{background:var(--hover)}
@@ -2498,6 +2556,9 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .board-floater-close:hover{color:var(--text)}
 /* BRD-05: Host/join — active icon in topbar */
 .bt-icon-btn.active{color:var(--accent);background:rgba(232,121,58,.12)}
+.export-menu-item{display:flex;align-items:center;gap:10px;width:100%;padding:8px 14px;background:transparent;border:none;cursor:pointer;text-align:left;font-family:inherit;color:var(--text);transition:background .1s}
+.export-menu-item:hover,.export-menu-item:focus-visible{background:var(--inset);outline:none}
+.export-menu-item:focus-visible{outline:2px solid var(--focus-ring);outline-offset:-2px}
 /* Mobile: floaters stack to bottom full-width */
 @media(max-width:640px){
   .board-floater{left:8px;right:8px;bottom:0;border-radius:12px 12px 0 0;min-width:0}

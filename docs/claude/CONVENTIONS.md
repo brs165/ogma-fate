@@ -409,7 +409,9 @@ Output: specific ROADMAP.md changes with tier placement and rationale.
 ```
 For this session, lead as the Senior JS Developer building interactive result renderers.
 
-CURRENT UI ARCHITECTURE (2026.03.326):
+CURRENT UI ARCHITECTURE (2026.03.332):
+- CampaignApp: 28 state vars, ~1500 lines. Generator/chrome/sync concerns extracted to hooks.
+- Custom hooks (call inside component, destructure result): useChromeHooks(campId), useGeneratorSession(...), useBoardPlayState(...), useBoardSync(showToast)
 - action-bar replaces roll-hero + panel-toolbar: div.action-bar with btn-roll, inspire, ctx pills, secondary icons
 - KBShortcutsModal: separate component, opened by ? key and sidebar button
 - Card system: `renderCard()` → `Cv4Card` (600×380, v4, flip-on-footer, world-adaptive colours)

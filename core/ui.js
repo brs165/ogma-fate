@@ -165,6 +165,7 @@ function Floater(props) {
         }, mini ? '▢' : '─'),
         h('button', {
           className: 'floater-btn floater-btn-close',
+          'aria-label': 'Close',
           onClick: function(e) { e.stopPropagation(); onClose(); },
           title: 'Close',
           'aria-label': 'Close ' + title,
@@ -937,22 +938,22 @@ function SessionPackCard(props) {
   var campId = props.campId;
   var gen   = (GENERATORS || []).find(function(g) { return g.id === genId; }) || {};
   var hc    = HELP_CONTENT[genId] || {};
-  var _cv = useState(false); var cardView = _cv[0]; var setCardView = _cv[1];
+  var _cv = useState(false); var spCardView = _cv[0]; var setSpCardView = _cv[1];
   return h('div', {className: 'sp-card'},
     h('div', {className: 'sp-card-header'},
       h('span', {className: 'sp-card-icon'}, gen.icon || ''),
       h('span', {className: 'sp-card-label'}, hc.title || gen.label || genId),
       h('button', {
-        className: 'card-view-btn' + (cardView ? ' active' : ''),
-        onClick: function() { setCardView(function(v) { return !v; }); },
-        title: cardView ? 'Switch to dossier view' : 'Switch to card view',
-        'aria-label': cardView ? 'Switch to dossier view' : 'Switch to card view',
-        'aria-pressed': String(cardView),
+        className: 'card-view-btn' + (spCardView ? ' active' : ''),
+        onClick: function() { setSpCardView(function(v) { return !v; }); },
+        title: spCardView ? 'Switch to dossier view' : 'Switch to card view',
+        'aria-label': spCardView ? 'Switch to dossier view' : 'Switch to card view',
+        'aria-pressed': String(spCardView),
         style: {marginLeft: 'auto', fontSize: 11, padding: '2px 8px'},
-      }, cardView ? '⊟ Dossier' : '♥ Card')
+      }, spCardView ? '⊟ Dossier' : '♥ Card')
     ),
     h('div', {className: 'sp-card-body'},
-      cardView
+      spCardView
         ? renderCard(genId, data, campId || '', function(){}, [], null)
         : renderResult(genId, data, null, [])
     )
@@ -1020,6 +1021,8 @@ function generateTableRoomCode(){
   return code;
 }
 
+// createTableSync — sole sync factory (v330: createSync in ui-run.js removed — this is the live implementation)
+// Superset of old createSync: adds broadcastLastState, sendCursor, cursor presence, 300ms re-broadcast fix.
 function createTableSync(roomCode,role,onStateUpdate,onRoll,onToast,onPresence){
   var host=TABLE_SYNC_HOST||OGMA_DEFAULT_SYNC_HOST;
   if(typeof PartySocket==='undefined'){console.warn('PartySocket not loaded');return null;}
@@ -1262,6 +1265,440 @@ function ResultHelpPanel(props) {
 
 
 
+// ── ExportMenu — unified export/import dropdown (EXP-06) ──────────────────
+// Props: cards[], campName, onImport
+// Shows: Image Pack (PNG zip), Print (HTML), JSON export, Import
+function ExportMenu(props) {
+  var cards    = props.cards || [];
+  var campName = props.campName || '';
+  var onImport = props.onImport || function(){};
+  var hasCards = cards.length > 0;
+
+  var _open = useState(false); var open = _open[0]; var setOpen = _open[1];
+  var menuRef = useRef(null);
+
+  // Close on outside click
+  useEffect(function() {
+    if (!open) return;
+    function handler(e) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener('mousedown', handler);
+    return function() { document.removeEventListener('mousedown', handler); };
+  }, [open]);
+
+  function doImagePack() {
+    setOpen(false);
+    if (!hasCards) return;
+    if (typeof DB === 'undefined' || !DB.exportCardsAsPng) { return; }
+    DB.exportCardsAsPng(cards, campName);
+  }
+
+  function doPrint() {
+    setOpen(false);
+    if (!hasCards) return;
+    if (typeof DB === 'undefined' || !DB.printCards) { return; }
+    DB.printCards(cards, campName);
+  }
+
+  function doJson() {
+    setOpen(false);
+    if (!hasCards) return;
+    if (typeof DB === 'undefined' || !DB.exportCards) { return; }
+    DB.exportCards(null, campName, cards);
+  }
+
+  function doImport() {
+    setOpen(false);
+    onImport();
+  }
+
+  var menuItems = [
+    hasCards && {
+      icon: '\uD83D\uDDBC\uFE0F',
+      label: 'Image Pack',
+      sub: 'PNG zip for Miro / Figma',
+      action: doImagePack,
+      key: 'img',
+    },
+    hasCards && {
+      icon: '\uD83D\uDDA8',
+      label: 'Print',
+      sub: 'Printable HTML',
+      action: doPrint,
+      key: 'print',
+    },
+    hasCards && {
+      icon: '\u2193',
+      label: 'Export JSON',
+      sub: cards.length + ' card' + (cards.length === 1 ? '' : 's'),
+      action: doJson,
+      key: 'json',
+    },
+    {
+      icon: '\u2191',
+      label: 'Import JSON',
+      sub: 'Restore from file',
+      action: doImport,
+      key: 'import',
+    },
+  ].filter(Boolean);
+
+  return h('div', {
+    ref: menuRef,
+    style: {position: 'relative', display: 'inline-flex'},
+  },
+    h('button', {
+      className: 'btn btn-ghost action-bar-icon' + (open ? ' active' : ''),
+      onClick: function() { setOpen(function(v) { return !v; }); },
+      title: 'Export / Import',
+      'aria-label': 'Export and import options',
+      'aria-expanded': String(open),
+      'aria-haspopup': 'menu',
+    }, h(FaFileArrowDownIcon, {size: 14})),
+    open && h('div', {
+      role: 'menu',
+      'aria-label': 'Export options',
+      style: {
+        position: 'absolute', bottom: 'calc(100% + 6px)', right: 0,
+        background: 'var(--panel-raised)', border: '1px solid var(--border)',
+        borderRadius: 10, padding: '6px 0', minWidth: 210,
+        boxShadow: '0 8px 32px rgba(0,0,0,.35), 0 0 0 1px rgba(0,0,0,.08)',
+        zIndex: 300,
+        animation: 'fadeUp .14s ease',
+      },
+    },
+      h('div', {
+        style: {padding: '4px 14px 7px', fontSize: 10, fontWeight: 700,
+          letterSpacing: '.12em', color: 'var(--text-muted)', textTransform: 'uppercase'},
+      }, 'Export / Import'),
+      menuItems.map(function(item) {
+        return h('button', {
+          key: item.key,
+          role: 'menuitem',
+          onClick: item.action,
+          className: 'export-menu-item',
+        },
+          h('span', {style: {fontSize: 16, width: 22, textAlign: 'center', flexShrink: 0}}, item.icon),
+          h('div', {style: {flex: 1, minWidth: 0}},
+            h('div', {style: {fontSize: 13, fontWeight: 600, lineHeight: 1.2}}, item.label),
+            h('div', {style: {fontSize: 11, color: 'var(--text-muted)', marginTop: 1}}, item.sub)
+          )
+        );
+      })
+    )
+  );
+}
+
+// ── useChromeHooks — UI chrome state: toast, PWA, Safari, SW update, online ──
+// Extracted from CampaignApp to reduce its state footprint.
+// Called once inside CampaignApp; all returned values destructured into local vars.
+function useChromeHooks(campId) {
+  var _toast       = useState(null);          var toast = _toast[0]; var setToast = _toast[1];
+  var _update      = useState(false);         var updateAvailable = _update[0]; var setUpdateAvailable = _update[1];
+  var _safari      = useState(false);         var showSafariWarn = _safari[0]; var setShowSafariWarn = _safari[1];
+  var _ios         = useState(false);         var showIosInstall = _ios[0]; var setShowIosInstall = _ios[1];
+  var _pwa         = useState(false);         var showPwaNudge = _pwa[0]; var setShowPwaNudge = _pwa[1];
+  var _online      = useState(typeof navigator !== 'undefined' ? navigator.onLine !== false : true);
+  var isOnline = _online[0]; var setIsOnline = _online[1];
+  var toastTimer          = useRef(null);
+  var deferredInstallPrompt = useRef(null);
+
+  function showToast(msg) {
+    setToast(msg);
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(function() { setToast(null); }, TIMING.TOAST_MS);
+  }
+
+  function dismissPwaNudge() {
+    setShowPwaNudge(false);
+    try { LS.set('pwa_nudge_dismissed', true); } catch(e) {}
+  }
+
+  function installPwa() {
+    if (!deferredInstallPrompt.current) return;
+    deferredInstallPrompt.current.prompt();
+    deferredInstallPrompt.current.userChoice.then(function() {
+      deferredInstallPrompt.current = null;
+      setShowPwaNudge(false);
+    });
+  }
+
+  // PWA install nudge
+  useEffect(function() {
+    var dismissed = false;
+    try { dismissed = LS.get('pwa_nudge_dismissed'); } catch(e) {}
+    if (dismissed) return;
+    var visits = 0;
+    try { visits = (LS.get('visit_count_' + campId) || 0) + 1; LS.set('visit_count_' + campId, visits); } catch(e) {}
+    function onBeforeInstall(e) {
+      e.preventDefault();
+      deferredInstallPrompt.current = e;
+      if (visits >= 2) setShowPwaNudge(true);
+    }
+    window.addEventListener('beforeinstallprompt', onBeforeInstall);
+    return function() { window.removeEventListener('beforeinstallprompt', onBeforeInstall); };
+  }, [campId]);
+
+  // SW update detection
+  useEffect(function() {
+    window.__showUpdateToast = function() { setUpdateAvailable(true); };
+    return function() { delete window.__showUpdateToast; };
+  }, []);
+
+  // Safari/iOS detection (run once — UA never changes)
+  useEffect(function() {
+    var ua = navigator.userAgent || '';
+    var isIOS = /iphone|ipad|ipod/i.test(ua);
+    var isSafari = /^((?!chrome|android|crios|fxios).)*safari/i.test(ua);
+    var isStandalone = ('standalone' in navigator) && navigator.standalone;
+    if ((isIOS || isSafari) && !isStandalone) {
+      var warnDismissed = false;
+      try { warnDismissed = LS.get('safari_warn_dismissed'); } catch(e) {}
+      if (!warnDismissed) setShowSafariWarn(true);
+    }
+    if (isIOS && isSafari && !isStandalone) {
+      var iosDismissed = false;
+      try { iosDismissed = LS.get('ios_install_dismissed'); } catch(e) {}
+      if (!iosDismissed) setShowIosInstall(true);
+    }
+  }, []);
+
+  // Online/offline
+  useEffect(function() {
+    function onOnline()  { setIsOnline(true);  }
+    function onOffline() { setIsOnline(false); }
+    window.addEventListener('online',  onOnline);
+    window.addEventListener('offline', onOffline);
+    return function() {
+      window.removeEventListener('online',  onOnline);
+      window.removeEventListener('offline', onOffline);
+    };
+  }, []);
+
+  return {
+    toast: toast, setToast: setToast, showToast: showToast,
+    updateAvailable: updateAvailable,
+    showSafariWarn: showSafariWarn, setShowSafariWarn: setShowSafariWarn,
+    showIosInstall: showIosInstall, setShowIosInstall: setShowIosInstall,
+    showPwaNudge: showPwaNudge, dismissPwaNudge: dismissPwaNudge, installPwa: installPwa,
+    isOnline: isOnline,
+    deferredInstallPrompt: deferredInstallPrompt,
+  };
+}
+
+// ── useGeneratorSession ──────────────────────────────────────────────────────
+// Owns: result, history, rolling, activeGen, partySize, consequenceSev, cardView,
+//       inspireMode/Results/Chosen, pinnedCards, sessionPack, packRolling,
+//       resultAnim, showStreakBadge, confPcs, pinBouncing + all generator handlers.
+// Args: campId, campMeta, t (tables), universalMerge, prefs, showToast
+function useGeneratorSession(campId, campMeta, t, universalMerge, prefs, showToast) {
+  var _activeGen    = useState('npc_minor');         var activeGen    = _activeGen[0];    var setActiveGen    = _activeGen[1];
+  var _result       = useState(null);                var result       = _result[0];       var setResult       = _result[1];
+  var _rolling      = useState(false);               var rolling      = _rolling[0];      var setRolling      = _rolling[1];
+  var _history      = useState([]);                  var history      = _history[0];      var setHistory      = _history[1];
+  var _partySize    = useState(3);                   var partySize    = _partySize[0];    var setPartySize    = _partySize[1];
+  var _consequenceSev = useState('');                var consequenceSev = _consequenceSev[0]; var setConsequenceSev = _consequenceSev[1];
+  var _cardView     = useState(false);               var cardView     = _cardView[0];     var setCardView     = _cardView[1];
+  var _inspireMode  = useState(false);               var inspireMode  = _inspireMode[0];  var setInspireMode  = _inspireMode[1];
+  var _inspireRes   = useState([]);                  var inspireResults = _inspireRes[0]; var setInspireResults = _inspireRes[1];
+  var _inspireChosen = useState(null);               var inspireChosen = _inspireChosen[0]; var setInspireChosen = _inspireChosen[1];
+  var _pinnedCards  = useState([]);                  var pinnedCards  = _pinnedCards[0];  var setPinnedCards  = _pinnedCards[1];
+  var _pinBouncing  = useState(false);               var pinBouncing  = _pinBouncing[0];  var setPinBouncing  = _pinBouncing[1];
+  var _sessionPack  = useState(null);                var sessionPack  = _sessionPack[0];  var setSessionPack  = _sessionPack[1];
+  var _packRolling  = useState(false);               var packRolling  = _packRolling[0];  var setPackRolling  = _packRolling[1];
+  var _resultAnim   = useState(false);               var resultAnim   = _resultAnim[0];   var setResultAnim   = _resultAnim[1];
+  var _streakBadge  = useState(false);               var showStreakBadge = _streakBadge[0]; var setShowStreakBadge = _streakBadge[1];
+  var _confPcs      = useState([]);                  var confPcs      = _confPcs[0];      var setConfPcs      = _confPcs[1];
+
+  var rollCountRef     = useRef(0);
+  var isMountedRef     = useRef(true);
+  var prefsRef         = useRef(prefs);   prefsRef.current = prefs;
+  var pinnedCardsRef   = useRef(pinnedCards); pinnedCardsRef.current = pinnedCards;
+  var _lastSeed        = useRef(null);
+  var seedResultDone   = useRef(false);
+  var usedGensRef      = useRef({});
+
+  // Cleanup on unmount
+  useEffect(function() { return function() { isMountedRef.current = false; }; }, []);
+
+  // Load session from IDB
+  useEffect(function() {
+    DB.loadSession('fate_' + campId).then(function(saved) {
+      if (saved && saved.result)    setResult(saved.result);
+      if (saved && saved.history)   setHistory(saved.history);
+      if (saved && saved.activeGen) setActiveGen(saved.activeGen);
+    }).catch(function() {});
+    DB.loadSession('fate_tprefs_' + campId).then(function() {}).catch(function() {});
+  }, [campId]);
+
+  // Save session when result changes
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(function() {
+    if (result) {
+      DB.saveSession('fate_' + campId, {result: result, history: history, activeGen: activeGen}).catch(function(err) { console.warn('[Ogma] save:', err); });
+      DB.saveSession('fate_last_camp', {id: campId}).catch(function(err) { console.warn('[Ogma] save:', err); });
+    }
+  }, [result]);
+
+  // Load pinned cards on mount
+  useEffect(function() {
+    DB.loadCards(campId).then(function(cards) {
+      if (cards && cards.length) setPinnedCards(cards.sort(function(a,b){return b.ts-a.ts;}));
+    }).catch(function() {});
+  }, [campId]);
+
+  var gen = (typeof GENERATORS !== 'undefined' ? GENERATORS : []).find(function(g) { return g.id === activeGen; }) || {};
+
+  function groupForGen(genId) {
+    if (typeof GENERATOR_GROUPS === 'undefined') return '';
+    for (var i = 0; i < GENERATOR_GROUPS.length; i++) {
+      if (GENERATOR_GROUPS[i].gens.indexOf(genId) !== -1) return GENERATOR_GROUPS[i].id;
+    }
+    return GENERATOR_GROUPS[0].id;
+  }
+
+  var doGenerate = useCallback(function() {
+    if (navigator.vibrate) navigator.vibrate(40);
+    setRolling(true);
+    rollCountRef.current += 1;
+    if (rollCountRef.current % 5 === 0) {
+      setShowStreakBadge(true);
+      setTimeout(function() { setShowStreakBadge(false); }, 1200);
+    }
+    try {
+      var base = universalMerge ? mergeUniversal(t) : t;
+      var eff  = filteredTables(base, prefsRef.current);
+      var opts = {};
+      if (activeGen === 'consequence' && consequenceSev) opts.severity = consequenceSev;
+      var seed = Math.floor(Math.random() * 0xFFFFFF) + 1;
+      var data = generate(activeGen, eff, partySize, opts, seed);
+      _lastSeed.current = seed;
+      var newResult = {genId: activeGen, data: data, _seed: seed, _ts: Date.now()};
+      setTimeout(function() {
+        if (!isMountedRef.current) return;
+        setResult(newResult);
+        setResultAnim(true);
+        setTimeout(function() { if(isMountedRef.current) setResultAnim(false); }, 320);
+        setHistory(function(h) {
+          return [{genId: activeGen, data: data, gen: gen}].concat(h).slice(0, 8);
+        });
+        setRolling(false);
+        var cat = activeGen.replace(/_minor|_major/, '');
+        (function() {
+          var prev = usedGensRef.current;
+          if (prev[cat + '_celebrated']) return;
+          prev[cat] = true;
+          var uniq = Object.keys(prev).filter(function(k) { return k.indexOf('_celebrated') === -1; }).length;
+          if (uniq >= 6) {
+            var CONF = ['#F5A623','#4CD964','#5AC8FA','#BF5AF2','#FF3B30','#FFD60A','#32D7E8','#C8864A'];
+            var pieces = Array.from({length: 28}, function(_, i) {
+              return {id: i, color: CONF[i % CONF.length], dx: (Math.random()-0.5)*200, dy: -(Math.random()*140+60), dr: Math.random()*720-360, delay: Math.random()*0.18, size: Math.random()*8+5};
+            });
+            setConfPcs(pieces);
+            setTimeout(function() { setConfPcs([]); }, 1200);
+            prev[cat + '_celebrated'] = true;
+          }
+        })();
+      }, 220);
+    } catch(e) {
+      console.error('Generate failed:', e);
+      setRolling(false);
+    }
+  }, [activeGen, t, partySize, gen, universalMerge, consequenceSev]);
+
+  var doInspire = useCallback(function() {
+    if (rolling) return;
+    setRolling(true);
+    var base = universalMerge ? mergeUniversal(t) : t;
+    var eff  = filteredTables(base, prefsRef.current);
+    var opts = {};
+    if (activeGen === 'consequence' && consequenceSev) opts.severity = consequenceSev;
+    var three = [generate(activeGen, eff, partySize, opts), generate(activeGen, eff, partySize, opts), generate(activeGen, eff, partySize, opts)];
+    setTimeout(function() {
+      setInspireResults(three); setInspireMode(true); setResult(null); setRolling(false);
+    }, 220);
+  }, [activeGen, t, partySize, gen, universalMerge, consequenceSev]);
+
+  function pickInspireResult(data) {
+    var chosenIdx = inspireResults.indexOf(data);
+    setInspireChosen(chosenIdx);
+    setTimeout(function() {
+      setResult({genId: activeGen, data: data});
+      setInspireMode(false); setInspireResults([]); setInspireChosen(null);
+    }, 280);
+    setHistory(function(h) { return [{genId: activeGen, data: data, gen: gen}].concat(h).slice(0, 8); });
+  }
+
+  function selectGen(id) {
+    setActiveGen(id); setResult(null); setSessionPack(null);
+    setInspireMode(false); setInspireResults([]);
+    if (typeof GENERATOR_GROUPS !== 'undefined') {
+      // activeGroup is in CampaignApp scope — call setActiveGroup via returned setter
+    }
+    var shell = typeof getAppShell === 'function' ? getAppShell() : null;
+    if (shell) shell.removeAttribute('data-pressure');
+  }
+
+  function pinResult() {
+    if (!result) return;
+    setPinBouncing(true);
+    setTimeout(function() { setPinBouncing(false); }, 400);
+    var card = {
+      id: String(Date.now()), campId: campId, genId: result.genId,
+      label: typeof getResultLabel === 'function' ? getResultLabel(result) : result.genId,
+      data: result.data, ts: Date.now(), state: null, visible: true,
+    };
+    setPinnedCards(function(prev) { return [card].concat(prev); });
+    DB.saveCard(campId, card).catch(function(err) { console.warn('[Ogma] pin save failed:', err); });
+    showToast('\uD83D\uDCCB Saved to Table Prep');
+    if (navigator.vibrate) navigator.vibrate(30);
+  }
+
+  function unpinCard(cardId) {
+    setPinnedCards(function(prev) { return prev.filter(function(c) { return c.id !== cardId; }); });
+    DB.deleteCard(campId, cardId).catch(function(err) { console.warn('[Ogma] unpin delete failed:', err); });
+  }
+
+  function restoreCard(card) {
+    setResult({ genId: card.genId, data: card.data });
+    setActiveGen(card.genId);
+  }
+
+  return {
+    activeGen: activeGen, setActiveGen: setActiveGen,
+    result: result, setResult: setResult,
+    rolling: rolling,
+    history: history,
+    partySize: partySize, setPartySize: setPartySize,
+    consequenceSev: consequenceSev, setConsequenceSev: setConsequenceSev,
+    cardView: cardView, setCardView: setCardView,
+    inspireMode: inspireMode, setInspireMode: setInspireMode,
+    inspireResults: inspireResults, inspireChosen: inspireChosen,
+    pinnedCards: pinnedCards, setPinnedCards: setPinnedCards,
+    pinBouncing: pinBouncing,
+    sessionPack: sessionPack, setSessionPack: setSessionPack,
+    packRolling: packRolling, setPackRolling: setPackRolling,
+    resultAnim: resultAnim,
+    showStreakBadge: showStreakBadge,
+    confPcs: confPcs,
+    gen: gen,
+    doGenerate: doGenerate,
+    doInspire: doInspire,
+    pickInspireResult: pickInspireResult,
+    selectGen: selectGen,
+    pinResult: pinResult,
+    unpinCard: unpinCard,
+    restoreCard: restoreCard,
+    isMountedRef: isMountedRef,
+    prefsRef: prefsRef,
+    pinnedCardsRef: pinnedCardsRef,
+    _lastSeed: _lastSeed,
+    seedResultDone: seedResultDone,
+    rollCountRef: rollCountRef,
+  };
+}
+
 function CampaignApp(props) {
   var campId = props.campId;
   var camp = CAMPAIGNS[campId];
@@ -1278,15 +1715,39 @@ function CampaignApp(props) {
       return (s && g) ? {seed: parseInt(s, 36), gen: g} : null;
     } catch(e) { return null; }
   })[0]; // [0] = current value only; no setter needed (URL never changes)
-  const [activeGen, setActiveGen] = useState(_urlParams ? _urlParams.gen : 'npc_minor');
-  const [result, setResult] = useState(null);
-  const [, setUsedGens] = useState({}); // write-only state (drives confetti tracking)
-  const [confPcs, setConfPcs] = useState([]);
-  // Seed the initial result from URL params (BL-06)
-  var seedResultDone = useRef(false); // one-shot guard for URL seed pre-generation
-  const [partySize, setPartySize] = useState(3);
-  const [rolling, setRolling] = useState(false);
-  const [history, setHistory] = useState([]);
+  // Generator session state (result, history, rolling, pinned, inspire, etc.)
+  var _gs = useGeneratorSession(campId, camp, t, universalMerge, prefs, showToast);
+  var activeGen = _gs.activeGen; var setActiveGen = _gs.setActiveGen;
+  var result = _gs.result; var setResult = _gs.setResult;
+  var rolling = _gs.rolling;
+  var history = _gs.history;
+  var partySize = _gs.partySize; var setPartySize = _gs.setPartySize;
+  var gen = _gs.gen;
+  var doGenerate = _gs.doGenerate;
+  var doInspire = _gs.doInspire;
+  var pickInspireResult = _gs.pickInspireResult;
+  var selectGen = _gs.selectGen;
+  var pinResult = _gs.pinResult;
+  var unpinCard = _gs.unpinCard;
+  var restoreCard = _gs.restoreCard;
+  var pinnedCards = _gs.pinnedCards; var setPinnedCards = _gs.setPinnedCards;
+  var pinBouncing = _gs.pinBouncing;
+  var confPcs = _gs.confPcs;
+  var inspireMode = _gs.inspireMode; var setInspireMode = _gs.setInspireMode;
+  var inspireResults = _gs.inspireResults;
+  var inspireChosen = _gs.inspireChosen;
+  var cardView = _gs.cardView; var setCardView = _gs.setCardView;
+  var consequenceSev = _gs.consequenceSev; var setConsequenceSev = _gs.setConsequenceSev;
+  var resultAnim = _gs.resultAnim;
+  var showStreakBadge = _gs.showStreakBadge;
+  var sessionPack = _gs.sessionPack; var setSessionPack = _gs.setSessionPack;
+  var packRolling = _gs.packRolling; var setPackRolling = _gs.setPackRolling;
+  var isMountedRef = _gs.isMountedRef;
+  var prefsRef = _gs.prefsRef;
+  var pinnedCardsRef = _gs.pinnedCardsRef;
+  var _lastSeed = _gs._lastSeed;
+  var seedResultDone = _gs.seedResultDone;
+  var rollCountRef = _gs.rollCountRef;
   const [showKbShortcuts, setShowKbShortcuts] = useState(false);
   // WS-12: Quick Find bar
   const [showQuickFind, setShowQuickFind] = useState(false);
@@ -1318,12 +1779,6 @@ function CampaignApp(props) {
     try { LS.set('fp_state', next); } catch(e) {}
   }
   const [showSidebar, setShowSidebar] = useState(false);
-  const [inspireMode, setInspireMode] = useState(false);
-  const [inspireResults, setInspireResults] = useState([]);
-  var prefsRef = useRef(prefs); prefsRef.current = prefs;
-  const [pinnedCards, setPinnedCards] = useState([]);
-  var pinnedCardsRef = useRef(pinnedCards); pinnedCardsRef.current = pinnedCards;
-  var _lastSeed = useRef(null);
   // Universal merge toggle - default on, persisted globally in localStorage
   const [universalMerge, setUniversalMerge] = useState(function() { try { return LS.get('universal_merge') !== false; } catch(e) { return true; } });
   function toggleUniversalMerge() {
@@ -1332,131 +1787,37 @@ function CampaignApp(props) {
     try { LS.set('universal_merge', next); } catch(e) {}
   }
   // F4: Consequence severity selector - '' means random (default)
-  const [consequenceSev, setConsequenceSev] = useState('');
   // Card view toggle — MTG-style result card vs dossier
-  const [cardView, setCardView] = useState(false);
 
-  // PWA install nudge
-  var deferredInstallPrompt = useRef(null);
-  const [showPwaNudge, setShowPwaNudge] = useState(false);
-
-  // Load last session + table prefs on mount
-  useEffect(function() {
-    DB.loadSession('fate_' + campId).then(function(saved) {
-      if (saved && saved.result)    setResult(saved.result);
-      if (saved && saved.history)   setHistory(saved.history);
-      if (saved && saved.activeGen) setActiveGen(saved.activeGen);
-    }).catch(function() {});
-    DB.loadSession('fate_tprefs_' + campId).then(function(saved) {
-      if (saved) setPrefs(saved);
-    }).catch(function() {});
-  }, [campId]);
-
-  // Save session when result changes (includes history snapshot and activeGen)
-  // history/activeGen intentionally omitted from deps — we want a snapshot at result-change time
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(function() {
-    if (result) {
-      DB.saveSession('fate_' + campId, {result: result, history: history, activeGen: activeGen}).catch(function(err) { console.warn('[Ogma] save:', err); });
-      DB.saveSession('fate_last_camp', {id: campId}).catch(function(err) { console.warn('[Ogma] save:', err); });
-    }
-  }, [result]);
-
-  // Save table prefs when they change
-  useEffect(function() {
-    DB.saveSession('fate_tprefs_' + campId, prefs).catch(function(err) { console.warn('[Ogma] table prefs save failed:', err); });
-  }, [prefs, campId]);
-
-  // PWA install nudge - capture prompt, show after 2nd visit if not dismissed
-  useEffect(function() {
-    var dismissed = false;
-    try { dismissed = LS.get('pwa_nudge_dismissed'); } catch(e) {}
-    if (dismissed) return;
-    // Increment visit count
-    var visits = 0;
-    try { visits = (LS.get('visit_count_' + campId) || 0) + 1; LS.set('visit_count_' + campId, visits); } catch(e) {}
-    function onBeforeInstall(e) {
-      e.preventDefault();
-      deferredInstallPrompt.current = e;
-      if (visits >= 2) setShowPwaNudge(true);
-    }
-    window.addEventListener('beforeinstallprompt', onBeforeInstall);
-    return function() { window.removeEventListener('beforeinstallprompt', onBeforeInstall); };
-  }, [campId]);
+  // Chrome state (toast, PWA, Safari, SW, online) extracted to useChromeHooks
+  var _chrome = useChromeHooks(campId);
+  var toast = _chrome.toast; var setToast = _chrome.setToast; var showToast = _chrome.showToast;
+  var updateAvailable = _chrome.updateAvailable; var setUpdateAvailable = _chrome.setUpdateAvailable;
+  var showSafariWarn = _chrome.showSafariWarn; var setShowSafariWarn = _chrome.setShowSafariWarn;
+  var showIosInstall = _chrome.showIosInstall; var setShowIosInstall = _chrome.setShowIosInstall;
+  var showPwaNudge = _chrome.showPwaNudge;
+  var dismissPwaNudge = _chrome.dismissPwaNudge; var installPwa = _chrome.installPwa;
+  var isOnline = _chrome.isOnline;
+  var deferredInstallPrompt = _chrome.deferredInstallPrompt;
+  // Interaction state
+  // Navigation
+  const [activeGroup, setActiveGroup] = useState(function() { return groupForGen('npc_minor'); });
+  // History/Pinned drawer
+  const [showHistory, setShowHistory] = useState(false);
+  const [prepView, setPrepView] = useState(false);
+  // Table multiplayer sync
+  const tableSyncRef = React.useRef(null);
+  const [tableRoomCode, setTableRoomCode] = useState(function(){
+    try{var p=new URLSearchParams(window.location.search);return p.get('room')||null;}catch(e){return null;}
+  });
+  const [tableIsRemote, setTableIsRemote] = useState(false);
+  const [tablePresence, setTablePresence] = useState([]);
 
 
-  // Toast notification
-  const [toast, setToast] = useState(null);
-  const [updateAvailable, setUpdateAvailable] = useState(false);
-  const [showSafariWarn, setShowSafariWarn] = useState(false);
-  const [showIosInstall, setShowIosInstall] = useState(false);
-  var toastTimer = useRef(null);
-  function showToast(msg) {
-    setToast(msg);
-    if (toastTimer.current) clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(function() { setToast(null); }, TIMING.TOAST_MS);
-  }
-
-  // SW update toast — triggered by controllerchange listener in page HTML
-  useEffect(function() {
-    window.__showUpdateToast = function() {
-      setUpdateAvailable(true);
-    };
-    return function() { delete window.__showUpdateToast; };
-  }, []);
-
-  // WS-07: Safari 7-day storage warning + iOS A2HS install nudge
-  useEffect(function() {
-    var ua = navigator.userAgent || '';
-    var isIOS = /iphone|ipad|ipod/i.test(ua);
-    var isSafari = /^((?!chrome|android|crios|fxios).)*safari/i.test(ua);
-    var isStandalone = ('standalone' in navigator) && navigator.standalone;
-
-    // Safari 7-day storage: show once if not dismissed, and not already installed
-    if ((isIOS || isSafari) && !isStandalone) {
-      var warnDismissed = false;
-      try { warnDismissed = LS.get('safari_warn_dismissed'); } catch(e) {}
-      if (!warnDismissed) setShowSafariWarn(true);
-    }
-
-    // iOS A2HS nudge: only on iOS Safari, not already installed, not dismissed
-    if (isIOS && isSafari && !isStandalone) {
-      var iosDismissed = false;
-      try { iosDismissed = LS.get('ios_install_dismissed'); } catch(e) {}
-      if (!iosDismissed) setShowIosInstall(true);
-    }
-  }, []);
-
-  const [pinBouncing, setPinBouncing] = useState(false);
-
-  function pinResult() {
-    if (!result) return;
-    setPinBouncing(true);
-    setTimeout(function() { setPinBouncing(false); }, 400);
-    var card = {
-      id: String(Date.now()),
-      campId: campId, genId: result.genId,
-      label: getResultLabel(result),
-      data: result.data, ts: Date.now(),
-      state: null,    // Y-04: interactive state (stress, consequences)
-      visible: true,  // Y-02: GM show/hide — true = visible to players
-    };
-    setPinnedCards(function(prev) { return [card].concat(prev); });
-    DB.saveCard(campId, card).catch(function(err) { console.warn('[Ogma] pin save failed:', err); });
-    showToast('\uD83D\uDCCB Saved to Table Prep');
-    if (navigator.vibrate) navigator.vibrate(30);
-  }
 
 
-  function unpinCard(cardId) {
-    setPinnedCards(function(prev) { return prev.filter(function(c) { return c.id !== cardId; }); });
-    DB.deleteCard(campId, cardId).catch(function(err) { console.warn('[Ogma] unpin delete failed:', err); });
-  }
+  // (showToast, SW update, Safari/iOS, PWA effects now in useChromeHooks)
 
-  function restoreCard(card) {
-    setResult({ genId: card.genId, data: card.data });
-    setActiveGen(card.genId);
-  }
 
   function toggleTheme() {
     var next = theme === 'dark' ? 'light' : 'dark';
@@ -1476,19 +1837,9 @@ function CampaignApp(props) {
     }
     return GENERATOR_GROUPS[0].id;
   }
-  const [activeGroup, setActiveGroup] = useState(function() { return groupForGen('npc_minor'); });
   var currentGroup = GENERATOR_GROUPS.find(function(g) { return g.id === activeGroup; }) || GENERATOR_GROUPS[0];
   var groupGens = currentGroup.gens.map(function(gid) { return GENERATORS.find(function(g) { return g.id === gid; }); }).filter(Boolean);
-  // History/Pinned drawer
-  const [showHistory, setShowHistory] = useState(false);
-  const [prepView, setPrepView] = useState(false);
-  // Table multiplayer sync
-  const tableSyncRef = React.useRef(null);
-  const [tableRoomCode, setTableRoomCode] = useState(function(){
-    try{var p=new URLSearchParams(window.location.search);return p.get('room')||null;}catch(e){return null;}
-  });
-  const [tableIsRemote, setTableIsRemote] = useState(false);
-  const [tablePresence, setTablePresence] = useState([]);
+  // Table multiplayer sync refs
   var tableCursorCbRef = useRef(null);   // MP-22: holds PrepCanvas cursor handler
   var remoteStateCbRef = useRef(null);    // MP-07 fix: holds PrepCanvas state applier
 
@@ -1552,7 +1903,6 @@ function CampaignApp(props) {
   // Checklist state — per-session, cleared on generator change
   const [checklistState, setChecklistState] = useState([]);
   // Inspire chosen index — for ghost animation
-  const [inspireChosen, setInspireChosen] = useState(null);
 
   // ── URL seed pre-generation — BL-06 ──────────────────────────────────────
   useEffect(function() {
@@ -1571,9 +1921,6 @@ function CampaignApp(props) {
   // ── Intro modal — large popup over the page, dismissed on click or sequence end ─
 
 
-  // ── Online/offline detection
-  const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine !== false : true);
-
   // Help level display metadata
   var HL_META = {
     experienced: {icon: '🎭', label: 'Experienced'},
@@ -1591,13 +1938,6 @@ function CampaignApp(props) {
     document.documentElement.setAttribute('data-gm-mode', next ? 'on' : 'off');
   }
 
-  var rollCountRef = useRef(0);
-  var isMountedRef = useRef(true); // leak fix: prevent setState after unmount
-  useEffect(function() { return function() { isMountedRef.current = false; }; }, []); // useRef: count doesn't need to drive re-renders
-  const [resultAnim, setResultAnim] = useState(false);
-  const [showStreakBadge, setShowStreakBadge] = useState(false);
-  const [sessionPack, setSessionPack] = useState(null);
-  const [packRolling, setPackRolling] = useState(false);
 
   // Quick Adventure Start Pack — generates Adventure Seed + Scene Setup + Major NPC (first-session bundle)
   // Changed from Seed+Countdown+Compel per WS-14 real session feedback (Priya):
@@ -1686,110 +2026,6 @@ function CampaignApp(props) {
     try { window.history.replaceState({}, '', '?gen=' + encodeURIComponent(result.genId) + '&seed=' + seed); } catch(e) {}
   }
 
-  var doGenerate = useCallback(function() {
-    if (navigator.vibrate) navigator.vibrate(40);
-    setRolling(true);
-    // Streak counter
-    rollCountRef.current += 1;
-    if (rollCountRef.current % 5 === 0) {
-      setShowStreakBadge(true);
-      setTimeout(function() { setShowStreakBadge(false); }, 1200);
-    }
-    try {
-      // Generate immediately but hold the rolling state for animation
-      var base = universalMerge ? mergeUniversal(t) : t;
-      var eff  = filteredTables(base, prefsRef.current);
-      var opts = {};
-      if (activeGen === 'consequence' && consequenceSev) opts.severity = consequenceSev;
-      var seed = Math.floor(Math.random() * 0xFFFFFF) + 1;
-      var data = generate(activeGen, eff, partySize, opts, seed);
-      _lastSeed.current = seed;
-      var newResult = {genId: activeGen, data: data, _seed: seed, _ts: Date.now()};
-      setTimeout(function() {
-        if (!isMountedRef.current) return;
-        setResult(newResult);
-        setResultAnim(true);
-        setTimeout(function() { if(isMountedRef.current) setResultAnim(false); }, 320);
-        setHistory(function(h) {
-          return [{genId: activeGen, data: data, gen: gen}].concat(h).slice(0, 8);
-        });
-        setRolling(false);
-        // Session confetti — fire once when 6 unique generator types used
-        var cat = activeGen.replace(/_minor|_major/, '');
-        setUsedGens(function(prev) {
-          if (prev[cat + '_celebrated']) return prev;
-          var next = Object.assign({}, prev);
-          next[cat] = true;
-          var uniq = Object.keys(next).filter(function(k) { return k.indexOf('_celebrated') === -1; }).length;
-          if (uniq >= 6) {
-            var CONF = ['#F5A623','#4CD964','#5AC8FA','#BF5AF2','#FF3B30','#FFD60A','#32D7E8','#C8864A'];
-            var pieces = Array.from({length: 28}, function(_, i) {
-              return {id: i, color: CONF[i % CONF.length],
-                dx: (Math.random()-0.5)*200, dy: -(Math.random()*140+60),
-                dr: Math.random()*720-360, delay: Math.random()*0.18, size: Math.random()*8+5};
-            });
-            setConfPcs(pieces);
-            setTimeout(function() { setConfPcs([]); }, 1200);
-            next[cat + '_celebrated'] = true;
-          }
-          return next;
-        });
-      }, 220);
-    } catch(e) {
-      console.error('Generate failed:', e);
-      setRolling(false);
-    }
-  }, [activeGen, t, partySize, gen, universalMerge, consequenceSev]);
-
-              // Inspiration mode — pick one of three options
-  var doInspire = useCallback(function() {
-    if (rolling) return;
-    setRolling(true);
-    var base = universalMerge ? mergeUniversal(t) : t;
-    var eff  = filteredTables(base, prefsRef.current);
-    var opts = {};
-    if (activeGen === 'consequence' && consequenceSev) opts.severity = consequenceSev;
-    var three = [
-      generate(activeGen, eff, partySize, opts),
-      generate(activeGen, eff, partySize, opts),
-      generate(activeGen, eff, partySize, opts),
-    ];
-    setTimeout(function() {
-      setInspireResults(three);
-      setInspireMode(true);
-      setResult(null);
-      setRolling(false);
-    }, 220);
-  }, [activeGen, t, partySize, gen, universalMerge, consequenceSev]);
-
-  function pickInspireResult(data) {
-    // Find which index was chosen for ghost animation
-    var chosenIdx = inspireResults.indexOf(data);
-    setInspireChosen(chosenIdx);
-    setTimeout(function() {
-      setResult({genId: activeGen, data: data});
-      setInspireMode(false);
-      setInspireResults([]);
-      setInspireChosen(null);
-    }, 280);
-    setHistory(function(h) {
-      return [{genId: activeGen, data: data, gen: gen}].concat(h).slice(0, 8);
-    });
-  }
-
-  function selectGen(id) {
-    setActiveGen(id);
-    setResult(null);
-    setSessionPack(null);
-    setInspireMode(false);
-    setInspireResults([]);
-    setActiveGroup(groupForGen(id));
-    setChecklistState([]);
-    // data-pressure is managed by CountdownResult.markBox() and cleared here:
-    var shell = getAppShell();
-    if (shell) shell.removeAttribute('data-pressure');
-  }
-
   // Apply campaign data-attribute for CSS accent vars
   useEffect(function() {
     document.documentElement.setAttribute('data-campaign', campId);
@@ -1825,17 +2061,6 @@ function CampaignApp(props) {
     return function() { obs.disconnect(); };
   }, []);
 
-  // ── Online/offline listener ──────────────────────────────────────────────
-  useEffect(function() {
-    function goOnline()  { setIsOnline(true);  }
-    function goOffline() { setIsOnline(false); }
-    window.addEventListener('online',  goOnline);
-    window.addEventListener('offline', goOffline);
-    return function() {
-      window.removeEventListener('online',  goOnline);
-      window.removeEventListener('offline', goOffline);
-    };
-  }, []);
 
   // Keyboard shortcuts
   useEffect(function() {
@@ -2115,6 +2340,7 @@ function CampaignApp(props) {
           ),
           h('button', {
             className: 'sidebar-tool-btn',
+            'aria-label': 'Keyboard shortcuts',
             onClick: function() { setShowKbShortcuts(true); },
             title: 'Keyboard shortcuts',
           },
@@ -2199,15 +2425,17 @@ function CampaignApp(props) {
           // TC-21: open the FP+Milestone floater from Table toolbar
           onShowMilestones: function() { setActivePanel('fp'); },
           // Table sync props
-          tableSync: tableSyncRef.current,
-          tableRoomCode: tableRoomCode,
-          tableIsRemote: tableIsRemote,
-          tablePresence: tablePresence,
-          onRemoteCursor: function(handler){tableCursorCbRef.current=handler;}, // MP-22: PrepCanvas registers its cursor setter
-          onRemoteState: function(handler){remoteStateCbRef.current=handler;},    // MP-07 fix: PrepCanvas registers state applier
-          onHostTable: hostTable,
-          onJoinTable: joinTable,
-          onDisconnectTable: disconnectTable,
+          tableSyncCtx: {
+            sync:       tableSyncRef.current,
+            roomCode:   tableRoomCode,
+            isRemote:   tableIsRemote,
+            presence:   tablePresence,
+            onCursor:   function(handler){tableCursorCbRef.current=handler;},
+            onState:    function(handler){remoteStateCbRef.current=handler;},
+            host:       hostTable,
+            join:       joinTable,
+            disconnect: disconnectTable,
+          },
         }),
 
         // ── NORMAL GENERATE VIEW ───────────────────────────────────────────
@@ -2290,14 +2518,13 @@ function CampaignApp(props) {
               // SECONDARY (pushed right): Rules / Share / Pin
               h('div', {className: 'action-bar-secondary'},
 
-                
-                // EXP-03: Copy link — prominent, one-tap
+                // EXP-03: Copy link
                 result && h('button', {
                   className: 'btn btn-ghost action-bar-icon' + (linkCopied ? ' export-copied' : ''),
                   onClick: copyShareLinkWithFeedback,
                   title: linkCopied ? 'Link copied!' : 'Copy shareable link to this result',
                   'aria-label': linkCopied ? 'Link copied' : 'Copy shareable link',
-                }, linkCopied ? '✅' : '🔗'),
+                }, linkCopied ? '\u2705' : '\uD83D\uDD17'),
                 result && h('button', {
                   className: 'btn btn-ghost action-bar-icon' + (showExport ? ' active' : ''),
                   onClick: function() { setShowExport(!showExport); },
@@ -2327,38 +2554,21 @@ function CampaignApp(props) {
                     },
                   }, pinnedCards.length > 9 ? '9+' : String(pinnedCards.length))
                 ),
-                pinnedCards.length > 0 && 
-                // Card view toggle — dossier vs MTG-style card
+                pinnedCards.length > 0 &&
+                // Card view toggle
                 h('button', {
                   className: 'card-view-btn' + (cardView ? ' active' : ''),
                   onClick: function() { setCardView(function(v) { return !v; }); },
                   title: cardView ? 'Switch to dossier view' : 'Switch to card view',
                   'aria-label': cardView ? 'Switch to dossier view' : 'Switch to card view',
                   'aria-pressed': String(cardView),
-                }, cardView ? '⊟ Dossier' : '♥ Card'),
-                // EXP-02: Export / Import cards
-                pinnedCards.length > 0 && h('button', {
-                  className: 'btn btn-ghost action-bar-icon',
-                  onClick: exportCards,
-                  title: 'Export ' + pinnedCards.length + ' pinned card' + (pinnedCards.length === 1 ? '' : 's') + ' as JSON',
-                  'aria-label': 'Export pinned cards as JSON',
-                }, h(FaFileArrowDownIcon, {size: 14})),
-                h('button', {
-                  className: 'btn btn-ghost action-bar-icon',
-                  onClick: importCards,
-                  title: 'Import cards from Ogma JSON file',
-                  'aria-label': 'Import cards from file',
-                }, h(FaFileArrowUpIcon, {size: 14})),
-                // EXP-05: Print pinned cards
-                pinnedCards.length > 0 && h('button', {
-                  className: 'btn btn-ghost action-bar-icon',
-                  onClick: function() {
-                    if (typeof DB === 'undefined' || !DB.printCards) { showToast('Print unavailable'); return; }
-                    DB.printCards(pinnedCards, camp.meta.name);
-                  },
-                  title: 'Print ' + pinnedCards.length + ' pinned card' + (pinnedCards.length === 1 ? '' : 's'),
-                  'aria-label': 'Print pinned cards',
-                }, '\uD83D\uDDA8')
+                }, cardView ? '\u22df Dossier' : '\u2665 Card'),
+                // EXP-06+: Export menu — Image Pack / Print / JSON / Import
+                h(ExportMenu, {
+                  cards: pinnedCards,
+                  campName: camp.meta.name,
+                  onImport: importCards,
+                })
               )
             ),
 
@@ -2533,6 +2743,7 @@ function CampaignApp(props) {
         h('span', {style: {fontSize: 'var(--text-md)', fontWeight: 700, color: 'var(--text)'}}, '\uD83D\uDCCB Table Prep'),
         h('button', {
           className: 'btn btn-icon btn-ghost',
+          'aria-label': 'Close Table Prep panel',
           onClick: function() { setShowHistory(false); },
           'aria-label': 'Close history panel',
           style: {fontSize: 18, padding: '4px 8px'},
@@ -2950,16 +3161,7 @@ function CampaignApp(props) {
         'Install Ogma for offline use - works without internet'
       ),
       h('button', {
-        onClick: function() {
-          if (deferredInstallPrompt.current) {
-            deferredInstallPrompt.current.prompt();
-            deferredInstallPrompt.current.userChoice.then(function() {
-              deferredInstallPrompt.current = null;
-              setShowPwaNudge(false);
-              try { LS.set('pwa_nudge_dismissed', true); } catch(e) {}
-            });
-          }
-        },
+        onClick: installPwa,
         className: 'btn btn-ghost',
         style: {fontSize: 12, padding: '4px 10px', minHeight: 0, whiteSpace: 'nowrap'},
       }, 'Install'),

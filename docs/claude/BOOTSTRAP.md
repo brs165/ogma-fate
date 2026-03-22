@@ -41,12 +41,11 @@ Offline-first browser PWA for Fate Condensed GMs. 16 generators × 8 worlds. No 
 | `core/ui.js` | `CampaignApp` shell — main campaign page component |
 | `core/ui-renderers.js` | 16 result renderers + `renderCard()` → `cv4Card` (600×380, 5 categories, GM guidance back, interactive stress/countdown/contest/consequence, world colour via CSS vars) |
 | `core/ui-table.js` | `PrepCanvas` + all Table canvas components |
-| `core/ui-run.js` | Run session surface components |
 | `core/ui-modals.js` | Modal, ShareDrawer, Settings, Vault, QuickFind, KBShortcuts |
 | `core/ui-primitives.js` | React aliases (`h`), FD card primitives, `ErrorBoundary`, `scoreAspect()` |
 | `core/ui-landing.js` | Landing page components |
 | `core/ui-board.js` | `BoardApp` — unified Prep/Play canvas. Play mode: `BoardPlayerRow`, `BoardTurnBar`, `BoardPlayPanel`, player/round/FP/sync state |
-| `core/ui-run.js` | Sync module (`createSync`, `generateRoomCode`) + legacy `RunApp` (run.html is now a redirect) |
+| `core/ui-run.js` | **STRIPPED v330** — tombstone only. `createTableSync` in `ui.js` is the live sync factory. |
 | `core/db.js` | Dexie 4 IDB wrapper, memStore fallback, `navigator.storage.persist()`, `DB.printCards()` — must live in second IIFE (`window.DB` block). First IIFE is localStorage prefs only. |
 | `core/config.js` | `OGMA_CONFIG`: `REPO_BASE` (auto-detect), `DEFAULT_SYNC_HOST` |
 | `core/intro.js` | Campaign intro animation (DOM, not React) |
@@ -81,6 +80,11 @@ Offline-first browser PWA for Fate Condensed GMs. 16 generators × 8 worlds. No 
 | `printCards` belongs in `window.DB` (second IIFE in db.js) | First IIFE is localStorage prefs only. Anything that needs to be on `DB.X` must go in the second IIFE's `window.DB` object. (v325 lesson) |
 | CI: use `npm install` not `npm ci` when no lock file committed | `npm ci` requires `package-lock.json`. `cache: 'npm'` on `setup-node` also requires a lock file. Use `npm install` or commit the lock file. |
 | CI: QA job runs `tests/qa_named.js` not `devdocs/qa_named.js` | Path changed when tests/ dir was created. Always reference `tests/` not `devdocs/`. |
+| `tableSyncCtx` object replaces 9 drilled sync props | `CampaignApp → PrepCanvas`: pass one context object, destructure inside. Avoids 9-prop drilling. See ARCHITECTURE.md sync section. |
+| Write-only `useState` → `useRef` | If you never read the state value in JSX/render, it's not state — it's a ref. `useState` triggers re-renders; `useRef` does not. |
+| `addPlayer(nameArg?)` accepts optional name | Passing a name skips the `prompt()`. Used by TBL-01 `player_hello` handler. Fallback is `prompt()` for manual GM add. |
+| All `useState` calls go at the top of a component | Interleaving state declarations with effects and functions makes a component unreadable and fragile to reorganise. |
+| Extract hooks when a component owns >3 related state+effect+handler groups | Use plain functions that call `useState`/`useEffect` — no React Context needed. Return an object, destructure in the parent. See useChromeHooks, useGeneratorSession, useBoardPlayState, useBoardSync. |
 | Local function names must not shadow global `renderCard` | ui-table.js has a local `renderTpCard` (was `renderCard` — renamed v321). Shadowing the global caused a TypeError crash. Any new local function inside PrepCanvas must check for name collisions with `ui-renderers.js` globals. |
 
 ---

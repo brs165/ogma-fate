@@ -86,7 +86,7 @@ Or use `npm test` which runs steps 2–5 in sequence.
 | NA-61–NA-62 | sessionzero.html + board.html load all 8 world data files (NA-62 migrated from run.html v306) |
 | NA-63–NA-64 | All 8 guide pages have correct worldKey + data-campaign attrs |
 | NA-65–NA-68 | SW APP_SHELL coverage, font size floor (9px prohibited), prefers-color-scheme |
-| NA-69–NA-85 | Multiplayer, sync, gmOnly filter, partysocket guards |
+| NA-69–NA-85 | Multiplayer, sync (`createTableSync` in ui.js), gmOnly filter, partysocket guards |
 | NA-86–NA-97 | Board: SW coverage, no globals redeclaration, ARIA roles, touch targets, round aria-live (NA-96 now checks ui-board.js BoardTurnBar) |
 | NA-98–NA-113 | Reserved — next assertion is NA-114 |
 

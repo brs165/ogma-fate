@@ -23,7 +23,7 @@ The codebase is intentionally split. This is not inconsistency — it is history
 |-------|-------|-----|
 | `core/engine.js` | `var` only | Legacy; Node test harness uses `eval()` which has quirks with `const` in strict mode |
 | `core/ui.js` | `var` only | Large legacy file; migration in progress but not complete |
-| `core/ui-board.js`, `core/ui-run.js` | `var` only | New files, matching `ui.js` style for consistency |
+| `core/ui-board.js` | `var` only | Matches `ui.js` style. `ui-run.js` stripped v330 — tombstone only. |
 | `core/db.js`, `core/config.js`, `core/intro.js` | `var` only | Legacy |
 | `data/*.js` | `var` only | All data files; never use `const` here |
 | `core/ui-primitives.js` | `const`/`let` | Module base; loaded first; defines the globals that cannot be redeclared |
@@ -193,3 +193,34 @@ For any PR or contribution:
 - [ ] `scripts/bump-version.sh` run before zip/deploy
 - [ ] If CSS changed: tested in both light and dark theme
 
+### Write-only state should be a ref
+
+If you declare `useState` but never read the value in JSX or render logic, it's a ref, not state:
+
+```js
+// BAD — causes re-render on every write, value never read
+const [, setUsedGens] = useState({});
+setUsedGens(function(prev) { ... });
+
+// GOOD — mutation only, no re-render
+var usedGensRef = useRef({});
+usedGensRef.current[key] = true;
+```
+
+**Rule:** If the only thing the state does is allow a functional update (reading `prev`), refactor to a `useRef` and mutate `ref.current` directly.
+
+### Prop drilling beyond 3 levels → context object
+
+When the same set of related props appears in a parent and must be threaded through to a grandchild (or deeper), collapse them into a single context object:
+
+```js
+// BAD — 9 props drilled CampaignApp → PrepCanvas
+tableSync, tableRoomCode, tableIsRemote, tablePresence,
+onRemoteCursor, onRemoteState, onHostTable, onJoinTable, onDisconnectTable
+
+// GOOD — one prop, destructure inside
+tableSyncCtx: { sync, roomCode, isRemote, presence, onCursor, onState, host, join, disconnect }
+// In child: var _sc = props.tableSyncCtx || {};
+```
+
+No React Context API needed — a plain object works and is easier to trace.

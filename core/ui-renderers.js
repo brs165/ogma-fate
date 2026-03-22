@@ -1373,7 +1373,11 @@ function cv4FrontContest(genId, d, campName, catColor, ctx) {
   ],[
     h('div',{style:{textAlign:'center'}},cv4Lbl('VICTORIES NEEDED',catColor),h('div',{style:{fontSize:46,fontWeight:900,color:catColor,lineHeight:1,fontFamily:CV4_MONO}},victories),h('div',{style:{fontSize:11,color:'var(--text-muted)',fontFamily:CV4_SANS}},'per side')),
     twists.length>0&&h('div',null,cv4Lbl('POSSIBLE TWISTS',catColor),h('p',{style:{margin:0,fontSize:11,color:'var(--text-dim)',fontFamily:CV4_SANS,lineHeight:1.5}},twists.slice(0,2).map(function(t){return '\u00b7 '+t;}).join('  '))),
-    cv4Inset([h('p',{style:{margin:0,fontSize:11,color:'var(--text-muted)',fontFamily:CV4_SANS,textAlign:'center',lineHeight:1.4}},'Both sides roll every exchange')])
+    cv4Inset([h('p',{style:{margin:0,fontSize:11,color:'var(--text-muted)',fontFamily:CV4_SANS,textAlign:'center',lineHeight:1.4}},'Both sides roll every exchange')]),
+    cv4Inset([cv4Lbl('ON A TIE','var(--c-amber,#f4b942)'),
+      h('p',{style:{margin:0,fontSize:11,color:'var(--text-dim)',fontFamily:CV4_SANS,lineHeight:1.4}},
+        'Neither side marks a victory. GM introduces a new situation aspect (FCon p.33).')
+    ])
   ],128);
 }
 

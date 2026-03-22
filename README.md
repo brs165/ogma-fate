@@ -98,7 +98,7 @@ Each world has deep thematic table content. The same 16 generators produce tonal
 
 **Board** - `campaigns/board.html` — a free-form canvas for prep and play. Generate cards directly onto the canvas, drag to arrange, label sections. Includes dice floater, Fate Point tracker, and multiplayer host/join.
 
-**v4 Cards** - All 16 generators render as 600×380 landscape `cv4Card` components with category colour headers, GM guidance back panel (flip on footer), and world-specific accent colours. Stress boxes, countdown clocks, contest trackers, and consequence toggles are interactive. Keyboard-accessible (WCAG SC 4.1.2).
+**v4 Cards (cv4Card)** - All 16 generators render as 600×380 landscape `cv4Card` components with category colour headers, GM guidance back panel (flip on footer), and world-specific accent colours. Stress boxes, countdown clocks, contest trackers, and consequence toggles are interactive. Keyboard-accessible (WCAG SC 4.1.2).
 
 **Run Session** - `campaigns/run.html` redirects to Board in Play mode. Board's Play mode has: player roster with FP/stress/consequences, round counter, turn order bar, and multiplayer sync.
 
@@ -146,7 +146,7 @@ fate-suite/
 │   ├── ui.js                     ← CampaignApp shell, sync, all campaign components
 │   ├── ui-renderers.js           ← 16 result renderers (dossier cards)
 │   ├── ui-table.js               ← PrepCanvas, TpDicePanel, FatePointTracker + Table components
-│   ├── ui-run.js                 ← RunApp — run session surface components
+│   ├── ui-run.js                 ← Tombstone (v330): stripped, run.html is a JS redirect
 │   ├── ui-board.js               ← BoardApp — board prep/play canvas components
 │   ├── ui-modals.js              ← Modal, ShareDrawer, Settings, Vault, QuickFind
 │   ├── ui-primitives.js          ← React aliases (h), FD primitives, ErrorBoundary

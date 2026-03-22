@@ -144,6 +144,7 @@ function ShareDrawer(props) {
         onClick: function() { window.print(); },
         title: 'Print or save as PDF',
         'aria-label': 'Print or save as PDF',
+        'aria-label': 'Print or save as PDF',
       }, '🖨 Print'),
       h('button', {
         className: 'btn btn-icon btn-ghost',

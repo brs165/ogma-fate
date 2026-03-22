@@ -6,7 +6,6 @@
 Thanks for your interest in contributing. This document covers everything you need to get oriented, make a change, and submit it confidently.
 
 ---
----
 
 ## Getting started locally
 
@@ -68,7 +67,7 @@ Table entries that are too generic, wrong for their world's voice, or violate th
 Anything that crashes, produces undefined output, or breaks a QA gate. Include the campaign and generator type.
 
 ### 4. Accessibility issues
-WCAG 3.0 / APCA violations, keyboard navigation gaps, touch target failures (minimum 48px), missing ARIA labels. Screen reader issues especially welcome.
+WCAG 2.1 AA violations, keyboard navigation gaps, touch target failures (minimum 44px per HIG), missing ARIA labels. Screen reader issues especially welcome.
 
 ---
 
@@ -81,7 +80,7 @@ These are not preferences — they're load-bearing walls. Any PR that violates t
 | **No build step** | Must work as static files served from any static host (deployed at ogma.net via Cloudflare Pages) |
 | **No TypeScript** | Same |
 | **React 18 via CDN UMD only** | `React.createElement` aliased as `h`. No JSX, no import maps yet. |
-| **`var`-only in `core/*.js`** | ES Modules migration is planned for Sprint 3 — don't get ahead of it |
+| **`var`-only in `core/*.js`** | `ui-primitives.js`, `ui-modals.js`, `ui-landing.js` use `const`/`let`. All others `var` only. See `docs/code-quality.md`. |
 | **No analytics** | Permanently closed. Not up for debate. |
 | **No backend** | Offline after first HTTPS load. No cloud sync, no server. |
 
@@ -100,7 +99,10 @@ fate-suite-new/
 │   └── campaigns-meta.js  # Campaign display metadata
 ├── core/
 │   ├── engine.js          # All generator logic — zero DOM dependency
-│   ├── ui.js              # All React components
+│   ├── ui.js              # CampaignApp + hooks: useChromeHooks, useGeneratorSession
+│   ├── ui-board.js        # BoardApp + hooks: useBoardPlayState, useBoardSync
+│   ├── ui-renderers.js    # 16 result renderers + renderCard() (v4 cv4Card system)
+│   ├── ui-table.js        # PrepCanvas + Table canvas components
 │   ├── db.js              # IndexedDB (Dexie 4) + localStorage wrapper
 │   └── intro.js           # Campaign intro overlay engine
 ├── assets/css/theme.css   # Full design system — Liquid Glass, dark/light, campaign theming
@@ -142,14 +144,16 @@ fate-suite-new/
 
 **Gate 1 — Syntax check:**
 ```bash
-node --check core/ui.js && node --check core/engine.js && node --check core/db.js && node --check core/intro.js
+node --check core/ui.js && node --check core/ui-board.js && node --check core/ui-table.js && \
+node --check core/ui-renderers.js && node --check core/engine.js && \
+node --check core/db.js && node --check core/intro.js
 ```
 
-**Gate 2 — 112/112 smoke test** (all generator/campaign combinations):
+**Gate 2 — 128/128 smoke test** (16 generators × 8 worlds):
 ```bash
-node -e "var fs=require('fs');eval(fs.readFileSync('data/shared.js','utf8'));eval(fs.readFileSync('data/universal.js','utf8'));['thelongafter','cyberpunk','fantasy','space','victorian','postapoc','western'].forEach(function(c){eval(fs.readFileSync('data/'+c+'.js','utf8'));});eval(fs.readFileSync('core/engine.js','utf8'));var errs=[],total=0;['thelongafter','cyberpunk','fantasy','space','victorian','postapoc','western'].forEach(function(camp){var t=filteredTables(mergeUniversal(CAMPAIGNS[camp].tables),{});['npc_minor','npc_major','scene','campaign','encounter','seed','compel','challenge','contest','consequence','faction','complication','backstory','obstacle','countdown','constraint'].forEach(function(gen){try{var r=generate(gen,t,4);if(!r||typeof r!=='object')errs.push(camp+'/'+gen);total++;}catch(e){errs.push(camp+'/'+gen+': '+e.message);}});});console.log('Smoke: '+total+'/112  errors:'+errs.length);"
+node -e "var fs=require('fs');eval(fs.readFileSync('data/shared.js','utf8'));eval(fs.readFileSync('data/universal.js','utf8'));['thelongafter','cyberpunk','fantasy','space','victorian','postapoc','western','dVentiRealm'].forEach(function(c){eval(fs.readFileSync('data/'+c+'.js','utf8'));});eval(fs.readFileSync('core/engine.js','utf8'));var errs=[],total=0;['thelongafter','cyberpunk','fantasy','space','victorian','postapoc','western','dVentiRealm'].forEach(function(camp){var t=filteredTables(mergeUniversal(CAMPAIGNS[camp].tables),{});['npc_minor','npc_major','scene','campaign','encounter','seed','compel','challenge','contest','consequence','faction','complication','backstory','obstacle','countdown','constraint'].forEach(function(gen){try{var r=generate(gen,t,4);if(!r||typeof r!=='object')errs.push(camp+'/'+gen);total++;}catch(e){errs.push(camp+'/'+gen+': '+e.message);}});});console.log('Smoke: '+total+'/128  errors:'+errs.length);"
 ```
-Expected: `Smoke: 112/112  errors:0`
+Expected: `Smoke: 128/128  errors:0`
 
 **Gate 3 — Named assertions:**
 ```bash
