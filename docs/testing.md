@@ -1,6 +1,6 @@
 # Ogma — Testing Reference
 
-> **Last updated:** 2026.03.326 — 113/113. Card system v4, print fix, CI fix, dice roller, world colour theming. No new assertion IDs added this session (interactive card elements tested manually — headless browser coverage remains a gap).
+> **Last updated:** 2026.03.342 — 113/113 · 59/59 · 128/128. No new IDs added since NA-97 (v281). Interactive elements (card stress boxes, countdown clock, contest tracker) tested manually. Headless browser coverage remains a known gap.
 
 ---
 
@@ -88,7 +88,7 @@ Or use `npm test` which runs steps 2–5 in sequence.
 | NA-65–NA-68 | SW APP_SHELL coverage, font size floor (9px prohibited), prefers-color-scheme |
 | NA-69–NA-85 | Multiplayer, sync (`createTableSync` in ui.js), gmOnly filter, partysocket guards |
 | NA-86–NA-97 | Board: SW coverage, no globals redeclaration, ARIA roles, touch targets, round aria-live (NA-96 now checks ui-board.js BoardTurnBar) |
-| NA-98–NA-113 | Reserved — next assertion is NA-114 |
+| NA-98–NA-113 | Reserved — no assertions assigned yet. Next assertion is NA-114. |
 
 ---
 

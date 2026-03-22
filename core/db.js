@@ -811,7 +811,7 @@
         +'<script>'
         +'async function doExport(){'
         +'if(typeof html2canvas==="undefined"||typeof JSZip==="undefined"){'
-        +'document.getElementById("status").innerHTML="<span class=\\"err\\">⚠ Export needs an internet connection to load image libraries. Connect and reload to try again.</span>";'
+        +'document.getElementById("status").innerHTML="<span class=\\"err\\">\u26a0 Export needs an internet connection to load image libraries. Connect and reload to try again.</span>";'
         +'return;}'
         +'var btn=document.getElementById("dlBtn"),status=document.getElementById("status");'
         +'btn.disabled=true;btn.textContent="⏳ Rendering…";'

@@ -8,9 +8,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Fate Mechanics — Ogma Help</title>
   <link rel="icon" type="image/svg+xml" href="../assets/favicons/icon.svg">
-  <link rel="stylesheet" href="../assets/css/help-shared.css?v=340">
-  <link rel="stylesheet" href="../assets/css/theme.css?v=340">
-<script src="../assets/js/help-shared.js?v=340"></script>
+  <link rel="stylesheet" href="../assets/css/help-shared.css?v=343">
+  <link rel="stylesheet" href="../assets/css/theme.css?v=343">
+<script src="../assets/js/help-shared.js?v=343"></script>
   <link rel="canonical" href="https://ogma.net/help/fate-mechanics.html">
 </head>
 <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -29,7 +29,7 @@
     <a href="/help/learn-fate.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#128218; Quick Start</a>
     <a href="../about.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">About</a>
     <button class="btn btn-icon btn-ghost" onclick="(function(){{var n=document.documentElement.getAttribute('data-theme')=='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{{var p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{{}}');p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(p));}}catch(e){{}}}})()" title="Toggle theme" aria-label="Switch to dark mode">&#9680;</button>
-    <button class="topbar-hamburger btn btn-icon btn-ghost" id="topnav-hbg" aria-label="Open navigation" aria-expanded="false" aria-haspopup="true" onclick="(function(b){{var d=document.getElementById('topnav-dd');var o=d.classList.toggle('open');b.setAttribute('aria-expanded',o);}})(this)">&#9776;</button>
+    <button class="topbar-hamburger btn btn-icon btn-ghost" id="topnav-hbg" aria-label="Open navigation" aria-expanded="false" aria-haspopup="true" onclick="(function(b){var d=document.getElementById('topnav-dd');var o=d.classList.toggle('open');b.setAttribute('aria-expanded',String(o));if(o){var r=b.getBoundingClientRect();document.documentElement.style.setProperty('--dd-top',(r.bottom+6)+'px');document.documentElement.style.setProperty('--dd-right',(window.innerWidth-r.right)+'px');}})(this)">&#9776;</button>
     <div class="land-topnav-dropdown" id="topnav-dd">
       <a href="/help/index.html">&#128218; Help Home</a>
       <a href="/help/getting-started.html">&#128640; Getting Started</a>
@@ -337,6 +337,10 @@
         dd.classList.remove('open');
         btn.setAttribute('aria-expanded','false');
       }
+    });
+    window.addEventListener('resize', function() {
+      var dd = document.getElementById('topnav-dd');
+      if (dd) dd.classList.remove('open');
     });
   }
 })();

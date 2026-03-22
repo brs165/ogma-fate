@@ -96,15 +96,25 @@ Each world has deep thematic table content. The same 16 generators produce tonal
 
 **Export / Import** - Download pinned cards as `.json` or full table state (players, cards, round, FP) for backup and transfer. Import from any Ogma export file.
 
-**Board** - `campaigns/board.html` — a free-form canvas for prep and play. Generate cards directly onto the canvas, drag to arrange, label sections. Includes dice floater, Fate Point tracker, and multiplayer host/join.
+**Board** - `campaigns/board.html` — free-form canvas for prep and play. Generate cards directly onto the canvas, drag to arrange, add section labels, sticky notes. Includes: dice floater, Fate Point tracker, multiplayer host/join, Stunt browser tab, mobile list view, player waiting state auto-add.
 
 **v4 Cards (cv4Card)** - All 16 generators render as 600×380 landscape `cv4Card` components with category colour headers, GM guidance back panel (flip on footer), and world-specific accent colours. Stress boxes, countdown clocks, contest trackers, and consequence toggles are interactive. Keyboard-accessible (WCAG SC 4.1.2).
 
-**Run Session** - `campaigns/run.html` redirects to Board in Play mode. Board's Play mode has: player roster with FP/stress/consequences, round counter, turn order bar, and multiplayer sync.
+**Run Session** - `campaigns/run.html` redirects to Board in Play mode. Board Play mode: player roster with FP/stress/consequences, round counter, turn order bar, multiplayer host/join.
 
-**Export** - ↓ MD copies results as formatted Markdown. 🖨 Print hides all UI chrome and formats cleanly for A4/Letter.
+**Player join UX** - When a player joins via room code, they see a name prompt; submitting sends their name to the GM's Board, which auto-creates their player slot and shows a join toast.
+
+**Export** - Unified ⬡ export menu: 🖼 Image Pack (PNG zip for Miro/Figma), 🖨 Print, ↓ JSON export, ↑ Import. Menu opens downward from the action bar.
 
 **Pinned Results** - 📌 saves any result to a persistent pinned list (IndexedDB). Survives reloads.
+
+**Stunt Browser** - In the Board left panel, a Stunts tab shows all world + universal stunts (56+ per world). Filter by skill, tag, or keyword. Click any stunt to copy name and description to clipboard.
+
+**Mobile List View** - On the Board, a toggle button (≡/▦, visible ≤640px) switches the canvas to a scrollable card list: colour-coded by category, tap to open dossier, × to remove.
+
+**Left Sidebar Nav** - Campaign pages use a persistent left sidebar (no topbar). Desktop: sidebar always visible with header (OGMA wordmark + world chip) and Generate / Navigate tabs. Mobile: 44px slim bar (hamburger + world name + theme toggle) opens sidebar overlay.
+
+**Complete Card View** - The ♥ Card view shows all generated data, matching the dossier: for Major NPCs, all aspects including `others[]`, full stunt descriptions, consequence slots; for Encounters, scene aspects, zones, opposition aspects and stunts; for all generators, every field the data contains.
 
 **Consequence Severity Selector** - When the Consequence generator is active, a severity bar appears: Random / Mild / Moderate / Severe.
 
@@ -146,7 +156,7 @@ fate-suite/
 │   ├── ui.js                     ← CampaignApp shell, sync, all campaign components
 │   ├── ui-renderers.js           ← 16 result renderers (dossier cards)
 │   ├── ui-table.js               ← PrepCanvas, TpDicePanel, FatePointTracker + Table components
-│   ├── ui-run.js                 ← Tombstone (v330): stripped, run.html is a JS redirect
+│   ├── ui-run.js                 ← Tombstone (v330): 9-line file. run.html is a JS redirect to board.html?mode=play
 │   ├── ui-board.js               ← BoardApp — board prep/play canvas components
 │   ├── ui-modals.js              ← Modal, ShareDrawer, Settings, Vault, QuickFind
 │   ├── ui-primitives.js          ← React aliases (h), FD primitives, ErrorBoundary

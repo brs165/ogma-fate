@@ -24,6 +24,33 @@
 
 
 
+
+---
+
+## 2026.03.341 — Two bug fixes + help hamburger complete
+
+**Bug: doExport SyntaxError / "doExport is not defined"**
+- Root cause: EXP-07 offline guard (v336) used `\\\\"err\\\\\"` in the blob script string — generates `\\"err\\"` inside a double-quoted JS string, where `\\"` means one backslash then `"` closes the string. Then `err` is a bare identifier → SyntaxError.
+- Fix: changed to `\\\"err\\\"` (same pattern as existing catch clause) → generates `\\"err\\"` → valid escaped quote inside string.
+- `doExport` was also unreachable because the SyntaxError halted script execution.
+
+**Bug: Major NPC missing consequence slots (rules compliance)**
+- `cv4FrontNpcMajor` showed PHY/MEN stress + refresh but no consequence slots at all.
+- FCon p.35 + p.43: all full characters (including Major NPCs) have Mild (2 shifts), Moderate (4), Severe (6) consequence slots.
+- Minor NPC "No consequences" is correct per FCon p.43.
+- Fix: three consequence slot rows added to Major NPC card back panel — checkbox + severity label + shift value. Card back-panel height 144→180.
+
+**Help hamburger: position:fixed fix complete (all 11 pages)**
+- Previously fixed 9/11 pages. `dnd-transition.html` and `new-to-ogma.html` had a slightly different onclick pattern — both now updated.
+- All 11 help pages: dropdown uses `position:fixed` + `getBoundingClientRect()` to escape the `position:sticky` stacking context that was trapping the dropdown on mobile.
+
+**Sidebar Navigate tab (follow-up from v340)**
+- `sb-header` (wordmark + world chip) and Navigate tab button were missing — two insertions from v340 did not apply. Fixed this session.
+- Sidebar now has: header section → Generate tab | Navigate tab → panels.
+
+113/113 · 59/59
+
+---
 ---
 
 ## 2026.03.340 — Option B: Left-nav refactor (topbar → sidebar)

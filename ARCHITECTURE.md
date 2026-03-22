@@ -2,7 +2,7 @@
 
 > Technical deep-dive for contributors. Covers the execution model, data flow, React patterns, IndexedDB persistence, the service worker, Cloudflare Pages deployment, and the Table canvas multiplayer system. Read this before touching `core/*.js`.
 >
-> **Last updated:** 2026.03.330
+> **Last updated:** 2026.03.342
 
 ---
 
@@ -63,7 +63,7 @@
 <script src="../core/ui-board.js?v=N"></script>   <!-- BoardApp — board-specific root component -->
 ```
 
-**Run page (`run.html`)** is now a JS redirect to `board.html?mode=play`. It preserves `?world=` and `?room=` URL params. `ui-run.js` is retained for its sync module (`createSync`, `generateRoomCode`) which `ui-board.js` depends on via `board.html` script loading.
+**Run page (`run.html`)** is a JS redirect to `board.html?mode=play`. It preserves `?world=` and `?room=` URL params. `core/ui-run.js` is a 9-line tombstone (v330) — sync lives in `createTableSync` inside `core/ui.js`, which `board.html` loads.
 
 `<base href="/">` is required on all campaign pages (Cloudflare Pages Pretty URLs strip `.html`; without it, `../core/` resolves to `/campaigns/core/`).
 
@@ -298,6 +298,25 @@ Key constants:
 
 ---
 
+## Layout pattern (Option B left-nav)
+
+Campaign pages (`cyberpunk.html` etc.) use a **persistent left sidebar** with no topbar.
+
+**Desktop (≥641px):**
+- `sb-slim-bar` is hidden (`display:none!important`)
+- `.sidebar` is always visible (220px) — `transform:none!important`
+- Sidebar has a `.sb-header` section: `.sb-wordmark` (OGMA) + `.sb-world-chip` (world name)
+- Two tabs: **Generate** (16 generators, 4 groups) and **Navigate** (nav links, Table Prep, theme toggle, online status)
+
+**Mobile (≤640px):**
+- `.sb-slim-bar` (44px): hamburger + world name + current generator + theme toggle
+- Hamburger opens sidebar as full-height overlay (unchanged behaviour)
+- `.app-body` is still the flex row containing sidebar + content
+
+CSS classes: `.sb-slim-bar`, `.sb-hamburger`, `.sb-slim-world`, `.sb-slim-gen`, `.sb-header`, `.sb-wordmark`, `.sb-world-chip`, `.sb-status-row`, `.sb-status-dot`.
+
+---
+
 ## localStorage schema (BL-01)
 
 All user preferences are stored under a single versioned JSON key `fate_prefs_v1`. Access via `window.LS.get(key)` / `window.LS.set(key, value)` — defined in `core/db.js`.
@@ -305,6 +324,21 @@ All user preferences are stored under a single versioned JSON key `fate_prefs_v1
 Current schema keys: `theme`, `textsize`, `fp_state`, `universal_merge`, `help_level`, `onboarding_done`, `gm_mode`, `intro_seen` (object keyed by worldKey), `pwa_nudge_dismissed`, `visit_count_[campId]`, `ios_install_dismissed`, `safari_warn_dismissed`.
 
 On first load, old flat keys (`fate_theme`, `fate_textsize`, etc.) are migrated to the new schema and removed.
+
+---
+
+## Custom hooks
+
+Four custom hooks extract complex stateful logic from component bodies. Each returns a plain object; parent destructures:
+
+| Hook | File | Owns |
+|------|------|------|
+| `useChromeHooks(campId)` | `core/ui.js` | toast, showToast, PWA nudge, Safari/iOS warn, SW update, isOnline |
+| `useGeneratorSession(campId, campMeta, t, universalMerge, prefs, showToast)` | `core/ui.js` | result, rolling, history, activeGen, partySize, cardView, inspireMode, pinnedCards, doGenerate, doInspire, selectGen, pinResult |
+| `useBoardPlayState(campId, mode, loaded)` | `core/ui-board.js` | players, round, order, selPlayer, roundFlash, newRound/prevRound, toggleActed, addPlayer(nameArg?), removePlayer, persistPlayState |
+| `useBoardSync(showToast)` | `core/ui-board.js` | syncObj, syncStatus, roomCode, showJoin, joinInput, connectAsHost, disconnectSync |
+
+**Declaration order rule:** All arguments passed to a custom hook must be declared *above* the hook call. `const` is not hoisted — reading it before declaration throws `ReferenceError`. Pattern: useChromeHooks → prefs → universalMerge → useGeneratorSession (v336 fix).
 
 ---
 
@@ -338,8 +372,9 @@ var useEffect = React.useEffect;
 | `fd-` | Field Dossier result renderers |
 | `dr-` | Dice roller widget |
 | `bt-` | Board topbar |
-| `blp-` | Board left panel (collapsible on mobile) |
+| `blp-` | Board left panel (collapsible on mobile, includes Stunts tab via `.bs-*`) |
 | `board-` | Board canvas, cards, floaters, dossier |
+| `sb-` | Sidebar header (Option B nav): `.sb-header`, `.sb-wordmark`, `.sb-world-chip`, `.sb-slim-bar`, `.sb-status-*` |
 | `bt-live-*` | Board Play mode: `bt-live-badge` (animated pulse dot + "Live/Play" text in topbar) |
 | `land-` | Landing page sections and cards |
 | `.callout-*` | Help page callout boxes (scenario/info/warning/dnd/tip) |

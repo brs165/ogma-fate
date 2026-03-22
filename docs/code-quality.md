@@ -23,7 +23,7 @@ The codebase is intentionally split. This is not inconsistency — it is history
 |-------|-------|-----|
 | `core/engine.js` | `var` only | Legacy; Node test harness uses `eval()` which has quirks with `const` in strict mode |
 | `core/ui.js` | `var` only | Large legacy file; migration in progress but not complete |
-| `core/ui-board.js` | `var` only | Matches `ui.js` style. `ui-run.js` stripped v330 — tombstone only. |
+| `core/ui-board.js` | `var` only | Matches `ui.js` style. Contains `useBoardPlayState` and `useBoardSync` custom hooks. |
 | `core/db.js`, `core/config.js`, `core/intro.js` | `var` only | Legacy |
 | `data/*.js` | `var` only | All data files; never use `const` here |
 | `core/ui-primitives.js` | `const`/`let` | Module base; loaded first; defines the globals that cannot be redeclared |
@@ -71,7 +71,7 @@ const [cards, setCards] = useState([]);
 | 500–1000 lines | Acceptable; review whether split makes sense |
 | Over 1000 lines | Needs a documented reason; split if a clean boundary exists |
 
-`ui.js` at ~2900 lines is a known legacy exception. It grew before the split pattern was established. Do not add to it if the addition fits better elsewhere. New components that would go in `ui.js` should go in the most appropriate split file (`ui-board.js`, `ui-run.js`, etc.) instead.
+`ui.js` at ~1500 lines after v330–333 architecture refactor (was ~3100 lines). Still the largest file in the codebase. Custom hooks (`useChromeHooks`, `useGeneratorSession`) extracted v331. It grew before the split pattern was established. Do not add to it if the addition fits better elsewhere. New components that would go in `ui.js` should go in the most appropriate split file (`ui-board.js`, `ui-run.js`, etc.) instead.
 
 `intro.js` at ~1350 lines is also a documented exception. It is entirely self-contained (no React, no Dexie, no globals from other files) and implements a complex frame-by-frame animation engine with world-specific sequences. The size is justified by the encapsulation — splitting it would create coupling where none currently exists.
 

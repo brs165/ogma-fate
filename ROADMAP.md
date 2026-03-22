@@ -2,7 +2,7 @@
 
 > **Source of truth** for all planned work. Update whenever items change.
 > **Current version:** 2026.03.335 · QA: 113/113 named · 59/59 unit
-> **Last revised:** 2026.03.340 — Option B left-nav: topbar removed, sidebar header + Navigate tab added — v336 hotfix (universalMerge ReferenceError); v337 order-of-ops audit (BoardApp showToast/syncObj hoisting)
+> **Last revised:** 2026.03.342 — card view complete data parity; all MD docs updated — doExport SyntaxError fix; Major NPC consequence slots; help hamburger all 11 pages — Option B left-nav: topbar removed, sidebar header + Navigate tab added — v336 hotfix (universalMerge ReferenceError); v337 order-of-ops audit (BoardApp showToast/syncObj hoisting)
 
 ---
 
@@ -86,6 +86,8 @@
 
 | Version | What |
 |---------|------|
+| v2026.03.342 | **Card view data parity** — all 16 `cv4Front*` renderers rewritten to show complete generator output: Minor NPC all skills; Major NPC other aspects + full stunt descriptions + consequence slots; Scene zone descriptions + framing questions; Encounter scene aspects + opposition aspects + stunts + zones; Campaign faces + places + impending desc; Seed issue + setting aspect + opposition + twist + win/lose; Challenge separate stakes fields; Contest scene aspect + stakes; Compel template text; Constraint correct fields (`restricted_action`, `consequence`, `gm_note`); Obstacle separate gm_note; Backstory actual `relationship` text. |
+| v2026.03.341 | **Bugfixes:** doExport SyntaxError (EXP-07 escape level); Major NPC missing consequence slots (rules compliance); help hamburger position:fixed all 11 pages; sidebar Navigate tab + sb-header missing pieces. |
 | v2026.03.338–340 | **Left-nav refactor (Option B):** topbar removed from campaign pages. Sidebar header (wordmark + world chip). "Navigate" tab: all nav links, Table Prep, theme toggle, status dot. Mobile: 44px slim bar (hamburger + world + generator + theme). ExportMenu opens downward. Order-of-ops audit + hotfixes. |
 | v2026.03.336–337 | **Hotfix + order-of-ops audit.** v336: `universalMerge`/`prefs`/`useChromeHooks` hoisted before `useGeneratorSession` (production ReferenceError). v337: `showToast`+`toastTimerRef` hoisted before `useBoardSync`; TBL-01 useEffect moved after `_sync` destructure; full const use-before-declare audit across all UI files — clean. |
 | v2026.03.335 | **TBL-01** player join UX (name prompt → auto-add to GM roster). **MOB-15** Board mobile list view (toggle button, scrollable card stack, tap-to-open, remove). ROADMAP cleanup. |

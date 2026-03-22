@@ -2186,6 +2186,12 @@ function CampaignApp(props) {
         // Visually-hidden ARIA live region — announces tab name on switch (W7, H1)
         h('div', {className: 'sidebar-aria-live', 'aria-live': 'polite', 'aria-atomic': 'true', id: 'sb-tab-announce', role: 'status'}),
 
+        // ── Sidebar header: wordmark + world chip ──────────────────
+        h('div', {className: 'sb-header'},
+          h('a', {href: '../index.html', className: 'sb-wordmark', 'aria-label': 'Ogma home'}, 'OGMA'),
+          h('span', {className: 'sb-world-chip'}, camp.meta.name)
+        ),
+
         // ── Tab bar ─────────────────────────────────────────────────
         h('div', {className: 'sidebar-tab-bar', role: 'tablist'},
           h('button', {
@@ -2200,6 +2206,18 @@ function CampaignApp(props) {
             'aria-selected': String(sidebarTab === 'gen'),
             'aria-controls': 'sb-panel-gen',
           }, 'Generate'),
+          h('button', {
+            id: 'sb-tab-nav',
+            className: 'sidebar-tab-btn' + (sidebarTab === 'nav' ? ' active' : ''),
+            onClick: function() {
+              setSidebarTab('nav');
+              var el = document.getElementById('sb-tab-announce');
+              if (el) el.textContent = 'Navigate tab';
+            },
+            role: 'tab',
+            'aria-selected': String(sidebarTab === 'nav'),
+            'aria-controls': 'sb-panel-nav',
+          }, 'Navigate'),
 
         ),
 

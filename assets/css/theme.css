@@ -821,7 +821,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .topbar-crumb-sep{font-size:11px;color:var(--border-bright);flex-shrink:0;pointer-events:none;user-select:none}
 
 /* Status zone — chips on the right (H1, H4, H6, H9) */
-.topbar-status{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.topbar-status{display:flex;align-items:center;gap:4px;flex-shrink:0;position:relative}
 .topbar-chip:hover{opacity:.8}
 @keyframes tb-blink{0%,100%{opacity:1}50%{opacity:.45}}
 
@@ -904,7 +904,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .land-topnav-brand{font-size:var(--text-sm);font-weight:400;color:var(--accent);text-decoration:none;letter-spacing:0.01em;display:flex;align-items:center}
 .land-topnav-actions{display:flex;align-items:center;gap:6px;position:relative}
 /* R-03: Static page mobile nav — hamburger + dropdown */
-.land-topnav-dropdown{display:none;position:absolute;top:calc(100% + 8px);right:0;background:var(--glass-bg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);border-radius:var(--glass-radius);padding:6px;min-width:180px;z-index:200;box-shadow:0 8px 32px rgba(0,0,0,0.4);flex-direction:column;gap:2px}
+.land-topnav-dropdown{display:none;position:fixed;top:var(--dd-top,52px);right:var(--dd-right,16px);background:var(--glass-bg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border:1px solid var(--glass-border);border-radius:var(--glass-radius);padding:6px;min-width:200px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,0.4);flex-direction:column;gap:2px}
 .land-topnav-dropdown.open{display:flex}
 .land-topnav-dropdown a,.land-topnav-dropdown button{display:flex;align-items:center;padding:10px 12px;border-radius:6px;font-size:13px;color:var(--text-dim);text-decoration:none;background:none;border:none;cursor:pointer;width:100%;text-align:left;transition:background 0.12s;font-family:var(--font-ui)}
 .land-topnav-dropdown a:hover,.land-topnav-dropdown button:hover{background:color-mix(in srgb,var(--accent) 8%,transparent);color:var(--text)}

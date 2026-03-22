@@ -49,7 +49,7 @@ When any new UI work creates a conflict between WCAG and HIG, **stop and raise i
 ### System integration (HIG)
 
 21. **First load respects `prefers-color-scheme`** (enforced by NA-69). New users on dark OS see dark theme, not light.
-22. **iOS safe area insets** on any `position:fixed` element near the bottom of the viewport. Use `env(safe-area-inset-bottom, 0px)`. Currently applied to (v293+): roll FAB (`bottom`), board floaters (dice, FP), `rs-dice-floater` in run.html, `rs-topbar` (left/right insets), `rs-left` mobile sidebar (bottom). All pages have `viewport-fit=cover` in their viewport meta tag.
+22. **iOS safe area insets** on any `position:fixed` element near the bottom of the viewport. Use `env(safe-area-inset-bottom, 0px)`. Applied to: roll FAB (`bottom`), board floaters (dice, FP), `rs-dice-floater`, `.sb-slim-bar` (left/right on mobile), `rs-left` mobile sidebar (bottom). All pages have `viewport-fit=cover` in their viewport meta tag.
 23. **`-webkit-tap-highlight-color: transparent`** should be set on all interactive elements that have custom tap states, to prevent the default grey flash on iOS conflicting with the component's own feedback.
 
 ### Resolving WCAG vs HIG conflicts
