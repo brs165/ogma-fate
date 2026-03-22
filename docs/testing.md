@@ -1,6 +1,6 @@
 # Ogma — Testing Reference
 
-> **Last updated:** 2026.03.299 — assertion count 113/113, NA-29 search window widened to 500 chars (QA-01).
+> **Last updated:** 2026.03.326 — 113/113. Card system v4, print fix, CI fix, dice roller, world colour theming. No new assertion IDs added this session (interactive card elements tested manually — headless browser coverage remains a gap).
 
 ---
 
@@ -32,6 +32,7 @@ node --check core/ui-renderers.js && \
 node --check core/ui-modals.js && \
 node --check core/ui-landing.js && \
 node --check core/db.js && \
+node --check core/config.js && \
 node --check core/intro.js
 
 # 2. Named assertions (113/113)
@@ -82,11 +83,11 @@ Or use `npm test` which runs steps 2–5 in sequence.
 | NA-41–NA-58 | World-specific data integrity (all 8 worlds) |
 | NA-59 | Stunt tags on all stunts |
 | NA-60 | No duplicate opposition in encounter results |
-| NA-61–NA-62 | sessionzero.html + run.html load all 8 world data files |
+| NA-61–NA-62 | sessionzero.html + board.html load all 8 world data files (NA-62 migrated from run.html v306) |
 | NA-63–NA-64 | All 8 guide pages have correct worldKey + data-campaign attrs |
 | NA-65–NA-68 | SW APP_SHELL coverage, font size floor (9px prohibited), prefers-color-scheme |
 | NA-69–NA-85 | Multiplayer, sync, gmOnly filter, partysocket guards |
-| NA-86–NA-97 | Board: SW coverage, no globals redeclaration, ARIA roles, touch targets, round aria-live |
+| NA-86–NA-97 | Board: SW coverage, no globals redeclaration, ARIA roles, touch targets, round aria-live (NA-96 now checks ui-board.js BoardTurnBar) |
 | NA-98–NA-113 | Reserved — next assertion is NA-114 |
 
 ---

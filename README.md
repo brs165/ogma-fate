@@ -98,7 +98,9 @@ Each world has deep thematic table content. The same 16 generators produce tonal
 
 **Board** - `campaigns/board.html` — a free-form canvas for prep and play. Generate cards directly onto the canvas, drag to arrange, label sections. Includes dice floater, Fate Point tracker, and multiplayer host/join.
 
-**Run Session** - `campaigns/run.html` — at-table session surface with player roster, stress/consequence tracking, zone map, round tracker, and live multiplayer sync.
+**v4 Cards** - All 16 generators render as 600×380 landscape `cv4Card` components with category colour headers, GM guidance back panel (flip on footer), and world-specific accent colours. Stress boxes, countdown clocks, contest trackers, and consequence toggles are interactive. Keyboard-accessible (WCAG SC 4.1.2).
+
+**Run Session** - `campaigns/run.html` redirects to Board in Play mode. Board's Play mode has: player roster with FP/stress/consequences, round counter, turn order bar, and multiplayer sync.
 
 **Export** - ↓ MD copies results as formatted Markdown. 🖨 Print hides all UI chrome and formats cleanly for A4/Letter.
 
@@ -136,7 +138,7 @@ fate-suite/
 │   ├── sessionzero.html          ← Session Zero character creation wizard
 │   ├── transition.html           ← Coming from D&D? guide
 │   ├── board.html                ← Board prep/play canvas surface
-│   └── run.html                  ← At-table run session surface
+│   └── run.html                  ← Redirect → board.html?mode=play (preserves ?world= and ?room=)
 │
 ├── core/
 │   ├── engine.js                 ← Pure logic - generators, table prefs, markdown export
@@ -246,13 +248,13 @@ camps.forEach(function(camp){
     catch(e){errs.push(camp+'/'+gen+': '+e.message);}
   });
 });
-console.log('Smoke: '+total+'/96  errors:'+errs.length);
+console.log('Smoke: '+total+'/128  errors:'+errs.length);
 "
 ```
 
 Expected: `Smoke: 128/128  errors:0`
 
-For the full named assertion suite, run `node qa_named.js` from the project root.
+For the full named assertion suite, run `node tests/qa_named.js` from the project root.
 
 ---
 
@@ -281,6 +283,10 @@ Built against **Fate Condensed** (Evil Hat, 2020), audited against the full Fate
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) · [ARCHITECTURE.md](ARCHITECTURE.md)
+
+## CI
+
+Three GitHub Actions jobs: **Lint & Format** (`npm install` + eslint + prettier), **QA Assertions** (named + smoke + unit + CDN check), **CDN Integrity** (SRI hash verify). All must pass before merging.
 
 Most valuable contributions:
 1. **Rules accuracy reports** — cite the FCon SRD page

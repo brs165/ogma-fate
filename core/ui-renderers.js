@@ -891,420 +891,597 @@ var CARD_META = {
   constraint:  {label:'Constraint', icon:'🔒',spine:'mechanic', color:'var(--c-purple)'},
 };
 
-function FlipCard(props) {
-  var genId   = props.genId;
-  var data    = props.data;
-  var campId  = props.campId;
-  var onUpdate= props.onUpdate;
-  var worldStunts = props.worldStunts || [];
-  var onChainRoll = props.onChainRoll;
 
-  const [flipped, setFlipped] = useState(false);
-  const [stressState, setStressState] = useState({});
-  const [cdFilled, setCdFilled] = useState(0);
+// ════════════════════════════════════════════════════════════════════════
+// CARD RENDERER v4 — Ogma Card Format
+// A2  Flip: pure opacity fade + state swap. Zero 3D transforms.
+// A1  All text >= 11px
+// A3  textMuted >= 4.6:1 contrast in both themes
+// A4  role="button", tabIndex, aria-label, aria-pressed, onKeyDown
+// A5  :focus-visible ring injected once on mount
+// A6  prefers-reduced-motion: instant swap, no animation
+// ════════════════════════════════════════════════════════════════════════
 
-  var meta = CARD_META[genId] || {label: genId, icon: '◈', spine:'mechanic', color:'var(--accent)'};
-  var d = data || {};
+var CV4_CAT = {
+  character: { color: 'var(--c-blue,#60a5fa)'    },
+  world:     { color: 'var(--gold,#fbbf24)'        },
+  mechanics: { color: 'var(--c-red,#f87171)'       },
+  tool:      { color: 'var(--c-purple,#a78bfa)'    },
+  pressure:  { color: 'var(--c-green,#34d399)'     },
+};
 
-  // Merge help content
-  var hc = (typeof HELP_CONTENT !== 'undefined' && HELP_CONTENT[genId]) ? HELP_CONTENT[genId] : {};
-  var entry = (typeof HELP_ENTRIES !== 'undefined' ? HELP_ENTRIES : []).find(function(e){return e.id===genId;}) || {};
-  var srdUrl = entry.srd_url || hc.srd_url;
-  var rules   = Array.isArray(hc.rules) ? hc.rules : [];
-  var tips    = (Array.isArray(hc.gm_tips) ? hc.gm_tips : []).slice(0,2);
+var CV4_META = {
+  npc_minor:    { cat: 'character', icon: '\u25c8' },
+  npc_major:    { cat: 'character', icon: '\u25c6' },
+  faction:      { cat: 'character', icon: '\u2691'  },
+  scene:        { cat: 'world',     icon: '\u25c9'  },
+  campaign:     { cat: 'world',     icon: '\u2736'  },
+  encounter:    { cat: 'world',     icon: '\u2694'  },
+  seed:         { cat: 'world',     icon: '\u2295'  },
+  compel:       { cat: 'mechanics', icon: '\u21a9'  },
+  challenge:    { cat: 'mechanics', icon: '\u2299'  },
+  contest:      { cat: 'mechanics', icon: '\u21cc'  },
+  consequence:  { cat: 'mechanics', icon: '\u2b21'  },
+  complication: { cat: 'tool',      icon: '\u26a1'  },
+  backstory:    { cat: 'tool',      icon: '\u25d1'  },
+  obstacle:     { cat: 'pressure',  icon: '\u25b2'  },
+  countdown:    { cat: 'pressure',  icon: '\u23f3'  },
+  constraint:   { cat: 'pressure',  icon: '\u2298'  },
+};
 
-  // ── KEY NUMBER for spine badge ─────────────────────────────────────
-  function spineNum() {
-    if (d.refresh) return d.refresh;
-    if (d.gm_fate_points) return d.gm_fate_points;
-    if (d.boxes) return d.boxes;
-    if (d.opposition && d.opposition.length) return d.opposition.length;
-    return null;
-  }
+var CV4_HELP = {
+  npc_minor:    { what: 'A supporting character with one aspect, one peak skill, and one stress box.', when: 'Shopkeepers, witnesses, bystanders \u2014 anyone who has one scene and a name.', rule: 'No consequences \u2014 one solid hit takes them out. Use the aspect as a compel hook immediately. Never give a minor NPC a second stress box by mistake; that turns them into a major NPC.' },
+  npc_major:    { what: 'A full character: skill pyramid, stunts, dual stress tracks, and a complete aspect suite.', when: 'Recurring antagonists, key allies, anyone who survives a conflict and returns.', rule: 'Refresh = free invokes they can spend against the party. High Concept and Trouble are the most compellable aspects. Consequence recovery requires a treatment roll before timing starts.' },
+  faction:      { what: 'An organisation with a goal, method, structural weakness, and a human face.', when: 'Between sessions or when players ask who is behind something.', rule: 'Goal + Method = two sides of one faction aspect. The Face is the person the PCs deal with. The Weakness is how the faction can be disrupted without direct confrontation.' },
+  scene:        { what: 'Situation aspects and zones that make a location mechanically and dramatically alive.', when: 'Before any scene where action is likely. Use framing questions to decide if the scene is worth playing.', rule: 'Scene aspects last until the fiction changes them. Free invokes reset each scene. Zones control movement.' },
+  campaign:     { what: 'A current issue, an impending threat, and setting aspects defining what kind of world this is.', when: 'Session zero, between arcs, or when the table needs a shared frame to pull against.', rule: 'Current issue = what is already on fire. Impending = what happens if they do not act. Both are aspects. Use them every session or they disappear.' },
+  encounter:    { what: 'A full conflict setup: opposition, zones, stakes, twist, and starting GM fate points.', when: 'Any scene with direct opposition. The twist fires mid-conflict, not in the first exchange.', rule: 'GM starts with 1 FP per PC. Always state victory and defeat conditions before the first roll. The twist is optional.' },
+  seed:         { what: 'A 3-scene skeleton: opening, complication, climax. Drop-in ready for one session.', when: 'Session prep, unexpected cancellations, or when you need something playable in minutes.', rule: 'Do not add more scenes. The constraint is the design.' },
+  compel:       { what: 'A situation where an aspect makes things worse in exchange for a Fate point.', when: 'When a player aspect is relevant and making life harder would be more interesting.', rule: 'Event compels happen to the character. Decision compels require a hard choice. Player refuses by spending 1 FP.' },
+  challenge:    { what: 'A series of overcome rolls where each result matters and changes the fiction.', when: 'Extended tasks where failure at multiple stages has independent consequences.', rule: 'Each roll succeeds, fails, or ties independently. Declare all stakes before the first roll.' },
+  contest:      { what: 'Two sides competing for a goal, not fighting, but racing, arguing, or outmanoeuvring.', when: 'Chases, debates, political manoeuvring, escape sequences.', rule: 'Both sides roll every exchange. Three victories wins (default). Ties add a twist. The loser earns a Fate point.' },
+  consequence:  { what: 'An aspect a character takes to absorb a hit instead of being taken out.', when: 'When stress will not cover the overflow and the player wants to stay in the scene.', rule: 'Mild = 2 shifts. Moderate = 4. Severe = 6. Recovery needs a treatment overcome roll first.' },
+  complication: { what: 'A new aspect that enters the scene and makes everything harder.', when: 'End of a scene that resolved cleanly, or when a scene needs a second wind.', rule: 'Complications arrive with at least one free invoke. Remove them only when the fiction justifies it.' },
+  backstory:    { what: 'Targeted questions that build a character history and create hooks into the campaign.', when: 'Session zero, or when a new player joins and needs weaving into the party.', rule: 'Every answer should name another PC or NPC and leave something unresolved. Hooks are invitations, never mandates.' },
+  obstacle:     { what: 'A passive threat that opposes the party without taking initiative.', when: 'Environmental dangers, barriers, conditions. Anything that resists without rolling initiative.', rule: 'Obstacles do not act in a conflict. Passive opposition = their rating. Disable by overcoming at rating + 2.' },
+  countdown:    { what: 'A ticking clock that creates urgency without requiring direct opposition.', when: 'Whenever players risk losing momentum, or a threat has a natural deadline.', rule: 'Fill one box per trigger. The last box fires the outcome, no roll, no negotiation. Show the track openly.' },
+  constraint:   { what: 'A limitation that forces the party to change their approach rather than roll higher.', when: 'When the obvious solution is too easy, or a scene needs tactical texture without more enemies.', rule: 'Constraints do not deal stress, they change the rules. Bypass requires specific fiction, not a high roll.' },
+};
 
-  // ── TYPELINE ──────────────────────────────────────────────────────
-  function typeLine() {
-    var parts = [meta.label];
-    if (d.type && d.type.name) parts.push(d.type.name);
-    if (genId==='npc_major'||genId==='npc_minor') {
-      var role = d.name ? '' : '';
-      if (d.aspects && d.aspects.others && d.aspects.others[0]) parts.push(d.aspects.others[0].split(' ').slice(0,3).join(' ')+'…');
-    }
-    if (genId==='encounter' && d.opposition && d.opposition.length) {
-      parts.push(d.opposition.map(function(o){return o.name+(o.qty>1?' ×'+o.qty:'');}).join(', '));
-    }
-    if (genId==='countdown' && d.unit) parts.push(d.unit);
-    if (genId==='consequence' && d.severity) parts.push(d.severity);
-    if (genId==='faction' && d.method) parts.push(d.method.split(' ').slice(0,2).join(' '));
-    return parts.join(' · ');
-  }
+var CV4_MONO = "'DM Mono','Courier New',Courier,monospace";
+var CV4_SANS = 'system-ui,-apple-system,sans-serif';
 
-  // ── CARD NAME ─────────────────────────────────────────────────────
-  function cardName() {
-    if (d.name) return d.name;
-    if (d.location) return d.location;
-    if (d.situation) return d.situation.slice(0,40)+(d.situation.length>40?'…':'');
-    if (d.aspects && d.aspects[0]) return typeof d.aspects[0]==='string' ? d.aspects[0] : (d.aspects[0].name||'');
-    if (d.aspects && d.aspects.high_concept) return d.aspects.high_concept;
-    if (d.type && d.type.aspect) return d.type.aspect;
-    if (d.goal) return d.goal.slice(0,40);
-    return meta.label;
-  }
+function cv4Lbl(label, color) {
+  return h('div', {style:{fontSize:11,fontWeight:700,letterSpacing:'0.2em',color:color,fontFamily:CV4_MONO,textTransform:'uppercase',marginBottom:4,lineHeight:1}}, label);
+}
 
-  // ── LEFT COLUMN content ───────────────────────────────────────────
-  function LeftCol() {
-    if (genId==='npc_major'||genId==='npc_minor') {
-      var asp = d.aspects || {};
-      var hc_list = Array.isArray(asp) ? asp : [asp.high_concept, asp.trouble].concat(asp.others||[]).filter(Boolean);
-      var skills = (d.skills||[]).slice(0,5);
-      return h('div', {className:'rc-col'},
-        h('div', {className:'rc-sec'}, 'Aspects'),
-        hc_list.map(function(a,i){
-          return h('div', {key:i, className:'rc-line'+(i===0?' rc-hc':i===1?' rc-tr':'')},
-            i===0?h('b',null,'HC: '):i===1?h('b',null,'TR: '):null, typeof a==='string'?a:(a.name||a)
-          );
-        }),
-        skills.length>0 && h('div', {className:'rc-sec', style:{marginTop:4}}, 'Skills'),
-        skills.length>0 && h('div', {className:'rc-line'},
-          skills.map(function(s){return '+'+s.r+' '+s.name;}).join(' · ')
-        )
-      );
-    }
-    if (genId==='encounter') {
-      var aspects = d.aspects || [];
-      return h('div', {className:'rc-col'},
-        h('div', {className:'rc-sec'}, 'Situation Aspects'),
-        aspects.map(function(a,i){ return h('div', {key:i, className:'rc-line'+(i===0?' rc-hc':'')}, typeof a==='string'?a:(a.name||a)); }),
-        d.zones && h('div', {className:'rc-sec', style:{marginTop:4}}, 'Zones'),
-        d.zones && d.zones.map(function(z,i){
-          return h('div', {key:i, className:'rc-line'}, h('b',null,z.name), z.aspect?' — '+z.aspect:'');
-        })
-      );
-    }
-    if (genId==='compel') {
-      return h('div', {className:'rc-col'},
-        h('div', {className:'rc-sec'}, 'Situation'),
-        h('div', {className:'rc-line rc-hc'}, d.situation||''),
-        d.consequence && h('div', {className:'rc-sec', style:{marginTop:4}}, 'If Accepted'),
-        d.consequence && h('div', {className:'rc-line rc-tr'}, d.consequence)
-      );
-    }
-    if (genId==='countdown') {
-      var total = d.boxes||4;
-      return h('div', {className:'rc-col'},
-        h('div', {className:'rc-sec'}, 'Track'),
-        h('div', {className:'rc-cd-row', style:{marginTop:5}},
-          Array.from({length:total}, function(_,i){
-            return h('div', {key:i, className:'rc-cdbox'+(i<cdFilled?' tick':''),
-              role:'checkbox', tabIndex:0,
-              'aria-checked':String(i<cdFilled),
-              'aria-label':'Countdown box '+(i+1),
-              onClick:function(e){e.stopPropagation();setCdFilled(i<cdFilled?i:i+1);},
-              onKeyDown:function(e){if(e.key===' '||e.key==='Enter'){e.stopPropagation();e.preventDefault();setCdFilled(i<cdFilled?i:i+1);}}} , i+1);
-          })
-        ),
-        d.trigger && h('div', {className:'rc-sec', style:{marginTop:4}}, 'Trigger'),
-        d.trigger && h('div', {className:'rc-line rc-tr'}, d.trigger),
-        d.unit && h('div', {className:'rc-muted', style:{marginTop:2}}, 'Unit: '+d.unit)
-      );
-    }
-    if (genId==='scene'||genId==='seed') {
-      var alist = d.aspects||[];
-      return h('div', {className:'rc-col'},
-        h('div', {className:'rc-sec'}, 'Aspects'),
-        alist.slice(0,4).map(function(a,i){
-          var txt = typeof a==='string'?a:(a.name||'');
-          return h('div', {key:i, className:'rc-line'+(i===0?' rc-hc':'')+(a.tags&&a.tags[0]?' rc-tagged':''), 
-            'data-tag': a.tags&&a.tags[0]?a.tags[0]:null}, txt);
-        }),
-        d.zones && d.zones.length>0 && h('div', {className:'rc-sec', style:{marginTop:4}}, 'Zones'),
-        d.zones && d.zones.slice(0,3).map(function(z,i){
-          return h('div', {key:i, className:'rc-line'}, h('b',null,z.name+(z.aspect?' — ':'')), z.aspect||'');
-        })
-      );
-    }
-    if (genId==='faction') {
-      return h('div', {className:'rc-col'},
-        h('div', {className:'rc-sec'}, 'Goal'),
-        h('div', {className:'rc-line rc-hc'}, d.goal||''),
-        d.weakness && h('div', {className:'rc-sec', style:{marginTop:4}}, 'Weakness'),
-        d.weakness && h('div', {className:'rc-line rc-tr'}, d.weakness),
-        d.face && h('div', {className:'rc-sec', style:{marginTop:4}}, 'Named Face'),
-        d.face && h('div', {className:'rc-line'}, (d.face.name||d.face)+(d.face.role?' — '+d.face.role:''))
-      );
-    }
-    if (genId==='consequence') {
-      return h('div', {className:'rc-col'},
-        h('div', {className:'rc-sec'}, 'Aspect'),
-        h('div', {className:'rc-line rc-hc'}, d.aspect||d.name||''),
-        d.context && h('div', {className:'rc-sec', style:{marginTop:4}}, 'Context'),
-        d.context && h('div', {className:'rc-line'}, d.context)
-      );
-    }
-    if (genId==='challenge') {
-      return h('div', {className:'rc-col'},
-        h('div', {className:'rc-sec'}, d.name||'Challenge'),
-        d.desc && h('div', {className:'rc-line', style:{lineHeight:1.5}}, d.desc),
-        d.primary && h('div', {className:'rc-sec', style:{marginTop:6}}, 'Primary skill'),
-        d.primary && h('div', {className:'rc-line'}, d.primary),
-        d.opposing && h('div', {className:'rc-sec', style:{marginTop:4}}, 'Opposition'),
-        d.opposing && h('div', {className:'rc-line rc-tr'}, d.opposing)
-      );
-    }
-    if (genId==='contest') {
-      return h('div', {className:'rc-col'},
-        h('div', {className:'rc-sec'}, d.contest_type||'Contest'),
-        d.desc && h('div', {className:'rc-line', style:{lineHeight:1.5}}, d.desc),
-        d.side_a && h('div', {className:'rc-sec', style:{marginTop:6}}, 'Sides'),
-        d.side_a && h('div', {className:'rc-line'}, d.side_a+' vs '+d.side_b),
-        d.aspect && h('div', {className:'rc-sec', style:{marginTop:4}}, 'Scene aspect'),
-        d.aspect && h('div', {className:'rc-line rc-hc'}, d.aspect)
-      );
-    }
-    if (genId==='obstacle') {
-      return h('div', {className:'rc-col'},
-        h('div', {className:'rc-sec'}, d.obstacle_type||'Obstacle'),
-        h('div', {className:'rc-line rc-hc'}, d.name||''),
-        d.choice && h('div', {className:'rc-sec', style:{marginTop:6}}, 'Choice'),
-        d.choice && h('div', {className:'rc-line'}, d.choice),
-        d.repercussion_deal && h('div', {className:'rc-sec', style:{marginTop:4}}, 'Deal with it'),
-        d.repercussion_deal && h('div', {className:'rc-line'}, d.repercussion_deal)
-      );
-    }
-    if (genId==='constraint') {
-      var body = d.what_resists || d.restricted_action || '';
-      return h('div', {className:'rc-col'},
-        h('div', {className:'rc-sec'}, d.constraint_type==='resistance'?'Resistance':'Limitation'),
-        h('div', {className:'rc-line rc-hc'}, d.name||''),
-        body && h('div', {className:'rc-sec', style:{marginTop:6}}, d.constraint_type==='resistance'?'What is resisted':'Restricted action'),
-        body && h('div', {className:'rc-line rc-tr'}, body),
-        d.consequence && h('div', {className:'rc-sec', style:{marginTop:4}}, 'If triggered'),
-        d.consequence && h('div', {className:'rc-line'}, d.consequence)
-      );
-    }
-    if (genId==='campaign') {
-      return h('div', {className:'rc-col'},
-        d.current && h('div', {className:'rc-sec'}, 'Current Issue'),
-        d.current && h('div', {className:'rc-line rc-hc'}, typeof d.current==='object'?(d.current.name||''):d.current),
-        d.impending && h('div', {className:'rc-sec', style:{marginTop:6}}, 'Impending Issue'),
-        d.impending && h('div', {className:'rc-line rc-tr'}, typeof d.impending==='object'?(d.impending.name||''):d.impending),
-        d.setting && d.setting[0] && h('div', {className:'rc-sec', style:{marginTop:6}}, 'Setting Aspect'),
-        d.setting && d.setting[0] && h('div', {className:'rc-line'}, d.setting[0])
-      );
-    }
-    if (genId==='complication') {
-      return h('div', {className:'rc-col'},
-        h('div', {className:'rc-sec'}, 'New Aspect'),
-        h('div', {className:'rc-line rc-hc'}, d.new_aspect||''),
-        d.arrival && h('div', {className:'rc-sec', style:{marginTop:6}}, 'Arrival'),
-        d.arrival && h('div', {className:'rc-line'}, d.arrival),
-        d.env && h('div', {className:'rc-sec', style:{marginTop:4}}, 'Environment shift'),
-        d.env && h('div', {className:'rc-line'}, d.env)
-      );
-    }
-    if (genId==='backstory') {
-      var qs = d.questions || [];
-      return h('div', {className:'rc-col'},
-        h('div', {className:'rc-sec'}, 'Questions'),
-        qs.slice(0,3).map(function(q,i){ return h('div', {key:i, className:'rc-line', style:{marginBottom:4,lineHeight:1.4}}, (i+1)+'. '+q); }),
-        d.hook && h('div', {className:'rc-sec', style:{marginTop:6}}, 'Hook'),
-        d.hook && h('div', {className:'rc-line rc-hc'}, d.hook)
-      );
-    }
-    // Default
-    var lines = [];
-    if (d.aspects) (Array.isArray(d.aspects)?d.aspects:[d.aspects.high_concept,d.aspects.trouble]).filter(Boolean).forEach(function(a){lines.push(typeof a==='string'?a:(a.name||''));});
-    if (d.goal) lines.push(d.goal);
-    if (d.situation) lines.push(d.situation);
-    return h('div', {className:'rc-col'},
-      h('div', {className:'rc-sec'}, 'Content'),
-      lines.slice(0,4).map(function(l,i){return h('div',{key:i,className:'rc-line'+(i===0?' rc-hc':'')},l);})
-    );
-  }
+function cv4Tag(text, color) {
+  return h('span', {style:{fontSize:10,fontWeight:700,letterSpacing:'0.1em',color:color,
+    border:'1px solid '+color+'55',borderRadius:3,padding:'2px 6px',marginRight:4,whiteSpace:'nowrap',display:'inline-block'}}, text);
+}
 
-  // ── RIGHT COLUMN content ──────────────────────────────────────────
-  function RightCol() {
-    if (genId==='npc_major'||genId==='npc_minor') {
-      var stunts = (d.stunts||[]).slice(0,2);
-      var phyMax = typeof d.physical_stress==='number'?d.physical_stress:(d.stress||2);
-      var menMax = typeof d.mental_stress==='number'?d.mental_stress:0;
-      return h('div', {className:'rc-col'},
-        stunts.length>0 && h('div', {className:'rc-sec'}, 'Stunts'),
-        stunts.map(function(s,i){
-          return h('div', {key:i, className:'rc-line', style:{marginBottom:2}},
-            h('b',null,(s.name||'Stunt')+': '), (s.desc||'').slice(0,60)+(s.desc&&s.desc.length>60?'…':'')
-          );
-        }),
-        d.opposition && d.opposition.length>0 && h('div', {className:'rc-sec', style:{marginTop:4}}, 'Opposition'),
-        h('div', {className:'rc-sec', style:{marginTop:4}}, 'Stress'),
-        h('div', {className:'rc-stress-row'},
-          phyMax>0 && h('span', {className:'rc-stress-lbl'}, 'PHY'),
-          Array.from({length:phyMax}, function(_,i){
-            var k='phy-'+i;
-            return h('div', {key:k, className:'rc-sbox'+(stressState[k]?' hit':''),
-              role:'checkbox', tabIndex:0,
-              'aria-checked':String(!!stressState[k]),
-              'aria-label':'Physical stress box '+(i+1),
-              onClick:function(e){e.stopPropagation();setStressState(function(s){var n=Object.assign({},s);n[k]=!n[k];return n;});},
-              onKeyDown:function(e){if(e.key===' '||e.key==='Enter'){e.stopPropagation();e.preventDefault();setStressState(function(s){var n=Object.assign({},s);n[k]=!n[k];return n;});}}});
-          }),
-          menMax>0 && h('span', {className:'rc-stress-lbl', style:{marginLeft:6}}, 'MEN'),
-          Array.from({length:menMax}, function(_,i){
-            var k='men-'+i;
-            return h('div', {key:k, className:'rc-sbox men'+(stressState[k]?' hit':''),
-              role:'checkbox', tabIndex:0,
-              'aria-checked':String(!!stressState[k]),
-              'aria-label':'Mental stress box '+(i+1),
-              onClick:function(e){e.stopPropagation();setStressState(function(s){var n=Object.assign({},s);n[k]=!n[k];return n;});},
-              onKeyDown:function(e){if(e.key===' '||e.key==='Enter'){e.stopPropagation();e.preventDefault();setStressState(function(s){var n=Object.assign({},s);n[k]=!n[k];return n;});}}});
-          })
-        ),
-        d.refresh && h('div', {className:'rc-muted', style:{marginTop:4}}, 'Refresh '+d.refresh)
-      );
-    }
-    if (genId==='encounter') {
-      return h('div', {className:'rc-col'},
-        h('div', {className:'rc-sec'}, 'Opposition'),
-        (d.opposition||[]).map(function(opp,i){
-          return h('div', {key:i, style:{marginBottom:6}},
-            h('div', {className:'rc-line'}, h('b',null,opp.name+(opp.qty>1?' ×'+opp.qty:'')),
-              opp.type==='major'?h('span',{className:'rc-tag-major'},' major'):''),
-            h('div', {className:'rc-muted'}, (opp.skills||[]).slice(0,3).map(function(s){return '+'+s.r+' '+s.name;}).join(' · ')),
-            opp.aspects && h('div', {className:'rc-line rc-tr'}, typeof opp.aspects[0]==='string'?opp.aspects[0]:(opp.aspects[0]&&opp.aspects[0].name)||'')
-          );
-        }),
-        d.victory && h('div', {className:'rc-sec', style:{marginTop:4}}, 'Victory'),
-        d.victory && h('div', {className:'rc-line'}, d.victory),
-        d.defeat  && h('div', {className:'rc-sec', style:{marginTop:2}}, 'Defeat'),
-        d.defeat  && h('div', {className:'rc-line rc-tr'}, d.defeat),
-        d.twist   && h('div', {className:'rc-muted', style:{marginTop:4}}, 'Twist: '+d.twist)
-      );
-    }
-    if (genId==='compel') {
-      return h('div', {className:'rc-col'},
-        h('div', {className:'rc-sec'}, 'Fate Point'),
-        h('div', {className:'rc-line'}, 'Accept → PC gains 1 FP'),
-        h('div', {className:'rc-line'}, 'Refuse → PC spends 1 FP'),
-        hc.invoke_example && h('div', {className:'rc-sec', style:{marginTop:4}}, 'Invoke example'),
-        hc.invoke_example && h('div', {className:'rc-muted'}, hc.invoke_example.slice(0,90)+'…')
-      );
-    }
-    if (genId==='countdown') {
-      return h('div', {className:'rc-col'},
-        h('div', {className:'rc-sec'}, 'Outcome'),
-        h('div', {className:'rc-line rc-tr'}, d.outcome||''),
-        tips.length>0 && h('div', {className:'rc-sec', style:{marginTop:4}}, 'GM Tip'),
-        tips.length>0 && h('div', {className:'rc-muted'}, tips[0])
-      );
-    }
-    if (genId==='seed') {
-      return h('div', {className:'rc-col'},
-        d.objective && h('div', {className:'rc-sec'}, 'Objective'),
-        d.objective && h('div', {className:'rc-line rc-hc'}, d.objective),
-        d.complication && h('div', {className:'rc-sec', style:{marginTop:4}}, 'Complication'),
-        d.complication && h('div', {className:'rc-line rc-tr'}, d.complication),
-        d.twist && h('div', {className:'rc-sec', style:{marginTop:4}}, 'Twist'),
-        d.twist && h('div', {className:'rc-muted'}, d.twist)
-      );
-    }
-    // Default right col — GM tips
-    return h('div', {className:'rc-col'},
-      tips.length>0 && h('div', {className:'rc-sec'}, 'For GM'),
-      tips.map(function(tip,i){return h('div',{key:i,className:'rc-muted',style:{marginBottom:3}},'→ '+tip);}),
-      hc.invoke_example && h('div', {className:'rc-sec', style:{marginTop:4}}, 'Invoke'),
-      hc.invoke_example && h('div', {className:'rc-muted'}, hc.invoke_example.slice(0,80)+'…')
-    );
-  }
+function cv4Pip(color, size) {
+  size = size || 10;
+  return h('div', {style:{width:size,height:size,border:'1.5px solid '+color,borderRadius:2,flexShrink:0}});
+}
 
-  // ── CARD BACK ─────────────────────────────────────────────────────
-  function CardBack() {
-    return h('div', {className:'rc-back-inner'},
-      h('div', {className:'rc-back-hdr'}, meta.label+' — Rules Reference · Fate Condensed'),
-      h('div', {className:'rc-back-cols'},
-        h('div', {className:'rc-back-col'},
-          hc.what && h('div', {className:'rc-back-sec'}, 'What this is'),
-          hc.what && h('div', {className:'rc-back-txt'}, hc.what),
-          hc.output && h('div', {className:'rc-back-sec'}, 'Output'),
-          hc.output && h('div', {className:'rc-back-txt'}, hc.output),
-          rules.slice(0,2).map(function(r,i){
-            return h('div', {key:i, className:'rc-back-rule'}, r,
-              srdUrl && h('a', {href:srdUrl,target:'_blank',rel:'noopener noreferrer',className:'rc-back-srd'},' SRD ↗'));
-          })
-        ),
-        h('div', {className:'rc-back-col'},
-          tips.length>0 && h('div', {className:'rc-back-sec'}, 'For GM'),
-          tips.map(function(tip,i){return h('div',{key:i,className:'rc-back-txt',style:{marginBottom:4}},'→ '+tip);}),
-          hc.invoke_example && h('div', {className:'rc-back-sec'}, 'Invoke example'),
-          hc.invoke_example && h('div', {className:'rc-back-txt'}, hc.invoke_example),
-          hc.compel_example && h('div', {className:'rc-back-sec', style:{marginTop:4}}, 'Compel example'),
-          hc.compel_example && h('div', {className:'rc-back-txt'}, hc.compel_example),
-          srdUrl && h('a', {href:srdUrl,target:'_blank',rel:'noopener noreferrer',className:'rc-back-srd-big'},'fate-srd.com ↗')
-        )
-      )
-    );
-  }
+function cv4SPill(name, r) {
+  var c = r >= 4 ? 'var(--c-red,#f87171)' : r >= 3 ? 'var(--gold,#fbbf24)' : r >= 2 ? 'var(--c-blue,#60a5fa)' : 'var(--text-muted)';
+  return h('div', {style:{display:'flex',alignItems:'center',gap:4}},
+    h('div', {style:{fontSize:11,fontWeight:800,color:c,fontFamily:CV4_MONO,lineHeight:1,minWidth:22,textAlign:'center'}}, '+'+r),
+    h('div', {style:{fontSize:11,color:'var(--text-dim)',fontFamily:CV4_SANS}}, name)
+  );
+}
 
-  var num = spineNum();
+function cv4UseReducedMotion() {
+  var _r = useState(function() {
+    try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch(e) { return false; }
+  });
+  var reduced = _r[0]; var setReduced = _r[1];
+  useEffect(function() {
+    try {
+      var mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+      function onMQ(e) { setReduced(e.matches); }
+      mq.addEventListener('change', onMQ);
+      return function() { mq.removeEventListener('change', onMQ); };
+    } catch(e) {}
+  }, []);
+  return reduced;
+}
 
-  return h('div', {className:'rc-scene'},
-    h('div', {
-      className:'rc-wrap'+(flipped?' rc-flipped':''),
-      onClick: function(){setFlipped(function(f){return !f;});},
-      onKeyDown: function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();setFlipped(function(f){return !f;});}},
-      role:'group',
-      tabIndex:0,
-      'aria-label': meta.label+': '+cardName()+' (press Space or Enter to flip for rules)',
-    },
-      // FRONT
-      h('div', {className:'rc-face'},
-        h('div', {className:'rc-spine', style:{borderColor:'color-mix(in srgb,'+meta.color+' 30%,transparent)',background:'color-mix(in srgb,'+meta.color+' 8%,transparent)'}},
-          h('span', {className:'rc-spine-type', style:{color:meta.color}}, meta.label),
-          h('span', {className:'rc-spine-icon'}, meta.icon),
-          num!=null && h('span', {className:'rc-spine-badge', style:{color:meta.color,borderColor:'color-mix(in srgb,'+meta.color+' 40%,transparent)',background:'color-mix(in srgb,'+meta.color+' 10%,transparent)'}}, num)
-        ),
-        h('div', {className:'rc-main'},
-          h('div', {className:'rc-namebar'},
-            h('span', {className:'rc-name'}, cardName()),
-            h('div', {className:'rc-pills'},
-              h('span', {className:'rc-pill', style:{borderColor:'color-mix(in srgb,'+meta.color+' 35%,transparent)'}}, meta.label),
-              num!=null && genId==='npc_major' && h('span', {className:'rc-pill', style:{borderColor:'color-mix(in srgb,'+meta.color+' 35%,transparent)'}}, 'Refresh '+num),
-              num!=null && genId==='encounter' && h('span', {className:'rc-pill', style:{borderColor:'color-mix(in srgb,'+meta.color+' 35%,transparent)'}}, 'GM FP '+num)
-            )
-          ),
-          h('div', {className:'rc-typeline', style:{borderColor:'color-mix(in srgb,'+meta.color+' 20%,transparent)',background:'color-mix(in srgb,'+meta.color+' 5%,transparent)'}},
-            h('span', {style:{color:meta.color,fontSize:10}}, meta.icon+' '),
-            typeLine()
-          ),
-          h('div', {className:'rc-content'},
-            LeftCol(),
-            h('div', {className:'rc-col-sep'}),
-            RightCol()
-          ),
-          h('div', {className:'rc-bottom'},
-            h('span', {className:'rc-flip-hint'}, 'Tap for rules →'),
-            h('div', {className:'rc-spacer'}),
-            onChainRoll && h('button', {
-              className:'chain-roll-btn',
-              onClick:function(e){e.stopPropagation();onChainRoll(genId);},
-              style:{fontSize:10},
-            }, '⟳ Chain'),
-            h('button', {
-              className:'rc-pin-btn',
-              onClick:function(e){e.stopPropagation();if(onUpdate)onUpdate({_pin:true});},
-              title:'Save to Table Prep',
-            }, '📌')
-          )
-        )
-      ),
-      // BACK
-      h('div', {className:'rc-back'}, CardBack())
+var cv4StyleInjected = false;
+function cv4InjectStyles() {
+  if (cv4StyleInjected) return;
+  cv4StyleInjected = true;
+  try {
+    if (document.getElementById('ogma-cv4-styles')) return;
+    var s = document.createElement('style');
+    s.id = 'ogma-cv4-styles';
+    s.textContent = '.cv4-card{transition:box-shadow .2s,border-color .2s}.cv4-body{transition:opacity .13s ease;scrollbar-width:thin}.cv4-body.cv4-fading{opacity:0!important}.cv4-body::-webkit-scrollbar{width:4px}.cv4-body::-webkit-scrollbar-thumb{background:var(--border-mid,rgba(255,255,255,0.14));border-radius:2px}@keyframes cv4pulse{0%,100%{opacity:1}50%{opacity:.4}}';
+    document.head.appendChild(s);
+  } catch(e) {}
+}
+
+function cv4BackPanel(genId, catColor) {
+  var help = CV4_HELP[genId] || {what:'',when:'',rule:''};
+  return h('div', {style:{flex:1,overflow:'hidden',padding:'10px 14px 0',display:'flex',gap:12}},
+    h('div', {style:{flex:1,display:'flex',flexDirection:'column',gap:10,minWidth:0}},
+      h('div', null, cv4Lbl('WHAT IT GENERATES', catColor), h('p', {style:{margin:0,fontSize:11,color:'var(--text)',lineHeight:1.65,fontFamily:CV4_SANS}}, help.what)),
+      h('div', null, cv4Lbl('WHEN TO USE IT', catColor), h('p', {style:{margin:0,fontSize:11,color:'var(--text-dim)',lineHeight:1.65,fontFamily:CV4_SANS}}, help.when))
+    ),
+    h('div', {style:{width:192,flexShrink:0,background:'var(--inset)',border:'1px solid '+catColor+'33',borderLeft:'3px solid '+catColor,borderRadius:'0 6px 6px 0',padding:'10px 12px'}},
+      cv4Lbl('TABLE RULE', catColor),
+      h('p', {style:{margin:0,fontSize:11,color:'var(--text-dim)',lineHeight:1.7,fontFamily:CV4_SANS}}, help.rule)
     )
   );
 }
 
-function renderCard(genId, data, campId, onUpdate, worldStunts, onChainRoll) {
-  return h(FlipCard, {
-    genId:genId, data:data, campId:campId,
-    onUpdate:onUpdate, worldStunts:worldStunts||[], onChainRoll:onChainRoll||null,
+function cv4Card(props) {
+  var genId    = props.genId;
+  var campName = props.campName || '';
+  var data     = props.data || {};
+  var frontFn  = props.frontFn;
+  var onUpdate = props.onUpdate || null;
+
+  var _back = useState(false); var isBack = _back[0]; var setIsBack = _back[1];
+  var _vis  = useState(true);  var visible = _vis[0];  var setVisible = _vis[1];
+  var _hov  = useState(false); var hovered = _hov[0];  var setHovered = _hov[1];
+  var reduced = cv4UseReducedMotion();
+  var pending = useRef(false);
+
+  // Interactive state for stress/countdown/contest/consequence
+  var phyMax = typeof data.physical_stress === 'number' ? data.physical_stress : (typeof data.stress === 'number' ? data.stress : 0);
+  var menMax = typeof data.mental_stress === 'number' ? data.mental_stress : 0;
+  var _st = useState(function() {
+    return {
+      phyHit: Array(phyMax).fill(false),
+      menHit: Array(menMax).fill(false),
+      cdFilled: 0,
+      scoreA: 0, scoreB: 0,
+      treated: false,
+    };
   });
+  var cardState = _st[0]; var setCardState = _st[1];
+
+  function updState(patch) {
+    setCardState(function(s) {
+      var next = Object.assign({}, s, patch);
+      if (onUpdate) onUpdate(next);
+      return next;
+    });
+  }
+
+  var meta = CV4_META[genId] || {cat:'mechanics', icon:'\u25c8'};
+  var cat  = CV4_CAT[meta.cat] || CV4_CAT.mechanics;
+  var catColor = cat.color;
+
+  useEffect(function() { cv4InjectStyles(); }, []);
+
+  function doFlip() {
+    if (pending.current) return;
+    if (reduced) { setIsBack(function(b) { return !b; }); return; }
+    pending.current = true;
+    setVisible(false);
+    setTimeout(function() {
+      setIsBack(function(b) { return !b; });
+      setVisible(true);
+      pending.current = false;
+    }, 130);
+  }
+
+  function handleKey(e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); doFlip(); }
+  }
+
+  var genLabel = genId.replace(/_/g, ' ').toUpperCase();
+  var ariaLabel = genLabel + ' card' + (campName ? ' from ' + campName : '') +
+    '. Currently showing ' + (isBack ? 'GM guidance' : 'card content') +
+    '. Activate to ' + (isBack ? 'return to card' : 'see GM guidance') + '.';
+
+  return h('div', {
+    className: 'cv4-card',
+    role: 'region',
+    'aria-label': ariaLabel,
+    onMouseEnter: function() { setHovered(true); },
+    onMouseLeave: function() { setHovered(false); },
+    style: {
+      width: 600, height: 380,
+      background: 'var(--panel)',
+      border: '1px solid ' + (hovered ? catColor + '99' : 'var(--border)'),
+      borderRadius: 10, overflow: 'hidden',
+      display: 'flex', flexDirection: 'column',
+      boxShadow: hovered ? '0 6px 28px ' + catColor + '30, 0 2px 8px rgba(0,0,0,0.3)' : '0 2px 12px rgba(0,0,0,0.25)',
+      flexShrink: 0,
+    },
+  },
+    h('div', {style:{height:36,flexShrink:0,
+      background: isBack ? 'color-mix(in srgb,'+catColor+' 12%,var(--inset))' : 'color-mix(in srgb,'+catColor+' 18%,var(--cv-card-dark2,var(--inset)))',
+      borderBottom:'1px solid '+catColor+'44',
+      display:'flex',alignItems:'center',padding:'0 14px',gap:8}},
+      h('span', {style:{fontSize:13,color:catColor,lineHeight:1,flexShrink:0}}, meta.icon),
+      h('span', {style:{fontSize:11,fontWeight:800,letterSpacing:'0.18em',color:catColor,fontFamily:CV4_MONO}},
+        isBack ? 'GM GUIDE \u2014 ' + genLabel : genLabel),
+      h('div', {style:{flex:1}}),
+      campName && h('span', {style:{fontSize:11,color:'var(--text-muted)',fontFamily:CV4_SANS,letterSpacing:'0.05em'}}, campName)
+    ),
+    h('div', {
+      className: 'cv4-body' + (!visible ? ' cv4-fading' : ''),
+      style: {flex:1, overflow:'auto', opacity: visible ? 1 : 0},
+    },
+      isBack ? cv4BackPanel(genId, catColor) : frontFn(genId, data, campName, catColor, {state:cardState, upd:updState, phyMax:phyMax, menMax:menMax})
+    ),
+    h('div', {
+      role: 'button', tabIndex: 0,
+      'aria-pressed': String(isBack),
+      onClick: doFlip, onKeyDown: handleKey,
+      style:{height:30,flexShrink:0,background:'var(--cv-card-dark2,var(--inset))',
+        borderTop:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'center',
+        cursor:'pointer',userSelect:'none',
+        transition:'background .15s'},
+      onMouseEnter:function(e){e.currentTarget.style.background='color-mix(in srgb,'+catColor+' 12%,var(--inset))';},
+      onMouseLeave:function(e){e.currentTarget.style.background='var(--cv-card-dark2,var(--inset))';},
+    },
+      h('span', {style:{fontSize:11,color:'var(--text-muted)',letterSpacing:'0.2em',fontFamily:CV4_MONO,pointerEvents:'none'}},
+        isBack ? '\u25c4  RETURN TO CARD' : '\u25ba  FLIP FOR GM GUIDANCE')
+    )
+  );
+}
+
+function cv4Body(left, right, rightWidth) {
+  return h('div', {style:{flex:1,overflow:'hidden',padding:'10px 14px 0',display:'flex',gap:12}},
+    h('div', {style:{flex:1,display:'flex',flexDirection:'column',gap:6,minWidth:0,overflow:'hidden'}}, left),
+    right && h('div', {style:{width:rightWidth||140,flexShrink:0,display:'flex',flexDirection:'column',gap:7}}, right)
+  );
+}
+
+function cv4Inset(children, sx) {
+  return h('div', {style:Object.assign({padding:'5px 9px',background:'var(--inset)',border:'1px solid var(--border)',borderRadius:5}, sx||{})}, children);
+}
+
+function cv4Accent(children, color, sx) {
+  return h('div', {style:Object.assign({padding:'5px 9px',background:'color-mix(in srgb,'+color+' 10%,var(--inset))',border:'1px solid '+color+'44',borderLeft:'3px solid '+color,borderRadius:'0 5px 5px 0'}, sx||{})}, children);
+}
+
+// ── Interactive stress track ─────────────────────────────────────────────────
+function cv4StressTrack(label, hits, setHits, color) {
+  return h('div', null,
+    cv4Lbl(label, color),
+    h('div', {style:{display:'flex',gap:4}},
+      hits.map(function(v, i) {
+        return h('div', {
+          key:i,
+          role:'checkbox',
+          tabIndex:0,
+          'aria-checked':String(!!v),
+          'aria-label':label+' stress box '+(i+1)+(v?' (marked)':' (clear)'),
+          onClick:function(e){e.stopPropagation();var a=hits.slice();a[i]=!a[i];setHits(a);},
+          onKeyDown:function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();var a=hits.slice();a[i]=!a[i];setHits(a);}},
+          style:{
+            width:18,height:18,borderRadius:3,
+            border:'2px solid '+color,
+            background:v?color:'transparent',
+            cursor:'pointer',flexShrink:0,
+            transition:'background .12s',
+            position:'relative',
+          },
+        },
+          v&&h('span',{style:{position:'absolute',inset:0,display:'flex',alignItems:'center',
+            justifyContent:'center',fontSize:11,fontWeight:700,
+            color:v?'var(--bg,#0d1117)':'transparent',lineHeight:1,pointerEvents:'none'}},'\u2715')
+        );
+      })
+    )
+  );
+}
+
+// ── Interactive countdown clock ──────────────────────────────────────────────
+function cv4Clock(boxes, filled, setFilled, color) {
+  var full = filled >= boxes;
+  return h('div', null,
+    cv4Lbl('CLOCK \u2014 '+boxes+' BOXES'+(full?' \u2014 TRIGGERED!':''), full?'var(--c-red,#f87171)':color),
+    h('div', {style:{display:'flex',gap:4,flexWrap:'wrap',marginBottom:4}},
+      Array.from({length:boxes}).map(function(_,i) {
+        var ticked = i < filled;
+        return h('div', {
+          key:i,
+          role:'checkbox',
+          tabIndex:0,
+          'aria-checked':String(ticked),
+          'aria-label':'Clock box '+(i+1)+(ticked?' (ticked)':' (empty)'),
+          onClick:function(e){e.stopPropagation();setFilled(ticked?i:i+1);},
+          onKeyDown:function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();setFilled(ticked?i:i+1);}},
+          style:{
+            width:26,height:26,borderRadius:4,cursor:'pointer',
+            border:'2px solid '+(full?'var(--c-red,#f87171)':color),
+            background:ticked?'color-mix(in srgb,'+(full?'var(--c-red,#f87171)':color)+' 40%,transparent)':'transparent',
+            transition:'all .15s',display:'flex',alignItems:'center',justifyContent:'center',
+          },
+        },
+          ticked&&h('span',{style:{fontSize:11,fontWeight:700,color:full?'var(--c-red,#f87171)':color,pointerEvents:'none'}},'\u2713')
+        );
+      })
+    ),
+    full&&h('div',{style:{fontSize:11,fontWeight:700,color:'var(--c-red,#f87171)',fontFamily:CV4_MONO,letterSpacing:'0.15em',animation:'cv4pulse 0.6s ease-in-out'}},'\u26a1 CLOCK FULL \u2014 TRIGGER NOW')
+  );
+}
+
+function cv4FrontNpcMinor(genId, d, campName, catColor, ctx) {
+  var aspects = Array.isArray(d.aspects) ? d.aspects : [];
+  var skills  = Array.isArray(d.skills)  ? d.skills  : [];
+  var stunt   = d.stunt || null;
+  var stress  = d.stress || 1;
+  var hits    = ctx ? ctx.state.phyHit : Array(stress).fill(false);
+  function setHits(a) { if (ctx) ctx.upd({phyHit:a}); }
+  return cv4Body([
+    h('div',{style:{fontSize:17,fontWeight:800,color:'var(--text)',fontFamily:CV4_MONO,lineHeight:1.1,letterSpacing:'-0.02em'}},d.name||''),
+    aspects.map(function(a,i){return h('div',{key:i,style:{padding:'4px 9px',borderRadius:4,fontSize:11,fontStyle:'italic',fontFamily:CV4_SANS,background:i===0?'color-mix(in srgb,'+catColor+' 12%,var(--inset))':'var(--inset)',border:'1px solid '+(i===0?catColor+'66':'var(--border)'),color:i===0?catColor:'var(--text-dim)',fontWeight:i===0?600:400}},i===0&&h('span',{style:{fontSize:10,fontWeight:800,fontStyle:'normal',letterSpacing:'0.15em',marginRight:5,fontFamily:CV4_MONO,color:catColor}},'HC '),a);}),
+    stunt&&cv4Inset([h('span',{style:{fontSize:11,fontWeight:700,color:catColor,fontFamily:CV4_SANS}},stunt.name+': '),h('span',{style:{fontSize:11,color:'var(--text-dim)',fontFamily:CV4_SANS}},stunt.desc||'')])
+  ],[
+    h('div',null,cv4Lbl('PEAK SKILL',catColor),skills.slice(0,1).map(function(s,i){return h('div',{key:i,style:{display:'flex',alignItems:'center',gap:7}},h('div',{style:{width:30,height:30,borderRadius:6,background:catColor,display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,fontWeight:800,color:'var(--bg,#0d1117)',fontFamily:CV4_MONO}},'+'+s.r),h('div',{style:{fontSize:12,color:'var(--text)',fontFamily:CV4_SANS,fontWeight:600}},s.name));})),
+    cv4StressTrack('STRESS', hits.length ? hits : Array(stress).fill(false), setHits, catColor),
+    cv4Inset([h('div',{style:{fontSize:11,color:'var(--text-muted)',fontFamily:CV4_SANS,lineHeight:1.5}},'No consequences'),h('div',{style:{fontSize:11,color:'var(--text-muted)',fontFamily:CV4_SANS}},'One hit = out')])
+  ],114);
+}
+
+function cv4FrontNpcMajor(genId, d, campName, catColor, ctx) {
+  var asp=d.aspects||{}; var skills=Array.isArray(d.skills)?d.skills:[]; var stunts=Array.isArray(d.stunts)?d.stunts:[];
+  var phyHits = ctx ? ctx.state.phyHit : Array(d.physical_stress||3).fill(false);
+  var menHits = ctx ? ctx.state.menHit : Array(d.mental_stress||3).fill(false);
+  function setPhy(a) { if (ctx) ctx.upd({phyHit:a}); }
+  function setMen(a) { if (ctx) ctx.upd({menHit:a}); }
+  return cv4Body([
+    h('div',{style:{fontSize:15,fontWeight:800,color:'var(--text)',fontFamily:CV4_MONO,lineHeight:1.1,letterSpacing:'-0.02em'}},d.name||''),
+    asp.high_concept&&h('div',{style:{padding:'4px 9px',background:'color-mix(in srgb,'+catColor+' 12%,var(--inset))',border:'1px solid '+catColor+'55',borderRadius:4,fontSize:11,color:catColor,fontStyle:'italic',fontFamily:CV4_SANS,fontWeight:600}},h('span',{style:{fontSize:10,fontWeight:800,fontStyle:'normal',letterSpacing:'0.15em',marginRight:5,fontFamily:CV4_MONO}},'HC '),asp.high_concept),
+    asp.trouble&&h('div',{style:{padding:'4px 9px',background:'color-mix(in srgb,var(--c-red,#f87171) 10%,var(--inset))',border:'1px solid rgba(248,113,113,0.33)',borderRadius:4,fontSize:11,color:'var(--text-dim)',fontStyle:'italic',fontFamily:CV4_SANS}},h('span',{style:{fontSize:10,fontWeight:800,fontStyle:'normal',letterSpacing:'0.15em',marginRight:5,fontFamily:CV4_MONO,color:'var(--c-red,#f87171)'}},'TR '),asp.trouble),
+    stunts.length>0&&h('div',{style:{display:'flex',gap:4,flexWrap:'wrap'}},stunts.map(function(s,i){return h('div',{key:i,style:{padding:'3px 8px',background:'var(--inset)',border:'1px solid var(--border)',borderRadius:4,fontSize:11,fontWeight:700,color:catColor,fontFamily:CV4_SANS}},s.name||s);}))
+  ],[
+    h('div',null,cv4Lbl('SKILLS',catColor),h('div',{style:{display:'flex',flexDirection:'column',gap:3}},skills.slice(0,4).map(function(s,i){return h('div',{key:i},cv4SPill(s.name,s.r));}))),
+    h('div',{style:{display:'flex',flexDirection:'column',gap:5}},
+      cv4StressTrack('PHY', phyHits.length ? phyHits : Array(d.physical_stress||3).fill(false), setPhy, 'var(--gold,#fbbf24)'),
+      cv4StressTrack('MEN', menHits.length ? menHits : Array(d.mental_stress||3).fill(false), setMen, 'var(--c-purple,#a78bfa)'),
+      h('div',null,cv4Lbl('REF',catColor),h('div',{style:{fontSize:20,fontWeight:800,color:'var(--text)',lineHeight:1,fontFamily:CV4_MONO}},d.refresh||3))
+    )
+  ],144);
+}
+
+function cv4FrontFaction(genId, d, campName, catColor) {
+  var face=d.face||{}; var fn_=typeof face==='string'?face:(face.name||''); var fr=typeof face==='string'?'':(face.role||'');
+  return cv4Body([
+    h('div',{style:{fontSize:14,fontWeight:800,color:'var(--text)',fontFamily:CV4_MONO,lineHeight:1.15}},d.name||''),
+    h('div',null,cv4Lbl('GOAL',catColor),h('p',{style:{margin:0,fontSize:11,color:'var(--text)',fontFamily:CV4_SANS,lineHeight:1.45}},d.goal||'')),
+    h('div',null,cv4Lbl('METHOD',catColor),h('p',{style:{margin:0,fontSize:11,color:'var(--text-dim)',fontFamily:CV4_SANS,lineHeight:1.45,fontStyle:'italic'}},d.method||'')),
+    cv4Accent([cv4Lbl('WEAKNESS','var(--c-red,#f87171)'),h('p',{style:{margin:0,fontSize:11,color:'var(--c-red,#f87171)',fontFamily:CV4_SANS,lineHeight:1.35}},d.weakness||'')],'var(--c-red,#f87171)')
+  ],[
+    fn_&&h('div',{style:{padding:'9px 10px',background:'color-mix(in srgb,'+catColor+' 12%,var(--inset))',border:'1px solid '+catColor+'44',borderRadius:6}},cv4Lbl('THE FACE',catColor),h('div',{style:{fontSize:12,fontWeight:700,color:'var(--text)',fontFamily:CV4_SANS,marginBottom:2}},fn_),h('p',{style:{margin:0,fontSize:11,color:'var(--text-dim)',fontFamily:CV4_SANS,lineHeight:1.4,fontStyle:'italic'}},fr)),
+    cv4Inset([h('p',{style:{margin:0,fontSize:11,color:'var(--text-muted)',fontFamily:CV4_SANS,lineHeight:1.5}},'Goal + Method = two sides of one faction aspect')])
+  ],162);
+}
+
+function cv4FrontScene(genId, d, campName, catColor) {
+  var aspects=Array.isArray(d.aspects)?d.aspects:[]; var zones=Array.isArray(d.zones)?d.zones:[];
+  var cc={danger:'var(--c-red,#f87171)',cover:'var(--c-blue,#60a5fa)',tone:'var(--gold,#fbbf24)',movement:'var(--c-green,#34d399)'};
+  return cv4Body([
+    cv4Lbl('SCENE ASPECTS',catColor),
+    aspects.map(function(a,i){var name=typeof a==='string'?a:(a.name||'');var cat_=(typeof a==='object'&&a.category)?a.category.toLowerCase():'tone';var fi=(typeof a==='object')?(a.free_invoke||a.fi):false;var acol=cc[cat_]||catColor;return h('div',{key:i,style:{display:'flex',gap:7,alignItems:'flex-start'}},cv4Tag(cat_.toUpperCase(),acol),h('div',{style:{fontSize:11,color:'var(--text)',fontFamily:CV4_SANS,fontStyle:'italic',lineHeight:1.35}},name,fi&&h('span',{style:{fontSize:10,fontWeight:700,color:'var(--c-green,#34d399)',fontStyle:'normal',marginLeft:4}},'FI')));})
+  ],[
+    cv4Lbl('ZONES',catColor),
+    zones.slice(0,4).map(function(z,i){var zn=typeof z==='string'?z:(z.name||'');var za=typeof z==='object'?(z.aspect||''):'';return h('div',{key:i,style:{marginBottom:5,padding:'4px 8px',background:'var(--inset)',border:'1px solid var(--border)',borderLeft:'2px solid '+catColor,borderRadius:'0 4px 4px 0'}},h('div',{style:{fontSize:11,fontWeight:700,color:'var(--text)',fontFamily:CV4_SANS,lineHeight:1.2}},zn),za&&h('div',{style:{fontSize:11,color:'var(--text-dim)',fontStyle:'italic',fontFamily:CV4_SANS}},za));})
+  ],180);
+}
+
+function cv4FrontCampaign(genId, d, campName, catColor) {
+  var cur=d.current||{}; var imp=d.impending||{}; var setting=Array.isArray(d.setting)?d.setting:[];
+  return cv4Body([
+    h('div',null,cv4Lbl('CURRENT ISSUE',catColor),h('div',{style:{fontSize:12,fontWeight:700,color:'var(--text)',fontFamily:CV4_SANS,lineHeight:1.3,marginBottom:3}},cur.name||''),h('p',{style:{margin:0,fontSize:11,color:'var(--text-dim)',fontFamily:CV4_SANS,lineHeight:1.5}},cur.desc||'')),
+    cv4Accent([cv4Lbl('IMPENDING','var(--c-red,#f87171)'),h('p',{style:{margin:0,fontSize:11,fontStyle:'italic',color:'var(--c-red,#f87171)',fontFamily:CV4_SANS,lineHeight:1.35}},imp.name||'')],'var(--c-red,#f87171)')
+  ],[
+    cv4Lbl('SETTING ASPECTS',catColor),
+    setting.map(function(s,i){return h('p',{key:i,style:{margin:'0 0 6px',fontSize:11,fontStyle:'italic',color:'var(--text-dim)',fontFamily:CV4_SANS,lineHeight:1.4,paddingLeft:8,borderLeft:'1px solid var(--border)'}},'\u201c'+s+'\u201d');})
+  ],172);
+}
+
+function cv4FrontEncounter(genId, d, campName, catColor) {
+  var opp=Array.isArray(d.opposition)?d.opposition:[];
+  return cv4Body([
+    cv4Lbl('OPPOSITION',catColor),
+    opp.map(function(o,i){var isMajor=(o.type||'').toLowerCase()==='major';return h('div',{key:i,style:{display:'flex',background:'var(--inset)',border:'1px solid '+(isMajor?catColor+'55':'var(--border)'),borderRadius:5,overflow:'hidden',marginBottom:4}},h('div',{style:{padding:'5px 8px',background:isMajor?catColor:'var(--panel)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',minWidth:42,flexShrink:0}},h('div',{style:{fontSize:10,fontWeight:700,color:isMajor?'#0d1117':'var(--text-muted)',letterSpacing:'0.1em',fontFamily:CV4_MONO}},(o.type||'').toUpperCase()),h('div',{style:{fontSize:13,fontWeight:700,color:isMajor?'#0d1117':'var(--text)',fontFamily:CV4_MONO}},'\xd7'+(o.qty||1))),h('div',{style:{flex:1,padding:'5px 8px'}},h('div',{style:{fontSize:11,fontWeight:700,color:'var(--text)',fontFamily:CV4_SANS,marginBottom:3}},o.name||''),h('div',{style:{display:'flex',gap:7}},(o.skills||[]).slice(0,3).map(function(s,j){return h('div',{key:j},cv4SPill(s.name,s.r));}))),h('div',{style:{padding:'5px 8px 5px 0',display:'flex',gap:2,alignItems:'center',flexShrink:0}},Array.from({length:o.stress||2}).map(function(_,j){return cv4Pip(isMajor?catColor:'var(--text-muted)',9);})));}),
+    h('div',{style:{display:'flex',gap:6}},
+      h('div',{style:{flex:1,padding:'4px 7px',background:'color-mix(in srgb,var(--c-green,#34d399) 10%,var(--inset))',border:'1px solid rgba(52,211,153,0.3)',borderLeft:'2px solid var(--c-green,#34d399)',borderRadius:'0 3px 3px 0'}},cv4Lbl('WIN','var(--c-green,#34d399)'),h('p',{style:{margin:0,fontSize:11,color:'var(--c-green,#34d399)',fontFamily:CV4_SANS,lineHeight:1.3}},d.victory||'')),
+      h('div',{style:{flex:1,padding:'4px 7px',background:'color-mix(in srgb,var(--c-red,#f87171) 10%,var(--inset))',border:'1px solid rgba(248,113,113,0.3)',borderLeft:'2px solid var(--c-red,#f87171)',borderRadius:'0 3px 3px 0'}},cv4Lbl('LOSE','var(--c-red,#f87171)'),h('p',{style:{margin:0,fontSize:11,color:'var(--c-red,#f87171)',fontFamily:CV4_SANS,lineHeight:1.3}},d.defeat||''))
+    )
+  ],[
+    h('div',null,cv4Lbl('TWIST',catColor),h('p',{style:{margin:0,fontSize:11,color:'var(--text-dim)',fontStyle:'italic',fontFamily:CV4_SANS,lineHeight:1.4}},d.twist||'')),
+    h('div',null,cv4Lbl('GM FP',catColor),h('div',{style:{fontSize:28,fontWeight:800,color:'var(--text)',lineHeight:1,fontFamily:CV4_MONO}},d.gm_fate_points||''))
+  ],130);
+}
+
+function cv4FrontSeed(genId, d, campName, catColor) {
+  var scenes=Array.isArray(d.scenes)?d.scenes:[]; var cols=[catColor,'var(--gold,#fbbf24)','var(--c-red,#f87171)'];
+  return cv4Body([
+    h('div',null,cv4Lbl('OBJECTIVE',catColor),h('p',{style:{margin:0,fontSize:11,fontWeight:600,color:'var(--text)',fontFamily:CV4_SANS,lineHeight:1.45}},d.objective||'')),
+    h('div',null,cv4Lbl('LOCATION',catColor),h('p',{style:{margin:0,fontSize:11,color:'var(--text-dim)',fontFamily:CV4_SANS,lineHeight:1.4}},d.location||'')),
+    cv4Accent([cv4Lbl('COMPLICATION','var(--c-red,#f87171)'),h('p',{style:{margin:0,fontSize:11,color:'var(--c-red,#f87171)',fontFamily:CV4_SANS,lineHeight:1.3}},d.complication||'')],'var(--c-red,#f87171)')
+  ],[
+    cv4Lbl('3-SCENE SKELETON',catColor),
+    scenes.map(function(s,i){var b=s.brief||'';if(b.length>80)b=b.slice(0,80)+'\u2026';return h('div',{key:i,style:{padding:'5px 8px',background:'var(--inset)',border:'1px solid var(--border)',borderLeft:'2px solid '+cols[i],borderRadius:'0 4px 4px 0',marginBottom:4}},h('div',{style:{fontSize:10,fontWeight:700,color:cols[i],letterSpacing:'0.15em',fontFamily:CV4_MONO}},s.type||('ACT '+(i+1))),h('p',{style:{margin:0,fontSize:11,color:'var(--text-dim)',fontFamily:CV4_SANS,lineHeight:1.3}},b));})
+  ],170);
+}
+
+function cv4FrontCompel(genId, d, campName, catColor) {
+  return cv4Body([
+    cv4Accent([cv4Lbl('SITUATION',catColor),h('p',{style:{margin:0,fontSize:13,fontWeight:700,color:'var(--text)',fontFamily:CV4_SANS,lineHeight:1.35}},d.situation||'')],catColor,{padding:'8px 10px'}),
+    cv4Inset([cv4Lbl('CONSEQUENCE',catColor),h('p',{style:{margin:0,fontSize:11,color:'var(--text-dim)',fontFamily:CV4_SANS,lineHeight:1.4,fontStyle:'italic'}},d.consequence||d.complication||'')])
+  ],[
+    h('div',null,cv4Lbl('TYPE',catColor),h('div',{style:{padding:'4px 9px',background:'color-mix(in srgb,'+catColor+' 16%,var(--inset))',border:'1px solid '+catColor+'44',borderRadius:4,display:'inline-block',fontSize:13,fontWeight:700,color:catColor,fontFamily:CV4_MONO,textTransform:'uppercase'}},d.template_type||'event')),
+    cv4Inset([cv4Lbl('PLAYER CHOICE',catColor),h('p',{style:{margin:0,fontSize:11,color:'var(--text-dim)',fontFamily:CV4_SANS,lineHeight:1.5}},'Accept for 1 FP \u2014 or refuse by spending 1 FP')])
+  ],160);
+}
+
+function cv4FrontChallenge(genId, d, campName, catColor) {
+  return cv4Body([
+    h('div',null,h('div',{style:{fontSize:14,fontWeight:800,color:'var(--text)',fontFamily:CV4_MONO,lineHeight:1.2}},d.name||d.title||''),h('p',{style:{margin:'3px 0 0',fontSize:11,color:'var(--text-dim)',fontFamily:CV4_SANS,lineHeight:1.4}},d.desc||d.description||'')),
+    h('div',{style:{display:'flex',gap:8}},
+      h('div',{style:{flex:1,padding:'5px 8px',background:'color-mix(in srgb,var(--c-green,#34d399) 10%,var(--inset))',border:'1px solid rgba(52,211,153,0.3)',borderLeft:'2px solid var(--c-green,#34d399)',borderRadius:'0 5px 5px 0'}},cv4Lbl('SUCCESS','var(--c-green,#34d399)'),h('p',{style:{margin:0,fontSize:11,color:'var(--c-green,#34d399)',fontFamily:CV4_SANS,lineHeight:1.35}},d.success||d.stakes_good||'')),
+      h('div',{style:{flex:1,padding:'5px 8px',background:'color-mix(in srgb,var(--c-red,#f87171) 10%,var(--inset))',border:'1px solid rgba(248,113,113,0.3)',borderLeft:'2px solid var(--c-red,#f87171)',borderRadius:'0 5px 5px 0'}},cv4Lbl('FAILURE','var(--c-red,#f87171)'),h('p',{style:{margin:0,fontSize:11,color:'var(--c-red,#f87171)',fontFamily:CV4_SANS,lineHeight:1.35}},d.failure||d.stakes_bad||''))
+    )
+  ],[
+    cv4Accent([cv4Lbl('PRIMARY SKILL',catColor),h('div',{style:{fontSize:13,fontWeight:700,color:catColor,fontFamily:CV4_MONO}},d.primary||d.primary_skill||'')],catColor),
+    cv4Inset([cv4Lbl('OPPOSING FORCE',catColor),h('p',{style:{margin:0,fontSize:11,color:'var(--text-dim)',fontFamily:CV4_SANS,lineHeight:1.4}},d.opposing||d.opposition_skill||'')])
+  ],158);
+}
+
+function cv4FrontContest(genId, d, campName, catColor, ctx) {
+  var victories=d.victories_needed||3; var twists=Array.isArray(d.twists)?d.twists:[];
+  var sideA={label:d.side_a||'Side A',skills:d.skills_a||''}; var sideB={label:d.side_b||'Side B',skills:d.skills_b||''};
+  var sA = ctx ? ctx.state.scoreA : 0;
+  var sB = ctx ? ctx.state.scoreB : 0;
+  function tick(side) { if (!ctx) return; var next=side==='a'?{scoreA:Math.min(sA+1,victories)}:{scoreB:Math.min(sB+1,victories)}; ctx.upd(next); }
+  function reset() { if (ctx) ctx.upd({scoreA:0,scoreB:0}); }
+  var winA = sA>=victories; var winB = sB>=victories;
+  return cv4Body([
+    h('div',null,h('div',{style:{fontSize:13,fontWeight:800,color:'var(--text)',fontFamily:CV4_MONO,lineHeight:1.2}},d.contest_type||''),h('p',{style:{margin:'2px 0 0',fontSize:11,color:'var(--text-dim)',fontFamily:CV4_SANS,lineHeight:1.4}},d.desc||'')),
+    h('div',{style:{display:'flex',gap:6}},
+      [[sideA,catColor,sA,winA,'a'],[sideB,'var(--c-red,#f87171)',sB,winB,'b']].map(function(row,i){
+        var side=row[0]; var col=row[1]; var score=row[2]; var won=row[3]; var key=row[4];
+        return h('div',{key:i,style:{flex:1,padding:'5px 8px',background:won?'color-mix(in srgb,'+col+' 15%,var(--inset))':'var(--inset)',border:'1px solid '+(won?col:col+'44'),borderTop:'2px solid '+col,borderRadius:4}},
+          h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:3}},
+            h('div',{style:{fontSize:11,fontWeight:700,color:col,fontFamily:CV4_SANS}},side.label),
+            h('button',{
+              onClick:function(e){e.stopPropagation();tick(key);},
+              disabled:won,
+              'aria-label':'Add victory for '+side.label,
+              style:{padding:'2px 8px',background:col,border:'none',borderRadius:3,
+                color:'var(--bg,#0d1117)',fontSize:11,fontWeight:700,cursor:won?'default':'pointer',
+                opacity:won?0.4:1,fontFamily:CV4_SANS}
+            },'+1')
+          ),
+          h('div',{style:{display:'flex',gap:3,'aria-label':side.label+' victories: '+score+' of '+victories}},
+            Array.from({length:victories}).map(function(_,j){
+              return h('div',{key:j,style:{width:16,height:16,borderRadius:2,
+                background:j<score?col:'transparent',border:'1.5px solid '+col,transition:'all .15s'}});
+            })
+          ),
+          h('div',{style:{fontSize:11,color:'var(--text-dim)',fontFamily:CV4_SANS,marginTop:2}},side.skills)
+        );
+      })
+    ),
+    h('div',{style:{display:'flex',justifyContent:'flex-end'}},
+      h('button',{onClick:function(e){e.stopPropagation();reset();},'aria-label':'Reset contest scores',
+        style:{padding:'2px 8px',background:'transparent',border:'1px solid var(--border)',borderRadius:3,
+          fontSize:11,color:'var(--text-muted)',cursor:'pointer',fontFamily:CV4_SANS}},'Reset')
+    )
+  ],[
+    h('div',{style:{textAlign:'center'}},cv4Lbl('VICTORIES NEEDED',catColor),h('div',{style:{fontSize:46,fontWeight:900,color:catColor,lineHeight:1,fontFamily:CV4_MONO}},victories),h('div',{style:{fontSize:11,color:'var(--text-muted)',fontFamily:CV4_SANS}},'per side')),
+    twists.length>0&&h('div',null,cv4Lbl('POSSIBLE TWISTS',catColor),h('p',{style:{margin:0,fontSize:11,color:'var(--text-dim)',fontFamily:CV4_SANS,lineHeight:1.5}},twists.slice(0,2).map(function(t){return '\u00b7 '+t;}).join('  '))),
+    cv4Inset([h('p',{style:{margin:0,fontSize:11,color:'var(--text-muted)',fontFamily:CV4_SANS,textAlign:'center',lineHeight:1.4}},'Both sides roll every exchange')])
+  ],128);
+}
+
+function cv4FrontConsequence(genId, d, campName, catColor, ctx) {
+  var sc={mild:'var(--c-blue,#60a5fa)',moderate:'var(--gold,#fbbf24)',severe:'var(--c-red,#f87171)'}; var sev=(d.severity||'mild').toLowerCase(); var col=sc[sev]||'var(--c-purple,#a78bfa)';
+  var rows=[{label:'Mild',s:2,c:'var(--c-blue,#60a5fa)'},{label:'Moderate',s:4,c:'var(--gold,#fbbf24)'},{label:'Severe',s:6,c:'var(--c-red,#f87171)'}];
+  var treated = ctx ? !!ctx.state.treated : false;
+  function toggleTreated(e) { e.stopPropagation(); if (ctx) ctx.upd({treated:!treated}); }
+  return cv4Body([
+    cv4Accent([cv4Lbl('CONSEQUENCE ASPECT',col),h('div',{style:{fontSize:15,fontWeight:800,color:'var(--text)',fontFamily:CV4_MONO,lineHeight:1.2,letterSpacing:'-0.02em'}},d.aspect||''),d.context&&h('p',{style:{margin:'4px 0 0',fontSize:11,color:'var(--text-dim)',fontFamily:CV4_SANS,fontStyle:'italic'}},d.context)],col,{padding:'10px 12px',borderLeft:'4px solid '+col,borderRadius:'0 8px 8px 0'}),
+    cv4Inset([cv4Lbl('COMPEL HOOK',catColor),h('p',{style:{margin:0,fontSize:11,color:'var(--text-dim)',fontFamily:CV4_SANS,lineHeight:1.4,fontStyle:'italic'}},'\u201c'+(d.compel_hook||'')+'\u201d')]),
+    h('button',{
+      onClick:toggleTreated, role:'checkbox', 'aria-checked':String(treated),
+      'aria-label':treated?'Consequence treated \u2014 timer started':'Mark consequence as treated',
+      style:{width:'100%',padding:'6px 10px',background:treated?'color-mix(in srgb,var(--c-green,#34d399) 15%,var(--inset))':'var(--inset)',
+        border:'1px solid '+(treated?'var(--c-green,#34d399)':'var(--border)'),borderRadius:5,
+        cursor:'pointer',fontFamily:CV4_MONO,fontSize:11,fontWeight:700,
+        color:treated?'var(--c-green,#34d399)':'var(--text-muted)',letterSpacing:'0.1em',
+        transition:'all .15s',textAlign:'center'}
+    }, treated?'\u2713 TREATED \u2014 TIMER STARTED':'MARK AS TREATED')
+  ],[
+    h('div',{style:{textAlign:'center'}},cv4Lbl('SEVERITY',col),h('div',{style:{padding:'8px 14px',background:'color-mix(in srgb,'+col+' 16%,var(--inset))',border:'2px solid '+col,borderRadius:8,display:'inline-block'}},h('div',{style:{fontSize:14,fontWeight:800,color:col,fontFamily:CV4_MONO,textTransform:'capitalize'}},sev))),
+    h('div',{style:{display:'flex',flexDirection:'column',gap:3}},rows.map(function(r){return h('div',{key:r.label,style:{display:'flex',gap:6,alignItems:'center',opacity:r.label.toLowerCase()===sev?1:0.28}},h('div',{style:{fontSize:11,fontWeight:r.label.toLowerCase()===sev?700:400,color:r.c,fontFamily:CV4_SANS,width:54}},r.label),h('div',{style:{fontSize:11,fontWeight:700,color:r.c,fontFamily:CV4_MONO}},r.s+' shifts'));}))  ],128);
+}
+
+function cv4FrontComplication(genId, d, campName, catColor) {
+  return cv4Body([
+    cv4Accent([cv4Lbl('NEW SCENE ASPECT',catColor),h('div',{style:{fontSize:12,fontWeight:700,color:'var(--text)',fontFamily:CV4_SANS,lineHeight:1.3,marginBottom:4}},d.new_aspect||''),d.type&&cv4Tag((d.type||'').toUpperCase(),catColor)],catColor,{padding:'8px 10px'}),
+    d.arrival&&h('div',null,cv4Lbl('ARRIVAL',catColor),h('p',{style:{margin:0,fontSize:11,color:'var(--text-dim)',fontFamily:CV4_SANS,lineHeight:1.4}},d.arrival))
+  ],[
+    cv4Inset([cv4Lbl('ENVIRONMENT SHIFT',catColor),h('p',{style:{margin:0,fontSize:11,color:'var(--text-dim)',fontFamily:CV4_SANS,lineHeight:1.4}},d.env||d.environment_shift||'')]),
+    cv4Accent([cv4Lbl('SPOTLIGHT',catColor),h('div',{style:{fontSize:13,fontWeight:700,color:catColor,fontFamily:CV4_MONO,textTransform:'capitalize'}},d.spotlight||'')],catColor)
+  ],160);
+}
+
+function cv4FrontBackstory(genId, d, campName, catColor) {
+  var qs=Array.isArray(d.questions)?d.questions:[];
+  return cv4Body([
+    cv4Lbl('SESSION ZERO QUESTIONS',catColor),
+    qs.map(function(q,i){return h('div',{key:i,style:{display:'flex',gap:8,alignItems:'flex-start'}},h('div',{style:{width:18,height:18,borderRadius:'50%',flexShrink:0,background:'color-mix(in srgb,'+catColor+' 16%,var(--inset))',border:'1px solid '+catColor+'55',display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:700,color:catColor,fontFamily:CV4_MONO}},(i+1).toString()),h('p',{style:{margin:0,fontSize:11,color:'var(--text)',fontFamily:CV4_SANS,lineHeight:1.45}},q));})
+  ],[
+    cv4Accent([cv4Lbl('HOOK',catColor),h('p',{style:{margin:0,fontSize:11,color:'var(--text-dim)',fontFamily:CV4_SANS,lineHeight:1.45,fontStyle:'italic'}},d.hook||'')],catColor),
+    cv4Inset([cv4Lbl('RELATIONSHIP WEB',catColor),h('p',{style:{margin:0,fontSize:11,color:'var(--text-muted)',fontFamily:CV4_SANS,lineHeight:1.5}},'Each player names two PCs. What investigation? What secret?')])
+  ],160);
+}
+
+function cv4FrontObstacle(genId, d, campName, catColor) {
+  var tc={block:'var(--c-blue,#60a5fa)',hazard:'var(--c-red,#f87171)',distraction:'var(--gold,#fbbf24)'}; var type_=(d.obstacle_type||'block').toLowerCase(); var col=tc[type_]||'var(--c-green,#34d399)'; var rating=d.rating!=null?d.rating:d.opposition; var ratingLabel=d.rating_label||d.opposition_label||'';
+  return cv4Body([
+    h('div',{style:{fontSize:15,fontWeight:800,color:'var(--text)',fontFamily:CV4_MONO,lineHeight:1.1}},d.name||d.title||''),
+    cv4Accent([cv4Lbl('OBSTACLE ASPECT',col),h('p',{style:{margin:0,fontSize:12,fontStyle:'italic',fontWeight:600,color:'var(--text)',fontFamily:CV4_SANS}},d.aspect||d.choice||'')],col),
+    cv4Inset([cv4Lbl('HOW TO BYPASS',catColor),h('p',{style:{margin:0,fontSize:11,color:'var(--text-dim)',fontFamily:CV4_SANS,lineHeight:1.4}},d.disable||d.bypass||d.gm_note||'')])
+  ],[
+    h('div',{style:{textAlign:'center'}},
+      h('div',{style:{fontSize:11,fontWeight:700,letterSpacing:'0.15em',color:col,fontFamily:CV4_MONO,marginBottom:6,textTransform:'uppercase'}},type_),
+      rating!=null&&h('div',{style:{width:60,height:60,borderRadius:'50%',background:'color-mix(in srgb,'+col+' 14%,var(--inset))',border:'2px solid '+col,margin:'0 auto',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column'}},h('div',{style:{fontSize:22,fontWeight:900,color:col,lineHeight:1,fontFamily:CV4_MONO}},rating),ratingLabel&&h('div',{style:{fontSize:10,color:col,fontFamily:CV4_SANS}},ratingLabel))
+    ),
+    d.weapon&&h('div',{style:{textAlign:'center'}},h('div',{style:{fontSize:11,color:'var(--text-muted)',fontFamily:CV4_MONO,letterSpacing:'0.1em'}},'WEAPON'),h('div',{style:{fontSize:20,fontWeight:800,color:'var(--c-red,#f87171)',fontFamily:CV4_MONO}},d.weapon))
+  ],118);
+}
+
+function cv4FrontCountdown(genId, d, campName, catColor, ctx) {
+  var boxes=d.boxes||4;
+  var filled = ctx ? ctx.state.cdFilled : 0;
+  function setFilled(n) { if (ctx) ctx.upd({cdFilled:n}); }
+  return cv4Body([
+    h('div',{style:{fontSize:15,fontWeight:800,color:'var(--text)',fontFamily:CV4_MONO,lineHeight:1.1}},d.name||''),
+    h('div',null,cv4Lbl('TRIGGER',catColor),h('p',{style:{margin:0,fontSize:11,color:'var(--text-dim)',fontFamily:CV4_SANS,lineHeight:1.4}},d.trigger||'')),
+    cv4Accent([cv4Lbl('OUTCOME WHEN FULL','var(--c-red,#f87171)'),h('p',{style:{margin:0,fontSize:11,fontWeight:600,color:'var(--c-red,#f87171)',fontFamily:CV4_SANS,lineHeight:1.35}},d.outcome||'')],'var(--c-red,#f87171)')
+  ],[
+    cv4Clock(boxes, filled, setFilled, catColor),
+    cv4Inset([cv4Lbl('UNIT',catColor),h('div',{style:{fontSize:13,fontWeight:700,color:'var(--text)',textTransform:'capitalize',fontFamily:CV4_MONO}},d.unit||'')])
+  ],160);
+}
+
+function cv4FrontConstraint(genId, d, campName, catColor) {
+  return cv4Body([
+    h('div',{style:{fontSize:15,fontWeight:800,color:'var(--text)',fontFamily:CV4_MONO,lineHeight:1.1}},d.name||''),
+    cv4Accent([cv4Lbl('WHAT IT DOES',catColor),h('p',{style:{margin:0,fontSize:12,fontWeight:600,color:'var(--text)',fontFamily:CV4_SANS,lineHeight:1.35}},d.what_resists||d.what||'')],catColor,{padding:'8px 10px'}),
+    cv4Accent([cv4Lbl('HOW TO BYPASS','var(--c-green,#34d399)'),h('p',{style:{margin:0,fontSize:11,color:'var(--c-green,#34d399)',fontFamily:CV4_SANS,lineHeight:1.4}},d.bypass||'')],'var(--c-green,#34d399)')
+  ],[
+    h('div',{style:{textAlign:'center'}},cv4Lbl('TYPE',catColor),h('div',{style:{padding:'7px 12px',background:'color-mix(in srgb,'+catColor+' 16%,var(--inset))',border:'2px solid '+catColor,borderRadius:6,display:'inline-block'}},h('div',{style:{fontSize:13,fontWeight:800,color:catColor,fontFamily:CV4_MONO,textTransform:'capitalize'}},d.constraint_type||''))),
+    cv4Inset([h('p',{style:{margin:0,fontSize:11,color:'var(--text-muted)',fontFamily:CV4_SANS,lineHeight:1.5}},'Forces a new approach \u2014 not higher rolls')])
+  ],128);
+}
+
+var CV4_FRONTS = {
+  npc_minor:cv4FrontNpcMinor, npc_major:cv4FrontNpcMajor, faction:cv4FrontFaction,
+  scene:cv4FrontScene, campaign:cv4FrontCampaign, encounter:cv4FrontEncounter, seed:cv4FrontSeed,
+  compel:cv4FrontCompel, challenge:cv4FrontChallenge, contest:cv4FrontContest, consequence:cv4FrontConsequence,
+  complication:cv4FrontComplication, backstory:cv4FrontBackstory, obstacle:cv4FrontObstacle,
+  countdown:cv4FrontCountdown, constraint:cv4FrontConstraint,
+};
+
+function renderCard(genId, data, campId, onUpdate, worldStunts, onChainRoll) {
+  var campName = '';
+  try {
+    if (typeof CAMPAIGNS !== 'undefined' && campId && CAMPAIGNS[campId] && CAMPAIGNS[campId].meta) {
+      campName = CAMPAIGNS[campId].meta.name || campId;
+    }
+  } catch(e) {}
+  var frontFn = CV4_FRONTS[genId] || function(gid,d,cn,cc) {
+    return h('div',{style:{flex:1,overflow:'hidden',padding:'10px 14px 0'}},
+      h('div',{style:{fontSize:13,fontWeight:700,color:'var(--text)'}},d.name||d.location||d.situation||gid),
+      h('div',{style:{marginTop:6,fontSize:11,color:'var(--text-dim)',lineHeight:1.6}},
+        Object.keys(d).filter(function(k){return typeof d[k]==='string'&&d[k];}).slice(0,4).map(function(k,i){return h('div',{key:i},h('strong',{style:{color:'var(--text-muted)',fontSize:10,letterSpacing:'0.15em',textTransform:'uppercase'}},k+': '),d[k]);})
+      )
+    );
+  };
+  return h(cv4Card, {genId:genId, campName:campName, data:data||{}, frontFn:frontFn, onUpdate:onUpdate||null});
 }

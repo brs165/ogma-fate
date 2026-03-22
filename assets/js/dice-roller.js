@@ -68,7 +68,7 @@
     var span = document.createElement('span');
     span.className = cls;
     span.setAttribute('aria-hidden', 'true');
-    span.textContent = hidden ? '?' : face;
+    span.textContent = hidden ? '?' : (face === '-' ? '−' : face);
     return span;
   }
 
@@ -84,14 +84,20 @@
     var topChildren = [];
     if (label) {
       topChildren.push(el('span', {class: 'dr-label', textContent: label}));
-    }
-    if (mode === 'skill') {
-      var skillText = (skill >= 0 ? '+' : '') + skill;
-      topChildren.push(
-        el('span', {class: 'dr-skill-badge'},
-          [document.createTextNode('Skill '),
-           el('span', {class: 'dr-skill-val', textContent: skillText})])
-      );
+      if (mode === 'skill') {
+        var skillText = (skill >= 0 ? '+' : '') + skill;
+        topChildren.push(el('span', {class: 'dr-label', textContent: '—'}));
+        topChildren.push(el('span', {class: 'dr-skill-badge'},
+          [el('span', {class: 'dr-skill-val', textContent: skillText})]));
+      }
+    } else {
+      var modeTitle = mode === 'skill' ? '4DF — SKILL ROLL' : '4DF — RAW ROLL';
+      topChildren.push(el('span', {class: 'dr-label', textContent: modeTitle}));
+      if (mode === 'skill') {
+        var skillText2 = (skill >= 0 ? '+' : '') + skill;
+        topChildren.push(el('span', {class: 'dr-skill-badge'},
+          [el('span', {class: 'dr-skill-val', textContent: skillText2})]));
+      }
     }
 
     var diceRow = el('div', {
@@ -106,7 +112,7 @@
     ]);
 
     var resultRow = el('div', {'class': 'dr-result-row', 'aria-live': 'polite'},
-      [el('span', {'class': 'dr-result-placeholder', textContent: 'Roll the dice →'})]);
+      [el('span', {'class': 'dr-result-placeholder', textContent: '—'})]);
 
     var btn = el('button', {
       'class': 'dr-btn',
@@ -170,7 +176,7 @@
             var cls = 'dr-die dr-die-pop dr-die-' + (f === '+' ? 'pos' : f === '-' ? 'neg' : 'zero');
             var span = document.createElement('span');
             span.className = cls;
-            span.textContent = f;
+            span.textContent = f === '-' ? '−' : f;
             diceRow.appendChild(span);
           } else {
             diceRow.appendChild(makeDieSpan(null, true));

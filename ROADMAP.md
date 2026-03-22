@@ -1,8 +1,8 @@
 # Ogma — Roadmap
 
 > **Source of truth** for all planned work. Update whenever items change.
-> **Current version:** 2026.03.294 · QA: 113/113 named · 59/59 unit
-> **Last revised:** 2026.03.294 — Mobile sprint (MOB-01–04); code review merge (EH-1–5, PB-1–2); XSS fix; _redirects removed
+> **Current version:** 2026.03.326 · QA: 113/113 named · 59/59 unit
+> **Last revised:** 2026.03.326 — v4 card system (cv4 landscape cards, interactive stress/countdown/contest/consequence, world colour theming, 600px, flip-on-footer); dice roller redesign; print fix (DB.printCards moved into window.DB); CI fix (npm ci → npm install, cache removed); WCAG audit
 
 ---
 
@@ -52,13 +52,13 @@ Sprint 1 shipped v266–278. Sprint 2 wires the at-table tools into the board su
 
 | ID | Title | Size | Notes |
 |----|-------|------|-------|
-| **BRD-01** | Play mode visual distinction | S | Play mode looks identical to Prep. Needs different topbar accent colour + multiplayer controls visible in Play |
+| ~~**BRD-01**~~ | Play mode visual distinction | S | Play mode looks identical to Prep. Needs different topbar accent colour + multiplayer controls visible in Play |
 | **BRD-02** | Dice floater in board | S | Reuse `TpDicePanel` from ui-table.js. Floating panel, same as run.html drawer dice tab |
 | **BRD-03** | Fate Point tracker floater | S | Reuse `FatePointTracker` from ui.js wired into board topbar |
-| **BRD-04** | Scene/encounter/compel dossier GM tips | S | Non-NPC dossier shows sparse content. Add invoke guidance + GM tip per generator type |
+| ~~**BRD-04**~~ | Scene/encounter/compel dossier GM tips | S | Non-NPC dossier shows sparse content. Add invoke guidance + GM tip per generator type |
 | **BRD-05** | Multiplayer host/join in board | M | Wire `createSync` from ui.js. Play mode unlocks Host/Join. Cursor presence on board canvas |
-| **BRD-06** | Board section labels | S | Drag-and-drop text headers on canvas ("Scene 1", "NPCs", etc.) — new card type |
-| **BRD-07** | Pin count → tappable Table link | XS | `bt-table` button in topbar should navigate to run.html, count should update live from IDB |
+| ~~**BRD-06**~~ | Board section labels | S | Drag-and-drop text headers on canvas ("Scene 1", "NPCs", etc.) — new card type |
+| ~~**BRD-07**~~ | Pin count → tappable Table link | XS | `bt-table` button in topbar should navigate to run.html, count should update live from IDB |
 
 ---
 
@@ -68,7 +68,7 @@ Sprint 1 shipped v266–278. Sprint 2 wires the at-table tools into the board su
 |----|-------|------|-------|
 | **TBL-01** | Player "waiting to be added" state | S | Player joins via room code but GM hasn't added them yet. Canvas visible but no FP/stress. Need "waiting for GM" overlay or auto-create empty slot |
 | **TBL-02** | Dice panel as floater on small screens | S | Drawer covers canvas on 13" laptops. Dice should be `position:fixed` floater (already is in PrepCanvas — replicate in run.html) |
-| **TBL-03** | New round visual confirmation | XS | Round increment is silent. Brief highlight/flash on the round counter when it ticks. Also clears acted status — no feedback that it happened |
+| ~~**TBL-03**~~ | New round visual confirmation | XS | Round increment is silent. Brief highlight/flash on the round counter when it ticks. Also clears acted status — no feedback that it happened |
 | **TBL-04** | World name in run.html topbar | XS | No world context shown. One line — read campName state, add to topbar |
 | **TBL-05** | Generator drawer discovery | S | Empty canvas state should mention the ➕ button. Drawer button label "➕ Generate" is easy to miss |
 
@@ -78,33 +78,22 @@ Sprint 1 shipped v266–278. Sprint 2 wires the at-table tools into the board su
 
 | ID | Title | Size | Notes |
 |----|-------|------|-------|
-| **WS-11** | r/FATErpg launch post | — | Repo must be public first. Highest-leverage non-code action. Draft in gtm-launch-copy.md. |
-| **WS-15** | Rebuild learn-fate.html as 7-step journey | M | ✅ Shipped v302. Further depth items follow. |
-| **WS-16** | Fiction-first principle + worked exchange | S | ✅ Shipped v302 |
-| **WS-17** | Create Advantage deep-dive | S | ✅ Shipped v302 |
-| **WS-18** | What does the GM prepare | S | ✅ Shipped v302 |
-| **WS-19** | Fate point economy GM guide | S | ✅ Shipped v302 |
-| **WS-20** | End-to-end worked conflict | M | ✅ Shipped v302 |
-| **WS-21** | FAQ — top 10 community questions | S | ✅ Shipped v302 |
-| **WS-22** | Permission to play imperfectly | XS | ✅ Shipped v302 |
-| **WS-23** | Book of Hanz reference + further reading | S | ✅ Shipped v302 |
-| **WS-24** | Common errors + how to fix them | M | ✅ Shipped v302 |
-| **BRD-01** | Play mode visual distinction | S | Play mode looks identical to Prep. Needs topbar accent + visible multiplayer controls. |
-| **BRD-04** | Scene/encounter dossier GM tips | S | Non-NPC dossier shows sparse content. Add invoke guidance per generator type. |
-| **BRD-06** | Board section labels | S | Drag text headers on canvas ("Scene 1", "NPCs") — new card type. |
-| **BRD-07** | Pin count → tappable Table link | XS | bt-table topbar button should nav to run.html; count updates live from IDB. |
-| **TBL-03** | New round visual confirmation | XS | Brief highlight on round counter tick; clear acted status feedback. |
-| **TBL-04** | ~~World name in run.html topbar~~ | XS | ✅ Board topbar already shows world name via world picker |
+| **WS-11** | r/FATErpg launch post | — | Repo must be public first. Draft ready in `gtm-launch-copy.md`. Highest-leverage non-code action. |
 
 ---
+
 
 ## Tier 2
 
 | ID | Title | Size | Notes |
 |----|-------|------|-------|
-| **BL-02** | Stunt data spec | M | Long-pending — needed before stunt UI can be built |
-| **MOB-06** | Board mobile: canvas usable when panel open | S | Panel now overlays canvas but canvas tap-target is behind backdrop |
-| **QA-01** | Widen NA-29 search window | XS | 300-char window too tight — verbose console.warn will trip it again |
+| **BL-05** | Stunt browser UI | M | Left-panel tab in Board Prep mode — browse/filter/add world stunts to NPCs |
+| **WS-12** | Help page: Stunt guide | S | Expand existing stunt section with examples from all 8 worlds |
+
+> Previously in Tier 2, now closed:
+> - **BL-02** ✅ Stunt data spec shipped v312 — `docs/stunt-data-spec.md`
+> - **MOB-06** ✅ Board mobile backdrop removed v312 — canvas tap now works with panel open
+> - **QA-01** ✅ NA-29 search window widened to 500 chars (v296)
 
 ---
 
@@ -137,6 +126,7 @@ Sprint 1 shipped v266–278. Sprint 2 wires the at-table tools into the board su
 
 | Version | What |
 |---------|------|
+| v2026.03.319–326 | **Card system v4:** `cv4Card` 600×380 landscape cards, 5 generator categories, GM guidance back panel. Interactive stress boxes (NPC minor/major PHY+MEN), countdown clock, contest victory tracker, consequence treated toggle — all WCAG SC 4.1.2 compliant with role/tabIndex/aria-checked. World colour theming via CSS vars (accent/c-blue/c-red per campaign). Flip only on footer. Table canvas renders full cv4 cards (renderTpCard, 2-col 640px grid). Dice roller redesigned to match mockup (68px dice, mint/red fills, pill button). `DB.printCards` moved into `window.DB` (was in wrong IIFE — print was always broken). CI: `npm ci` → `npm install`, `cache: npm` removed (no lock file). Board players ReferenceError hotfix (BoardTurnBar misplaced in BoardTopbar). Table canvas local renderCard renamed renderTpCard. |
 | v2026.03.294 | Code review merge (v292 external review): EH-1 console.warn on all DB writes, EH-2/3 SW promise chain fixes, EH-4 IDB retry budget (2 failures before permanent disable), EH-5 migration warns, PB-1 timer cleanup returns (rollTimerRef ReferenceError fixed), PB-2 getAppShell lazy cache. TBL-02 re-applied after merge. NA-29 regression fixed (session-save warn strings shortened to fit 300-char window). |
 | v2026.03.293 | Mobile sprint: MOB-01 viewport-fit=cover (36 HTML files), MOB-04 safe-area FAB + floaters, MOB-03 board topbar responsive (bt-nav-text, bt-nav-hide-xs, 520px breakpoint), MOB-02 board left panel collapsible (leftOpen state, blp-wrap/blp-hidden, blp-backdrop, bt-panel-toggle). |
 | v2026.03.292 | Security: dice-roller.js XSS fix (CWE-79/116) — full rewrite from innerHTML interpolation to DOM construction; el() helper, zero innerHTML in file. |
@@ -163,4 +153,4 @@ Sprint 1 shipped v266–278. Sprint 2 wires the at-table tools into the board su
 | v2026.03.229 | Code quality Tier 3: ui-table.js split, 59 unit tests, ErrorBoundary, JSDoc |
 | v2026.03.224–226 | OSS readiness: LICENSE, SRI, CI, CONTRIBUTING, ARCHITECTURE, ADRs |
 
-*Last updated: 2026.03.306*
+*Last updated: 2026.03.326*

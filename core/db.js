@@ -130,6 +130,7 @@
       if (p.intro_seen) delete p.intro_seen[worldKey];
       savePrefs(p);
     },
+
   };
 
 })();
@@ -468,6 +469,214 @@
         };
         input.click();
       });
+    },
+    // EXP-05: Print cards — opens a printable HTML page in a new window
+        printCards: function(cards, campName) {
+      if (!cards || cards.length === 0) { alert('No cards to print.'); return; }
+
+      function esc(s) {
+        if (!s) return '';
+        return String(s)
+          .replace(/&/g,'&amp;')
+          .replace(/</g,'&lt;')
+          .replace(/>/g,'&gt;')
+          .replace(/"/g,'&quot;');
+      }
+
+      function renderCardHtml(card) {
+        var genId = card.genId || '';
+        var data  = card.data  || {};
+        var title = card.title || data.name || data.location || data.situation || genId;
+        var GEN_LABELS = {
+          npc_minor:'Minor NPC', npc_major:'Major NPC', scene:'Scene Setup',
+          encounter:'Encounter', seed:'Adventure Seed', compel:'Compel',
+          challenge:'Challenge', contest:'Contest', consequence:'Consequence',
+          faction:'Faction', complication:'Complication', backstory:'PC Backstory',
+          obstacle:'Obstacle', countdown:'Countdown', constraint:'Constraint',
+          campaign:'Campaign Frame', sticky:'Aspect', label:'Section'
+        };
+        var typeLabel = GEN_LABELS[genId] || genId;
+
+        var rows = [];
+
+        // ── NPC ──────────────────────────────────────────────────────
+        if (genId === 'npc_minor' || genId === 'npc_major') {
+          var asp = data.aspects || {};
+          if (asp.high_concept) rows.push('<div class="pc-row asp-hc">' + esc(asp.high_concept) + '</div>');
+          if (asp.trouble)      rows.push('<div class="pc-row asp-tr">► ' + esc(asp.trouble) + '</div>');
+          if (asp.others && asp.others.length) {
+            asp.others.forEach(function(a) {
+              rows.push('<div class="pc-row asp-other">' + esc(a) + '</div>');
+            });
+          }
+          if (data.skills && data.skills.length) {
+            var sk = data.skills.slice(0,6).map(function(s) {
+              return '<span class="skill-chip">+' + s.r + ' ' + esc(s.name) + '</span>';
+            }).join(' ');
+            rows.push('<div class="pc-skills">' + sk + '</div>');
+          }
+          if (data.stunts && data.stunts.length) {
+            data.stunts.forEach(function(st) {
+              rows.push('<div class="pc-stunt"><strong>' + esc(st.name) + ':</strong> ' + esc(st.desc) + '</div>');
+            });
+          }
+          if (data.physical_stress || data.mental_stress) {
+            var phy = data.physical_stress || 0;
+            var men = data.mental_stress || 0;
+            var boxes = function(n, cls) {
+              var s = '';
+              for (var i=0;i<n;i++) s += '<span class="stress-box ' + cls + '"></span>';
+              return s;
+            };
+            rows.push('<div class="pc-stress">PHY ' + boxes(phy,'phy') + '  MEN ' + boxes(men,'men') + '</div>');
+          }
+        }
+        // ── SCENE ────────────────────────────────────────────────────
+        else if (genId === 'scene') {
+          if (data.situation) rows.push('<div class="field-row"><strong>Situation:</strong> ' + esc(data.situation) + '</div>');
+          if (data.aspects && data.aspects.length) {
+            data.aspects.forEach(function(a) {
+              rows.push('<div class="asp-chip">' + esc(a) + '</div>');
+            });
+          }
+          if (data.threat)  rows.push('<div class="field-row"><strong>Threat:</strong> ' + esc(data.threat) + '</div>');
+          if (data.zones && data.zones.length) {
+            rows.push('<div class="field-row"><strong>Zones:</strong> ' + data.zones.slice(0,3).map(esc).join(' · ') + '</div>');
+          }
+        }
+        // ── FACTION ──────────────────────────────────────────────────
+        else if (genId === 'faction') {
+          if (data.goal)    rows.push('<div class="field-row"><strong>Goal:</strong> ' + esc(data.goal) + '</div>');
+          if (data.method)  rows.push('<div class="field-row"><strong>Method:</strong> ' + esc(data.method) + '</div>');
+          if (data.weakness)rows.push('<div class="field-row"><strong>Weakness:</strong> ' + esc(data.weakness) + '</div>');
+          if (data.face)    rows.push('<div class="field-row"><strong>Face:</strong> ' + esc(data.face) + '</div>');
+        }
+        // ── SEED ─────────────────────────────────────────────────────
+        else if (genId === 'seed') {
+          if (data.objective)    rows.push('<div class="field-row"><strong>Objective:</strong> ' + esc(data.objective) + '</div>');
+          if (data.complication) rows.push('<div class="field-row"><strong>Complication:</strong> ' + esc(data.complication) + '</div>');
+          if (data.opposition)   rows.push('<div class="field-row"><strong>Opposition:</strong> ' + esc(data.opposition) + '</div>');
+          if (data.twist)        rows.push('<div class="field-row"><strong>Twist:</strong> ' + esc(data.twist) + '</div>');
+        }
+        // ── ENCOUNTER ────────────────────────────────────────────────
+        else if (genId === 'encounter') {
+          if (data.opposition)  rows.push('<div class="field-row"><strong>Opposition:</strong> ' + esc(data.opposition) + '</div>');
+          if (data.stakes)      rows.push('<div class="field-row"><strong>Stakes:</strong> ' + esc(data.stakes) + '</div>');
+          if (data.twist)       rows.push('<div class="field-row"><strong>Twist:</strong> ' + esc(data.twist) + '</div>');
+          if (data.victory)     rows.push('<div class="field-row"><strong>Victory:</strong> ' + esc(data.victory) + '</div>');
+        }
+        // ── COMPEL ───────────────────────────────────────────────────
+        else if (genId === 'compel') {
+          if (data.situation)   rows.push('<div class="field-row">' + esc(data.situation) + '</div>');
+          if (data.consequence) rows.push('<div class="field-row"><strong>Consequence:</strong> ' + esc(data.consequence) + '</div>');
+        }
+        // ── CHALLENGE ────────────────────────────────────────────────
+        else if (genId === 'challenge') {
+          if (data.obstacle)    rows.push('<div class="field-row">' + esc(data.obstacle) + '</div>');
+          if (data.primary_skill) rows.push('<div class="field-row"><strong>Skill:</strong> ' + esc(data.primary_skill) + '</div>');
+          if (data.success)     rows.push('<div class="field-row"><strong>Success:</strong> ' + esc(data.success) + '</div>');
+          if (data.failure)     rows.push('<div class="field-row"><strong>Failure:</strong> ' + esc(data.failure) + '</div>');
+        }
+        // ── CONSEQUENCE ──────────────────────────────────────────────
+        else if (genId === 'consequence') {
+          var sev = data.severity || data.mild ? 'Mild' : data.moderate ? 'Moderate' : data.severe ? 'Severe' : '';
+          var text = data.mild || data.moderate || data.severe || data.aspect || '';
+          if (sev)  rows.push('<div class="asp-hc">' + sev + ' Consequence</div>');
+          if (text) rows.push('<div class="pc-row asp-hc">' + esc(text) + '</div>');
+          if (data.compel_hook) rows.push('<div class="field-row"><strong>Hook:</strong> ' + esc(data.compel_hook) + '</div>');
+        }
+        // ── COUNTDOWN ────────────────────────────────────────────────
+        else if (genId === 'countdown') {
+          if (data.track_name)  rows.push('<div class="asp-hc">' + esc(data.track_name) + '</div>');
+          if (data.trigger)     rows.push('<div class="field-row"><strong>Trigger:</strong> ' + esc(data.trigger) + '</div>');
+          if (data.outcome)     rows.push('<div class="field-row"><strong>Outcome:</strong> ' + esc(data.outcome) + '</div>');
+          var ticks = data.boxes || 4;
+          var boxes = '';
+          for (var i=0;i<ticks;i++) boxes += '<span class="stress-box"></span>';
+          rows.push('<div class="pc-stress" style="margin-top:6px">' + boxes + '</div>');
+        }
+        // ── CAMPAIGN ─────────────────────────────────────────────────
+        else if (genId === 'campaign') {
+          if (data.current_issue)   rows.push('<div class="field-row"><strong>Current:</strong> ' + esc(data.current_issue) + '</div>');
+          if (data.impending_issue) rows.push('<div class="field-row"><strong>Impending:</strong> ' + esc(data.impending_issue) + '</div>');
+          if (data.aspects && data.aspects.length) {
+            data.aspects.forEach(function(a) { rows.push('<div class="asp-chip">' + esc(a) + '</div>'); });
+          }
+        }
+        // ── STICKY / LABEL / FALLBACK ─────────────────────────────────
+        else {
+          var text2 = card.text || data.situation || data.description || data.text || card.summary || '';
+          if (text2) rows.push('<div class="field-row">' + esc(text2) + '</div>');
+          if (card.summary && card.summary !== text2) rows.push('<div class="field-row">' + esc(card.summary) + '</div>');
+        }
+
+        return (
+          '<div class="card">' +
+            '<div class="card-header">' +
+              '<span class="card-type">' + esc(typeLabel) + '</span>' +
+              (campName ? '<span class="card-world">' + esc(campName) + '</span>' : '') +
+            '</div>' +
+            '<div class="card-title">' + esc(title) + '</div>' +
+            (rows.length ? '<div class="card-body">' + rows.join('') + '</div>' : '') +
+          '</div>'
+        );
+      }
+
+      var html = (
+        '<!DOCTYPE html><html lang="en"><head>' +
+        '<meta charset="UTF-8">' +
+        '<title>Ogma Print — ' + esc(campName || 'Cards') + '</title>' +
+        '<style>' +
+        '@page{size:A4 portrait;margin:10mm}' +
+        'body{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;margin:0;padding:0;background:#fff;color:#111;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
+        'h1{font-size:11pt;font-weight:400;color:#555;margin:0 0 8px;padding:0}' +
+        '.controls{padding:6px 0 10px;display:flex;gap:8px;align-items:center}' +
+        '@media print{.controls{display:none}}' +
+        'button{padding:6px 14px;border:1px solid #ccc;border-radius:4px;background:#fff;cursor:pointer;font-size:12px}' +
+        'button:hover{background:#f5f5f5}' +
+        '.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8mm;padding:0}' +
+        '@media(min-width:800px){.grid{grid-template-columns:repeat(3,1fr)}}' +
+        '.card{border:1px solid #222;border-radius:3px;padding:7px 9px;min-height:48mm;display:flex;flex-direction:column;break-inside:avoid;page-break-inside:avoid;box-sizing:border-box}' +
+        '.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;padding-bottom:4px;border-bottom:1px solid #ccc}' +
+        '.card-type{font-size:7.5pt;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#444}' +
+        '.card-world{font-size:7pt;color:#888;letter-spacing:.05em}' +
+        '.card-title{font-size:11pt;font-weight:700;line-height:1.25;margin-bottom:5px;color:#000}' +
+        '.card-body{font-size:8.5pt;color:#222;line-height:1.4;flex:1;display:flex;flex-direction:column;gap:3px}' +
+        '.pc-row{color:#333}' +
+        '.asp-hc{font-style:italic;font-weight:600;color:#000}' +
+        '.asp-tr{font-style:italic;color:#555}' +
+        '.asp-other{font-style:italic;color:#777;font-size:8pt}' +
+        '.asp-chip{display:inline-block;border:1px solid #aaa;border-radius:2px;padding:1px 5px;margin:1px 2px 1px 0;font-size:7.5pt;font-style:italic;color:#333}' +
+        '.pc-skills{display:flex;flex-wrap:wrap;gap:2px;margin:3px 0}' +
+        '.skill-chip{font-size:7.5pt;border:1px solid #ccc;border-radius:2px;padding:1px 4px;color:#333;white-space:nowrap}' +
+        '.pc-stunt{font-size:7.5pt;color:#444;border-left:2px solid #aaa;padding-left:4px;margin:2px 0}' +
+        '.pc-stress{display:flex;align-items:center;gap:3px;font-size:7pt;color:#666;margin-top:auto;padding-top:4px}' +
+        '.stress-box{display:inline-block;width:10px;height:10px;border:1.5px solid #666;border-radius:1px}' +
+        '.stress-box.phy{border-color:#e05}' +
+        '.stress-box.men{border-color:#55a}' +
+        '.field-row{font-size:8.5pt;color:#333;line-height:1.35}' +
+        '.field-row strong{color:#000}' +
+        '</style></head><body>' +
+        '<div class="controls">' +
+        '<h1>Ogma — ' + esc(campName || 'Cards') + ' — ' + cards.length + ' card' + (cards.length === 1 ? '' : 's') + '</h1>' +
+        '<button onclick="window.print()">&#128438; Print</button>' +
+        '<button onclick="window.close()">&#x2715; Close</button>' +
+        '</div>' +
+        '<div class="grid">' +
+        cards.map(renderCardHtml).join('') +
+        '</div></body></html>'
+      );
+
+      var blob = new Blob([html], {type: 'text/html;charset=utf-8'});
+      var url = URL.createObjectURL(blob);
+      var w = window.open(url, '_blank', 'width=900,height=700,scrollbars=yes');
+      if (!w) {
+        // Pop-up blocked — fall back to download
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = (campName || 'ogma').replace(/[^a-zA-Z0-9_-]/g, '_') + '-print.html';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      }
     },
 
   };

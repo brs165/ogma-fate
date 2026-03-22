@@ -2,7 +2,7 @@
 
 > Technical deep-dive for contributors. Covers the execution model, data flow, React patterns, IndexedDB persistence, the service worker, Cloudflare Pages deployment, and the Table canvas multiplayer system. Read this before touching `core/*.js`.
 >
-> **Last updated:** 2026.03.299
+> **Last updated:** 2026.03.326
 
 ---
 
@@ -63,15 +63,23 @@
 <script src="../core/ui-board.js?v=N"></script>   <!-- BoardApp — board-specific root component -->
 ```
 
-**Run page (`run.html`)** loads all 8 world data files (any world can be run), then:
-```html
-<!-- After ui-primitives.js and partysocket.js... -->
-<script src="../core/ui-renderers.js?v=N"></script>
-<script src="../core/ui-table.js?v=N"></script>
-<script src="../core/ui-run.js?v=N"></script>     <!-- RunApp — run session surface components -->
-```
+**Run page (`run.html`)** is now a JS redirect to `board.html?mode=play`. It preserves `?world=` and `?room=` URL params. `ui-run.js` is retained for its sync module (`createSync`, `generateRoomCode`) which `ui-board.js` depends on via `board.html` script loading.
 
 `<base href="/">` is required on all campaign pages (Cloudflare Pages Pretty URLs strip `.html`; without it, `../core/` resolves to `/campaigns/core/`).
+
+---
+
+## CI (GitHub Actions)
+
+Three jobs in `.github/workflows/ci.yml`:
+
+| Job | What it does |
+|-----|-------------|
+| **Lint & Format** | `npm install` (no lock file — uses `npm install` not `npm ci`) then ESLint + Prettier check |
+| **QA Assertions** | `node tests/qa_named.js` · `npm run smoke` · `node tests/engine.test.js` · CDN version check |
+| **CDN Integrity** | `node scripts/verify-cdn-deps.js` — SRI hash verification |
+
+**No `package-lock.json` is committed.** The `lint` job uses `npm install` which generates a fresh lock file per run. `cache: 'npm'` is omitted from `setup-node` (it requires a lock file to hash).
 
 ---
 
@@ -83,6 +91,7 @@
 - **Pretty URLs** — CF Pages strips `.html` from URLs. `<base href="/">` on every campaign page prevents relative path breakage.
 - **SW skipWaiting** — `self.skipWaiting()` on install forces immediate takeover so users on old SW versions get the new SW on next visit without closing tabs.
 - **CF Beacon SRI warning** — CF Pages auto-injects their Web Analytics beacon script. If the beacon URL updates before CF updates the injected hash, a console SRI warning appears. This is on CF's side and does not affect functionality.
+
 
 ---
 
@@ -109,7 +118,7 @@ generate(genId, tables, partySize)   ← engine.js, Node-testable
   ▼
 setResult(data)  →  renderResult(genId, data)  ← ui-renderers.js
                                    OR
-                     renderCard(genId, data)   ← FlipCard (MTG-style)
+                     renderCard(genId, data)   ← cv4Card (600×380 landscape, world-coloured)
 ```
 
 ---
@@ -121,7 +130,7 @@ Ogma has three distinct session surfaces, each a separate HTML page:
 | Surface | File | Root component | Purpose |
 |---------|------|---------------|---------|
 | **Generator** | `campaigns/[world].html` | `CampaignApp` (ui.js) | Roll generators, pin results, FP tracker, table settings |
-| **Board** | `campaigns/board.html` | `BoardApp` (ui-board.js) | Prep/Play canvas — drag cards, dice floater, FP floater, multiplayer |
+| **Board** | `campaigns/board.html` | `BoardApp` (ui-board.js) | Unified prep/play canvas. Prep mode: generate + arrange cards. Play mode: player roster, stress/FP, round tracker, turn order. |
 | **Run** | `campaigns/run.html` | Redirect | Now redirects to `board.html?mode=play`. `ui-run.js` retained for sync module (`createSync`). |
 
 The Board and Run surfaces share sync infrastructure (`createTableSync` in ui.js) and the `PrepCanvas` component (`ui-table.js`).
@@ -130,14 +139,15 @@ The Board and Run surfaces share sync infrastructure (`createTableSync` in ui.js
 
 ## Table canvas architecture
 
-`PrepCanvas` (in `core/ui-table.js`) is the full-screen interactive session surface, used both in campaign pages and `run.html`.
+`PrepCanvas` (in `core/ui-table.js`) is the full-screen interactive session surface used in campaign pages. Board's Play mode uses its own `BoardPlayerRow`/`BoardTurnBar` components rather than PrepCanvas directly.
 
 ### State model
 
 ```
 PrepCanvas local state:
   pinnedCards[]    ← from props.pinnedCards / props.setPinnedCards (CampaignApp owns)
-  extras{}         ← keyed by card.id: { x, y, size, phyHit, menHit, gmOnly, ... }
+  extras{}         ← keyed by card.id: { x, y, phyHit, menHit, cdFilled, gmOnly, freeInvoke, ... }
+  (size toggle removed v319 — canvas cards are fixed cv4 width 640px, 2-column grid)
   players[]        ← player roster with FP, stress, consequences
   round, scene     ← counters
   gmFP             ← GM fate point pool
@@ -206,6 +216,24 @@ new_sqlite_classes = ["OgmaRoom"]
 
 ---
 
+## Board Play mode state
+
+When `mode === 'play'`, `BoardApp` activates a player management layer on top of the canvas.
+
+**State added in Play mode:**
+- `players[]` — player roster with FP, ref, phy/men stress, consequences, color, `acted` flag
+- `round`, `order[]` — round counter and turn order (drag-to-reorder)
+- `showDice`, `showFP` — floater visibility toggles
+- `syncObj`, `syncStatus`, `roomCode` — multiplayer connection state
+- `fpState` — FP tracker state loaded from IDB (`board_fp_v1_[campId]`)
+- `boardPlayers` — derived from `fpState.pcs` for dice floater skill rolling
+
+**IDB key:** `board_play_session_[campId]` — persists players, round, order.
+
+**`?mode=play` prop:** `board.html` reads `?mode=play` from the URL and passes `initialMode='play'` to `BoardApp`. This is how the `run.html` redirect lands in Play mode automatically.
+
+**`generateBoardRoomCode()`** — 4-char unambiguous code generator (no 0/O/I/1 confusion). Called by `connectAsHost()` when `roomCode` is empty.
+
 ## IDB schema (Dexie 4)
 
 ```javascript
@@ -261,13 +289,14 @@ var useEffect = React.useEffect;
 |--------|---------| 
 | `cc-` | Canvas cards on Table (compact, draggable) |
 | `tp-` | Table canvas shell, hero modal, gen callout, dropdowns, turn bar |
-| `rs-` | Run session surface (run.html) + Table player roster |
-| `rc-` | Result card (MTG FlipCard — spine, face, back) |
+| `rs-` | Player roster rows, stress boxes, FP buttons, round pill, turn bar — shared between Board Play mode and PrepCanvas |
+| `cv4-` | v4 landscape cards (cv4Card, cv4-body, cv4-fading) |
 | `fd-` | Field Dossier result renderers |
 | `dr-` | Dice roller widget |
 | `bt-` | Board topbar |
 | `blp-` | Board left panel (collapsible on mobile) |
 | `board-` | Board canvas, cards, floaters, dossier |
+| `bt-live-*` | Board Play mode: `bt-live-badge` (animated pulse dot + "Live/Play" text in topbar) |
 | `land-` | Landing page sections and cards |
 | `.callout-*` | Help page callout boxes (scenario/info/warning/dnd/tip) |
 
@@ -282,6 +311,7 @@ var useEffect = React.useEffect;
 - `tp-shell-rise` / `tp-overlay-in` / `tp-close-spin` — hero modal sequence
 - `dr-pop` / `dr-spin` — dice face animations
 - `result-slide` — result card entrance
+- `cv4pulse` — countdown clock full alert blink
 - World-specific: `tla-idle`, `neo-scan`, `fan-rune`, `sp-idle`, `vic-flicker`, `pa-blink`
 
 ---

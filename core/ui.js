@@ -2348,7 +2348,17 @@ function CampaignApp(props) {
                   onClick: importCards,
                   title: 'Import cards from Ogma JSON file',
                   'aria-label': 'Import cards from file',
-                }, h(FaFileArrowUpIcon, {size: 14}))
+                }, h(FaFileArrowUpIcon, {size: 14})),
+                // EXP-05: Print pinned cards
+                pinnedCards.length > 0 && h('button', {
+                  className: 'btn btn-ghost action-bar-icon',
+                  onClick: function() {
+                    if (typeof DB === 'undefined' || !DB.printCards) { showToast('Print unavailable'); return; }
+                    DB.printCards(pinnedCards, camp.meta.name);
+                  },
+                  title: 'Print ' + pinnedCards.length + ' pinned card' + (pinnedCards.length === 1 ? '' : 's'),
+                  'aria-label': 'Print pinned cards',
+                }, '\uD83D\uDDA8')
               )
             ),
 

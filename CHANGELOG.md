@@ -8,6 +8,94 @@
 
 ---
 
+
+## 2026.03.326 — CI fix + print fix
+
+- **CI:** `npm ci` → `npm install` in Lint & Format job. `cache: 'npm'` removed from `setup-node` (requires lock file — we have none). QA job path was already correct (`tests/qa_named.js` not `devdocs/qa_named.js` — the latter was the old path still in the live repo on GitHub).
+- **Print:** `DB.printCards` was defined in the wrong IIFE (localStorage preferences module, first IIFE) rather than in `window.DB` (Dexie module, second IIFE). `DB.printCards` was always `undefined` — every print attempt hit the "Print unavailable" guard. Moved into `window.DB`.
+
+113/113 named · 59/59 unit · 128/128 smoke.
+
+
+---
+
+## 2026.03.319–326 — v4 cards, WCAG audit, CI fix
+
+**v4 card system (`ui-renderers.js`):**
+- `renderCard()` now dispatches to `Cv4Card` — 600×380 landscape, category-colour header, world-adaptive colours, flip-on-footer-only
+- Interactive elements added to cards: `cv4StressTrack` (NPC Minor PHY, NPC Major PHY+MEN), `cv4Clock` (Countdown), Contest victory tracker (+1/Reset), Consequence "Mark Treated" toggle
+- All interactive elements: `role="checkbox"`, `tabIndex=0`, `aria-checked`, `aria-label`, keyboard (Space/Enter)
+- `cardState` in `cv4Card` passes `ctx = {state, upd}` to front builders; state persists via `onUpdate` to IDB
+- Footer strip is sole flip target (`role="button"`, hover highlight); card wrapper is `role="region"`
+- Card body `overflow:auto` with thin scrollbar; `cv4pulse` keyframe for full countdown alert
+
+**Table canvas (`ui-table.js`):**
+- `TpCardBody` replaced with `renderCard()` on canvas tiles — full v4 cards render directly
+- Local `renderCard` renamed `renderTpCard` to avoid shadowing global (v321 crash fix)
+- Canvas layout: `COL_W=640`, `COL_H=400`, `COLS=2`, `PAD=24`
+
+**Board (`ui-board.js`):**
+- `BoardTurnBar` removed from `BoardTopbar` scope (v320 crash fix — `players` was not in scope)
+- `data-campaign` `useEffect` sets world CSS vars on board page
+- `campId` passed through `BoardDossier` → `renderCard`
+
+**Dice roller redesign:**
+- 68×68px dice, 16px `border-radius`, soft tinted fills (+green, 0 grey, −red)
+- Title: `4DF — RAW ROLL` / `4DF — SKILL ROLL` in small-caps
+- Minus uses U+2212 (−) not ASCII hyphen
+- Result: 32px/900 total + 15px adj muted label
+- Button: neutral pill, `Roll 4dF` → `Roll again`
+
+**Print (`db.js`):** `printCards` moved from first IIFE (localStorage) into `window.DB` (second IIFE) — was never reachable as `DB.printCards`, always showed "Print unavailable"
+
+**CI (`.github/workflows/ci.yml`):** `cache: 'npm'` removed, `npm ci` → `npm install` — no `package-lock.json` committed; `tests/qa_named.js` path was already correct locally
+
+---
+---
+
+## 2026.03.322–325 — Dice roller redesign + card polish
+
+- **Dice roller:** Full CSS rewrite to match design mockup. 68px square dice (was 40px). Soft tinted fills: `+` = green, `−` = red, `0` = neutral grey — all via `color-mix` against panel background for light/dark adaptability. `−` glyph is now U+2212 (proper minus sign). Title reads `4DF — RAW ROLL` / `4DF — SKILL ROLL`. Result: large `+N` beside adjective label. Button: pill shape, neutral grey, "Roll again". Flicker → sequential reveal animation retained.
+- **Card interactions (WCAG SC 4.1.2):** Stress boxes, countdown clock, contest tracker, consequence toggle now all interactive with `role="checkbox"`, `tabIndex=0`, `aria-checked`, `aria-label`, keyboard handlers (Space/Enter). State persists to IDB via `onUpdate`/`updExtra`. `cv4pulse` keyframe for clock-full alert.
+- **World colour theming on cards:** `cv4Card` reads `var(--accent)`, `var(--c-blue)`, `var(--c-red)` etc. — all defined per campaign in `assets/css/campaigns/theme-*.css`. Board page sets `data-campaign` on `<html>` via `useEffect`. Cards adapt per world in all four surfaces.
+
+113/113 · 59/59 · 128/128.
+
+---
+
+## 2026.03.319–321 — Card system v4 + canvas integration + bugfixes
+
+- **cv4 card format:** Full rewrite of `renderCard()` in `ui-renderers.js`. `Cv4Card` component: 600×380 landscape, 5 semantic category colours (`character`/`world`/`mechanics`/`tool`/`pressure`), GM guidance back panel with WHAT/WHEN/RULE for all 16 generators. Flip only on footer strip (click/keyboard). Body `overflow: auto` so content scrolls and interactions work.
+- **All 16 front builders:** `cv4FrontNpcMinor`, `cv4FrontNpcMajor`, `cv4FrontFaction`, `cv4FrontScene`, `cv4FrontCampaign`, `cv4FrontEncounter`, `cv4FrontSeed`, `cv4FrontCompel`, `cv4FrontChallenge`, `cv4FrontContest`, `cv4FrontConsequence`, `cv4FrontComplication`, `cv4FrontBackstory`, `cv4FrontObstacle`, `cv4FrontCountdown`, `cv4FrontConstraint` — all with `cv4Body(left, right)` two-column layout.
+- **Table canvas:** `TpCardBody` replaced with `renderCard()` on canvas. Local `renderCard` renamed `renderTpCard` (was shadowing global). Size toggle buttons removed. Canvas grid: `COL_W=640`, `COL_H=400`, `COLS=2`, `PAD=24`.
+- **Board dossier:** `campId` prop wired through `BoardDossier` → `renderCard`. `data-campaign` set on `<html>` by `BoardApp` `useEffect`.
+- **Bugfix:** `BoardTurnBar` was misplaced inside `BoardTopbar` render — `players` ReferenceError on board load. Removed from `BoardTopbar`; correct instance at line 1751 in `BoardApp` retained.
+- **Bugfix:** Table canvas crash — local `function renderCard` shadowed global, causing `card.id` TypeError on undefined. Renamed to `renderTpCard`.
+
+113/113 · 59/59 · 128/128.
+
+---
+
+## 2026.03.300–308 — Board/Run consolidation, CSP fix, help overhaul, doc pass
+
+**v308** — BRD-01: Play mode strong visual distinction. Canvas gets 4% green tint, left panel header is green "▶ Play Mode", topbar shows animated pulsing `● Live / Play` badge. BRD-04/06/07, TBL-03 confirmed already fully shipped in earlier sprints.
+
+**v307** — Crash fix: 17 state vars used in `BoardApp` render were never declared (`showDice`, `showFP`, `syncStatus`, `syncObj`, `roomCode`, `boardPlayers`, `fpState`, `joinInput`, `showJoin`, + setters). All now `useState` in BoardApp. `connectAsHost` now generates a room code via `generateBoardRoomCode()` when `roomCode` is empty. FP IDB load effect added on mount. `ui-board.js?v=286` stale version stamp fixed in `board.html`; `bump-version.sh` updated to stamp `ui-board.js` going forward.
+
+**v306** — Board/Run consolidation complete. `run.html` is now a JS redirect to `board.html?mode=play` (preserving `?world=` and `?room=` params). Board Play mode gains: `BoardPlayerRow` (FP, stress, consequences), `BoardPlayPanel` (left panel roster), `BoardTurnBar` (round counter + turn order strip above canvas), player/round/order IDB persistence via `board_play_session_[campId]`. `?mode=play` auto-activates Play mode. All live `run.html` links updated. 13 QA assertions migrated from `run.html` to `board.html`/`ui-board.js`. `ROADMAP.md` and `ARCHITECTURE.md` updated.
+
+**v305** — Help sidebar: scrollbar hidden (`scrollbar-width:none` + `::-webkit-scrollbar{display:none}`). Generic `IntersectionObserver` added to `help-shared.js` — highlights `.wiki-sidebar-child` links as user scrolls on any help page (fate-mechanics, at-the-table, etc.). Skips `learn-fate.html` which has its own inline observer.
+
+**v304** — CSP fix: CF Pages auto-injects beacon with `sha512-z4Ph...` hash appended to our `Content-Security-Policy`. Per spec, any hash-source in `script-src` silently disables `'unsafe-inline'`. All inline scripts (theme restore, skeleton hide, `ReactDOM.createRoot`, SW registration) were blocked → blank page. Fix: removed the sha512 hash from `_headers`. `unsafe-inline` works again.
+
+**v303** — Bugfix: 50 fragment-only hrefs in help sidebar broken by `<base href="/">`. All `href="#anchor"` links resolved to `/#anchor` instead of `/help/[page].html#anchor`. Fixed to fully absolute across 9 help pages. Skip-to-content links (`href="#main-content"`) intentionally left as-is.
+
+**v302** — Help/onboarding overhaul (WS-15–24): 3-path audience selector on help index. `learn-fate.html` gains "permission to play imperfectly" callout (Step 1). `fate-mechanics.html` gets Create Advantage deep-dive (worked warehouse fight example), fate point economy GM guide (full earn/spend cycle, compel frequency), "what the GM prepares" section, 6 common error fixes, Further Reading (Book of Hanz, Up to Four Players comic, SRD links). `at-the-table.html` gets session structure rhythm and full 3-exchange annotated conflict walkthrough. `faq.html` rebuilt with 10 community questions (stress ≠ HP, when to invoke, why Create Advantage, FP economy, what GMs prepare, D&D-style Fate, zones, challenge/contest/conflict, why experienced gamers struggle). Contextual D&D callouts added to fate-mechanics.html.
+
+**v300–301** — Docs audit: `ARCHITECTURE.md` full rewrite (three surfaces, correct script load orders for Board/Run/Generator pages, `_redirects` removal, Board IDB keys, LS schema, icon system table, safe area insets, export/import DB API). `BOOTSTRAP.md`, `CONVENTIONS.md`, `README.md`, `testing.md`, `code-quality.md`, `CONTRIBUTING.md` all updated to current state. `CHANGELOG.md` extended with v286–299 entries.
+
+---
+
 ## 2026.03.293–299 — Mobile sprint, code review merge, icon system, crash fix
 
 **v299** — Critical bugfix: `showDice is not defined` crash on board page. Root cause: `var leftOpen = leftOpen` (self-referential assignment) in `BoardTopbar` props destructuring — JavaScript hoists the `var` declaration so right-hand side was `undefined`, throwing `ReferenceError` before any component rendered. Fixed to `var leftOpen = props.leftOpen`. CF beacon SRI warning documented as CF-side issue.

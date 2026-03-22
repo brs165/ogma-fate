@@ -60,6 +60,7 @@ for f in $HTML_FILES; do
     -e 's|\(src="\.\./core/ui-modals\.js\)\(?v=[^"]*\)\?"|\1?v='"${NEW_B}"'"|g' \
     -e 's|\(src="\.\./core/ui-landing\.js\)\(?v=[^"]*\)\?"|\1?v='"${NEW_B}"'"|g' \
     -e 's|\(src="\.\./core/ui\.js\)\(?v=[^"]*\)\?"|\1?v='"${NEW_B}"'"|g' \
+    -e 's|\(src="\.\./core/ui-board\.js\)\(?v=[^"]*\)\?"|\1?v='"${NEW_B}"'"|g' \
     -e 's|\(src="\.\./core/db\.js\)\(?v=[^"]*\)\?"|\1?v='"${NEW_B}"'"|g' \
     -e 's|\(src="\.\./core/intro\.js\)\(?v=[^"]*\)\?"|\1?v='"${NEW_B}"'"|g' \
     -e 's|\(src="core/engine\.js\)\(?v=[^"]*\)\?"|\1?v='"${NEW_B}"'"|g' \

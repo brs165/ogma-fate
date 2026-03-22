@@ -48,7 +48,6 @@ Read these two files first. They're short and they'll save you time:
 
 - **`README.md`** — what Ogma is, all 16 generators, rules accuracy commitments
 - **`LICENSING.md`** — CC BY 3.0 attribution requirements (required for all contributions)
-- **`docs/code-quality.md`** — naming conventions, the var/const split, comment standards, and the open source checklist
 - **`docs/code-quality.md`** — naming conventions, file size limits, the var/const split, h() indentation, comment standards
 
 ---

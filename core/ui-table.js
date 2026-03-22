@@ -876,7 +876,7 @@ function PrepCanvas(props){
   var _heroCard=useState(null);var heroCard=_heroCard[0];var setHeroCard=_heroCard[1];
   var newCardRef=useRef(null); // ID of most recently added card for entrance anim
   var _extras=useState(function(){
-    var ex={};var COL_W=240,COL_H=260,COLS=4,PAD=20;
+    var ex={};var COL_W=640,COL_H=400,COLS=2,PAD=24;
     pinnedCards.forEach(function(card,i){
       var col=i%COLS,row=Math.floor(i/COLS);
       ex[card.id]={x:PAD+col*(COL_W+PAD),y:PAD+row*(COL_H+PAD),size:'md',phyHit:null,menHit:null,cdFilled:0,gmOnly:false,freeInvoke:false,title:null,notes:'',zoneId:null};
@@ -975,7 +975,7 @@ function PrepCanvas(props){
     setExtras(function(prev){
       var next=Object.assign({},prev);
       var idx=Object.keys(next).length;
-      var COL_W=240,COL_H=260,COLS=4,PAD=20;
+      var COL_W=640,COL_H=400,COLS=2,PAD=24;
       pinnedCards.forEach(function(card){
         if(!next[card.id]){
           var col=idx%COLS,row=Math.floor(idx/COLS);
@@ -1037,8 +1037,8 @@ function PrepCanvas(props){
     var pinnedCard={id:id,genId:'aspect',title:name.trim(),data:{aspects:[{name:name.trim()}]},ts:Date.now()};
     if(DB)DB.saveCard(campId,pinnedCard).catch(function(err){console.warn('[Ogma] card save failed:',err);});
     setPinnedCards(function(cs){return cs.concat([pinnedCard]);});
-    var idx=Object.keys(extras).length,PAD=20,COL_W=220;
-    setExtras(function(prev){var next=Object.assign({},prev);next[id]={x:PAD+(idx%4)*(COL_W+PAD),y:PAD+Math.floor(idx/4)*160,size:'md',phyHit:null,menHit:null,cdFilled:0,gmOnly:false,freeInvoke:true,title:name.trim(),notes:''};return next;});
+    var idx=Object.keys(extras).length,PAD=24,COL_W=640;
+    setExtras(function(prev){var next=Object.assign({},prev);next[id]={x:PAD+(idx%2)*(COL_W+PAD),y:PAD+Math.floor(idx/2)*424,size:'md',phyHit:null,menHit:null,cdFilled:0,gmOnly:false,freeInvoke:true,title:name.trim(),notes:''};return next;});
     if(showToast)showToast('Aspect added with free invoke');
   }
   // TC-09: Add GM note card
@@ -1476,7 +1476,7 @@ function PrepCanvas(props){
             var ex=extras[card.id]||{};
             return card.genId!=='zone'&&ex.zoneId;
           });
-          function renderCard(card,inZoneMode){
+          function renderTpCard(card,inZoneMode){
             var ex=extras[card.id]||{x:0,y:0,size:'md'};
             var typeKey=TP_TYPE_CLS[card.genId]||'cct-mechanic';
             var typeLbl=TP_TYPE_LBL[card.genId]||(card.genId||'').toUpperCase();
@@ -1484,7 +1484,7 @@ function PrepCanvas(props){
             var genMeta=(typeof GENERATORS!=='undefined'?GENERATORS:[]).find(function(g){return g.id===card.genId;})||{};
             var zoneChildren=card.genId==='zone'?inZone.filter(function(ch){return (extras[ch.id]||{}).zoneId===card.id;}):[];
             return h('div',{key:card.id,
-              className:'cc cc-'+sz+(ex._dragging?' drag-active':'')+(ex.gmOnly?' cc-gm-only':'')+(ex.freeInvoke?' cc-free-invoke':'')+(card.genId==='zone'?' cc-zone-card':'')+(newCardRef.current===card.id?' tp-card-new':''),
+              className:'cc'+(card.genId!=='zone'?' tp-cv4':' cc-'+sz)+(ex._dragging?' drag-active':'')+(ex.gmOnly?' cc-gm-only':'')+(ex.freeInvoke?' cc-free-invoke':'')+(card.genId==='zone'?' cc-zone-card':'')+(newCardRef.current===card.id?' tp-card-new':''),
               ref:newCardRef.current===card.id?function(el){if(el){setTimeout(function(){newCardRef.current=null;},400);}}:null,
               style:{left:ex.x+'px',top:ex.y+'px',zIndex:ex._dragging?1000:(card.genId==='zone'?1:2)},
               onDragOver:card.genId==='zone'?function(e){e.preventDefault();}:null,
@@ -1519,14 +1519,6 @@ function PrepCanvas(props){
                     'aria-label':ex.freeInvoke?'Remove free invoke':'Add free invoke',
                     'aria-pressed':String(!!ex.freeInvoke),
                   },'★'),
-                  ['sm','md','full'].map(function(s){
-                    return h('button',{key:s,className:'cc-ibtn'+(sz===s?' active':''),
-                      title:s==='sm'?'Compact':s==='md'?'Medium':'Full',
-                      'aria-label':(s==='sm'?'Compact':s==='md'?'Medium':'Full')+' size',
-                      'aria-pressed':String(sz===s),
-                      onClick:function(e){e.stopPropagation();updExtra(card.id,{size:s});}
-                    },s==='sm'?'□':s==='md'?'▣':'■');
-                  }),
                   editMode&&h('button',{className:'cc-ibtn',
                     onClick:function(e){e.stopPropagation();setEditingCard(card.id);},
                     'aria-label':'Edit card',title:'Edit',
@@ -1543,35 +1535,11 @@ function PrepCanvas(props){
                     'aria-label':'Remove card'},'×')
                 )
               ),
-              sz!=='sm'&&card.genId!=='zone'&&h('div',{
-                className:'tp-card-expand-btn',
-                title:'Tap to expand',
-                role:'button',
-                tabIndex:0,
-                'aria-label':'Expand card',
-                onKeyDown:function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();
-                  setHeroCard(card);
-                  if(tableSync&&tableSync.role==='gm'&&tableSync.connected)
-                    tableSync.ws.send(JSON.stringify({type:'card_expand',cardId:card.id}));
-                }},
-                onClick:function(e){
-                  if(e.target.closest('button'))return;
-                  setHeroCard(card);
-                  if(tableSync&&tableSync.role==='gm'&&tableSync.connected)
-                    tableSync.ws.send(JSON.stringify({type:'card_expand',cardId:card.id}));
-                },
+              card.genId!=='zone'&&h('div',{
+                className:'tp-cv4-wrap',
+                onClick:function(e){if(e.target.closest('button'))return;},
               },
-                h(TpCardBody,{
-                  card:Object.assign({},card,{size:sz,phyHit:ex.phyHit,menHit:ex.menHit,cdFilled:ex.cdFilled||0,
-                    title:ex.title!=null?ex.title:card.title,
-                    _notes:ex.notes||''}),
-                  onUpd:function(patch){updExtra(card.id,patch);},
-                  onRollSkill:function(sk){
-                    setSelPlayer(selPlayer||(players[0]&&players[0].id)||null);
-                    setShowDiceFloat(true);
-                    if(showToast)showToast('Rolling '+sk.l+' +'+sk.v+' — select player to roll');
-                  }
-                })
+                renderCard(card.genId, card.data||{}, campId||'', function(patch){updExtra(card.id,patch);}, [], null)
               ),
               // TC-07: Zone body with children list + drop hint
               card.genId==='zone'&&h('div',{className:'cc-zone-body'},
@@ -1595,8 +1563,8 @@ function PrepCanvas(props){
               )
             );
           }
-          return zones.map(function(z){return renderCard(z,false);}).concat(
-                 nonZone.map(function(card){return renderCard(card,false);}));
+          return zones.map(function(z){return renderTpCard(z,false);}).concat(
+                 nonZone.map(function(card){return renderTpCard(card,false);}));
         })()
 
         ),

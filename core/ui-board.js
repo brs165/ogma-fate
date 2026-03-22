@@ -88,6 +88,15 @@ var STICKY_COLORS = [
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
 
+// Room code generator (4 chars, unambiguous alphabet)
+function generateBoardRoomCode() {
+  var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var code = '';
+  for (var i = 0; i < 4; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
+}
+
+
 function boardUid() {
   return 'b' + Date.now() + Math.random().toString(36).slice(2, 6);
 }
@@ -512,7 +521,7 @@ function BoardPlayPanel(props) {
 
   return h('div', {className: 'blp'},
     h('div', {className: 'blp-tabs'},
-      h('span', {className: 'blp-tab active', style: {pointerEvents: 'none'}}, '▶ Players')
+      h('span', {className: 'blp-tab active', style: {pointerEvents: 'none', color: 'var(--c-green,#30d158)'}}, '▶ Play Mode')
     ),
     h('div', {className: 'blp-body'},
       players.length === 0 && h('div', {style: {padding: '16px 8px', textAlign: 'center',
@@ -675,6 +684,7 @@ function BoardDossier(props) {
   var onReroll = props.onReroll;
   var onPin = props.onPin;
   var campName = props.campName;
+  var campId = props.campId || '';
   var modalRef = useRef(null);
 
   // C-01: Focus trap + focus-on-open (WCAG 2.1.2)
@@ -716,17 +726,10 @@ function BoardDossier(props) {
         }, genMeta.icon + ' ' + (genMeta.label || card.genId))
       ),
 
-      // Body — left tab + content + right stress panel
-      h('div', {className: 'bd-body'},
-        h('div', {className: 'bd-tab', style: {borderLeft: '3px solid ' + C.stripe, background: C.bg}},
-          h('span', {className: 'bd-tab-label', style: {color: C.tc}}, genMeta.label || card.genId)
-        ),
-        h('div', {className: 'bd-content'},
-          // Full rendered result via ui-renderers.js
-          card.data && h(BoardDossierContent, {card: card, campName: campName})
-        ),
-        h('div', {className: 'bd-right'},
-          card.data && h(BoardDossierStress, {card: card, C: C})
+      // Body — new card design
+      h('div', {className: 'bd-body bd-card-body'},
+        card.data && h('div', {style: {display:'flex', justifyContent:'center', padding:'12px 0 4px'}},
+          renderCard(card.genId, card.data, campId || campName, null, [], null)
         )
       ),
 
@@ -973,17 +976,6 @@ function BoardTopbar(props) {
       mode === 'play' && syncStatus === 'connected' && h('span', {className: 'bt-chip bt-play-chip'}, '\u25B6 Live'),
       mode === 'play' && syncStatus === 'connecting' && h('span', {className: 'bt-chip bt-offline'}, '\u29D7 Connecting…'),
       !isOnline && h('span', {className: 'bt-chip bt-offline'}, '\u26A1 Offline'),
-      // ── Play mode: turn order bar at bottom of canvas ──────────────────────────
-    mode === 'play' && h(BoardTurnBar, {
-      players: players,
-      order: order,
-      setOrder: setOrder,
-      onToggleActed: toggleActed,
-      round: round,
-      onNewRound: newRound,
-      onPrevRound: prevRound,
-      roundFlash: roundFlash,
-    }),
 
     // BRD-02: Dice floater toggle
       h('button', {
@@ -1031,6 +1023,13 @@ function BoardTopbar(props) {
         title: 'Export board as JSON',
         'aria-label': 'Export board canvas as JSON file',
       }, h(FaFileArrowDownIcon, {size: 14})),
+      // EXP-05: Print canvas cards
+      props.mode !== 'play' && props.onPrint && h('button', {
+        className: 'bt-icon-btn',
+        onClick: props.onPrint,
+        title: 'Print cards',
+        'aria-label': 'Print canvas cards',
+      }, '\uD83D\uDDA8'),
       h('button', {
         className: 'bt-icon-btn',
         onClick: onToggleTheme,
@@ -1105,6 +1104,28 @@ function BoardApp(props) {
   var _roundFlash = useState(false); var roundFlash = _roundFlash[0]; var setRoundFlash = _roundFlash[1];
   var roundFlashTimer = useRef(null);
 
+  // ── BRD-02/03: Dice floater + FP floater visibility ──────────────────────
+  var _showDice = useState(false); var showDice = _showDice[0]; var setShowDice = _showDice[1];
+  var _showFP = useState(false); var showFP = _showFP[0]; var setShowFP = _showFP[1];
+
+  // ── BRD-05: Multiplayer sync state ───────────────────────────────────────
+  var _syncObj = useState(null); var syncObj = _syncObj[0]; var setSyncObj = _syncObj[1];
+  var _syncStatus = useState('offline'); var syncStatus = _syncStatus[0]; var setSyncStatus = _syncStatus[1];
+  var _roomCode = useState(function() {
+    try { return new URLSearchParams(location.search).get('room') || ''; } catch(e) { return ''; }
+  }); var roomCode = _roomCode[0]; var setRoomCode = _roomCode[1];
+  var _showJoin = useState(false); var showJoin = _showJoin[0]; var setShowJoin = _showJoin[1];
+  var _joinInput = useState(''); var joinInput = _joinInput[0]; var setJoinInput = _joinInput[1];
+
+  // ── BRD-03: FP tracker state (loaded from IDB) ────────────────────────────
+  var _fpState = useState(null); var fpState = _fpState[0]; var setFpState = _fpState[1];
+
+  // ── BRD-02: Dice floater — players list from FP state for skill rolling ──
+  var boardPlayers = fpState ? (fpState.pcs || []).map(function(pc) {
+    return {id: pc.id, name: pc.name, skills: pc.skills || []};
+  }) : [];
+  var _boardSelPlayer = useState(null); var boardSelPlayer = _boardSelPlayer[0]; var setBoardSelPlayer = _boardSelPlayer[1];
+
   var _pan = useState({x: 0, y: 0});
   var pan = _pan[0];
   var setPan = _pan[1];
@@ -1127,6 +1148,12 @@ function BoardApp(props) {
   var campCanvasKey = canvasKey + '_' + campId;
 
   // ── Effects ────────────────────────────────────────────────────────────────
+
+  // Set data-campaign so world CSS vars apply to the card components
+  useEffect(function() {
+    if (campId) document.documentElement.setAttribute('data-campaign', campId);
+    return function() { document.documentElement.removeAttribute('data-campaign'); };
+  }, [campId]);
 
   // Theme restore
   useEffect(function() {
@@ -1176,6 +1203,14 @@ function BoardApp(props) {
     if (typeof DB === 'undefined') return;
     DB.loadSession('pinned_board_' + campId).then(function(saved) {
       if (saved && typeof saved.count === 'number') setPinCount(saved.count);
+    }).catch(function() {});
+  }, [campId]);
+
+  // ── Load FP state from IDB on mount ──────────────────────────────────────────
+  useEffect(function() {
+    if (typeof DB === 'undefined') return;
+    DB.loadSession(BOARD_FP_KEY + '_' + campId).then(function(saved) {
+      if (saved && saved.pcs) setFpState(saved);
     }).catch(function() {});
   }, [campId]);
 
@@ -1292,7 +1327,9 @@ function BoardApp(props) {
   // ── BRD-05: Multiplayer sync ───────────────────────────────────────────────
   function connectAsHost() {
     if (typeof createTableSync === 'undefined') { showToast('⚠ Sync not available offline'); return; }
-    var s = createTableSync(roomCode, 'gm',
+    var code = roomCode && roomCode.length === 4 ? roomCode : generateBoardRoomCode();
+    setRoomCode(code);
+    var s = createTableSync(code, 'gm',
       function() {},
       function(roll) { showToast(roll.who + ' · ' + (roll.total >= 0 ? '+' : '') + roll.total); },
       function(msg) { showToast(msg); },
@@ -1301,7 +1338,7 @@ function BoardApp(props) {
     if (!s) { showToast('⚠ Could not connect'); return; }
     setSyncObj(s);
     setSyncStatus('connecting');
-    s.ws.addEventListener('open', function() { setSyncStatus('connected'); showToast('✅ Live — room: ' + roomCode); });
+    s.ws.addEventListener('open', function() { setSyncStatus('connected'); showToast('✅ Live — room: ' + code); });
     s.ws.addEventListener('close', function() { setSyncStatus('offline'); });
   }
 
@@ -1673,16 +1710,22 @@ if (genId === 'sticky') {
       onHost: connectAsHost,
       onDisconnect: disconnectSync,
       onExportCanvas: exportCanvas,
+      onPrint: function() {
+        if (typeof DB === 'undefined' || !DB.printCards) return;
+        var printable = cards.filter(function(card) {
+          return card.genId && card.genId !== 'sticky' && card.genId !== 'label' && card.data;
+        }).map(function(card) {
+          return {genId: card.genId, title: card.title, summary: card.summary, tags: card.tags || [], data: card.data};
+        });
+        if (!printable.length) { showToast('No cards to print'); return; }
+        DB.printCards(printable, campMeta.name);
+        showToast('Opening print view\u2026');
+      },
     }),
 
     h('div', {className: 'board-body'},
 
-      // MOB-02: Mobile backdrop — tapping closes the panel
-      leftOpen && h('div', {
-        className: 'blp-backdrop',
-        onClick: function() { setLeftOpen(false); },
-        'aria-hidden': 'true',
-      }),
+      // MOB-02: Mobile close is handled by canvas onMouseDown (MOB-06)
       // MOB-02: Left panel — hidden on mobile when leftOpen is false
       h('div', {className: 'blp-wrap' + (leftOpen ? '' : ' blp-hidden')},
         mode === 'play'
@@ -1950,6 +1993,8 @@ if (genId === 'sticky') {
                   function(msg) { showToast(msg); },
                   function() {}
                 );
+                setRoomCode(joinInput);
+                setRoomCode(joinInput);
                 if (s) { setSyncObj(s); setSyncStatus('connecting'); setShowJoin(false);
                   s.ws.addEventListener('open', function() { setSyncStatus('connected'); showToast('✅ Joined room ' + joinInput); });
                   s.ws.addEventListener('close', function() { setSyncStatus('offline'); });
@@ -1988,6 +2033,7 @@ if (genId === 'sticky') {
       onPin: pinCard,
       onOpenHelp: function() { setLeftTab('help'); setDossierCard(null); },
       campName: campMeta.name,
+      campId: campId,
     })
   );
 }

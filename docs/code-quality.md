@@ -28,7 +28,7 @@ The codebase is intentionally split. This is not inconsistency — it is history
 | `data/*.js` | `var` only | All data files; never use `const` here |
 | `core/ui-primitives.js` | `const`/`let` | Module base; loaded first; defines the globals that cannot be redeclared |
 | `core/ui-modals.js`, `core/ui-landing.js` | `const`/`let` | Clean split-off components |
-| `core/ui-renderers.js`, `core/ui-table.js` | **Mixed** | Module-level `const` constants (`CARD_META`, `TP_LADDER`, `TP_COLORS` etc.) coexist with function-scoped `var`. ESLint allows `var` in these files. Migration to full const/let is pending. |
+| `core/ui-renderers.js`, `core/ui-table.js` | **Mixed** | Module-level `const` constants (`CV4_META`, `CV4_CAT`, `CV4_DARK`, `CV4_LIGHT`, `CV4_FRONTS`, `TP_LADDER`, `TP_COLORS` etc.) coexist with function-scoped `var`. ESLint allows `var` in these files. |
 
 **The critical rule:** `ui-primitives.js` declares `h`, `useState`, `useCallback`, `useEffect`, `useRef`, `Fragment`, `RA_ICONS`, and `TIMING` as `const`. **Never redeclare these in any other file.** Redeclaring a `const` with `var` is a `SyntaxError` that silently kills the entire script — it does not produce a helpful error message in the browser. This has burned us twice.
 
@@ -115,6 +115,12 @@ style: {position: 'fixed', top: pos.top + 'px'}
 ---
 
 ## Known footguns
+
+**Local function `renderCard` in PrepCanvas (FIXED v321):** `ui-table.js` had a local `function renderCard(card, inZoneMode)` inside the `PrepCanvas` IIFE. When `renderCard(card.genId, card.data, ...)` was called as a global inside that scope, JS resolved the local first — `card` became a string, `card.id` threw a TypeError. Renamed to `renderTpCard`. If you add a new helper inside PrepCanvas, check for collisions with `ui-renderers.js` globals (`renderCard`, `renderResult`).
+
+**`DB.printCards` must be in `window.DB` (second IIFE):** `db.js` has two IIFEs. The first handles localStorage. The second defines `window.DB`. A function defined in the first is not accessible via `DB.x`. Burned us in v310 — print showed "Print unavailable" for months. Always add DB methods to the `window.DB = { ... }` block in the second IIFE.
+
+**`bump-version.sh` must be updated when adding new core JS files.** New files (like `ui-board.js`) are not stamped by default — the script has an explicit list of patterns. If a file has a stale `?v=286` while everything else is `?v=307`, users get the old cached version. Add the pattern to `scripts/bump-version.sh` immediately when the file is created. (This caused the v286→v307 stale stamp bug.)
 
 **Self-referential var assignment.** In `var`-only files, destructuring component props manually (`var foo = props.foo`) is correct. Writing `var foo = foo` (referencing the var being declared) does not throw a SyntaxError — JavaScript hoists the `var` declaration, so the right-hand side resolves to `undefined`. The component then receives `undefined` for that prop and any usage of it will be a `ReferenceError` at render time. This produced the `showDice is not defined` ErrorBoundary crash in v298. Always write `var foo = props.foo`. `// TODO BL-02: stunt data spec needed before this can render`. No orphan TODOs without an ID.
 

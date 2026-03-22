@@ -39,15 +39,15 @@ Offline-first browser PWA for Fate Condensed GMs. 16 generators × 8 worlds. No 
 |----------|---------|
 | `core/engine.js` | All `generate*()` functions, PRNG, table ops. Pure JS — no React/DOM. |
 | `core/ui.js` | `CampaignApp` shell — main campaign page component |
-| `core/ui-renderers.js` | 16 result renderers (dossier cards) |
+| `core/ui-renderers.js` | 16 result renderers + `renderCard()` → `cv4Card` (600×380, 5 categories, GM guidance back, interactive stress/countdown/contest/consequence, world colour via CSS vars) |
 | `core/ui-table.js` | `PrepCanvas` + all Table canvas components |
 | `core/ui-run.js` | Run session surface components |
 | `core/ui-modals.js` | Modal, ShareDrawer, Settings, Vault, QuickFind, KBShortcuts |
 | `core/ui-primitives.js` | React aliases (`h`), FD card primitives, `ErrorBoundary`, `scoreAspect()` |
 | `core/ui-landing.js` | Landing page components |
-| `core/ui-board.js` | `BoardApp` — board prep/play canvas root component |
-| `core/ui-run.js` | `RunApp` — run session surface root component |
-| `core/db.js` | Dexie 4 IDB wrapper, memStore fallback, `navigator.storage.persist()` |
+| `core/ui-board.js` | `BoardApp` — unified Prep/Play canvas. Play mode: `BoardPlayerRow`, `BoardTurnBar`, `BoardPlayPanel`, player/round/FP/sync state |
+| `core/ui-run.js` | Sync module (`createSync`, `generateRoomCode`) + legacy `RunApp` (run.html is now a redirect) |
+| `core/db.js` | Dexie 4 IDB wrapper, memStore fallback, `navigator.storage.persist()`, `DB.printCards()` — must live in second IIFE (`window.DB` block). First IIFE is localStorage prefs only. |
 | `core/config.js` | `OGMA_CONFIG`: `REPO_BASE` (auto-detect), `DEFAULT_SYNC_HOST` |
 | `core/intro.js` | Campaign intro animation (DOM, not React) |
 | `data/shared.js` | `CAMPAIGNS={}`, `GENERATORS`, `ALL_SKILLS`, `HELP_CONTENT` |
@@ -68,13 +68,20 @@ Offline-first browser PWA for Fate Condensed GMs. 16 generators × 8 worlds. No 
 | Python `open()` → `encoding='utf-8'` | Default codec corrupts emoji |
 | Emoji in JS strings written from Python → unicode escapes | Raw chars become surrogate pairs |
 | Large JS replacements → `fs.writeFileSync` in Node | Node owns encoding |
-| Never redeclare `h`, `useState`, `useEffect`, `useRef`, `useCallback`, `Fragment` | All declared as `const` in `ui-primitives.js` — re-declaring with `var` in any other file is a `SyntaxError`. Full list of globals from `ui-primitives.js`: `h`, `useState`, `useCallback`, `useEffect`, `useRef`, `Fragment`, `RA_ICONS`, `TIMING`, `FaShareIcon`, `FaCartPlusIcon`, `FaFileArrowDownIcon`, `FaFileArrowUpIcon` |
+| Never redeclare `h`, `useState`, `useEffect`, `useRef`, `useCallback`, `Fragment` | All declared as `const` in `ui-primitives.js` — re-declaring with `var` in any other file is a `SyntaxError`. Full list of globals from `ui-primitives.js`: `h`, `useState`, `useCallback`, `useEffect`, `useRef`, `Fragment`, `RA_ICONS`, `TIMING`, `FaShareIcon`, `FaCartPlusIcon`, `FaFileArrowDownIcon`, `FaFileArrowUpIcon`. `ErrorBoundary` is also global (class component, sole exception to hooks-only rule). |
 | After every write: `node --check <file> && echo OK` | Catch syntax before QA |
 | Never replace `assets/js/partysocket.js` with a CDN tag | No UMD build exists |
 | `_headers` must NOT be in SW `APP_SHELL` | Cloudflare Pages consumes it server-side |
 | CDN scripts must NOT be SW-intercepted | SW intercept strips CORS headers |
 | `<base href="/">` on all campaign HTML pages | CF Pages Pretty URLs strip `.html` |
 | No `_redirects` file in repo | File removed v290 — caused redirect conflicts. CF Pages Pretty URLs handles `.html` stripping. Do not re-add. |
+| `var foo = props.foo` not `var foo = foo` | Self-referential prop destructuring silently produces `undefined`, causing `ReferenceError` at render (v299 crash, v307 crash). Always write `props.X`. |
+| All state vars used in `BoardApp` render must be declared | Undeclared vars are `undefined` globals — falsy gates work but setter calls throw. Declare every `useState` before use (v307 lesson). |
+| Local function names must not shadow global renderers | `PrepCanvas` had `function renderCard(card,inZoneMode)` — shadowed global `renderCard(genId,data,...)` causing `card.id` crash (v321). Rename local functions when they conflict. |
+| `printCards` belongs in `window.DB` (second IIFE in db.js) | First IIFE is localStorage prefs only. Anything that needs to be on `DB.X` must go in the second IIFE's `window.DB` object. (v325 lesson) |
+| CI: use `npm install` not `npm ci` when no lock file committed | `npm ci` requires `package-lock.json`. `cache: 'npm'` on `setup-node` also requires a lock file. Use `npm install` or commit the lock file. |
+| CI: QA job runs `tests/qa_named.js` not `devdocs/qa_named.js` | Path changed when tests/ dir was created. Always reference `tests/` not `devdocs/`. |
+| Local function names must not shadow global `renderCard` | ui-table.js has a local `renderTpCard` (was `renderCard` — renamed v321). Shadowing the global caused a TypeError crash. Any new local function inside PrepCanvas must check for name collisions with `ui-renderers.js` globals. |
 
 ---
 
@@ -82,7 +89,7 @@ Offline-first browser PWA for Fate Condensed GMs. 16 generators × 8 worlds. No 
 
 ```bash
 # Syntax check core files
-node --check core/engine.js && node --check core/ui.js && node --check core/ui-table.js
+node --check core/engine.js && node --check core/ui.js && node --check core/ui-table.js && node --check core/ui-board.js && node --check core/ui-renderers.js && node --check core/db.js
 
 # Named assertions
 node tests/qa_named.js
@@ -119,7 +126,7 @@ config.js → engine.js → [Dexie CDN] → db.js → ui-primitives.js → party
 ui-renderers.js → ui-table.js → ui-modals.js → ui-landing.js → ui.js → intro.js
 ```
 Board page: same up to ui-primitives.js, then: ui-renderers.js → ui-table.js → ui-modals.js → ui.js → ui-board.js (no ui-landing.js, no intro.js)
-Run page: same up to ui-primitives.js, then: ui-renderers.js → ui-table.js → ui-run.js
+Run page: `run.html` now redirects to `board.html?mode=play` — no longer loads ui-run.js as root
 
 ---
 

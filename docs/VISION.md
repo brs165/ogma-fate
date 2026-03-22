@@ -1,6 +1,6 @@
 # Ogma — Vision, Strategy, and Objectives
 
-> **Version:** 5.0 — Sprint 17 shipped, 2026.03.130
+> **Version:** 5.1 — v4 card system shipped, 2026.03.326
 > **Tagline:** Learn · Prep · Run · Export
 > **Mission:** Every GM should be able to run a great Fate Condensed session, regardless of how much time they had to prep.
 

@@ -409,22 +409,28 @@ Output: specific ROADMAP.md changes with tier placement and rationale.
 ```
 For this session, lead as the Senior JS Developer building interactive result renderers.
 
-CURRENT UI ARCHITECTURE (2026.03.299):
+CURRENT UI ARCHITECTURE (2026.03.326):
 - action-bar replaces roll-hero + panel-toolbar: div.action-bar with btn-roll, inspire, ctx pills, secondary icons
 - KBShortcutsModal: separate component, opened by ? key and sidebar button
-- showKbShortcuts: boolean state alongside showHelp, showSettings, etc.
-- OGMA brand: .topbar-ogma class, accent colour, via React or static HTML depending on page type
+- Card system: `renderCard()` → `Cv4Card` (600×380, v4, flip-on-footer, world-adaptive colours)
+- Card interactivity: `cardState` in `cv4Card` passes `ctx = {state, upd}` to front builders
+  - `cv4StressTrack(label, hits, setHits, color)` — NPC stress boxes, role=checkbox, keyboard
+  - `cv4Clock(boxes, filled, setFilled, color)` — Countdown ticking clock
+  - Contest: +1 buttons per side + Reset; Consequence: treated toggle
+- `data-campaign` attribute set on `document.documentElement` by BoardApp useEffect
 
 Ogma uses React 18 UMD via CDN with React.createElement (aliased as `h`).
-ALL state declarations use the array destructure pattern:
+ALL state declarations use the array destructure pattern (var-only files):
   var _s = useState(false); var val = _s[0]; var setVal = _s[1];
 
-Every result renderer is a React component that receives {data} as props.
-Interactive elements use local useState - no global state, no IDB for per-result interactions.
-
-Pattern for tappable stress boxes:
-  var _hit = useState(0); var hits = _hit[0]; var setHits = _hit[1];
-  onClick: function() { setHits(function(h) { return h === i+1 ? i : i+1; }); }
+Card interactive element pattern (WCAG-compliant):
+  h('div', {
+    role: 'checkbox', tabIndex: 0,
+    'aria-checked': String(!!v),
+    'aria-label': 'Stress box N (clear/marked)',
+    onClick: function(e) { e.stopPropagation(); /* update state */ },
+    onKeyDown: function(e) { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); /* update */ } },
+  })
 
 Pattern for collapsible reveal:
   var _open = useState(false); var open = _open[0]; var setOpen = _open[1];
