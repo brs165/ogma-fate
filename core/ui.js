@@ -2141,93 +2141,31 @@ function CampaignApp(props) {
     h('a', {href: '#main', className: 'skip-link'}, 'Skip to main content'),
 
     // ════════════════════════════════════════════════════════════════
-    // PATTERN G: TOPBAR + SIDEBAR + CONTENT PANEL
-    // Desktop: sticky topbar (40px) + sidebar (220px) + result panel
-    // Mobile:  sticky topbar + off-canvas drawer + full-width content
+    // PATTERN B: PERSISTENT LEFT SIDEBAR (Option B nav refactor)
+    // Desktop: 220px sidebar always visible + full-height content panel (no topbar)
+    // Mobile:  44px slim bar (hamburger + world + theme) + off-canvas sidebar drawer
     // ════════════════════════════════════════════════════════════════
 
-    // ── Top bar — unified chrome: wordmark + breadcrumb + status chips ──
-    h('header', {className: 'topbar', role: 'banner'},
-      // Hamburger — 44px touch target (W2), mobile only
+    // ── Mobile slim bar (hamburger + world + theme) — desktop has no top bar ──
+    h('header', {className: 'sb-slim-bar', role: 'banner'},
       h('button', {
-        className: 'topbar-hamburger btn btn-icon btn-ghost',
+        className: 'btn btn-icon btn-ghost sb-hamburger',
         onClick: function() { setShowSidebar(!showSidebar); },
         'aria-label': showSidebar ? 'Close menu' : 'Open menu',
         'aria-expanded': String(showSidebar),
-        title: 'Menu',
-      }, showSidebar ? '✕' : '☰'),
-      // OGMA wordmark — replaces full acronym (H8)
-      h('a', {href: '../index.html', className: 'topbar-wordmark', 'aria-label': 'Ogma home'}, 'OGMA'),
-      h('div', {className: 'topbar-sep', 'aria-hidden': 'true'}),
-      // Breadcrumb trail — IA3, present on every page
-      h('nav', {className: 'topbar-crumb', 'aria-label': 'Breadcrumb'},
-        h('a', {href: '../index.html', className: 'topbar-crumb-item'}, 'Home'),
-        h('span', {className: 'topbar-crumb-sep', 'aria-hidden': 'true'}, '›'),
-        h('span', {className: 'topbar-crumb-item'}, camp.meta.name),
-        h('span', {className: 'topbar-crumb-sep', 'aria-hidden': 'true'}, '›'),
-        h('span', {
-          className: 'topbar-crumb-item current',
-          'aria-current': 'page',
-        }, (GENERATORS.find(function(g) { return g.id === activeGen; }) || {}).label || activeGen)
+      }, showSidebar ? '\u2715' : '\u2630'),
+      h('span', {className: 'sb-slim-world'}, camp.meta.name),
+      h('span', {className: 'sb-slim-gen', 'aria-hidden': 'true'},
+        (GENERATORS.find(function(g) { return g.id === activeGen; }) || {}).label || ''
       ),
-      // UX-04: unified nav tabs — Worlds / Prep / Learn / Help
-      h('nav', {className: 'topbar-tabs', 'aria-label': 'Main navigation'},
-        h('a', {href: '../index.html', className: 'topbar-tab'},
-          h('span', {className: 'topbar-tab-icon', 'aria-hidden': 'true'}, '🌍'),
-          h('span', {className: 'topbar-tab-label'}, 'Worlds')
-        ),
-
-        h('a', {href: '../help/learn-fate.html', className: 'topbar-tab'},
-          h('span', {className: 'topbar-tab-icon', 'aria-hidden': 'true'}, '📖'),
-          h('span', {className: 'topbar-tab-label'}, 'Learn')
-        ),
-        h('a', {href: '../help/index.html', className: 'topbar-tab'},
-          h('span', {className: 'topbar-tab-icon', 'aria-hidden': 'true'}, '❓'),
-          h('span', {className: 'topbar-tab-label'}, 'Help')
-        )
-      ),
-      // Status zone — always visible, interactive (H1, H4, H6, H9)
-      h('div', {className: 'topbar-status'},
-        // Offline indicator
-        !isOnline && h('span', {
-          className: 'topbar-chip topbar-chip-offline',
-          role: 'status',
-          'aria-live': 'polite',
-          title: 'You are offline. Ogma is running from cached data.',
-        }, '⚡ Offline'),
-
-        // Table prep — cart icon + saved card count
-        h('button', {
-          className: 'btn btn-ghost topbar-nav-btn topbar-nav-hide-sm' + (prepView ? ' active' : ''),
-          onClick: function() { setPrepView(function(v) { return !v; }); },
-          title: prepView ? 'Back to generator' : 'View Table (' + pinnedCards.length + ' cards)',
-          'aria-pressed': String(prepView),
-          style: {fontSize: 13, gap: 5},
-        },
-          h(FaCartPlusIcon, {size: 13}),
-          ' Table',
-          pinnedCards.length > 0 && h('span', {style: {
-            marginLeft: 4, fontSize: 10, fontWeight: 800,
-            background: 'var(--accent)', color: '#000',
-            borderRadius: '100px', padding: '1px 5px', lineHeight: 1.4,
-          }}, String(pinnedCards.length))
-        ),
-        // Theme toggle
-        h('a', {
-          href: 'campaigns/board.html?world=' + campId,
-          className: 'btn btn-ghost topbar-nav-btn topbar-nav-hide-sm',
-          style: {fontSize: 12, textDecoration: 'none', padding: '5px 10px'},
-          title: 'Try the new Board view (beta)',
-        }, '📄 Board'),
-        h('button', {
-          className: 'btn btn-icon btn-ghost',
-          onClick: toggleTheme,
-          'aria-label': theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode',
-          title: theme === 'dark' ? 'Light mode' : 'Dark mode',
-          style: {width: 44, height: 44},
-        }, h(RaIcon, {n: theme === 'dark' ? RA_ICONS.theme_light : RA_ICONS.theme_dark}))
-      )
+      h('button', {
+        className: 'btn btn-icon btn-ghost',
+        onClick: toggleTheme,
+        'aria-label': theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode',
+        style: {width: 44, height: 44, marginLeft: 'auto'},
+      }, h(RaIcon, {n: theme === 'dark' ? RA_ICONS.theme_light : RA_ICONS.theme_dark}))
     ),
+
 
     // ── App body: sidebar + content ───────────────────────────────────
     h('div', {className: 'app-body'},
@@ -2394,6 +2332,61 @@ function CampaignApp(props) {
           )
         )
       ),
+
+        // ════════════════════════════════════════════════════════
+        // NAVIGATE PANEL — links + status + tools (moved from topbar)
+        // ════════════════════════════════════════════════════════
+        h('div', {
+          id: 'sb-panel-nav',
+          className: 'sidebar-panel' + (sidebarTab === 'nav' ? ' active' : ''),
+          role: 'tabpanel',
+          'aria-labelledby': 'sb-tab-nav',
+        },
+          h('div', {className: 'sidebar-group-label'}, 'Navigate'),
+          h('a', {href: '../index.html', className: 'sidebar-tool-btn'},
+            h('span', {className: 'sidebar-item-icon'}, '🌍'),
+            h('span', {className: 'sidebar-item-label'}, 'All Worlds')
+          ),
+          h('a', {href: '../help/learn-fate.html', className: 'sidebar-tool-btn'},
+            h('span', {className: 'sidebar-item-icon'}, '📚'),
+            h('span', {className: 'sidebar-item-label'}, 'Learn Fate')
+          ),
+          h('a', {href: '../help/index.html', className: 'sidebar-tool-btn'},
+            h('span', {className: 'sidebar-item-icon'}, '\u2753'),
+            h('span', {className: 'sidebar-item-label'}, 'Help')
+          ),
+          h('a', {href: '../campaigns/board.html?world=' + campId, className: 'sidebar-tool-btn'},
+            h('span', {className: 'sidebar-item-icon'}, '🎲'),
+            h('span', {className: 'sidebar-item-label'}, 'Board')
+          ),
+          h('div', {className: 'sidebar-divider'}),
+          h('div', {className: 'sidebar-group-label'}, 'Tools'),
+          h('button', {
+            className: 'sidebar-tool-btn' + (prepView ? ' active' : ''),
+            onClick: function() { setPrepView(function(v) { return !v; }); setShowSidebar(false); },
+            'aria-pressed': String(prepView),
+          },
+            h('span', {className: 'sidebar-item-icon'}, h(FaCartPlusIcon, {size: 16})),
+            h('span', {className: 'sidebar-item-label'}, 'Table Prep' + (pinnedCards.length > 0 ? ' (' + pinnedCards.length + ')' : ''))
+          ),
+          h('button', {
+            className: 'sidebar-tool-btn',
+            onClick: toggleTheme,
+            'aria-label': theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode',
+          },
+            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: theme === 'dark' ? RA_ICONS.theme_light : RA_ICONS.theme_dark})),
+            h('span', {className: 'sidebar-item-label'}, theme === 'dark' ? 'Light mode' : 'Dark mode')
+          ),
+          h('div', {className: 'sidebar-divider'}),
+          h('div', {className: 'sidebar-group-label'}, 'Status'),
+          h('div', {className: 'sb-status-row'},
+            h('span', {className: 'sb-status-dot' + (isOnline ? '' : ' offline')}),
+            h('span', {className: 'sidebar-item-label', role: 'status', 'aria-live': 'polite'},
+              isOnline ? 'Online' : '\u26A1 Offline'
+            )
+          ),
+          h('div', {style: {height: 8}})
+        ),
 
       // ── Main content panel ───────────────────────────────────────────
       h('div', {className: 'content-panel'},

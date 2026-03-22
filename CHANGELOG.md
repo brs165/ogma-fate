@@ -23,6 +23,41 @@
 
 
 
+
+---
+
+## 2026.03.340 — Option B: Left-nav refactor (topbar → sidebar)
+
+**Design change:** Persistent left sidebar replaces the top navigation bar on the campaign generator pages.
+
+**Desktop (≥641px):**
+- No topbar. Sidebar is always visible (220px, existing layout unchanged).
+- New sidebar header section: OGMA wordmark + world chip (accent colour, current world name).
+- New "Navigate" tab in the sidebar tab bar (alongside "Generate"):
+  - All Worlds, Learn Fate, Help, Board links
+  - Table Prep button with pinned card count
+  - Theme toggle
+  - Online/Offline status dot
+
+**Mobile (≤640px):**
+- 44px slim bar replaces the old topbar: hamburger + world name + current generator + theme toggle.
+- Hamburger opens the sidebar as a full-height overlay (unchanged behaviour).
+- `sb-slim-bar` hidden on desktop via `@media(min-width:641px){.sb-slim-bar{display:none!important}}`.
+
+**Removed from topbar:**
+- OGMA wordmark → sidebar header
+- Breadcrumb → replaced by world chip + slim bar generator label
+- Nav tabs (Worlds / Learn / Help) → Navigate panel in sidebar
+- Table prep button → Navigate panel
+- Board link → Navigate panel
+- Theme toggle → Navigate panel + slim bar
+- Offline chip → Navigate panel status row
+
+**New CSS classes:** `.sb-slim-bar`, `.sb-hamburger`, `.sb-slim-world`, `.sb-slim-gen`, `.sb-header`, `.sb-wordmark`, `.sb-world-chip`, `.sb-status-row`, `.sb-status-dot`
+
+113/113 · 59/59
+
+---
 ---
 
 ## 2026.03.336–337 — Hotfix + order-of-operations audit
