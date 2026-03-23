@@ -91,6 +91,11 @@ sed -i "s|var CACHE_NAME = '[^']*'|var CACHE_NAME = '${CACHE_NAME}'|g" "$ROOT/sw
 echo "  ✓ sw.js"
 
 echo ""
+echo "=== Updating config.js VERSION to ${NEW_VER} ==="
+sed -i "s|VERSION: '[^']*'|VERSION: '${NEW_VER}'|g" "$ROOT/core/config.js"
+echo "  ✓ config.js"
+
+echo ""
 echo "=== Updating about.html version block to ${NEW_VER} ==="
 sed -i \
   -e 's|<span class="about-version-badge">[^<]*</span>|<span class="about-version-badge">'"${NEW_VER}"'</span>|g' \

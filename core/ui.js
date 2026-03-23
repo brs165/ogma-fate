@@ -3548,9 +3548,13 @@ function CampaignApp(props) {
       'Fate\u2122 trademark of Evil Hat Productions, LLC. D&D\u00ae trademark of Wizards of the Coast LLC. Released under CC BY 3.0. \u00b7 ',
       h('a', {href: '../license.html', className: 'camp-content-footer-link'}, 'Full Attribution'),
       ' \u00b7 ',
-      /* FARI_FOOTER_PARKED 2026.03.154 */ // h('a', {href: 'https://fari.app/', ...}, 'Fari App'),
+      h('a', {href: 'https://fate-srd.com/', target: '_blank', rel: 'noreferrer', className: 'camp-content-footer-link'}, 'fate-srd.com'),
       ' \u00b7 ',
-      h('a', {href: 'https://fate-srd.com/', target: '_blank', rel: 'noreferrer', className: 'camp-content-footer-link'}, 'fate-srd.com')
+      h('a', {href: '../design-system.html', className: 'camp-content-footer-link'}, 'Style Guide'),
+      ' \u00b7 ',
+      h('span', {className: 'camp-content-footer-version'},
+        (typeof OGMA_CONFIG !== 'undefined' && OGMA_CONFIG.VERSION) ? 'v' + OGMA_CONFIG.VERSION : ''
+      )
     ),
 
   ); // close app-shell

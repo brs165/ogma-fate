@@ -1056,7 +1056,7 @@ var CV4_HELP = {
 
 
 
-var CV4_MONO = "'Martian Mono','Courier New',Courier,monospace";
+var CV4_MONO = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
 
 function cv4UseReducedMotion() {
   var _r = useState(function() {
@@ -1093,7 +1093,7 @@ function cv4InjectStyles() {
     document.head.appendChild(s);
   } catch(e) {}
 }
-var CV4_SANS = "'Fraunces',Georgia,'Times New Roman',serif";
+var CV4_SANS = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
 var CV4_BODY = "system-ui,-apple-system,sans-serif";
 
 // ── Field Dispatch cv4 helpers ────────────────────────────────────────────

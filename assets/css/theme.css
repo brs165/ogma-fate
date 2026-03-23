@@ -1,8 +1,8 @@
 /* Ogma — Field Dispatch Design System
-   Physical, warm, tactile. Fraunces serif + Martian Mono. Stamp-press interactions.
+   Physical, warm, tactile. Futura geometric stack. Stamp-press interactions.
    Dark mode default. Light mode: [data-theme="light"]. Campaign accents: [data-campaign]. */
 
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,900;1,9..144,500&family=Martian+Mono:wght@400;700;800&display=swap&font-display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600;1,700&display=swap&font-display=swap');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
@@ -23,9 +23,9 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 @keyframes glassOrb { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(30px,-20px) scale(1.05)} 66%{transform:translate(-20px,30px) scale(0.95)} }
 
 :root {
-  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
-  --font-ui: 'Fraunces', Georgia, serif;
-  --font-mono: 'Martian Mono', 'Courier New', Courier, monospace;
+  --font-display: 'Jost', 'Futura', 'Century Gothic', 'Trebuchet MS', sans-serif;
+  --font-ui: 'Jost', 'Futura', 'Century Gothic', 'Trebuchet MS', sans-serif;
+  --font-mono: 'Jost', 'Futura', 'Century Gothic', 'Trebuchet MS', sans-serif;
   --font-body: system-ui, -apple-system, sans-serif;
   --font-camp: var(--font-display);
   --text-caps:11px; --text-label:12px; --text-sm:14px; --text-base:15px;
@@ -169,7 +169,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .about-version{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 18px;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--glass-radius-sm);margin:12px 0 24px;backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm)}
 .about-version-badge{font-size:var(--text-sm);font-weight:800;color:var(--accent);letter-spacing:0.04em;background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);padding:3px 12px;border-radius:var(--glass-radius-pill)}
 .about-version-meta{font-size:var(--text-label);color:var(--text-muted);line-height:1.6}
-.about-version-qa{font-size:var(--text-label);color:var(--c-green);font-family:'Courier New',Courier,monospace;margin-left:auto}
+.about-version-qa{font-size:var(--text-label);color:var(--c-green);font-family:'Jost','Futura','Century Gothic',sans-serif;margin-left:auto}
 
 /* ── Mobile visibility utilities ── */
  /* shown by default — hidden via media query below */
@@ -243,7 +243,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 /* ═══ NEON ABYSS — Glitch Interface ═══
    Monospace, sharp corners, scanline idle, RGB-split glitch on click. */
   background:#0a1418;color:var(--accent);border:1px solid var(--accent,#32D7E8)66;
-  border-radius:4px;font-family:'Courier New',Courier,monospace;
+  border-radius:4px;font-family:'Jost','Futura','Century Gothic',sans-serif;
   letter-spacing:0.06em;text-transform:uppercase;
   text-shadow:0 0 8px color-mix(in srgb,var(--accent) 50%,transparent);
   box-shadow:0 0 15px color-mix(in srgb,var(--accent) 30%,transparent);
@@ -264,7 +264,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
    Serif, warm stone, rune text-glow pulse, bright crack-flare on click. */
   background:linear-gradient(135deg,#1a0f08,#2a1510);color:var(--accent);
   border:1px solid var(--accent,#D4884A)44;border-radius:6px;
-  font-family:Georgia,'Times New Roman',serif;letter-spacing:0.03em;
+  font-family:'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif;letter-spacing:0.03em;
   box-shadow:0 0 15px color-mix(in srgb,var(--accent) 25%,transparent);
   animation:fan-rune 4s ease-in-out infinite;
 }
@@ -302,7 +302,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
    Serif, warm amber, constant gas-lamp flicker, dramatic flare-up on click. */
   background:linear-gradient(180deg,#1a1608,#0f0e08);color:var(--accent);
   border:1px solid var(--accent,#C8B858)44;border-radius:4px;
-  font-family:Georgia,'Times New Roman',serif;
+  font-family:'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif;
   box-shadow:0 -4px 15px color-mix(in srgb,var(--accent) 25%,transparent),0 0 20px color-mix(in srgb,var(--accent) 18%,transparent);
   text-shadow:0 0 6px color-mix(in srgb,var(--accent) 40%,transparent);
   animation:vic-flicker 0.15s ease-in-out infinite alternate;
@@ -316,7 +316,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
    Monospace, static grain overlay, signal blink, static burst on click. */
   background:#1a0e05;color:var(--accent);
   border:1px solid var(--accent,#F08030)44;border-radius:4px;
-  font-family:'Courier New',Courier,monospace;letter-spacing:0.04em;
+  font-family:'Jost','Futura','Century Gothic',sans-serif;letter-spacing:0.04em;
   box-shadow:0 0 10px color-mix(in srgb,var(--accent) 18%,transparent);
   animation:pa-blink 3s ease-in-out infinite;
 }
@@ -949,7 +949,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .sb-acc-hdr.is-open .sb-acc-sec-ico{color:var(--accent)}
 .sb-acc-sec-ico-sm{font-size:12px}
 
-/* Section name — Fraunces italic, matches card system */
+/* Section name — Futura geometric */
 .sb-acc-sec-name{
   font-family:var(--font-display);font-size:14px;font-weight:700;font-style:italic;
   color:var(--text-dim);flex:1;letter-spacing:.01em;transition:color .12s;
@@ -1208,6 +1208,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .camp-content-footer{text-align:center;padding:20px 16px 32px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--border);margin-top:auto;flex-shrink:0}
 .camp-content-footer-link{color:var(--text-muted);text-decoration:underline;opacity:0.7}
 .camp-content-footer-link:hover{opacity:1}
+.camp-content-footer-version{color:var(--text-muted);opacity:0.5;font-size:10px;letter-spacing:0.06em}
 
 /* ══ LANDING GEN ITEM SUB TEXT ══ */
 

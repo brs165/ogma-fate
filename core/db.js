@@ -683,34 +683,34 @@
         '<meta charset="UTF-8">' +
         '<title>Ogma Print — ' + esc(campName || 'Cards') + '</title>' +
         '<style>' +
-        '@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,500&family=Martian+Mono:wght@700;800&display=swap");' +
+        '@import url("https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,400;0,700;0,800;1,400;1,700&display=swap");' +
         '@page{size:A4 portrait;margin:10mm}' +
-        'body{font-family:"Fraunces",Georgia,serif;margin:0;padding:0;background:#EDE8DF;color:#1C1410;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
+        'body{font-family:"Jost","Futura","Century Gothic","Trebuchet MS",sans-serif;margin:0;padding:0;background:#EDE8DF;color:#1C1410;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
         'h1{font-size:11pt;font-weight:900;color:#8B4513;margin:0 0 8px;letter-spacing:-.02em}' +
         '.controls{padding:6px 0 10px;display:flex;gap:8px;align-items:center}' +
         '@media print{.controls{display:none}}' +
-        'button{padding:6px 14px;border:1.5px solid #8B4513;border-radius:3px;background:#F5F0E8;cursor:pointer;font-size:11px;font-family:"Martian Mono","Courier New",monospace;font-weight:700;letter-spacing:.06em;color:#8B4513;box-shadow:2px 2px 0 rgba(0,0,0,.12)}' +
+        'button{padding:6px 14px;border:1.5px solid #8B4513;border-radius:3px;background:#F5F0E8;cursor:pointer;font-size:11px;font-family:"Jost","Futura","Century Gothic","Trebuchet MS",sans-serif;font-weight:700;letter-spacing:.06em;color:#8B4513;box-shadow:2px 2px 0 rgba(0,0,0,.12)}' +
         'button:hover{box-shadow:3px 4px 0 rgba(0,0,0,.12)}' +
         '.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8mm;padding:0}' +
         '@media(min-width:800px){.grid{grid-template-columns:repeat(3,1fr)}}' +
         '.card{border:1px solid rgba(28,20,10,.18);border-radius:3px;min-height:48mm;display:flex;flex-direction:column;break-inside:avoid;page-break-inside:avoid;box-sizing:border-box;background:#F5F0E8;box-shadow:2px 2px 0 rgba(0,0,0,.1)}' +
         '.card-band{height:4px;border-radius:3px 3px 0 0;flex-shrink:0}' +
         '.card-header{display:flex;justify-content:space-between;align-items:center;padding:5px 9px 4px;border-bottom:1px solid rgba(28,20,10,.1)}' +
-        '.card-type{font-size:7pt;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:#8B4513;font-family:"Martian Mono","Courier New",monospace}' +
-        '.card-world{font-size:7pt;color:rgba(139,69,19,.5);letter-spacing:.06em;font-style:italic;font-family:"Martian Mono","Courier New",monospace}' +
+        '.card-type{font-size:7pt;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:#8B4513;font-family:"Jost","Futura","Century Gothic","Trebuchet MS",sans-serif}' +
+        '.card-world{font-size:7pt;color:rgba(139,69,19,.5);letter-spacing:.06em;font-style:italic;font-family:"Jost","Futura","Century Gothic","Trebuchet MS",sans-serif}' +
         '.card-inner{padding:7px 9px;flex:1;display:flex;flex-direction:column;gap:0}' +
         '.card-title{font-size:11pt;font-weight:900;line-height:1.2;margin-bottom:6px;color:#1C1410;letter-spacing:-.02em}' +
         '.card-body{font-size:8.5pt;color:#3a2e24;line-height:1.4;flex:1;display:flex;flex-direction:column;gap:3px}' +
-        '.sec-lbl{font-size:7pt;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:#8B4513;font-family:"Martian Mono",monospace;margin:5px 0 3px}' +
+        '.sec-lbl{font-size:7pt;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:#8B4513;font-family:"Jost","Futura","Century Gothic","Trebuchet MS",sans-serif;margin:5px 0 3px}' +
         '.pc-row{color:#3a2e24}' +
         '.asp-hc{font-style:italic;font-weight:600;color:#1C1410;padding:2px 6px 2px 8px;border-left:2.5px solid #8B4513;background:rgba(139,69,19,.05);border-radius:0 2px 2px 0;margin:2px 0}' +
         '.asp-tr{font-style:italic;color:#7A1414;padding:2px 6px 2px 8px;border-left:2px solid rgba(122,20,20,.35);border-radius:0 2px 2px 0;margin:2px 0}' +
         '.asp-other{font-style:italic;color:#5a4a3a;font-size:8pt;padding:2px 6px 2px 8px;border-left:1px solid rgba(28,20,10,.12);border-radius:0 2px 2px 0;margin:2px 0}' +
         '.asp-chip{display:inline-block;border:1px solid rgba(139,69,19,.25);border-radius:2px;padding:1px 5px;margin:1px 2px 1px 0;font-size:7.5pt;font-style:italic;color:#5a4a3a}' +
         '.pc-skills{display:flex;flex-wrap:wrap;gap:2px;margin:3px 0}' +
-        '.skill-chip{font-size:7pt;border:none;border-radius:2px;padding:2px 5px;color:#F5F0E8;white-space:nowrap;font-family:"Martian Mono",monospace;font-weight:700;background:#8B4513}' +
+        '.skill-chip{font-size:7pt;border:none;border-radius:2px;padding:2px 5px;color:#F5F0E8;white-space:nowrap;font-family:"Jost","Futura","Century Gothic","Trebuchet MS",sans-serif;font-weight:700;background:#8B4513}' +
         '.pc-stunt{font-size:7.5pt;color:#5a4a3a;border-left:2px solid rgba(139,69,19,.28);padding-left:5px;margin:2px 0;font-style:italic}' +
-        '.pc-stress{display:flex;align-items:center;gap:3px;font-size:7pt;color:#8B4513;margin-top:auto;padding-top:5px;font-family:"Martian Mono",monospace;font-weight:700;letter-spacing:.06em}' +
+        '.pc-stress{display:flex;align-items:center;gap:3px;font-size:7pt;color:#8B4513;margin-top:auto;padding-top:5px;font-family:"Jost","Futura","Century Gothic","Trebuchet MS",sans-serif;font-weight:700;letter-spacing:.06em}' +
         '.stress-box{display:inline-block;width:10px;height:10px;border:1.5px solid;border-radius:1px}' +
         '.stress-box.phy{border-color:#C8944A}' +
         '.stress-box.men{border-color:#7C3ACD}' +
@@ -915,21 +915,21 @@
         '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous"><'+'/script>' +
         '<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous"><'+'/script>' +
         '<style>' +
-        '@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,500&family=Martian+Mono:wght@700;800&display=swap");' +
-        'body{font-family:"Fraunces",Georgia,serif;margin:0;padding:16px;background:#EDE8DF;color:#1C1410;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
+        '@import url("https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,400;0,700;0,800;1,400;1,700&display=swap");' +
+        'body{font-family:"Jost","Futura","Century Gothic","Trebuchet MS",sans-serif;margin:0;padding:16px;background:#EDE8DF;color:#1C1410;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
         'h1{font-size:11pt;font-weight:900;color:#8B4513;margin:0 0 6px;letter-spacing:-.02em}' +
         '.controls{padding:4px 0 12px;display:flex;gap:8px;align-items:center}' +
-        '#status{padding:8px 12px;background:#F5F0E8;border:1px solid rgba(139,69,19,.2);border-radius:3px;margin-bottom:12px;font-size:12px;color:#5a4a3a;font-family:"Martian Mono","Courier New",monospace}' +
+        '#status{padding:8px 12px;background:#F5F0E8;border:1px solid rgba(139,69,19,.2);border-radius:3px;margin-bottom:12px;font-size:12px;color:#5a4a3a;font-family:"Jost","Futura","Century Gothic","Trebuchet MS",sans-serif}' +
         '.done{color:#2e7d32;font-weight:700}.err{color:#7A1414}' +
-        'button{padding:6px 14px;border:1.5px solid #8B4513;border-radius:3px;background:#F5F0E8;cursor:pointer;font-size:11px;font-family:"Martian Mono","Courier New",monospace;font-weight:700;letter-spacing:.06em;color:#8B4513;box-shadow:2px 2px 0 rgba(0,0,0,.12)}' +
+        'button{padding:6px 14px;border:1.5px solid #8B4513;border-radius:3px;background:#F5F0E8;cursor:pointer;font-size:11px;font-family:"Jost","Futura","Century Gothic","Trebuchet MS",sans-serif;font-weight:700;letter-spacing:.06em;color:#8B4513;box-shadow:2px 2px 0 rgba(0,0,0,.12)}' +
         'button:hover{box-shadow:3px 4px 0 rgba(0,0,0,.12);transform:translateY(-1px)}' +
         'button:disabled{opacity:.5;cursor:default;transform:none}' +
         '.grid{display:grid;grid-template-columns:repeat(auto-fill,320px);gap:12px}' +
         '.card{background:#F5F0E8;border:1px solid rgba(28,20,10,.18);border-radius:3px;overflow:hidden;display:flex;flex-direction:column;box-shadow:2px 2px 0 rgba(0,0,0,.10)}' +
         '.card-band{height:4px;flex-shrink:0}' +
         '.card-header{display:flex;justify-content:space-between;align-items:center;padding:5px 9px 4px;border-bottom:1px solid rgba(28,20,10,.1)}' +
-        '.card-type{font-size:7pt;font-weight:800;letter-spacing:.2em;text-transform:uppercase;font-family:"Martian Mono","Courier New",monospace}' +
-        '.card-world{font-size:7pt;color:rgba(139,69,19,.5);letter-spacing:.06em;font-style:italic;font-family:"Martian Mono","Courier New",monospace}' +
+        '.card-type{font-size:7pt;font-weight:800;letter-spacing:.2em;text-transform:uppercase;font-family:"Jost","Futura","Century Gothic","Trebuchet MS",sans-serif}' +
+        '.card-world{font-size:7pt;color:rgba(139,69,19,.5);letter-spacing:.06em;font-style:italic;font-family:"Jost","Futura","Century Gothic","Trebuchet MS",sans-serif}' +
         '.card-inner{padding:7px 9px;flex:1;display:flex;flex-direction:column;gap:0}' +
         '.card-title{font-size:11pt;font-weight:900;line-height:1.2;margin-bottom:6px;color:#1C1410;letter-spacing:-.02em}' +
         '.card-body{font-size:8.5pt;color:#3a2e24;line-height:1.4;flex:1;display:flex;flex-direction:column;gap:3px}' +
@@ -938,10 +938,10 @@
         '.asp-tr{font-style:italic;color:#7A1414;padding:2px 6px 2px 8px;border-left:2px solid rgba(122,20,20,.35);border-radius:0 2px 2px 0;margin:2px 0}' +
         '.asp-other{font-style:italic;color:#5a4a3a;font-size:8pt;padding:2px 6px 2px 8px;border-left:1px solid rgba(28,20,10,.12);border-radius:0 2px 2px 0;margin:2px 0}' +
         '.pc-skills{display:flex;flex-wrap:wrap;gap:2px;margin:3px 0}' +
-        '.skill-chip{font-size:7pt;border:none;border-radius:2px;padding:2px 5px;color:#F5F0E8;white-space:nowrap;font-family:"Martian Mono",monospace;font-weight:700;background:#8B4513}' +
+        '.skill-chip{font-size:7pt;border:none;border-radius:2px;padding:2px 5px;color:#F5F0E8;white-space:nowrap;font-family:"Jost","Futura","Century Gothic","Trebuchet MS",sans-serif;font-weight:700;background:#8B4513}' +
         '.pc-stunt{font-size:7.5pt;color:#5a4a3a;border-left:2px solid rgba(139,69,19,.28);padding-left:5px;margin:2px 0;font-style:italic}' +
-        '.pc-stunt-hdr{font-size:7pt;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:#8B4513;font-family:"Martian Mono",monospace;margin:5px 0 3px}' +
-        '.pc-stress{display:flex;align-items:center;gap:3px;font-size:7pt;color:#8B4513;margin-top:auto;padding-top:5px;font-family:"Martian Mono",monospace;font-weight:700;letter-spacing:.06em;flex-wrap:wrap}' +
+        '.pc-stunt-hdr{font-size:7pt;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:#8B4513;font-family:"Jost","Futura","Century Gothic","Trebuchet MS",sans-serif;margin:5px 0 3px}' +
+        '.pc-stress{display:flex;align-items:center;gap:3px;font-size:7pt;color:#8B4513;margin-top:auto;padding-top:5px;font-family:"Jost","Futura","Century Gothic","Trebuchet MS",sans-serif;font-weight:700;letter-spacing:.06em;flex-wrap:wrap}' +
         '.stress-box{display:inline-block;width:10px;height:10px;border:1.5px solid;border-radius:1px}' +
         '.stress-box.phy{border-color:#C8944A}' +
         '.stress-box.men{border-color:#7C3ACD}' +

@@ -18,4 +18,7 @@ var OGMA_CONFIG = {
   // Default multiplayer sync server. Override in Settings (stored in fate_prefs_v1.syncHost).
   // Self-hosting: deploy ogma-sync/ to your own Cloudflare Worker and set this URL.
   DEFAULT_SYNC_HOST: 'ogma-sync.brs165.workers.dev',
+
+  // Build version — stamped by bump-version.sh. Used in footers.
+  VERSION: '2026.03.367',
 };
