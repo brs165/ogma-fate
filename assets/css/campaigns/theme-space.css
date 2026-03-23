@@ -1,7 +1,0 @@
-/* Campaign: space — colour tokens (dark + light)
-   Auto-split from theme.css by PERF-03 */
-
-[data-campaign="space"]{--accent:#BF7AF0;--accent-dim:#7C3ACD;--gold:#BF7AF0;--tag-bg:rgba(191,122,240,0.10);--tag-border:rgba(191,122,240,0.25);--c-red:#FF6482;--c-green:#30D158;--c-blue:#64D2FF;--c-purple:#DA8FFF;--orb-a:rgba(191,122,240,0.14);--orb-b:rgba(140,80,210,0.08);--camp-bg:linear-gradient(160deg,#0E0820 0%,#1A1040 30%,#080418 100%)}
-
-[data-theme="light"][data-campaign="space"]{--accent:#7C3ACD;--accent-dim:#9B59B6;--gold:#5E2CA5;--tag-bg:rgba(124,58,205,0.07);--tag-border:rgba(124,58,205,0.18);--c-red:#C62828;--c-green:#2E7D32;--c-blue:#1565C0;--c-purple:#8E24AA;--orb-a:rgba(191,122,240,0.12);--orb-b:rgba(140,80,210,0.08);--camp-bg:linear-gradient(160deg,#F8F2FF 0%,#EDE0FF 40%,#F4F0FA 100%)}
-

@@ -1,6 +1,0 @@
-/* Campaign: dVentiRealm — colour tokens (dark + light)
-   dVenti Realm: D&D red — dungeon torchlight, dragon scale crimson, vault danger. */
-
-[data-campaign="dVentiRealm"]{--accent:#E8402A;--accent-dim:#A02010;--gold:#E8402A;--tag-bg:rgba(232,64,42,0.10);--tag-border:rgba(232,64,42,0.28);--c-red:#FF6464;--c-green:#30D158;--c-blue:#64D2FF;--c-purple:#BF7AF0;--orb-a:rgba(232,64,42,0.14);--orb-b:rgba(180,40,20,0.08);--camp-bg:linear-gradient(160deg,#120806 0%,#1e0c08 30%,#0a0402 100%)}
-
-[data-theme="light"][data-campaign="dVentiRealm"]{--accent:#8B1A10;--accent-dim:#A02018;--gold:#6B1008;--tag-bg:rgba(139,26,16,0.07);--tag-border:rgba(139,26,16,0.20);--c-red:#B71C1C;--c-green:#1B5E20;--c-blue:#0D47A1;--c-purple:#6A1B9A;--orb-a:rgba(232,64,42,0.10);--orb-b:rgba(180,40,20,0.07);--camp-bg:linear-gradient(160deg,#FFF8F6 0%,#FFE8E4 40%,#F8F0EE 100%)}

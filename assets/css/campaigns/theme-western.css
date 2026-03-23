@@ -1,7 +1,0 @@
-/* Campaign: western — colour tokens (dark + light)
-   Auto-split from theme.css by PERF-03 */
-
-[data-campaign="western"]{--accent:#D4924A;--accent-dim:#A06830;--gold:#D4924A;--tag-bg:rgba(212,146,74,0.13);--tag-border:rgba(212,146,74,0.30);--c-red:#C03020;--c-green:#507040;--c-blue:#4A7890;--c-purple:#8B6090;--orb-a:rgba(212,146,74,0.13);--orb-b:rgba(160,100,30,0.07);--camp-bg:linear-gradient(160deg,#1a0f06 0%,#2d1a08 30%,#0f0804 100%)}
-
-[data-theme="light"][data-campaign="western"]{--accent:#8B4513;--accent-dim:#A0522D;--gold:#6B3410;--tag-bg:rgba(139,69,19,0.08);--tag-border:rgba(139,69,19,0.20);--c-red:#B71C1C;--c-green:#2E7D32;--c-blue:#1565C0;--c-purple:#6A1B9A;--orb-a:rgba(192,120,48,0.10);--orb-b:rgba(160,90,20,0.07);--camp-bg:linear-gradient(160deg,#FFF8F0 0%,#FFF0DC 40%,#F8EED8 100%)}
-

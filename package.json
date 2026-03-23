@@ -15,12 +15,19 @@
     "serve": "npx serve . -l 8080",
     "test:unit": "node tests/engine.test.js",
     "check-cdn": "node scripts/check-cdn-versions.js",
-    "test:export": "node tests/export-roundtrip.test.js"
+    "test:export": "node tests/export-roundtrip.test.js",
+    "build": "node scripts/build.js",
+    "build:prod": "bash scripts/bump-version.sh && node scripts/build.js"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
     "eslint": "^9.0.0",
-    "prettier": "^3.3.0"
+    "prettier": "^3.3.0",
+    "terser": "^5.39.0",
+    "esbuild": "^0.25.0",
+    "html-minifier-terser": "^7.2.0",
+    "puppeteer": "^24.0.0",
+    "sharp": "^0.33.0"
   },
   "engines": {
     "node": ">=18"

@@ -1,8 +1,8 @@
 # Ogma — Roadmap
 
 > **Source of truth** for all planned work. Update whenever items change.
-> **Current version:** 2026.03.359 · QA: 180/180 named · 59/59 unit · 89/89 export
-> **Last revised:** 2026.03.344 — Field Dispatch design system site-wide; card view replaces dossier — card view complete data parity; all MD docs updated — doExport SyntaxError fix; Major NPC consequence slots; help hamburger all 11 pages — Option B left-nav: topbar removed, sidebar header + Navigate tab added — v336 hotfix (universalMerge ReferenceError); v337 order-of-ops audit (BoardApp showToast/syncObj hoisting)
+> **Current version:** 2026.03.360 · QA: 198/198 named · 59/59 unit · 89/89 export
+> **Last revised:** 2026.03.360 — Build pipeline (scripts/build.js 3-tier, docs/BUILD.md, package.json devDeps, sw.js bundle entry); PROJECT_MEMORY.md written; help copy fixes (at-the-table + generators "Prep tab" → "Binder")
 
 ---
 

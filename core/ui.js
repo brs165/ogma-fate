@@ -2132,6 +2132,38 @@ function CampaignApp(props) {
     showToast('Exported ' + pinnedCards.length + ' card' + (pinnedCards.length === 1 ? '' : 's'));
   }
 
+  // Send a single Binder card to the Play Table canvas (IDB write, BoardApp picks up on next mount)
+  function sendToCanvas(card) {
+    if (typeof DB === 'undefined') { showToast('\u26a0 Storage unavailable'); return; }
+    var canvasKey = 'board_canvas_v1_' + campId;
+    var d = card.data || {};
+    // Build a canvas card matching BoardApp's schema
+    var title = d.name || d.location || d.situation || d.title ||
+                (d.aspects && d.aspects.high_concept) || card.genId;
+    var newCard = {
+      id: 'b' + Date.now() + Math.random().toString(36).slice(2, 6),
+      genId: card.genId,
+      title: title,
+      summary: card.label || title,
+      tags: [],
+      data: d,
+      x: 60 + Math.floor(Math.random() * 3) * 220,
+      y: 60 + Math.floor(Math.random() * 2) * 200,
+      z: Date.now(),
+      ts: Date.now(),
+      gmOnly: false,
+    };
+    DB.loadSession(canvasKey).then(function(saved) {
+      var existing = (saved && Array.isArray(saved.cards)) ? saved.cards : [];
+      var updated = existing.concat([newCard]);
+      return DB.saveSession(canvasKey, {cards: updated, ts: Date.now()});
+    }).then(function() {
+      showToast('\u2713 Sent to Table — open Play \u2192 Table');
+    }).catch(function() {
+      showToast('\u26a0 Could not send to Table');
+    });
+  }
+
   // EXP-02: Import cards from Ogma JSON file
   function importCards() {
     if (typeof DB === 'undefined' || !DB.importFile) { showToast('Import unavailable'); return; }
@@ -3162,69 +3194,48 @@ function CampaignApp(props) {
       /* FARI_VAULT_PARKED 2026.03.154
       // Fari / Foundry batch export — parked, see ROADMAP.md parking lot
       */
-      // Pinned section — full card content view
+      // Pinned section — full cv4Card view
       pinnedCards.length > 0 && h('div', {style: {marginBottom: 16}},
         h('div', {className: 'history-label'}, '\uD83D\uDCCB Your session (' + pinnedCards.length + ')'),
-        h('div', {style: {display:'flex', flexDirection:'column', gap:6, marginTop:4}},
+        h('div', {style: {display:'flex', flexDirection:'column', gap:12, marginTop:8}},
           pinnedCards.map(function(card) {
-            var d = card.data || {};
-            var genMeta = (GENERATORS||[]).find(function(g){return g.id===card.genId;})||{};
-            var hcHelp = HELP_CONTENT && HELP_CONTENT[card.genId] ? HELP_CONTENT[card.genId] : {};
-            var typeName = hcHelp.title || genMeta.label || card.genId;
-            var icon = genMeta.icon || '\u25C8';
-            // Derive 2-3 key content lines from data
-            var lines = [];
-            var name = d.name||d.location||d.situation||d.contest_type||d.aspect||d.hook||d.new_aspect||'';
-            if(name && name !== card.label) lines.push({t:'title', v:name});
-            if(d.aspects && d.aspects.high_concept) lines.push({t:'hc', v:d.aspects.high_concept});
-            else if(Array.isArray(d.aspects) && d.aspects[0]) lines.push({t:'hc', v:d.aspects[0].name||d.aspects[0]});
-            if(d.aspects && d.aspects.trouble) lines.push({t:'tr', v:d.aspects.trouble});
-            if(d.goal) lines.push({t:'hc', v:d.goal});
-            if(d.objective) lines.push({t:'hc', v:d.objective});
-            if(d.complication) lines.push({t:'tr', v:d.complication});
-            if(d.situation) lines.push({t:'tr', v:d.situation});
-            if(d.current && d.current.name) lines.push({t:'hc', v:'\u26A1 '+d.current.name});
-            if(d.impending && d.impending.name) lines.push({t:'tr', v:'\uD83C\uDF11 '+d.impending.name});
-            if(d.desc) lines.push({t:'dim', v:d.desc.slice(0,80)+(d.desc.length>80?'\u2026':'')});
-            lines = lines.slice(0,3);
-            return h('div', {
-              key: card.id,
-              style: {background:'var(--inset)',border:'1px solid var(--border)',borderRadius:7,
-                      padding:'7px 9px',display:'flex',flexDirection:'column',gap:3}
-            },
-              h('div', {style: {display:'flex',alignItems:'center',gap:5,marginBottom:2}},
-                h('span', {style: {fontSize:8,fontWeight:800,letterSpacing:'.08em',textTransform:'uppercase',
-                                   color:'var(--accent)',background:'color-mix(in srgb,var(--accent) 10%,transparent)',
-                                   padding:'1px 5px',borderRadius:3,flexShrink:0}}, icon+' '+typeName),
-                h('span', {
-                  style: {flex:1,fontSize:11,fontWeight:700,color:'var(--text)',
-                          overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',
-                          cursor:'pointer'},
-                  onClick: function() { restoreCard(card); setShowHistory(false); },
-                  title: 'Restore: ' + card.label,
-                }, card.label),
+            return h('div', {key: card.id, style: {display:'flex', flexDirection:'column', gap:4}},
+              // cv4Card — same format as Play Table
+              h('div', {className: 'binder-card-preview'},
+                renderCard(card.genId, card.data || {}, campId, null, [], null)
+              ),
+              // Action row under the card
+              h('div', {style: {display:'flex', gap:4}},
                 h('button', {
-                  style: {flexShrink:0,background:'none',border:'none',cursor:'pointer',
-                          color:'var(--text-muted)',fontSize:12,padding:'0 3px',lineHeight:1},
+                  className: 'btn btn-ghost',
+                  style: {flex:1, fontSize:'var(--text-sm)', justifyContent:'center'},
+                  onClick: function() { restoreCard(card); setShowHistory(false); },
+                  title: 'Restore result to generator panel',
+                  'aria-label': 'Restore ' + card.label,
+                }, '\u21A9 Restore'),
+                h('button', {
+                  className: 'btn btn-ghost',
+                  style: {flex:1, fontSize:'var(--text-sm)', justifyContent:'center',
+                          color:'var(--accent)', borderColor:'var(--accent)'},
+                  onClick: function() { sendToCanvas(card); },
+                  title: 'Send this card to the Play Table canvas',
+                  'aria-label': 'Send ' + card.label + ' to Table',
+                }, '\u2192 Send to Table'),
+                h('button', {
+                  className: 'btn btn-ghost',
+                  style: {fontSize:'var(--text-sm)', padding:'0 8px'},
                   onClick: function() { DB.exportCard({genId:card.genId,label:card.label,data:card.data,state:card.state||null,ts:card.ts},camp.meta?camp.meta.name:campId); },
-                  title:'Export as JSON','aria-label':'Export '+card.label,
+                  title: 'Export as JSON',
+                  'aria-label': 'Export ' + card.label,
                 }, '\u2193'),
                 h('button', {
-                  style: {flexShrink:0,background:'none',border:'none',cursor:'pointer',
-                          color:'var(--text-muted)',fontSize:13,padding:'0 2px',lineHeight:1},
+                  className: 'btn btn-ghost',
+                  style: {fontSize:'var(--text-sm)', padding:'0 8px', color:'var(--c-red)'},
                   onClick: function() { unpinCard(card.id); },
-                  title:'Remove from Table Prep','aria-label':'Remove '+card.label,
+                  title: 'Remove from Binder',
+                  'aria-label': 'Remove ' + card.label,
                 }, '\u2715')
-              ),
-              lines.map(function(l,i){
-                var col = l.t==='hc'?'var(--text)':l.t==='tr'?'var(--c-red)':'var(--text-dim)';
-                var style = {fontSize:10,color:col,lineHeight:1.4,
-                             overflow:'hidden',textOverflow:'ellipsis',
-                             display:'-webkit-box',WebkitLineClamp:1,WebkitBoxOrient:'vertical'};
-                if(l.t==='hc') style.fontWeight=600;
-                if(l.t==='tr') style.fontStyle='italic';
-                return h('div',{key:i,style:style},l.v);
-              })
+              )
             );
           })
         )

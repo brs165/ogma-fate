@@ -23,6 +23,28 @@
 
 ---
 
+## Active voices
+
+### Engineering
+Load order, encoding, paren balance, syntax, no-build-step contract. Flags anything that adds a dep, breaks `node --check`, or silently produces `undefined`. Skeptical of complexity. After every write: `node --check <file> && echo OK`.
+
+### Rules / Content
+Canonical authority on Fate Condensed SRD. Flags when generator output violates FCon rules (stress model, refresh, stunt format, consequence recovery, initiative, create advantage tie). Also owns world voice — Neon Abyss copy that reads like The Long After is a bug. Cites section and page numbers. Flags Fate Core bleed explicitly.
+
+### QA
+Runs last, has veto. 198/198 · 59/59 · 89/89 · 128/128 are the numbers. Adds a named assertion for every fixed bug — if it broke once, it has a test. Calls out when a fix is incomplete because the assertion range wasn't updated.
+
+### UX
+Measures: task completion rate, time-to-first-value, discoverability (below 50% = critical), learnability (5-minute test), mobile parity (375px viewport, 44px touch targets per HIG). Severity ratings: Critical / High / Moderate / Low / Delight. User segments: new GM, experienced player, D&D convert, complete beginner, solo prep GM, at-table group use. "If users can't find a feature, it doesn't exist" is a hard gate on any UI decision.
+
+### Product Strategist
+Prioritises by user segment × impact × effort. The tool's competitive advantage is rules accuracy + content quality + offline capability — never compromise these. Educational content is a product feature, not documentation: contextual, tiered by experience, actionable. Asks which user segment benefits before any feature ships.
+
+### Mechanical Auditor
+Invoked during content and world data work (not code). Scores tables 1–10 across: Voice & Vernacular, Narrative Interconnectivity, Mechanical Integrity (correct stunts, stress, opposition aspects, consequence slots, FCon skill list), Editorial Polish (flags filler, semicolon chains, aspects over 15 words), Structural Pacing. Output: score with justification, lore gaps with examples, priority action items, specific rewrites. Quality over quantity — 10 entries that sing beat 30 that fill space.
+
+---
+
 ## What is Ogma?
 
 Offline-first browser PWA for Fate Condensed GMs. 16 generators × 8 worlds. No build step — source files are the app. Deployed at ogma.net (Cloudflare Pages).
@@ -99,7 +121,7 @@ Offline-first browser PWA for Fate Condensed GMs. 16 generators × 8 worlds. No 
 # Syntax check core files
 node --check core/engine.js && node --check core/ui.js && node --check core/ui-table.js && node --check core/ui-board.js && node --check core/ui-renderers.js && node --check core/db.js
 
-# Named assertions (135/135)
+# Named assertions (198/198)
 node tests/qa_named.js
 
 # Export round-trip (89/89)
@@ -113,6 +135,9 @@ node -e "var fs=require('fs');eval(fs.readFileSync('data/shared.js','utf8'));eva
 
 # CDN integrity check
 node scripts/check-cdn-versions.js
+
+# Build bundle (Tier 1 terser — run after npm install --ignore-scripts)
+npm install --ignore-scripts && node scripts/build.js
 
 # Bump version (run before every deploy)
 bash scripts/bump-version.sh

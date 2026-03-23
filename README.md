@@ -26,9 +26,9 @@ Live at **ogma.net** (Cloudflare Pages). Works fully offline after first load vi
 
 | Your expectation | Reality in Ogma |
 |-----------------|-----------------|
-| `npm install` | Nothing to install — no build step |
+| `npm install` | Not required to run the app. Optional for build tools (terser, esbuild). Use `--ignore-scripts` to skip puppeteer browser download. |
 | `npm run dev` | Run `npx serve .` or any static server |
-| `npm run build` | No build — source files ARE the app |
+| `npm run build` | Optional: runs `scripts/build.js` (3-tier terser/esbuild/concat → `dist/ogma.core.min.js`). Not required for deploy — source files are the app. |
 | `import` / `require` | Globals loaded by `<script>` tag order |
 | TypeScript | Plain JS with comments |
 | `.env` files | Config lives in `core/config.js` |
@@ -112,7 +112,7 @@ Each world has deep thematic table content. The same 16 generators produce tonal
 
 **Mobile List View** - On the Board, a toggle button (≡/▦, visible ≤640px) switches the canvas to a scrollable card list: colour-coded by category, tap to open dossier, × to remove.
 
-**Left Sidebar Nav** - Campaign pages use a persistent left sidebar (no topbar). Desktop: sidebar always visible with header (OGMA wordmark + world chip) and Generate / Navigate tabs. Mobile: 44px slim bar (hamburger + world name + theme toggle) opens sidebar overlay.
+**Left Sidebar Nav** - Campaign pages use a persistent left sidebar (no topbar). Desktop: sidebar always visible with header (OGMA wordmark + world chip) and an accordion nav — **Play** (Table, Session Notes) → **Binder** (Cards, Session Zero) → **Generate** (17 generators in 4 sub-groups, scroll-contained) → **Settings**. Mobile: 44px slim bar (hamburger + world name + theme toggle) opens sidebar overlay.
 
 **Complete Card View** - The ♥ Card view shows all generated data, matching the dossier: for Major NPCs, all aspects including `others[]`, full stunt descriptions, consequence slots; for Encounters, scene aspects, zones, opposition aspects and stunts; for all generators, every field the data contains.
 
@@ -147,8 +147,8 @@ fate-suite/
 │   ├── guide-victorian.html      ┘
 │   ├── sessionzero.html          ← Session Zero character creation wizard
 │   ├── transition.html           ← Coming from D&D? guide
-│   ├── board.html                ← Board prep/play canvas surface
-│   └── run.html                  ← Redirect → board.html?mode=play (preserves ?world= and ?room=)
+│   ├── board.html                ← JS redirect → {world}.html?canvas=1 (preserves ?world=, ?room=, ?mode=)
+│   └── run.html                  ← JS redirect → board.html?mode=play (preserves ?world= and ?room=)
 │
 ├── core/
 │   ├── engine.js                 ← Pure logic - generators, table prefs, markdown export
@@ -156,9 +156,9 @@ fate-suite/
 │   ├── ui.js                     ← CampaignApp shell, sync, all campaign components
 │   ├── ui-renderers.js           ← 16 result renderers (dossier cards)
 │   ├── ui-table.js               ← PrepCanvas, TpDicePanel, FatePointTracker + Table components
-│   ├── ui-run.js                 ← Tombstone (v330): 9-line file. run.html is a JS redirect to board.html?mode=play
+│   ├── ui-run.js                 ← Tombstone (v330): 9-line JS redirect. run.html → board.html → {world}.html?canvas=1
 │   ├── ui-board.js               ← BoardApp — board prep/play canvas components
-│   ├── ui-modals.js              ← Modal, ShareDrawer, Settings, Vault, QuickFind
+│   ├── ui-modals.js              ← Modal, ExportModal, Settings, Vault, QuickFind, KBShortcuts
 │   ├── ui-primitives.js          ← React aliases (h), FD primitives, ErrorBoundary
 │   ├── ui-landing.js             ← Landing page components
 │   ├── db.js                     ← IndexedDB wrapper with localStorage fallback

@@ -1,6 +1,6 @@
 # Ogma — Testing Reference
 
-> **Last updated:** 2026.03.346 — 124/124 · 59/59 · 128/128. NA-114–124 added: WCAG 2.2 compliance assertions (focus appearance, target size, scroll-padding, dark default, table scopes, reduced-motion functions, design system cache). Interactive elements tested manually. Headless browser coverage remains a known gap.
+> **Last updated:** 2026.03.362 — 198/198 · 59/59 · 89/89 · 128/128. NA-125–198 cover: accordion nav, ExportModal, canvas wiring, toBatchMarkdown, Session Zero deepening (dVentiRealm, pc_high_concepts, questions step), board redirect, build pipeline. Interactive elements tested manually. Headless browser coverage remains a known gap.
 
 ---
 
@@ -9,7 +9,7 @@
 | Suite | Command | Expected | What it catches |
 |-------|---------|----------|----------------|
 | Syntax check | `node --check core/*.js` | Exit 0 | Parse errors before anything else |
-| Named assertions | `node tests/qa_named.js` | 124/124 | Rules compliance, content quality, WCAG 2.2, SW coverage, ARIA |
+| Named assertions | `node tests/qa_named.js` | 198/198 | Rules compliance, content quality, WCAG 2.2, SW coverage, ARIA |
 | Unit tests | `node tests/engine.test.js` | 59/59 | Engine function correctness |
 | Smoke test | see below | 128/128 | Every generator × every world runs without throwing |
 | Export round-trip | `node tests/export-roundtrip.test.js` | 89/89 | All 16 generators produce exportable JSON; parse back; every card intact |
@@ -26,7 +26,6 @@
 node --check core/engine.js && \
 node --check core/ui.js && \
 node --check core/ui-table.js && \
-node --check core/ui-run.js && \
 node --check core/ui-board.js && \
 node --check core/ui-primitives.js && \
 node --check core/ui-renderers.js && \
@@ -36,7 +35,7 @@ node --check core/db.js && \
 node --check core/config.js && \
 node --check core/intro.js
 
-# 2. Named assertions (113/113)
+# 2. Named assertions (198/198)
 node tests/qa_named.js
 
 # 3. Unit tests (59/59)
@@ -87,24 +86,37 @@ Or use `npm test` which runs steps 2–5 in sequence.
 | NA-41–NA-58 | World-specific data integrity (all 8 worlds) |
 | NA-59 | Stunt tags on all stunts |
 | NA-60 | No duplicate opposition in encounter results |
-| NA-61–NA-62 | sessionzero.html + board.html load all 8 world data files (NA-62 migrated from run.html v306) |
+| NA-61–NA-62 | sessionzero.html + board.html load all 8 world data files |
 | NA-63–NA-64 | All 8 guide pages have correct worldKey + data-campaign attrs |
 | NA-65–NA-68 | SW APP_SHELL coverage, font size floor (9px prohibited), prefers-color-scheme |
 | NA-69–NA-85 | Multiplayer, sync (`createTableSync` in ui.js), gmOnly filter, partysocket guards |
-| NA-86–NA-97 | Board: SW coverage, no globals redeclaration, ARIA roles, touch targets, round aria-live (NA-96 now checks ui-board.js BoardTurnBar) |
-| NA-98–NA-113 | Reserved — unassigned. |
-| NA-114 | `[role="checkbox"]:focus-visible` rule present — WCAG 2.2 SC 3.2.6 Focus Appearance |
-| NA-115 | `rs-zone-input:focus` sets `border-width:2px` — WCAG 2.2 SC 2.4.11 Focus Appearance (Minimum) |
-| NA-116 | `body` has `scroll-padding-bottom:80px` — WCAG 2.2 SC 2.4.12 Focus Not Obscured (Minimum) |
-| NA-117 | `data-theme="dark"` on campaign pages — dark mode as default |
-| NA-118 | `design-system.html` in SW APP_SHELL — offline coverage |
-| NA-119 | `scope="col"` on `<th>` in `help/faq.html` — WCAG 1.3.1 Info and Relationships |
-| NA-120 | `scope="col"` on `<th>` in `help/dnd-transition.html` — WCAG 1.3.1 |
-| NA-121 | `cv4UseReducedMotion` defined in `ui-renderers.js` — WCAG 2.3.3 / 2.1 reduced-motion |
-| NA-122 | `cv4InjectStyles` defined in `ui-renderers.js` — Field Dispatch keyframe injection |
-| NA-123 | `fd-stamp-in` keyframe in `cv4InjectStyles` — animation integrity check |
-| NA-124 | `--focus-ring:#D4A060` in dark theme — 4.6:1 contrast on `#0E0C09` |
-| (next) | Next assertion ID is **NA-125** |
+| NA-86–NA-97 | Board: SW coverage, no globals redeclaration, ARIA roles, touch targets, round aria-live |
+| NA-98–NA-113 | Reserved — unassigned |
+| NA-114 | `[role="checkbox"]:focus-visible` rule present — WCAG 2.2 SC 3.2.6 |
+| NA-115 | `rs-zone-input:focus` sets `border-width:2px` — WCAG 2.2 SC 2.4.11 |
+| NA-116 | `body` has `scroll-padding-bottom:80px` — WCAG 2.2 SC 2.4.12 |
+| NA-117 | `data-theme="dark"` on campaign pages |
+| NA-118 | `design-system.html` in SW APP_SHELL |
+| NA-119 | `scope="col"` on `<th>` in `help/faq.html` |
+| NA-120 | `scope="col"` on `<th>` in `help/dnd-transition.html` |
+| NA-121 | `cv4UseReducedMotion` defined in `ui-renderers.js` |
+| NA-122 | `cv4InjectStyles` defined in `ui-renderers.js` |
+| NA-123 | `fd-stamp-in` keyframe in `cv4InjectStyles` |
+| NA-124 | `--focus-ring:#D4A060` in dark theme |
+| NA-125–NA-129 | Option B sidebar — `sb-dock` role=toolbar, dock buttons 44px, no sidebarTab state |
+| NA-130–NA-135 | Export cleanup — ShareDrawer removed, ExportMenu rewrite, BoardExportMenu, importCanvas |
+| NA-136–NA-148 | PC generator — `generatePC`, `pc_high_concepts`, `pc_questions`, `cv4FrontPc`, GENERATORS entry |
+| NA-149–NA-157 | BL-01/07/08 — `initPrefs()` migration, CV4_HELP invoke/compel, western data expansion |
+| NA-158–NA-162 | Mermaid export — `toMermaid`, `toBatchMermaid`, ExportMenu Mermaid item |
+| NA-163–NA-172 | Text export formats — Obsidian MD, Typst, plain text, batch variants |
+| NA-173–NA-180 | Toast + BL-06 shareable links + BL-15 mobile nav bottom bar |
+| NA-181–NA-187 | Accordion nav — `sbAcc` state, `toggleAcc`, GENERATOR_GROUPS, accordion sections |
+| NA-188–NA-197 | Export modal + board kill + Session Zero deepening — `ExportModal`, `toBatchMarkdown`, `canvasView`, `openCanvas`, dVentiRealm script, `pc_high_concepts` branch, questions step in all 3 modes, `pc_questions` |
+| NA-198 | Build pipeline — `scripts/build.js` presence, `dist/ogma.core.min.js` target path |
+| NA-199 | `disconnectSync` defined in `useBoardSync` — missing definition crashed Table open |
+| NA-200 | `sendToCanvas` defined in `CampaignApp` — required for Binder → Table workflow |
+| NA-201 | Binder panel uses `renderCard` + "Send to Table" button — cv4Card format matches Play Table |
+| (next) | Next assertion ID is **NA-202** |
 
 ---
 

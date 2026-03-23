@@ -1457,6 +1457,16 @@ function useBoardSync(showToast) {
     s.ws.addEventListener('close', function() { setSyncStatus('offline'); });
   }
 
+  function disconnectSync() {
+    if (syncObj && syncObj.ws) {
+      try { syncObj.ws.close(); } catch(e) {}
+    }
+    setSyncObj(null);
+    setSyncStatus('offline');
+    setRoomCode('');
+    showToast('Disconnected');
+  }
+
 
   return {
     syncObj: syncObj, setSyncObj: setSyncObj,

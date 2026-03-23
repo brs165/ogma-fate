@@ -1,7 +1,0 @@
-/* Campaign: thelongafter — colour tokens (dark + light)
-   Auto-split from theme.css by PERF-03 */
-
-[data-campaign="thelongafter"]{--accent:#F5A623;--accent-dim:#C07818;--gold:#F5A623;--tag-bg:rgba(245,166,35,0.12);--tag-border:rgba(245,166,35,0.28);--c-red:#FF5A3C;--c-green:#4CD964;--c-blue:#5AC8FA;--c-purple:#BF5AF2;--orb-a:rgba(245,166,35,0.14);--orb-b:rgba(200,130,20,0.08);--camp-bg:linear-gradient(160deg,#1A0E00 0%,#2D1800 30%,#0D0800 100%)}
-
-[data-theme="light"][data-campaign="thelongafter"]{--accent:#9A5E10;--accent-dim:#C07A18;--gold:#7A4800;--tag-bg:rgba(196,127,23,0.08);--tag-border:rgba(196,127,23,0.20);--c-red:#D32F2F;--c-green:#2E7D32;--c-blue:#1565C0;--c-purple:#7B1FA2;--orb-a:rgba(245,166,35,0.12);--orb-b:rgba(200,130,20,0.08);--camp-bg:linear-gradient(160deg,#FFF8EE 0%,#FFF0D4 40%,#F8F0E8 100%)}
-

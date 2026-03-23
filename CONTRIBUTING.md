@@ -9,7 +9,7 @@ Thanks for your interest in contributing. This document covers everything you ne
 
 ## Getting started locally
 
-**No npm, no build step, no install required to run the app.**
+**No build step required to run the app. npm is optional — for linting and the build pipeline only.**
 
 ```bash
 git clone https://github.com/brs165/ogma-fate.git
@@ -28,14 +28,15 @@ Then either:
 
 **That's it.** Edit a file, refresh the browser. No hot reload, no compilation.
 
-### Dev tooling (optional — for linting only)
+### Dev tooling (optional — for linting and build pipeline)
 
-The app needs no Node tooling to run, but if you want ESLint and Prettier:
+The app needs no Node tooling to run, but if you want ESLint, Prettier, or the optional build pipeline:
 ```bash
-npm install          # installs devDependencies only
-npm run lint         # ESLint across core/ and data/
-npm run format:check # Prettier dry-run
-npm run test         # QA assertions + smoke test
+npm install --ignore-scripts   # use --ignore-scripts to skip puppeteer browser download
+npm run lint                   # ESLint across core/ and data/
+npm run format:check           # Prettier dry-run
+npm run test                   # QA assertions + smoke test
+npm run build                  # optional: produce dist/ogma.core.min.js (Tier 1 terser if available)
 ```
 
 ---

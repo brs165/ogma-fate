@@ -4,7 +4,59 @@
 
 ---
 
-## Adding Entries to an Existing Campaign
+## Content design principles
+
+### Four audiences simultaneously
+
+Every piece of content — table entries, help text, GM tips, inline help — is read by four audiences at once. Good content works for all of them:
+
+| Audience | What they need |
+|----------|---------------|
+| **TTRPG beginners** | Concrete examples before abstract rules. No assumed knowledge. |
+| **D&D converts** | Side-by-side contrast. Name the D&D equivalent, then explain the Fate difference. |
+| **Other-RPG players** | Enough context to orient. Don't assume D&D as the only prior system. |
+| **Veteran Fate GMs** | Respect their expertise. Don't over-explain. Give them the tool, not the tutorial. |
+
+Progressive disclosure: lead with what beginners need, layer depth for veterans. Never dumb down — tier up.
+
+### Inline help entry format (`HELP_CONTENT` in `data/shared.js`)
+
+```js
+{
+  title: "Generator Name",          // display label
+  what: "One sentence: what it produces.",
+  output: "Specific fields: Name · Aspect · Skill rating.",
+  rules: "FCon SRD p.XX — one sentence, cite the page.",
+  gm_tips: "One to two actionable sentences. Starts with an action verb.",
+  invoke: "Concrete example of invoking an output aspect for +2.",
+  compel: "Concrete example of compelling the same aspect for a fate point.",
+}
+```
+
+Rules: cite section and page. GM tips: actionable, not descriptive. Invoke/compel: specific enough that a new GM could use them verbatim at the table.
+
+### Aspect quality bar
+
+Every aspect — NPC trouble, scene aspect, faction goal — must clear both directions:
+
+- **Invokable**: there is a clear situation where spending a fate point for +2 makes narrative sense
+- **Compellable**: there is a clear situation where a GM can offer a fate point for a complication
+
+If you can only argue one direction, rewrite. Aspects that only hinder (pure trouble) or only help (pure advantage) are mechanically incomplete.
+
+Length: 3–8 words for most aspects. Troubles: ≤10 words, punchy, specific. "Owes a debt to the wrong people" is inconvenience. "The thing I buried is walking again" is dramatic tension.
+
+### Stunt format (FCon SRD p.28–29)
+
+Two permitted forms only:
+1. `+2 to [Skill] when [specific, limiting condition]` — condition must genuinely limit scope
+2. Once-per-scene special effect — clearly defined trigger and outcome
+
+Never: charge a fate point, apply to a broad condition ("when in combat"), combine two bonus effects in one stunt.
+
+---
+
+
 
 1. Open `data/[campaign].js`
 2. Find the table key you want to extend
@@ -197,16 +249,16 @@ var fs=require('fs');
   console.log(f+':'+(d===0?' PASS':' FAIL diff='+d));
 });"
 
-# Smoke test (96/96)
+# Smoke test (128/128)
 node -e "
 var fs=require('fs');
 eval(fs.readFileSync('data/shared.js','utf8'));
 eval(fs.readFileSync('data/universal.js','utf8'));
-['thelongafter','cyberpunk','fantasy','space','victorian','postapoc','western'].forEach(function(c){
+['thelongafter','cyberpunk','fantasy','space','victorian','postapoc','western','dVentiRealm'].forEach(function(c){
   eval(fs.readFileSync('data/'+c+'.js','utf8'));
 });
 eval(fs.readFileSync('core/engine.js','utf8'));
-var camps=['thelongafter','cyberpunk','fantasy','space','victorian','postapoc','western'];
+var camps=['thelongafter','cyberpunk','fantasy','space','victorian','postapoc','western','dVentiRealm'];
 var gens=['npc_minor','npc_major','scene','campaign','encounter','seed','compel','challenge','contest','consequence','faction','complication','backstory','obstacle','countdown','constraint'];
 var errs=[];var total=0;
 camps.forEach(function(camp){
@@ -216,7 +268,7 @@ camps.forEach(function(camp){
     catch(e){errs.push(camp+'/'+gen+': '+e.message);}
   });
 });
-console.log('Smoke: '+total+'/112  errors:'+errs.length);
+console.log('Smoke: '+total+'/128  errors:'+errs.length);
 errs.forEach(function(e){console.log('  FAIL:',e);});"
 
 # Named assertions (see ROADMAP.md for current count)
@@ -242,7 +294,7 @@ Run the smoke test only. Named assertions are only required when touching `core/
 - [ ] No entries contain "significant milestone", "breakthrough" as an advancement term, or Fate Core-specific mechanics
 - [ ] New campaign: `CAMPAIGN_PAGES`, `CAMPAIGN_INFO`, and intro sequence added
 - [ ] New campaign: `index.html`, `sw.js`, `manifest.json`, and `theme.css` updated
-- [ ] Smoke test passes: 112/112 (7 worlds × 16 generators)
+- [ ] Smoke test passes: 128/128 (8 worlds × 16 generators)
 
 ---
 

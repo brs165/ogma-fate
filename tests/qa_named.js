@@ -1656,5 +1656,26 @@ assert('NA-12 React theme-toggle aria-label dynamic', uiSrc.includes("'Switch to
     'character-creation.html must load dVentiRealm.js data');
 })();
 
+(function() {
+  var src = fs.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-199: disconnectSync defined in useBoardSync — missing definition caused ReferenceError on Table open',
+    src.includes('function disconnectSync('),
+    'disconnectSync must be defined inside useBoardSync before being returned');
+})();
+
+(function() {
+  var src = fs.readFileSync('core/ui.js', 'utf8');
+  assert('NA-200: sendToCanvas defined in CampaignApp — required for Binder → Table workflow',
+    src.includes('function sendToCanvas('),
+    'sendToCanvas must exist in ui.js to send Binder cards to the Play Table canvas');
+})();
+
+(function() {
+  var src = fs.readFileSync('core/ui.js', 'utf8');
+  assert('NA-201: Binder panel uses renderCard — cv4Card format in Binder matches Play Table',
+    src.includes('renderCard(card.genId, card.data') && src.includes('Send to Table'),
+    'Binder must render cv4Cards and include Send to Table button');
+})();
+
 console.log('Named assertions: '+(pass+fail)+' total  pass:'+pass+'  fail:'+fail);
 results.forEach(function(r){console.log(r);});

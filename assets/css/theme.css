@@ -337,12 +337,24 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 /* ══ HISTORY / PINNED — Slide-over panel ══ */
 .hist-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;animation:fadeIn 0.2s ease}
 .hist-panel{
-  position:fixed;top:0;right:0;bottom:0;width:320px;max-width:90vw;z-index:201;
+  position:fixed;top:0;right:0;bottom:0;width:340px;max-width:90vw;z-index:201;
   background:var(--panel-raised);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
   border-left:1px solid var(--glass-border);
   display:flex;flex-direction:column;overflow-y:auto;
   animation:slideIn 0.25s cubic-bezier(0.4,0,0.2,1);
   box-shadow:-8px 0 40px rgba(0,0,0,0.3);
+}
+/* Scale cv4Cards to fit the binder panel without horizontal scroll */
+.hist-panel .binder-card-preview{
+  width:100%;overflow:hidden;position:relative;
+}
+.hist-panel .binder-card-preview .fd-card{
+  transform-origin:top left;
+  transform:scale(0.54);
+  width:calc(100% / 0.54);
+  margin-bottom:calc(-46% - 8px);
+  pointer-events:none;
+  user-select:none;
 }
 @keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}

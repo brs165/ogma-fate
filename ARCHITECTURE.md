@@ -47,7 +47,7 @@
 <script src="../core/ui-primitives.js?v=N"></script>  <!-- h, useState, useEffect…, ErrorBoundary, SVG icons -->
 <script src="../core/ui-renderers.js?v=N"></script>   <!-- 16 result renderers, renderResult() -->
 <script src="../core/ui-table.js?v=N"></script>       <!-- PrepCanvas + Table canvas components -->
-<script src="../core/ui-modals.js?v=N"></script>      <!-- Modal, ShareDrawer, Settings, Vault, QuickFind -->
+<script src="../core/ui-modals.js?v=N"></script>      <!-- Modal, ExportModal, Settings, Vault, QuickFind, KBShortcuts -->
 <script src="../core/ui-landing.js?v=N"></script>     <!-- LandingApp, CAMPAIGN_PAGES, JoinTableCard -->
 <script src="../core/ui.js?v=N"></script>             <!-- CampaignApp shell — main campaign page component -->
 <script src="../core/intro.js?v=N"></script>          <!-- Campaign intro animation (DOM, not React) -->
@@ -63,7 +63,9 @@
 <script src="../core/ui-board.js?v=N"></script>   <!-- BoardApp — board-specific root component -->
 ```
 
-**Run page (`run.html`)** is a JS redirect to `board.html?mode=play`. It preserves `?world=` and `?room=` URL params. `core/ui-run.js` is a 9-line tombstone (v330) — sync lives in `createTableSync` inside `core/ui.js`, which `board.html` loads.
+**Run page (`run.html`)** is a JS redirect to `board.html?mode=play`. It preserves `?world=` and `?room=` URL params. `core/ui-run.js` is a 9-line tombstone (v330) — sync lives in `createTableSync` inside `core/ui.js`, which board pages load.
+
+**Board page (`board.html`)** is itself a JS redirect to `{world}.html?canvas=1` (v358+). It preserves `?world=`, `?room=`, and `?mode=` params, falling back to `thelongafter`. The canvas is rendered inline in each campaign page via the `canvasView` state in `CampaignApp`. `board.html` is preserved for backwards-compatible URLs.
 
 `<base href="/">` is required on all campaign pages (Cloudflare Pages Pretty URLs strip `.html`; without it, `../core/` resolves to `/campaigns/core/`).
 
@@ -274,7 +276,7 @@ When `mode === 'play'`, `BoardApp` activates a player management layer on top of
 
 **IDB key:** `board_play_session_[campId]` — persists players, round, order.
 
-**`?mode=play` prop:** `board.html` reads `?mode=play` from the URL and passes `initialMode='play'` to `BoardApp`. This is how the `run.html` redirect lands in Play mode automatically.
+**`?canvas=1` prop:** Campaign pages (`{world}.html`) check for `?canvas=1` and set `canvasView=true` on mount, opening `BoardApp` inline. `board.html` redirects here automatically. `run.html` redirects to `board.html?mode=play` which carries the mode through to the campaign page.
 
 **`generateBoardRoomCode()`** — 4-char unambiguous code generator (no 0/O/I/1 confusion). Called by `connectAsHost()` when `roomCode` is empty.
 

@@ -1,7 +1,0 @@
-/* Campaign: cyberpunk — colour tokens (dark + light)
-   Auto-split from theme.css by PERF-03 */
-
-[data-campaign="cyberpunk"]{--accent:#32D7E8;--accent-dim:#0891A2;--gold:#32D7E8;--tag-bg:rgba(50,215,232,0.10);--tag-border:rgba(50,215,232,0.25);--c-red:#FF375F;--c-green:#30D158;--c-blue:#0A84FF;--c-purple:#BF5AF2;--orb-a:rgba(50,215,232,0.14);--orb-b:rgba(20,170,190,0.08);--camp-bg:linear-gradient(160deg,#001418 0%,#002830 30%,#000D10 100%)}
-
-[data-theme="light"][data-campaign="cyberpunk"]{--accent:#076478;--accent-dim:#0891A2;--gold:#054D5E;--tag-bg:rgba(8,145,162,0.07);--tag-border:rgba(8,145,162,0.18);--c-red:#C62828;--c-green:#2E7D32;--c-blue:#0D47A1;--c-purple:#6A1B9A;--orb-a:rgba(50,215,232,0.10);--orb-b:rgba(20,170,190,0.07);--camp-bg:linear-gradient(160deg,#F0FAFB 0%,#D8F4F8 40%,#EAF8FA 100%)}
-
