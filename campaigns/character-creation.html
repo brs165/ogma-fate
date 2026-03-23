@@ -2,6 +2,9 @@
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,900;1,9..144,500&family=Martian+Mono:wght@400;700;800&display=swap" rel="stylesheet">
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Character Creation Wizard — Ogma</title>
@@ -11,7 +14,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicons/icon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicons/apple-touch-icon.png">
   <link rel="manifest" href="../manifest.json">
-  <link rel="stylesheet" href="../assets/css/theme.css?v=343">
+  <link rel="stylesheet" href="../assets/css/theme.css?v=359">
   <style>
     /* Session Zero wizard-specific styles */
     .sz-container { max-width: 760px; margin: 0 auto; padding: 24px 20px 80px; }
@@ -99,26 +102,27 @@
     <div id="root"></div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" integrity="sha384-tMH8h3BGESGckSAVGZ82T9n90ztNXxvdwvdM6UoR56cYcf+0iGXBliJ29D+wZ/x8" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" integrity="sha384-bm7MnzvK++ykSwVJ2tynSE5TRdN+xL418osEVF2DE/L/gfWHj91J2Sphe582B1Bh" crossorigin="anonymous"></script>
-  <script src="../data/shared.js?v=343"></script>
-  <script src="../data/universal.js?v=343"></script>
-  <script src="../data/thelongafter.js?v=343"></script>
-  <script src="../data/cyberpunk.js?v=343"></script>
-  <script src="../data/fantasy.js?v=343"></script>
-  <script src="../data/space.js?v=343"></script>
-  <script src="../data/victorian.js?v=343"></script>
-  <script src="../data/postapoc.js?v=343"></script>
-  <script src="../data/western.js?v=343"></script>
+  <script src="../data/shared.js?v=359"></script>
+  <script src="../data/universal.js?v=359"></script>
+  <script src="../data/thelongafter.js?v=359"></script>
+  <script src="../data/cyberpunk.js?v=359"></script>
+  <script src="../data/fantasy.js?v=359"></script>
+  <script src="../data/space.js?v=359"></script>
+  <script src="../data/victorian.js?v=359"></script>
+  <script src="../data/postapoc.js?v=359"></script>
+  <script src="../data/western.js?v=359"></script>
+  <script src="../data/dVentiRealm.js?v=359"></script>
   <script src="../core/config.js?v=1"></script>
-  <script src="../core/engine.js?v=343"></script>
+  <script src="../core/engine.js?v=359"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dexie/4.0.10/dexie.min.js" integrity="sha384-3VWLzUTczDc/wazaoH+b5qG4iME0duPONRO281rRiaFkfpV/b3w5uxrvod7rCHcW" crossorigin="anonymous"></script>
-  <script src="../core/db.js?v=343"></script>
+  <script src="../core/db.js?v=359"></script>
   <script src="../core/config.js?v=1"></script>
-  <script src="../core/ui-primitives.js?v=343"></script>
-  <script src="../core/ui-renderers.js?v=343"></script>
-  <script src="../core/ui-table.js?v=343"></script>
-  <script src="../core/ui-modals.js?v=343"></script>
-  <script src="../core/ui-landing.js?v=343"></script>
-  <script src="../core/ui.js?v=343"></script>
+  <script src="../core/ui-primitives.js?v=359"></script>
+  <script src="../core/ui-renderers.js?v=359"></script>
+  <script src="../core/ui-table.js?v=359"></script>
+  <script src="../core/ui-modals.js?v=359"></script>
+  <script src="../core/ui-landing.js?v=359"></script>
+  <script src="../core/ui.js?v=359"></script>
   <script>
   (function() {
     var h = React.createElement;
@@ -171,15 +175,23 @@
 
     function getSteps(mode) {
       var common = ['campaign','mode','setting','highconcept','trouble'];
-      if (mode === 'standard') return common.concat(['relationship','freeaspects','skills','stunts','stress','summary']);
-      if (mode === 'trio')     return common.concat(['phase1','phase2','phase3','skills','stunts','stress','summary']);
-      if (mode === 'flashback') return common.concat(['flashbacks','skills','stunts','stress','summary']);
+      if (mode === 'standard') return common.concat(['relationship','freeaspects','skills','stunts','stress','questions','summary']);
+      if (mode === 'trio')     return common.concat(['phase1','phase2','phase3','skills','stunts','stress','questions','summary']);
+      if (mode === 'flashback') return common.concat(['flashbacks','skills','stunts','stress','questions','summary']);
       return common;
     }
 
     function SessionZeroApp() {
-      var s = useState(0), step = s[0], setStep = s[1];
-      var c = useState(null), campId = c[0], setCampId = c[1];
+      // Read ?world= URL param — pre-select campaign and skip world picker
+      var _urlWorld = (function() {
+        try {
+          var p = new URLSearchParams(window.location.search);
+          var w = p.get('world');
+          return (w && CAMPAIGNS[w]) ? w : null;
+        } catch(e) { return null; }
+      })();
+      var s = useState(_urlWorld ? 1 : 0), step = s[0], setStep = s[1];
+      var c = useState(_urlWorld), campId = c[0], setCampId = c[1];
       var m = useState('standard'), mode = m[0], setMode = m[1];
       // Reroll counter - incrementing forces new random values
       var rc = useState(0), rerolls = rc[0], setRerolls = rc[1];
@@ -409,7 +421,7 @@
       // ── HIGH CONCEPT ──
       else if (stepId === 'highconcept') {
         // Use rerolls counter to seed deterministic-ish picks
-        var hcExamples = camp ? [fillTemplate(camp.tables.major_concepts), fillTemplate(camp.tables.major_concepts), fillTemplate(camp.tables.major_concepts), fillTemplate(camp.tables.major_concepts)] : [];
+        var hcExamples = (camp && camp.tables.pc_high_concepts && camp.tables.pc_high_concepts.length) ? pickN(camp.tables.pc_high_concepts, 4) : (camp ? [fillTemplate(camp.tables.major_concepts), fillTemplate(camp.tables.major_concepts), fillTemplate(camp.tables.major_concepts), fillTemplate(camp.tables.major_concepts)] : []);
         void rerolls; // force dependency so re-render picks new values
         content = h(F, null,
           h('div', {className:'sz-step-title'}, 'High Concept'),
@@ -676,6 +688,51 @@
       }
 
       // ── SUMMARY + EXPORT ──
+      // -- SESSION ZERO QUESTIONS --
+      else if (stepId === 'questions') {
+        var pcQs = camp && camp.tables.pc_questions ? pickN(camp.tables.pc_questions, 6) : [];
+        void rerolls;
+        var genPC = null;
+        if (camp && typeof generate === 'function') {
+          try {
+            var _base = typeof mergeUniversal === 'function' ? mergeUniversal(camp.tables) : camp.tables;
+            var _eff  = typeof filteredTables  === 'function' ? filteredTables(_base, {}) : _base;
+            genPC = generate('pc', _eff, 4);
+          } catch(_e) { genPC = null; }
+        }
+        content = h(F, null,
+          h('div', {className:'sz-step-title'}, 'Session Zero Questions'),
+          h('div', {className:'sz-body'},
+            p('Go around the table. Each player answers two of these questions aloud. Every answer should name another character. These become aspect seeds.'),
+            h('div', {className:'sz-card'},
+              h('div', {className:'sz-card-title'}, 'World Questions — ' + (camp ? camp.meta.name : '')),
+              h('ol', {style:{margin:'8px 0 0 18px', color:'var(--text-dim)', lineHeight:1.8}},
+                pcQs.map(function(q, i) { return h('li', {key:i+'-'+rerolls, style:{padding:'3px 0'}}, q); })
+              ),
+              rerollBtn(reroll, 'Different questions')
+            ),
+            genPC && h('div', {className:'sz-card', style:{marginTop:12}},
+              h('div', {className:'sz-card-title'}, 'Example PC — ' + (genPC.name || 'Generated')),
+              h('div', {style:{fontSize:13, color:'var(--text-muted)', marginBottom:8}}, 'Inspiration only. Reroll for a new one.'),
+              h('div', {style:{display:'flex', flexDirection:'column', gap:6}},
+                h('div', null, h('strong', {style:{color:'var(--accent)'}}, 'HC: '), genPC.aspects && genPC.aspects.high_concept),
+                h('div', null, h('strong', {style:{color:'var(--c-red,#E06060)'}}, 'Trouble: '), genPC.aspects && genPC.aspects.trouble),
+                genPC.skills && genPC.skills.length && h('div', null,
+                  h('strong', null, 'Peak: '),
+                  genPC.skills.slice(0,4).map(function(s){ return '+'+s.r+' '+s.name; }).join(' · ')
+                ),
+                genPC.stunts && genPC.stunts.length && h('div', null,
+                  h('strong', null, 'Stunts: '),
+                  genPC.stunts.map(function(st){ return st.name+' ['+(st.skill||'')+']'; }).join(', ')
+                )
+              ),
+              h('div', {style:{marginTop:8}}, rerollBtn(reroll, 'New example PC'))
+            ),
+            tip('High Concept and Trouble are enough to start play. The other three aspects reveal themselves in the first session.')
+          )
+        );
+      }
+
       else if (stepId === 'summary') {
         var campName = camp ? camp.meta.name : '-';
         var modeLabel = mode === 'trio' ? 'Phase Trio' : mode === 'flashback' ? 'Flashback Slots' : 'Condensed Standard';

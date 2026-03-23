@@ -1265,127 +1265,273 @@ function ResultHelpPanel(props) {
 
 
 
-// ── ExportMenu — unified export/import dropdown (EXP-06) ──────────────────
-// Props: cards[], campName, onImport
-// Shows: Image Pack (PNG zip), Print (HTML), JSON export, Import
-function ExportMenu(props) {
-  var cards    = props.cards || [];
-  var campName = props.campName || '';
-  var onImport = props.onImport || function(){};
-  var hasCards = cards.length > 0;
+// ── ExportModal ─────────────────────────────────────────────────────────────
+// Replaces ExportMenu dropdown. Opens a full modal with:
+//   1. Card checklist (derived titles, checkbox + remove)
+//   2. Format selector (tab strip, 8 formats)
+//   3. Delivery picker (Copy / Download — hidden when format opens popup)
+// Props: cards, campName, onImport, onToast, onShareLink, currentResult, genId
+function ExportModal(props) {
+  var cards         = props.cards || [];
+  var campName      = props.campName || '';
+  var onImport      = props.onImport      || function(){};
+  var onToast       = props.onToast       || function(){};
+  var onShareLink   = props.onShareLink   || null;
+  var currentResult = props.currentResult || null;
+  var hasCards      = cards.length > 0;
 
-  var _open = useState(false); var open = _open[0]; var setOpen = _open[1];
-  var menuRef = useRef(null);
+  var _open  = useState(false); var open  = _open[0]; var setOpen  = _open[1];
 
-  // Close on outside click
+  // Modal state
+  var _sel  = useState(function() {
+    var s = {}; cards.forEach(function(c){ s[c.id] = true; }); return s;
+  }); var sel = _sel[0]; var setSel = _sel[1];
+  var _fmt  = useState('md');   var fmt   = _fmt[0];  var setFmt   = _fmt[1];
+  var _del  = useState('copy'); var del_  = _del[0];  var setDel   = _del[1];
+  var _done = useState(false);  var done  = _done[0]; var setDone  = _done[1];
+
+  // Reset selection when cards change
   useEffect(function() {
-    if (!open) return;
-    function handler(e) {
-      if (menuRef.current && !menuRef.current.contains(e.target)) setOpen(false);
+    var s = {}; cards.forEach(function(c){ s[c.id] = true; }); setSel(s);
+    setDone(false);
+  }, [cards.length]);
+
+  function openModal()  { setDone(false); setOpen(true); }
+  function closeModal() { setOpen(false); }
+  function toggleCard(id) { setSel(function(s){ var n=Object.assign({},s); n[id]=!n[id]; return n; }); }
+  function selAll()  { setSel(function(){ var s={}; cards.forEach(function(c){s[c.id]=true;}); return s; }); }
+  function selNone() { setSel(function(){ return {}; }); }
+
+  var selectedCards = cards.filter(function(c){ return sel[c.id]; });
+  var selectedCount = selectedCards.length;
+
+  // Derive human title for a card
+  function cardTitle(c) {
+    var d = c.data || {};
+    return d.name || d.location || d.situation || d.title ||
+           (d.aspects && d.aspects.high_concept) ||
+           c.title || c.genId || '';
+  }
+
+  // Format definitions
+  var FORMATS = [
+    {id:'md',  label:'Markdown',   icon:'MD',  sub:'GM notes · Discord',        action:'copy'},
+    {id:'mm',  label:'Mermaid',    icon:'MM',  sub:'Notion · GitHub',           action:'copy'},
+    {id:'ob',  label:'Obsidian',   icon:'OB',  sub:'Callout blocks',            action:'copy'},
+    {id:'ty',  label:'Typst',      icon:'TY',  sub:'Compiles to PDF',           action:'download'},
+    {id:'txt', label:'Plain text', icon:'TXT', sub:'Any editor · Terminal',     action:'download'},
+    {id:'json',label:'JSON',       icon:'{}',  sub:'Re-import to Ogma',         action:'download'},
+    {id:'img', label:'Image Pack', icon:'\u25a3', sub:'PNG zip for Miro · Figma', action:'popup'},
+    {id:'prt', label:'Print',      icon:'\u2399', sub:'A4 PDF popup',             action:'popup'},
+  ];
+  var activeFmt = FORMATS.find(function(f){ return f.id === fmt; }) || FORMATS[0];
+  // popup formats open their own window; hide delivery picker
+  var isPopup = activeFmt.action === 'popup';
+
+  function doExecute() {
+    var cardsToExport = selectedCards;
+    if (!cardsToExport.length && !currentResult) return;
+    var single = currentResult && cardsToExport.length === 0 ? currentResult : null;
+
+    if (fmt === 'json') {
+      if (typeof DB !== 'undefined' && DB.exportCards) DB.exportCards(null, campName, cardsToExport);
+      onToast('\u2193 JSON downloaded');
+    } else if (fmt === 'img') {
+      if (typeof DB !== 'undefined' && DB.exportCardsAsPng) DB.exportCardsAsPng(cardsToExport, campName);
+    } else if (fmt === 'prt') {
+      if (typeof DB !== 'undefined' && DB.printCards) DB.printCards(cardsToExport, campName);
+    } else {
+      // Text formats
+      var txt = '';
+      var batchFn = {
+        md:  typeof toBatchMarkdown  === 'function' ? toBatchMarkdown  : null,
+        mm:  typeof toBatchMermaid   === 'function' ? toBatchMermaid   : null,
+        ob:  typeof toBatchObsidianMD=== 'function' ? toBatchObsidianMD: null,
+        ty:  typeof toBatchTypst     === 'function' ? toBatchTypst     : null,
+        txt: typeof toBatchPlainText === 'function' ? toBatchPlainText : null,
+      }[fmt];
+      var singleFn = {
+        md:  typeof toMarkdown    === 'function' ? toMarkdown    : null,
+        mm:  typeof toMermaid     === 'function' ? toMermaid     : null,
+        ob:  typeof toObsidianMD  === 'function' ? toObsidianMD  : null,
+        ty:  typeof toTypst       === 'function' ? toTypst       : null,
+        txt: typeof toPlainText   === 'function' ? toPlainText   : null,
+      }[fmt];
+
+      if (single && singleFn) {
+        txt = singleFn(single.genId, single.data, campName);
+      } else if (batchFn && cardsToExport.length) {
+        var cardObjs = cardsToExport.map(function(c){ return {genId:c.genId||'',data:c.data||{},title:cardTitle(c)}; });
+        txt = batchFn(cardObjs, campName);
+      }
+
+      if (!txt) return;
+
+      if (del_ === 'copy') {
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(txt).then(function(){
+            setDone(true);
+            setTimeout(function(){ setDone(false); }, 1500);
+            onToast(activeFmt.label + ' copied');
+          });
+        }
+      } else {
+        // Download
+        var ext = {md:'md',mm:'mmd',ob:'md',ty:'typ',txt:'txt'}[fmt] || 'txt';
+        var fname = (campName||'ogma').replace(/[^a-zA-Z0-9_-]/g,'_') + '-prep.' + ext;
+        var blob = new Blob([txt], {type:'text/plain;charset=utf-8'});
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a'); a.href=url; a.download=fname;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(function(){ URL.revokeObjectURL(url); }, 30000);
+        onToast('\u2193 ' + activeFmt.label + ' downloaded');
+      }
     }
-    document.addEventListener('mousedown', handler);
-    return function() { document.removeEventListener('mousedown', handler); };
-  }, [open]);
 
-  function doImagePack() {
-    setOpen(false);
-    if (!hasCards) return;
-    if (typeof DB === 'undefined' || !DB.exportCardsAsPng) { return; }
-    DB.exportCardsAsPng(cards, campName);
+    if (!isPopup) closeModal();
   }
 
-  function doPrint() {
-    setOpen(false);
-    if (!hasCards) return;
-    if (typeof DB === 'undefined' || !DB.printCards) { return; }
-    DB.printCards(cards, campName);
-  }
-
-  function doJson() {
-    setOpen(false);
-    if (!hasCards) return;
-    if (typeof DB === 'undefined' || !DB.exportCards) { return; }
-    DB.exportCards(null, campName, cards);
-  }
-
-  function doImport() {
-    setOpen(false);
-    onImport();
-  }
-
-  var menuItems = [
-    hasCards && {
-      icon: '\uD83D\uDDBC\uFE0F',
-      label: 'Image Pack',
-      sub: 'PNG zip for Miro / Figma',
-      action: doImagePack,
-      key: 'img',
-    },
-    hasCards && {
-      icon: '\uD83D\uDDA8',
-      label: 'Print',
-      sub: 'Printable HTML',
-      action: doPrint,
-      key: 'print',
-    },
-    hasCards && {
-      icon: '\u2193',
-      label: 'Export JSON',
-      sub: cards.length + ' card' + (cards.length === 1 ? '' : 's'),
-      action: doJson,
-      key: 'json',
-    },
-    {
-      icon: '\u2191',
-      label: 'Import JSON',
-      sub: 'Restore from file',
-      action: doImport,
-      key: 'import',
-    },
-  ].filter(Boolean);
-
-  return h('div', {
-    ref: menuRef,
-    style: {position: 'relative', display: 'inline-flex'},
-  },
+  // ── Render trigger button ─────────────────────────────────────────────────
+  return h(Fragment, null,
+    // Trigger — same icon as before
     h('button', {
-      className: 'btn btn-ghost action-bar-icon' + (open ? ' active' : ''),
-      onClick: function() { setOpen(function(v) { return !v; }); },
-      title: 'Export / Import',
-      'aria-label': 'Export and import options',
-      'aria-expanded': String(open),
-      'aria-haspopup': 'menu',
+      className: 'btn btn-ghost action-bar-icon',
+      onClick: openModal,
+      title: 'Export table prep',
+      'aria-label': 'Export table prep',
+      'aria-haspopup': 'dialog',
     }, h(FaFileArrowDownIcon, {size: 14})),
+
+    // Copy Link button — separate, only when result exists
+    onShareLink && currentResult && h('button', {
+      className: 'btn btn-ghost action-bar-icon',
+      onClick: onShareLink,
+      title: 'Copy shareable link',
+      'aria-label': 'Copy shareable link to this result',
+    }, '\uD83D\uDD17'),
+
+    // ── Modal ───────────────────────────────────────────────────────────────
     open && h('div', {
-      role: 'menu',
-      'aria-label': 'Export options',
-      style: {
-        position: 'absolute', top: 'calc(100% + 6px)', right: 0,
-        background: 'var(--panel-raised)', border: '1px solid var(--border)',
-        borderRadius: 10, padding: '6px 0', minWidth: 210,
-        boxShadow: '0 8px 32px rgba(0,0,0,.35), 0 0 0 1px rgba(0,0,0,.08)',
-        zIndex: 500,
-        animation: 'fadeDown .14s ease',
-      },
+      className: 'tp-export-overlay',
+      onClick: function(e){ if(e.target===e.currentTarget) closeModal(); },
+      role: 'dialog',
+      'aria-modal': 'true',
+      'aria-label': 'Export table prep',
     },
-      h('div', {
-        style: {padding: '4px 14px 7px', fontSize: 10, fontWeight: 700,
-          letterSpacing: '.12em', color: 'var(--text-muted)', textTransform: 'uppercase'},
-      }, 'Export / Import'),
-      menuItems.map(function(item) {
-        return h('button', {
-          key: item.key,
-          role: 'menuitem',
-          onClick: item.action,
-          className: 'export-menu-item',
-        },
-          h('span', {style: {fontSize: 16, width: 22, textAlign: 'center', flexShrink: 0}}, item.icon),
-          h('div', {style: {flex: 1, minWidth: 0}},
-            h('div', {style: {fontSize: 13, fontWeight: 600, lineHeight: 1.2}}, item.label),
-            h('div', {style: {fontSize: 11, color: 'var(--text-muted)', marginTop: 1}}, item.sub)
+      h('div', {className: 'tp-export-modal em-modal'},
+        // Header
+        h('div', {className: 'tp-export-header'},
+          h('div', {style:{fontWeight:700,fontSize:14,display:'flex',alignItems:'center',gap:6}},
+            h(FaFileArrowDownIcon,{size:14}), ' Export table prep'
+          ),
+          h('button', {className:'rs-drawer-close',onClick:closeModal,'aria-label':'Close'}, '\u00d7')
+        ),
+
+        h('div', {className:'tp-export-body'},
+
+          // ── 1. Cards ───────────────────────────────────────────────────
+          hasCards && h(Fragment, null,
+            h('div', {className:'tp-export-section-label', style:{display:'flex',alignItems:'center',justifyContent:'space-between'}},
+              h('span', null,
+                'Cards ',
+                h('span', {style:{fontWeight:400,color:'var(--text-muted)',fontSize:11}},
+                  '('+selectedCount+'/'+cards.length+' selected)'
+                )
+              ),
+              h('span', {style:{display:'flex',gap:4}},
+                h('button',{className:'tp-export-selectall',onClick:selAll},'All'),
+                h('button',{className:'tp-export-selectall',onClick:selNone},'None')
+              )
+            ),
+            h('div', {className:'tp-export-card-list'},
+              cards.map(function(c){
+                var title = cardTitle(c);
+                var label = c.genId ? (c.genId.replace(/_/g,' ').replace(/\b\w/g,function(l){return l.toUpperCase();})) : '';
+                return h('label', {
+                  key:c.id,
+                  className:'tp-export-row em-card-row',
+                },
+                  h('input',{type:'checkbox',checked:!!sel[c.id],onChange:function(){toggleCard(c.id);}}),
+                  h('span',{className:'em-card-dot',style:{background:TP_TYPE_CLS&&TP_TYPE_CLS[c.genId]?'var(--accent)':'var(--border-mid)'}}),
+                  h('span',{style:{flex:1,minWidth:0,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',fontSize:12}},
+                    title || label
+                  ),
+                  h('span',{style:{fontSize:10,color:'var(--text-muted)',flexShrink:0,fontFamily:'var(--font-mono)'}},
+                    label
+                  )
+                );
+              })
+            )
+          ),
+
+          // ── 2. Format ──────────────────────────────────────────────────
+          h('div', {className:'tp-export-section-label'},'Format'),
+          h('div', {className:'em-fmt-grid'},
+            FORMATS.map(function(f){
+              return h('button',{
+                key:f.id,
+                className:'em-fmt-btn'+(fmt===f.id?' is-active':''),
+                onClick:function(){setFmt(f.id);},
+                'aria-pressed':String(fmt===f.id),
+                title:f.label+' \u2014 '+f.sub,
+              },
+                h('span',{className:'em-fmt-icon'},f.icon),
+                h('span',{className:'em-fmt-info'},
+                  h('span',{className:'em-fmt-name'},f.label),
+                  h('span',{className:'em-fmt-sub'},f.sub)
+                )
+              );
+            })
+          ),
+
+          // ── 3. Delivery (hidden for popup formats) ─────────────────────
+          !isPopup && h(Fragment, null,
+            h('div', {className:'tp-export-section-label'},'Delivery'),
+            h('div', {className:'em-del-row'},
+              h('button',{
+                className:'em-del-btn'+(del_==='copy'?' is-active':''),
+                onClick:function(){setDel('copy');},
+                'aria-pressed':String(del_==='copy'),
+              }, '\u2398 Copy to clipboard'),
+              h('button',{
+                className:'em-del-btn'+(del_==='download'?' is-active':''),
+                onClick:function(){setDel('download');},
+                'aria-pressed':String(del_==='download'),
+              }, '\u2193 Download file')
+            )
           )
-        );
-      })
+
+        ), // end tp-export-body
+
+        // Footer
+        h('div', {className:'tp-export-footer em-footer'},
+          h('span', {style:{fontSize:11,color:'var(--text-muted)'}},
+            selectedCount + ' card' + (selectedCount===1?'':'s') +
+            ' \u00b7 ' + activeFmt.label +
+            (isPopup ? '' : (' \u00b7 ' + (del_==='copy'?'clipboard':'file')))
+          ),
+          h('div',{style:{display:'flex',gap:6,alignItems:'center'}},
+            h('button',{
+              className:'btn btn-ghost',
+              onClick:function(){ onImport(); closeModal(); },
+              style:{fontSize:12},
+              'aria-label':'Import cards from JSON',
+            },'\u2191 Import'),
+            h('button',{
+              className:'btn btn-ghost',
+              onClick:closeModal,
+              style:{fontSize:12},
+            },'Cancel'),
+            h('button',{
+              className:'btn',
+              onClick:doExecute,
+              disabled:(selectedCount===0&&!currentResult)||done,
+              style:{background:'var(--accent)',color:'#fff',border:'none',fontWeight:700,fontSize:12,minHeight:36},
+              'aria-label': done?'Done':'Execute export',
+            }, done?'\u2713 Done':(isPopup?'Open':'Export'))
+          )
+        )
+      )
     )
   );
 }
@@ -1769,8 +1915,6 @@ function CampaignApp(props) {
   const [showKbShortcuts, setShowKbShortcuts] = useState(false);
   // WS-12: Quick Find bar
   const [showQuickFind, setShowQuickFind] = useState(false);
-  const [showExport, setShowExport] = useState(false);
-  const [linkCopied, setLinkCopied] = useState(false); // EXP-03: copy-link feedback
   // ── Modal panels — one active at a time ─────────────────────────────────
   // Replaces 7 separate boolean state vars with a single discriminated union.
   // activePanel: 'tables'|'settings'|'vault'|'fp'|'cd'|'doc'|null
@@ -1796,6 +1940,9 @@ function CampaignApp(props) {
     try { LS.set('fp_state', next); } catch(e) {}
   }
   const [showSidebar, setShowSidebar] = useState(false);
+  // Accordion nav: which section is open ('play'|'binder'|'generate'|'settings'|null)
+  var _sbAcc = useState('generate'); var sbAcc = _sbAcc[0]; var setSbAcc = _sbAcc[1];
+  function toggleAcc(s) { setSbAcc(function(cur) { return cur === s ? null : s; }); }
   // F4: Consequence severity selector - '' means random (default)
   // Card view toggle — MTG-style result card vs dossier
 
@@ -1805,6 +1952,14 @@ function CampaignApp(props) {
   // History/Pinned drawer
   const [showHistory, setShowHistory] = useState(false);
   const [prepView, setPrepView] = useState(false);
+  // Canvas view — open BoardApp as a full content-panel mode
+  // Activated by ?canvas=1 URL param or Play→Table click
+  var _canvasView = useState(function() {
+    try { return new URLSearchParams(window.location.search).get('canvas') === '1'; }
+    catch(e) { return false; }
+  }); var canvasView = _canvasView[0]; var setCanvasView = _canvasView[1];
+  function openCanvas() { setCanvasView(true); setPrepView(false); setShowSidebar(false); }
+  function closeCanvas() { setCanvasView(false); }
   // Table multiplayer sync
   const tableSyncRef = React.useRef(null);
   const [tableRoomCode, setTableRoomCode] = useState(function(){
@@ -1896,8 +2051,6 @@ function CampaignApp(props) {
   const [helpLevel, setHelpLevel] = useState(function() { try { return LS.get('help_level') || 'new_fate'; } catch(e) { return 'new_fate'; } });
   function changeHelpLevel(lvl) { setHelpLevel(lvl); try { LS.set('help_level', lvl); } catch(e) {} }
 
-  // ── Sidebar tab state (Concept A tabbed sidebar)
-  const [sidebarTab, setSidebarTab] = useState('gen');
 
   // ── Result panel tab state (GM Tips | Rules | D&D Notes)
   // Checklist state — per-session, cleared on generator change
@@ -2003,11 +2156,6 @@ function CampaignApp(props) {
     });
   }
 
-  function copyShareLinkWithFeedback() {
-    copyShareLink();
-    setLinkCopied(true);
-    setTimeout(function() { setLinkCopied(false); }, 1800);
-  }
 
   function copyShareLink() {
     if (!result) return;
@@ -2116,8 +2264,6 @@ function CampaignApp(props) {
           setToast('Removed from session ↩');
           return prev.slice(1);
         });
-      } else if (e.key === 'l' || e.key === 'L') {
-        if (result) copyShareLinkWithFeedback();
       } else if (e.key === 'c' || e.key === 'C') {
         if (result) {
           var md = toMarkdown(result.genId, result.data, camp.meta.name);
@@ -2133,7 +2279,7 @@ function CampaignApp(props) {
     }
     document.addEventListener('keydown', onKey);
     return function() { document.removeEventListener('keydown', onKey); };
-  }, [rolling, result, activeGen, showTables, showSettings, showVault, showHistory, showSidebar, showKbShortcuts, showQuickFind, showDoc, doGenerate, doInspire, copyShareLink]);
+  }, [rolling, result, activeGen, showTables, showSettings, showVault, showHistory, showSidebar, showKbShortcuts, showQuickFind, showDoc, doGenerate, doInspire]);
 
   var totalEntries = Object.values(t).reduce(function(n, v) { return n + (Array.isArray(v) ? v.length : 0); }, 0);
 
@@ -2192,225 +2338,389 @@ function CampaignApp(props) {
           h('span', {className: 'sb-world-chip'}, camp.meta.name)
         ),
 
-        // ── Tab bar ─────────────────────────────────────────────────
-        h('div', {className: 'sidebar-tab-bar', role: 'tablist'},
-          h('button', {
-            id: 'sb-tab-gen',
-            className: 'sidebar-tab-btn' + (sidebarTab === 'gen' ? ' active' : ''),
-            onClick: function() {
-              setSidebarTab('gen');
-              var el = document.getElementById('sb-tab-announce');
-              if (el) el.textContent = 'Generate tab';
-            },
-            role: 'tab',
-            'aria-selected': String(sidebarTab === 'gen'),
-            'aria-controls': 'sb-panel-gen',
-          }, 'Generate'),
-          h('button', {
-            id: 'sb-tab-nav',
-            className: 'sidebar-tab-btn' + (sidebarTab === 'nav' ? ' active' : ''),
-            onClick: function() {
-              setSidebarTab('nav');
-              var el = document.getElementById('sb-tab-announce');
-              if (el) el.textContent = 'Navigate tab';
-            },
-            role: 'tab',
-            'aria-selected': String(sidebarTab === 'nav'),
-            'aria-controls': 'sb-panel-nav',
-          }, 'Navigate'),
-
-        ),
-
         // ══════════════════════════════════════════════════════════
-        // GENERATE PANEL — 16 generators in 4 groups
+        // ACCORDION NAV — Play | Binder | Generate | Settings
+        // One section open at a time. Section header = 44px touch target.
+        // Meta badge shows state without opening the section.
         // ══════════════════════════════════════════════════════════
         h('div', {
-          id: 'sb-panel-gen',
-          className: 'sidebar-panel' + (sidebarTab === 'gen' ? ' active' : ''),
-          role: 'tabpanel',
-          'aria-labelledby': 'sb-tab-gen',
-        },
-          h('div', {className: 'sidebar-group-label'}, 'Characters'),
-          ['npc_minor','npc_major','backstory'].map(function(gid) {
-            var g = GENERATORS.find(function(x) { return x.id === gid; });
-            if (!g) return null;
-            return h('button', {
-              key: gid,
-              className: 'sidebar-gen-item' + (activeGen === gid ? ' active' : ''),
-              onClick: function() { selectGen(gid); setShowSidebar(false); },
-            },
-              h('span', {className: 'sidebar-item-icon'}, RA_ICONS[gid] ? h(RaIcon, {n: RA_ICONS[gid]}) : g.icon),
-              h('span', {className: 'sidebar-item-label'}, g.label)
-            );
-          }),
-          h('div', {className: 'sidebar-group-label'}, 'Scenes'),
-          ['scene','encounter','complication'].map(function(gid) {
-            var g = GENERATORS.find(function(x) { return x.id === gid; });
-            if (!g) return null;
-            return h('button', {
-              key: gid,
-              className: 'sidebar-gen-item' + (activeGen === gid ? ' active' : ''),
-              onClick: function() { selectGen(gid); setShowSidebar(false); },
-            },
-              h('span', {className: 'sidebar-item-icon'}, RA_ICONS[gid] ? h(RaIcon, {n: RA_ICONS[gid]}) : g.icon),
-              h('span', {className: 'sidebar-item-label'}, g.label)
-            );
-          }),
-          h('div', {className: 'sidebar-group-label'}, 'Pacing'),
-          ['challenge','contest','obstacle','countdown','constraint'].map(function(gid) {
-            var g = GENERATORS.find(function(x) { return x.id === gid; });
-            if (!g) return null;
-            return h('button', {
-              key: gid,
-              className: 'sidebar-gen-item' + (activeGen === gid ? ' active' : ''),
-              onClick: function() { selectGen(gid); setShowSidebar(false); },
-            },
-              h('span', {className: 'sidebar-item-icon'}, RA_ICONS[gid] ? h(RaIcon, {n: RA_ICONS[gid]}) : g.icon),
-              h('span', {className: 'sidebar-item-label'}, g.label)
-            );
-          }),
-          h('div', {className: 'sidebar-group-label'}, 'World'),
-          ['campaign','seed','faction','compel','consequence'].map(function(gid) {
-            var g = GENERATORS.find(function(x) { return x.id === gid; });
-            if (!g) return null;
-            return h('button', {
-              key: gid,
-              className: 'sidebar-gen-item' + (activeGen === gid ? ' active' : ''),
-              onClick: function() { selectGen(gid); setShowSidebar(false); },
-            },
-              h('span', {className: 'sidebar-item-icon'}, RA_ICONS[gid] ? h(RaIcon, {n: RA_ICONS[gid]}) : g.icon),
-              h('span', {className: 'sidebar-item-label'}, g.label)
-            );
-          }),
-          h('div', {className: 'sidebar-group-label'}, 'Tools'),
-          
-          h('button', {
-            id: 'sidebar-btn-doc',
-            className: 'sidebar-tool-btn' + (showDoc ? ' active' : ''),
-            onClick: function() { setShowDoc(!showDoc); setShowSidebar(false); },
-            'aria-pressed': String(showDoc),
-            'aria-controls': 'floater-doc',
-          },
-            h('span', {className: 'sidebar-item-icon'}, '📝'),
-            h('span', {className: 'sidebar-item-label'}, 'Session Notes')
-          ),
-          h('button', {
-            className: 'sidebar-tool-btn',
-            'aria-label': 'Keyboard shortcuts',
-            onClick: function() { setShowKbShortcuts(true); },
-            title: 'Keyboard shortcuts',
-          },
-            h('span', {className: 'sidebar-item-icon'}, h('span', {'aria-hidden':'true'}, '⌨')),
-            h('span', {className: 'sidebar-item-label'}, 'KB Shortcuts')
-          ),
-          h('div', {className: 'sidebar-group-label'}, 'Settings'),
-          h('button', {
-            className: 'sidebar-tool-btn',
-            onClick: function() { setShowTables(true); setShowSidebar(false); },
-          },
-            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.customize})),
-            h('span', {className: 'sidebar-item-label'}, 'Customize Tables')
-          ),
-          h('button', {
-            className: 'sidebar-tool-btn',
-            onClick: function() { setShowSettings(true); setShowSidebar(false); },
-          },
-            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: RA_ICONS.settings})),
-            h('span', {className: 'sidebar-item-label'}, 'Settings')
-          ),
-          
-          h('div', {style: {height: 8, flexShrink: 0}})
-        ),
-
-        // ══════════════════════════════════════════════════════════
-        // SESSION PANEL — at-table tools + GM Mode/Help Level + nav
-        // ══════════════════════════════════════════════════════════
-        h('div', {
-          id: 'sb-panel-sess',
-          className: 'sidebar-panel' + (sidebarTab === 'sess' ? ' active' : ''),
-          role: 'tabpanel',
-          'aria-label': 'Prep tools and settings',
+          className: 'sb-acc',
+          role: 'navigation',
+          'aria-label': 'Campaign navigation',
         },
 
-          // ── Vault ─────────────────────────────────────────────
-          
-
-          h('div', {className: 'sidebar-divider'}),
-
-          // ── Tools ──────────────────────────────────────
-          h('div', {className: 'sidebar-group-label'}, 'Tools'),
-          
-
-
-                    h('div', {className: 'sidebar-legal'},
-            'Fate™ is a trademark of Evil Hat Productions, LLC.',
-            h('br', null),
-            h('a', {href: '../license.html', style: {color: 'inherit', textDecoration: 'underline', opacity: 0.7}},
-              'License & Attribution (CC BY 3.0)')
-          )
-        )
-      ),
-
-        // ════════════════════════════════════════════════════════
-        // NAVIGATE PANEL — links + status + tools (moved from topbar)
-        // ════════════════════════════════════════════════════════
-        h('div', {
-          id: 'sb-panel-nav',
-          className: 'sidebar-panel' + (sidebarTab === 'nav' ? ' active' : ''),
-          role: 'tabpanel',
-          'aria-labelledby': 'sb-tab-nav',
-        },
-          h('div', {className: 'sidebar-group-label'}, 'Navigate'),
-          h('a', {href: '../index.html', className: 'sidebar-tool-btn'},
-            h('span', {className: 'sidebar-item-icon'}, '🌍'),
-            h('span', {className: 'sidebar-item-label'}, 'All Worlds')
-          ),
-          h('a', {href: '../help/learn-fate.html', className: 'sidebar-tool-btn'},
-            h('span', {className: 'sidebar-item-icon'}, '📚'),
-            h('span', {className: 'sidebar-item-label'}, 'Learn Fate')
-          ),
-          h('a', {href: '../help/index.html', className: 'sidebar-tool-btn'},
-            h('span', {className: 'sidebar-item-icon'}, '\u2753'),
-            h('span', {className: 'sidebar-item-label'}, 'Help')
-          ),
-          h('a', {href: '../campaigns/board.html?world=' + campId, className: 'sidebar-tool-btn'},
-            h('span', {className: 'sidebar-item-icon'}, '🎲'),
-            h('span', {className: 'sidebar-item-label'}, 'Board')
-          ),
-          h('div', {className: 'sidebar-divider'}),
-          h('div', {className: 'sidebar-group-label'}, 'Tools'),
-          h('button', {
-            className: 'sidebar-tool-btn' + (prepView ? ' active' : ''),
-            onClick: function() { setPrepView(function(v) { return !v; }); setShowSidebar(false); },
-            'aria-pressed': String(prepView),
-          },
-            h('span', {className: 'sidebar-item-icon'}, h(FaCartPlusIcon, {size: 16})),
-            h('span', {className: 'sidebar-item-label'}, 'Table Prep' + (pinnedCards.length > 0 ? ' (' + pinnedCards.length + ')' : ''))
-          ),
-          h('button', {
-            className: 'sidebar-tool-btn',
-            onClick: toggleTheme,
-            'aria-label': theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode',
-          },
-            h('span', {className: 'sidebar-item-icon'}, h(RaIcon, {n: theme === 'dark' ? RA_ICONS.theme_light : RA_ICONS.theme_dark})),
-            h('span', {className: 'sidebar-item-label'}, theme === 'dark' ? 'Light mode' : 'Dark mode')
-          ),
-          h('div', {className: 'sidebar-divider'}),
-          h('div', {className: 'sidebar-group-label'}, 'Status'),
-          h('div', {className: 'sb-status-row'},
-            h('span', {className: 'sb-status-dot' + (isOnline ? '' : ' offline')}),
-            h('span', {className: 'sidebar-item-label', role: 'status', 'aria-live': 'polite'},
-              isOnline ? 'Online' : '\u26A1 Offline'
+          // ── PLAY ───────────────────────────────────────────────────
+          h('div', {className: 'sb-acc-sec'},
+            h('button', {
+              className: 'sb-acc-hdr' + (sbAcc === 'play' ? ' is-open' : ''),
+              onClick: function() { toggleAcc('play'); },
+              'aria-expanded': String(sbAcc === 'play'),
+              'aria-controls': 'sb-acc-play',
+              'aria-label': 'Play section',
+            },
+              h('span', {'aria-hidden':'true', className:'sb-acc-sec-ico'}, '▶'),
+              h('span', {className:'sb-acc-sec-name'}, 'Play'),
+              h('span', {'aria-hidden':'true', className:'sb-acc-meta'}, isOnline ? 'online' : 'offline'),
+              h('span', {'aria-hidden':'true', className:'sb-acc-chev'}, '›')
+            ),
+            sbAcc === 'play' && h('div', {
+              id: 'sb-acc-play', className: 'sb-acc-body',
+              role: 'group', 'aria-label': 'Play tools',
+            },
+              h('button', {
+                className: 'sb-acc-item' + (canvasView ? ' active' : ''),
+                onClick: openCanvas,
+                'aria-pressed': String(canvasView),
+                'aria-label': 'Open play table — spatial canvas',
+              },
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, '▦'),
+                h('span', {className:'sidebar-item-label'}, 'Table')
+              ),
+              h('button', {
+                className: 'sb-acc-item' + (showDoc ? ' active' : ''),
+                onClick: function() { setShowDoc(!showDoc); setShowSidebar(false); },
+                'aria-pressed': String(showDoc),
+                'aria-controls': 'floater-doc',
+                'aria-label': showDoc ? 'Close Session Notes' : 'Open Session Notes',
+              },
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, '✏'),
+                h('span', {className:'sidebar-item-label'}, 'Session Notes')
+              )
             )
           ),
-          h('div', {style: {height: 8}})
-        ),
+
+          // ── BINDER ─────────────────────────────────────────────────
+          h('div', {className: 'sb-acc-sec'},
+            h('button', {
+              className: 'sb-acc-hdr' + (sbAcc === 'binder' ? ' is-open' : ''),
+              onClick: function() { toggleAcc('binder'); },
+              'aria-expanded': String(sbAcc === 'binder'),
+              'aria-controls': 'sb-acc-binder',
+              'aria-label': 'Binder — ' + (pinnedCards.length > 0 ? pinnedCards.length + ' cards' : 'empty'),
+            },
+              h('span', {'aria-hidden':'true', className:'sb-acc-sec-ico'}, '📁'),
+              h('span', {className:'sb-acc-sec-name'}, 'Binder'),
+              pinnedCards.length > 0
+                ? h('span', {'aria-hidden':'true', className:'sb-acc-meta sb-acc-meta-badge'}, String(pinnedCards.length))
+                : h('span', {'aria-hidden':'true', className:'sb-acc-meta'}, 'empty'),
+              h('span', {'aria-hidden':'true', className:'sb-acc-chev'}, '›')
+            ),
+            sbAcc === 'binder' && h('div', {
+              id: 'sb-acc-binder', className: 'sb-acc-body',
+              role: 'group', 'aria-label': 'Binder tools',
+            },
+              h('button', {
+                className: 'sb-acc-item' + (prepView ? ' active' : ''),
+                onClick: function() { setPrepView(function(v){return !v;}); setShowSidebar(false); },
+                'aria-pressed': String(prepView),
+                'aria-label': 'Cards' + (pinnedCards.length > 0 ? ' — ' + pinnedCards.length + ' pinned' : ''),
+              },
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, h(FaCartPlusIcon,{size:15})),
+                h('span', {className:'sidebar-item-label'}, 'Cards'),
+                pinnedCards.length > 0 && h('span', {className:'sb-count-badge','aria-hidden':'true'}, String(pinnedCards.length))
+              ),
+              h('a', {
+                href: '../campaigns/character-creation.html?world=' + campId,
+                className: 'sb-acc-item',
+                'aria-label': 'Session Zero — guided character creation',
+              },
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, '★'),
+                h('span', {className:'sidebar-item-label'}, 'Session Zero')
+              )
+            )
+          ),
+
+          // ── GENERATE ───────────────────────────────────────────────
+          h('div', {className: 'sb-acc-sec'},
+            h('button', {
+              className: 'sb-acc-hdr' + (sbAcc === 'generate' ? ' is-open' : ''),
+              onClick: function() { toggleAcc('generate'); },
+              'aria-expanded': String(sbAcc === 'generate'),
+              'aria-controls': 'sb-acc-generate',
+              'aria-label': 'Generate — active: ' + ((GENERATORS.find(function(g){return g.id===activeGen;}) || {}).label || activeGen),
+            },
+              h('span', {'aria-hidden':'true', className:'sb-acc-sec-ico'}, '🎲'),
+              h('span', {className:'sb-acc-sec-name'}, 'Generate'),
+              h('span', {'aria-hidden':'true', className:'sb-acc-meta'},
+                ((GENERATORS.find(function(g){return g.id===activeGen;}) || {}).label || '').split(' ').slice(0,2).join(' ')
+              ),
+              h('span', {'aria-hidden':'true', className:'sb-acc-chev'}, '›')
+            ),
+            sbAcc === 'generate' && h('div', {
+              id: 'sb-acc-generate', className: 'sb-acc-body sb-acc-generate-body',
+              role: 'group', 'aria-label': 'Generators',
+            },
+            h('div', {className:'sb-acc-group-lbl'}, 'People'),
+              h('button', {
+                key: 'npc_minor',
+                className: 'sb-acc-item sb-acc-gen' + (activeGen === 'npc_minor' ? ' active' : ''),
+                onClick: function() { selectGen('npc_minor'); setShowSidebar(false); },
+                'aria-label': (GENERATORS.find(function(g){return g.id==='npc_minor';}) || {}).label || 'npc_minor',
+              },
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, RA_ICONS['npc_minor'] ? h(RaIcon,{n:RA_ICONS['npc_minor']}) : ''),
+                h('span', {className:'sidebar-item-label'}, (GENERATORS.find(function(g){return g.id==='npc_minor';}) || {}).label || 'npc_minor')
+              ),
+              h('button', {
+                key: 'npc_major',
+                className: 'sb-acc-item sb-acc-gen' + (activeGen === 'npc_major' ? ' active' : ''),
+                onClick: function() { selectGen('npc_major'); setShowSidebar(false); },
+                'aria-label': (GENERATORS.find(function(g){return g.id==='npc_major';}) || {}).label || 'npc_major',
+              },
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, RA_ICONS['npc_major'] ? h(RaIcon,{n:RA_ICONS['npc_major']}) : ''),
+                h('span', {className:'sidebar-item-label'}, (GENERATORS.find(function(g){return g.id==='npc_major';}) || {}).label || 'npc_major')
+              ),
+              h('button', {
+                key: 'pc',
+                className: 'sb-acc-item sb-acc-gen' + (activeGen === 'pc' ? ' active' : ''),
+                onClick: function() { selectGen('pc'); setShowSidebar(false); },
+                'aria-label': (GENERATORS.find(function(g){return g.id==='pc';}) || {}).label || 'pc',
+              },
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, RA_ICONS['pc'] ? h(RaIcon,{n:RA_ICONS['pc']}) : ''),
+                h('span', {className:'sidebar-item-label'}, (GENERATORS.find(function(g){return g.id==='pc';}) || {}).label || 'pc')
+              ),
+              h('button', {
+                key: 'backstory',
+                className: 'sb-acc-item sb-acc-gen' + (activeGen === 'backstory' ? ' active' : ''),
+                onClick: function() { selectGen('backstory'); setShowSidebar(false); },
+                'aria-label': (GENERATORS.find(function(g){return g.id==='backstory';}) || {}).label || 'backstory',
+              },
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, RA_ICONS['backstory'] ? h(RaIcon,{n:RA_ICONS['backstory']}) : ''),
+                h('span', {className:'sidebar-item-label'}, (GENERATORS.find(function(g){return g.id==='backstory';}) || {}).label || 'backstory')
+              ),
+            h('div', {className:'sb-acc-group-lbl'}, 'Scene'),
+              h('button', {
+                key: 'scene',
+                className: 'sb-acc-item sb-acc-gen' + (activeGen === 'scene' ? ' active' : ''),
+                onClick: function() { selectGen('scene'); setShowSidebar(false); },
+                'aria-label': (GENERATORS.find(function(g){return g.id==='scene';}) || {}).label || 'scene',
+              },
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, RA_ICONS['scene'] ? h(RaIcon,{n:RA_ICONS['scene']}) : ''),
+                h('span', {className:'sidebar-item-label'}, (GENERATORS.find(function(g){return g.id==='scene';}) || {}).label || 'scene')
+              ),
+              h('button', {
+                key: 'encounter',
+                className: 'sb-acc-item sb-acc-gen' + (activeGen === 'encounter' ? ' active' : ''),
+                onClick: function() { selectGen('encounter'); setShowSidebar(false); },
+                'aria-label': (GENERATORS.find(function(g){return g.id==='encounter';}) || {}).label || 'encounter',
+              },
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, RA_ICONS['encounter'] ? h(RaIcon,{n:RA_ICONS['encounter']}) : ''),
+                h('span', {className:'sidebar-item-label'}, (GENERATORS.find(function(g){return g.id==='encounter';}) || {}).label || 'encounter')
+              ),
+              h('button', {
+                key: 'complication',
+                className: 'sb-acc-item sb-acc-gen' + (activeGen === 'complication' ? ' active' : ''),
+                onClick: function() { selectGen('complication'); setShowSidebar(false); },
+                'aria-label': (GENERATORS.find(function(g){return g.id==='complication';}) || {}).label || 'complication',
+              },
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, RA_ICONS['complication'] ? h(RaIcon,{n:RA_ICONS['complication']}) : ''),
+                h('span', {className:'sidebar-item-label'}, (GENERATORS.find(function(g){return g.id==='complication';}) || {}).label || 'complication')
+              ),
+            h('div', {className:'sb-acc-group-lbl'}, 'Story'),
+              h('button', {
+                key: 'seed',
+                className: 'sb-acc-item sb-acc-gen' + (activeGen === 'seed' ? ' active' : ''),
+                onClick: function() { selectGen('seed'); setShowSidebar(false); },
+                'aria-label': (GENERATORS.find(function(g){return g.id==='seed';}) || {}).label || 'seed',
+              },
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, RA_ICONS['seed'] ? h(RaIcon,{n:RA_ICONS['seed']}) : ''),
+                h('span', {className:'sidebar-item-label'}, (GENERATORS.find(function(g){return g.id==='seed';}) || {}).label || 'seed')
+              ),
+              h('button', {
+                key: 'campaign',
+                className: 'sb-acc-item sb-acc-gen' + (activeGen === 'campaign' ? ' active' : ''),
+                onClick: function() { selectGen('campaign'); setShowSidebar(false); },
+                'aria-label': (GENERATORS.find(function(g){return g.id==='campaign';}) || {}).label || 'campaign',
+              },
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, RA_ICONS['campaign'] ? h(RaIcon,{n:RA_ICONS['campaign']}) : ''),
+                h('span', {className:'sidebar-item-label'}, (GENERATORS.find(function(g){return g.id==='campaign';}) || {}).label || 'campaign')
+              ),
+              h('button', {
+                key: 'faction',
+                className: 'sb-acc-item sb-acc-gen' + (activeGen === 'faction' ? ' active' : ''),
+                onClick: function() { selectGen('faction'); setShowSidebar(false); },
+                'aria-label': (GENERATORS.find(function(g){return g.id==='faction';}) || {}).label || 'faction',
+              },
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, RA_ICONS['faction'] ? h(RaIcon,{n:RA_ICONS['faction']}) : ''),
+                h('span', {className:'sidebar-item-label'}, (GENERATORS.find(function(g){return g.id==='faction';}) || {}).label || 'faction')
+              ),
+            h('div', {className:'sb-acc-group-lbl'}, 'Mechanics'),
+              h('button', {
+                key: 'compel',
+                className: 'sb-acc-item sb-acc-gen' + (activeGen === 'compel' ? ' active' : ''),
+                onClick: function() { selectGen('compel'); setShowSidebar(false); },
+                'aria-label': (GENERATORS.find(function(g){return g.id==='compel';}) || {}).label || 'compel',
+              },
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, RA_ICONS['compel'] ? h(RaIcon,{n:RA_ICONS['compel']}) : ''),
+                h('span', {className:'sidebar-item-label'}, (GENERATORS.find(function(g){return g.id==='compel';}) || {}).label || 'compel')
+              ),
+              h('button', {
+                key: 'consequence',
+                className: 'sb-acc-item sb-acc-gen' + (activeGen === 'consequence' ? ' active' : ''),
+                onClick: function() { selectGen('consequence'); setShowSidebar(false); },
+                'aria-label': (GENERATORS.find(function(g){return g.id==='consequence';}) || {}).label || 'consequence',
+              },
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, RA_ICONS['consequence'] ? h(RaIcon,{n:RA_ICONS['consequence']}) : ''),
+                h('span', {className:'sidebar-item-label'}, (GENERATORS.find(function(g){return g.id==='consequence';}) || {}).label || 'consequence')
+              ),
+              h('button', {
+                key: 'challenge',
+                className: 'sb-acc-item sb-acc-gen' + (activeGen === 'challenge' ? ' active' : ''),
+                onClick: function() { selectGen('challenge'); setShowSidebar(false); },
+                'aria-label': (GENERATORS.find(function(g){return g.id==='challenge';}) || {}).label || 'challenge',
+              },
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, RA_ICONS['challenge'] ? h(RaIcon,{n:RA_ICONS['challenge']}) : ''),
+                h('span', {className:'sidebar-item-label'}, (GENERATORS.find(function(g){return g.id==='challenge';}) || {}).label || 'challenge')
+              ),
+              h('button', {
+                key: 'contest',
+                className: 'sb-acc-item sb-acc-gen' + (activeGen === 'contest' ? ' active' : ''),
+                onClick: function() { selectGen('contest'); setShowSidebar(false); },
+                'aria-label': (GENERATORS.find(function(g){return g.id==='contest';}) || {}).label || 'contest',
+              },
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, RA_ICONS['contest'] ? h(RaIcon,{n:RA_ICONS['contest']}) : ''),
+                h('span', {className:'sidebar-item-label'}, (GENERATORS.find(function(g){return g.id==='contest';}) || {}).label || 'contest')
+              ),
+              h('button', {
+                key: 'obstacle',
+                className: 'sb-acc-item sb-acc-gen' + (activeGen === 'obstacle' ? ' active' : ''),
+                onClick: function() { selectGen('obstacle'); setShowSidebar(false); },
+                'aria-label': (GENERATORS.find(function(g){return g.id==='obstacle';}) || {}).label || 'obstacle',
+              },
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, RA_ICONS['obstacle'] ? h(RaIcon,{n:RA_ICONS['obstacle']}) : ''),
+                h('span', {className:'sidebar-item-label'}, (GENERATORS.find(function(g){return g.id==='obstacle';}) || {}).label || 'obstacle')
+              ),
+              h('button', {
+                key: 'countdown',
+                className: 'sb-acc-item sb-acc-gen' + (activeGen === 'countdown' ? ' active' : ''),
+                onClick: function() { selectGen('countdown'); setShowSidebar(false); },
+                'aria-label': (GENERATORS.find(function(g){return g.id==='countdown';}) || {}).label || 'countdown',
+              },
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, RA_ICONS['countdown'] ? h(RaIcon,{n:RA_ICONS['countdown']}) : ''),
+                h('span', {className:'sidebar-item-label'}, (GENERATORS.find(function(g){return g.id==='countdown';}) || {}).label || 'countdown')
+              ),
+              h('button', {
+                key: 'constraint',
+                className: 'sb-acc-item sb-acc-gen' + (activeGen === 'constraint' ? ' active' : ''),
+                onClick: function() { selectGen('constraint'); setShowSidebar(false); },
+                'aria-label': (GENERATORS.find(function(g){return g.id==='constraint';}) || {}).label || 'constraint',
+              },
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, RA_ICONS['constraint'] ? h(RaIcon,{n:RA_ICONS['constraint']}) : ''),
+                h('span', {className:'sidebar-item-label'}, (GENERATORS.find(function(g){return g.id==='constraint';}) || {}).label || 'constraint')
+              ),
+            )
+          ),
+
+          // ── SETTINGS ───────────────────────────────────────────────
+          h('div', {className: 'sb-acc-sec sb-acc-sec-settings'},
+            h('button', {
+              className: 'sb-acc-hdr sb-acc-hdr-settings' + (sbAcc === 'settings' ? ' is-open' : ''),
+              onClick: function() { toggleAcc('settings'); },
+              'aria-expanded': String(sbAcc === 'settings'),
+              'aria-controls': 'sb-acc-settings',
+              'aria-label': 'Settings',
+            },
+              h('span', {'aria-hidden':'true', className:'sb-acc-sec-ico sb-acc-sec-ico-sm'}, '⚙'),
+              h('span', {className:'sb-acc-sec-name sb-acc-sec-name-muted'}, 'Settings'),
+              h('span', {'aria-hidden':'true', className:'sb-acc-chev'}, '›')
+            ),
+            sbAcc === 'settings' && h('div', {
+              id: 'sb-acc-settings', className: 'sb-acc-body',
+              role: 'group', 'aria-label': 'Settings',
+            },
+              h('button', {
+                className: 'sb-acc-item',
+                onClick: toggleTheme,
+                'aria-label': theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode',
+                'aria-pressed': String(theme === 'light'),
+              },
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, h(RaIcon,{n: theme==='dark'?RA_ICONS.theme_light:RA_ICONS.theme_dark})),
+                h('span', {className:'sidebar-item-label'}, theme === 'dark' ? 'Light mode' : 'Dark mode')
+              ),
+              h('button', {
+                className: 'sb-acc-item',
+                onClick: function() { setShowTables(true); setShowSidebar(false); },
+                'aria-label': 'Customize table content',
+              },
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, h(RaIcon,{n:RA_ICONS.customize})),
+                h('span', {className:'sidebar-item-label'}, 'Customize Tables')
+              ),
+              h('button', {
+                className: 'sb-acc-item',
+                onClick: function() { setShowSettings(true); setShowSidebar(false); },
+                'aria-label': 'Open settings',
+              },
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, h(RaIcon,{n:RA_ICONS.settings})),
+                h('span', {className:'sidebar-item-label'}, 'Settings')
+              ),
+              h('button', {
+                className: 'sb-acc-item',
+                onClick: function() { setShowKbShortcuts(true); },
+                'aria-label': 'Keyboard shortcuts',
+              },
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, h('span',{'aria-hidden':'true'},'⌨')),
+                h('span', {className:'sidebar-item-label'}, 'KB Shortcuts')
+              )
+            )
+          )
+
+        ), // close sb-acc
+        h('div', {style: {height: 8, flexShrink: 0}}),
+
+        // ── Icon dock — nav links + online status, pinned to sidebar bottom ──
+        // WCAG: role="toolbar", aria-label, each button has aria-label, min 44px height
+        h('div', {className: 'sb-dock', role: 'toolbar', 'aria-label': 'Site navigation and status'},
+          h('a', {
+            href: '../index.html',
+            className: 'sb-dock-btn',
+            'aria-label': 'All Worlds — return to world selection',
+          },
+            h('span', {'aria-hidden': 'true', className: 'sb-dock-ico'}, '\uD83C\uDF0D'),
+            h('span', {className: 'sb-dock-lbl'}, 'Worlds')
+          ),
+          h('a', {
+            href: '../help/learn-fate.html',
+            className: 'sb-dock-btn',
+            'aria-label': 'Learn Fate Condensed',
+          },
+            h('span', {'aria-hidden': 'true', className: 'sb-dock-ico'}, '\uD83D\uDCDA'),
+            h('span', {className: 'sb-dock-lbl'}, 'Learn')
+          ),
+          h('a', {
+            href: '../help/index.html',
+            className: 'sb-dock-btn',
+            'aria-label': 'Help and wiki',
+          },
+            h('span', {'aria-hidden': 'true', className: 'sb-dock-ico', style: {fontSize: 13}}, '?'),
+            h('span', {className: 'sb-dock-lbl'}, 'Help')
+          ),
+          h('div', {
+            className: 'sb-dock-btn sb-dock-status',
+            role: 'status',
+            'aria-live': 'polite',
+            'aria-label': isOnline ? 'Connection status: Online' : 'Connection status: Offline',
+            tabIndex: -1,
+          },
+            h('span', {'aria-hidden': 'true', className: 'sb-status-dot' + (isOnline ? '' : ' offline')}),
+            h('span', {className: 'sb-dock-lbl', style: {color: isOnline ? 'var(--c-green,#4CD964)' : 'var(--c-red,#E06060)'}},
+              isOnline ? 'Online' : 'Offline'
+            )
+          )
+        ), // close sb-dock
+      ), // close h('nav') sidebar
 
       // ── Main content panel ───────────────────────────────────────────
       h('div', {className: 'content-panel'},
 
+        // ── CANVAS VIEW — BoardApp rendered inside campaign page ──────────────
+        canvasView && (typeof BoardApp !== 'undefined') && h(BoardApp, {
+          campId: campId,
+          initialMode: 'play',
+          onClose: closeCanvas,
+          key: 'canvas-' + campId,
+        }),
+
         // ── TABLE PREP VIEW — infinite canvas (run-style) ─────────────────
-        prepView && h(PrepCanvas, {
+        !canvasView && prepView && h(PrepCanvas, {
           campId: campId,
           campName: camp.meta.name,
           partySize: partySize,
@@ -2526,22 +2836,9 @@ function CampaignApp(props) {
                   }, n);
                 })
               ),
-              // SECONDARY (pushed right): Rules / Share / Pin
+              // SECONDARY (pushed right): Pin + Export
               h('div', {className: 'action-bar-secondary'},
-
-                // EXP-03: Copy link
-                result && h('button', {
-                  className: 'btn btn-ghost action-bar-icon' + (linkCopied ? ' export-copied' : ''),
-                  onClick: copyShareLinkWithFeedback,
-                  title: linkCopied ? 'Link copied!' : 'Copy shareable link to this result',
-                  'aria-label': linkCopied ? 'Link copied' : 'Copy shareable link',
-                }, linkCopied ? '\u2705' : '\uD83D\uDD17'),
-                result && h('button', {
-                  className: 'btn btn-ghost action-bar-icon' + (showExport ? ' active' : ''),
-                  onClick: function() { setShowExport(!showExport); },
-                  title: showExport ? 'Close export options' : 'More export options',
-                  'aria-label': 'Export options',
-                }, h(FaShareIcon, {size:14})),
+                // Pin to Table Prep
                 result && h('button', {
                   className: 'btn btn-ghost action-bar-icon' + (pinBouncing ? ' pin-bounce' : ''),
                   onClick: pinResult,
@@ -2559,39 +2856,24 @@ function CampaignApp(props) {
                       position: 'absolute', top: 1, right: 1,
                       width: 14, height: 14, borderRadius: '50%',
                       background: 'var(--accent)', color: '#fff',
-                      fontSize: 9, fontWeight: 700,
+                      fontSize: 10, fontWeight: 700,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       lineHeight: 1, pointerEvents: 'none',
                     },
                   }, pinnedCards.length > 9 ? '9+' : String(pinnedCards.length))
                 ),
-                pinnedCards.length > 0 &&
-                // Card view toggle
-                h('button', {
-                  className: 'card-view-btn' + (cardView ? ' active' : ''),
-                  onClick: function() { setCardView(function(v) { return !v; }); },
-                  title: cardView ? 'Switch to dossier view' : 'Switch to card view',
-                  'aria-label': cardView ? 'Switch to dossier view' : 'Switch to card view',
-                  'aria-pressed': String(cardView),
-                }, cardView ? '\u22df Dossier' : '\u2665 Card'),
-                // EXP-06+: Export menu — Image Pack / Print / JSON / Import
-                h(ExportMenu, {
+                // Export menu
+                h(ExportModal, {
                   cards: pinnedCards,
                   campName: camp.meta.name,
                   onImport: importCards,
+                  onToast: showToast,
+                  onShareLink: result ? copyShareLink : null,
+                  currentResult: result || null,
+                  genId: activeGen,
                 })
               )
             ),
-
-            // ── Inline share drawer ────────────────────────────────────
-            showExport && result && h(ShareDrawer, {
-              genId:    result.genId,
-              data:     result.data,
-              campName: camp.meta.name,
-              campId:   campId,
-              onClose:  function() { setShowExport(false); },
-              onCopyLink: copyShareLink,
-            }),
 
             // ── Session Pack — shown instead of single result ─────────────────────
             sessionPack && h(SessionPackPanel, {
@@ -2628,18 +2910,12 @@ function CampaignApp(props) {
             ),
 
             // ── Full generator content: card view or dossier ─────────────────
-            result && (cardView
-              ? h('div', {key: result._ts || result.genId},
-                  renderCard(result.genId, result.data, campId,
-                    function(patch) { if (patch && patch._pin) { pinResult(); } },
-                    t.stunts,
-                    function(targetGenId) { selectGen(targetGenId); setTimeout(doGenerate, 80); }
-                  ))
-              : h('div', {key: (result._ts || result.genId) + '-d'},
-                  renderResult(result.genId, result.data, null, t.stunts, function(targetGenId) {
-                    selectGen(targetGenId);
-                    setTimeout(doGenerate, 80);
-                  }))),
+            result && h('div', {key: result._ts || result.genId},
+              renderCard(result.genId, result.data, campId,
+                function(patch) { if (patch && patch._pin) { pinResult(); } },
+                t.stunts,
+                function(targetGenId) { selectGen(targetGenId); setTimeout(doGenerate, 80); }
+              )),
 
             // ── UX-10: What next? guidance strip ────────────────────────────
             result && pinnedCards.length < 5 && (function() {
@@ -2774,9 +3050,8 @@ function CampaignApp(props) {
               setToast('Session pack copied - ' + pinnedCards.length + ' results');
             });
           } else {
-            setResult({genId: pinnedCards[0].genId, data: pinnedCards[0].data, _batchMd: md});
-            setShowExport(true);
-            setShowHistory(false);
+            // Clipboard API unavailable — fall back to download via ExportMenu JSON
+            setToast('Use Export \u2192 JSON to save this session pack');
           }
         },
         style: {width: '100%', marginBottom: 4, justifyContent: 'center', fontSize: 'var(--text-sm)'},
@@ -3194,6 +3469,68 @@ function CampaignApp(props) {
       'aria-label': 'Roll ' + gen.label,
       title: 'Roll ' + gen.label,
     }, rolling ? '…' : '🎲'),
+
+    // ── BL-15: Mobile bottom nav ─────────────────────────────────────────
+    // Four persistent tabs replacing hamburger-only mobile UX.
+    // Desktop: hidden via CSS. Mobile: fixed bottom, above FAB.
+    h('nav', {
+      className: 'bottom-nav',
+      'aria-label': 'Main navigation',
+      role: 'navigation',
+    },
+      // Roll — fires generate for active generator, closes any open panels
+      h('button', {
+        className: 'bn-tab' + ((!prepView && !showSidebar) ? ' active' : ''),
+        onClick: function() {
+          setShowSidebar(false);
+          if (prepView) setPrepView(false);
+          doGenerate();
+        },
+        'aria-label': 'Roll ' + (gen.label || 'generator'),
+        'aria-current': (!prepView && !showSidebar) ? 'page' : undefined,
+        disabled: rolling,
+      },
+        h('span', {className: 'bn-tab-ico', 'aria-hidden': 'true'}, rolling ? '…' : '🎲'),
+        h('span', {className: 'bn-tab-lbl'}, gen.label ? gen.label.slice(0, 7) : 'Roll')
+      ),
+
+      // Pinned — toggles Table Prep panel, shows card count badge
+      h('button', {
+        className: 'bn-tab' + (prepView ? ' active' : ''),
+        onClick: function() {
+          setShowSidebar(false);
+          setPrepView(function(v) { return !v; });
+        },
+        'aria-label': 'Table Prep' + (pinnedCards.length ? ' — ' + pinnedCards.length + ' cards' : ''),
+        'aria-pressed': String(prepView),
+      },
+        h('span', {className: 'bn-tab-ico', 'aria-hidden': 'true'}, '📌'),
+        pinnedCards.length > 0 && h('span', {className: 'bn-badge', 'aria-hidden': 'true'}, String(pinnedCards.length)),
+        h('span', {className: 'bn-tab-lbl'}, 'Pinned')
+      ),
+
+      // Board — navigates to board page
+      h('a', {
+        className: 'bn-tab',
+        href: '../campaigns/board.html?world=' + campId,
+        'aria-label': 'Board for ' + camp.meta.name,
+        style: {textDecoration: 'none'},
+      },
+        h('span', {className: 'bn-tab-ico', 'aria-hidden': 'true'}, '▦'),
+        h('span', {className: 'bn-tab-lbl'}, 'Board')
+      ),
+
+      // Menu — toggles the sidebar drawer
+      h('button', {
+        className: 'bn-tab' + (showSidebar ? ' active' : ''),
+        onClick: function() { setShowSidebar(function(v) { return !v; }); },
+        'aria-label': showSidebar ? 'Close menu' : 'Open menu',
+        'aria-expanded': String(showSidebar),
+      },
+        h('span', {className: 'bn-tab-ico', 'aria-hidden': 'true'}, showSidebar ? '✕' : '☰'),
+        h('span', {className: 'bn-tab-lbl'}, 'Menu')
+      )
+    ),
 
     // License footer - last item in content-panel; always visible without opening sidebar
     h('footer', {className: 'camp-content-footer'},

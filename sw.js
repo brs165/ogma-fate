@@ -2,11 +2,12 @@
 // Strategy: cache-first for all static assets, network-first for CDN scripts.
 // Safari fix: redirected responses are cloned as non-redirected before caching.
 
-var CACHE_NAME = 'fate-generator-2026.03.343';
+var CACHE_NAME = 'fate-generator-2026.03.359';
 
 var APP_SHELL = [
   '/index.html',
   '/about.html',
+  '/design-system.html',
   '/learn.html',
   '/license.html',
   '/help/index.html',
@@ -25,6 +26,7 @@ var APP_SHELL = [
   '/assets/js/partysocket.js',
   '/campaigns/thelongafter.html',
   '/campaigns/sessionzero.html',
+  '/campaigns/run.html',
   '/campaigns/transition.html',
   '/campaigns/guide-thelongafter.html',
   '/campaigns/guide-cyberpunk.html',
@@ -41,7 +43,6 @@ var APP_SHELL = [
   '/campaigns/guide-western.html',
   '/campaigns/dVentiRealm.html',
   '/campaigns/guide-dVentiRealm.html',
-  '/campaigns/run.html',
   '/campaigns/board.html',
   '/core/ui-table.js',
   '/core/ui-board.js',
@@ -51,14 +52,6 @@ var APP_SHELL = [
   '/campaigns/character-creation.html',
   '/assets/css/theme.css',
   '/assets/css/help-shared.css',
-  '/assets/css/campaigns/theme-thelongafter.css',
-  '/assets/css/campaigns/theme-cyberpunk.css',
-  '/assets/css/campaigns/theme-fantasy.css',
-  '/assets/css/campaigns/theme-space.css',
-  '/assets/css/campaigns/theme-victorian.css',
-  '/assets/css/campaigns/theme-postapoc.css',
-  '/assets/css/campaigns/theme-western.css',
-  '/assets/css/campaigns/theme-dVentiRealm.css',
   '/core/engine.js',
   '/core/ui-primitives.js',
   '/core/ui-renderers.js',
@@ -181,23 +174,7 @@ self.addEventListener('fetch', function(event) {
         // Offline: try exact URL in cache first
         return caches.match(event.request).then(function(cached) {
           if (cached) return cached;
-          // Map clean top-level world slugs to their cached campaign HTML files
-          var CLEAN_URL_MAP = {
-            '/thelongafter': '/campaigns/thelongafter.html',
-            '/cyberpunk':    '/campaigns/cyberpunk.html',
-            '/fantasy':      '/campaigns/fantasy.html',
-            '/space':        '/campaigns/space.html',
-            '/victorian':    '/campaigns/victorian.html',
-            '/postapoc':     '/campaigns/postapoc.html',
-            '/western':      '/campaigns/western.html',
-            '/dVentiRealm':  '/campaigns/dVentiRealm.html',
-          };
-          var pathname = new URL(event.request.url).pathname.replace(/\/$/, '');
-          if (CLEAN_URL_MAP[pathname]) {
-            return caches.match(CLEAN_URL_MAP[pathname]).then(function(mapped) {
-              if (mapped) return mapped;
-            });
-          }
+
           // Try appending .html (handles other clean URLs)
           var htmlUrl = event.request.url.replace(/\/?(\?.*)?$/, '.html$1');
           return caches.match(htmlUrl).then(function(cached2) {

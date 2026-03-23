@@ -43,6 +43,10 @@ CAMPAIGNS["western"] = {
       "Aurelia","Beulah","Calista","Dora","Eulalia","Fannie","Greta","Ines",
       "Juana","Leticia","Mercy","Nell","Opal","Pearl","Sadie","Winona",
       "Consuelo","Dolores","Esperanza","Pilar",
+      "Ignacio","Tobias","Ezra","Cormac","Dillon","Reid","Bram","Ansel",
+      "Whitfield","Clarence","Vernon","Leroy","Chester","Grady","Floyd","Earl",
+      "Guadalupe","Rosario","Soledad","Remedios","Socorro","Concepcion",
+      "Wilhelmina","Cordelia","Lavinia","Harriet","Thomasina","Isadora",
     ],
     names_last: [
       "Alcott","Brannigan","Calhoun","Devereaux","Ellison","Farrow",
@@ -50,7 +54,13 @@ CAMPAIGNS["western"] = {
       "Navarro","Oakes","Pruitt","Quinn","Reyes","Sutter","Tate",
       "Underhill","Valdez","Wace","Xantos","Yancey","Zorn",
       "Delgado","Blackwood","Rourke","Crane","Bauer","Holloway",
+      "Fitzpatrick","Guerrero","Hawthorne","Ibarra","Jennings","Kowalski",
+      "Langley","Medina","Newland","Orozco","Prentiss","Ruiz","Sandoval",
+      "Thayer","Vickers","Whitmore","Xiong","Yazzie","Zimmerman",
+      "Beaumont","Chaparral","Dunbar","Eaton","Finch",
     ],
+      pc_high_concepts: ["Frontier Surgeon Who Has Patched Both Sides of Too Many Disputes","Railroad-Displaced Rancher With a Land Claim the Company Wants Gone","Former Marshal Whose Territory No Longer Recognises Her Commission","Pinkerton Agent Who Has Stopped Believing the Agency's Reports","Homesteader's Widow Carrying the Deed That Got Her Husband Killed","Army Scout Mustered Out With Knowledge the Command Wants Buried","Freight Contractor Whose Route Goes Through Land Three Parties Claim","Telegraph Operator Who Has Read Too Many Official Messages","Gunsmith Whose Customers Include Everyone on Both Sides","Chinese Railroad Worker Who Built This Line and Isn't Leaving","Freedman Rancher Whose Deed Is Legal and Therefore a Target","Mexican Land-Grant Holder Watching the Survey Crew Arrive"],
+      pc_questions: ["What did the old war cost you specifically, and are you still paying?","Who in this territory owes you a debt they haven't acknowledged?","What are you building here, and who wants to stop it?","What reputation follows you that isn't entirely accurate?","What would make you leave everything you've built and ride out?","Who do you trust completely in this group and who are you watching?"],
 
     // ── Minor NPC concepts ─────────────────────────────────────────────────
     minor_concepts: {
@@ -341,6 +351,14 @@ CAMPAIGNS["western"] = {
        desc:"Three homesteads have gone under. The cause is upstream, and upstream belongs to the Harker Company."},
       {name:"Cattlemen vs. Farmers",
        desc:"The fence lines are going up and the grass wars have started. The town is choosing sides."},
+      {name:"The Reservation Border Is Being Redrawn",
+       desc:"The government survey moved the line. The people it affects weren't consulted. The people doing it have cavalry."},
+      {name:"Drought and No Rain Coming",
+       desc:"The creek is down to ankle-deep. Three ranchers have already sold. Two more are one bad month from it."},
+      {name:"The Sheriff Rode Out and Hasn't Come Back",
+       desc:"That was six days ago. The deputy is nineteen years old and the wrong people have noticed."},
+      {name:"A New Preacher in Town",
+       desc:"He's been here three weeks and he knows things about people he shouldn't know. He's also organising."},
     ],
     impending_issues: [
       {name:"Silver Strike Rumour",
@@ -351,6 +369,14 @@ CAMPAIGNS["western"] = {
        desc:"The garrison is pulling out. What the soldiers kept away will come back with interest."},
       {name:"The Old Blood Feud Wakes Up",
        desc:"The Morrow boy rode back into town. His father's enemies haven't forgotten."},
+      {name:"The Water Rights Go to Court",
+       desc:"The case is three months out. Both sides have hired lawyers. Whoever loses will not accept the verdict."},
+      {name:"The Company Town Goes Up",
+       desc:"The rail company is building housing, a commissary, and a company marshal's office. Independent merchants have sixty days."},
+      {name:"A Hard Winter Prediction",
+       desc:"The almanac says the worst in thirty years. People who weren't going to make hard choices are going to have to."},
+      {name:"Election Season",
+       desc:"The territorial governor's seat is open. Three factions are backing three candidates. None of them represent this town."},
     ],
 
     // ── Setting aspects ────────────────────────────────────────────────────

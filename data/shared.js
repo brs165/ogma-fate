@@ -20,6 +20,7 @@ var GENERATORS = [
   {id:"consequence", label:"Consequence",     icon:"⚡", sub:"Mild · moderate · severe · compel hook"},
   {id:"faction",     label:"Faction",         icon:"⚑", sub:"Name · goal · method · weakness · face"},
   {id:"complication",label:"Complication", icon:"⚠", sub:"New aspect · arrival · environment shift"},
+  {id:"pc",          label:"Player Character", icon:"☆",      sub:"5 aspects · skill pyramid · stunts · refresh 3"},
   {id:"backstory",   label:"PC Backstory",    icon:"📖", sub:"Session Zero questions · relationship web · hook"},
   {id:"obstacle",    label:"Obstacle",        icon:"🛡", sub:"Hazard · block · distraction - not an enemy"},
   {id:"countdown",   label:"Countdown",       icon:"⏱", sub:"Track · trigger · outcome - pacing pressure"},
@@ -27,7 +28,7 @@ var GENERATORS = [
 ];
 
 var GENERATOR_GROUPS = [
-  {id:"people",    label:"People",    icon:"👤", gens:["npc_minor","npc_major","backstory"]},
+  {id:"people",    label:"People",    icon:"👤", gens:["npc_minor","npc_major","pc","backstory"]},
   {id:"scene",     label:"Scene",     icon:"🎬", gens:["scene","encounter","complication"]},
   {id:"story",     label:"Story",     icon:"🌍", gens:["seed","campaign","faction"]},
   {id:"mechanics", label:"Mechanics", icon:"⚙",  gens:["compel","consequence","challenge","contest","obstacle","countdown","constraint"]},

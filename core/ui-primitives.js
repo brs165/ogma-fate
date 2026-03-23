@@ -32,6 +32,7 @@ const RA_ICONS = {
   consequence:  '💔',
   faction:      '🏴',
   complication: '⚠',
+  pc:           '☆',
   backstory:    '✒',
   obstacle:     '🛡',
   countdown:    '⏳',

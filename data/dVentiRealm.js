@@ -53,6 +53,8 @@ CAMPAIGNS["dVentiRealm"] = {
       "of the Last Compact","the Arbitrated","Sealborn","Archmark","Breakward",
       "the Contract's End","Shadowguild","Oathmark","Vaultend","Sunderborn",
     ],
+      pc_high_concepts: ["Senate-Trained Functionary Whose Patron's Faction No Longer Exists","Vault Surveyor Who Found Something the Charter Office Won't Document","Former Senate Guard Whose Loyalty Has Outlasted the Institution","Inter-Faction Arbitrator With No Neutral Faction Left to Represent","Regional Governor's Aide Who Stayed After the Governor Fled","Lore-Keeper Whose Archive Contains Documents Someone Wants Destroyed","Trade Compact Agent Whose Compact Has Dissolved Into Its Members","Court Investigator Whose Last Case Implicated the Court","Debt Collector Working Cases From Before the Senate Fell","Treaty Negotiator Whose Treaties Are Being Quietly Unmade","Census Scholar Who Knows Where the Population Actually Is","Courier Who Has Memorised Routes the New Powers Don't Know Exist"],
+      pc_questions: ["What did the Senate's collapse cost you personally, beyond the obvious?","Which faction's interests do you privately serve, and which do you publicly claim?","What vault record have you seen that changes everything you thought you knew?","Who do you owe loyalty to that no longer has the power to protect you?","What do you still believe can be salvaged from the old order?","What have you been doing for thirty years that you're prepared to stop?"],
 
     minor_concepts: {
       t: [

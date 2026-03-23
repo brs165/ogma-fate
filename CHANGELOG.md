@@ -25,6 +25,38 @@
 
 
 
+
+---
+
+## 2026.03.344 — Field Dispatch design system site-wide
+
+**Design system: Field Dispatch**
+- Replaces the glass/blur aesthetic with a warm, physical, stamp-press character across the entire site
+- **Typography:** Fraunces (display serif) for headings, body copy, world names, taglines, sidebar labels, wiki content; Martian Mono for UI chrome, code, badge labels, section headers, nav tabs, wordmark
+- **Palette (dark):** Warm-dark `#0E0C09` with cream text `#F5F0E8`; accent warm amber `#C8944A`; stamp shadows instead of glass blur
+- **Palette (light):** Cream paper `#EDE8DF` / `#F5F0E8` with dark ink `#1C1410`; saddle brown accent `#8B4513`
+- **Radii:** 16px glass → 3px stamp (all panels, buttons, cards, modals)
+- **Shadow:** `--fd-stamp-shadow: 3px 3px 0` offset physical shadow; hover lifts + rotates 0.25deg
+- **Animations:** `fd-stamp-in` (card entry), `fd-box-stamp` (stress boxes), `fd-clock-tick` (countdown boxes)
+- **Buttons:** Martian Mono, stamp shadow, spring hover (translateY -1px), active press (translate down+right)
+- **Roll button:** Fraunces display, stamp press, spring release
+
+**Card view replaces dossier view:**
+- `♥ Card` toggle button removed from action bar
+- `cardView` ternary replaced — `renderCard()` always used
+- `cv4Card` rebuilt as **auto-height Field Dispatch card**: stamp band top, expandable GM Guidance footer (replaces flip)
+- All 16 `cv4Front*` renderers intact with full data from v342
+- cv4 helpers rewritten: CV4_MONO → Martian Mono, CV4_SANS → Fraunces italic
+
+**Site-wide coverage:**
+- All 38 HTML files: Google Fonts preconnect + stylesheet link injected
+- `theme.css`: landing page, board, sidebar, modals, result panel all updated
+- `assets/css/help-shared.css`: wiki headings, sidebar, links, callouts, body text all updated
+- `help-shared.css`: `@import` Fraunces + Martian Mono
+
+113/113 · 59/59
+
+---
 ---
 
 ## 2026.03.341 — Two bug fixes + help hamburger complete

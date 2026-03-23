@@ -69,6 +69,8 @@ CAMPAIGNS["thelongafter"] = {
         "Darkmantle",
         "Worldsend",
         "Stoneheart","of the Vault-Line","the Signal-Born","Glyph-Touched","the Untranslated","of the Third Iteration","Null-Marked","the Interpreted","of the Maintenance Cycle","Error-Named","the Indexed","of the Dying Sun","Last-Calibrated","the Deprecated","of the Root-System","Spore-Chosen","the Excavated","of the Long Stasis","Threshold-Born"],
+      pc_high_concepts: ["Memory Keeper of the Third Generation","Name-Giver Who Has Forgotten Where the Practice Began","Relic Walker Whose Finds Are Never What They Seem","Last Speaker of a Language No One Else Uses","Oracle Who Knows the Predictions Are Pattern, Not Prophecy","Wayfinder Carrying a Route the Named Ones Want Buried","Keeper of the Before-Time Who Doesn't Know What It Was","Ritual Leader Whose Rituals Have Started Working","Debris Scholar With Too Many Theories and No Answers","Unnamed One Seeking the Ceremony That Was Withheld","Bridge Between Named and Unnamed Who Belongs to Neither","Shard Collector Who Has Assembled Something Recognisable"],
+      pc_questions: ["What aspect of the Before-Time do you think is being misremembered, and by whom?","What name were you given, and what name do you use, and are they the same?","What relic do you carry that you cannot explain, and what do you tell people it is?","Who taught you what you know, and what did they withhold?","What do the Named Ones fear about you specifically?","What did you see at the edge of the debris field that you haven't told anyone?"],
       minor_concepts: {
           t: [
             "A {MAdj} {MRole}",

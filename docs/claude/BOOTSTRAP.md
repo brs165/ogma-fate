@@ -86,7 +86,9 @@ Offline-first browser PWA for Fate Condensed GMs. 16 generators × 8 worlds. No 
 | All `useState` calls go at the top of a component | Interleaving state declarations with effects and functions makes a component unreadable and fragile to reorganise. |
 | Extract hooks when a component owns >3 related state+effect+handler groups | Use plain functions that call `useState`/`useEffect` — no React Context needed. Return an object, destructure in the parent. See useChromeHooks, useGeneratorSession, useBoardPlayState, useBoardSync. |
 | Local function names must not shadow global `renderCard` | ui-table.js has a local `renderTpCard` (was `renderCard` — renamed v321). Shadowing the global caused a TypeError crash. Any new local function inside PrepCanvas must check for name collisions with `ui-renderers.js` globals. |
-| **Option B layout**: no topbar in `CampaignApp` | `sb-slim-bar` (mobile-only header). Sidebar has `.sb-header` (wordmark + world chip) + Generate/Navigate tab pair. Navigate panel owns: All Worlds, Learn, Help, Board, Table Prep, theme toggle, online status. Do not add a new `<header class="topbar">` to campaign pages. |
+| **Option B layout v347**: no topbar, no tab bar | Single scrollable sidebar panel. `sb-dock` (role="toolbar") pinned to bottom: All Worlds, Learn, Help, Online status. Board is in "At the table" group. `sidebarTab` state is gone. Accordion nav (v358): `sbAcc` state + `toggleAcc()`. Sections: Play → Binder → Generate → Settings. One section open at a time. Do not re-add flat group labels.. |
+| `cv4UseReducedMotion` and `cv4InjectStyles` must stay defined in `ui-renderers.js` | Both are called inside `cv4Card`. Removing them crashes every campaign page with a `ReferenceError`. They were accidentally dropped in v343 — v345 restores them. |
+| `ShareDrawer` and share-link button are removed | Both lived in `core/ui-modals.js` and `core/ui.js`. Do not re-add. Export lives entirely in `ExportMenu` (campaign) and `BoardExportMenu` (board). |
 | Card view must show all data fields | `cv4Front*` renderers in `ui-renderers.js` render every field in the generator output. When adding a new data field to a generator, update its `cv4Front*` function. Card view = dossier view in terms of information completeness. |
 
 ---
@@ -97,8 +99,11 @@ Offline-first browser PWA for Fate Condensed GMs. 16 generators × 8 worlds. No 
 # Syntax check core files
 node --check core/engine.js && node --check core/ui.js && node --check core/ui-table.js && node --check core/ui-board.js && node --check core/ui-renderers.js && node --check core/db.js
 
-# Named assertions
+# Named assertions (135/135)
 node tests/qa_named.js
+
+# Export round-trip (89/89)
+node tests/export-roundtrip.test.js
 
 # Unit tests
 node tests/engine.test.js
@@ -132,7 +137,7 @@ config.js → engine.js → [Dexie CDN] → db.js → ui-primitives.js → party
 ui-renderers.js → ui-table.js → ui-modals.js → ui-landing.js → ui.js → intro.js
 ```
 Board page: same up to ui-primitives.js, then: ui-renderers.js → ui-table.js → ui-modals.js → ui.js → ui-board.js (no ui-landing.js, no intro.js)
-Run page: `run.html` now redirects to `board.html?mode=play` — no longer loads ui-run.js as root
+Both `run.html` and `board.html` are JS redirects. `board.html` → `{world}.html?canvas=1`. `canvasView` state in CampaignApp opens BoardApp inline. All campaign pages load ui-board.js.
 
 ---
 

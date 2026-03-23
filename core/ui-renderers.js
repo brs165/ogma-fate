@@ -854,6 +854,7 @@ function renderResult(genId, data, onUpdate, worldStunts, onChainRoll) {
     case 'consequence':  return h(ConsequenceResult,  {data: data});
     case 'faction':      return h(FactionResult,      {data: data, onChainRoll: chain});
     case 'complication': return h(ComplicationResult, {data: data});
+    case 'pc':           return h(MajorResult,          {data: {name: data.name, aspects: {high_concept: data.aspects&&data.aspects.high_concept, trouble: data.aspects&&data.aspects.trouble, others: [data.aspects&&data.aspects.other1, data.aspects&&data.aspects.other2, data.aspects&&data.aspects.other3].filter(Boolean)}, skills: data.skills, stunts: data.stunts, physical_stress: data.physical_stress, mental_stress: data.mental_stress, refresh: data.refresh}, onUpdate: up, stunts: stunts, onChainRoll: chain});
     case 'backstory':    return h(BackstoryResult,    {data: data});
     case 'obstacle':     return h(ObstacleResult,     {data: data});
     case 'countdown':    return h(CountdownResult,    {data: data, onUpdate: up});
@@ -885,6 +886,7 @@ var CARD_META = {
   consequence: {label:'Consequence',icon:'⚡', spine:'mechanic', color:'var(--c-purple)'},
   faction:     {label:'Faction',    icon:'⚑', spine:'faction', color:'var(--accent)'},
   complication:{label:'Complication',icon:'⚠',spine:'mechanic', color:'var(--c-purple)'},
+  pc:          {label:'Player Character', icon:'☆', spine:'npc', color:'var(--c-blue)'},
   backstory:   {label:'Backstory',  icon:'📖',spine:'gm', color:'var(--text-muted)'},
   obstacle:    {label:'Obstacle',   icon:'🛡', spine:'mechanic', color:'var(--c-purple)'},
   countdown:   {label:'Countdown',  icon:'⏱', spine:'countdown', color:'var(--accent)'},
@@ -923,6 +925,7 @@ var CV4_META = {
   contest:      { cat: 'mechanics', icon: '\u21cc'  },
   consequence:  { cat: 'mechanics', icon: '\u2b21'  },
   complication: { cat: 'tool',      icon: '\u26a1'  },
+  pc:           { cat: 'character', icon: '\u2606'  },
   backstory:    { cat: 'tool',      icon: '\u25d1'  },
   obstacle:     { cat: 'pressure',  icon: '\u25b2'  },
   countdown:    { cat: 'pressure',  icon: '\u23f3'  },
@@ -930,48 +933,130 @@ var CV4_META = {
 };
 
 var CV4_HELP = {
-  npc_minor:    { what: 'A supporting character with one aspect, one peak skill, and one stress box.', when: 'Shopkeepers, witnesses, bystanders \u2014 anyone who has one scene and a name.', rule: 'No consequences \u2014 one solid hit takes them out. Use the aspect as a compel hook immediately. Never give a minor NPC a second stress box by mistake; that turns them into a major NPC.' },
-  npc_major:    { what: 'A full character: skill pyramid, stunts, dual stress tracks, and a complete aspect suite.', when: 'Recurring antagonists, key allies, anyone who survives a conflict and returns.', rule: 'Refresh = free invokes they can spend against the party. High Concept and Trouble are the most compellable aspects. Consequence recovery requires a treatment roll before timing starts.' },
-  faction:      { what: 'An organisation with a goal, method, structural weakness, and a human face.', when: 'Between sessions or when players ask who is behind something.', rule: 'Goal + Method = two sides of one faction aspect. The Face is the person the PCs deal with. The Weakness is how the faction can be disrupted without direct confrontation.' },
-  scene:        { what: 'Situation aspects and zones that make a location mechanically and dramatically alive.', when: 'Before any scene where action is likely. Use framing questions to decide if the scene is worth playing.', rule: 'Scene aspects last until the fiction changes them. Free invokes reset each scene. Zones control movement.' },
-  campaign:     { what: 'A current issue, an impending threat, and setting aspects defining what kind of world this is.', when: 'Session zero, between arcs, or when the table needs a shared frame to pull against.', rule: 'Current issue = what is already on fire. Impending = what happens if they do not act. Both are aspects. Use them every session or they disappear.' },
-  encounter:    { what: 'A full conflict setup: opposition, zones, stakes, twist, and starting GM fate points.', when: 'Any scene with direct opposition. The twist fires mid-conflict, not in the first exchange.', rule: 'GM starts with 1 FP per PC. Always state victory and defeat conditions before the first roll. The twist is optional.' },
-  seed:         { what: 'A 3-scene skeleton: opening, complication, climax. Drop-in ready for one session.', when: 'Session prep, unexpected cancellations, or when you need something playable in minutes.', rule: 'Do not add more scenes. The constraint is the design.' },
-  compel:       { what: 'A situation where an aspect makes things worse in exchange for a Fate point.', when: 'When a player aspect is relevant and making life harder would be more interesting.', rule: 'Event compels happen to the character. Decision compels require a hard choice. Player refuses by spending 1 FP.' },
-  challenge:    { what: 'A series of overcome rolls where each result matters and changes the fiction.', when: 'Extended tasks where failure at multiple stages has independent consequences.', rule: 'Each roll succeeds, fails, or ties independently. Declare all stakes before the first roll.' },
-  contest:      { what: 'Two sides competing for a goal, not fighting, but racing, arguing, or outmanoeuvring.', when: 'Chases, debates, political manoeuvring, escape sequences.', rule: 'Both sides roll every exchange. Three victories wins (default). Ties add a twist. The loser earns a Fate point.' },
-  consequence:  { what: 'An aspect a character takes to absorb a hit instead of being taken out.', when: 'When stress will not cover the overflow and the player wants to stay in the scene.', rule: 'Mild = 2 shifts. Moderate = 4. Severe = 6. Recovery needs a treatment overcome roll first.' },
-  complication: { what: 'A new aspect that enters the scene and makes everything harder.', when: 'End of a scene that resolved cleanly, or when a scene needs a second wind.', rule: 'Complications arrive with at least one free invoke. Remove them only when the fiction justifies it.' },
-  backstory:    { what: 'Targeted questions that build a character history and create hooks into the campaign.', when: 'Session zero, or when a new player joins and needs weaving into the party.', rule: 'Every answer should name another PC or NPC and leave something unresolved. Hooks are invitations, never mandates.' },
-  obstacle:     { what: 'A passive threat that opposes the party without taking initiative.', when: 'Environmental dangers, barriers, conditions. Anything that resists without rolling initiative.', rule: 'Obstacles do not act in a conflict. Passive opposition = their rating. Disable by overcoming at rating + 2.' },
-  countdown:    { what: 'A ticking clock that creates urgency without requiring direct opposition.', when: 'Whenever players risk losing momentum, or a threat has a natural deadline.', rule: 'Fill one box per trigger. The last box fires the outcome, no roll, no negotiation. Show the track openly.' },
-  constraint:   { what: 'A limitation that forces the party to change their approach rather than roll higher.', when: 'When the obvious solution is too easy, or a scene needs tactical texture without more enemies.', rule: 'Constraints do not deal stress, they change the rules. Bypass requires specific fiction, not a high roll.' },
+  npc_minor: {
+    what: 'A supporting character with one aspect, one peak skill, and one stress box.',
+    when: 'Shopkeepers, witnesses, bystanders \u2014 anyone who has one scene and a name.',
+    rule: 'No consequences \u2014 one solid hit takes them out. Use the aspect as a compel hook immediately. Never give a minor NPC a second stress box by mistake; that turns them into a major NPC.',
+    invoke: 'A PC with Athletics needs to leap a rooftop. The guard\u2019s aspect is \u201cAlways Watching the Exits\u201d. Invoke it as an obstacle \u2014 they spotted the PC\u2019s route, adding passive opposition.',
+    compel: 'The informant\u2019s weakness is \u201cDesperate for Coin\u201d. Compel it: someone offers them money mid-scene and they hesitate just long enough to blow the party\u2019s cover.',
+  },
+  npc_major: {
+    what: 'A full character: skill pyramid, stunts, dual stress tracks, and a complete aspect suite.',
+    when: 'Recurring antagonists, key allies, anyone who survives a conflict and returns.',
+    rule: 'Refresh = free invokes they can spend against the party. High Concept and Trouble are the most compellable aspects. Consequence recovery requires a treatment roll before timing starts.',
+    invoke: 'The warlord\u2019s High Concept is \u201cFeared Across Three Territories\u201d. Invoke it on a Provoke roll to intimidate the PC into backing down without combat \u2014 +2 or a reroll.',
+    compel: 'The same warlord\u2019s Trouble is \u201cI Never Forgive a Debt\u201d. Compel it when a PC who once helped them asks a favour \u2014 the warlord has to honour it, even when it costs them.',
+  },
+  faction: {
+    what: 'An organisation with a goal, method, structural weakness, and a human face.',
+    when: 'Between sessions or when players ask who is behind something.',
+    rule: 'Goal + Method = two sides of one faction aspect. The Face is the person the PCs deal with. The Weakness is how the faction can be disrupted without direct confrontation.',
+    invoke: 'The faction\u2019s aspect is \u201cResources Flow Upward, Never Down\u201d. Invoke it when they bribe a checkpoint: the bribe gets through because the faction\u2019s money is everywhere.',
+    compel: 'The same faction aspect means a local chapter is starved of supplies. Compel it: a faction lieutenant asks the PCs to help, because they can\u2019t ask headquarters without losing face.',
+  },
+  scene: {
+    what: 'Situation aspects and zones that make a location mechanically and dramatically alive.',
+    when: 'Before any scene where action is likely. Use framing questions to decide if the scene is worth playing.',
+    rule: 'Scene aspects last until the fiction changes them. Free invokes reset each scene. Zones control movement.',
+    invoke: 'The scene aspect is \u201cChoking Dust Storm Closing In\u201d. A PC uses its free invoke on a Notice roll to spot the enemy before visibility drops to zero.',
+    compel: 'The same aspect: compel it mid-fight to cut off a PC\u2019s escape route. The storm arrived early and the exit zone is now impassable \u2014 here\u2019s a Fate point.',
+  },
+  campaign: {
+    what: 'A current issue, an impending threat, and setting aspects defining what kind of world this is.',
+    when: 'Session zero, between arcs, or when the table needs a shared frame to pull against.',
+    rule: 'Current issue = what is already on fire. Impending = what happens if they do not act. Both are aspects. Use them every session or they disappear.',
+    invoke: 'The current issue is \u201cThe Water Rights War Is Already Being Fought\u201d. Invoke it when the PCs need to explain why every faction is armed \u2014 free narrative permission.',
+    compel: 'The impending issue is \u201cThe Rail Company Arrives in Sixty Days\u201d. Compel it: the company\u2019s advance scouts are already in town, asking questions, and they\u2019ve noticed the PCs.',
+  },
+  encounter: {
+    what: 'A full conflict setup: opposition, zones, stakes, twist, and starting GM fate points.',
+    when: 'Any scene with direct opposition. The twist fires mid-conflict, not in the first exchange.',
+    rule: 'GM starts with 1 FP per PC. Always state victory and defeat conditions before the first roll. The twist is optional.',
+    invoke: 'Spend a GM fate point to invoke the encounter aspect \u201cNarrow Corridors, No Flanking\u201d against a PC\u2019s Fight attack: the tight space negates their advantage.',
+    compel: 'A PC\u2019s trouble is relevant: they\u2019re \u201cKnown in Every Town\u201d. Compel it \u2014 a guard recognises them the moment they walk in and sounds the alarm.',
+  },
+  seed: {
+    what: 'A 3-scene skeleton: opening, complication, climax. Drop-in ready for one session.',
+    when: 'Session prep, unexpected cancellations, or when you need something playable in minutes.',
+    rule: 'Do not add more scenes. The constraint is the design.',
+    invoke: 'The seed\u2019s situation aspect is \u201cOld Debts Come Due Tonight\u201d. Invoke it in the opening scene to establish why the NPC called the PCs specifically \u2014 free context, no roll needed.',
+    compel: 'The same aspect in the climax: compel a PC whose trouble relates to owing favours. They can\u2019t refuse the call for help, even though they know it\u2019s a trap.',
+  },
+  compel: {
+    what: 'A situation where an aspect makes things worse in exchange for a Fate point.',
+    when: 'When a player aspect is relevant and making life harder would be more interesting.',
+    rule: 'Event compels happen to the character. Decision compels require a hard choice. Player refuses by spending 1 FP.',
+    invoke: 'Not applicable \u2014 a Compel is itself the activation of an aspect. If a player refuses, that costs them 1 FP. The GM gains nothing from invoking vs. compelling the same aspect.',
+    compel: 'A PC\u2019s trouble is \u201cI Always Finish What I Start\u201d. Event compel: the building is on fire and the target escaped, but the evidence is still inside. Here\u2019s a Fate point \u2014 do you go in?',
+  },
+  challenge: {
+    what: 'A series of overcome rolls where each result matters and changes the fiction.',
+    when: 'Extended tasks where failure at multiple stages has independent consequences.',
+    rule: 'Each roll succeeds, fails, or ties independently. Declare all stakes before the first roll.',
+    invoke: 'A PC rolls Crafts to repair the transmitter mid-challenge. Invoke the scene aspect \u201cPartially Flooded Engine Room\u201d for +2 on a creative approach: standing water conducts the signal.',
+    compel: 'Mid-challenge, a PC\u2019s High Concept \u201cSelf-Taught Mechanic\u201d gets compelled: the procedure requires training they don\u2019t have. They can solve it \u2014 but it will take an extra roll and a cost.',
+  },
+  contest: {
+    what: 'Two sides competing for a goal, not fighting, but racing, arguing, or outmanoeuvring.',
+    when: 'Chases, debates, political manoeuvring, escape sequences.',
+    rule: 'Both sides roll every exchange. Three victories wins (default). Ties add a twist. The loser earns a Fate point.',
+    invoke: 'A PC is one victory from winning the debate. Invoke their aspect \u201cI\u2019ve Read Every Document in This Archive\u201d for +2 on the final Academics roll.',
+    compel: 'The PC is ahead in a footchase but their trouble is \u201cI Never Leave Anyone Behind\u201d. Compel it: an ally just tripped. Do they keep running or stop? Here\u2019s a Fate point.',
+  },
+  consequence: {
+    what: 'An aspect a character takes to absorb a hit instead of being taken out.',
+    when: 'When stress will not cover the overflow and the player wants to stay in the scene.',
+    rule: 'Mild = 2 shifts. Moderate = 4. Severe = 6. Recovery needs a treatment overcome roll first.',
+    invoke: 'The PC took a Mild consequence: \u201cKnocked Around\u201d. In the next scene, an enemy invokes it for +2 on a Provoke roll \u2014 battered people are easier to intimidate.',
+    compel: 'Same consequence: compel it when the PC tries to climb a wall. \u201cYou\u2019re knocked around \u2014 the GM offers a Fate point. You can make the climb but you\u2019ll worsen the injury.\u201d',
+  },
+  complication: {
+    what: 'A new aspect that enters the scene and makes everything harder.',
+    when: 'End of a scene that resolved cleanly, or when a scene needs a second wind.',
+    rule: 'Complications arrive with at least one free invoke. Remove them only when the fiction justifies it.',
+    invoke: 'The complication \u201cReinforcements Called In\u201d arrives with one free invoke. Use it immediately on the new NPCs\u2019 initiative roll \u2014 they arrived coordinated and ready.',
+    compel: 'The complication is \u201cThe Safe House Is Compromised\u201d. Compel it when a PC tries to retreat there: they arrive and walk straight into an ambush. Fate point offered.',
+  },
+  pc: {
+    what: 'A complete Fate Condensed player character: 5 aspects, full skill pyramid, 3 stunts, stress tracks, and session zero questions.',
+    when: 'Session zero, one-shots, or when a player needs an instant character. Generate 3\u20134, let players pick and customise.',
+    rule: 'Skill pyramid: 1\u00d7+4, 2\u00d7+3, 3\u00d7+2, 4\u00d7+1. Refresh 3 with 3 free stunts. Physique/Will determine stress track length. All 3 consequence slots always open at creation.',
+    invoke: 'A PC\u2019s High Concept is \u201cVault-Born Archivist on First Surface Mission\u201d. Invoke it when they recall pre-war technical schematics \u2014 +2 on Lore, and the fiction earns it.',
+    compel: 'The same PC\u2019s Trouble is \u201cThe Map In My Head Has Never Been Wrong Before\u201d. Compel it when the map is wrong: they trusted it too long and now they\u2019re deep in hostile territory.',
+  },
+  backstory: {
+    what: 'Targeted questions that build a character history and create hooks into the campaign.',
+    when: 'Session zero, or when a new player joins and needs weaving into the party.',
+    rule: 'Every answer should name another PC or NPC and leave something unresolved. Hooks are invitations, never mandates.',
+    invoke: 'A backstory established that the PC \u201cOwes the Settlement That Patched Them Up\u201d. Turn it into an aspect and invoke it when the settlement sends a messenger \u2014 the PC\u2019s history opens a door.',
+    compel: 'The same aspect: compel it when the settlement asks for something dangerous. \u201cYou owe them. Here\u2019s a Fate point if you agree even though it\u2019s a terrible idea.\u201d',
+  },
+  obstacle: {
+    what: 'A passive threat that opposes the party without taking initiative.',
+    when: 'Environmental dangers, barriers, conditions. Anything that resists without rolling initiative.',
+    rule: 'Obstacles do not act in a conflict. Passive opposition = their rating. Disable by overcoming at rating + 2.',
+    invoke: 'The obstacle aspect is \u201cFloodwater Rising Fast\u201d. Invoke it against a PC\u2019s Athletics roll to cross: the water\u2019s current is now actively opposing them, not just a difficulty number.',
+    compel: 'The same obstacle: compel a PC whose trouble is \u201cI Can\u2019t Leave Anyone Behind\u201d. The water is rising and someone\u2019s stuck. Do they go back? Fate point on the table.',
+  },
+  countdown: {
+    what: 'A ticking clock that creates urgency without requiring direct opposition.',
+    when: 'Whenever players risk losing momentum, or a threat has a natural deadline.',
+    rule: 'Fill one box per trigger. The last box fires the outcome, no roll, no negotiation. Show the track openly.',
+    invoke: 'The countdown aspect is \u201cThe Convoy Reaches the Border in Four Hours\u201d. Invoke it when a PC is stalling \u2014 it\u2019s a reminder the clock is an aspect with mechanical weight.',
+    compel: 'Two boxes left. Compel a PC\u2019s trouble to fill one now: their impulsive action triggered the next stage early. Fate point, and the clock ticks forward.',
+  },
+  constraint: {
+    what: 'A limitation that forces the party to change their approach rather than roll higher.',
+    when: 'When the obvious solution is too easy, or a scene needs tactical texture without more enemies.',
+    rule: 'Constraints do not deal stress, they change the rules. Bypass requires specific fiction, not a high roll.',
+    invoke: 'The constraint is \u201cNo Weapons Inside the Negotiation Chamber\u201d. Invoke it on a Contacts roll to establish that a PC has a contact who can smuggle one in \u2014 using the rule as the hook.',
+    compel: 'Same constraint. A PC goes for their weapon anyway \u2014 compel their impulsive trouble. Guards move. The room goes hostile. Fate point, and the negotiation just became a conflict.',
+  },
 };
 
-var CV4_MONO = "'DM Mono','Courier New',Courier,monospace";
-var CV4_SANS = 'system-ui,-apple-system,sans-serif';
 
-function cv4Lbl(label, color) {
-  return h('div', {style:{fontSize:11,fontWeight:700,letterSpacing:'0.2em',color:color,fontFamily:CV4_MONO,textTransform:'uppercase',marginBottom:4,lineHeight:1}}, label);
-}
 
-function cv4Tag(text, color) {
-  return h('span', {style:{fontSize:10,fontWeight:700,letterSpacing:'0.1em',color:color,
-    border:'1px solid '+color+'55',borderRadius:3,padding:'2px 6px',marginRight:4,whiteSpace:'nowrap',display:'inline-block'}}, text);
-}
-
-function cv4Pip(color, size) {
-  size = size || 10;
-  return h('div', {style:{width:size,height:size,border:'1.5px solid '+color,borderRadius:2,flexShrink:0}});
-}
-
-function cv4SPill(name, r) {
-  var c = r >= 4 ? 'var(--c-red,#f87171)' : r >= 3 ? 'var(--gold,#fbbf24)' : r >= 2 ? 'var(--c-blue,#60a5fa)' : 'var(--text-muted)';
-  return h('div', {style:{display:'flex',alignItems:'center',gap:4}},
-    h('div', {style:{fontSize:11,fontWeight:800,color:c,fontFamily:CV4_MONO,lineHeight:1,minWidth:22,textAlign:'center'}}, '+'+r),
-    h('div', {style:{fontSize:11,color:'var(--text-dim)',fontFamily:CV4_SANS}}, name)
-  );
-}
+var CV4_MONO = "'Martian Mono','Courier New',Courier,monospace";
 
 function cv4UseReducedMotion() {
   var _r = useState(function() {
@@ -997,25 +1082,229 @@ function cv4InjectStyles() {
     if (document.getElementById('ogma-cv4-styles')) return;
     var s = document.createElement('style');
     s.id = 'ogma-cv4-styles';
-    s.textContent = '.cv4-card{transition:box-shadow .2s,border-color .2s}.cv4-body{transition:opacity .13s ease;scrollbar-width:thin}.cv4-body.cv4-fading{opacity:0!important}.cv4-body::-webkit-scrollbar{width:4px}.cv4-body::-webkit-scrollbar-thumb{background:var(--border-mid,rgba(255,255,255,0.14));border-radius:2px}@keyframes cv4pulse{0%,100%{opacity:1}50%{opacity:.4}}';
+    s.textContent = [
+      '.fd-card{transition:transform .2s cubic-bezier(.34,1.56,.64,1),box-shadow .2s ease,border-color .15s}',
+      '@keyframes fd-stamp-in{from{opacity:0;transform:scale(.95) rotate(-.4deg)}to{opacity:1;transform:none}}',
+      '@keyframes fd-box-stamp{from{transform:scale(1.4)}to{transform:none}}',
+      '@keyframes fd-clock-tick{from{transform:scaleY(.7)}to{transform:none}}',
+      '@keyframes cv4pulse{0%,100%{opacity:1}50%{opacity:.4}}',
+      '@keyframes fadeDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}'
+    ].join('');
     document.head.appendChild(s);
   } catch(e) {}
 }
+var CV4_SANS = "'Fraunces',Georgia,'Times New Roman',serif";
+var CV4_BODY = "system-ui,-apple-system,sans-serif";
 
-function cv4BackPanel(genId, catColor) {
-  var help = CV4_HELP[genId] || {what:'',when:'',rule:''};
-  return h('div', {style:{flex:1,overflow:'hidden',padding:'10px 14px 0',display:'flex',gap:12}},
-    h('div', {style:{flex:1,display:'flex',flexDirection:'column',gap:10,minWidth:0}},
-      h('div', null, cv4Lbl('WHAT IT GENERATES', catColor), h('p', {style:{margin:0,fontSize:11,color:'var(--text)',lineHeight:1.65,fontFamily:CV4_SANS}}, help.what)),
-      h('div', null, cv4Lbl('WHEN TO USE IT', catColor), h('p', {style:{margin:0,fontSize:11,color:'var(--text-dim)',lineHeight:1.65,fontFamily:CV4_SANS}}, help.when))
-    ),
-    h('div', {style:{width:192,flexShrink:0,background:'var(--inset)',border:'1px solid '+catColor+'33',borderLeft:'3px solid '+catColor,borderRadius:'0 6px 6px 0',padding:'10px 12px'}},
-      cv4Lbl('TABLE RULE', catColor),
-      h('p', {style:{margin:0,fontSize:11,color:'var(--text-dim)',lineHeight:1.7,fontFamily:CV4_SANS}}, help.rule)
+// ── Field Dispatch cv4 helpers ────────────────────────────────────────────
+
+function cv4Lbl(label, color) {
+  return h('div', {style:{
+    fontSize:10, fontWeight:800, letterSpacing:'0.22em', color:color||'var(--text-muted)',
+    fontFamily:CV4_MONO, textTransform:'uppercase', marginBottom:4, lineHeight:1
+  }}, label);
+}
+
+function cv4Tag(text, color) {
+  return h('span', {style:{
+    fontSize:10, fontWeight:800, letterSpacing:'0.12em', color:color,
+    border:'1.5px solid '+color+'66', borderRadius:2, padding:'2px 6px',
+    marginRight:4, whiteSpace:'nowrap', display:'inline-block',
+    fontFamily:CV4_MONO
+  }}, text);
+}
+
+function cv4Pip(color, size) {
+  size = size || 10;
+  return h('div', {style:{width:size, height:size, border:'1.5px solid '+color, borderRadius:1, flexShrink:0}});
+}
+
+function cv4SPill(name, r) {
+  var c = r >= 4 ? 'var(--c-red,#E06060)' : r >= 3 ? 'var(--gold,#C8A050)' : r >= 2 ? 'var(--c-blue,#5AC8FA)' : 'var(--text-muted)';
+  return h('div', {style:{display:'flex', alignItems:'center', gap:5}},
+    h('div', {style:{
+      fontSize:11, fontWeight:800, color:'var(--cv-card-dark,#1A1610)', background:c,
+      fontFamily:CV4_MONO, lineHeight:1, minWidth:26, textAlign:'center',
+      padding:'2px 5px', borderRadius:2
+    }}, '+'+r),
+    h('div', {style:{fontSize:12, color:'var(--cv-card-text-dim)', fontFamily:CV4_SANS, fontStyle:'italic'}}, name)
+  );
+}
+
+function cv4Inset(children, sx) {
+  return h('div', {style:Object.assign({
+    padding:'7px 10px',
+    background:'var(--inset)',
+    border:'1px solid var(--cv-card-bdr,var(--border))',
+    borderRadius:2
+  }, sx||{})}, children);
+}
+
+function cv4Accent(children, color, sx) {
+  return h('div', {style:Object.assign({
+    padding:'7px 10px',
+    background:'color-mix(in srgb,'+color+' 8%,var(--cv-card-dark,var(--panel)))',
+    border:'1px solid '+color+'33',
+    borderLeft:'3px solid '+color,
+    borderRadius:'0 2px 2px 0'
+  }, sx||{})}, children);
+}
+
+function cv4StressTrack(label, hits, setHits, color) {
+  return h('div', null,
+    cv4Lbl(label, color),
+    h('div', {style:{display:'flex', gap:4, flexWrap:'wrap'}},
+      hits.map(function(v, i) {
+        return h('div', {
+          key:i,
+          role:'checkbox',
+          tabIndex:0,
+          'aria-checked':String(!!v),
+          'aria-label':label+' stress box '+(i+1)+(v?' (marked)':' (clear)'),
+          onClick:function(e){
+            e.stopPropagation();
+            var a=hits.slice(); a[i]=!a[i]; setHits(a);
+          },
+          onKeyDown:function(e){
+            if(e.key===' '||e.key==='Enter'){
+              e.preventDefault();
+              var a=hits.slice(); a[i]=!a[i]; setHits(a);
+            }
+          },
+          style:{
+            width:18, height:18, borderRadius:2,
+            border:'2px solid '+color,
+            background:v?color:'transparent',
+            cursor:'pointer', flexShrink:0,
+            transition:'all 0.12s cubic-bezier(0.34,1.56,0.64,1)',
+            position:'relative',
+            animation:v?'fd-box-stamp 0.2s cubic-bezier(0.34,1.56,0.64,1)':'none',
+          },
+        },
+          v&&h('span',{style:{
+            position:'absolute', inset:0, display:'flex', alignItems:'center',
+            justifyContent:'center', fontSize:10, fontWeight:800,
+            color:'var(--cv-card-dark,#1A1610)', lineHeight:1, pointerEvents:'none',
+            fontFamily:CV4_MONO
+          }},'\u2715')
+        );
+      })
     )
   );
 }
 
+function cv4Clock(boxes, filled, setFilled, color) {
+  var full = filled >= boxes;
+  return h('div', null,
+    cv4Lbl('CLOCK \u2014 '+boxes+' BOXES'+(full?' \u2014 TRIGGERED!':''), full?'var(--c-red,#E06060)':color),
+    h('div', {style:{display:'flex', gap:5, flexWrap:'wrap', marginBottom:4}},
+      Array.from({length:boxes}).map(function(_,i) {
+        var ticked = i < filled;
+        return h('div', {
+          key:i,
+          role:'checkbox',
+          tabIndex:0,
+          'aria-checked':String(ticked),
+          'aria-label':'Clock box '+(i+1)+(ticked?' (ticked)':' (empty)'),
+          onClick:function(e){e.stopPropagation();setFilled(ticked?i:i+1);},
+          onKeyDown:function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();setFilled(ticked?i:i+1);}},
+          style:{
+            width:28, height:28, borderRadius:2, cursor:'pointer',
+            border:'2px solid '+(full?'var(--c-red,#E06060)':color),
+            background:ticked
+              ?'color-mix(in srgb,'+(full?'var(--c-red,#E06060)':color)+' 35%,var(--cv-card-dark,#1A1610))'
+              :'transparent',
+            transition:'all 0.18s cubic-bezier(0.34,1.56,0.64,1)',
+            display:'flex', alignItems:'center', justifyContent:'center',
+            animation:ticked?'fd-clock-tick 0.2s cubic-bezier(0.34,1.56,0.64,1)':'none',
+          },
+        },
+          ticked&&h('span',{style:{
+            fontSize:12, fontWeight:800,
+            color:full?'var(--c-red,#E06060)':color,
+            pointerEvents:'none', fontFamily:CV4_MONO
+          }},'\u2713')
+        );
+      })
+    ),
+    full&&h('div',{style:{
+      fontSize:11, fontWeight:800, color:'var(--c-red,#E06060)', fontFamily:CV4_MONO,
+      letterSpacing:'0.18em', animation:'cv4pulse 0.6s ease-in-out infinite'
+    }},'\u26a1 CLOCK FULL \u2014 TRIGGER NOW')
+  );
+}
+
+function cv4Body(left, right, rightWidth) {
+  // Field Dispatch: left column + optional right data column
+  return h('div', {style:{flex:1, padding:'12px 16px 14px', display:'flex', gap:14}},
+    h('div', {style:{flex:1, display:'flex', flexDirection:'column', gap:8, minWidth:0}}, left),
+    right && h('div', {style:{width:rightWidth||144, flexShrink:0, display:'flex', flexDirection:'column', gap:8}}, right)
+  );
+}
+
+// ── cv4BackPanel — GM guidance inline footer ───────────────────────────────
+function cv4BackPanel(genId, catColor) {
+  var help = CV4_HELP[genId] || {what:'',when:'',rule:'',invoke:'',compel:''};
+  var accentBlue  = 'var(--c-blue,#60a5fa)';
+  var accentGreen = 'var(--c-green,#4CD964)';
+  return h('div', {style:{padding:'12px 16px 14px', display:'flex', flexDirection:'column', gap:10}},
+
+    // ── What / When ──────────────────────────────────────────────────────
+    h('div', {style:{display:'flex', gap:12}},
+      h('div', {style:{flex:1}},
+        cv4Lbl('WHAT IT GENERATES', catColor),
+        h('p', {style:{margin:0, fontSize:11, color:'var(--cv-card-text-dim)', lineHeight:1.65, fontFamily:CV4_BODY}}, help.what)
+      ),
+      h('div', {style:{flex:1}},
+        cv4Lbl('WHEN TO USE IT', catColor),
+        h('p', {style:{margin:0, fontSize:11, color:'var(--cv-card-text-dim)', lineHeight:1.65, fontFamily:CV4_BODY}}, help.when)
+      )
+    ),
+
+    // ── Table rule ───────────────────────────────────────────────────────
+    h('div', {style:{
+      padding:'8px 12px',
+      background:'color-mix(in srgb,'+catColor+' 8%,var(--cv-card-dark,var(--panel)))',
+      borderLeft:'3px solid '+catColor,
+      borderRadius:'0 2px 2px 0'
+    }},
+      cv4Lbl('TABLE RULE', catColor),
+      h('p', {style:{margin:0, fontSize:11, color:'var(--cv-card-text-dim)', lineHeight:1.7, fontFamily:CV4_BODY}}, help.rule)
+    ),
+
+    // ── Invoke + Compel examples ─────────────────────────────────────────
+    (help.invoke || help.compel) && h('div', {style:{display:'flex', gap:8}},
+      help.invoke && h('div', {style:{
+        flex:1, padding:'8px 10px',
+        background:'color-mix(in srgb,'+accentBlue+' 8%,var(--cv-card-dark,var(--panel)))',
+        borderLeft:'3px solid '+accentBlue,
+        borderRadius:'0 2px 2px 0'
+      }},
+        h('div', {style:{display:'flex', alignItems:'center', gap:5, marginBottom:4}},
+          cv4Lbl('INVOKE', accentBlue),
+          h('span', {style:{fontSize:9, color:accentBlue, fontFamily:CV4_MONO, opacity:0.7, letterSpacing:'0.1em'}}, 'EXAMPLE')
+        ),
+        h('p', {style:{margin:0, fontSize:11, color:'var(--cv-card-text-dim)', lineHeight:1.6, fontFamily:CV4_BODY}}, help.invoke)
+      ),
+      help.compel && h('div', {style:{
+        flex:1, padding:'8px 10px',
+        background:'color-mix(in srgb,var(--c-red,#E06060) 8%,var(--cv-card-dark,var(--panel)))',
+        borderLeft:'3px solid var(--c-red,#E06060)',
+        borderRadius:'0 2px 2px 0'
+      }},
+        h('div', {style:{display:'flex', alignItems:'center', gap:5, marginBottom:4}},
+          cv4Lbl('COMPEL', 'var(--c-red,#E06060)'),
+          h('span', {style:{fontSize:9, color:'var(--c-red,#E06060)', fontFamily:CV4_MONO, opacity:0.7, letterSpacing:'0.1em'}}, 'EXAMPLE')
+        ),
+        h('p', {style:{margin:0, fontSize:11, color:'var(--cv-card-text-dim)', lineHeight:1.6, fontFamily:CV4_BODY}}, help.compel)
+      )
+    )
+  );
+}
+
+// ── Field Dispatch cv4Card ─────────────────────────────────────────────────
+// Auto-height. No fixed width/height. Stamp band top. No flip — GM guidance
+// lives in a collapsible footer section below the card content.
 function cv4Card(props) {
   var genId    = props.genId;
   var campName = props.campName || '';
@@ -1023,13 +1312,11 @@ function cv4Card(props) {
   var frontFn  = props.frontFn;
   var onUpdate = props.onUpdate || null;
 
-  var _back = useState(false); var isBack = _back[0]; var setIsBack = _back[1];
-  var _vis  = useState(true);  var visible = _vis[0];  var setVisible = _vis[1];
-  var _hov  = useState(false); var hovered = _hov[0];  var setHovered = _hov[1];
+  var _gmOpen = useState(false); var gmOpen = _gmOpen[0]; var setGmOpen = _gmOpen[1];
+  var _hov    = useState(false); var hovered = _hov[0];   var setHovered = _hov[1];
+  var _vis    = useState(true);  var visible = _vis[0];   var setVisible = _vis[1];
   var reduced = cv4UseReducedMotion();
-  var pending = useRef(false);
 
-  // Interactive state for stress/countdown/contest/consequence
   var phyMax = typeof data.physical_stress === 'number' ? data.physical_stress : (typeof data.stress === 'number' ? data.stress : 0);
   var menMax = typeof data.mental_stress === 'number' ? data.mental_stress : 0;
   var _st = useState(function() {
@@ -1057,151 +1344,99 @@ function cv4Card(props) {
 
   useEffect(function() { cv4InjectStyles(); }, []);
 
-  function doFlip() {
-    if (pending.current) return;
-    if (reduced) { setIsBack(function(b) { return !b; }); return; }
-    pending.current = true;
+  // Entry fade
+  useEffect(function() {
+    if (reduced) return;
     setVisible(false);
-    setTimeout(function() {
-      setIsBack(function(b) { return !b; });
-      setVisible(true);
-      pending.current = false;
-    }, 130);
-  }
-
-  function handleKey(e) {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); doFlip(); }
-  }
+    var t = setTimeout(function() { setVisible(true); }, 30);
+    return function() { clearTimeout(t); };
+  }, [genId, data]);
 
   var genLabel = genId.replace(/_/g, ' ').toUpperCase();
-  var ariaLabel = genLabel + ' card' + (campName ? ' from ' + campName : '') +
-    '. Currently showing ' + (isBack ? 'GM guidance' : 'card content') +
-    '. Activate to ' + (isBack ? 'return to card' : 'see GM guidance') + '.';
+  var ariaLabel = genLabel + ' card' + (campName ? ' from ' + campName : '');
 
   return h('div', {
-    className: 'cv4-card',
+    className: 'fd-card',
     role: 'region',
     'aria-label': ariaLabel,
     onMouseEnter: function() { setHovered(true); },
     onMouseLeave: function() { setHovered(false); },
     style: {
-      width: 600, height: 380,
-      background: 'var(--panel)',
-      border: '1px solid ' + (hovered ? catColor + '99' : 'var(--border)'),
-      borderRadius: 10, overflow: 'hidden',
-      display: 'flex', flexDirection: 'column',
-      boxShadow: hovered ? '0 6px 28px ' + catColor + '30, 0 2px 8px rgba(0,0,0,0.3)' : '0 2px 12px rgba(0,0,0,0.25)',
-      flexShrink: 0,
+      background: 'var(--cv-card-dark,var(--panel))',
+      border: '1px solid ' + (hovered ? catColor + 'AA' : 'var(--cv-card-bdr,var(--border))'),
+      borderRadius: 3,
+      overflow: 'hidden',
+      display: 'flex',
+      flexDirection: 'column',
+      boxShadow: hovered
+        ? '5px 7px 0 rgba(0,0,0,0.18), 0 0 0 1px ' + catColor + '44'
+        : '3px 3px 0 rgba(0,0,0,0.18)',
+      transform: hovered ? 'translateY(-3px) rotate(0.25deg)' : 'none',
+      transition: 'transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s ease, border-color 0.15s',
+      animation: reduced ? 'none' : 'fd-stamp-in 0.35s cubic-bezier(0.34,1.56,0.64,1) both',
+      opacity: visible ? 1 : 0,
     },
   },
-    h('div', {style:{height:36,flexShrink:0,
-      background: isBack ? 'color-mix(in srgb,'+catColor+' 12%,var(--inset))' : 'color-mix(in srgb,'+catColor+' 18%,var(--cv-card-dark2,var(--inset)))',
-      borderBottom:'1px solid '+catColor+'44',
-      display:'flex',alignItems:'center',padding:'0 14px',gap:8}},
-      h('span', {style:{fontSize:13,color:catColor,lineHeight:1,flexShrink:0}}, meta.icon),
-      h('span', {style:{fontSize:11,fontWeight:800,letterSpacing:'0.18em',color:catColor,fontFamily:CV4_MONO}},
-        isBack ? 'GM GUIDE \u2014 ' + genLabel : genLabel),
+    // ── Stamp band ────────────────────────────────────────────────────────
+    h('div', {style:{
+      height: 5,
+      background: catColor,
+      flexShrink: 0,
+    }}),
+    // ── Header ────────────────────────────────────────────────────────────
+    h('div', {style:{
+      height: 34, flexShrink: 0,
+      borderBottom: '1px solid ' + catColor + '33',
+      display: 'flex', alignItems: 'center', padding: '0 14px', gap: 8,
+      background: 'color-mix(in srgb,'+catColor+' 6%,var(--cv-card-dark,var(--panel)))',
+    }},
+      h('span', {style:{fontSize:14, color:catColor, lineHeight:1, flexShrink:0}}, meta.icon),
+      h('span', {style:{
+        fontSize:10, fontWeight:800, letterSpacing:'0.22em', color:catColor,
+        fontFamily:CV4_MONO, textTransform:'uppercase'
+      }}, genLabel),
       h('div', {style:{flex:1}}),
-      campName && h('span', {style:{fontSize:11,color:'var(--text-muted)',fontFamily:CV4_SANS,letterSpacing:'0.05em'}}, campName)
+      campName && h('span', {style:{
+        fontSize:10, color:'var(--cv-card-text-muted)', fontFamily:CV4_MONO,
+        letterSpacing:'0.08em', fontStyle:'italic'
+      }}, campName)
     ),
+    // ── Card body ─────────────────────────────────────────────────────────
+    h('div', {style:{flexShrink:0}},
+      frontFn(genId, data, campName, catColor, {state:cardState, upd:updState, phyMax:phyMax, menMax:menMax})
+    ),
+    // ── GM Guidance footer (expandable) ───────────────────────────────────
     h('div', {
-      className: 'cv4-body' + (!visible ? ' cv4-fading' : ''),
-      style: {flex:1, overflow:'auto', opacity: visible ? 1 : 0},
+      style:{
+        borderTop: '1px solid ' + catColor + '22',
+        flexShrink: 0,
+      }
     },
-      isBack ? cv4BackPanel(genId, catColor) : frontFn(genId, data, campName, catColor, {state:cardState, upd:updState, phyMax:phyMax, menMax:menMax})
-    ),
-    h('div', {
-      role: 'button', tabIndex: 0,
-      'aria-pressed': String(isBack),
-      onClick: doFlip, onKeyDown: handleKey,
-      style:{height:30,flexShrink:0,background:'var(--cv-card-dark2,var(--inset))',
-        borderTop:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'center',
-        cursor:'pointer',userSelect:'none',
-        transition:'background .15s'},
-      onMouseEnter:function(e){e.currentTarget.style.background='color-mix(in srgb,'+catColor+' 12%,var(--inset))';},
-      onMouseLeave:function(e){e.currentTarget.style.background='var(--cv-card-dark2,var(--inset))';},
-    },
-      h('span', {style:{fontSize:11,color:'var(--text-muted)',letterSpacing:'0.2em',fontFamily:CV4_MONO,pointerEvents:'none'}},
-        isBack ? '\u25c4  RETURN TO CARD' : '\u25ba  FLIP FOR GM GUIDANCE')
-    )
-  );
-}
-
-function cv4Body(left, right, rightWidth) {
-  return h('div', {style:{flex:1,overflow:'hidden',padding:'10px 14px 0',display:'flex',gap:12}},
-    h('div', {style:{flex:1,display:'flex',flexDirection:'column',gap:6,minWidth:0,overflow:'hidden'}}, left),
-    right && h('div', {style:{width:rightWidth||140,flexShrink:0,display:'flex',flexDirection:'column',gap:7}}, right)
-  );
-}
-
-function cv4Inset(children, sx) {
-  return h('div', {style:Object.assign({padding:'5px 9px',background:'var(--inset)',border:'1px solid var(--border)',borderRadius:5}, sx||{})}, children);
-}
-
-function cv4Accent(children, color, sx) {
-  return h('div', {style:Object.assign({padding:'5px 9px',background:'color-mix(in srgb,'+color+' 10%,var(--inset))',border:'1px solid '+color+'44',borderLeft:'3px solid '+color,borderRadius:'0 5px 5px 0'}, sx||{})}, children);
-}
-
-// ── Interactive stress track ─────────────────────────────────────────────────
-function cv4StressTrack(label, hits, setHits, color) {
-  return h('div', null,
-    cv4Lbl(label, color),
-    h('div', {style:{display:'flex',gap:4}},
-      hits.map(function(v, i) {
-        return h('div', {
-          key:i,
-          role:'checkbox',
-          tabIndex:0,
-          'aria-checked':String(!!v),
-          'aria-label':label+' stress box '+(i+1)+(v?' (marked)':' (clear)'),
-          onClick:function(e){e.stopPropagation();var a=hits.slice();a[i]=!a[i];setHits(a);},
-          onKeyDown:function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();var a=hits.slice();a[i]=!a[i];setHits(a);}},
-          style:{
-            width:18,height:18,borderRadius:3,
-            border:'2px solid '+color,
-            background:v?color:'transparent',
-            cursor:'pointer',flexShrink:0,
-            transition:'background .12s',
-            position:'relative',
-          },
+      h('button', {
+        onClick: function(e){ e.stopPropagation(); setGmOpen(function(v){return !v;}); },
+        onKeyDown: function(e){ if(e.key==='Enter'||e.key===' '){e.preventDefault();setGmOpen(function(v){return !v;});} },
+        'aria-expanded': String(gmOpen),
+        'aria-controls': 'gm-guide-'+genId,
+        style:{
+          width:'100%', height:28, background:'transparent', border:'none',
+          cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
+          gap:6, fontFamily:CV4_MONO, fontSize:10, fontWeight:700, letterSpacing:'0.18em',
+          color: gmOpen ? catColor : 'var(--cv-card-text-muted)',
+          textTransform:'uppercase',
+          transition:'color 0.12s',
         },
-          v&&h('span',{style:{position:'absolute',inset:0,display:'flex',alignItems:'center',
-            justifyContent:'center',fontSize:11,fontWeight:700,
-            color:v?'var(--bg,#0d1117)':'transparent',lineHeight:1,pointerEvents:'none'}},'\u2715')
-        );
-      })
+      },
+        h('span', {style:{fontSize:8, lineHeight:1}}, gmOpen?'\u25bc':'\u25ba'),
+        'GM Guidance'
+      ),
+      gmOpen && h('div', {
+        id: 'gm-guide-'+genId,
+        style:{
+          borderTop: '1px solid ' + catColor + '22',
+          animation: 'fadeDown 0.15s ease both',
+        }
+      }, cv4BackPanel(genId, catColor))
     )
-  );
-}
-
-// ── Interactive countdown clock ──────────────────────────────────────────────
-function cv4Clock(boxes, filled, setFilled, color) {
-  var full = filled >= boxes;
-  return h('div', null,
-    cv4Lbl('CLOCK \u2014 '+boxes+' BOXES'+(full?' \u2014 TRIGGERED!':''), full?'var(--c-red,#f87171)':color),
-    h('div', {style:{display:'flex',gap:4,flexWrap:'wrap',marginBottom:4}},
-      Array.from({length:boxes}).map(function(_,i) {
-        var ticked = i < filled;
-        return h('div', {
-          key:i,
-          role:'checkbox',
-          tabIndex:0,
-          'aria-checked':String(ticked),
-          'aria-label':'Clock box '+(i+1)+(ticked?' (ticked)':' (empty)'),
-          onClick:function(e){e.stopPropagation();setFilled(ticked?i:i+1);},
-          onKeyDown:function(e){if(e.key===' '||e.key==='Enter'){e.preventDefault();setFilled(ticked?i:i+1);}},
-          style:{
-            width:26,height:26,borderRadius:4,cursor:'pointer',
-            border:'2px solid '+(full?'var(--c-red,#f87171)':color),
-            background:ticked?'color-mix(in srgb,'+(full?'var(--c-red,#f87171)':color)+' 40%,transparent)':'transparent',
-            transition:'all .15s',display:'flex',alignItems:'center',justifyContent:'center',
-          },
-        },
-          ticked&&h('span',{style:{fontSize:11,fontWeight:700,color:full?'var(--c-red,#f87171)':color,pointerEvents:'none'}},'\u2713')
-        );
-      })
-    ),
-    full&&h('div',{style:{fontSize:11,fontWeight:700,color:'var(--c-red,#f87171)',fontFamily:CV4_MONO,letterSpacing:'0.15em',animation:'cv4pulse 0.6s ease-in-out'}},'\u26a1 CLOCK FULL \u2014 TRIGGER NOW')
   );
 }
 
@@ -1563,11 +1798,124 @@ function cv4FrontConstraint(genId, d, campName, catColor) {
 }
 
 
+function cv4FrontPc(genId, d, campName, catColor) {
+  var asp = d.aspects || {};
+  var skills = Array.isArray(d.skills) ? d.skills : [];
+  var stunts = Array.isArray(d.stunts) ? d.stunts : [];
+  var LADDER = {4:'Great',3:'Good',2:'Fair',1:'Average',0:'Mediocre'};
+
+  // Group skills by rating for compact pyramid display
+  var byRating = {};
+  skills.forEach(function(s) {
+    var r = s.r || 0;
+    if (!byRating[r]) byRating[r] = [];
+    byRating[r].push(s.name);
+  });
+  var pyramidRatings = [4,3,2,1].filter(function(r){ return byRating[r] && byRating[r].length; });
+
+  return cv4Body([
+    // Name
+    h('div', {style:{fontSize:16, fontWeight:900, color:'var(--text)', fontFamily:CV4_MONO, lineHeight:1.1, marginBottom:4}}, d.name || ''),
+
+    // High Concept + Trouble
+    cv4Accent([
+      cv4Lbl('HIGH CONCEPT', catColor),
+      h('p', {style:{margin:0, fontSize:12, fontWeight:700, color:'var(--text)', fontFamily:CV4_SANS, lineHeight:1.35, fontStyle:'italic'}}, asp.high_concept || ''),
+    ], catColor),
+    cv4Accent([
+      cv4Lbl('TROUBLE', 'var(--c-red,#f87171)'),
+      h('p', {style:{margin:0, fontSize:11, fontWeight:600, color:'var(--c-red,#f87171)', fontFamily:CV4_SANS, lineHeight:1.35, fontStyle:'italic'}}, asp.trouble || ''),
+    ], 'var(--c-red,#f87171)'),
+
+    // Other aspects
+    [asp.other1, asp.other2, asp.other3].filter(Boolean).length > 0 &&
+      cv4Inset([
+        cv4Lbl('OTHER ASPECTS', catColor),
+        [asp.other1, asp.other2, asp.other3].filter(Boolean).map(function(a, i) {
+          return h('p', {key:i, style:{margin:0, fontSize:11, color:'var(--text)', fontFamily:CV4_SANS, lineHeight:1.4, fontStyle:'italic',
+            borderLeft:'2px solid '+catColor+'44', paddingLeft:7, marginBottom: i < 2 ? 4 : 0}}, a);
+        })
+      ]),
+
+  ],[
+    // Skill pyramid
+    cv4Inset([
+      cv4Lbl('SKILLS', catColor),
+      h('div', {style:{display:'flex', flexDirection:'column', gap:3, marginTop:3}},
+        pyramidRatings.map(function(r) {
+          return h('div', {key:r, style:{display:'flex', alignItems:'baseline', gap:5}},
+            h('div', {style:{fontSize:10, fontWeight:800, color:catColor, fontFamily:CV4_MONO, width:52, flexShrink:0}},
+              '+'+r+' '+LADDER[r]),
+            h('div', {style:{fontSize:10, color:'var(--text-dim)', fontFamily:CV4_SANS}},
+              byRating[r].join(', '))
+          );
+        })
+      )
+    ]),
+
+    // Stress tracks
+    h('div', {style:{display:'flex', gap:6, marginTop:4}},
+      h('div', {style:{flex:1}},
+        cv4StressTrack('PHYS', Array(d.physical_stress || 3).fill(false), function(){}, catColor)
+      ),
+      h('div', {style:{flex:1}},
+        cv4StressTrack('MENT', Array(d.mental_stress || 3).fill(false), function(){}, catColor)
+      )
+    ),
+
+    // Refresh + consequences
+    h('div', {style:{display:'flex', gap:8, alignItems:'center', marginTop:4}},
+      h('div', {style:{textAlign:'center'}},
+        cv4Lbl('REFRESH', catColor),
+        h('div', {style:{fontSize:18, fontWeight:900, color:catColor, fontFamily:CV4_MONO, lineHeight:1}},
+          String(d.refresh || 3))
+      ),
+      h('div', {style:{flex:1}},
+        cv4Lbl('CONSEQUENCES', catColor),
+        h('div', {style:{display:'flex', flexDirection:'column', gap:2, marginTop:2}},
+          (d.consequences||[2,4,6]).map(function(shift, i) {
+            var label = ['Mild','Moderate','Severe'][i] || 'Severe';
+            return h('div', {key:i, style:{display:'flex', alignItems:'center', gap:4}},
+              h('div', {style:{fontSize:9, fontWeight:800, color:'var(--text-muted)', fontFamily:CV4_MONO, width:52, flexShrink:0}},
+                label+' (-'+shift+')'),
+              h('div', {style:{flex:1, height:1, borderBottom:'1px dashed var(--border)'}}));
+          })
+        )
+      )
+    ),
+
+    // Stunts
+    stunts.length > 0 && cv4Inset([
+      cv4Lbl('STUNTS', catColor),
+      stunts.map(function(st, i) {
+        return h('div', {key:i, style:{marginBottom: i < stunts.length-1 ? 5 : 0}},
+          h('div', {style:{fontSize:11, fontWeight:700, color:'var(--text)', fontFamily:CV4_SANS}},
+            (st.name || '') + (st.skill ? h('span',{style:{color:catColor,fontSize:10,fontFamily:CV4_MONO}},' ['+st.skill+']') : '')),
+          h('div', {style:{fontSize:10, color:'var(--text-muted)', fontFamily:CV4_SANS, lineHeight:1.4, marginTop:1}},
+            st.desc || '')
+        );
+      })
+    ]),
+
+    // Session zero questions
+    Array.isArray(d.questions) && d.questions.length > 0 &&
+      cv4Inset([
+        cv4Lbl('SESSION ZERO QUESTIONS', catColor),
+        d.questions.map(function(q, i) {
+          return h('p', {key:i, style:{margin:0, marginBottom: i<d.questions.length-1?4:0,
+            fontSize:11, color:'var(--text-dim)', fontFamily:CV4_SANS, lineHeight:1.45,
+            paddingLeft:10, borderLeft:'2px solid '+catColor+'44'}}, q);
+        })
+      ]),
+
+  ], 220);
+}
+
 var CV4_FRONTS = {
   npc_minor:cv4FrontNpcMinor, npc_major:cv4FrontNpcMajor, faction:cv4FrontFaction,
   scene:cv4FrontScene, campaign:cv4FrontCampaign, encounter:cv4FrontEncounter, seed:cv4FrontSeed,
   compel:cv4FrontCompel, challenge:cv4FrontChallenge, contest:cv4FrontContest, consequence:cv4FrontConsequence,
-  complication:cv4FrontComplication, backstory:cv4FrontBackstory, obstacle:cv4FrontObstacle,
+  complication:cv4FrontComplication, pc:cv4FrontPc, backstory:cv4FrontBackstory, obstacle:cv4FrontObstacle,
   countdown:cv4FrontCountdown, constraint:cv4FrontConstraint,
 };
 

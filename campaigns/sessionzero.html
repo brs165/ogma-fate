@@ -3,6 +3,9 @@
 <head>
   <script>(function(){try{var p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');var t=p.theme||localStorage.getItem('fate_theme')||localStorage.getItem('fate-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})()</script>
   <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,900;1,9..144,500&family=Martian+Mono:wght@400;700;800&display=swap" rel="stylesheet">
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Prep Wizard — Ogma</title>
@@ -22,7 +25,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicons/icon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicons/apple-touch-icon.png">
   <link rel="manifest" href="../manifest.json">
-  <link rel="stylesheet" href="../assets/css/theme.css?v=343">
+  <link rel="stylesheet" href="../assets/css/theme.css?v=359">
   <style>
     /* ── PREP WIZARD SHELL ──────────────────────────────────────── */
     .pw-root{min-height:100vh;display:flex;flex-direction:column;background:var(--bg)}
@@ -154,7 +157,7 @@
     <span class="topbar-crumb-item current" aria-current="page">Prep Wizard</span>
   </nav>
   <div class="topbar-status">
-    <a href="/campaigns/run.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">▶ Run</a>
+    <a href="/campaigns/board.html?mode=play" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">▶ Run</a>
     <a href="/campaigns/character-creation.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">🎭 Character Creation</a>
     <a href="../help/index.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">📖 Help</a>
     <button class="btn btn-icon btn-ghost" onclick="(function(){var n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(p));}catch(e){}})()" title="Toggle theme" aria-label="Toggle theme">◑</button>
@@ -167,23 +170,23 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" integrity="sha384-tMH8h3BGESGckSAVGZ82T9n90ztNXxvdwvdM6UoR56cYcf+0iGXBliJ29D+wZ/x8" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" integrity="sha384-bm7MnzvK++ykSwVJ2tynSE5TRdN+xL418osEVF2DE/L/gfWHj91J2Sphe582B1Bh" crossorigin="anonymous"></script>
-<script src="../data/shared.js?v=343"></script>
-<script src="../data/universal.js?v=343"></script>
-<script src="../data/thelongafter.js?v=343"></script>
-<script src="../data/cyberpunk.js?v=343"></script>
-<script src="../data/fantasy.js?v=343"></script>
-<script src="../data/space.js?v=343"></script>
-<script src="../data/victorian.js?v=343"></script>
-<script src="../data/postapoc.js?v=343"></script>
-<script src="../data/western.js?v=343"></script>
-<script src="../data/dVentiRealm.js?v=343"></script>
+<script src="../data/shared.js?v=359"></script>
+<script src="../data/universal.js?v=359"></script>
+<script src="../data/thelongafter.js?v=359"></script>
+<script src="../data/cyberpunk.js?v=359"></script>
+<script src="../data/fantasy.js?v=359"></script>
+<script src="../data/space.js?v=359"></script>
+<script src="../data/victorian.js?v=359"></script>
+<script src="../data/postapoc.js?v=359"></script>
+<script src="../data/western.js?v=359"></script>
+<script src="../data/dVentiRealm.js?v=359"></script>
 <script src="../core/config.js?v=1"></script>
-<script src="../core/engine.js?v=343"></script>
+<script src="../core/engine.js?v=359"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dexie/4.0.10/dexie.min.js" integrity="sha384-3VWLzUTczDc/wazaoH+b5qG4iME0duPONRO281rRiaFkfpV/b3w5uxrvod7rCHcW" crossorigin="anonymous"></script>
-<script src="../core/db.js?v=343"></script>
-<script src="../core/ui-primitives.js?v=343"></script>
-<script src="../core/ui-renderers.js?v=343"></script>
-<script src="../core/ui-table.js?v=343"></script>
+<script src="../core/db.js?v=359"></script>
+<script src="../core/ui-primitives.js?v=359"></script>
+<script src="../core/ui-renderers.js?v=359"></script>
+<script src="../core/ui-table.js?v=359"></script>
 
 <script>
 (function() {
@@ -672,6 +675,37 @@
       DB.clearSession(IDB_KEY).catch(function(){});
     }
 
+    function exportWizardSession() {
+      var cards = [];
+      if (keptSeed && seedData)
+        cards.push({id:'wiz_seed',  genId:'seed',      title:seedData.location||'Seed',   data:seedData,  tags:[], ts:Date.now()});
+      if (keptScene && sceneData)
+        cards.push({id:'wiz_scene', genId:'scene',     title:sceneData.aspects&&sceneData.aspects[0]?sceneData.aspects[0].name||'Scene':'Scene', data:sceneData, tags:[], ts:Date.now()});
+      if (keptNpc && npcData)
+        cards.push({id:'wiz_npc',   genId:'npc_major', title:npcData.name||'NPC',         data:npcData,   tags:[], ts:Date.now()});
+      backstories.forEach(function(b, i) {
+        cards.push({id:'wiz_backstory_'+i, genId:'backstory',
+          title:'Backstory '+(i+1), data:{hook:b.hook||'', relationship:b.relationship||'', questions:b.questions||[]}, tags:[], ts:Date.now()});
+      });
+      extras.forEach(function(e) {
+        cards.push({id:String(e.id)||('wiz_extra_'+Date.now()), genId:e.genId,
+          title:e.data&&(e.data.name||e.data.location)||e.genId, data:e.data||{}, tags:[], ts:Date.now()});
+      });
+      var exportObj = {
+        ogma:true, version:1, type:'cards',
+        exported:new Date().toISOString(),
+        campaign:campId||'', campName:campId&&CAMPAIGNS[campId]?CAMPAIGNS[campId].meta.name:'',
+        cards:cards,
+      };
+      var blob = new Blob([JSON.stringify(exportObj, null, 2)], {type:'application/json;charset=utf-8'});
+      var url  = URL.createObjectURL(blob);
+      var a    = document.createElement('a');
+      a.href   = url;
+      a.download = (campId||'ogma')+'-session-prep.json';
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a); URL.revokeObjectURL(url);
+    }
+
     // Derive open URL for the chosen world
     var campUrl = campId ? ('/campaigns/' + campId + '.html') : '/';
 
@@ -738,7 +772,7 @@
           campId: campId, partySize: playerCount,
           extras: extras,
           onAdd: function(genId, data) {
-            var next = extras.concat([{genId:genId, data:data, id:Date.now()}]);
+            var next = extras.concat([{genId:genId, data:data, id:'wiz_'+String(Date.now())}]);
             setExtras(next); persist({extras:next});
           },
           onRemove: function(id) {
@@ -786,6 +820,13 @@
               className:'pw-open-btn',
               style:{background:'none',border:'1px solid var(--border)',color:'var(--text-dim)',fontSize:13,fontWeight:600,padding:'12px 20px'},
             }, 'Open Generator'),
+            h('button', {
+              className:'pw-open-btn',
+              onClick: exportWizardSession,
+              style:{background:'none',border:'1px solid var(--border)',color:'var(--text-dim)',fontSize:13,fontWeight:600,padding:'12px 20px'},
+              title:'Export all prep cards as Ogma JSON — re-importable into Table Prep',
+              'aria-label':'Export session prep as JSON',
+            }, '\u2193 Export JSON'),
             h('button', {
               className:'pw-print-btn',
               onClick: function() { window.print(); },

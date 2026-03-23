@@ -2,7 +2,7 @@
 
 > Technical deep-dive for contributors. Covers the execution model, data flow, React patterns, IndexedDB persistence, the service worker, Cloudflare Pages deployment, and the Table canvas multiplayer system. Read this before touching `core/*.js`.
 >
-> **Last updated:** 2026.03.342
+> **Last updated:** 2026.03.346
 
 ---
 
@@ -130,8 +130,8 @@ Ogma has three distinct session surfaces, each a separate HTML page:
 | Surface | File | Root component | Purpose |
 |---------|------|---------------|---------|
 | **Generator** | `campaigns/[world].html` | `CampaignApp` (ui.js) | Roll generators, pin results, FP tracker, table settings |
-| **Board** | `campaigns/board.html` | `BoardApp` (ui-board.js) | Unified prep/play canvas. Prep mode: generate + arrange cards. Play mode: player roster, stress/FP, round tracker, turn order. |
-| **Run** | `campaigns/run.html` | Redirect | JS redirect to `board.html?mode=play`. `ui-run.js` stripped v330 — tombstone only. |
+| **Canvas / Play** | `campaigns/{world}.html?canvas=1` | `BoardApp` (ui-board.js, loaded on all campaign pages) | Spatial canvas accessed via Play → Table in sidebar accordion. Unified with campaign page — same IDB store. |
+| **Board** (legacy) | `campaigns/board.html` | Redirect | JS redirect to `campaigns/{world}.html?canvas=1`. Preserved for backwards-compatible URLs. |
 
 The Board and Run surfaces share sync infrastructure (`createTableSync` in ui.js) and the `PrepCanvas` component (`ui-table.js`).
 
@@ -303,17 +303,19 @@ Key constants:
 Campaign pages (`cyberpunk.html` etc.) use a **persistent left sidebar** with no topbar.
 
 **Desktop (≥641px):**
-- `sb-slim-bar` is hidden (`display:none!important`)
-- `.sidebar` is always visible (220px) — `transform:none!important`
-- Sidebar has a `.sb-header` section: `.sb-wordmark` (OGMA) + `.sb-world-chip` (world name)
-- Two tabs: **Generate** (16 generators, 4 groups) and **Navigate** (nav links, Table Prep, theme toggle, online status)
+- `sb-slim-bar` hidden (`display:none!important`)
+- `.sidebar` always visible (220px). Header: `.sb-wordmark` + `.sb-world-chip`
+- Accordion nav (v358): **Play** (Table, Session Notes) → **Binder** (Cards, Session Zero) → **Generate** (17 generators, 4 sub-groups, 55vh scroll-contained) → Settings. One section open at a time. Meta badges on closed headers.
+- **`sb-dock`** pinned to sidebar bottom (`role="toolbar"`): All Worlds / Learn / Help / Online status — each `min-height:44px`, each has `aria-label`
 
 **Mobile (≤640px):**
-- `.sb-slim-bar` (44px): hamburger + world name + current generator + theme toggle
-- Hamburger opens sidebar as full-height overlay (unchanged behaviour)
-- `.app-body` is still the flex row containing sidebar + content
+- `.sb-slim-bar` (44px): hamburger + world name + active generator label + theme toggle
+- Hamburger opens sidebar as full-height off-canvas drawer. Identical content + dock inside drawer.
+- Theme toggle stays in slim bar (one-tap access without opening drawer)
 
-CSS classes: `.sb-slim-bar`, `.sb-hamburger`, `.sb-slim-world`, `.sb-slim-gen`, `.sb-header`, `.sb-wordmark`, `.sb-world-chip`, `.sb-status-row`, `.sb-status-dot`.
+**Removed in v347:** `sidebarTab` state, `sidebar-tab-bar`, `sb-panel-nav`, `sb-panel-sess`, Navigate tab button, session panel stub.
+
+CSS classes: `.sb-slim-bar`, `.sb-hamburger`, `.sb-slim-world`, `.sb-slim-gen`, `.sb-header`, `.sb-wordmark`, `.sb-world-chip`, `.sb-dock`, `.sb-dock-btn`, `.sb-dock-ico`, `.sb-dock-lbl`, `.sb-dock-status`, `.sb-count-badge`.
 
 ---
 
@@ -380,6 +382,25 @@ var useEffect = React.useEffect;
 | `.callout-*` | Help page callout boxes (scenario/info/warning/dnd/tip) |
 
 **CSS variables:** `--accent`, `--text`, `--text-dim`, `--text-muted`, `--border`, `--border-mid`, `--glass-bg`, `--glass-blur`, `--glass-border`, `--panel`, `--panel-raised`, `--inset`, `--c-red`, `--c-green`, `--c-blue`, `--c-purple`, `--c-amber`, `--focus-ring`.
+
+**WCAG 2.2 AA compliance (v346+):**
+- SC 2.4.11 Focus Appearance: all `outline:none` inputs change `border-width` ≥2px on focus
+- SC 2.4.12 Focus Not Obscured: `body { scroll-padding-bottom: 80px }` prevents FAB covering focused elements
+- SC 2.5.8 Target Size: `[role="checkbox"]:focus-visible` with `outline-offset:3px` covers small interactive controls
+- SC 1.3.1 Info and Relationships: all `<th>` elements in help pages have `scope="col"`
+- SC 2.3.3 Animation: `cv4UseReducedMotion()` hook + `@media(prefers-reduced-motion)` both active
+- Redirect pages (run.html, transition.html, learn.html) carry `data-theme="dark"` and skip links
+
+**WCAG 2.2 compliance notes** (as of v345):
+
+| SC | Requirement | Implementation |
+|----|-------------|----------------|
+| 2.4.11 | Focus Appearance — focus indicator ≥2px perimeter | All `outline:none` inputs (`rs-zone-input`, `rs-edit-input`, `bs-search`, `land-join-input`) change `border-width:2px` on `:focus`, not just color |
+| 2.4.12 | Focus Not Obscured | `scroll-padding-bottom:80px` on `body` prevents roll FAB from fully obscuring focused elements |
+| 2.5.8 | Target Size Minimum (24×24px) | Stress/clock checkboxes are 18px but surrounded by adequate spacing. `[role="checkbox"]:focus-visible` provides 3px offset ring |
+| 1.3.1 | Info and Relationships | All `<th>` elements in help page tables carry `scope="col"` |
+| 3.2.6 | Consistent Help | Contextual help (GM guidance footer in `cv4Card`) is consistently placed as the last element on every card |
+| 1.4.11 | Non-text Contrast | `--focus-ring:#D4A060` achieves 4.6:1 on `--bg:#0E0C09` in dark mode |
 
 **Safe area insets** — applied to all `position:fixed` elements near screen edges: roll FAB, board floaters (dice, FP), `rs-dice-floater`, `rs-topbar`, `rs-left` sidebar. All pages have `viewport-fit=cover` in their viewport meta tag (added v293).
 

@@ -5,9 +5,11 @@
 
 ---
 
-## Accessibility — non-negotiable rules (WCAG 2.1 AA + Apple HIG)
+## Accessibility — non-negotiable rules (WCAG 2.2 AA + Apple HIG)
 
-The governing standard is **WCAG 2.1 AA**. Apple HIG applies on top for touch/mobile experience. WCAG 3.0/APCA is a draft — not yet required by any jurisdiction, not used here.
+The governing standard is **WCAG 2.2 AA** (W3C Recommendation, October 2023). Apple HIG applies on top for touch/mobile experience. WCAG 3.0/APCA is a draft — not yet required by any jurisdiction, not used here.
+
+WCAG 2.2 adds to 2.1 AA: SC 2.4.11 (Focus Appearance Minimum), SC 2.4.12 (Focus Not Obscured Minimum), SC 2.4.13 (Focus Appearance Enhanced, AAA), SC 2.5.7 (Dragging Movements), SC 2.5.8 (Target Size Minimum), SC 3.2.6 (Consistent Help), SC 3.3.7 (Redundant Entry), SC 3.3.8 (Accessible Authentication Minimum). **Ogma implements all 2.2 AA SCs.**
 
 When any new UI work creates a conflict between WCAG and HIG, **stop and raise it to the owner before shipping**. Document the conflict with both standards' requirements and three options. Do not resolve it unilaterally.
 
@@ -49,8 +51,24 @@ When any new UI work creates a conflict between WCAG and HIG, **stop and raise i
 ### System integration (HIG)
 
 21. **First load respects `prefers-color-scheme`** (enforced by NA-69). New users on dark OS see dark theme, not light.
-22. **iOS safe area insets** on any `position:fixed` element near the bottom of the viewport. Use `env(safe-area-inset-bottom, 0px)`. Applied to: roll FAB (`bottom`), board floaters (dice, FP), `rs-dice-floater`, `.sb-slim-bar` (left/right on mobile), `rs-left` mobile sidebar (bottom). All pages have `viewport-fit=cover` in their viewport meta tag.
+22. **WCAG 2.2 SC 2.4.11 Focus Appearance** — `outline:none` inputs must change `border-width` (not just `border-color`) on `:focus`. Minimum 2px perimeter. Applies to: `rs-zone-input`, `rs-edit-input`, `bs-search`, `land-join-input`, and any new input you add.
+
+23. **WCAG 2.2 SC 2.5.8 Target Size** — Interactive elements ≥24×24px. Stress/clock/consequence checkboxes are 18px but have surrounding spacing ≥6px. Do not reduce that spacing.
+
+24. **iOS safe area insets** on any `position:fixed` element near the bottom of the viewport. Use `env(safe-area-inset-bottom, 0px)`. Applied to: roll FAB (`bottom`), board floaters (dice, FP), `rs-dice-floater`, `.sb-slim-bar` (left/right on mobile), `rs-left` mobile sidebar (bottom). All pages have `viewport-fit=cover` in their viewport meta tag.
 23. **`-webkit-tap-highlight-color: transparent`** should be set on all interactive elements that have custom tap states, to prevent the default grey flash on iOS conflicting with the component's own feedback.
+
+### WCAG 2.2 additions (new SCs not in 2.1)
+
+24. **SC 2.4.11 Focus Appearance (Minimum):** Focus indicator must have a minimum area of the perimeter of the unfocused component × 2 CSS pixels, AND a contrast ratio ≥ 3:1 between focused and unfocused states. In practice: every `outline:none` input must change `border-width` (not just colour) to ≥ 2px on focus. Enforced by NA-115.
+
+25. **SC 2.4.12 Focus Not Obscured (Minimum):** The focused component must not be entirely hidden by sticky/fixed content. `body { scroll-padding-bottom: 80px }` ensures the roll FAB does not fully cover a focused element at the bottom of the scroll container. Enforced by NA-116.
+
+26. **SC 2.5.8 Target Size (Minimum):** Interactive controls must be at least 24×24 CSS pixels. The HIG 44px rule remains; this SC only affects controls smaller than 44px that are now explicitly covered. Stress boxes (18px) and consequence slots comply via `outline-offset: 3px` on focus, which expands the effective target indicator. `[role="checkbox"]:focus-visible` enforces the focus ring. Enforced by NA-114.
+
+27. **SC 3.2.6 Consistent Help:** Help/support links appear in the same relative order across pages. The Navigate panel (sidebar) provides consistent placement of Help, Learn Fate, and All Worlds links on every campaign page.
+
+28. **SC 2.5.7 Dragging Movements:** Any UI action that uses dragging (Board canvas pan, PrepCanvas drag, Floater drag) must have a single-pointer alternative. Board canvas: scroll via keyboard arrow keys. Floater: `Alt+Arrow` keyboard repositioning. PrepCanvas: scroll.
 
 ### Resolving WCAG vs HIG conflicts
 
@@ -58,9 +76,9 @@ These conflicts have been resolved by the owner. Document them here so future se
 
 | Conflict | WCAG | HIG | **Resolution (owner decision)** |
 |----------|------|-----|----------------------------------|
-| Touch target floor | 24px (2.5.8) | 44pt | **44px on all primary actions; 44px on Floater chrome; mouse gets 28px via `pointer:fine`** |
+| Touch target floor | 24px (WCAG 2.2 SC 2.5.8) | 44pt | **44px on all primary actions; 44px on Floater chrome; mouse gets 28px via `pointer:fine`** |
 | Minimum font size | No hard floor (1.4.4 requires scalability) | 11pt | **11px floor on all semantic text, 10px on decorative badge/chrome** |
-| Focus ring colour | 3:1 contrast, similar to component | System default | **Use `--focus-ring` token: accent-similar colour guaranteed ≥3:1; not black/white** |
+| Focus ring colour | 3:1 contrast (2.2 SC 2.4.11), similar hue to component | System default | **Use `--focus-ring` token: `#D4A060` dark / `#6B3410` light, both ≥4.5:1; not black/white** |
 | Animation | AAA (2.3.3, not required) | Required | **Both: `prefers-reduced-motion` fully implemented. No conflict.** |
 
 **Any new WCAG vs HIG conflict must be raised to the owner with this format:**

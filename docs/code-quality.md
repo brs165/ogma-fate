@@ -224,3 +224,17 @@ tableSyncCtx: { sync, roomCode, isRemote, presence, onCursor, onState, host, joi
 ```
 
 No React Context API needed — a plain object works and is easier to trace.
+
+---
+
+## WCAG 2.2 standards (enforced from v345)
+
+| Area | Rule |
+|------|------|
+| Focus indicators | Every `outline:none` input must have a `:focus` rule that changes both `border-color` AND `border-width` to ≥2px. Color-only change fails WCAG 2.2 SC 2.4.11. |
+| Checkbox role | All interactive boxes (stress, clock, consequence) use `role="checkbox"` + `aria-checked` + `tabIndex=0` + `onKeyDown`. No exceptions. |
+| Touch targets | Min 44×44px for primary actions. Stress boxes (18px) are exempt by proximity spacing — do not reduce spacing around them. |
+| Table headers | Every `<th>` in a data table must carry `scope="col"` or `scope="row"`. |
+| Focus not obscured | Do not increase `z-index` of sticky FAB above 200. `scroll-padding-bottom:80px` on body provides the required clearance. |
+| Heading order | Never skip heading levels. `h3` must follow `h2`. No `h2` directly inside a section that opens with `h4`. |
+| Skip links | Every page that has a `<header>` must have a `.skip-link` as the first focusable element. Redirect pages (tombstones) need a main content anchor. |

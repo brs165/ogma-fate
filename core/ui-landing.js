@@ -63,7 +63,7 @@ function JoinTableCard() {
     var clean = code.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
     if (clean.length < 4) { setErr('Enter the 4-character code your GM shared.'); return; }
     setErr('');
-    // Navigate to the run surface with the room code — run.html handles join flow
+    // Navigate to the run surface with the room code — board.html?mode=play handles join flow
     window.location.href = 'campaigns/board.html?mode=play&room=' + clean;
   }
 

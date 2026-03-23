@@ -1063,85 +1063,122 @@ function BoardDossierStress(props) {
 
 // ── BoardExportMenu — export dropdown for Board topbar ──────────────────────
 function BoardExportMenu(props) {
-  var cards        = props.cards || [];
-  var campName     = props.campName || '';
+  var cards          = props.cards || [];
+  var campName       = props.campName || '';
   var onExportCanvas = props.onExportCanvas;
-  var onPrint      = props.onPrint;
-  var mode         = props.mode || 'prep';
-  var hasCards     = cards.filter(function(c){return c.genId && c.genId !== 'sticky' && c.genId !== 'label';}).length > 0;
+  var onImportCanvas = props.onImportCanvas;
+  var onPrint        = props.onPrint;
+  var mode           = props.mode || 'prep';
+  var hasCards       = cards.filter(function(c){ return c.genId && c.genId !== 'sticky' && c.genId !== 'label'; }).length > 0;
 
   var _open = useState(false); var open = _open[0]; var setOpen = _open[1];
+  var _pos = useState({top: 0, right: 0}); var menuPos = _pos[0]; var setMenuPos = _pos[1];
   var menuRef = useRef(null);
+  var btnRef  = useRef(null);
 
   useEffect(function() {
     if (!open) return;
     function handler(e) {
-      if (menuRef.current && !menuRef.current.contains(e.target)) setOpen(false);
+      if (menuRef.current && !menuRef.current.contains(e.target) &&
+          btnRef.current  && !btnRef.current.contains(e.target)) setOpen(false);
     }
     document.addEventListener('mousedown', handler);
     return function() { document.removeEventListener('mousedown', handler); };
   }, [open]);
 
+  function close() { setOpen(false); }
+
+  function toggle() {
+    if (!open && btnRef.current) {
+      var r = btnRef.current.getBoundingClientRect();
+      setMenuPos({top: r.bottom + 6, right: window.innerWidth - r.right});
+    }
+    setOpen(function(v) { return !v; });
+  }
+
   function doImagePack() {
-    setOpen(false);
+    close();
     if (!hasCards) return;
-    var printable = cards.filter(function(card) { return card.genId && card.genId !== 'sticky' && card.genId !== 'label' && card.data; });
+    var printable = cards.filter(function(c){ return c.genId && c.genId !== 'sticky' && c.genId !== 'label' && c.data; });
     if (typeof DB === 'undefined' || !DB.exportCardsAsPng) return;
     DB.exportCardsAsPng(printable, campName);
   }
 
-  function doPrint() {
-    setOpen(false);
-    if (onPrint) onPrint();
-  }
+  function doPrint() { close(); if (onPrint) onPrint(); }
+  function doExportCanvas() { close(); if (onExportCanvas) onExportCanvas(); }
+  function doImportCanvas() { close(); if (onImportCanvas) onImportCanvas(); }
 
-  function doExportCanvas() {
-    setOpen(false);
-    if (onExportCanvas) onExportCanvas();
-  }
-
-  var items = [
-    hasCards && {key:'img', icon:'\uD83D\uDDBC\uFE0F', label:'Image Pack', sub:'PNG zip for Miro / Figma', action:doImagePack},
-    mode !== 'play' && hasCards && {key:'print', icon:'\uD83D\uDDA8', label:'Print', sub:'Printable HTML', action:doPrint},
-    {key:'json', icon:'\u2193', label:'Export Board', sub:'Canvas state JSON', action:doExportCanvas},
-  ].filter(Boolean);
-
-  return h('div', {ref: menuRef, style: {position:'relative', display:'inline-flex'}},
+  return h('div', {style: {position: 'relative', display: 'inline-flex'}},
     h('button', {
+      ref: btnRef,
       className: 'bt-icon-btn' + (open ? ' active' : ''),
-      onClick: function() { setOpen(function(v){ return !v; }); },
-      title: 'Export options',
-      'aria-label': 'Export options',
+      onClick: toggle,
+      title: 'Export / Import',
+      'aria-label': 'Export and import options',
       'aria-expanded': String(open),
       'aria-haspopup': 'menu',
     }, h(FaFileArrowDownIcon, {size: 14})),
     open && h('div', {
+      ref: menuRef,
       role: 'menu',
+      'aria-label': 'Export options',
       style: {
-        position:'absolute', top:'calc(100% + 6px)', right:0,
-        background:'var(--panel-raised)', border:'1px solid var(--border)',
-        borderRadius:10, padding:'6px 0', minWidth:210,
-        boxShadow:'0 8px 32px rgba(0,0,0,.35)',
-        zIndex:300, animation:'fadeUp .14s ease',
+        position: 'fixed',
+        top: menuPos.top,
+        right: menuPos.right,
+        background: 'var(--panel-raised)',
+        border: '1.5px solid var(--border-mid)',
+        borderRadius: 3, padding: '4px 0', minWidth: 200,
+        boxShadow: '4px 4px 0 rgba(0,0,0,.22)',
+        zIndex: 9000, animation: 'fadeDown .14s ease',
       },
     },
-      h('div', {style:{padding:'4px 14px 7px', fontSize:10, fontWeight:700, letterSpacing:'.12em', color:'var(--text-muted)', textTransform:'uppercase'}}, 'Export'),
-      items.map(function(item) {
-        return h('button', {
-          key: item.key, role:'menuitem',
-          onClick: item.action,
-          className:'export-menu-item',
-        },
-          h('span',{style:{fontSize:16,width:22,textAlign:'center',flexShrink:0}},item.icon),
-          h('div',{style:{flex:1,minWidth:0}},
-            h('div',{style:{fontSize:13,fontWeight:600,lineHeight:1.2}},item.label),
-            h('div',{style:{fontSize:11,color:'var(--text-muted)',marginTop:1}},item.sub)
-          )
-        );
-      })
+      h('div', {style: {padding: '6px 14px 5px', fontSize: 10, fontWeight: 800,
+        letterSpacing: '.2em', color: 'var(--text-muted)', textTransform: 'uppercase',
+        fontFamily: 'var(--font-mono)', borderBottom: '1px solid var(--border)'}}, 'Export'),
+
+      // ── JSON (Board canvas) ────────────────────────────────────────
+      h('button', {role: 'menuitem', onClick: doExportCanvas, className: 'export-menu-item', 'aria-label': 'Export board canvas as JSON'},
+        h('div', {className: 'export-menu-item-icon'}, '{ }'),
+        h('div', {className: 'export-menu-item-body'},
+          h('div', {className: 'export-menu-item-label'}, 'JSON'),
+          h('div', {className: 'export-menu-item-sub'}, 'Canvas state \u2014 re-importable')
+        )
+      ),
+
+      // ── Image Pack ────────────────────────────────────────────────
+      hasCards && h('button', {role: 'menuitem', onClick: doImagePack, className: 'export-menu-item', 'aria-label': 'Export cards as PNG image pack'},
+        h('div', {className: 'export-menu-item-icon'}, '\u25a3'),
+        h('div', {className: 'export-menu-item-body'},
+          h('div', {className: 'export-menu-item-label'}, 'Image Pack'),
+          h('div', {className: 'export-menu-item-sub'}, 'PNG zip for Miro / Figma')
+        )
+      ),
+
+      // ── Print ─────────────────────────────────────────────────────
+      mode !== 'play' && hasCards && h('button', {role: 'menuitem', onClick: doPrint, className: 'export-menu-item', 'aria-label': 'Print cards'},
+        h('div', {className: 'export-menu-item-icon'}, '\u2399'),
+        h('div', {className: 'export-menu-item-body'},
+          h('div', {className: 'export-menu-item-label'}, 'Print'),
+          h('div', {className: 'export-menu-item-sub'}, 'Printable A4 layout')
+        )
+      ),
+
+      // ── Divider ───────────────────────────────────────────────────
+      h('div', {role: 'separator', style: {height: 1, background: 'var(--border)', margin: '4px 0'}}),
+
+      // ── Import ────────────────────────────────────────────────────
+      h('button', {role: 'menuitem', onClick: doImportCanvas, className: 'export-menu-item', 'aria-label': 'Import board from JSON file'},
+        h('div', {className: 'export-menu-item-icon'}, '\u2191'),
+        h('div', {className: 'export-menu-item-body'},
+          h('div', {className: 'export-menu-item-label'}, 'Import'),
+          h('div', {className: 'export-menu-item-sub'}, 'Restore from .json file')
+        )
+      )
     )
   );
 }
+
 
 function BoardTopbar(props) {
   var campMeta = props.campMeta;
@@ -1262,6 +1299,7 @@ function BoardTopbar(props) {
         cards: props.cards || [],
         campName: props.campName || '',
         onExportCanvas: props.onExportCanvas,
+        onImportCanvas: props.onImportCanvas,
         onPrint: props.onPrint,
         mode: props.mode,
       }),
@@ -1739,6 +1777,23 @@ function BoardApp(props) {
     });
   }
 
+  function importCanvas() {
+    if (typeof DB === 'undefined' || !DB.importCanvasState) { showToast('Import unavailable'); return; }
+    DB.importCanvasState().then(function(data) {
+      if (!data || !data.state || !Array.isArray(data.state.cards)) {
+        showToast('Invalid board file');
+        return;
+      }
+      setCards(data.state.cards);
+      persistCanvas(data.state.cards);
+      showToast('Board imported \u2014 ' + data.state.cards.length + ' cards loaded');
+    }).catch(function(err) {
+      if (err && err.message && err.message !== 'No file selected') {
+        showToast('Import failed: ' + err.message);
+      }
+    });
+  }
+
 
   // ── Generate card ─────────────────────────────────────────────────────────
   function generateCard(genId, x, y) {
@@ -2091,6 +2146,7 @@ if (genId === 'sticky') {
       onHost: connectAsHost,
       onDisconnect: disconnectSync,
       onExportCanvas: exportCanvas,
+      onImportCanvas: importCanvas,
       cards: cards,
       campName: campMeta.name,
       mobileListView: mobileListView,

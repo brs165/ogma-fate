@@ -5,7 +5,6 @@
 
 // ── BL-01: Versioned localStorage schema ─────────────────────────────────────
 // All app preferences are stored under a single versioned JSON key.
-// On first load, old flat keys are migrated and then removed.
 // Access via window.LS.get(key) / window.LS.set(key, value).
 //
 // Schema v1 keys:
@@ -22,19 +21,6 @@
   var LS_KEY     = 'fate_prefs_v1';
   var LS_VERSION = 1;
 
-  // Old flat keys → new schema key map (for migration)
-  // Note: static pages (learn, about) used 'fate-theme' (hyphen); campaign pages used 'fate_theme' (underscore)
-  var MIGRATE_MAP = {
-    'fate_theme':           'theme',
-    'fate-theme':           'theme',
-    'fate_textsize':        'textsize',
-    'fate_fp_state':        'fp_state',
-    'fate_universal_merge': 'universal_merge',
-    'fate_help_level':      'help_level',
-    'fate_onboarding_done': 'onboarding_done',
-    'fate_gm_mode':         'gm_mode',
-  };
-
   function loadPrefs() {
     try {
       var raw = localStorage.getItem(LS_KEY);
@@ -47,55 +33,37 @@
     try { localStorage.setItem(LS_KEY, JSON.stringify(prefs)); } catch(e) {}
   }
 
-  function migrate() {
-    // Check if any old flat keys exist
-    var hadOldKeys = false;
-    var migrated = { _v: LS_VERSION, intro_seen: {} };
-
-    Object.keys(MIGRATE_MAP).forEach(function(oldKey) {
-      var newKey = MIGRATE_MAP[oldKey];
-      try {
-        var val = localStorage.getItem(oldKey);
-        if (val !== null) {
-          hadOldKeys = true;
-          // Coerce types
-          if (newKey === 'fp_state') {
-            try { migrated[newKey] = JSON.parse(val); } catch(e) {}
-          } else if (newKey === 'universal_merge' || newKey === 'gm_mode') {
-            migrated[newKey] = val !== 'off';
-          } else if (newKey === 'onboarding_done') {
-            migrated[newKey] = val === '1';
-          } else if (newKey === 'textsize') {
-            migrated[newKey] = parseInt(val, 10) || 0;
-          } else {
-            migrated[newKey] = val;
-          }
-          localStorage.removeItem(oldKey);
-        }
-      } catch(e) {}
-    });
-
-    // Migrate intro_seen keys (fate_intro_seen_{world})
-    var worlds = ['thelongafter','cyberpunk','fantasy','space','victorian','postapoc','index'];
-    worlds.forEach(function(w) {
-      var k = 'fate_intro_seen_' + w;
-      try {
-        if (localStorage.getItem(k)) {
-          hadOldKeys = true;
-          migrated.intro_seen[w] = true;
-          localStorage.removeItem(k);
-        }
-      } catch(e) {}
-    });
-
-    if (hadOldKeys) savePrefs(migrated);
-    return migrated;
-  }
-
   function initPrefs() {
     var prefs = loadPrefs();
-    if (!prefs) prefs = migrate();
     if (!prefs) prefs = { _v: LS_VERSION, intro_seen: {} };
+
+    // ── BL-01: Migration — lift legacy bare localStorage keys into prefs ──
+    // Old code wrote theme directly as localStorage.setItem('fate_theme', ...)
+    // Pull them in once, then they live under fate_prefs_v1 forever.
+    if (!prefs.theme) {
+      var legacyTheme = (function() {
+        try { return localStorage.getItem('fate_theme') || localStorage.getItem('fate-theme') || null; } catch(e) { return null; }
+      })();
+      if (legacyTheme) { prefs.theme = legacyTheme; savePrefs(prefs); }
+    }
+
+    // ── Schema defaults — ensure all known keys have a value ──────────────
+    var DEFAULTS = {
+      _v:              LS_VERSION,
+      theme:           'dark',
+      textsize:        0,
+      universal_merge: true,
+      help_level:      'new_fate',
+      gm_mode:         true,
+      intro_seen:      {},
+    };
+    var changed = false;
+    Object.keys(DEFAULTS).forEach(function(k) {
+      if (prefs[k] === undefined) { prefs[k] = DEFAULTS[k]; changed = true; }
+    });
+    if (!prefs._v) { prefs._v = LS_VERSION; changed = true; }
+    if (changed) savePrefs(prefs);
+
     return prefs;
   }
 
@@ -138,11 +106,9 @@
 // ── IndexedDB via Dexie 4 (WS-04) ────────────────────────────────────────────
 // Dexie 4 CDN loaded before this file. Falls back to memStore if unavailable.
 // Public API surface identical to v1 — no call-site changes required.
-// Migration: on first open, reads any records from the legacy raw-IDB db
-// (fate_generator v1) and copies them into the Dexie db, then marks done.
+// IDB via Dexie 4. Falls back to memStore if unavailable.
 (function() {
-  var DB_NAME = 'ogma_v2';       // new name avoids collision with legacy db
-  var LEGACY_DB_NAME = 'fate_generator'; // v1 raw IDB — migrated on first open
+  var DB_NAME = 'ogma_v2';
 
   // ── In-memory fallback (private browsing / storage pressure) ─────────────
   var memStore = {};
@@ -174,7 +140,6 @@
         cards:    'key, ts',
       });
       dxOpening = db.open()
-        .then(function() { return runMigration(db); })
         .then(function() {
           dx = db; dxOpening = null;
           // Request persistent storage so the browser (especially Safari) won't
@@ -197,53 +162,6 @@
       if (dxFailCount >= DX_MAX_FAILS) { dxFailed = true; }
       return Promise.reject(err);
     }
-  }
-
-  // ── One-time migration from legacy raw IDB ────────────────────────────────
-  function runMigration(db) {
-    var MIGRATED_KEY = 'idb_migrated_v2';
-    try { if (localStorage.getItem(MIGRATED_KEY)) return Promise.resolve(); } catch(e) {}
-
-    return new Promise(function(resolve) {
-      try {
-        var req = indexedDB.open(LEGACY_DB_NAME, 1);
-        req.onsuccess = function(e) {
-          var legacyDb = e.target.result;
-          var storeNames = Array.prototype.slice.call(legacyDb.objectStoreNames);
-          if (!storeNames.length) { legacyDb.close(); resolve(); return; }
-
-          var pending = [];
-
-          storeNames.forEach(function(storeName) {
-            var targetTable = storeName === 'sessions' ? db.sessions : db.cards;
-            pending.push(new Promise(function(res) {
-              try {
-                var tx  = legacyDb.transaction(storeName, 'readonly');
-                var all = tx.objectStore(storeName).getAll();
-                all.onsuccess = function(ev) {
-                  var records = ev.target.result || [];
-                  if (!records.length) { res(); return; }
-                  targetTable.bulkPut(records).then(res).catch(res);
-                };
-                all.onerror = function(ev) { console.warn('[DB] Legacy store read failed:', ev); res(); };
-              } catch(err) { console.warn('[DB] Legacy transaction failed:', err); res(); }
-            }));
-          });
-
-          Promise.all(pending).then(function() {
-            legacyDb.close();
-            try { localStorage.setItem(MIGRATED_KEY, '1'); } catch(e) {}
-            resolve();
-          }).catch(function(err) {
-            console.warn('[DB] Legacy migration failed:', err);
-            legacyDb.close(); // ensure close on failure path
-            resolve();
-          });
-        };
-        req.onerror  = function(ev) { console.warn('[DB] Legacy IDB open failed — migration skipped:', ev); resolve(); };
-        req.onblocked = function() { console.warn('[DB] Legacy IDB open blocked — migration skipped'); resolve(); };
-      } catch(err) { console.warn('[DB] Legacy IDB unavailable — migration skipped:', err); resolve(); }
-    });
   }
 
   // ── Low-level Dexie helpers ───────────────────────────────────────────────
@@ -483,12 +401,13 @@
           .replace(/"/g,'&quot;');
       }
 
+
       function renderCardHtml(card) {
         var genId = card.genId || '';
         var data  = card.data  || {};
         var title = card.title || data.name || data.location || data.situation || genId;
         var GEN_LABELS = {
-          npc_minor:'Minor NPC', npc_major:'Major NPC', scene:'Scene Setup',
+          npc_minor:'Minor NPC', npc_major:'Major NPC', pc:'Player Character', scene:'Scene Setup',
           encounter:'Encounter', seed:'Adventure Seed', compel:'Compel',
           challenge:'Challenge', contest:'Contest', consequence:'Consequence',
           faction:'Faction', complication:'Complication', backstory:'PC Backstory',
@@ -499,8 +418,30 @@
 
         var rows = [];
 
-        // ── NPC ──────────────────────────────────────────────────────
-        if (genId === 'npc_minor' || genId === 'npc_major') {
+        if (genId === 'npc_minor') {
+          var aspects = Array.isArray(data.aspects) ? data.aspects : [];
+          aspects.forEach(function(a, i) {
+            rows.push('<div class="pc-row ' + (i===0?'asp-hc':'asp-other') + '">' + esc(a) + '</div>');
+          });
+          if (data.skills && data.skills.length) {
+            var sk = data.skills.map(function(s) {
+              return '<span class="skill-chip">+' + s.r + ' ' + esc(s.name) + '</span>';
+            }).join(' ');
+            rows.push('<div class="pc-skills">' + sk + '</div>');
+          }
+          if (data.stunt) {
+            rows.push('<div class="pc-stunt"><strong>' + esc(data.stunt.name) + ':</strong> ' + esc(data.stunt.desc) + '</div>');
+          }
+          var stressN = data.stress || 0;
+          if (stressN) {
+            var boxes = '';
+            for (var i=0;i<stressN;i++) boxes += '<span class="stress-box phy"></span>';
+            rows.push('<div class="pc-stress">STRESS ' + boxes + '</div>');
+          }
+          rows.push('<div class="pc-row asp-other">No consequences — one hit = out</div>');
+        }
+
+        else if (genId === 'npc_major') {
           var asp = data.aspects || {};
           if (asp.high_concept) rows.push('<div class="pc-row asp-hc">' + esc(asp.high_concept) + '</div>');
           if (asp.trouble)      rows.push('<div class="pc-row asp-tr">► ' + esc(asp.trouble) + '</div>');
@@ -510,114 +451,229 @@
             });
           }
           if (data.skills && data.skills.length) {
-            var sk = data.skills.slice(0,6).map(function(s) {
+            var sk2 = data.skills.map(function(s) {
               return '<span class="skill-chip">+' + s.r + ' ' + esc(s.name) + '</span>';
             }).join(' ');
-            rows.push('<div class="pc-skills">' + sk + '</div>');
+            rows.push('<div class="pc-skills">' + sk2 + '</div>');
           }
           if (data.stunts && data.stunts.length) {
             data.stunts.forEach(function(st) {
-              rows.push('<div class="pc-stunt"><strong>' + esc(st.name) + ':</strong> ' + esc(st.desc) + '</div>');
+              rows.push('<div class="pc-stunt"><strong>' + esc(st.name) + ' (' + esc(st.skill) + '):</strong> ' + esc(st.desc) + '</div>');
             });
           }
-          if (data.physical_stress || data.mental_stress) {
-            var phy = data.physical_stress || 0;
-            var men = data.mental_stress || 0;
-            var boxes = function(n, cls) {
-              var s = '';
-              for (var i=0;i<n;i++) s += '<span class="stress-box ' + cls + '"></span>';
-              return s;
-            };
-            rows.push('<div class="pc-stress">PHY ' + boxes(phy,'phy') + '  MEN ' + boxes(men,'men') + '</div>');
-          }
+          var phy = data.physical_stress || 0, men = data.mental_stress || 0;
+          var phyBoxes = '', menBoxes = '';
+          for (var pi=0;pi<phy;pi++) phyBoxes += '<span class="stress-box phy"></span>';
+          for (var mi=0;mi<men;mi++) menBoxes += '<span class="stress-box men"></span>';
+          if (phy || men) rows.push('<div class="pc-stress">PHY ' + phyBoxes + '&nbsp;&nbsp;MEN ' + menBoxes + '</div>');
+          rows.push('<div class="pc-stress" style="font-size:7pt;color:#666">Mild □ 2  Moderate □ 4  Severe □ 6 &nbsp;|&nbsp; Refresh: ' + (data.refresh || 3) + '</div>');
         }
-        // ── SCENE ────────────────────────────────────────────────────
+
         else if (genId === 'scene') {
-          if (data.situation) rows.push('<div class="field-row"><strong>Situation:</strong> ' + esc(data.situation) + '</div>');
-          if (data.aspects && data.aspects.length) {
-            data.aspects.forEach(function(a) {
-              rows.push('<div class="asp-chip">' + esc(a) + '</div>');
-            });
-          }
-          if (data.threat)  rows.push('<div class="field-row"><strong>Threat:</strong> ' + esc(data.threat) + '</div>');
-          if (data.zones && data.zones.length) {
-            rows.push('<div class="field-row"><strong>Zones:</strong> ' + data.zones.slice(0,3).map(esc).join(' · ') + '</div>');
+          var scAspects = Array.isArray(data.aspects) ? data.aspects : [];
+          scAspects.forEach(function(a) {
+            var name = typeof a === 'string' ? a : (a.name || '');
+            var cat  = typeof a === 'object' ? (a.category || '') : '';
+            var fi   = typeof a === 'object' && (a.free_invoke || a.fi);
+            rows.push('<div class="asp-chip">' + (cat?'['+cat+'] ':'') + esc(name) + (fi?' ★FI':'') + '</div>');
+          });
+          var zones = Array.isArray(data.zones) ? data.zones : [];
+          if (zones.length) {
+            rows.push('<div class="field-row"><strong>Zones:</strong> ' + zones.slice(0,4).map(function(z) {
+              var zn = typeof z==='string'?z:(z.name||'');
+              var za = typeof z==='object'?(z.aspect||''):'';
+              return esc(zn) + (za?' — <em>'+esc(za)+'</em>':'');
+            }).join(' · ') + '</div>');
           }
         }
-        // ── FACTION ──────────────────────────────────────────────────
+
+        else if (genId === 'encounter') {
+          var scAsp2 = Array.isArray(data.aspects) ? data.aspects : [];
+          if (scAsp2.length) {
+            rows.push('<div class="asp-chip">' + scAsp2.slice(0,3).map(function(a){return esc(typeof a==='string'?a:(a.name||''));}).join('</div><div class="asp-chip">') + '</div>');
+          }
+          var opp = Array.isArray(data.opposition) ? data.opposition : [];
+          opp.forEach(function(o) {
+            var isMajor = (o.type||'').toLowerCase()==='major';
+            var sk3 = (o.skills||[]).slice(0,3).map(function(s){return '+'+s.r+' '+s.name;}).join(' / ');
+            rows.push('<div class="field-row"><strong>' + (isMajor?'◆':'◈') + ' ×' + (o.qty||1) + ' ' + esc(o.name) + '</strong>' + (sk3?' — '+esc(sk3):'') + '</div>');
+          });
+          if (data.victory) rows.push('<div class="field-row"><strong style="color:#1a7a40">Win:</strong> ' + esc(data.victory) + '</div>');
+          if (data.defeat)  rows.push('<div class="field-row"><strong style="color:#a00">Lose:</strong> ' + esc(data.defeat) + '</div>');
+          if (data.twist)   rows.push('<div class="field-row"><strong>Twist:</strong> <em>' + esc(data.twist) + '</em></div>');
+        }
+
         else if (genId === 'faction') {
           if (data.goal)    rows.push('<div class="field-row"><strong>Goal:</strong> ' + esc(data.goal) + '</div>');
           if (data.method)  rows.push('<div class="field-row"><strong>Method:</strong> ' + esc(data.method) + '</div>');
           if (data.weakness)rows.push('<div class="field-row"><strong>Weakness:</strong> ' + esc(data.weakness) + '</div>');
-          if (data.face)    rows.push('<div class="field-row"><strong>Face:</strong> ' + esc(data.face) + '</div>');
+          var face = data.face || {};
+          var faceName = typeof face==='string'?face:(face.name||'');
+          var faceRole = typeof face==='object'?(face.role||''):'';
+          if (faceName) rows.push('<div class="field-row"><strong>Face:</strong> ' + esc(faceName) + (faceRole?' — <em>'+esc(faceRole)+'</em>':'') + '</div>');
         }
-        // ── SEED ─────────────────────────────────────────────────────
+
         else if (genId === 'seed') {
           if (data.objective)    rows.push('<div class="field-row"><strong>Objective:</strong> ' + esc(data.objective) + '</div>');
+          if (data.location)     rows.push('<div class="field-row"><strong>Location:</strong> ' + esc(data.location) + '</div>');
           if (data.complication) rows.push('<div class="field-row"><strong>Complication:</strong> ' + esc(data.complication) + '</div>');
-          if (data.opposition)   rows.push('<div class="field-row"><strong>Opposition:</strong> ' + esc(data.opposition) + '</div>');
-          if (data.twist)        rows.push('<div class="field-row"><strong>Twist:</strong> ' + esc(data.twist) + '</div>');
+          if (data.issue)        rows.push('<div class="field-row"><strong>Issue:</strong> <em>' + esc(data.issue) + '</em></div>');
+          var seOpp = Array.isArray(data.opposition) ? data.opposition : [];
+          seOpp.slice(0,2).forEach(function(o) {
+            rows.push('<div class="field-row">◈ ×' + (o.qty||1) + ' ' + esc(o.name||'') + '</div>');
+          });
+          if (data.victory) rows.push('<div class="field-row"><strong style="color:#1a7a40">Win:</strong> ' + esc(data.victory) + '</div>');
+          if (data.defeat)  rows.push('<div class="field-row"><strong style="color:#a00">Lose:</strong> ' + esc(data.defeat) + '</div>');
+          if (data.twist)   rows.push('<div class="field-row"><strong>Twist:</strong> <em>' + esc(data.twist) + '</em></div>');
         }
-        // ── ENCOUNTER ────────────────────────────────────────────────
-        else if (genId === 'encounter') {
-          if (data.opposition)  rows.push('<div class="field-row"><strong>Opposition:</strong> ' + esc(data.opposition) + '</div>');
-          if (data.stakes)      rows.push('<div class="field-row"><strong>Stakes:</strong> ' + esc(data.stakes) + '</div>');
-          if (data.twist)       rows.push('<div class="field-row"><strong>Twist:</strong> ' + esc(data.twist) + '</div>');
-          if (data.victory)     rows.push('<div class="field-row"><strong>Victory:</strong> ' + esc(data.victory) + '</div>');
-        }
-        // ── COMPEL ───────────────────────────────────────────────────
+
         else if (genId === 'compel') {
-          if (data.situation)   rows.push('<div class="field-row">' + esc(data.situation) + '</div>');
-          if (data.consequence) rows.push('<div class="field-row"><strong>Consequence:</strong> ' + esc(data.consequence) + '</div>');
+          if (data.situation)   rows.push('<div class="asp-hc">' + esc(data.situation) + '</div>');
+          if (data.consequence) rows.push('<div class="field-row"><strong>If accepted:</strong> ' + esc(data.consequence) + '</div>');
+          if (data.template_type) rows.push('<div class="field-row"><strong>Type:</strong> ' + esc(data.template_type) + '</div>');
         }
-        // ── CHALLENGE ────────────────────────────────────────────────
+
         else if (genId === 'challenge') {
-          if (data.obstacle)    rows.push('<div class="field-row">' + esc(data.obstacle) + '</div>');
-          if (data.primary_skill) rows.push('<div class="field-row"><strong>Skill:</strong> ' + esc(data.primary_skill) + '</div>');
-          if (data.success)     rows.push('<div class="field-row"><strong>Success:</strong> ' + esc(data.success) + '</div>');
-          if (data.failure)     rows.push('<div class="field-row"><strong>Failure:</strong> ' + esc(data.failure) + '</div>');
+          if (data.name||data.title) rows.push('<div class="asp-hc">' + esc(data.name||data.title) + '</div>');
+          if (data.desc)          rows.push('<div class="field-row">' + esc(data.desc) + '</div>');
+          if (data.primary)       rows.push('<div class="field-row"><strong>Skill:</strong> ' + esc(data.primary) + '</div>');
+          if (data.opposing)      rows.push('<div class="field-row"><strong>Opposing:</strong> ' + esc(data.opposing) + '</div>');
+          if (data.success)       rows.push('<div class="field-row"><strong style="color:#1a7a40">Success:</strong> ' + esc(data.success) + '</div>');
+          if (data.failure)       rows.push('<div class="field-row"><strong style="color:#a00">Failure:</strong> ' + esc(data.failure) + '</div>');
+          if (data.stakes_good)   rows.push('<div class="field-row" style="color:#555"><strong>Stakes win:</strong> ' + esc(data.stakes_good) + '</div>');
+          if (data.stakes_bad)    rows.push('<div class="field-row" style="color:#555"><strong>Stakes lose:</strong> ' + esc(data.stakes_bad) + '</div>');
         }
-        // ── CONSEQUENCE ──────────────────────────────────────────────
+
+        else if (genId === 'contest') {
+          if (data.contest_type)   rows.push('<div class="asp-hc">' + esc(data.contest_type) + '</div>');
+          if (data.desc)           rows.push('<div class="field-row">' + esc(data.desc) + '</div>');
+          if (data.aspect)         rows.push('<div class="asp-chip"><em>' + esc(data.aspect) + '</em></div>');
+          if (data.side_a && data.side_b) rows.push('<div class="field-row"><strong>' + esc(data.side_a) + '</strong> ' + esc(data.skills_a||'') + '</div><div class="field-row"><strong>' + esc(data.side_b) + '</strong> ' + esc(data.skills_b||'') + '</div>');
+          if (data.victories_needed) rows.push('<div class="field-row">First to ' + data.victories_needed + ' victories</div>');
+          var twists = Array.isArray(data.twists) ? data.twists : [];
+          if (twists.length) rows.push('<div class="field-row"><strong>Twists:</strong> ' + twists.slice(0,2).map(esc).join(' / ') + '</div>');
+          if (data.stakes_good) rows.push('<div class="field-row" style="color:#555"><strong>Win:</strong> ' + esc(data.stakes_good) + '</div>');
+          if (data.stakes_bad)  rows.push('<div class="field-row" style="color:#555"><strong>Lose:</strong> ' + esc(data.stakes_bad) + '</div>');
+        }
+
         else if (genId === 'consequence') {
-          var sev = data.severity || data.mild ? 'Mild' : data.moderate ? 'Moderate' : data.severe ? 'Severe' : '';
-          var text = data.mild || data.moderate || data.severe || data.aspect || '';
-          if (sev)  rows.push('<div class="asp-hc">' + sev + ' Consequence</div>');
-          if (text) rows.push('<div class="pc-row asp-hc">' + esc(text) + '</div>');
-          if (data.compel_hook) rows.push('<div class="field-row"><strong>Hook:</strong> ' + esc(data.compel_hook) + '</div>');
+          var sev = (data.severity || 'mild');
+          rows.push('<div class="asp-hc">' + sev.charAt(0).toUpperCase()+sev.slice(1) + ' Consequence</div>');
+          if (data.aspect)  rows.push('<div class="pc-row asp-hc">' + esc(data.aspect) + '</div>');
+          if (data.context) rows.push('<div class="pc-row asp-other"><em>' + esc(data.context) + '</em></div>');
+          if (data.compel_hook) rows.push('<div class="field-row"><strong>Compel hook:</strong> ' + esc(data.compel_hook) + '</div>');
         }
-        // ── COUNTDOWN ────────────────────────────────────────────────
+
         else if (genId === 'countdown') {
-          if (data.track_name)  rows.push('<div class="asp-hc">' + esc(data.track_name) + '</div>');
-          if (data.trigger)     rows.push('<div class="field-row"><strong>Trigger:</strong> ' + esc(data.trigger) + '</div>');
-          if (data.outcome)     rows.push('<div class="field-row"><strong>Outcome:</strong> ' + esc(data.outcome) + '</div>');
+          if (data.name)    rows.push('<div class="asp-hc">' + esc(data.name) + '</div>');
+          if (data.trigger) rows.push('<div class="field-row"><strong>Trigger:</strong> ' + esc(data.trigger) + '</div>');
+          if (data.unit)    rows.push('<div class="field-row"><strong>Unit:</strong> ' + esc(data.unit) + '</div>');
           var ticks = data.boxes || 4;
-          var boxes = '';
-          for (var i=0;i<ticks;i++) boxes += '<span class="stress-box"></span>';
-          rows.push('<div class="pc-stress" style="margin-top:6px">' + boxes + '</div>');
+          var boxHtml = '';
+          for (var ci=0;ci<ticks;ci++) boxHtml += '<span class="stress-box"></span>';
+          rows.push('<div class="pc-stress" style="margin-top:6px">' + boxHtml + '</div>');
+          if (data.outcome) rows.push('<div class="field-row"><strong style="color:#a00">When full:</strong> ' + esc(data.outcome) + '</div>');
         }
-        // ── CAMPAIGN ─────────────────────────────────────────────────
+
         else if (genId === 'campaign') {
-          if (data.current_issue)   rows.push('<div class="field-row"><strong>Current:</strong> ' + esc(data.current_issue) + '</div>');
-          if (data.impending_issue) rows.push('<div class="field-row"><strong>Impending:</strong> ' + esc(data.impending_issue) + '</div>');
-          if (data.aspects && data.aspects.length) {
-            data.aspects.forEach(function(a) { rows.push('<div class="asp-chip">' + esc(a) + '</div>'); });
+          var cur = data.current || {}, imp = data.impending || {};
+          if (cur.name) rows.push('<div class="asp-hc">' + esc(cur.name) + '</div>');
+          if (cur.desc) rows.push('<div class="field-row">' + esc(cur.desc) + '</div>');
+          var curFaces = Array.isArray(cur.faces) ? cur.faces : [];
+          curFaces.forEach(function(f) {
+            rows.push('<div class="field-row" style="color:#555">◈ <strong>' + esc(f.name) + '</strong> — <em>' + esc(f.role) + '</em></div>');
+          });
+          if (imp.name) rows.push('<div class="field-row"><strong style="color:#a00">Impending:</strong> ' + esc(imp.name) + '</div>');
+          var setting = Array.isArray(data.setting) ? data.setting : [];
+          setting.forEach(function(s) { rows.push('<div class="asp-chip"><em>' + esc(s) + '</em></div>'); });
+        }
+
+        else if (genId === 'complication') {
+          if (data.new_aspect) rows.push('<div class="asp-hc">"' + esc(data.new_aspect) + '"</div>');
+          if (data.arrival)    rows.push('<div class="field-row"><strong>Arrival:</strong> ' + esc(data.arrival) + '</div>');
+          if (data.env)        rows.push('<div class="field-row"><strong>Env:</strong> ' + esc(data.env) + '</div>');
+          if (data.spotlight)  rows.push('<div class="field-row"><strong>Spotlight:</strong> ' + esc(data.spotlight) + '</div>');
+        }
+
+        else if (genId === 'obstacle') {
+          if (data.name||data.title) rows.push('<div class="asp-hc">' + esc(data.name||data.title) + '</div>');
+          if (data.aspect)    rows.push('<div class="asp-chip"><em>' + esc(data.aspect) + '</em></div>');
+          if (data.obstacle_type) rows.push('<div class="field-row"><strong>Type:</strong> ' + esc(data.obstacle_type) + (data.rating != null ?' &nbsp;Rating: '+data.rating:'') + '</div>');
+          if (data.disable||data.bypass) rows.push('<div class="field-row"><strong>Bypass:</strong> ' + esc(data.disable||data.bypass) + '</div>');
+          if (data.gm_note)   rows.push('<div class="field-row" style="color:#666">' + esc(data.gm_note) + '</div>');
+        }
+
+        else if (genId === 'constraint') {
+          if (data.name) rows.push('<div class="asp-hc">' + esc(data.name) + '</div>');
+          if (data.restricted_action||data.what_resists) rows.push('<div class="field-row"><strong>Restricts:</strong> ' + esc(data.restricted_action||data.what_resists) + '</div>');
+          if (data.consequence) rows.push('<div class="field-row"><strong style="color:#a00">If violated:</strong> ' + esc(data.consequence) + '</div>');
+          if (data.bypass)      rows.push('<div class="field-row"><strong style="color:#1a7a40">Bypass:</strong> ' + esc(data.bypass) + '</div>');
+          if (data.gm_note)     rows.push('<div class="field-row" style="color:#666">' + esc(data.gm_note) + '</div>');
+        }
+
+        else if (genId === 'pc') {
+          var asp = data.aspects || {};
+          var LADDER = {4:'Great (+4)',3:'Good (+3)',2:'Fair (+2)',1:'Average (+1)'};
+          if (asp.high_concept) rows.push('<div class="pc-row asp-hc">' + esc(asp.high_concept) + '</div>');
+          if (asp.trouble)      rows.push('<div class="pc-row asp-tr">► ' + esc(asp.trouble) + '</div>');
+          ['other1','other2','other3'].forEach(function(k){ if(asp[k]) rows.push('<div class="pc-row asp-other">' + esc(asp[k]) + '</div>'); });
+          if (data.skills && data.skills.length) {
+            var byR = {};
+            data.skills.forEach(function(s){ if(!byR[s.r]) byR[s.r]=[]; byR[s.r].push(s.name); });
+            var skRows = [4,3,2,1].filter(function(r){return byR[r];}).map(function(r){
+              return '<span class="skill-chip">+'+r+' '+esc(byR[r].join('/'))+' <em style="font-weight:400;opacity:.7">('+LADDER[r]+')</em></span>';
+            });
+            rows.push('<div class="pc-skills">' + skRows.join(' ') + '</div>');
+          }
+          if (data.stunts && data.stunts.length) {
+            rows.push('<div class="pc-stunt-hdr">STUNTS</div>');
+            data.stunts.forEach(function(st){
+              rows.push('<div class="pc-stunt"><strong>' + esc(st.name) + '</strong> ['+esc(st.skill||'')+'] ' + esc(st.desc||'') + '</div>');
+            });
+          }
+          var physN = data.physical_stress || 3, mentN = data.mental_stress || 3;
+          var physB = '', mentB = '';
+          for(var i=0;i<physN;i++) physB += '<span class="stress-box phy"></span>';
+          for(var j=0;j<mentN;j++) mentB += '<span class="stress-box men"></span>';
+          rows.push('<div class="pc-stress">PHYSICAL ' + physB + ' &nbsp; MENTAL ' + mentB + '  &nbsp; REFRESH <strong>' + (data.refresh||3) + '</strong></div>');
+          rows.push('<div class="pc-row asp-other" style="font-size:10px;opacity:.7">Consequences: Mild −2 / Moderate −4 / Severe −6</div>');
+          if (Array.isArray(data.questions) && data.questions.length) {
+            rows.push('<div class="pc-stunt-hdr">SESSION ZERO</div>');
+            data.questions.forEach(function(q,i){ rows.push('<div class="pc-row asp-other">'+(i+1)+'. '+esc(q)+'</div>'); });
           }
         }
-        // ── STICKY / LABEL / FALLBACK ─────────────────────────────────
+
+        else if (genId === 'backstory') {
+          (Array.isArray(data.questions)?data.questions:[]).forEach(function(q,i){
+            rows.push('<div class="field-row">' + (i+1) + '. ' + esc(q) + '</div>');
+          });
+          if (data.hook) rows.push('<div class="field-row"><strong>Hook:</strong> <em>' + esc(data.hook) + '</em></div>');
+        }
+
         else {
           var text2 = card.text || data.situation || data.description || data.text || card.summary || '';
           if (text2) rows.push('<div class="field-row">' + esc(text2) + '</div>');
-          if (card.summary && card.summary !== text2) rows.push('<div class="field-row">' + esc(card.summary) + '</div>');
         }
 
+        var accentColor = ({
+          npc_minor:'#8B4513', npc_major:'#8B4513', pc:'#1565C0', faction:'#7C3ACD',
+          scene:'#076478', campaign:'#076478', encounter:'#8B4513',
+          seed:'#076478', compel:'#7B1FA2', challenge:'#7B1FA2',
+          contest:'#7B1FA2', consequence:'#7B1FA2', complication:'#7B1FA2',
+          backstory:'#7B1FA2', obstacle:'#2E7D32', countdown:'#2E7D32',
+          constraint:'#2E7D32'
+        })[genId] || '#8B4513';
         return (
           '<div class="card">' +
+            '<div class="card-band" style="background:' + accentColor + '"></div>' +
             '<div class="card-header">' +
-              '<span class="card-type">' + esc(typeLabel) + '</span>' +
+              '<span class="card-type" style="color:' + accentColor + '">' + esc(typeLabel) + '</span>' +
               (campName ? '<span class="card-world">' + esc(campName) + '</span>' : '') +
             '</div>' +
-            '<div class="card-title">' + esc(title) + '</div>' +
-            (rows.length ? '<div class="card-body">' + rows.join('') + '</div>' : '') +
+            '<div class="card-inner">' +
+              '<div class="card-title">' + esc(title) + '</div>' +
+              (rows.length ? '<div class="card-body">' + rows.join('') + '</div>' : '') +
+            '</div>' +
           '</div>'
         );
       }
@@ -627,35 +683,39 @@
         '<meta charset="UTF-8">' +
         '<title>Ogma Print — ' + esc(campName || 'Cards') + '</title>' +
         '<style>' +
+        '@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,500&family=Martian+Mono:wght@700;800&display=swap");' +
         '@page{size:A4 portrait;margin:10mm}' +
-        'body{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;margin:0;padding:0;background:#fff;color:#111;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
-        'h1{font-size:11pt;font-weight:400;color:#555;margin:0 0 8px;padding:0}' +
+        'body{font-family:"Fraunces",Georgia,serif;margin:0;padding:0;background:#EDE8DF;color:#1C1410;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
+        'h1{font-size:11pt;font-weight:900;color:#8B4513;margin:0 0 8px;letter-spacing:-.02em}' +
         '.controls{padding:6px 0 10px;display:flex;gap:8px;align-items:center}' +
         '@media print{.controls{display:none}}' +
-        'button{padding:6px 14px;border:1px solid #ccc;border-radius:4px;background:#fff;cursor:pointer;font-size:12px}' +
-        'button:hover{background:#f5f5f5}' +
+        'button{padding:6px 14px;border:1.5px solid #8B4513;border-radius:3px;background:#F5F0E8;cursor:pointer;font-size:11px;font-family:"Martian Mono","Courier New",monospace;font-weight:700;letter-spacing:.06em;color:#8B4513;box-shadow:2px 2px 0 rgba(0,0,0,.12)}' +
+        'button:hover{box-shadow:3px 4px 0 rgba(0,0,0,.12)}' +
         '.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8mm;padding:0}' +
         '@media(min-width:800px){.grid{grid-template-columns:repeat(3,1fr)}}' +
-        '.card{border:1px solid #222;border-radius:3px;padding:7px 9px;min-height:48mm;display:flex;flex-direction:column;break-inside:avoid;page-break-inside:avoid;box-sizing:border-box}' +
-        '.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;padding-bottom:4px;border-bottom:1px solid #ccc}' +
-        '.card-type{font-size:7.5pt;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#444}' +
-        '.card-world{font-size:7pt;color:#888;letter-spacing:.05em}' +
-        '.card-title{font-size:11pt;font-weight:700;line-height:1.25;margin-bottom:5px;color:#000}' +
-        '.card-body{font-size:8.5pt;color:#222;line-height:1.4;flex:1;display:flex;flex-direction:column;gap:3px}' +
-        '.pc-row{color:#333}' +
-        '.asp-hc{font-style:italic;font-weight:600;color:#000}' +
-        '.asp-tr{font-style:italic;color:#555}' +
-        '.asp-other{font-style:italic;color:#777;font-size:8pt}' +
-        '.asp-chip{display:inline-block;border:1px solid #aaa;border-radius:2px;padding:1px 5px;margin:1px 2px 1px 0;font-size:7.5pt;font-style:italic;color:#333}' +
+        '.card{border:1px solid rgba(28,20,10,.18);border-radius:3px;min-height:48mm;display:flex;flex-direction:column;break-inside:avoid;page-break-inside:avoid;box-sizing:border-box;background:#F5F0E8;box-shadow:2px 2px 0 rgba(0,0,0,.1)}' +
+        '.card-band{height:4px;border-radius:3px 3px 0 0;flex-shrink:0}' +
+        '.card-header{display:flex;justify-content:space-between;align-items:center;padding:5px 9px 4px;border-bottom:1px solid rgba(28,20,10,.1)}' +
+        '.card-type{font-size:7pt;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:#8B4513;font-family:"Martian Mono","Courier New",monospace}' +
+        '.card-world{font-size:7pt;color:rgba(139,69,19,.5);letter-spacing:.06em;font-style:italic;font-family:"Martian Mono","Courier New",monospace}' +
+        '.card-inner{padding:7px 9px;flex:1;display:flex;flex-direction:column;gap:0}' +
+        '.card-title{font-size:11pt;font-weight:900;line-height:1.2;margin-bottom:6px;color:#1C1410;letter-spacing:-.02em}' +
+        '.card-body{font-size:8.5pt;color:#3a2e24;line-height:1.4;flex:1;display:flex;flex-direction:column;gap:3px}' +
+        '.sec-lbl{font-size:7pt;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:#8B4513;font-family:"Martian Mono",monospace;margin:5px 0 3px}' +
+        '.pc-row{color:#3a2e24}' +
+        '.asp-hc{font-style:italic;font-weight:600;color:#1C1410;padding:2px 6px 2px 8px;border-left:2.5px solid #8B4513;background:rgba(139,69,19,.05);border-radius:0 2px 2px 0;margin:2px 0}' +
+        '.asp-tr{font-style:italic;color:#7A1414;padding:2px 6px 2px 8px;border-left:2px solid rgba(122,20,20,.35);border-radius:0 2px 2px 0;margin:2px 0}' +
+        '.asp-other{font-style:italic;color:#5a4a3a;font-size:8pt;padding:2px 6px 2px 8px;border-left:1px solid rgba(28,20,10,.12);border-radius:0 2px 2px 0;margin:2px 0}' +
+        '.asp-chip{display:inline-block;border:1px solid rgba(139,69,19,.25);border-radius:2px;padding:1px 5px;margin:1px 2px 1px 0;font-size:7.5pt;font-style:italic;color:#5a4a3a}' +
         '.pc-skills{display:flex;flex-wrap:wrap;gap:2px;margin:3px 0}' +
-        '.skill-chip{font-size:7.5pt;border:1px solid #ccc;border-radius:2px;padding:1px 4px;color:#333;white-space:nowrap}' +
-        '.pc-stunt{font-size:7.5pt;color:#444;border-left:2px solid #aaa;padding-left:4px;margin:2px 0}' +
-        '.pc-stress{display:flex;align-items:center;gap:3px;font-size:7pt;color:#666;margin-top:auto;padding-top:4px}' +
-        '.stress-box{display:inline-block;width:10px;height:10px;border:1.5px solid #666;border-radius:1px}' +
-        '.stress-box.phy{border-color:#e05}' +
-        '.stress-box.men{border-color:#55a}' +
-        '.field-row{font-size:8.5pt;color:#333;line-height:1.35}' +
-        '.field-row strong{color:#000}' +
+        '.skill-chip{font-size:7pt;border:none;border-radius:2px;padding:2px 5px;color:#F5F0E8;white-space:nowrap;font-family:"Martian Mono",monospace;font-weight:700;background:#8B4513}' +
+        '.pc-stunt{font-size:7.5pt;color:#5a4a3a;border-left:2px solid rgba(139,69,19,.28);padding-left:5px;margin:2px 0;font-style:italic}' +
+        '.pc-stress{display:flex;align-items:center;gap:3px;font-size:7pt;color:#8B4513;margin-top:auto;padding-top:5px;font-family:"Martian Mono",monospace;font-weight:700;letter-spacing:.06em}' +
+        '.stress-box{display:inline-block;width:10px;height:10px;border:1.5px solid;border-radius:1px}' +
+        '.stress-box.phy{border-color:#C8944A}' +
+        '.stress-box.men{border-color:#7C3ACD}' +
+        '.field-row{font-size:8.5pt;color:#3a2e24;line-height:1.35}' +
+        '.field-row strong{color:#1C1410;font-weight:700}' +
         '</style></head><body>' +
         '<div class="controls">' +
         '<h1>Ogma — ' + esc(campName || 'Cards') + ' — ' + cards.length + ' card' + (cards.length === 1 ? '' : 's') + '</h1>' +
@@ -683,163 +743,266 @@
     exportCardsAsPng: function(cards, campName) {
       if (!cards || cards.length === 0) { alert('No cards to export.'); return; }
 
+      // Re-use the same esc() and renderCardHtml() logic as printCards so visual output matches.
       function esc(s) {
         if (!s) return '';
         return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
       }
 
-      var CAT_COLORS = {character:'#60a5fa',world:'#fbbf24',mechanics:'#f87171',tool:'#a78bfa',pressure:'#34d399'};
-      var CAT_MAP = {npc_minor:'character',npc_major:'character',faction:'character',scene:'world',campaign:'world',encounter:'world',seed:'world',compel:'mechanics',challenge:'mechanics',contest:'mechanics',consequence:'mechanics',complication:'tool',backstory:'tool',obstacle:'pressure',countdown:'pressure',constraint:'pressure'};
-      var GEN_LABELS = {npc_minor:'MINOR NPC',npc_major:'MAJOR NPC',faction:'FACTION',scene:'SCENE',campaign:'CAMPAIGN',encounter:'ENCOUNTER',seed:'SEED',compel:'COMPEL',challenge:'CHALLENGE',contest:'CONTEST',consequence:'CONSEQUENCE',complication:'COMPLICATION',backstory:'BACKSTORY',obstacle:'OBSTACLE',countdown:'COUNTDOWN',constraint:'CONSTRAINT'};
-
-      function cardHtml(card, idx) {
-        var genId = card.genId || 'other';
-        var d = card.data || {};
-        var title = card.title || d.name || d.location || d.situation || genId;
-        var color = CAT_COLORS[CAT_MAP[genId]] || '#f87171';
-        var label = GEN_LABELS[genId] || genId.toUpperCase().replace(/_/g,' ');
+      // ── renderCardHtml is duplicated here so the popup is self-contained ─
+      function renderCard(card) {
+        var genId = card.genId || '';
+        var data  = card.data  || {};
+        var title = card.title || data.name || data.location || data.situation || genId;
+        var GEN_LABELS = {
+          npc_minor:'Minor NPC', npc_major:'Major NPC', pc:'Player Character', scene:'Scene Setup',
+          encounter:'Encounter', seed:'Adventure Seed', compel:'Compel',
+          challenge:'Challenge', contest:'Contest', consequence:'Consequence',
+          faction:'Faction', complication:'Complication', backstory:'PC Backstory',
+          obstacle:'Obstacle', countdown:'Countdown', constraint:'Constraint',
+          campaign:'Campaign Frame'
+        };
+        var LADDER = {4:'Great (+4)', 3:'Good (+3)', 2:'Fair (+2)', 1:'Average (+1)'};
+        var typeLabel = GEN_LABELS[genId] || genId;
         var rows = [];
-        var asp = d.aspects || {};
-        if (genId === 'npc_minor' || genId === 'npc_major') {
-          if (asp.high_concept) rows.push('<div class="row hc"><span class="badge">HC</span>' + esc(asp.high_concept) + '</div>');
-          if (asp.trouble)      rows.push('<div class="row tr"><span class="badge">TR</span>' + esc(asp.trouble) + '</div>');
-          if (d.skills && d.skills.length) rows.push('<div class="chips">' + d.skills.slice(0,5).map(function(s){return '<span class="chip">+'+s.r+' '+esc(s.name)+'</span>';}).join('') + '</div>');
-          var phy=d.physical_stress||d.stress||0, men=d.mental_stress||0, boxes='';
-          for(var i=0;i<phy;i++) boxes+='<span class="sbox phy"></span>';
-          for(var j=0;j<men;j++) boxes+='<span class="sbox men"></span>';
-          if(boxes) rows.push('<div class="stress">'+boxes+'</div>');
-        } else if (genId==='scene') {
-          (Array.isArray(d.aspects)?d.aspects:[]).slice(0,4).forEach(function(a){var n=typeof a==='string'?a:(a.name||'');rows.push('<div class="row asp">“'+esc(n)+'”</div>');});
-          if(d.zones&&d.zones.length) rows.push('<div class="row muted">Zones: '+d.zones.slice(0,3).map(function(z){return typeof z==='string'?esc(z):esc(z.name||'');}).join(' · ')+'</div>');
-        } else if (genId==='encounter') {
-          (Array.isArray(d.opposition)?d.opposition:[]).slice(0,3).forEach(function(o){rows.push('<div class="row">×'+(o.qty||1)+' '+esc(o.name||o)+'</div>');});
-          if(d.victory) rows.push('<div class="row win">✓ '+esc(d.victory)+'</div>');
-          if(d.defeat)  rows.push('<div class="row lose">✗ '+esc(d.defeat)+'</div>');
-        } else if (genId==='faction') {
-          if(d.goal)    rows.push('<div class="row"><b>Goal:</b> '+esc(d.goal)+'</div>');
-          if(d.method)  rows.push('<div class="row"><b>Method:</b> '+esc(d.method)+'</div>');
-          if(d.weakness)rows.push('<div class="row warn"><b>Weakness:</b> '+esc(d.weakness)+'</div>');
-        } else if (genId==='seed') {
-          if(d.objective)    rows.push('<div class="row"><b>Objective:</b> '+esc(d.objective)+'</div>');
-          if(d.complication) rows.push('<div class="row warn"><b>Complication:</b> '+esc(d.complication)+'</div>');
-          if(d.twist)        rows.push('<div class="row muted"><b>Twist:</b> '+esc(d.twist)+'</div>');
-        } else if (genId==='compel') {
-          if(d.situation)   rows.push('<div class="row hc">'+esc(d.situation)+'</div>');
-          if(d.consequence) rows.push('<div class="row muted"><b>If accepted:</b> '+esc(d.consequence||d.complication)+'</div>');
-        } else if (genId==='challenge') {
-          if(d.name||d.title) rows.push('<div class="row hc">'+esc(d.name||d.title)+'</div>');
-          if(d.primary||d.primary_skill) rows.push('<div class="row"><b>Skill:</b> '+esc(d.primary||d.primary_skill)+'</div>');
-          if(d.success) rows.push('<div class="row win">✓ '+esc(d.success)+'</div>');
-          if(d.failure) rows.push('<div class="row lose">✗ '+esc(d.failure)+'</div>');
-        } else if (genId==='contest') {
-          if(d.contest_type) rows.push('<div class="row hc">'+esc(d.contest_type)+'</div>');
-          if(d.side_a&&d.side_b) rows.push('<div class="row">'+esc(d.side_a)+' ⚔ '+esc(d.side_b)+'</div>');
-          if(d.victories_needed) rows.push('<div class="row muted">First to '+d.victories_needed+' victories</div>');
-        } else if (genId==='consequence') {
-          var sev=(d.severity||'mild').toUpperCase();
-          rows.push('<div class="row hc badge-row"><span class="badge sev">'+esc(sev)+'</span>'+esc(d.aspect||d.mild||d.moderate||d.severe||'')+'</div>');
-          if(d.compel_hook) rows.push('<div class="row muted"><b>Hook:</b> '+esc(d.compel_hook)+'</div>');
-        } else if (genId==='countdown') {
-          if(d.trigger) rows.push('<div class="row"><b>Trigger:</b> '+esc(d.trigger)+'</div>');
-          var bc=d.boxes||4,bs='';for(var bi=0;bi<bc;bi++) bs+='<span class="sbox"></span>';
-          rows.push('<div class="stress">'+bs+'</div>');
-          if(d.outcome) rows.push('<div class="row warn"><b>When full:</b> '+esc(d.outcome)+'</div>');
-        } else if (genId==='campaign') {
-          var cur=d.current||{},imp=d.impending||{};
-          if(cur.name) rows.push('<div class="row hc">'+esc(cur.name)+'</div>');
-          if(imp.name) rows.push('<div class="row warn"><b>Impending:</b> '+esc(imp.name)+'</div>');
-        } else if (genId==='complication') {
-          if(d.new_aspect) rows.push('<div class="row hc">“'+esc(d.new_aspect)+'”</div>');
-          if(d.arrival)    rows.push('<div class="row muted">'+esc(d.arrival)+'</div>');
-        } else if (genId==='obstacle') {
-          rows.push('<div class="row"><span class="badge">'+esc((d.obstacle_type||'obstacle').toUpperCase())+'</span> '+esc(d.name||d.title||'')+'</div>');
-          if(d.bypass) rows.push('<div class="row muted"><b>Bypass:</b> '+esc(d.bypass)+'</div>');
-        } else if (genId==='constraint') {
-          if(d.what_resists||d.what) rows.push('<div class="row hc">'+esc(d.what_resists||d.what||'')+'</div>');
-          if(d.bypass) rows.push('<div class="row win"><b>Bypass:</b> '+esc(d.bypass)+'</div>');
-        } else if (genId==='backstory') {
-          (Array.isArray(d.questions)?d.questions:[]).slice(0,3).forEach(function(q,i){rows.push('<div class="row">'+(i+1)+'. '+esc(q)+'</div>');});
-        } else {
-          var fb=card.summary||d.situation||d.description||d.text||'';
-          if(fb) rows.push('<div class="row">'+esc(fb)+'</div>');
+
+        if (genId === 'npc_minor') {
+          var aspects = Array.isArray(data.aspects) ? data.aspects : [];
+          aspects.forEach(function(a, i) { rows.push('<div class="pc-row '+(i===0?'asp-hc':'asp-other')+'">'+esc(a)+'</div>'); });
+          if (data.skills && data.skills.length) rows.push('<div class="pc-skills">'+data.skills.map(function(s){return '<span class="skill-chip">+'+s.r+' '+esc(s.name)+'</span>';}).join(' ')+'</div>');
+          if (data.stunt) rows.push('<div class="pc-stunt"><strong>'+esc(data.stunt.name)+':</strong> '+esc(data.stunt.desc)+'</div>');
+          var stressN = data.stress || 0;
+          if (stressN) { var boxes=''; for(var i=0;i<stressN;i++) boxes+='<span class="stress-box phy"></span>'; rows.push('<div class="pc-stress">STRESS '+boxes+'</div>'); }
+          rows.push('<div class="pc-row asp-other">No consequences &mdash; one hit = out</div>');
         }
-        return '<div class="card"><div class="card-hdr" style="background:'+color+'22;border-bottom:2px solid '+color+'44"><span class="gen-label" style="color:'+color+'">'+label+'</span>'+(campName?'<span class="world">'+esc(campName)+'</span>':'')+'</div><div class="card-title">'+esc(title)+'</div>'+(rows.length?'<div class="card-body">'+rows.join('')+'</div>':'')+'<div class="card-footer" style="border-top:1px solid '+color+'33;color:'+color+'">'+label+'</div></div>';
+        else if (genId === 'pc' || genId === 'npc_major') {
+          var asp = data.aspects || {};
+          if (asp.high_concept) rows.push('<div class="pc-row asp-hc">'+esc(asp.high_concept)+'</div>');
+          if (asp.trouble)      rows.push('<div class="pc-row asp-tr">&#9658; '+esc(asp.trouble)+'</div>');
+          var others = genId==='pc' ? [asp.other1,asp.other2,asp.other3].filter(Boolean) : (asp.others||[]);
+          others.forEach(function(a){ rows.push('<div class="pc-row asp-other">'+esc(a)+'</div>'); });
+          if (data.skills && data.skills.length) {
+            var byR={};
+            data.skills.forEach(function(s){if(!byR[s.r])byR[s.r]=[];byR[s.r].push(s.name);});
+            rows.push('<div class="pc-skills">'+ [4,3,2,1].filter(function(r){return byR[r];}).map(function(r){
+              return '<span class="skill-chip">+'+r+' '+esc(byR[r].join('/'))+' <em style="font-weight:400;opacity:.7">('+LADDER[r]+')</em></span>';
+            }).join(' ')+'</div>');
+          }
+          if (data.stunts && data.stunts.length) {
+            rows.push('<div class="pc-stunt-hdr">STUNTS</div>');
+            data.stunts.forEach(function(st){ rows.push('<div class="pc-stunt"><strong>'+esc(st.name)+'</strong> ['+esc(st.skill||'')+'] '+esc(st.desc||'')+'</div>'); });
+          }
+          var physN=data.physical_stress||3, mentN=data.mental_stress||3;
+          var physB='', mentB='';
+          for(var i=0;i<physN;i++) physB+='<span class="stress-box phy"></span>';
+          for(var j=0;j<mentN;j++) mentB+='<span class="stress-box men"></span>';
+          rows.push('<div class="pc-stress">PHYSICAL '+physB+' &nbsp; MENTAL '+mentB+' &nbsp; REFRESH <strong>'+(data.refresh||3)+'</strong></div>');
+          rows.push('<div class="pc-row asp-other" style="font-size:10px;opacity:.7">Consequences: Mild &minus;2 / Moderate &minus;4 / Severe &minus;6</div>');
+          if (genId==='pc' && Array.isArray(data.questions) && data.questions.length) {
+            rows.push('<div class="pc-stunt-hdr">SESSION ZERO</div>');
+            data.questions.forEach(function(q,i){ rows.push('<div class="pc-row asp-other">'+(i+1)+'. '+esc(q)+'</div>'); });
+          }
+        }
+        else if (genId==='faction') {
+          var asp2=data.aspects||{};
+          if(asp2.high_concept) rows.push('<div class="pc-row asp-hc">'+esc(asp2.high_concept)+'</div>');
+          if(data.goal)     rows.push('<div class="field-row"><strong>Goal:</strong> '+esc(data.goal)+'</div>');
+          if(data.method)   rows.push('<div class="field-row"><strong>Method:</strong> '+esc(data.method)+'</div>');
+          if(data.weakness) rows.push('<div class="field-row" style="color:#7A1414"><strong>Weakness:</strong> '+esc(data.weakness)+'</div>');
+          if(data.face)     rows.push('<div class="field-row"><strong>Face:</strong> '+esc(data.face)+'</div>');
+        }
+        else if (genId==='scene') {
+          (Array.isArray(data.aspects)?data.aspects:[]).slice(0,4).forEach(function(a){
+            var n=typeof a==='string'?a:(a.name||'');
+            rows.push('<div class="pc-row asp-other">&ldquo;'+esc(n)+'&rdquo;</div>');
+          });
+          if(data.zones&&data.zones.length) rows.push('<div class="field-row" style="color:#5a4a3a;font-size:8pt">Zones: '+data.zones.slice(0,3).map(function(z){return typeof z==='string'?esc(z):esc(z.name||'');}).join(' &middot; ')+'</div>');
+        }
+        else if (genId==='encounter') {
+          (Array.isArray(data.opposition)?data.opposition:[]).slice(0,3).forEach(function(o){ rows.push('<div class="pc-row asp-other">&times;'+(o.qty||1)+' '+esc(o.name||o)+'</div>'); });
+          if(data.victory) rows.push('<div class="field-row" style="color:#2e7d32"><strong>Win:</strong> '+esc(data.victory)+'</div>');
+          if(data.defeat)  rows.push('<div class="field-row" style="color:#7A1414"><strong>Lose:</strong> '+esc(data.defeat)+'</div>');
+        }
+        else if (genId==='seed') {
+          if(data.objective)    rows.push('<div class="pc-row asp-hc">'+esc(data.objective)+'</div>');
+          if(data.complication) rows.push('<div class="pc-row asp-tr">'+esc(data.complication)+'</div>');
+          if(data.twist)        rows.push('<div class="field-row" style="color:#5a4a3a"><strong>Twist:</strong> '+esc(data.twist)+'</div>');
+          if(data.victory||data.stakes_good) rows.push('<div class="field-row" style="color:#2e7d32"><strong>Win:</strong> '+esc(data.victory||data.stakes_good)+'</div>');
+          if(data.defeat||data.stakes_bad)   rows.push('<div class="field-row" style="color:#7A1414"><strong>Lose:</strong> '+esc(data.defeat||data.stakes_bad)+'</div>');
+        }
+        else if (genId==='campaign') {
+          var cur=data.current||{}, imp=data.impending||{};
+          if(cur.name) rows.push('<div class="pc-row asp-hc">'+esc(cur.name)+'</div>');
+          if(imp.name) rows.push('<div class="pc-row asp-tr"><strong>Impending:</strong> '+esc(imp.name)+'</div>');
+        }
+        else if (genId==='compel') {
+          if(data.situation)   rows.push('<div class="pc-row asp-hc">'+esc(data.situation)+'</div>');
+          if(data.consequence||data.complication) rows.push('<div class="field-row"><strong>If accepted:</strong> '+esc(data.consequence||data.complication)+'</div>');
+        }
+        else if (genId==='challenge') {
+          if(data.name||data.title) rows.push('<div class="pc-row asp-hc">'+esc(data.name||data.title)+'</div>');
+          if(data.primary||data.primary_skill) rows.push('<div class="field-row"><strong>Skill:</strong> '+esc(data.primary||data.primary_skill)+'</div>');
+          if(data.success||data.stakes_good) rows.push('<div class="field-row" style="color:#2e7d32"><strong>Win:</strong> '+esc(data.success||data.stakes_good)+'</div>');
+          if(data.failure||data.stakes_bad)  rows.push('<div class="field-row" style="color:#7A1414"><strong>Lose:</strong> '+esc(data.failure||data.stakes_bad)+'</div>');
+        }
+        else if (genId==='contest') {
+          if(data.contest_type) rows.push('<div class="pc-row asp-hc">'+esc(data.contest_type)+'</div>');
+          if(data.side_a&&data.side_b) rows.push('<div class="field-row">'+esc(data.side_a)+' vs '+esc(data.side_b)+'</div>');
+          if(data.victories_needed) rows.push('<div class="field-row" style="color:#5a4a3a">First to '+data.victories_needed+' victories</div>');
+        }
+        else if (genId==='consequence') {
+          var sev=(data.severity||'mild').toUpperCase();
+          rows.push('<div class="pc-row asp-hc">'+esc(sev)+': '+esc(data.aspect||data.mild||data.moderate||data.severe||'')+'</div>');
+          if(data.compel_hook) rows.push('<div class="field-row"><strong>Hook:</strong> '+esc(data.compel_hook)+'</div>');
+        }
+        else if (genId==='countdown') {
+          if(data.trigger) rows.push('<div class="field-row"><strong>Trigger:</strong> '+esc(data.trigger)+'</div>');
+          var bc=data.boxes||4, bs=''; for(var bi=0;bi<bc;bi++) bs+='<span class="stress-box phy"></span>';
+          rows.push('<div class="pc-stress">'+bs+'</div>');
+          if(data.outcome) rows.push('<div class="field-row" style="color:#7A1414"><strong>When full:</strong> '+esc(data.outcome)+'</div>');
+        }
+        else if (genId==='complication') {
+          if(data.new_aspect) rows.push('<div class="pc-row asp-hc">&ldquo;'+esc(data.new_aspect)+'&rdquo;</div>');
+          if(data.arrival)    rows.push('<div class="field-row" style="color:#5a4a3a">'+esc(data.arrival)+'</div>');
+        }
+        else if (genId==='obstacle') {
+          if(data.restricted_action||data.what_resists) rows.push('<div class="field-row"><strong>Restricts:</strong> '+esc(data.restricted_action||data.what_resists)+'</div>');
+          if(data.bypass) rows.push('<div class="field-row" style="color:#2e7d32"><strong>Bypass:</strong> '+esc(data.bypass)+'</div>');
+          if(data.gm_note) rows.push('<div class="field-row" style="color:#5a4a3a;font-style:italic">'+esc(data.gm_note)+'</div>');
+        }
+        else if (genId==='constraint') {
+          if(data.restricted_action||data.what_resists) rows.push('<div class="field-row"><strong>Restricts:</strong> '+esc(data.restricted_action||data.what_resists)+'</div>');
+          if(data.consequence) rows.push('<div class="field-row" style="color:#7A1414"><strong>If violated:</strong> '+esc(data.consequence)+'</div>');
+          if(data.bypass) rows.push('<div class="field-row" style="color:#2e7d32"><strong>Bypass:</strong> '+esc(data.bypass)+'</div>');
+        }
+        else if (genId==='backstory') {
+          (Array.isArray(data.questions)?data.questions:[]).forEach(function(q,i){ rows.push('<div class="field-row">'+(i+1)+'. '+esc(q)+'</div>'); });
+          if(data.hook) rows.push('<div class="field-row"><strong>Hook:</strong> <em>'+esc(data.hook)+'</em></div>');
+        }
+        else {
+          var text2 = card.text || data.situation || data.description || data.text || card.summary || '';
+          if (text2) rows.push('<div class="field-row">'+esc(text2)+'</div>');
+        }
+
+        var accentColor = ({
+          npc_minor:'#8B4513', npc_major:'#8B4513', pc:'#1565C0', faction:'#7C3ACD',
+          scene:'#076478', campaign:'#076478', encounter:'#8B4513',
+          seed:'#076478', compel:'#7B1FA2', challenge:'#7B1FA2',
+          contest:'#7B1FA2', consequence:'#7B1FA2', complication:'#7B1FA2',
+          backstory:'#7B1FA2', obstacle:'#2E7D32', countdown:'#2E7D32', constraint:'#2E7D32'
+        })[genId] || '#8B4513';
+
+        return (
+          '<div class="card">' +
+            '<div class="card-band" style="background:' + accentColor + '"></div>' +
+            '<div class="card-header">' +
+              '<span class="card-type" style="color:' + accentColor + '">' + esc(typeLabel) + '</span>' +
+              (campName ? '<span class="card-world">' + esc(campName) + '</span>' : '') +
+            '</div>' +
+            '<div class="card-inner">' +
+              '<div class="card-title">' + esc(title) + '</div>' +
+              (rows.length ? '<div class="card-body">' + rows.join('') + '</div>' : '') +
+            '</div>' +
+          '</div>'
+        );
       }
 
       var safecamp = (campName||'ogma').replace(/[^a-zA-Z0-9_-]/g,'_');
-      var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Ogma Image Pack</title>'
-        +'<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous"><\/script>'
-        +'<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous"><\/script>'
-        +'<style>'
-        +'body{font-family:system-ui,sans-serif;background:#0f1012;margin:0;padding:20px;color:#f0f0f0}'
-        +'h1{font-size:12px;font-weight:700;letter-spacing:.15em;color:#555;margin:0 0 10px;text-transform:uppercase;font-family:"Courier New",monospace}'
-        +'#status{padding:10px 14px;background:#16181c;border-radius:8px;margin-bottom:12px;font-size:13px;color:#c0c0c0;border:1px solid #2a2d35}'
-        +'.done{color:#34d399;font-weight:700}.err{color:#f87171}'
-        +'.controls{display:flex;gap:8px;margin-bottom:20px}'
-        +'button{padding:9px 22px;border-radius:6px;border:none;cursor:pointer;font-size:13px;font-weight:700;font-family:inherit;transition:opacity .15s}'
-        +'.btn-dl{background:#3b82f6;color:#fff}.btn-dl:hover{opacity:.85}'
-        +'.btn-cl{background:#2a2d35;color:#888}.btn-cl:hover{background:#333}'
-        +'.grid{display:grid;grid-template-columns:repeat(auto-fill,600px);gap:16px}'
-        +'.card{width:600px;background:#1e1e2a;border:1px solid #2a2d35;border-radius:10px;overflow:hidden;display:flex;flex-direction:column}'
-        +'.card-hdr{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;flex-shrink:0}'
-        +'.gen-label{font-size:11px;font-weight:800;letter-spacing:.2em;font-family:"Courier New",monospace}'
-        +'.world{font-size:11px;color:#555;letter-spacing:.05em}'
-        +'.card-title{font-size:16px;font-weight:800;padding:10px 14px 6px;color:#f0f0f0;font-family:"Courier New",monospace;letter-spacing:-.02em;line-height:1.25}'
-        +'.card-body{flex:1;padding:4px 14px 12px;display:flex;flex-direction:column;gap:5px}'
-        +'.card-footer{height:22px;display:flex;align-items:center;justify-content:center;font-size:9px;letter-spacing:.2em;font-family:"Courier New",monospace;font-weight:700;opacity:.35;flex-shrink:0}'
-        +'.row{font-size:12px;color:#b0b0b0;line-height:1.45}'
-        +'.row.hc{font-style:italic;color:#f0f0f0;font-weight:600}'
-        +'.row.tr{font-style:italic;color:#f87171}'
-        +'.row.asp{font-style:italic;color:#d0d0d0}'
-        +'.row.win{color:#34d399}.row.lose{color:#f87171}.row.warn{color:#fbbf24}.row.muted{color:#666}'
-        +'.row.badge-row{display:flex;align-items:center;gap:5px}'
-        +'.badge{font-size:9px;font-weight:800;letter-spacing:.12em;padding:1px 5px;border-radius:3px;background:rgba(255,255,255,.06);font-family:"Courier New",monospace}'
-        +'.badge.sev{background:rgba(248,113,113,.18);color:#f87171}'
-        +'.chips{display:flex;flex-wrap:wrap;gap:3px;margin:2px 0}'
-        +'.chip{font-size:11px;padding:2px 6px;border:1px solid #333;border-radius:3px;color:#909090;white-space:nowrap}'
-        +'.stress{display:flex;gap:4px;align-items:center;margin:3px 0;flex-wrap:wrap}'
-        +'.sbox{display:inline-block;width:14px;height:14px;border-radius:2px;border:2px solid #555;flex-shrink:0}'
-        +'.sbox.phy{border-color:#fbbf24}.sbox.men{border-color:#a78bfa}'
-        +'</style></head><body>'
-        +'<h1>Ogma — '+esc(campName||'Image Pack')+' — '+cards.length+' card'+(cards.length===1?'':'s')+'</h1>'
-        +'<div id="status">Loaded. Click “Download ZIP” to capture and package all cards as PNG images.</div>'
-        +'<div class="controls">'
-        +'<button class="btn-dl" id="dlBtn" onclick="doExport()">📥 Download ZIP</button>'
-        +'<button class="btn-cl" onclick="window.close()">✕ Close</button>'
-        +'</div>'
-        +'<div class="grid" id="grid">'+cards.map(function(card,i){return cardHtml(card,i);}).join('')+'</div>'
-        +'<script>'
-        +'async function doExport(){'
-        +'if(typeof html2canvas==="undefined"||typeof JSZip==="undefined"){'
-        +'document.getElementById("status").innerHTML="<span class=\\"err\\">\u26a0 Export needs an internet connection to load image libraries. Connect and reload to try again.</span>";'
-        +'return;}'
-        +'var btn=document.getElementById("dlBtn"),status=document.getElementById("status");'
-        +'btn.disabled=true;btn.textContent="⏳ Rendering…";'
-        +'var els=document.querySelectorAll(".card");'
-        +'var zip=new JSZip(),folder=zip.folder("'+safecamp+'_cards");'
-        +'for(var i=0;i<els.length;i++){'
-        +'status.textContent="Rendering card "+(i+1)+" of "+els.length+"…";'
-        +'try{'
-        +'var cv=await html2canvas(els[i],{scale:2,backgroundColor:"#0f1012",logging:false,useCORS:true});'
-        +'var img=cv.toDataURL("image/png").split(",")[1];'
-        +'var lbl=(els[i].querySelector(".gen-label")||{}).textContent||("card_"+(i+1));'
-        +'var fn=lbl.toLowerCase().replace(/[^a-z0-9]+/g,"_")+"_"+(i+1).toString().padStart(3,"0")+".png";'
-        +'folder.file(fn,img,{base64:true});'
-        +'}catch(e){status.innerHTML+="<br><span class=\"err\">Card "+(i+1)+" failed: "+e.message+"</span>";}'
-        +'}'
-        +'status.textContent="Packaging ZIP…";'
-        +'var blob=await zip.generateAsync({type:"blob"});'
-        +'var url=URL.createObjectURL(blob);'
-        +'var a=document.createElement("a");a.href=url;a.download="'+safecamp+'_cards.zip";'
-        +'document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);'
-        +'status.innerHTML="<span class=\"done\">✓ "+els.length+" card"+(els.length===1?"":"s")+" exported as PNG. Drag the ZIP into Miro, Figma, or any canvas app.</span>";'
-        +'btn.disabled=false;btn.textContent="✓ Done";'
-        +'}'
-        +'<\/script></body></html>';
+      var html = (
+        '<!DOCTYPE html><html lang="en"><head>' +
+        '<meta charset="UTF-8">' +
+        '<title>Ogma Image Pack &mdash; ' + esc(campName||'Cards') + '</title>' +
+        '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous"><'+'/script>' +
+        '<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous"><'+'/script>' +
+        '<style>' +
+        '@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,500&family=Martian+Mono:wght@700;800&display=swap");' +
+        'body{font-family:"Fraunces",Georgia,serif;margin:0;padding:16px;background:#EDE8DF;color:#1C1410;-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
+        'h1{font-size:11pt;font-weight:900;color:#8B4513;margin:0 0 6px;letter-spacing:-.02em}' +
+        '.controls{padding:4px 0 12px;display:flex;gap:8px;align-items:center}' +
+        '#status{padding:8px 12px;background:#F5F0E8;border:1px solid rgba(139,69,19,.2);border-radius:3px;margin-bottom:12px;font-size:12px;color:#5a4a3a;font-family:"Martian Mono","Courier New",monospace}' +
+        '.done{color:#2e7d32;font-weight:700}.err{color:#7A1414}' +
+        'button{padding:6px 14px;border:1.5px solid #8B4513;border-radius:3px;background:#F5F0E8;cursor:pointer;font-size:11px;font-family:"Martian Mono","Courier New",monospace;font-weight:700;letter-spacing:.06em;color:#8B4513;box-shadow:2px 2px 0 rgba(0,0,0,.12)}' +
+        'button:hover{box-shadow:3px 4px 0 rgba(0,0,0,.12);transform:translateY(-1px)}' +
+        'button:disabled{opacity:.5;cursor:default;transform:none}' +
+        '.grid{display:grid;grid-template-columns:repeat(auto-fill,320px);gap:12px}' +
+        '.card{background:#F5F0E8;border:1px solid rgba(28,20,10,.18);border-radius:3px;overflow:hidden;display:flex;flex-direction:column;box-shadow:2px 2px 0 rgba(0,0,0,.10)}' +
+        '.card-band{height:4px;flex-shrink:0}' +
+        '.card-header{display:flex;justify-content:space-between;align-items:center;padding:5px 9px 4px;border-bottom:1px solid rgba(28,20,10,.1)}' +
+        '.card-type{font-size:7pt;font-weight:800;letter-spacing:.2em;text-transform:uppercase;font-family:"Martian Mono","Courier New",monospace}' +
+        '.card-world{font-size:7pt;color:rgba(139,69,19,.5);letter-spacing:.06em;font-style:italic;font-family:"Martian Mono","Courier New",monospace}' +
+        '.card-inner{padding:7px 9px;flex:1;display:flex;flex-direction:column;gap:0}' +
+        '.card-title{font-size:11pt;font-weight:900;line-height:1.2;margin-bottom:6px;color:#1C1410;letter-spacing:-.02em}' +
+        '.card-body{font-size:8.5pt;color:#3a2e24;line-height:1.4;flex:1;display:flex;flex-direction:column;gap:3px}' +
+        '.pc-row{color:#3a2e24}' +
+        '.asp-hc{font-style:italic;font-weight:600;color:#1C1410;padding:2px 6px 2px 8px;border-left:2.5px solid #8B4513;background:rgba(139,69,19,.05);border-radius:0 2px 2px 0;margin:2px 0}' +
+        '.asp-tr{font-style:italic;color:#7A1414;padding:2px 6px 2px 8px;border-left:2px solid rgba(122,20,20,.35);border-radius:0 2px 2px 0;margin:2px 0}' +
+        '.asp-other{font-style:italic;color:#5a4a3a;font-size:8pt;padding:2px 6px 2px 8px;border-left:1px solid rgba(28,20,10,.12);border-radius:0 2px 2px 0;margin:2px 0}' +
+        '.pc-skills{display:flex;flex-wrap:wrap;gap:2px;margin:3px 0}' +
+        '.skill-chip{font-size:7pt;border:none;border-radius:2px;padding:2px 5px;color:#F5F0E8;white-space:nowrap;font-family:"Martian Mono",monospace;font-weight:700;background:#8B4513}' +
+        '.pc-stunt{font-size:7.5pt;color:#5a4a3a;border-left:2px solid rgba(139,69,19,.28);padding-left:5px;margin:2px 0;font-style:italic}' +
+        '.pc-stunt-hdr{font-size:7pt;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:#8B4513;font-family:"Martian Mono",monospace;margin:5px 0 3px}' +
+        '.pc-stress{display:flex;align-items:center;gap:3px;font-size:7pt;color:#8B4513;margin-top:auto;padding-top:5px;font-family:"Martian Mono",monospace;font-weight:700;letter-spacing:.06em;flex-wrap:wrap}' +
+        '.stress-box{display:inline-block;width:10px;height:10px;border:1.5px solid;border-radius:1px}' +
+        '.stress-box.phy{border-color:#C8944A}' +
+        '.stress-box.men{border-color:#7C3ACD}' +
+        '.field-row{font-size:8.5pt;color:#3a2e24;line-height:1.35}' +
+        '.field-row strong{color:#1C1410;font-weight:700}' +
+        '</style></head><body>' +
+        '<div class="controls">' +
+        '<h1>Ogma &mdash; ' + esc(campName||'Cards') + ' &mdash; ' + cards.length + ' card' + (cards.length===1?'':'s') + '</h1>' +
+        '<button id="dlBtn" onclick="startExport()">Download ZIP</button>' +
+        '<button onclick="window.close()">&#x2715; Close</button>' +
+        '</div>' +
+        '<div id="status">Ready. Click "Download ZIP" to capture all cards as PNG images.</div>' +
+        '<div class="grid" id="grid">' + cards.map(renderCard).join('') + '</div>' +
+        '<script>' +
+        'function startExport(){' +
+        '  if(typeof html2canvas==="undefined"||typeof JSZip==="undefined"){' +
+        '    document.getElementById("status").innerHTML="<span class=\\"err\\">Libraries not loaded &mdash; check internet connection and reload.</span>";' +
+        '    return;' +
+        '  }' +
+        '  var btn=document.getElementById("dlBtn");' +
+        '  var status=document.getElementById("status");' +
+        '  var els=document.querySelectorAll(".card");' +
+        '  var zip=new JSZip();' +
+        '  var folder=zip.folder("' + safecamp + '_cards");' +
+        '  btn.disabled=true;' +
+        '  btn.textContent="Rendering...";' +
+        '  var idx=0;' +
+        '  function next(){' +
+        '    if(idx>=els.length){' +
+        '      status.textContent="Packaging ZIP...";' +
+        '      zip.generateAsync({type:"blob"}).then(function(blob){' +
+        '        var url=URL.createObjectURL(blob);' +
+        '        var a=document.createElement("a");' +
+        '        a.href=url;a.download="' + safecamp + '_cards.zip";' +
+        '        document.body.appendChild(a);a.click();' +
+        '        document.body.removeChild(a);URL.revokeObjectURL(url);' +
+        '        status.innerHTML="<span class=\\"done\\">Done &mdash; "+els.length+" card'+(cards.length===1?'':'s')+' exported.</span>";' +
+        '        btn.textContent="Done";btn.disabled=false;' +
+        '      });' +
+        '      return;' +
+        '    }' +
+        '    status.textContent="Rendering card "+(idx+1)+" of "+els.length+"...";' +
+        '    html2canvas(els[idx],{scale:2,backgroundColor:"#EDE8DF",logging:false,useCORS:true}).then(function(cv){' +
+        '      var img=cv.toDataURL("image/png").split(",")[1];' +
+        '      var lbl=(els[idx].querySelector(".card-type")||{}).textContent||("card_"+(idx+1));' +
+        '      var fn=lbl.toLowerCase().replace(/[^a-z0-9]+/g,"_")+"_"+(idx+1).toString().padStart(3,"0")+".png";' +
+        '      folder.file(fn,img,{base64:true});' +
+        '      idx++;next();' +
+        '    }).catch(function(e){' +
+        '      status.innerHTML+="<br><span class=\\"err\\">Card "+(idx+1)+" failed: "+e.message+"</span>";' +
+        '      idx++;next();' +
+        '    });' +
+        '  }' +
+        '  next();' +
+        '}' +
+        '<'+'/script></body></html>'
+      );
 
       var blob = new Blob([html], {type:'text/html;charset=utf-8'});
       var url = URL.createObjectURL(blob);
-      var w = window.open(url, '_blank', 'width=740,height=640,scrollbars=yes');
+      var w = window.open(url, '_blank', 'width=900,height=700,scrollbars=yes');
       if (!w) {
         var a = document.createElement('a');
         a.href = url; a.download = safecamp + '-image-pack.html';
