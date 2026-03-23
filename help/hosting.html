@@ -6,14 +6,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600;1,700&display=swap" rel="stylesheet">
-  <base href="/">
+  <script>if(location.protocol!=="file:"){document.write("<base href="/">");}</script>
   <meta name="description" content="How to host a live multiplayer Ogma session — deploy the sync server, share a room code, and play with remote players in real time.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Hosting — Ogma Help</title>
   <link rel="icon" type="image/svg+xml" href="../assets/favicons/icon.svg">
-  <link rel="stylesheet" href="../assets/css/help-shared.css?v=367">
-  <link rel="stylesheet" href="../assets/css/theme.css?v=367">
-  <script src="../assets/js/help-shared.js?v=367"></script>
+  <link rel="stylesheet" href="../assets/css/help-shared.css?v=377">
+  <link rel="stylesheet" href="../assets/css/theme.css?v=377">
+  <script src="../assets/js/help-shared.js?v=377"></script>
   <link rel="canonical" href="https://ogma.net/help/hosting.html">
 </head>
 <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -267,7 +267,7 @@ jobs:
 <p>The GM needs to have added at least one card to the canvas before players join — the server only stores the state from the most recent GM broadcast, and an empty board is valid state. Have the GM add a card or click Host again to re-broadcast.</p>
 
 <h3>The Host button does nothing or shows "Sync unavailable offline"</h3>
-<p>The <code>partysocket</code> client script failed to load. This usually means the browser is fully offline. The script is cached by the service worker after first load, so if you've opened run.html online at least once, it should work offline. Try a hard refresh (<kbd>Ctrl+Shift+R</kbd> / <kbd>Cmd+Shift+R</kbd>) while online.</p>
+<p>The <code>partysocket</code> client script failed to load. This usually means the browser is fully offline. The script is cached by the service worker after first load, so if you've opened a campaign page online at least once, it should work offline. Try a hard refresh (<kbd>Ctrl+Shift+R</kbd> / <kbd>Cmd+Shift+R</kbd>) while online.</p>
 
 <h3>Players keep disconnecting</h3>
 <p>The <code>partysocket</code> client reconnects automatically with exponential backoff. Brief dropouts are normal and recover silently. If a player is on a corporate or school network, port 443 WebSocket connections are occasionally blocked — a personal hotspot usually fixes it.</p>

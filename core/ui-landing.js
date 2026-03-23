@@ -212,10 +212,10 @@ function LandingApp() {
       h('div', {className: 'land-hero'},
         h('div', {className: 'land-hero-inner'},
           h('p', {className: 'land-hero-eyebrow'},
-            h('strong', {className: 'ogma-letter', style: {'--i': 0}}, 'O'), 'n-demand ',
-            h('strong', {className: 'ogma-letter', style: {'--i': 1}}, 'G'), 'enerator for ',
-            h('strong', {className: 'ogma-letter', style: {'--i': 2}}, 'M'), 'asterful ',
-            h('strong', {className: 'ogma-letter', style: {'--i': 3}}, 'A'), 'dventures'
+            h('span', {style: {whiteSpace: 'nowrap'}}, h('strong', {className: 'ogma-letter', style: {'--i': 0}}, 'O'), 'n-demand '),
+            h('span', {style: {whiteSpace: 'nowrap'}}, h('strong', {className: 'ogma-letter', style: {'--i': 1}}, 'G'), 'enerator for '),
+            h('span', {style: {whiteSpace: 'nowrap'}}, h('strong', {className: 'ogma-letter', style: {'--i': 2}}, 'M'), 'asterful '),
+            h('span', {style: {whiteSpace: 'nowrap'}}, h('strong', {className: 'ogma-letter', style: {'--i': 3}}, 'A'), 'dventures')
           ),
           h('h1', {className: 'land-hero-title'},
             'Your session is in two hours.',

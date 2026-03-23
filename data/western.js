@@ -61,6 +61,7 @@ CAMPAIGNS["western"] = {
     ],
       pc_high_concepts: ["Frontier Surgeon Who Has Patched Both Sides of Too Many Disputes","Railroad-Displaced Rancher With a Land Claim the Company Wants Gone","Former Marshal Whose Territory No Longer Recognises Her Commission","Pinkerton Agent Who Has Stopped Believing the Agency's Reports","Homesteader's Widow Carrying the Deed That Got Her Husband Killed","Army Scout Mustered Out With Knowledge the Command Wants Buried","Freight Contractor Whose Route Goes Through Land Three Parties Claim","Telegraph Operator Who Has Read Too Many Official Messages","Gunsmith Whose Customers Include Everyone on Both Sides","Chinese Railroad Worker Who Built This Line and Isn't Leaving","Freedman Rancher Whose Deed Is Legal and Therefore a Target","Mexican Land-Grant Holder Watching the Survey Crew Arrive"],
       pc_questions: ["What did the old war cost you specifically, and are you still paying?","Who in this territory owes you a debt they haven't acknowledged?","What are you building here, and who wants to stop it?","What reputation follows you that isn't entirely accurate?","What would make you leave everything you've built and ride out?","Who do you trust completely in this group and who are you watching?"],
+      pc_skills: ["Shoot","Fight","Ride","Notice","Physique","Provoke","Deceive","Rapport","Stealth","Crafts","Resources","Contacts","Empathy","Will","Lore","Investigate","Burglary","Drive"],
 
     // ── Minor NPC concepts ─────────────────────────────────────────────────
     minor_concepts: {

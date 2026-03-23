@@ -1014,7 +1014,7 @@ var CV4_HELP = {
     what: 'A new aspect that enters the scene and makes everything harder.',
     when: 'End of a scene that resolved cleanly, or when a scene needs a second wind.',
     rule: 'Complications arrive with at least one free invoke. Remove them only when the fiction justifies it.',
-    invoke: 'The complication \u201cReinforcements Called In\u201d arrives with one free invoke. Use it immediately on the new NPCs\u2019 initiative roll \u2014 they arrived coordinated and ready.',
+    invoke: 'The complication \u201cReinforcements Called In\u201d arrives with one free invoke. Use it on the new NPCs\u2019 first action in the exchange \u2014 they arrived coordinated and ready.',
     compel: 'The complication is \u201cThe Safe House Is Compromised\u201d. Compel it when a PC tries to retreat there: they arrive and walk straight into an ambush. Fate point offered.',
   },
   pc: {
@@ -1032,8 +1032,8 @@ var CV4_HELP = {
     compel: 'The same aspect: compel it when the settlement asks for something dangerous. \u201cYou owe them. Here\u2019s a Fate point if you agree even though it\u2019s a terrible idea.\u201d',
   },
   obstacle: {
-    what: 'A passive threat that opposes the party without taking initiative.',
-    when: 'Environmental dangers, barriers, conditions. Anything that resists without rolling initiative.',
+    what: 'A passive threat that opposes the party without taking an action each exchange.',
+    when: 'Environmental dangers, barriers, conditions. Anything that resists without acting in the conflict.',
     rule: 'Obstacles do not act in a conflict. Passive opposition = their rating. Disable by overcoming at rating + 2.',
     invoke: 'The obstacle aspect is \u201cFloodwater Rising Fast\u201d. Invoke it against a PC\u2019s Athletics roll to cross: the water\u2019s current is now actively opposing them, not just a difficulty number.',
     compel: 'The same obstacle: compel a PC whose trouble is \u201cI Can\u2019t Leave Anyone Behind\u201d. The water is rising and someone\u2019s stuck. Do they go back? Fate point on the table.',
@@ -1405,7 +1405,7 @@ function cv4Card(props) {
     h('div', {style:{flexShrink:0}},
       frontFn(genId, data, campName, catColor, {state:cardState, upd:updState, phyMax:phyMax, menMax:menMax})
     ),
-    // ── GM Guidance footer (expandable) ───────────────────────────────────
+    // ── GM Guidance footer (expandable — smooth slide, BDR-03) ────────────
     h('div', {
       style:{
         borderTop: '1px solid ' + catColor + '22',
@@ -1423,17 +1423,28 @@ function cv4Card(props) {
           gap:6, fontFamily:CV4_MONO, fontSize:10, fontWeight:700, letterSpacing:'0.18em',
           color: gmOpen ? catColor : 'var(--cv-card-text-muted)',
           textTransform:'uppercase',
-          transition:'color 0.12s',
+          transition:'color 0.18s',
         },
       },
-        h('span', {style:{fontSize:8, lineHeight:1}}, gmOpen?'\u25bc':'\u25ba'),
+        h('span', {style:{
+          fontSize:10, lineHeight:1,
+          display:'inline-block',
+          transform: gmOpen ? 'rotate(90deg)' : 'rotate(0deg)',
+          transition:'transform 0.22s cubic-bezier(0.34,1.56,0.64,1)',
+        }}, '\u25ba'),
         'GM Guidance'
       ),
-      gmOpen && h('div', {
+      h('div', {
         id: 'gm-guide-'+genId,
+        'aria-hidden': String(!gmOpen),
         style:{
-          borderTop: '1px solid ' + catColor + '22',
-          animation: 'fadeDown 0.15s ease both',
+          borderTop: gmOpen ? '1px solid ' + catColor + '22' : 'none',
+          maxHeight: gmOpen ? '600px' : '0px',
+          overflow: 'hidden',
+          transition: gmOpen
+            ? 'max-height 0.32s cubic-bezier(0.4,0,0.2,1), opacity 0.18s ease 0.06s'
+            : 'max-height 0.22s cubic-bezier(0.4,0,0.2,1), opacity 0.12s ease',
+          opacity: gmOpen ? 1 : 0,
         }
       }, cv4BackPanel(genId, catColor))
     )

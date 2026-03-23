@@ -73,14 +73,14 @@ test('rating 1 → 4 boxes', function() {
 test('rating 2 → 4 boxes', function() {
   assert.strictEqual(stressFromRating(2), 4);
 });
-test('rating 3 → 5 boxes', function() {
-  assert.strictEqual(stressFromRating(3), 5);
+test('rating 3 → 6 boxes (FCon: Good=6)', function() {
+  assert.strictEqual(stressFromRating(3), 6);
 });
-test('rating 4 → 5 boxes (cap)', function() {
-  assert.strictEqual(stressFromRating(4), 5);
+test('rating 4 → 6 boxes (FCon: Great=6)', function() {
+  assert.strictEqual(stressFromRating(4), 6);
 });
-test('rating 5 → 5 boxes (cap enforced)', function() {
-  assert.strictEqual(stressFromRating(5), 5);
+test('rating 5 → 6 boxes (FCon: Superb+=6+extra mild slot)', function() {
+  assert.strictEqual(stressFromRating(5), 6);
 });
 
 // ════════════════════════════════════════════════════════════════════════
@@ -184,13 +184,13 @@ test('npc_major refresh >= 1 (FCon minimum)', function() {
   }
 });
 
-test('npc_major stress boxes 3-5 (FCon p.35)', function() {
+test('npc_major stress boxes 3 or 4 or 6 (FCon p.12/35)', function() {
   for (var i = 0; i < 20; i++) {
     var npc = generate('npc_major', t, 4);
-    assert(npc.physical_stress >= 3 && npc.physical_stress <= 5,
-      'physical_stress out of range: ' + npc.physical_stress);
-    assert(npc.mental_stress >= 3 && npc.mental_stress <= 5,
-      'mental_stress out of range: ' + npc.mental_stress);
+    assert([3,4,6].indexOf(npc.physical_stress) !== -1,
+      'physical_stress invalid: ' + npc.physical_stress + ' (FCon: 3, 4, or 6)');
+    assert([3,4,6].indexOf(npc.mental_stress) !== -1,
+      'mental_stress invalid: ' + npc.mental_stress + ' (FCon: 3, 4, or 6)');
   }
 });
 

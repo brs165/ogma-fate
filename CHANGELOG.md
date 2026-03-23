@@ -8,8 +8,224 @@
 
 ---
 
+## 2026.03.375 — React Architect review: architecture, dead code, ARIA
 
-## 2026.03.326 — CI fix + print fix
+**Crashes fixed:**
+- `ReferenceError: setPrepView is not defined` — `openCanvas()` still called `setPrepView(false)` after that state was removed in UNI-06. Removed.
+- `ReferenceError: playCardIds is not defined` in `BoardTopbar` — `playCardIds` is `BoardApp` state but was referenced directly inside `BoardTopbar`'s render. Added `onTableCount` prop, passed `playCardIds.size` from `BoardApp`, destructured in `BoardTopbar`.
+
+**Architecture — `useBoardBinder` hook extracted:**
+- 70+ lines of inline state, 3 IDB load effects, and 7 helper functions removed from `BoardApp` and moved into a `useBoardBinder(campId, campMetaName, playCanvasKey, showToast, getCanvasCards, persistCanvas)` hook
+- `BoardApp` state count drops from 27 to 20
+- Single hook call: `var binder = useBoardBinder(...)` — all state and helpers accessible via `binder.*`
+
+**`BoardTopbar` props: 38 → 8:**
+- Flat 38-prop call site grouped into `sync`, `panels`, `counts`, `exportActions` semantic objects
+- `BoardTopbar` destructuring updated to match — intent is now readable at the call site
+
+**Dead code purged:**
+- `PrepCanvas` function (lines 516–1645, 1130 lines) removed from `ui-table.js` — still loaded but unreachable since UNI-06
+- 4 dead variables removed from `ui.js`: `groupGens`, `hlMeta`, `totalEntries`, `typeLabel`
+- 8 dead CSS classes removed: `.bd-card-body`, `.bd-tab`, `.bd-tab-label`, `.bd-content`, `.bd-right`, `.bd-rules-link`, `.bd-rules-link:hover`, stale PrepCanvas comment
+
+**Hook quality:**
+- `showToast` wrapped in `useCallback` — stable identity prevents unnecessary child re-renders
+- `zoom` removed from keyboard shortcut `useEffect` dep array (not used by handler)
+- `useBoardPlayState` — `hasLoaded` ref guard prevents IDB reload on every PREP↔PLAY toggle
+
+**Accessibility:**
+- `aria-label` added to: consequence inputs (Mild/Moderate/Severe), BoardLabel editor, room code input, participant name input
+- `bd-backdrop` — added `role="presentation"`
+
+**Bundle:** 509KB → 304KB (40% savings maintained; absolute size reduced by 55KB from cleanup)
+
+208/208 named · 59/59 unit · 89/89 export · 128/128 smoke.
+
+---
+
+## 2026.03.374 — GM Screen model: cv4Cards inline, Send to Table, panel lock
+
+**cv4Cards inline on canvas:**
+- `BoardCard` compact chip (title/summary/tags) replaced with scaled `renderCard()` at 65% inside a 224px width shell
+- Cards on the GM Screen canvas are now fully readable without tapping
+- Default zoom changed to 0.75 — a populated canvas opens at a readable density
+- `BoardDossier` redesigned as compact GM Guidance panel: rules reference, invoke/compel examples from `HELP_CONTENT` — no redundant card re-render
+
+**"Put on table" / "On table" indicator:**
+- `sendToTable(card)` copies a prep canvas card to `board_play_v1_{campId}` with a `sourceId` linking back
+- `playCardIds` Set loaded from play canvas IDB on mount — tracks which prep cards are visible to players
+- Each prep card shows `→ Table` pill; when sent shows `● On table` green indicator
+- `● N on table` chip in topbar counts live table cards
+- GM stays on PREP screen throughout — no mode switch required to reveal a card
+
+**Left panel locked in PREP:**
+- `useEffect` forces `leftOpen = true` on every PREP mode entry
+- Panel toggle button only rendered in PLAY mode
+- The GM Screen's reference material (Generate/Stunts/Help) is always accessible
+
+208/208 named · 59/59 unit · 89/89 export · 128/128 smoke.
+
+---
+
+## 2026.03.373 — UNI sprint: unified GM surface, PrepCanvas retired
+
+**UNI-01–06: BoardApp is now the single surface for prep and play.**
+
+**UNI-02 — BoardBinderPanel in BoardApp:**
+- Loads `card_{campId}_*` and `binder_tray_{campId}` from IDB on mount (same keys as CampaignApp)
+- Filter strip (All / People / Scene / Story / Mechanics), card list with ☆ Tray toggle, Drafting Tray section
+- Binder toggle button in topbar with count badge (`binderOpen` state)
+
+**UNI-03 — Prominent PREP/PLAY badge:**
+- Active pill filled: PREP = `--accent`, PLAY = green
+- Topbar border stripe changes colour with mode
+
+**UNI-04 — Generate panel in both modes:**
+- `BoardLeftPanel` (Generate/Stunts/Help) always visible; no longer swaps to player panel in PLAY
+- Player roster added below as collapsible accordion (UNI-05)
+
+**UNI-06 — PrepCanvas retired:**
+- `prepView` state removed from `CampaignApp`
+- 50+ lines of table sync code removed (`tableSyncRef`, `hostTable`, `joinTable`, `disconnectTable`, etc.)
+- Sidebar: "Table" + "Binder → Cards" consolidated to single **"Prep & Play"** entry
+- Mobile bottom nav "Pinned" tab → "Prep" tab opening BoardApp
+
+3 new QA assertions NA-206–208. 208/208 named · 59/59 unit · 89/89 export · 128/128 smoke. Bundle 572KB → 567KB (PrepCanvas removal accounted for by new features added same version).
+
+---
+
+## 2026.03.372 — Neon Abyss content audit + CHANGELOG catch-up
+
+**Help pages — 6 stale references fixed:**
+- `generators.html`: "GM Tips tab" → "For GM tab"; stale three-tab description updated to current two-tab names
+- `getting-started.html`: "GM Tips tab / Rules tab" → current tab labels ("What this is · For GM", "⚔ D&D?")
+- `customise.html`: stale three-tab description replaced with accurate two-tab description
+- `hosting.html`: "opened run.html" → "opened a campaign page" (run.html was removed in v344)
+- `export-share.html`: "Open History (📋 in the action bar)" → "Open the Binder (sidebar → Binder)"
+
+**Docs:**
+- ROADMAP shipped summary updated: v360–v370 all documented
+- ROADMAP header version + QA counts updated (198/198 → 205/205)
+- Stale duplicate PL-03 parking lot entry removed
+- `PROJECT_MEMORY.md` version and QA counts updated
+
+205/205 named · 59/59 unit · 89/89 export · 128/128 smoke.
+
+---
+
+## 2026.03.370 — PL-03 pre-join character builder + file:// offline fix + VIS-01
+
+**PL-03: Pre-join character builder**
+- Replaces single name-field waiting banner with a 3-step wizard: name → aspects → skills
+- Step 1 (Name): existing behaviour preserved
+- Step 2 (Aspects): High Concept, Trouble, and one free aspect — all optional, skippable
+- Step 3 (Skills): full 19-skill FCon grid; tap to assign pyramid ratings (+4×1, +3×2, +2×2, +1×4); pip ladder shows slots remaining
+- On submit: sends `{type:'player_hello', name, pc:{hc, trouble, aspects, skills}}`
+- GM-side `addPlayer` reads `pc` payload and derives stress track length from Physique/Will per FCon p.12
+- Player arrives pre-filled rather than as a blank slot
+
+**file:// offline fix:**
+- `<base href="/">` replaced with protocol-conditional in all 36 HTML files
+- `if(location.protocol !== "file:"){document.write("<base href=\"/\">")}` fires only under HTTP/HTTPS
+- Unzipping and double-clicking any page now resolves assets correctly
+
+**VIS-01 — `.fp-btn` base rule restored:**
+- `.fp-btn` base rule was missing (CSS orphan from earlier audit period)
+- Restored: `border-radius:50%`, `width:24px`, `height:24px` — circular FP tracker buttons work again
+
+2 new QA assertions NA-204–205. 205/205 named · 59/59 unit · 89/89 export · 128/128 smoke.
+
+---
+
+## 2026.03.369 — Binder rework: Drafting Tray, filter strip, GM Guidance animation (BDR-01/02/03)
+
+**BDR-01: Drafting Tray**
+- Staging layer between Binder and Play Table, pinned to the bottom of the Binder panel
+- ☆ Tray / ★ In Tray toggle button on every Binder card
+- "Send all to Table" button pushes all staged cards to the canvas in a 4-column grid layout and clears the tray
+- Persists in IDB as `binder_tray_{campId}` — survives page reload
+- Binder accordion meta badge updated to show `{cards} · 🗂 {tray}` when tray is populated
+- `addToTray`, `removeFromTray`, `sendTrayToCanvas` functions in CampaignApp
+
+**BDR-02: Binder filter strip**
+- All · People · Scene · Story · Mechanics pill buttons above the card list
+- Filters by genId group (People: npc_minor/npc_major/pc/backstory; Scene: scene/encounter/complication/seed; Story: campaign/faction/compel/consequence; Mechanics: challenge/contest/obstacle/countdown/constraint)
+- Local state only — resets on panel close
+
+**BDR-03: GM Guidance footer animation**
+- Replaced hard conditional render (`gmOpen && h('div',...)`) with CSS `maxHeight` + `opacity` transition
+- Slide-open: 0.32s `cubic-bezier(0.4,0,0.2,1)`; slide-close: 0.22s
+- Chevron arrow rotates 90° on open with spring easing `cubic-bezier(0.34,1.56,0.64,1)`
+- Panel content stays in DOM; `aria-hidden` toggles for screen readers
+
+2 new QA assertions NA-202–203. 203/203 named · 59/59 unit · 89/89 export · 128/128 smoke.
+
+---
+
+## 2026.03.368 — Full CSS and JS audit
+
+**CSS audit — orphaned selectors restored:**
+- 6 campaign roll button style blocks (`thelongafter`, `cyberpunk`, `fantasy`, `space`, `victorian`, `postapoc`) had selectors stripped since v344; all styles were completely inert. Restored with correct `[data-campaign="X"] .btn-roll` selectors plus `::before`, `.rolling`, `:active` variants
+- PWA banner variants (`.pwa-banner-update`, `.pwa-banner-action.active`, `.pwa-banner-warn`, `.pwa-banner-ios`) — selectors stripped, restored
+- `.action-bar .btn-roll` and `.action-bar-inspire` — selectors stripped, restored
+- `.fp-btn` base rule — missing entirely, restored (circular buttons)
+- Malformed `.action-bar` closing (spurious `;overflow:visible`) — fixed
+- Dead orphaned glass panel blocks, session zero hero blocks — removed
+
+**CSS audit — font stragglers:**
+- `.dr-die`, `.qf-footer kbd`, stunt browser classes (`bs-name`, `bs-type`, `bs-tag`, `bs-copy-hint`), board mobile list classes — all updated from `'Courier New'` to Futura stack
+- dVenti Realm and Dust and Iron roll buttons retain `'Courier New'` intentionally (terminal/typewriter aesthetic)
+
+**JS audit — 9 dead functions resolved:**
+- `var MD_FOOTER = MD_FOOTER` self-assignment fixed — was always `undefined`, blank footers on all Markdown exports. Now: `'\n---\n*Generated by Ogma · fate-srd.com*'`
+- `mdHeader`, `mdAspectList`, `mdWinLose` — dead helpers removed from engine.js (superseded when `toMarkdown` was inlined)
+- `toggleGmMode` — wired to Settings accordion as **GM Tips: On/Off** toggle button
+- `BoardDossierContent` + `BoardDossierStress` (157 lines) — removed; dead since cv4 card system replaced the dossier
+- `addStunt` in TpPlayerRow — removed dead wrapper (inline prompt button does the same)
+- `addGMNote` — wired to table toolbar as 📝 button
+- `exportFull` — wired to table toolbar as 📋 MD button (Markdown export of players + cards)
+- `handleExportCard` in ui-modals.js — removed dead wrapper
+
+201/201 named · 59/59 unit · 89/89 export · 128/128 smoke.
+
+---
+
+## 2026.03.367 — Futura typeface site-wide
+
+**Typography: Futura**
+- Replaced Fraunces (display serif) and Martian Mono (monospace) with the Futura stack: `'Jost', 'Futura', 'Century Gothic', 'Trebuchet MS', sans-serif`
+- Jost is a free geometric sans-serif with near-identical metrics to Futura, served from Google Fonts
+- Applied across all 38 HTML files, `theme.css` CSS vars (`--font-display`, `--font-ui`, `--font-mono`), `help-shared.css`, `ui-renderers.js` (`CV4_MONO`, `CV4_SANS`), `db.js` print/image-pack popups
+- Zero Fraunces or Martian Mono references remaining
+- dVenti Realm and Dust and Iron roll buttons retain thematic exceptions (terminal/typewriter)
+
+**Version stamping:**
+- `OGMA_CONFIG.VERSION` constant added to `core/config.js`; stamped by `bump-version.sh`
+- Version number displayed in all campaign page footers alongside Style Guide link
+- `about.html` version badge updated to use `OGMA_CONFIG.VERSION`
+
+---
+
+## 2026.03.359–366 — Export modal, Board, Session Zero, build pipeline, Binder cv4Cards
+
+**v2026.03.359 — Export modal + Board + Session Zero deepening:**
+- `ExportModal` replaces `ExportMenu`: full modal with card checklist (derived titles), 8-format grid (MD/Mermaid/Obsidian/Typst/TXT/JSON/IMG/Print), copy-vs-download picker, Import link in footer
+- `board.html` confirmed as JS redirect to `{world}.html?canvas=1`; Play → Table wired to `canvasView`/`openCanvas()`; all 8 campaign pages load `ui-board.js`
+- Session Zero: dVentiRealm data added, `pc_high_concepts` replaces `major_concepts`, `questions` step added to all three modes (standard/trio/flashback) with world-specific `pc_questions` and live-generated example PC
+- Help docs updated: `fate-mechanics.html`, `at-the-table.html`, `generators.html`, `getting-started.html`
+- 10 new QA assertions NA-188–197
+
+**v2026.03.360–365 — Build pipeline + Binder cv4Cards:**
+- `scripts/build.js` 3-tier terser pipeline (~40% savings); `docs/BUILD.md`; `package.json` devDeps
+- `disconnectSync` ReferenceError on Table open fixed; `sendToCanvas` wired
+- Binder card list replaced with full cv4Cards (54% scale) + action row (Restore, Send to Table, Export, Remove)
+- New workshop voices added to BOOTSTRAP: Product Strategist, UX Researcher, Mechanical Auditor
+- SW regression fixed: bundle removed from APP_SHELL
+- NA-198–201 added
+
+---
+
+## 2026.03.344 — Field Dispatch design system site-wide
 
 - **CI:** `npm ci` → `npm install` in Lint & Format job. `cache: 'npm'` removed from `setup-node` (requires lock file — we have none). QA job path was already correct (`tests/qa_named.js` not `devdocs/qa_named.js` — the latter was the old path still in the live repo on GitHub).
 - **Print:** `DB.printCards` was defined in the wrong IIFE (localStorage preferences module, first IIFE) rather than in `window.DB` (Dexie module, second IIFE). `DB.printCards` was always `undefined` — every print attempt hit the "Print unavailable" guard. Moved into `window.DB`.

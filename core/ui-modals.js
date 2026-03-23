@@ -326,10 +326,6 @@ function VaultModal(props) {
     DB.exportSession(session);
   }
 
-  function handleExportCard(card) {
-    DB.exportCard(card, campName);
-  }
-
   function handleImport() {
     DB.importFile().then(function(data) {
       if (data.type === 'session' && data.session) {

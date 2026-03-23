@@ -2,7 +2,7 @@
 
 > Snapshot of architecture state for model-switching and session continuity.
 > Keep in sync with ROADMAP.md and CHANGELOG.md.
-> **Last updated:** v2026.03.360
+> **Last updated:** v2026.03.370
 
 ---
 
@@ -33,8 +33,8 @@ Offline-first browser PWA for Fate Condensed GMs. 16 generators × 8 worlds. Sou
 
 | Item | Value |
 |------|-------|
-| Version | `2026.03.360` |
-| Named QA | 198/198 |
+| Version | `2026.03.370` |
+| Named QA | 205/205 |
 | Unit tests | 59/59 |
 | Export round-trip | 89/89 |
 | Smoke | 128/128 (16 generators × 8 worlds) |

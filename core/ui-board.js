@@ -227,6 +227,7 @@ function BoardLabel(props) {
       editing
         ? h('input', {
             type: 'text', className: 'board-label-input', value: draft, autoFocus: true,
+            'aria-label': 'Edit label text',
             style: {background: 'transparent', color: S.text, border: 'none', outline: 'none',
                     fontFamily: 'inherit', fontSize: 'inherit', fontWeight: 'inherit', width: '100%'},
             onChange: function(e) { setDraft(e.target.value); },
@@ -248,10 +249,13 @@ function BoardCard(props) {
   var card = props.card;
   var onDelete = props.onDelete;
   var onReroll = props.onReroll;
-  var onPin = props.onPin;
+  var onSendToTable = props.onSendToTable;
   var onOpen = props.onOpen;
   var onDragStart = props.onDragStart;
   var onUpdate = props.onUpdate || function() {};
+  var isOnTable = props.isOnTable || false;
+  var mode = props.mode || 'prep';
+  var campId = props.campId || '';
 
   var C = BOARD_TYPE_COLOR[card.genId] || {stripe: '#888', tc: '#555'};
   var isSticky = card.genId === 'sticky';
@@ -320,7 +324,6 @@ function BoardCard(props) {
   var summary = card.summary || '';
   var tags = card.tags || [];
   var genLabel = (GENERATORS || []).find(function(g) { return g.id === card.genId; });
-  var typeLabel = (genLabel ? genLabel.icon + ' ' + genLabel.label : card.genId);
 
   return h('div', {
     className: 'board-card',
@@ -348,23 +351,33 @@ function BoardCard(props) {
   },
     h('div', {className: 'bc-actions'},
       h('button', {className: 'bc-btn', title: 'Reroll', onClick: function(e) { e.stopPropagation(); onReroll(card.id); }}, '\u21BB'),
-      h('button', {className: 'bc-btn', title: 'Pin to Table', onClick: function(e) { e.stopPropagation(); onPin(card); }}, '\uD83D\uDCCC'),
+      h('button', {className: 'bc-btn', title: 'Pin to Table', onClick: function(e) { e.stopPropagation(); onSendToTable(card); }}, '\uD83D\uDCCC'),
       h('button', {className: 'bc-btn', title: 'Delete', onClick: function(e) { e.stopPropagation(); onDelete(card.id); }}, '\u2715')
     ),
-    h('div', {className: 'bc-stripe', style: {background: C.stripe}}),
-    h('div', {className: 'bc-inner'},
-      h('div', {className: 'bc-type', style: {color: C.tc}}, typeLabel),
-      h('div', {className: 'bc-title'}, title),
-      summary && h('div', {className: 'bc-body'}, summary.split('\n').map(function(ln, i) {
-        return h('span', {key: i}, ln, i < summary.split('\n').length - 1 ? h('br', null) : null);
-      })),
-      tags.length > 0 && h('div', {className: 'bc-tags'},
-        tags.map(function(t, i) {
-          return h('span', {key: i, className: 'bc-tag', style: {background: C.bg, color: C.tc}}, t);
-        })
-      )
+    // GM Screen: cv4Card inline at 65% scale
+    h('div', {className: 'bc-cv4-wrap'},
+      card.data
+        ? h('div', {className: 'bc-cv4-scaler'},
+            renderCard(card.genId, card.data, campId, null, [], null)
+          )
+        : h('div', {className: 'bc-inner'},
+            h('div', {className: 'bc-type', style: {color: C.tc}},
+              (GENERATORS || []).find(function(g){ return g.id === card.genId; }) ?
+                ((GENERATORS || []).find(function(g){ return g.id === card.genId; }).icon + ' ' +
+                 (GENERATORS || []).find(function(g){ return g.id === card.genId; }).label) : card.genId),
+            h('div', {className: 'bc-title'}, card.title || '')
+          )
     ),
-    h('div', {className: 'bc-hint'}, 'Click to open dossier')
+    // GM Screen: "Put on table" / "On table" strip (PREP mode only)
+    mode === 'prep' && h('div', {className: 'bc-table-strip'},
+      isOnTable
+        ? h('span', {className: 'bc-on-table'}, '\u25CF\u00a0On table')
+        : h('button', {
+            className: 'bc-send-table',
+            onClick: function(e) { e.stopPropagation(); onSendToTable(card); },
+            'aria-label': 'Put ' + (card.title || 'card') + ' on table',
+          }, '\u2192 Table')
+    )
   );
 }
 
@@ -438,6 +451,7 @@ function BoardPlayerRow(props) {
         return h('div', {key: i, style: {display: 'flex', alignItems: 'center', gap: 3, marginBottom: 3}},
           h('span', {style: {fontSize: 11, color: 'var(--text-muted)', width: 46, flexShrink: 0}}, sev),
           h('input', {type: 'text', value: conseq[i] || '', placeholder: 'empty',
+            'aria-label': sev + ' consequence',
             onChange: function(e) { setConseq(i, e.target.value); },
             style: {flex: 1, background: 'var(--inset)',
               border: '1px solid ' + (conseq[i] ? 'var(--c-amber,#f4b942)' : 'var(--border)'),
@@ -511,36 +525,65 @@ function BoardTurnBar(props) {
   );
 }
 
-// ── BoardPlayPanel — left panel content in Play mode ─────────────────────────
+// ── BoardPlayPanel — left panel content in Play mode (UNI-05: also shown in PREP as collapsed) ──
 function BoardPlayPanel(props) {
-  var players = props.players;
+  var players   = props.players;
   var selPlayer = props.selPlayer;
-  var onSel = props.onSel;
-  var onUpd = props.onUpd;
-  var onAdd = props.onAdd;
+  var onSel     = props.onSel;
+  var onUpd     = props.onUpd;
+  var onAdd     = props.onAdd;
+  var collapsed = props.collapsed; // UNI-05: true in PREP mode → compact accordion
+  var _open = useState(false); var open = _open[0]; var setOpen = _open[1];
 
+  // In PREP mode render as a compact accordion at the bottom of the left panel
+  if (collapsed) {
+    return h('div', {className: 'blp-roster-acc'},
+      h('button', {
+        className: 'blp-roster-hdr',
+        onClick: function() { setOpen(function(v){ return !v; }); },
+        'aria-expanded': String(open),
+      },
+        h('span', null, '\u{1F465}\u00a0Players'),
+        players.length > 0 && h('span', {className: 'blp-roster-badge'}, String(players.length)),
+        h('span', {className: 'blp-roster-chev', style: {
+          display:'inline-block',
+          transform: open ? 'rotate(90deg)' : 'rotate(0deg)',
+          transition:'transform .18s cubic-bezier(.34,1.56,.64,1)',
+          fontSize: 10,
+        }}, '\u203a')
+      ),
+      open && h('div', {className: 'blp-body blp-roster-body'},
+        players.length === 0 && h('div', {style:{padding:'10px 8px',textAlign:'center',color:'var(--text-muted)',fontSize:11}},
+          'No players yet. Add before session start.'
+        ),
+        players.map(function(p) {
+          return h(BoardPlayerRow, {key:p.id, player:p, sel:selPlayer===p.id, onSel:onSel,
+            onUpd:function(patch){onUpd(p.id,patch);}});
+        }),
+        h('button', {className:'rs-add-player','aria-label':'Add player',onClick:onAdd}, '+ Add Player')
+      )
+    );
+  }
+
+  // PLAY mode — full panel
   return h('div', {className: 'blp'},
     h('div', {className: 'blp-tabs'},
-      h('span', {className: 'blp-tab active', style: {pointerEvents: 'none', color: 'var(--c-green,#30d158)'}}, '▶ Play Mode')
+      h('span', {className: 'blp-tab active', style: {pointerEvents: 'none', color: 'var(--c-green,#30d158)'}}, '\u25B6 Play Mode')
     ),
     h('div', {className: 'blp-body'},
       players.length === 0 && h('div', {style: {padding: '16px 8px', textAlign: 'center',
         color: 'var(--text-muted)', fontSize: 12}},
-        h('div', {style: {marginBottom: 8}}, '👥'),
+        h('div', {style: {marginBottom: 8}}, '\uD83D\uDC65'),
         h('div', null, 'No players yet.'),
         h('div', {style: {fontSize: 11, marginTop: 4}}, 'Add players to track FP and stress.')
       ),
       players.map(function(p) {
         return h(BoardPlayerRow, {
-          key: p.id,
-          player: p,
-          sel: selPlayer === p.id,
-          onSel: onSel,
+          key: p.id, player: p, sel: selPlayer === p.id, onSel: onSel,
           onUpd: function(patch) { onUpd(p.id, patch); },
         });
       }),
-      h('button', {className: 'rs-add-player', 'aria-label': 'Add player',
-        onClick: onAdd}, '+ Add Player')
+      h('button', {className: 'rs-add-player', 'aria-label': 'Add player', onClick: onAdd}, '+ Add Player')
     )
   );
 }
@@ -794,7 +837,7 @@ function BoardHelpPanel(props) {
       id: 'npcs', title: 'Minor vs Major NPCs',
       content: [
         {head: 'Minor NPC', body: '1\u20132 aspects, one skill at +1\u2013+3, 1\u20132 stress boxes. One solid hit takes them out. No consequence slots.'},
-        {head: 'Major NPC', body: 'Full character. 3\u20135 aspects, skill pyramid, stress track, all consequence slots. Treat like a PC.'},
+        {head: 'Major NPC', body: 'Full character. 5 aspects (High Concept, Trouble, 3 others), skill pyramid, stress tracks, all consequence slots. Treat like a PC.'},
         {head: 'Boss tip', body: 'Give bosses a unique stunt, an extra stress box, or a secret aspect revealed mid-fight.'},
       ]
     },
@@ -802,7 +845,7 @@ function BoardHelpPanel(props) {
       id: 'conflict', title: 'Challenges & Contests',
       content: [
         {head: 'Challenge', body: 'Series of overcome rolls. Each can succeed or fail independently. No active opposition.'},
-        {head: 'Contest', body: 'Two sides race to 3 victories. Each exchange both roll \u2014 3+ shifts margin = victory. Tie = boost.'},
+        {head: 'Contest', body: 'Two sides race to 3 victories. Each exchange both roll \u2014 highest effort marks a victory; succeed with style (no one else did) = 2 victories. Tie = no victory + GM introduces a new situation aspect (unexpected twist, FCon p.33).'},
         {head: 'Conflict', body: 'Full structure. Exchange = everyone acts once. Use zones, aspects, terrain.'},
       ]
     },
@@ -832,15 +875,161 @@ function BoardHelpPanel(props) {
   );
 }
 
-// ── BoardDossier — Sprint 2 placeholder ──────────────────────────────────────
+// ── BoardBinderPanel — UNI-02: Binder library inside BoardApp ────────────────
+// Right panel in PREP mode. Shows Binder cards (from IDB) with filter strip and
+// Drafting Tray. Mirrors the Binder panel in CampaignApp but lives in BoardApp.
+
+var BINDER_FILTER_GROUPS = {
+  people:    ['npc_minor','npc_major','pc','backstory'],
+  scene:     ['scene','encounter','complication','seed'],
+  story:     ['campaign','faction','compel','consequence'],
+  mechanics: ['challenge','contest','obstacle','countdown','constraint'],
+};
+
+function BoardBinderPanel(props) {
+  var campId      = props.campId;
+  var campName    = props.campName || campId;
+  var binderCards = props.binderCards || [];
+  var trayCards   = props.trayCards  || [];
+  var onAddToTray    = props.onAddToTray    || function(){};
+  var onRemoveFromTray = props.onRemoveFromTray || function(){};
+  var onSendTrayToCanvas = props.onSendTrayToCanvas || function(){};
+  var onSendToCanvas = props.onSendToCanvas || function(){};
+  var onExportCard   = props.onExportCard   || function(){};
+  var onUnpin        = props.onUnpin        || function(){};
+
+  var _filter = useState('all'); var filter = _filter[0]; var setFilter = _filter[1];
+
+  var filters = [
+    {id:'all',    label:'All'},
+    {id:'people', label:'People'},
+    {id:'scene',  label:'Scene'},
+    {id:'story',  label:'Story'},
+    {id:'mechanics', label:'Mech'},
+  ];
+
+  var visible = binderCards.filter(function(card) {
+    if (filter === 'all') return true;
+    return (BINDER_FILTER_GROUPS[filter] || []).indexOf(card.genId) !== -1;
+  });
+
+  return h('div', {className: 'bbp'},
+
+    // Header
+    h('div', {className: 'bbp-header'},
+      h('span', {className: 'bbp-title'}, '\uD83D\uDCCB Binder'),
+      binderCards.length > 0 && h('span', {className: 'bbp-count'}, String(binderCards.length))
+    ),
+
+    // Filter strip
+    binderCards.length > 0 && h('div', {className: 'bbp-filters', role: 'group', 'aria-label': 'Filter by type'},
+      filters.map(function(f) {
+        var active = filter === f.id;
+        return h('button', {
+          key: f.id,
+          className: 'bbp-filter-btn' + (active ? ' active' : ''),
+          onClick: function() { setFilter(f.id); },
+          'aria-pressed': String(active),
+        }, f.label);
+      })
+    ),
+
+    // Card list
+    h('div', {className: 'bbp-list'},
+      visible.length === 0 && h('div', {className: 'bbp-empty'},
+        binderCards.length === 0
+          ? 'Save cards from the generator to build your Binder.'
+          : 'No cards match this filter.'
+      ),
+      visible.map(function(card) {
+        var inTray = trayCards.some(function(c) { return c.id === card.id; });
+        var d = card.data || {};
+        var title = d.name || d.location || d.situation ||
+                    (d.aspects && d.aspects.high_concept) || card.label || card.genId;
+        var genMeta = (typeof GENERATORS !== 'undefined' ? GENERATORS : []).find(function(g){ return g.id === card.genId; }) || {};
+        return h('div', {key: card.id, className: 'bbp-card'},
+          // Mini identity row
+          h('div', {className: 'bbp-card-id'},
+            h('span', {className: 'bbp-card-icon', 'aria-hidden': 'true'}, genMeta.icon || '\u25C8'),
+            h('span', {className: 'bbp-card-title'}, title)
+          ),
+          // Action row
+          h('div', {className: 'bbp-card-actions'},
+            h('button', {
+              className: 'bbp-action' + (inTray ? ' in-tray' : ''),
+              onClick: function() { inTray ? onRemoveFromTray(card.id) : onAddToTray(card); },
+              title: inTray ? 'Remove from Tray' : 'Add to Drafting Tray',
+              'aria-pressed': String(inTray),
+            }, inTray ? '\u2605' : '\u2606'),
+            h('button', {
+              className: 'bbp-action bbp-action-canvas',
+              onClick: function() { onSendToCanvas(card); },
+              title: 'Place on canvas now',
+            }, '\u2192'),
+            h('button', {
+              className: 'bbp-action',
+              onClick: function() { onExportCard(card); },
+              title: 'Export as JSON',
+            }, '\u2193'),
+            h('button', {
+              className: 'bbp-action bbp-action-remove',
+              onClick: function() { onUnpin(card.id); },
+              title: 'Remove from Binder',
+            }, '\u2715')
+          )
+        );
+      })
+    ),
+
+    // Drafting Tray
+    h('div', {className: 'bbp-tray'},
+      h('div', {className: 'bbp-tray-header'},
+        h('span', {className: 'bbp-tray-title'}, '\uD83D\uDDC2 Tray'),
+        trayCards.length > 0 && h('span', {className: 'bbp-tray-count'}, String(trayCards.length)),
+        trayCards.length > 0 && h('button', {
+          className: 'bbp-tray-send',
+          onClick: onSendTrayToCanvas,
+          title: 'Place all Tray cards on canvas',
+        }, '\u2192 All to canvas')
+      ),
+      trayCards.length === 0
+        ? h('div', {className: 'bbp-tray-empty'}, 'Stage cards here before play.')
+        : h('div', {className: 'bbp-tray-list'},
+            trayCards.map(function(card) {
+              var d = card.data || {};
+              var title = d.name || d.location || d.situation ||
+                          (d.aspects && d.aspects.high_concept) || card.label || card.genId;
+              var genMeta = (typeof GENERATORS !== 'undefined' ? GENERATORS : []).find(function(g){ return g.id === card.genId; }) || {};
+              return h('div', {key: card.id, className: 'bbp-tray-row'},
+                h('span', {className: 'bbp-tray-icon', 'aria-hidden': 'true'}, genMeta.icon || '\u25C8'),
+                h('span', {className: 'bbp-tray-name'}, title),
+                h('button', {
+                  className: 'bbp-tray-remove',
+                  onClick: function() { onRemoveFromTray(card.id); },
+                  'aria-label': 'Remove from tray',
+                }, '\u2715')
+              );
+            })
+          )
+    )
+  );
+}
+
+// ── BoardDossier — GM Guidance + actions panel (cv4Card shown inline on canvas) ─
+// Since cv4Cards are now visible inline, the dossier shows only:
+//   • GM Guidance footer (rules, invoke/compel examples)
+//   • Chain / Send to table / Delete actions
 
 function BoardDossier(props) {
   var card = props.card;
   var onClose = props.onClose;
   var onReroll = props.onReroll;
-  var onPin = props.onPin;
+  var onSendToTable = props.onSendToTable;
+  var onDelete = props.onDelete;
+  var isOnTable = props.isOnTable || false;
   var campName = props.campName;
   var campId = props.campId || '';
+  var mode = props.mode || 'prep';
   var modalRef = useRef(null);
 
   // C-01: Focus trap + focus-on-open (WCAG 2.1.2)
@@ -867,197 +1056,75 @@ function BoardDossier(props) {
 
   var C = BOARD_TYPE_COLOR[card.genId] || {stripe: '#888', tc: '#555', bg: '#f5f4f1'};
   var genMeta = (GENERATORS || []).find(function(g) { return g.id === card.genId; }) || {};
+  // Get GM guidance content from CV4_HELP
+  var hc = (typeof HELP_CONTENT !== 'undefined' && HELP_CONTENT[card.genId]) || null;
 
-  return h('div', {className: 'bd-backdrop', onClick: function(e) { if (e.target.className === 'bd-backdrop') onClose(); }},
-    h('div', {className: 'bd-modal', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'bd-title-' + card.id, ref: modalRef},
-      // Close
-      h('button', {className: 'bd-close', onClick: onClose, 'aria-label': 'Close dossier'}, '\u2715'),
+  return h('div', {className: 'bd-backdrop', role: 'presentation', 'aria-hidden': 'false',
+                   onClick: function(e) { if (e.target.className === 'bd-backdrop') onClose(); }},
+    h('div', {className: 'bd-modal bd-modal-compact', role: 'dialog', 'aria-modal': 'true',
+              'aria-labelledby': 'bd-title-' + card.id, ref: modalRef},
 
-      // Top
+      h('button', {className: 'bd-close', onClick: onClose, 'aria-label': 'Close'}, '\u2715'),
+
+      // Header strip
       h('div', {className: 'bd-top'},
         h('div', {className: 'bd-title', id: 'bd-title-' + card.id}, card.title),
-        h('div', {
-          className: 'bd-badge',
-          style: {color: C.tc, borderColor: C.tc, background: C.bg}
-        }, genMeta.icon + ' ' + (genMeta.label || card.genId))
+        h('div', {className: 'bd-badge', style: {color: C.tc, borderColor: C.tc, background: C.bg}},
+          genMeta.icon + '\u00a0' + (genMeta.label || card.genId))
       ),
 
-      // Body — new card design
-      h('div', {className: 'bd-body bd-card-body'},
-        card.data && h('div', {style: {display:'flex', justifyContent:'center', padding:'12px 0 4px'}},
-          renderCard(card.genId, card.data, campId || campName, null, [], null)
-        )
+      // GM Guidance body — rules, invoke, compel
+      h('div', {className: 'bd-guidance'},
+        hc && hc.what && h('div', {className: 'bd-guidance-what'}, hc.what),
+        hc && (hc.invoke_example || hc.compel_example) && h('div', {className: 'bd-guidance-examples'},
+          hc.invoke_example && h('div', {className: 'bd-ex-invoke'},
+            h('span', {className: 'bd-ex-lbl'}, '\u2746 Invoke'),
+            h('span', null, hc.invoke_example)
+          ),
+          hc.compel_example && h('div', {className: 'bd-ex-compel'},
+            h('span', {className: 'bd-ex-lbl'}, '\u2297 Compel'),
+            h('span', null, hc.compel_example)
+          )
+        ),
+        hc && Array.isArray(hc.rules) && hc.rules.length > 0 && h('div', {className: 'bd-guidance-rules'},
+          hc.rules.map(function(rule, i) {
+            return h('div', {key: i, className: 'bd-rule-row'},
+              h('span', {className: 'bd-rule-pip'}, '\u25C8'),
+              h('span', null, rule)
+            );
+          })
+        ),
+        (!hc || (!hc.what && !hc.invoke_example && !hc.compel_example)) && h('div', {
+          style: {color: 'var(--text-muted)', fontSize: 12, padding: '8px 0', fontStyle: 'italic'}
+        }, 'No GM guidance for this generator yet.'),
+        hc && hc.srd_url && h('a', {
+          href: hc.srd_url, target: '_blank', rel: 'noopener noreferrer',
+          className: 'bd-srd-link'
+        }, 'Fate Condensed SRD \u2197')
       ),
 
-      // Footer
+      // Footer actions
       h('div', {className: 'bd-footer'},
-        h('span', {className: 'bd-rules-link', onClick: props.onOpenHelp}, 'Tap for rules \u2192'),
-        h('button', {className: 'bd-chain', onClick: function() { onReroll(card.id); onClose(); }}, '\u21BB\u00a0Chain'),
+        h('button', {className: 'bd-chain', onClick: function() { onReroll(card.id); onClose(); },
+                     title: 'Generate a new card of this type'}, '\u21BB\u00a0Chain'),
+        mode === 'prep' && (isOnTable
+          ? h('span', {className: 'bd-on-table-badge'}, '\u25CF\u00a0On table')
+          : h('button', {
+              className: 'bd-send-table',
+              onClick: function() { onSendToTable(card); onClose(); },
+              title: 'Put this card on the play table',
+            }, '\u2192 Table')
+        ),
         h('button', {
-          className: 'bd-pin',
-          title: 'Pin to Table',
-          onClick: function() { onPin(card); onClose(); }
-        }, '\uD83D\uDCCC')
+          className: 'bd-delete',
+          onClick: function() { onDelete(card.id); onClose(); },
+          title: 'Remove card from canvas',
+        }, '\u2715')
       )
     )
   );
 }
 
-function BoardDossierContent(props) {
-  var card = props.card;
-  var data = card.data || {};
-  var genId = card.genId;
-
-  // Always use structured display so we control exactly what shows here vs right stress panel
-  // (renderResult includes its own stress boxes which duplicates BoardDossierStress)
-
-  var aspects = data.aspects || {};
-  var skills = data.skills || [];
-  var aspItems = [];
-
-  if (aspects.high_concept) aspItems.push({label: 'HC', text: aspects.high_concept, color: 'var(--c-blue,#378add)'});
-  if (aspects.trouble)       aspItems.push({label: 'TR', text: aspects.trouble,       color: 'var(--c-red,#e24b4a)'});
-  if (aspects.aspect_1)      aspItems.push({label: 'A1', text: aspects.aspect_1,      color: 'var(--text)'});
-  if (aspects.aspect_2)      aspItems.push({label: 'A2', text: aspects.aspect_2,      color: 'var(--text)'});
-  if (aspects.aspect_3)      aspItems.push({label: 'A3', text: aspects.aspect_3,      color: 'var(--text)'});
-
-  // Non-NPC fields — strings only, skip objects/numbers that aren't meaningful
-  var fieldDefs = [
-    ['situation','Situation'],['threat','Threat'],['zone','Zone'],
-    ['opposition','Opposition'],['stakes','Stakes'],['twist','Twist'],
-    ['hook','Hook'],['premise','Premise'],['goal','Goal'],
-    ['method','Method'],['weakness','Weakness'],
-    ['current_issue','Current Issue'],['impending_issue','Impending Issue'],
-    ['obstacle','Obstacle'],['track_name','Track'],['trigger','Trigger'],
-    ['mild','Mild'],['moderate','Moderate'],['severe','Severe'],
-  ];
-  var fields = fieldDefs.reduce(function(acc, fd) {
-    var v = data[fd[0]];
-    if (v && typeof v === 'string') acc.push({label: fd[1], text: v});
-    return acc;
-  }, []);
-
-  // GM note — from data or synthesised per type
-  var gmNote = data.gm_note || (function(){
-    if (genId === 'npc_minor')   return 'No consequence slots. One solid hit takes them out. Compel the trouble for drama.';
-    if (genId === 'npc_major')   return 'Full PC sheet. Use the trouble to drive compels. A unique stunt makes them memorable.';
-    if (genId === 'scene')       return 'Place the situation aspect on the table — it\u2019s free to invoke on the first roll. The threat drives the clock. Ask: what happens if nobody acts?';
-    if (genId === 'encounter')   return 'Set the stakes before the first roll. Let players invoke the opposition\u2019s aspects against it. Twist on a tie or cost.';
-    if (genId === 'compel')      return 'Offer 1 FP and frame the complication. Player can refuse for 1 FP. The consequence hook is the next compel seed.';
-    if (genId === 'challenge')   return 'Each overcome roll is independent — partial success on one doesn\u2019t carry over. Call for a cost on a tie. Failure = new aspect, not dead end.';
-    if (genId === 'contest')     return 'First to 3 victories wins. Tie = boost for one side. Each exchange both sides roll — 3+ margin on the winner\u2019s shift counts as a victory.';
-    if (genId === 'consequence') return 'Consequences are aspects — invoke and compel them. Recovery requires a treatment overcome roll first, then the scene/session/breakthrough clock.';
-    if (genId === 'faction')     return 'The face NPC is the human handle on this faction. Method = how they act when threatened. Weakness = what a clever PC can exploit.';
-    if (genId === 'seed')        return 'Hook drops into scene 1. Opposition is the central antagonist. Stakes tell the players what matters. Twist ready for act 3.';
-    if (genId === 'complication') return 'A complication is a new aspect. Place it immediately. It\u2019s invocable by anyone — including enemies — until it\u2019s overcome.';
-    if (genId === 'backstory')   return 'Let the player narrate. Your job is to say \u201Cyes, and\u2014\u201D and note which relationship might be a compel hook later.';
-    if (genId === 'obstacle')    return 'Hazard = aspect that attacks. Block = passive opposition. Distraction = compel bait. Name it as an aspect and put it on the table.';
-    if (genId === 'countdown')   return 'Show the track to the players. Tick it visibly. When it fills, trigger immediately — delays kill tension.';
-    if (genId === 'constraint')  return 'A constraint limits what\u2019s possible, not what\u2019s allowed. Frame it as \u201Cthe only path forward requires\u2026\u201D';
-    if (genId === 'campaign')    return 'Current issue = what\u2019s already on fire. Impending = what will catch fire if nobody acts. Setting aspects = what\u2019s always true here.';
-    return null;
-  })();
-
-  return h('div', {className: 'bd-fallback'},
-    aspItems.length > 0 && h('div', null,
-      h('div', {className: 'bdf-section'}, 'Aspects'),
-      aspItems.map(function(it, i) {
-        return h('div', {key: i, className: 'bdf-aspect'},
-          h('span', {className: 'bdf-label'}, it.label),
-          h('span', {style: {color: it.color, fontSize: '12px', lineHeight: 1.45}}, it.text)
-        );
-      })
-    ),
-    skills.length > 0 && h('div', {style: {marginTop: 12}},
-      h('div', {className: 'bdf-section'}, 'Skills'),
-      skills.slice(0, 6).map(function(s, i) {
-        return h('div', {key: i, className: 'bdf-skill'},
-          h('span', {className: 'bdf-skill-badge'}, '+' + s.r),
-          h('span', {className: 'bdf-skill-name'}, s.name)
-        );
-      })
-    ),
-    data.stunt && h('div', {style: {marginTop: 12}},
-      h('div', {className: 'bdf-section'}, 'Stunt'),
-      h('div', {className: 'bdf-field', style: {border: 'none', paddingTop: 4}}, data.stunt)
-    ),
-    fields.length > 0 && h('div', {style: {marginTop: 12}},
-      fields.map(function(f, i) {
-        return h('div', {key: i, className: 'bdf-field'},
-          h('strong', null, f.label + ': '),
-          f.text
-        );
-      })
-    ),
-    gmNote && h('div', {className: 'bdf-gm-note', style: {marginTop: 14}},
-      h('div', {style: {fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 5}}, 'GM Note'),
-      gmNote
-    )
-  );
-}
-
-function BoardDossierStress(props) {
-  var card = props.card;
-  var C = props.C;
-  var data = card.data || {};
-  var _hits = useState({phy: {}, men: {}});
-  var hits = _hits[0];
-  var setHits = _hits[1];
-
-  var phyMax = typeof data.physical_stress === 'number' ? data.physical_stress :
-               (typeof data.stress === 'number' ? data.stress : 0);
-  var menMax = typeof data.mental_stress === 'number' ? data.mental_stress : 0;
-
-  if (phyMax === 0 && menMax === 0) return h('div', {style: {fontSize: 11, color: '#aaa'}}, 'No stress track');
-
-  function toggle(track, i) {
-    setHits(function(prev) {
-      var next = Object.assign({}, prev);
-      next[track] = Object.assign({}, prev[track]);
-      next[track][i] = !prev[track][i];
-      return next;
-    });
-  }
-
-  return h('div', null,
-    phyMax > 0 && h('div', {style: {marginBottom: 12}},
-      h('div', {className: 'bdf-section'}, 'Stress'),
-      h('div', {style: {fontSize: 9, color: '#aaa', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.08em'}}, 'Physical'),
-      h('div', {className: 'bds-boxes'},
-        Array.from({length: phyMax}).map(function(_, i) {
-          var checked = !!hits.phy[i];
-          return h('div', {
-            key: i,
-            className: 'bds-box' + (checked ? ' checked' : ''),
-            style: {borderColor: C.stripe, color: checked ? '#fff' : C.tc, background: checked ? C.stripe : '#fff'},
-            onClick: function() { toggle('phy', i); },
-          }, i + 1);
-        })
-      )
-    ),
-    menMax > 0 && h('div', null,
-      h('div', {style: {fontSize: 9, color: '#aaa', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.08em'}}, 'Mental'),
-      h('div', {className: 'bds-boxes'},
-        Array.from({length: menMax}).map(function(_, i) {
-          var checked = !!hits.men[i];
-          return h('div', {
-            key: i,
-            className: 'bds-box' + (checked ? ' checked' : ''),
-            style: {borderColor: '#6a7dd4', color: checked ? '#fff' : '#5a6db8', background: checked ? '#6a7dd4' : '#fff'},
-            onClick: function() { toggle('men', i); },
-          }, i + 1);
-        })
-      )
-    ),
-    (data.mild !== undefined || data.moderate !== undefined || data.severe !== undefined ||
-     (card.genId === 'npc_major')) && h('div', {style: {marginTop: 14}},
-      h('div', {className: 'bdf-section'}, 'Consequences'),
-      ['Mild (−2)', 'Moderate (−4)', 'Severe (−6)'].map(function(s, i) {
-        return h('div', {key: i, className: 'bds-conseq'}, s);
-      })
-    )
-  );
-}
 
 // ── BoardTopbar ───────────────────────────────────────────────────────────────
 
@@ -1181,29 +1248,51 @@ function BoardExportMenu(props) {
 
 
 function BoardTopbar(props) {
-  var campMeta = props.campMeta;
-  var mode = props.mode;
+  var campMeta     = props.campMeta;
+  var mode         = props.mode;
   var onModeChange = props.onModeChange;
-  var pinCount = props.pinCount;
-  var theme = props.theme;
-  var onToggleTheme = props.onToggleTheme;
-  var campId = props.campId;
+  var campId       = props.campId;
   var onCampChange = props.onCampChange;
-  var isOnline = props.isOnline;
-  var showDice = props.showDice;
-  var onToggleDice = props.onToggleDice;
-  var showFP = props.showFP;
-  var onToggleFP = props.onToggleFP;
-  var syncStatus = props.syncStatus;
-  var roomCode = props.roomCode;
-  var onHost = props.onHost;
-  var onDisconnect = props.onDisconnect;
-  var onExportCanvas = props.onExportCanvas;
-  var cards = props.cards || [];
-  var campName = props.campName || (props.campMeta && props.campMeta.name) || '';
-  var mobileListView = props.mobileListView || false;
-  var leftOpen = props.leftOpen;
-  var onToggleLeft = props.onToggleLeft;
+  var isOnline     = props.isOnline;
+
+  // Grouped prop objects
+  var sync         = props.sync         || {};
+  var panels       = props.panels       || {};
+  var counts       = props.counts       || {};
+  var exp          = props.exportActions || {};
+
+  // Destructure sync
+  var syncStatus  = sync.status   || 'offline';
+  var roomCode    = sync.roomCode || '';
+  var onHost      = sync.onHost;
+  var onDisconnect = sync.onDisconnect;
+
+  // Destructure panels
+  var leftOpen         = panels.leftOpen;
+  var onToggleLeft     = panels.onToggleLeft;
+  var showDice         = panels.showDice;
+  var onToggleDice     = panels.onToggleDice;
+  var showFP           = panels.showFP;
+  var onToggleFP       = panels.onToggleFP;
+  var binderOpen       = panels.binderOpen;
+  var onToggleBinder   = panels.onToggleBinder;
+  var mobileListView   = panels.mobileListView || false;
+  var onToggleMobileList = panels.onToggleMobileList;
+
+  // Destructure counts
+  var onTableCount = counts.onTable || 0;
+  var binderCount  = counts.binder  || 0;
+  var trayCount    = counts.tray    || 0;
+  var pinCount     = counts.pin     || 0;
+
+  // Destructure export actions
+  var cards            = exp.cards        || [];
+  var campName         = exp.campName     || (campMeta && campMeta.name) || '';
+  var theme            = exp.theme        || 'dark';
+  var onToggleTheme    = exp.onToggleTheme;
+  var onExportCanvas   = exp.onExportCanvas;
+  var onImportCanvas   = exp.onImportCanvas;
+  var onPrint          = exp.onPrint;
 
   var worlds = typeof CAMPAIGNS !== 'undefined'
     ? Object.keys(CAMPAIGNS).map(function(id) { return {id: id, name: (CAMPAIGNS[id].meta || {}).name || id}; })
@@ -1225,9 +1314,8 @@ function BoardTopbar(props) {
       )
     ),
 
-    // Mode toggle
-    // MOB-02: Left panel toggle (visible on mobile only)
-    h('button', {
+    // GM Screen: panel toggle only in PLAY (panel is always open in PREP)
+    mode === 'play' && h('button', {
       className: 'bt-icon-btn bt-panel-toggle',
       onClick: onToggleLeft,
       title: leftOpen ? 'Hide generators' : 'Show generators',
@@ -1255,7 +1343,27 @@ function BoardTopbar(props) {
       mode === 'play' && syncStatus === 'connecting' && h('span', {className: 'bt-chip bt-offline'}, '\u29D7 Connecting…'),
       !isOnline && h('span', {className: 'bt-chip bt-offline'}, '\u26A1 Offline'),
 
-    // BRD-02: Dice floater toggle
+      // UNI: "N on table" chip — PREP mode only, shows how many cards are on the play canvas
+      mode === 'prep' && onTableCount > 0 && h('span', {
+        className: 'bt-chip bt-ontable-chip',
+        title: onTableCount + ' card' + (onTableCount === 1 ? '' : 's') + ' on the play table',
+      }, '\u25CF\u00a0' + onTableCount + ' on table'),
+      // UNI-02: Binder toggle (Prep mode only)
+      mode === 'prep' && h('button', {
+        className: 'bt-icon-btn' + (binderOpen ? ' active' : ''),
+        onClick: onToggleBinder,
+        title: binderOpen ? 'Hide Binder' : 'Show Binder' + (binderCount > 0 ? ' (' + binderCount + ' cards)' : ''),
+        'aria-label': binderOpen ? 'Hide Binder' : 'Open Binder',
+        'aria-pressed': String(binderOpen),
+        style: {position: 'relative'},
+      },
+        '\uD83D\uDCCB',
+        (binderCount > 0 || trayCount > 0) && h('span', {
+          className: 'bt-count',
+          style: {position:'absolute', top:-4, right:-4},
+        }, String(trayCount > 0 ? trayCount : binderCount))
+      ),
+      // BRD-02: Dice floater toggle
       h('button', {
         className: 'bt-icon-btn' + (showDice ? ' active' : ''),
         onClick: onToggleDice,
@@ -1380,16 +1488,31 @@ function useBoardPlayState(campId, mode, loaded) {
     });
   }
 
-  function addPlayer(nameArg) {
+  function addPlayer(nameArg, pcArg) {
     var name = nameArg || prompt('Player name:');
     if (!name) return;
     var COLORS = ['var(--accent)', 'var(--c-purple)', 'var(--c-blue)', 'var(--c-green)', 'var(--c-red)'];
+    // PL-03: derive stress from skills if pc data provided (FCon p.12)
+    var pc = pcArg || {};
+    var skills = Array.isArray(pc.skills) ? pc.skills : [];
+    var physique = (skills.find(function(s){ return s.name==='Physique'; })||{}).r||0;
+    var will     = (skills.find(function(s){ return s.name==='Will'; })    ||{}).r||0;
+    var phy = physique >= 3 ? [false,false,false,false,false,false]
+            : physique >= 1 ? [false,false,false,false]
+            : [false,false,false];
+    var men = will >= 3 ? [false,false,false,false,false,false]
+            : will >= 1 ? [false,false,false,false]
+            : [false,false,false];
     var np = {
       id: 'bp' + Date.now() + Math.random().toString(36).slice(2, 5),
-      name: name, hc: '', fp: 3, ref: 3,
-      phy: [false, false, false], men: [false, false],
+      name: name,
+      hc: pc.hc || '',
+      fp: 3, ref: 3,
+      phy: phy, men: men,
       color: COLORS[players.length % COLORS.length],
-      acted: false, conseq: ['', '', '']
+      acted: false, conseq: ['', '', ''],
+      aspects: pc.aspects || [],
+      skills: skills,
     };
     var nextP = players.concat([np]);
     var nextO = order.concat([np.id]);
@@ -1405,16 +1528,18 @@ function useBoardPlayState(campId, mode, loaded) {
     if (selPlayer === id) setSelPlayer(null);
   }
 
-  // Load play state on mount and when entering play mode
+  // Load play state on mount only — guard prevents reload on every PREP↔PLAY toggle
+  var _hasLoadedPlay = useRef(false);
   useEffect(function() {
-    if (!DB || !loaded) return;
+    if (!DB || !loaded || _hasLoadedPlay.current) return;
+    _hasLoadedPlay.current = true;
     DB.loadSession('board_play_session_' + campId).then(function(saved) {
       if (!saved) return;
       if (Array.isArray(saved.players) && saved.players.length > 0) setPlayers(saved.players);
       if (typeof saved.round === 'number') setRound(saved.round);
       if (Array.isArray(saved.order) && saved.order.length > 0) setOrder(saved.order);
     }).catch(function() {});
-  }, [campId, mode, loaded]);
+  }, [campId, loaded]);
 
   return {
     players: players, setPlayers: setPlayers,
@@ -1550,6 +1675,127 @@ function BoardMobileList(props) {
   );
 }
 
+// ── useBoardBinder — Binder + Tray + playCardIds state for BoardApp ──────────
+// Extracted from BoardApp (was ~70 lines of inline state + helpers).
+// Owns: binderCards, trayCards, binderOpen, playCardIds.
+// Exposes: helpers for add/remove/send/unpin/export.
+function useBoardBinder(campId, campMetaName, playCanvasKey, showToast, getCanvasCards, persistCanvas) {
+  var _binderCards = useState([]); var binderCards = _binderCards[0]; var setBinderCards = _binderCards[1];
+  var _trayCards   = useState([]); var trayCards   = _trayCards[0];   var setTrayCards   = _trayCards[1];
+  var _binderOpen  = useState(false); var binderOpen = _binderOpen[0]; var setBinderOpen  = _binderOpen[1];
+  var _playCardIds = useState(new Set()); var playCardIds = _playCardIds[0]; var setPlayCardIds = _playCardIds[1];
+
+  // Load Binder cards + Tray + play canvas IDs from IDB on mount
+  useEffect(function() {
+    if (typeof DB === 'undefined') return;
+    DB.loadCards(campId).then(function(cards) {
+      if (cards && cards.length) setBinderCards(cards.sort(function(a,b){ return b.ts - a.ts; }));
+    }).catch(function() {});
+    DB.loadSession('binder_tray_' + campId).then(function(saved) {
+      if (saved && Array.isArray(saved.cards) && saved.cards.length) setTrayCards(saved.cards);
+    }).catch(function() {});
+    DB.loadSession(playCanvasKey).then(function(saved) {
+      if (saved && Array.isArray(saved.cards)) {
+        setPlayCardIds(new Set(saved.cards.map(function(c) { return c.sourceId || c.id; })));
+      }
+    }).catch(function() {});
+  }, [campId]);
+
+  function addToTray(card) {
+    var already = trayCards.some(function(c) { return c.id === card.id; });
+    if (already) { showToast('Already in Tray'); return; }
+    var next = trayCards.concat([Object.assign({}, card, {trayTs: Date.now()})]);
+    setTrayCards(next);
+    if (typeof DB !== 'undefined') DB.saveSession('binder_tray_' + campId, {cards: next}).catch(function(){});
+    showToast('\u2713 Added to Tray');
+  }
+
+  function removeFromTray(cardId) {
+    setTrayCards(function(prev) {
+      var next = prev.filter(function(c) { return c.id !== cardId; });
+      if (typeof DB !== 'undefined') DB.saveSession('binder_tray_' + campId, {cards: next}).catch(function(){});
+      return next;
+    });
+  }
+
+  function sendTrayToCanvas() {
+    if (!trayCards.length) { showToast('Tray is empty'); return; }
+    var currentCards = getCanvasCards();
+    var newCards = trayCards.map(function(card, i) {
+      var d = card.data || {};
+      var title = d.name || d.location || d.situation || (d.aspects && d.aspects.high_concept) || card.genId;
+      return {
+        id: 'b' + Date.now() + i + Math.random().toString(36).slice(2,5),
+        genId: card.genId, title: title, summary: card.label || title, tags: [],
+        data: d, x: 60 + (i % 4) * 220, y: 60 + Math.floor(i / 4) * 210,
+        z: Date.now() + i, ts: Date.now(), gmOnly: false,
+      };
+    });
+    persistCanvas(currentCards.concat(newCards));
+    var count = trayCards.length;
+    setTrayCards([]);
+    if (typeof DB !== 'undefined') DB.saveSession('binder_tray_' + campId, {cards: []}).catch(function(){});
+    showToast('\u2713 ' + count + ' card' + (count === 1 ? '' : 's') + ' placed on canvas');
+  }
+
+  function sendToCanvas(card, setCards) {
+    var d = card.data || {};
+    var title = d.name || d.location || d.situation || (d.aspects && d.aspects.high_concept) || card.genId;
+    var placed = {
+      id: 'b' + Date.now() + Math.random().toString(36).slice(2,6),
+      genId: card.genId, title: title, summary: card.label || title, tags: [],
+      data: d, x: 60 + Math.floor(Math.random() * 3) * 220,
+      y: 60 + Math.floor(Math.random() * 2) * 200,
+      z: Date.now(), ts: Date.now(), gmOnly: false,
+    };
+    setCards(function(prev) {
+      var next = prev.concat([placed]);
+      persistCanvas(next);
+      return next;
+    });
+    showToast('\u2713 Placed on canvas');
+  }
+
+  function unpinCard(cardId) {
+    setBinderCards(function(prev) { return prev.filter(function(c) { return c.id !== cardId; }); });
+    if (typeof DB !== 'undefined') DB.deleteCard(campId, cardId).catch(function(){});
+  }
+
+  function exportCard(card) {
+    if (typeof DB !== 'undefined' && DB.exportCard) {
+      DB.exportCard({genId:card.genId,label:card.label,data:card.data,state:card.state||null,ts:card.ts}, campMetaName);
+    }
+  }
+
+  function sendToTable(card) {
+    if (typeof DB === 'undefined') { showToast('\u26a0 Storage unavailable'); return; }
+    var tableCard = Object.assign({}, card, {
+      id: 'tbl_' + Date.now() + Math.random().toString(36).slice(2, 5),
+      sourceId: card.id, ts: Date.now(),
+    });
+    DB.loadSession(playCanvasKey).then(function(saved) {
+      var existing = (saved && Array.isArray(saved.cards)) ? saved.cards : [];
+      var alreadySent = existing.some(function(c) { return c.sourceId === card.id; });
+      if (alreadySent) { showToast('Already on table'); return; }
+      var next = existing.concat([tableCard]);
+      return DB.saveSession(playCanvasKey, {cards: next, ts: Date.now()}).then(function() {
+        setPlayCardIds(function(prev) { var ns = new Set(prev); ns.add(card.id); return ns; });
+        showToast('\u25CF Put on table');
+      });
+    }).catch(function() { showToast('\u26a0 Could not put on table'); });
+  }
+
+  return {
+    binderCards: binderCards, setBinderCards: setBinderCards,
+    trayCards: trayCards,
+    binderOpen: binderOpen, setBinderOpen: setBinderOpen,
+    playCardIds: playCardIds,
+    addToTray: addToTray, removeFromTray: removeFromTray,
+    sendTrayToCanvas: sendTrayToCanvas, sendToCanvas: sendToCanvas,
+    unpinCard: unpinCard, exportCard: exportCard, sendToTable: sendToTable,
+  };
+}
+
 function BoardApp(props) {
   var campId       = props.campId || 'fantasy';
   var initialMode  = props.initialMode || 'prep';
@@ -1596,13 +1842,18 @@ function BoardApp(props) {
   var loaded = _loaded[0];
   var setLoaded = _loaded[1];
 
-  var _zoom = useState(1);
+  var _zoom = useState(0.75); // cv4Cards are larger — 75% default gives a readable canvas
   var zoom = _zoom[0];
   var setZoom = _zoom[1];
 
   // MOB-02: left panel collapsed state (default open on desktop, closed on mobile)
   var _leftOpen = useState(function() { return window.innerWidth > 520; });
   var leftOpen = _leftOpen[0]; var setLeftOpen = _leftOpen[1];
+
+  // GM Screen: left panel is always open in PREP mode (it's reference material, not a feature)
+  useEffect(function() {
+    if (mode === 'prep') setLeftOpen(true);
+  }, [mode]);
 
   // ── Play mode: player roster, round tracker, turn order (useBoardPlayState) ──
   var _play = useBoardPlayState(campId, mode, loaded);
@@ -1622,11 +1873,11 @@ function BoardApp(props) {
 
   // Toast — declared before useBoardSync so showToast can be passed as a callback
   var toastTimerRef = useRef(null);
-  function showToast(msg) {
+  var showToast = useCallback(function(msg) {
     setToast(msg);
     clearTimeout(toastTimerRef.current);
     toastTimerRef.current = setTimeout(function() { setToast(null); }, 1800);
-  }
+  }, []);
 
   // ── BRD-05: Multiplayer sync state ───────────────────────────────────────
   // Sync state extracted to useBoardSync
@@ -1647,8 +1898,8 @@ function BoardApp(props) {
       var data; try { data = JSON.parse(event.data); } catch(e) { return; }
       if (data.type === 'player_hello' && data.name) {
         var name = String(data.name).slice(0, 30);
-        addPlayer(name);
-        showToast('\uD83D\uDC4B ' + name + ' joined');
+        addPlayer(name, data.pc || null);
+        showToast('\uD83D\uDC4B ' + name + ' joined' + (data.pc && data.pc.hc ? ' \u2014 ' + data.pc.hc : ''));
       }
     }
     syncObj.ws.addEventListener('message', onMessage);
@@ -1661,6 +1912,81 @@ function BoardApp(props) {
   // TBL-01: player-side name for waiting banner
   var _pjn = useState(''); var playerJoinName = _pjn[0]; var setPlayerJoinName = _pjn[1];
   var _pjSent = useState(false); var playerJoinSent = _pjSent[0]; var setPlayerJoinSent = _pjSent[1];
+
+  // UNI-02: Binder — extracted to useBoardBinder hook
+  // _pcRef lets the hook call persistCanvas which is defined later in BoardApp
+  var _pcRef = useRef(null);
+  var binder = useBoardBinder(
+    campId, campMeta.name,
+    BOARD_CANVAS_PLAY_KEY + '_' + campId,
+    showToast,
+    function() { return cardsRef.current; },
+    function(next) { setCards(next); if (_pcRef.current) _pcRef.current(next); }
+  );
+  var binderCards   = binder.binderCards;
+  var trayCards     = binder.trayCards;
+  var binderOpen    = binder.binderOpen;
+  var setBinderOpen = binder.setBinderOpen;
+  var playCardIds   = binder.playCardIds;
+  // PL-03: pre-join character builder — step 0=name, 1=aspects, 2=skills
+  var _pcStep = useState(0); var pcStep = _pcStep[0]; var setPcStep = _pcStep[1];
+  var _pcDraft = useState({hc:'',trouble:'',aspect3:'',skills:{}}); var pcDraft = _pcDraft[0]; var setPcDraft = _pcDraft[1];
+  function updDraft(patch) { setPcDraft(function(d){ return Object.assign({},d,patch); }); }
+  // FCon skill pyramid: 1×+4, 2×+3, 3×+2, 4×+1 — total 10 rated skills (FCon p.10)
+  var PC_SKILL_LADDER = [{r:4,n:1},{r:3,n:2},{r:2,n:3},{r:1,n:4}];
+  var PC_SKILLS = typeof ALL_SKILLS !== 'undefined' ? ALL_SKILLS :
+    ['Academics','Athletics','Burglary','Contacts','Crafts','Deceive','Drive',
+     'Empathy','Fight','Investigate','Lore','Notice','Physique','Provoke',
+     'Rapport','Resources','Shoot','Stealth','Will'];
+  function pcSkillRating(skillName) { return pcDraft.skills[skillName] || 0; }
+  function pcSkillSlots() {
+    // How many at each rating are still available
+    var used = {};
+    Object.values(pcDraft.skills).forEach(function(r){ used[r]=(used[r]||0)+1; });
+    var avail = {};
+    PC_SKILL_LADDER.forEach(function(row){ avail[row.r] = row.n - (used[row.r]||0); });
+    return avail;
+  }
+  function togglePcSkill(skillName) {
+    var cur = pcDraft.skills[skillName] || 0;
+    if (cur > 0) {
+      // deselect — remove
+      var next = Object.assign({}, pcDraft.skills);
+      delete next[skillName];
+      updDraft({skills: next});
+    } else {
+      // select — assign lowest available rating
+      var avail = pcSkillSlots();
+      var ratings = [4,3,2,1];
+      var assign = null;
+      for (var i = 0; i < ratings.length; i++) {
+        if ((avail[ratings[i]]||0) > 0) { assign = ratings[i]; break; }
+      }
+      if (assign === null) { showToast('All skill slots filled'); return; }
+      var next2 = Object.assign({}, pcDraft.skills);
+      next2[skillName] = assign;
+      updDraft({skills: next2});
+    }
+  }
+  function pcTotalSkills() { return Object.keys(pcDraft.skills).length; }
+  function submitPcJoin() {
+    if (!playerJoinName.trim()) return;
+    var skills = Object.keys(pcDraft.skills).map(function(name){
+      return {name: name, r: pcDraft.skills[name]};
+    }).sort(function(a,b){ return b.r - a.r; });
+    var aspects = [];
+    if (pcDraft.hc) aspects.push(pcDraft.hc);
+    if (pcDraft.trouble) aspects.push(pcDraft.trouble);
+    if (pcDraft.aspect3) aspects.push(pcDraft.aspect3);
+    var payload = {
+      type: 'player_hello',
+      name: playerJoinName.trim(),
+      pc: { hc: pcDraft.hc, trouble: pcDraft.trouble, aspects: aspects, skills: skills }
+    };
+    syncObj.ws.send(JSON.stringify(payload));
+    setPlayerJoinSent(true);
+    showToast('\uD83D\uDC4B Sent your character to the GM');
+  }
 
   // ── BRD-03: FP tracker state (loaded from IDB) ────────────────────────────
   var _fpState = useState(null); var fpState = _fpState[0]; var setFpState = _fpState[1];
@@ -1755,11 +2081,14 @@ function BoardApp(props) {
   }
 
 
+
   // ── Persist canvas to IDB ─────────────────────────────────────────────────
   function persistCanvas(nextCards) {
     if (typeof DB === 'undefined') return;
     DB.saveSession(campCanvasKey, {cards: nextCards, ts: Date.now()}).catch(function() {});
   }
+  // Wire binder hook's persistCanvas callback now that the function is defined
+  _pcRef.current = persistCanvas;
 
 
   // ── Theme toggle ──────────────────────────────────────────────────────────
@@ -1958,30 +2287,6 @@ if (genId === 'sticky') {
   }
 
   // ── Pin card to Table (shared IDB) ────────────────────────────────────────
-  function pinCard(card) {
-    if (typeof DB === 'undefined') { showToast('Pinned (no DB)'); return; }
-    // Load existing pinned cards, append, save back
-    DB.loadSession('prep_table_pinned_' + campId).then(function(saved) {
-      var current = (saved && Array.isArray(saved)) ? saved : [];
-      var alreadyPinned = current.some(function(c) { return c.id === card.id; });
-      if (alreadyPinned) { showToast('Already pinned'); return; }
-      var pinned = current.concat([{
-        id: card.id,
-        genId: card.genId,
-        title: card.title,
-        data: card.data,
-        ts: card.ts,
-      }]);
-      DB.saveSession('prep_table_pinned_' + campId, pinned).catch(function() {});
-      var newCount = pinned.length;
-      setPinCount(newCount);
-      DB.saveSession('pinned_board_' + campId, {count: newCount}).catch(function() {});
-      showToast('\uD83D\uDCCC Pinned to Table');
-    }).catch(function() {
-      showToast('Pinned (could not save)');
-    });
-  }
-
   // ── Drag ─────────────────────────────────────────────────────────────────
   function onDragStart(e, cardId) {
     if (e.button !== 0) return;
@@ -2095,7 +2400,7 @@ if (genId === 'sticky') {
     }
     document.addEventListener('keydown', onKey);
     return function() { document.removeEventListener('keydown', onKey); };
-  }, [activeGen, dossierCard, zoom]);
+  }, [activeGen, dossierCard]);
 
   // ── Context menu (right-click on canvas) ─────────────────────────────────
   var _ctx = useState(null);
@@ -2128,73 +2433,81 @@ if (genId === 'sticky') {
     'data-mode': mode,
     onClick: function() { setCtx(null); },
   },
-    // Topbar
+    // Topbar — grouped props pattern reduces call site from 38 → 8 top-level props
     h(BoardTopbar, {
       campMeta: campMeta,
       mode: mode,
-      onModeChange: function(m) {
-        persistCanvas(cards);
-        setMode(m);
-      },
-      pinCount: pinCount,
-      theme: theme,
-      onToggleTheme: toggleTheme,
+      onModeChange: function(m) { persistCanvas(cards); setMode(m); },
       campId: campId,
-      onCampChange: function(newId) {
-        persistCanvas(cards);
-        window.location.href = 'campaigns/board.html?world=' + newId;
-      },
+      onCampChange: function(newId) { persistCanvas(cards); window.location.href = 'campaigns/board.html?world=' + newId; },
       isOnline: isOnline,
-      leftOpen: leftOpen,
-      onToggleLeft: function() { setLeftOpen(function(v) { return !v; }); },
-      showDice: showDice,
-      onToggleDice: function() { setShowDice(function(v) { return !v; }); },
-      showFP: showFP,
-      onToggleFP: function() { setShowFP(function(v) { return !v; }); },
-      syncStatus: syncStatus,
-      roomCode: roomCode,
-      onHost: connectAsHost,
-      onDisconnect: disconnectSync,
-      onExportCanvas: exportCanvas,
-      onImportCanvas: importCanvas,
-      cards: cards,
-      campName: campMeta.name,
-      mobileListView: mobileListView,
-      onToggleMobileList: function() { setMobileListView(function(v) { return !v; }); },
-      onPrint: function() {
-        if (typeof DB === 'undefined' || !DB.printCards) return;
-        var printable = cards.filter(function(card) {
-          return card.genId && card.genId !== 'sticky' && card.genId !== 'label' && card.data;
-        }).map(function(card) {
-          return {genId: card.genId, title: card.title, summary: card.summary, tags: card.tags || [], data: card.data};
-        });
-        if (!printable.length) { showToast('No cards to print'); return; }
-        DB.printCards(printable, campMeta.name);
-        showToast('Opening print view…');
+      sync: {
+        status: syncStatus,
+        roomCode: roomCode,
+        onHost: connectAsHost,
+        onDisconnect: disconnectSync,
+      },
+      panels: {
+        leftOpen: leftOpen,
+        onToggleLeft: function() { setLeftOpen(function(v) { return !v; }); },
+        showDice: showDice,
+        onToggleDice: function() { setShowDice(function(v) { return !v; }); },
+        showFP: showFP,
+        onToggleFP: function() { setShowFP(function(v) { return !v; }); },
+        binderOpen: binderOpen,
+        onToggleBinder: function() { binder.setBinderOpen(function(v) { return !v; }); },
+        mobileListView: mobileListView,
+        onToggleMobileList: function() { setMobileListView(function(v) { return !v; }); },
+      },
+      counts: {
+        onTable: playCardIds.size,
+        binder: binderCards.length,
+        tray: trayCards.length,
+        pin: pinCount,
+      },
+      exportActions: {
+        cards: cards,
+        campName: campMeta.name,
+        theme: theme,
+        onToggleTheme: toggleTheme,
+        onExportCanvas: exportCanvas,
+        onImportCanvas: importCanvas,
+        onPrint: function() {
+          if (typeof DB === 'undefined' || !DB.printCards) return;
+          var printable = cards.filter(function(card) {
+            return card.genId && card.genId !== 'sticky' && card.genId !== 'label' && card.data;
+          }).map(function(card) {
+            return {genId: card.genId, title: card.title, summary: card.summary, tags: card.tags || [], data: card.data};
+          });
+          if (!printable.length) { showToast('No cards to print'); return; }
+          DB.printCards(printable, campMeta.name);
+          showToast('Opening print view\u2026');
+        },
       },
     }),
 
     h('div', {className: 'board-body'},
 
-      // MOB-02: Mobile close is handled by canvas onMouseDown (MOB-06)
-      // MOB-02: Left panel — hidden on mobile when leftOpen is false
+      // UNI-04: Left panel — Generate/Stunts/Help always visible.
+      // In PLAY mode the player roster appears below the generator list.
       h('div', {className: 'blp-wrap' + (leftOpen ? '' : ' blp-hidden')},
-        mode === 'play'
-          ? h(BoardPlayPanel, {
-              players: players,
-              selPlayer: selPlayer,
-              onSel: setSelPlayer,
-              onUpd: updPlayer,
-              onAdd: addPlayer,
-            })
-          : h(BoardLeftPanel, {
-              activeGen: activeGen,
-              onSelectGen: selectGen,
-              campId: campId,
-              activeTab: leftTab,
-              onTabChange: setLeftTab,
-              campName: campMeta.name,
-            })
+        h(BoardLeftPanel, {
+          activeGen: activeGen,
+          onSelectGen: selectGen,
+          campId: campId,
+          activeTab: leftTab,
+          onTabChange: setLeftTab,
+          campName: campMeta.name,
+        }),
+        // UNI-05: Player roster visible in both modes as a panel beneath the generator
+        h(BoardPlayPanel, {
+          players: players,
+          selPlayer: selPlayer,
+          onSel: setSelPlayer,
+          onUpd: updPlayer,
+          onAdd: addPlayer,
+          collapsed: mode === 'prep',
+        })
       ),
 
       // Right column: TurnBar (play mode) + canvas
@@ -2283,49 +2596,130 @@ if (genId === 'sticky') {
               card: card,
               onDelete: deleteCard,
               onReroll: rerollCard,
-              onPin: pinCard,
+              onSendToTable: binder.sendToTable,
               onOpen: setDossierCard,
               onDragStart: onDragStart,
               onUpdate: updateCard,
+              mode: mode,
+              campId: campId,
+              isOnTable: playCardIds.has(card.id),
             });
           })
         ),
 
         // Empty state
-        // TBL-01: Waiting banner for player who just joined
+        // PL-03: Pre-join character builder (3 steps)
         syncObj && syncObj.role === 'player' && syncStatus === 'connected' && !playerJoinSent &&
-          h('div', {className: 'board-waiting-banner'},
-            h('div', {className: 'bwb-icon'}, '\uD83C\uDF10'),
-            h('div', {className: 'bwb-title'}, 'Connected to GM'),
-            h('div', {className: 'bwb-sub'}, 'Enter your name so the GM can add you to the tracker:'),
-            h('div', {className: 'bwb-row'},
+          h('div', {className: 'board-waiting-banner bwb-wizard', role:'dialog', 'aria-label':'Join session'},
+
+            // Step progress dots
+            h('div', {className:'bwb-steps', 'aria-label':'Step ' + (pcStep+1) + ' of 3'},
+              [0,1,2].map(function(i){
+                return h('div', {key:i, className:'bwb-step-dot' + (i===pcStep?' active':i<pcStep?' done':'')});
+              })
+            ),
+
+            // ── STEP 0: Name ──────────────────────────────────────────────
+            pcStep === 0 && h('div', null,
+              h('div', {className:'bwb-icon'}, '\uD83C\uDF10'),
+              h('div', {className:'bwb-title'}, 'Join Session'),
+              h('div', {className:'bwb-sub'}, 'What should the GM call you?'),
               h('input', {
-                type: 'text',
-                className: 'bwb-input',
-                placeholder: 'Your name\u2026',
-                value: playerJoinName,
-                'aria-label': 'Your player name',
-                autoFocus: true,
-                maxLength: 30,
-                onChange: function(e) { setPlayerJoinName(e.target.value); },
-                onKeyDown: function(e) {
-                  if (e.key === 'Enter' && playerJoinName.trim()) {
-                    syncObj.ws.send(JSON.stringify({type:'player_hello',name:playerJoinName.trim()}));
-                    setPlayerJoinSent(true);
-                    showToast('\uD83D\uDC4B Sent your name to the GM');
-                  }
-                },
+                type:'text', className:'bwb-input', style:{marginBottom:10},
+                placeholder:'Your name\u2026', value:playerJoinName,
+                'aria-label':'Your player name', autoFocus:true, maxLength:30,
+                onChange: function(e){ setPlayerJoinName(e.target.value); },
+                onKeyDown: function(e){ if(e.key==='Enter'&&playerJoinName.trim()) setPcStep(1); },
               }),
-              h('button', {
-                className: 'bwb-btn',
-                disabled: !playerJoinName.trim(),
-                onClick: function() {
-                  if (!playerJoinName.trim()) return;
-                  syncObj.ws.send(JSON.stringify({type:'player_hello',name:playerJoinName.trim()}));
-                  setPlayerJoinSent(true);
-                  showToast('\uD83D\uDC4B Sent your name to the GM');
-                },
-              }, 'Join')
+              h('div', {className:'bwb-row', style:{justifyContent:'flex-end'}},
+                h('button', {
+                  className:'bwb-btn', disabled:!playerJoinName.trim(),
+                  onClick: function(){ if(playerJoinName.trim()) setPcStep(1); },
+                }, 'Next \u2192')
+              )
+            ),
+
+            // ── STEP 1: Aspects ───────────────────────────────────────────
+            pcStep === 1 && h('div', null,
+              h('div', {className:'bwb-title', style:{marginBottom:4}}, playerJoinName),
+              h('div', {className:'bwb-sub', style:{marginBottom:12}}, 'Give your character a High Concept and Trouble. Both optional — you can fill in at the table.'),
+              h('div', {className:'bwb-field'},
+                h('label', {className:'bwb-lbl', htmlFor:'bwb-hc'}, 'High Concept'),
+                h('input', {
+                  id:'bwb-hc', type:'text', className:'bwb-input',
+                  placeholder:'e.g. Burned Ex-Corporate Fixer\u2026', maxLength:60,
+                  value:pcDraft.hc, autoFocus:true,
+                  onChange:function(e){updDraft({hc:e.target.value});},
+                })
+              ),
+              h('div', {className:'bwb-field'},
+                h('label', {className:'bwb-lbl', htmlFor:'bwb-tr'}, 'Trouble'),
+                h('input', {
+                  id:'bwb-tr', type:'text', className:'bwb-input',
+                  placeholder:'e.g. Debts That Never Disappear\u2026', maxLength:60,
+                  value:pcDraft.trouble,
+                  onChange:function(e){updDraft({trouble:e.target.value});},
+                })
+              ),
+              h('div', {className:'bwb-field'},
+                h('label', {className:'bwb-lbl', htmlFor:'bwb-a3'}, 'Free Aspect (optional)'),
+                h('input', {
+                  id:'bwb-a3', type:'text', className:'bwb-input',
+                  placeholder:'Another aspect\u2026', maxLength:60,
+                  value:pcDraft.aspect3,
+                  onChange:function(e){updDraft({aspect3:e.target.value});},
+                })
+              ),
+              h('div', {className:'bwb-row', style:{justifyContent:'space-between',marginTop:10}},
+                h('button', {className:'bwb-btn bwb-back', onClick:function(){setPcStep(0);}}, '\u2190 Back'),
+                h('button', {className:'bwb-btn', onClick:function(){setPcStep(2);}}, 'Next \u2192')
+              )
+            ),
+
+            // ── STEP 2: Skills ────────────────────────────────────────────
+            pcStep === 2 && h('div', null,
+              h('div', {className:'bwb-title', style:{marginBottom:2}}, playerJoinName),
+              h('div', {className:'bwb-sub', style:{marginBottom:8}},
+                'Pick skills to assign ratings. ' +
+                'Tap a skill to add it at the next available slot (\u00b14 \u00b13\u00d72 \u00b12\u00d72 \u00b11\u00d74). ' +
+                'Tap again to remove. Skip and finish at the table.'
+              ),
+              // Ladder summary
+              h('div', {className:'bwb-ladder'},
+                PC_SKILL_LADDER.map(function(row){
+                  var used = Object.values(pcDraft.skills).filter(function(r){return r===row.r;}).length;
+                  return h('div', {key:row.r, className:'bwb-ladder-row'},
+                    h('span', {className:'bwb-ladder-rating', style:{color: used===row.n?'var(--c-green)':'var(--accent)'}},
+                      '+' + row.r),
+                    Array.from({length:row.n}).map(function(_,i){
+                      return h('div', {key:i, className:'bwb-ladder-pip'+(i<used?' filled':'')});
+                    })
+                  );
+                })
+              ),
+              // Skill grid
+              h('div', {className:'bwb-skill-grid'},
+                PC_SKILLS.map(function(sk){
+                  var r = pcSkillRating(sk);
+                  return h('button', {
+                    key:sk,
+                    className:'bwb-skill-btn' + (r>0?' selected':''),
+                    onClick:function(){togglePcSkill(sk);},
+                    'aria-pressed': String(r>0),
+                    title: r>0 ? '+'+r+' '+sk : sk,
+                  },
+                    r>0 && h('span', {className:'bwb-skill-r'}, '+'+r),
+                    sk
+                  );
+                })
+              ),
+              h('div', {className:'bwb-row', style:{justifyContent:'space-between',marginTop:10}},
+                h('button', {className:'bwb-btn bwb-back', onClick:function(){setPcStep(1);}}, '\u2190 Back'),
+                h('button', {
+                  className:'bwb-btn',
+                  onClick: submitPcJoin,
+                }, '\u2713 Join Session')
+              )
             )
           ),
 
@@ -2401,6 +2795,22 @@ if (genId === 'sticky') {
         toast && h('div', {className: 'board-toast', key: toast}, toast)
       )
       ) // end board-canvas-col
+    ),
+
+    // UNI-02: Binder right panel — PREP mode only, toggleable
+    mode === 'prep' && binderOpen && h('div', {className: 'bbp-wrap'},
+      h(BoardBinderPanel, {
+        campId: campId,
+        campName: campMeta.name,
+        binderCards: binderCards,
+        trayCards: trayCards,
+        onAddToTray: binder.addToTray,
+        onRemoveFromTray: binder.removeFromTray,
+        onSendTrayToCanvas: binder.sendTrayToCanvas,
+        onSendToCanvas: binder.sendToCanvas,
+        onExportCard: binder.exportCard,
+        onUnpin: binder.unpinCard,
+      })
     ),
 
     // BRD-02: Dice floater
@@ -2483,6 +2893,8 @@ if (genId === 'sticky') {
             onChange: function(e) { setJoinInput(e.target.value.toUpperCase().slice(0, 4)); },
             placeholder: 'XXXX',
             autoFocus: true,
+            'aria-label': '4-character room code',
+            maxLength: 4,
             style: {
               width: '100%', padding: '10px 14px', borderRadius: 8,
               background: 'var(--inset)', border: '1px solid var(--border)',
@@ -2530,13 +2942,15 @@ if (genId === 'sticky') {
       )
     ),
 
-    // Dossier modal
+    // Dossier modal — GM Guidance + actions (cv4Card visible inline on canvas)
     dossierCard && h(BoardDossier, {
       card: dossierCard,
       onClose: function() { setDossierCard(null); },
       onReroll: rerollCard,
-      onPin: pinCard,
-      onOpenHelp: function() { setLeftTab('help'); setDossierCard(null); },
+      onSendToTable: binder.sendToTable,
+      onDelete: deleteCard,
+      isOnTable: playCardIds.has(dossierCard.id),
+      mode: mode,
       campName: campMeta.name,
       campId: campId,
     })

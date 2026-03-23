@@ -1,8 +1,8 @@
 # Ogma — Roadmap
 
 > **Source of truth** for all planned work. Update whenever items change.
-> **Current version:** 2026.03.360 · QA: 198/198 named · 59/59 unit · 89/89 export
-> **Last revised:** 2026.03.360 — Build pipeline (scripts/build.js 3-tier, docs/BUILD.md, package.json devDeps, sw.js bundle entry); PROJECT_MEMORY.md written; help copy fixes (at-the-table + generators "Prep tab" → "Binder")
+> **Current version:** 2026.03.375 · QA: 208/208 named · 59/59 unit · 89/89 export
+> **Last revised:** 2026.03.375 — React Architect review: crashes fixed, useBoardBinder hook extracted, BoardTopbar 38→8 props, dead code purged, ARIA fixes, bundle 509→304KB; GM Screen model (cv4Cards inline, Send to Table, panel locked in PREP); UNI sprint complete (unified surface, PrepCanvas retired)
 
 ---
 
@@ -51,6 +51,65 @@
 
 | ID | Title | Size | Notes |
 |----|-------|------|-------|
+| ~~**UNI-01**~~ ✅ | Unified surface — Binder (PREP) and BoardApp (PLAY) | L | See plan below. 4-sprint execution. Retire PrepCanvas on completion. |
+| ~~**UNI-02**~~ ✅ | Binder panel inside BoardApp | M | Load `card_{campId}_*` + `binder_tray_{campId}` from IDB directly in BoardApp. Render Binder panel with filter strip + Tray in a collapsible right panel. |
+| ~~**UNI-03**~~ ✅ | PREP/PLAY mode toggle — prominent | S | Replace small editMode toolbar button with persistent PREP\|PLAY badge in topbar. Visual state shift on toggle: gmOnly cards fade, edit controls collapse. |
+| ~~**UNI-04**~~ ✅ | Generate panel in PREP mode | S | `BoardLeftPanel` (Generate/Stunts/Help) already exists. Show it in both PREP and PLAY modes (not just PLAY). Currently swaps for BoardPlayPanel in PLAY. |
+| ~~**UNI-05**~~ ✅ | Player roster in PREP mode | S | Show collapsed player tracker in PREP mode (currently play-only). Allows GM to pre-fill players before switching to PLAY. |
+| ~~**UNI-06**~~ ✅ | Retire PrepCanvas | M | Remove PrepCanvas from CampaignApp. Replace `prepView`/`canvasView` with single `surfaceView`. Update sidebar: "Prep & Play" single entry point. |
+| ~~**BDR-01**~~ ✅ | Drafting Tray | S | Done. |
+| ~~**BDR-02**~~ ✅ | Binder filter strip | S | Done. |
+| ~~**BDR-03**~~ ✅ | cv4Card flip animation | S | Done. |
+| ~~**PL-03**~~ ✅ | Pre-join character builder | M | Done. |
+| ~~**TBL-01**~~ ✅ | Player waiting state | S | Done. |
+| ~~**MOB-15**~~ ✅ | Mobile nav spike | M | Done. |
+
+---
+
+## UNI: Unified Surface — Design & Execution Plan
+
+### The problem
+Three surfaces exist where one should. A GM generating content (CampaignApp), managing a prep canvas (PrepCanvas), and running a live session (BoardApp) visits three separate UIs with three separate state stores and three separate navigation entries. This creates unnecessary hand-offs and cognitive load.
+
+### The solution
+**BoardApp becomes the single surface.** It already owns the hardest things: multiplayer sync (`useBoardSync`), player join flow (PL-03), role negotiation (GM vs player), the canvas, and the Generate/Stunts/Help panel. The missing pieces — Binder card library, Drafting Tray, Binder filter strip — are added to BoardApp. PrepCanvas is retired.
+
+### Three usage scenarios, one surface
+
+| Scenario | Mode | What GM sees |
+|---|---|---|
+| Solo prep | PREP | Generate panel left, Binder panel right, canvas centre, no sync |
+| In-person around one machine | Toggle PREP→PLAY | GM toggles to PLAY: gmOnly cards hide, edit controls collapse, turn bar appears |
+| Remote with players on own devices | PLAY + Host | GM hosts room, players join, see PLAY view on their device, interact with their own character card |
+
+### IDB key strategy
+BoardApp currently uses two canvas keys (`board_canvas_v1_{campId}` for prep, `board_play_v1_{campId}` for play). PrepCanvas uses `tp_canvas_{campId}`. These are separate stores — migration is **not** required. GMs start fresh on the unified surface. Old PrepCanvas data remains in IDB under the old key and is quietly abandoned.
+
+Binder cards (`card_{campId}_*`) are already shared — both CampaignApp and BoardApp read from `DB.loadCards(campId)`. No migration needed.
+
+Tray (`binder_tray_{campId}`) moves with the Binder — BoardApp loads it directly.
+
+### Sprint plan
+
+| Sprint | Items | What ships |
+|---|---|---|
+| 1 | UNI-02 | Binder panel (with filter strip + Tray) in BoardApp right panel. IDB load on mount. |
+| 2 | UNI-03 + UNI-04 | PREP/PLAY badge toggle. Generate panel visible in both modes. |
+| 3 | UNI-05 | Player roster accessible in PREP mode (collapsed). |
+| 4 | UNI-06 | PrepCanvas retired. CampaignApp sidebar simplified to single "Prep & Play" entry. QA full suite. |
+
+### What is NOT changing
+- BoardApp multiplayer sync (`useBoardSync`) — untouched
+- PL-03 player join flow — untouched  
+- Card schema, IDB structure, export formats — untouched
+- CampaignApp generator hub (Roll button, result panel) — stays as the quick-roll surface; only the canvas/table navigation collapses
+
+---
+
+| ~~**BDR-01**~~ ✅ | Drafting Tray | S | Staging layer between Binder and Table. Strip at bottom of Binder panel. Cards dragged/sent here persist in IDB (`binder_tray_{campId}`). "Send all to Table" button. Shows count badge. |
+| ~~**BDR-02**~~ ✅ | Binder filter strip | S | Filter row above Binder card list: All · People · Scene · Story · Mechanics. Filters by genId group. State is local (resets on panel close). |
+| ~~**BDR-03**~~ ✅ | cv4Card flip animation | S | GM Guidance footer now uses CSS maxHeight + opacity transition with spring chevron rotation. Smooth slide open/close. |
+| ~~**PL-03**~~ ✅ | Pre-join character builder | M | 3-step wizard in waiting banner: name → aspects (HC/Trouble/free) → skills (FCon pyramid, 19 skills). Sends `{type:player_hello, name, pc:{hc,trouble,aspects,skills}}`. GM `addPlayer` derives stress from Physique/Will per FCon p.12. |
 | ~~**TBL-01**~~ ✅ | Player waiting state | S | Player joins via room code before GM adds them. Need "Waiting for GM to add you" overlay in Board Play mode. Auto-create empty player slot on join. |
 | ~~**MOB-15**~~ ✅ | Mobile nav spike | M | Board on mobile is pinch-to-zoom. Spike what a designed mobile response looks like. Bottom nav bar? Slide-in panel? Floating action pattern? |
 
@@ -61,7 +120,6 @@
 | ID | Title | Notes |
 |----|-------|-------|
 | **BL-11** | Stunt builder wizard | Skipped — build when there's user demand. BL-05 stunt browser ships first. |
-| **PL-03** | Pre-join character builder | Before joining via room code, player builds character. Loads into Table on join. |
 | **WLD-02** | 9th campaign world | Parked — revisit 2027.03.01 |
 | **PDF-04–08** | 5 remaining PDF books | Parked — revisit 2027.03.01 |
 | **PERF-02** | Vite/terser minify | Revisit after SPA decision |
@@ -86,6 +144,20 @@
 
 | Version | What |
 |---------|------|
+| v2026.03.375 | **React Architect review.** Two runtime crashes fixed: `setPrepView is not defined` in `openCanvas`; `playCardIds is not defined` in `BoardTopbar` (now `onTableCount` prop). `useBoardBinder` hook extracted from BoardApp (70 lines inline state+effects+helpers → single hook call). BoardTopbar props grouped 38→8 semantic objects (`sync`, `panels`, `counts`, `exportActions`). 4 dead vars removed, 8 dead CSS classes removed, `PrepCanvas` function (1130 lines) removed from ui-table.js. `aria-label` on consequence/label/room-code/participant inputs. `showToast` → `useCallback`. Stale keyboard effect dep removed. IDB reload guard in `useBoardPlayState`. Bundle: 509KB → 304KB. |
+| v2026.03.374 | **GM Screen model.** cv4Cards inline on canvas at 65% scale (replaced compact chips). `sendToTable` function + `playCardIds` Set: copies prep card to play canvas IDB, shows bullet On-table indicator. Topbar "N on table" chip. Default zoom 0.75. Dossier redesigned as compact GM Guidance panel (rules, invoke/compel examples) — no redundant card re-render. Left panel locked open in PREP; toggle only in PLAY. |
+| v2026.03.373 | **UNI sprint — unified GM surface.** BoardApp is now the single surface for prep and play. UNI-01–06: BoardBinderPanel added to BoardApp (filter strip + Drafting Tray, IDB-backed). PREP/PLAY mode badge (accent/green filled pill, topbar border stripe). Generate/Stunts/Help panel always visible in both modes. Player roster collapsible accordion in PREP. PrepCanvas retired from nav (prepView state + 50 lines table sync removed from ui.js). Sidebar: single "Prep & Play" entry. Mobile nav updated. NA-206–208. |
+| v2026.03.372 | **Neon Abyss content audit + CHANGELOG v344–v371.** Mechanical Auditor pass: 4 trouble duplicates replaced, 5 stunt fixes (2 dupes removed, 2 narrow stunts broadened, Flash-Bang skill corrected to Crafts), 4 stub issues fleshed out with faces/places, 3 weakness dupes replaced, 2 faction role dupes replaced, 1 twist and 1 compel situation replaced. CHANGELOG entries written for v344–v371 (was empty above v344). |
+| v2026.03.370 | **PL-03 + offline fix + VIS-01.** 3-step pre-join character builder (name / aspects / skills, FCon pyramid, stress derived from Physique/Will per FCon p.12). Conditional base href in all 36 HTML files (unzip+open locally now works). fp-btn circular style restored. Mobile acronym nowrap. NA-204-205. |
+| v2026.03.369 | **Binder rework (BDR-01/02/03).** Drafting Tray: IDB-persisted staging layer, Send all to Table. Binder filter strip: All/People/Scene/Story/Mechanics. GM Guidance footer: CSS maxHeight slide + spring chevron rotation. NA-202-203. |
+| v2026.03.368 | **Full CSS + JS audit.** 6 campaign roll button selectors restored (orphaned since v344). PWA banner, action-bar, fp-btn base rules restored. Font stragglers to Futura. 9 dead JS functions resolved: dead helpers removed, toggleGmMode/addGMNote/exportFull wired, MD_FOOTER self-assignment fixed. |
+| v2026.03.367 | **Futura typeface site-wide.** Jost (Futura proxy) replaces Fraunces+Martian Mono across all 38 HTML, theme.css, ui-renderers.js, db.js. OGMA_CONFIG.VERSION in config.js + campaign footers. Style Guide link in footers. |
+| v2026.03.366 | **disconnectSync fix + Binder cv4Cards.** disconnectSync ReferenceError on Table open fixed. Binder shows full cv4Cards with Send to Table, filter strip, Drafting Tray. NA-199-203. |
+| v2026.03.365 | **Build pipeline.** scripts/build.js 3-tier (terser 40% savings). npm install --ignore-scripts standard workflow. PROJECT_MEMORY.md, docs/BUILD.md, help copy fixes. |
+| v2026.03.364 | **Workshop voices.** Product Strategist, UX Researcher, Mechanical Auditor added to BOOTSTRAP. content-authoring.md updated: four-audience framework, aspect quality bar, smoke test 7-to-8 worlds. |
+| v2026.03.363 | **MD + help audit.** README npm table, testing.md counts, CONTRIBUTING.md, ADR-0001 all updated for current architecture. |
+| v2026.03.362 | **SW regression + offline build.** Bundle removed from APP_SHELL. Build runs before every zip. |
+| v2026.03.360-361 | **10-changeset apply.** Accordion nav, ExportModal, canvas wiring, toBatchMarkdown, Session Zero deepening all confirmed in v359; build pipeline, PROJECT_MEMORY, help fixes added. |
 | v2026.03.343–344 | **Field Dispatch design system site-wide.** Fraunces + Martian Mono. Warm-dark/cream palette. Stamp radii + physical shadows. `cv4Card` auto-height with expandable GM guidance footer. Dossier view removed — Field Dispatch card always shown. All 38 HTML files get Google Fonts. Landing, board, help, sidebar all updated. |
 | v2026.03.359 | **Export modal + Board kill + Session Zero deepening.** (1) `ExportModal` replaces `ExportMenu`: full modal with card checklist (derived titles from `data.name`/`data.location`/HC), 8-format grid (MD/MM/OB/TY/TXT/JSON/IMG/Print), copy-vs-download delivery picker, Import link in footer. `toBatchMarkdown` added to engine.js. (2) `board.html` confirmed as JS redirect to `{world}.html?canvas=1`. Play → Table wired to `canvasView`/`openCanvas()`. All 8 campaign pages confirmed loading `ui-board.js`. (3) Session Zero deepening: dVentiRealm data added, `pc_high_concepts` replaces `major_concepts` for high concept examples, `questions` step added to all three modes (standard/trio/flashback) with world-specific `pc_questions` and live-generated example PC from engine. (4) Help docs updated: `fate-mechanics.html`, `at-the-table.html`, `generators.html`, `getting-started.html`. `about.html` + `index.html` Play links updated. `ARCHITECTURE.md` + `BOOTSTRAP.md` updated. 10 new QA assertions NA-188–197. |
 | v2026.03.358 | **Accordion nav.** Replaced flat group-label sidebar with three-section accordion: **Play** (Table, Session Notes) → **Binder** (Cards w/ count badge, Session Zero) → **Generate** (17 generators in 4 sub-groups, scroll-contained at 55vh max-height) → Settings. One section open at a time. Section headers: 44px (WCAG 2.5.5 + Apple HIG), Fraunces italic, left accent bar on open state, chevron spring-rotates 90°. Meta badge on every closed header (active generator name, card count, online status) so state is readable without opening. `sbAcc` useState + `toggleAcc()` in CampaignApp. All 17 generators re-registered under correct GENERATOR_GROUPS (People/Scene/Story/Mechanics). 7 new QA assertions NA-181–187. |

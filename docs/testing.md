@@ -115,8 +115,12 @@ Or use `npm test` which runs steps 2–5 in sequence.
 | NA-198 | Build pipeline — `scripts/build.js` presence, `dist/ogma.core.min.js` target path |
 | NA-199 | `disconnectSync` defined in `useBoardSync` — missing definition crashed Table open |
 | NA-200 | `sendToCanvas` defined in `CampaignApp` — required for Binder → Table workflow |
-| NA-201 | Binder panel uses `renderCard` + "Send to Table" button — cv4Card format matches Play Table |
-| (next) | Next assertion ID is **NA-202** |
+| NA-201 | Binder panel uses `renderCard` + `sendToCanvas` — cv4Card format matches Play Table |
+| NA-202 | Drafting Tray — `addToTray`, `sendTrayToCanvas`, `binder_tray_` IDB key (BDR-01) |
+| NA-203 | Binder filter strip — `binderFilter` state present (BDR-02) |
+| NA-204 | PL-03 pre-join character builder — `submitPcJoin`, `pcDraft`, `PC_SKILL_LADDER` present |
+| NA-205 | `file://` compat — campaign pages use conditional `base href`, not bare `<base href="/">` |
+| (next) | Next assertion ID is **NA-206** |
 
 ---
 

@@ -19,15 +19,15 @@ function assert(label, val, msg) {
   else      { fail++; results.push('  FAIL: '+label+' -- '+msg); }
 }
 
-// NA-01: Minor NPC stress cap <= 3
+// NA-01: Minor NPC stress cap <= 2 (FCon: minor NPCs have 1–2 stress boxes)
 camps.forEach(function(camp) {
   var t = filteredTables(mergeUniversal(CAMPAIGNS[camp].tables), {});
   var hit = false;
   for (var i = 0; i < 200; i++) {
     var r = generateMinorNPC(t);
-    if (r.stress !== null && r.stress > 3) { hit = true; break; }
+    if (r.stress !== null && r.stress > 2) { hit = true; break; }
   }
-  assert('NA-01 minor stress <=3 ['+camp+']', !hit, 'stress exceeded 3');
+  assert('NA-01 minor stress <=2 ['+camp+']', !hit, 'minor NPC stress exceeded 2 (FCon: 1-2 boxes)');
 });
 
 // NA-02: Major NPC refresh = max(1, 3 - max(0, stunts.length - 3)) — first 3 stunts are free (FCon p.10)
@@ -1673,8 +1673,101 @@ assert('NA-12 React theme-toggle aria-label dynamic', uiSrc.includes("'Switch to
 (function() {
   var src = fs.readFileSync('core/ui.js', 'utf8');
   assert('NA-201: Binder panel uses renderCard — cv4Card format in Binder matches Play Table',
-    src.includes('renderCard(card.genId, card.data') && src.includes('Send to Table'),
-    'Binder must render cv4Cards and include Send to Table button');
+    src.includes('renderCard(card.genId, card.data') && src.includes('sendToCanvas'),
+    'Binder must render cv4Cards and include sendToCanvas call');
+})();
+
+(function() {
+  var src = fs.readFileSync('core/ui.js', 'utf8');
+  assert('NA-202: Drafting Tray — addToTray, sendTrayToCanvas, binder_tray IDB key (BDR-01)',
+    src.includes('function addToTray(') && src.includes('function sendTrayToCanvas(') &&
+    src.includes('binder_tray_'),
+    'Drafting Tray functions and IDB key must be present in ui.js');
+})();
+
+(function() {
+  var src = fs.readFileSync('core/ui.js', 'utf8');
+  assert('NA-203: Binder filter strip — binderFilter state and filter pill buttons (BDR-02)',
+    src.includes('binderFilter') && src.includes('setBinderFilter'),
+    'Binder filter strip state must be present in ui.js');
+})();
+
+(function() {
+  var src = fs.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-204: PL-03 pre-join character builder — submitPcJoin, pcDraft, skill ladder present',
+    src.includes('function submitPcJoin(') && src.includes('pcDraft') && src.includes('PC_SKILL_LADDER'),
+    'PL-03 character builder must define submitPcJoin and pcDraft state');
+})();
+
+(function() {
+  var fs2 = require('fs');
+  var camp = fs2.readFileSync('campaigns/space.html', 'utf8');
+  assert('NA-205: file:// compat — base href is conditional not bare (offline play fix)',
+    camp.includes('location.protocol') && !camp.includes('  <base href="/">'),
+    'Campaign pages must use conditional base href, not bare <base href="/">');
+})();
+
+(function() {
+  var fs2 = require('fs');
+  var board = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-206: UNI-02 BoardBinderPanel — component defined with binderCards + trayCards props',
+    board.includes('function BoardBinderPanel(') && board.includes('binderCards') && board.includes('trayCards'),
+    'BoardBinderPanel component must exist in ui-board.js');
+})();
+
+(function() {
+  var fs2 = require('fs');
+  var board = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-207: UNI-02 Binder IDB load — DB.loadCards called in BoardApp',
+    board.includes('DB.loadCards(campId)') && board.includes("'binder_tray_'"),
+    'BoardApp must load Binder cards and Tray from IDB on mount');
+})();
+
+(function() {
+  var fs2 = require('fs');
+  var ui = fs2.readFileSync('core/ui.js', 'utf8');
+  assert('NA-208: UNI-06 PrepCanvas retired — no live prepView render branches in ui.js',
+    !ui.includes('h(PrepCanvas,') && !ui.includes('prepView && h('),
+    'PrepCanvas must be removed from ui.js render tree');
+})();
+
+// NA-209: V-01 — stressFromRating returns 6 for Good/Great (not 5)
+(function() {
+  var fs2 = require('fs');
+  eval(fs2.readFileSync('data/shared.js','utf8'));
+  eval(fs2.readFileSync('data/universal.js','utf8'));
+  eval(fs2.readFileSync('data/fantasy.js','utf8'));
+  eval(fs2.readFileSync('core/engine.js','utf8'));
+  var t = filteredTables(mergeUniversal(CAMPAIGNS['fantasy'].tables), {});
+  // PC with Fight +4 should have physical_stress=6
+  var physHigh = false;
+  for (var i = 0; i < 500; i++) {
+    var pc = generatePC(t);
+    var ph = pc.skills.find(function(s){ return s.name === 'Physique' && s.r >= 3; });
+    if (ph) {
+      if (pc.physical_stress === 6) { physHigh = true; break; }
+    }
+  }
+  assert('NA-209: V-01 stress fix — Physique/Will >=3 yields 6 stress boxes (FCon p.12)',
+    physHigh, 'stressFromRating(r>=3) must return 6, not 5');
+})();
+
+// NA-210: V-04 — PL-03 pyramid has 3 Fair (+2) slots (not 2)
+(function() {
+  var fs2 = require('fs');
+  var board = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-210: V-04 PL-03 pyramid — 3 Fair (+2) slots (FCon: 1×+4, 2×+3, 3×+2, 4×+1)',
+    board.includes('{r:2,n:3}') && !board.includes('{r:2,n:2}'),
+    'PC_SKILL_LADDER must have {r:2,n:3} for Fair slots');
+})();
+
+// NA-211: V-03 — Contest tie wording mentions "situation aspect" not "boost"
+(function() {
+  var fs2 = require('fs');
+  var board = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-211: V-03 Contest tie wording — must say situation aspect not boost (FCon p.33)',
+    board.includes('situation aspect') && !board.includes('Tie = boost'),
+    'Contest help text must describe unexpected twist / situation aspect, not boost');
 })();
 
 console.log('Named assertions: '+(pass+fail)+' total  pass:'+pass+'  fail:'+fail);

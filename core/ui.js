@@ -694,6 +694,7 @@ function PopcornTracker(props) {
         onChange: function(e) { setNewName(e.target.value); },
         onKeyDown: function(e) { if (e.key === 'Enter') addParticipant(); },
         placeholder: 'Add participant…',
+        'aria-label': 'New participant name',
         style: {
           flex: 1, background: 'var(--inset)', border: '1px solid var(--border)',
           borderRadius: 6, padding: '4px 8px', color: 'var(--text)',
@@ -1030,7 +1031,6 @@ function createTableSync(roomCode,role,onStateUpdate,onRoll,onToast,onPresence){
   var sync={ws:ws,role:role,roomCode:roomCode,connected:false,_lastState:null,
     broadcastState:function(state){
       if(sync.role!=='gm'||!sync.connected)return;
-      // PrepCanvas already filtered gmOnly cards before calling this
       sync._lastState=state; // cache for re-broadcast on player join
       ws.send(JSON.stringify({type:'state',payload:state}));
     },
@@ -1694,6 +1694,14 @@ function useGeneratorSession(campId, campMeta, t, universalMerge, prefs, showToa
     }).catch(function() {});
   }, [campId]);
 
+  // Load drafting tray on mount (BDR-01)
+  useEffect(function() {
+    if (typeof DB === 'undefined') return;
+    DB.loadSession('binder_tray_' + campId).then(function(saved) {
+      if (saved && Array.isArray(saved.cards) && saved.cards.length) setTrayCards(saved.cards);
+    }).catch(function() {});
+  }, [campId]);
+
   var gen = (typeof GENERATORS !== 'undefined' ? GENERATORS : []).find(function(g) { return g.id === activeGen; }) || {};
 
   function groupForGen(genId) {
@@ -1951,28 +1959,21 @@ function CampaignApp(props) {
   const [activeGroup, setActiveGroup] = useState(function() { return groupForGen('npc_minor'); });
   // History/Pinned drawer
   const [showHistory, setShowHistory] = useState(false);
-  const [prepView, setPrepView] = useState(false);
+  // UNI-06: prepView retired — BoardApp is now the unified surface via canvasView
+  // Drafting Tray — staging layer between Binder and Table (BDR-01)
+  var _trayCards = useState([]); var trayCards = _trayCards[0]; var setTrayCards = _trayCards[1];
+  // Binder filter strip (BDR-02)
+  var _binderFilter = useState('all'); var binderFilter = _binderFilter[0]; var setBinderFilter = _binderFilter[1];
   // Canvas view — open BoardApp as a full content-panel mode
   // Activated by ?canvas=1 URL param or Play→Table click
   var _canvasView = useState(function() {
     try { return new URLSearchParams(window.location.search).get('canvas') === '1'; }
     catch(e) { return false; }
   }); var canvasView = _canvasView[0]; var setCanvasView = _canvasView[1];
-  function openCanvas() { setCanvasView(true); setPrepView(false); setShowSidebar(false); }
+  function openCanvas() { setCanvasView(true); setShowSidebar(false); }
   function closeCanvas() { setCanvasView(false); }
-  // Table multiplayer sync
-  const tableSyncRef = React.useRef(null);
-  const [tableRoomCode, setTableRoomCode] = useState(function(){
-    try{var p=new URLSearchParams(window.location.search);return p.get('room')||null;}catch(e){return null;}
-  });
-  const [tableIsRemote, setTableIsRemote] = useState(false);
-  const [tablePresence, setTablePresence] = useState([]);
-
-
-
 
   // (showToast, SW update, Safari/iOS, PWA effects now in useChromeHooks)
-
 
   function toggleTheme() {
     var next = theme === 'dark' ? 'light' : 'dark';
@@ -1984,7 +1985,6 @@ function CampaignApp(props) {
   }
   var gen = GENERATORS.find(function(g) { return g.id === activeGen; });
 
-
   // Two-tier nav: find which group the active generator belongs to
   function groupForGen(genId) {
     for (var i = 0; i < GENERATOR_GROUPS.length; i++) {
@@ -1993,60 +1993,7 @@ function CampaignApp(props) {
     return GENERATOR_GROUPS[0].id;
   }
   var currentGroup = GENERATOR_GROUPS.find(function(g) { return g.id === activeGroup; }) || GENERATOR_GROUPS[0];
-  var groupGens = currentGroup.gens.map(function(gid) { return GENERATORS.find(function(g) { return g.id === gid; }); }).filter(Boolean);
-  // Table multiplayer sync refs
-  var tableCursorCbRef = useRef(null);   // MP-22: holds PrepCanvas cursor handler
-  var remoteStateCbRef = useRef(null);    // MP-07 fix: holds PrepCanvas state applier
 
-  function hostTable(){
-    var code=generateTableRoomCode();
-    setTableRoomCode(code);
-    var s=createTableSync(code,'gm',
-      function(data){
-        if(data.type==='cursor'){
-          if(tableCursorCbRef.current)tableCursorCbRef.current(data);
-        }
-      },
-      function(rollData){showToast((rollData.who||'?')+' \u00B7 '+(rollData.skill||'?')+' \u2192 '+(rollData.label||rollData.total));}, // MP-21: receive player rolls
-      function(msg){showToast(msg);},
-      function(conns){setTablePresence(conns);}
-    );
-    tableSyncRef.current=s;
-    if(!s){showToast('Sync unavailable');return;}
-    showToast('Table hosted: '+code);
-  }
-  function joinTable(code){
-    var s=createTableSync(code,'player',
-      function(data){
-        if(!data||typeof data!=='object')return;
-        if(data.type==='cursor'){
-          if(tableCursorCbRef.current)tableCursorCbRef.current(data);
-          return;
-        }
-        if(data.type==='player_action')return;
-        // MP-07 fix: apply full canvas state broadcast from GM
-        if(remoteStateCbRef.current)remoteStateCbRef.current(data);
-        setTableIsRemote(true);
-      },
-      function(rollData){showToast((rollData.who||'?')+' \u00B7 '+(rollData.skill||'?')+' \u2192 '+(rollData.label||rollData.total));}, // MP-20: receive GM rolls
-      function(msg){showToast(msg);},
-      function(conns){setTablePresence(conns);}
-    );
-    tableSyncRef.current=s;
-    setTableRoomCode(code);
-    setTableIsRemote(true);
-  }
-  function disconnectTable(){
-    if(tableSyncRef.current)tableSyncRef.current.disconnect();
-    tableSyncRef.current=null;
-    setTableRoomCode(null);setTableIsRemote(false);setTablePresence([]);
-    showToast('Table disconnected');
-  }
-  // Auto-join if URL has ?room= param (remote player following a link)
-  useEffect(function(){
-    if(tableRoomCode&&!tableSyncRef.current)joinTable(tableRoomCode);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tableRoomCode]);
   // Help level preference - controls inline help detail
   const [helpLevel, setHelpLevel] = useState(function() { try { return LS.get('help_level') || 'new_fate'; } catch(e) { return 'new_fate'; } });
   function changeHelpLevel(lvl) { setHelpLevel(lvl); try { LS.set('help_level', lvl); } catch(e) {} }
@@ -2081,7 +2028,6 @@ function CampaignApp(props) {
     dnd_convert: {icon: '⚔',  label: 'D&D player'},
     new_ttrpg:   {icon: '🌱', label: 'New here'},
   };
-  var hlMeta = HL_META[helpLevel] || HL_META['new_fate'];
 
   // GM Mode - surfaces running guidance on results
   const [gmMode, setGmMode] = useState(function() { try { return LS.get('gm_mode') !== false; } catch(e) { return true; } });
@@ -2164,7 +2110,51 @@ function CampaignApp(props) {
     });
   }
 
-  // EXP-02: Import cards from Ogma JSON file
+  // ── Drafting Tray (BDR-01) ────────────────────────────────────────────────
+  function addToTray(card) {
+    var already = trayCards.some(function(c) { return c.id === card.id; });
+    if (already) { showToast('Already in Tray'); return; }
+    var trayCard = Object.assign({}, card, {trayTs: Date.now()});
+    setTrayCards(function(prev) { return prev.concat([trayCard]); });
+    if (typeof DB !== 'undefined') {
+      DB.saveSession('binder_tray_' + campId, {cards: trayCards.concat([trayCard])}).catch(function(){});
+    }
+    showToast('\u2713 Added to Tray');
+  }
+
+  function removeFromTray(cardId) {
+    setTrayCards(function(prev) {
+      var next = prev.filter(function(c) { return c.id !== cardId; });
+      if (typeof DB !== 'undefined') DB.saveSession('binder_tray_' + campId, {cards: next}).catch(function(){});
+      return next;
+    });
+  }
+
+  function sendTrayToCanvas() {
+    if (!trayCards.length) { showToast('Tray is empty'); return; }
+    if (typeof DB === 'undefined') { showToast('\u26a0 Storage unavailable'); return; }
+    var canvasKey = 'board_canvas_v1_' + campId;
+    DB.loadSession(canvasKey).then(function(saved) {
+      var existing = (saved && Array.isArray(saved.cards)) ? saved.cards : [];
+      var newCards = trayCards.map(function(card, i) {
+        var d = card.data || {};
+        var title = d.name || d.location || d.situation || d.title ||
+                    (d.aspects && d.aspects.high_concept) || card.genId;
+        return {
+          id: 'b' + Date.now() + i + Math.random().toString(36).slice(2, 5),
+          genId: card.genId, title: title, summary: card.label || title, tags: [],
+          data: d, x: 60 + (i % 4) * 220, y: 60 + Math.floor(i / 4) * 210,
+          z: Date.now() + i, ts: Date.now(), gmOnly: false,
+        };
+      });
+      return DB.saveSession(canvasKey, {cards: existing.concat(newCards), ts: Date.now()});
+    }).then(function() {
+      var count = trayCards.length;
+      setTrayCards([]);
+      if (typeof DB !== 'undefined') DB.saveSession('binder_tray_' + campId, {cards: []}).catch(function(){});
+      showToast('\u2713 ' + count + ' card' + (count === 1 ? '' : 's') + ' sent to Table \u2014 open Play \u2192 Table');
+    }).catch(function() { showToast('\u26a0 Could not send Tray to Table'); });
+  }
   function importCards() {
     if (typeof DB === 'undefined' || !DB.importFile) { showToast('Import unavailable'); return; }
     DB.importFile().then(function(data) {
@@ -2313,7 +2303,6 @@ function CampaignApp(props) {
     return function() { document.removeEventListener('keydown', onKey); };
   }, [rolling, result, activeGen, showTables, showSettings, showVault, showHistory, showSidebar, showKbShortcuts, showQuickFind, showDoc, doGenerate, doInspire]);
 
-  var totalEntries = Object.values(t).reduce(function(n, v) { return n + (Array.isArray(v) ? v.length : 0); }, 0);
 
   return h('div', {className: 'app-shell', 'data-gen': activeGen},
     h('a', {href: '#main', className: 'skip-link'}, 'Skip to main content'),
@@ -2399,14 +2388,18 @@ function CampaignApp(props) {
               id: 'sb-acc-play', className: 'sb-acc-body',
               role: 'group', 'aria-label': 'Play tools',
             },
+              // UNI-06: single Prep & Play entry — opens BoardApp (unified surface)
               h('button', {
                 className: 'sb-acc-item' + (canvasView ? ' active' : ''),
                 onClick: openCanvas,
                 'aria-pressed': String(canvasView),
-                'aria-label': 'Open play table — spatial canvas',
+                'aria-label': 'Prep & Play — spatial canvas, generator, Binder, and live session',
               },
                 h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, '▦'),
-                h('span', {className:'sidebar-item-label'}, 'Table')
+                h('span', {className:'sidebar-item-label'}, 'Prep & Play'),
+                (pinnedCards.length > 0 || trayCards.length > 0) && h('span', {
+                  className:'sb-count-badge','aria-hidden':'true'
+                }, String(pinnedCards.length) + (trayCards.length > 0 ? '+' + trayCards.length : ''))
               ),
               h('button', {
                 className: 'sb-acc-item' + (showDoc ? ' active' : ''),
@@ -2415,7 +2408,7 @@ function CampaignApp(props) {
                 'aria-controls': 'floater-doc',
                 'aria-label': showDoc ? 'Close Session Notes' : 'Open Session Notes',
               },
-                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, '✏'),
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, '\u270F'),
                 h('span', {className:'sidebar-item-label'}, 'Session Notes')
               )
             )
@@ -2430,10 +2423,11 @@ function CampaignApp(props) {
               'aria-controls': 'sb-acc-binder',
               'aria-label': 'Binder — ' + (pinnedCards.length > 0 ? pinnedCards.length + ' cards' : 'empty'),
             },
-              h('span', {'aria-hidden':'true', className:'sb-acc-sec-ico'}, '📁'),
+              h('span', {'aria-hidden':'true', className:'sb-acc-sec-ico'}, '\uD83D\uDCC1'),
               h('span', {className:'sb-acc-sec-name'}, 'Binder'),
-              pinnedCards.length > 0
-                ? h('span', {'aria-hidden':'true', className:'sb-acc-meta sb-acc-meta-badge'}, String(pinnedCards.length))
+              (pinnedCards.length > 0 || trayCards.length > 0)
+                ? h('span', {'aria-hidden':'true', className:'sb-acc-meta sb-acc-meta-badge'},
+                    String(pinnedCards.length) + (trayCards.length > 0 ? ' \xb7 \uD83D\uDDC2 ' + trayCards.length : ''))
                 : h('span', {'aria-hidden':'true', className:'sb-acc-meta'}, 'empty'),
               h('span', {'aria-hidden':'true', className:'sb-acc-chev'}, '›')
             ),
@@ -2441,22 +2435,12 @@ function CampaignApp(props) {
               id: 'sb-acc-binder', className: 'sb-acc-body',
               role: 'group', 'aria-label': 'Binder tools',
             },
-              h('button', {
-                className: 'sb-acc-item' + (prepView ? ' active' : ''),
-                onClick: function() { setPrepView(function(v){return !v;}); setShowSidebar(false); },
-                'aria-pressed': String(prepView),
-                'aria-label': 'Cards' + (pinnedCards.length > 0 ? ' — ' + pinnedCards.length + ' pinned' : ''),
-              },
-                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, h(FaCartPlusIcon,{size:15})),
-                h('span', {className:'sidebar-item-label'}, 'Cards'),
-                pinnedCards.length > 0 && h('span', {className:'sb-count-badge','aria-hidden':'true'}, String(pinnedCards.length))
-              ),
               h('a', {
                 href: '../campaigns/character-creation.html?world=' + campId,
                 className: 'sb-acc-item',
                 'aria-label': 'Session Zero — guided character creation',
               },
-                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, '★'),
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, '\u2605'),
                 h('span', {className:'sidebar-item-label'}, 'Session Zero')
               )
             )
@@ -2669,6 +2653,15 @@ function CampaignApp(props) {
                 h('span', {className:'sidebar-item-label'}, theme === 'dark' ? 'Light mode' : 'Dark mode')
               ),
               h('button', {
+                className: 'sb-acc-item' + (gmMode ? ' active' : ''),
+                onClick: toggleGmMode,
+                'aria-label': gmMode ? 'Hide GM tips' : 'Show GM tips',
+                'aria-pressed': String(gmMode),
+              },
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, '\uD83C\uDFAD'),
+                h('span', {className:'sidebar-item-label'}, gmMode ? 'GM Tips: On' : 'GM Tips: Off')
+              ),
+              h('button', {
                 className: 'sb-acc-item',
                 onClick: function() { setShowTables(true); setShowSidebar(false); },
                 'aria-label': 'Customize table content',
@@ -2751,48 +2744,8 @@ function CampaignApp(props) {
           key: 'canvas-' + campId,
         }),
 
-        // ── TABLE PREP VIEW — infinite canvas (run-style) ─────────────────
-        !canvasView && prepView && h(PrepCanvas, {
-          campId: campId,
-          campName: camp.meta.name,
-          partySize: partySize,
-          pinnedCards: pinnedCards,
-          setPinnedCards: setPinnedCards,
-          toStunts: t.stunts,
-          onBack: function() { setPrepView(false); },
-          onExport: function() {
-            var header = '# ' + camp.meta.name + ' \u2014 Session Pack\n_' + pinnedCards.length + ' cards_\n\n';
-            var body = pinnedCards.map(function(c, i) {
-              return '## ' + (i+1) + '. ' + (c.data.name || c.data.location || c.genId) + '\n' + toMarkdown(c.genId, c.data, camp.meta.name);
-            }).join('\n\n---\n\n');
-            var blob = new Blob([header + body], {type: 'text/markdown'});
-            var url = URL.createObjectURL(blob);
-            var a = document.createElement('a');
-            a.href = url; a.download = camp.meta.name.replace(/\s+/g,'-').toLowerCase() + '-prep.md';
-            document.body.appendChild(a); a.click();
-            document.body.removeChild(a); setTimeout(function(){URL.revokeObjectURL(url);}, 30000);
-            showToast('\u2B07 Prep exported as .md');
-          },
-          showToast: showToast,
-          DB: DB,
-          // TC-21: open the FP+Milestone floater from Table toolbar
-          onShowMilestones: function() { setActivePanel('fp'); },
-          // Table sync props
-          tableSyncCtx: {
-            sync:       tableSyncRef.current,
-            roomCode:   tableRoomCode,
-            isRemote:   tableIsRemote,
-            presence:   tablePresence,
-            onCursor:   function(handler){tableCursorCbRef.current=handler;},
-            onState:    function(handler){remoteStateCbRef.current=handler;},
-            host:       hostTable,
-            join:       joinTable,
-            disconnect: disconnectTable,
-          },
-        }),
-
         // ── NORMAL GENERATE VIEW ───────────────────────────────────────────
-        !prepView && h('main', {id: 'main'},
+        !canvasView && h('main', {id: 'main'},
           h('div', {className: 'main-layout'},
 
         // Result panel
@@ -3053,7 +3006,7 @@ function CampaignApp(props) {
           )     // close result-panel.class
         )       // close result-panel id
       )         // close main-layout
-    ),          // close main (!prepView && h('main'...)); separator before history panel
+    ),          // close main (!canvasView && h('main'...)); separator before history panel
 
     // ── History & Pinned slide-over panel ─────────────────────────────
     showHistory && h('div', {className: 'hist-overlay', onClick: function() { setShowHistory(false); }, 'aria-hidden': 'true'}),
@@ -3194,11 +3147,50 @@ function CampaignApp(props) {
       /* FARI_VAULT_PARKED 2026.03.154
       // Fari / Foundry batch export — parked, see ROADMAP.md parking lot
       */
+
+      // ── BDR-02: Filter strip ──────────────────────────────────────────────
+      pinnedCards.length > 0 && h('div', {
+        style: {display:'flex', gap:4, padding:'0 0 10px', flexWrap:'wrap'},
+        role: 'group', 'aria-label': 'Filter cards by type',
+      },
+        [
+          {id:'all', label:'All'},
+          {id:'people', label:'People'},
+          {id:'scene', label:'Scene'},
+          {id:'story', label:'Story'},
+          {id:'mechanics', label:'Mechanics'},
+        ].map(function(f) {
+          var isActive = binderFilter === f.id;
+          return h('button', {
+            key: f.id,
+            className: 'btn btn-ghost',
+            style: {
+              fontSize:10, padding:'2px 8px', minHeight:28,
+              background: isActive ? 'color-mix(in srgb,var(--accent) 15%,transparent)' : 'transparent',
+              color: isActive ? 'var(--accent)' : 'var(--text-muted)',
+              borderColor: isActive ? 'var(--accent)' : 'var(--border)',
+            },
+            onClick: function() { setBinderFilter(f.id); },
+            'aria-pressed': String(isActive),
+          }, f.label);
+        })
+      ),
+
       // Pinned section — full cv4Card view
       pinnedCards.length > 0 && h('div', {style: {marginBottom: 16}},
         h('div', {className: 'history-label'}, '\uD83D\uDCCB Your session (' + pinnedCards.length + ')'),
         h('div', {style: {display:'flex', flexDirection:'column', gap:12, marginTop:8}},
-          pinnedCards.map(function(card) {
+          pinnedCards.filter(function(card) {
+            if (binderFilter === 'all') return true;
+            var genGroupMap = {
+              people: ['npc_minor','npc_major','pc','backstory'],
+              scene: ['scene','encounter','complication','seed'],
+              story: ['campaign','faction','compel','consequence'],
+              mechanics: ['challenge','contest','obstacle','countdown','constraint'],
+            };
+            return (genGroupMap[binderFilter] || []).indexOf(card.genId) !== -1;
+          }).map(function(card) {
+            var inTray = trayCards.some(function(c) { return c.id === card.id; });
             return h('div', {key: card.id, style: {display:'flex', flexDirection:'column', gap:4}},
               // cv4Card — same format as Play Table
               h('div', {className: 'binder-card-preview'},
@@ -3216,11 +3208,21 @@ function CampaignApp(props) {
                 h('button', {
                   className: 'btn btn-ghost',
                   style: {flex:1, fontSize:'var(--text-sm)', justifyContent:'center',
+                          color: inTray ? 'var(--c-green)' : 'var(--text-dim)',
+                          borderColor: inTray ? 'var(--c-green)' : 'var(--border)'},
+                  onClick: function() { if (!inTray) addToTray(card); else removeFromTray(card.id); },
+                  title: inTray ? 'Remove from Tray' : 'Add to Drafting Tray',
+                  'aria-label': (inTray ? 'Remove from Tray: ' : 'Add to Tray: ') + card.label,
+                  'aria-pressed': String(inTray),
+                }, inTray ? '\u2605 In Tray' : '\u2606 Tray'),
+                h('button', {
+                  className: 'btn btn-ghost',
+                  style: {flex:1, fontSize:'var(--text-sm)', justifyContent:'center',
                           color:'var(--accent)', borderColor:'var(--accent)'},
                   onClick: function() { sendToCanvas(card); },
                   title: 'Send this card to the Play Table canvas',
                   'aria-label': 'Send ' + card.label + ' to Table',
-                }, '\u2192 Send to Table'),
+                }, '\u2192 Table'),
                 h('button', {
                   className: 'btn btn-ghost',
                   style: {fontSize:'var(--text-sm)', padding:'0 8px'},
@@ -3239,6 +3241,43 @@ function CampaignApp(props) {
             );
           })
         )
+      ),
+
+      // ── BDR-01: Drafting Tray ─────────────────────────────────────────────
+      h('div', {className: 'bdr-tray'},
+        h('div', {
+          className: 'bdr-tray-header',
+          'aria-label': 'Drafting Tray — cards staged for tonight\'s session',
+        },
+          h('span', {className: 'bdr-tray-title'}, '\uD83D\uDDC2 Drafting Tray'),
+          trayCards.length > 0 && h('span', {className: 'bdr-tray-count'}, String(trayCards.length)),
+          trayCards.length > 0 && h('button', {
+            className: 'btn btn-ghost bdr-tray-send',
+            onClick: sendTrayToCanvas,
+            title: 'Send all tray cards to the Play Table',
+            'aria-label': 'Send all ' + trayCards.length + ' tray cards to Table',
+          }, '\u2192 Send all to Table')
+        ),
+        trayCards.length === 0
+          ? h('div', {className: 'bdr-tray-empty'},
+              'Stage cards here before your session. Tap \u2606\u00a0Tray on any Binder card.'
+            )
+          : h('div', {className: 'bdr-tray-list'},
+              trayCards.map(function(card) {
+                var genMeta = (typeof GENERATORS !== 'undefined' ? GENERATORS : []).find(function(g){ return g.id === card.genId; }) || {};
+                var title = (card.data && (card.data.name || card.data.location || card.data.situation ||
+                             (card.data.aspects && card.data.aspects.high_concept))) || card.label || card.genId;
+                return h('div', {key: card.id, className: 'bdr-tray-row'},
+                  h('span', {className: 'bdr-tray-icon', 'aria-hidden':'true'}, genMeta.icon || '\u25C8'),
+                  h('span', {className: 'bdr-tray-name'}, title),
+                  h('button', {
+                    className: 'bdr-tray-remove',
+                    onClick: function() { removeFromTray(card.id); },
+                    'aria-label': 'Remove ' + title + ' from tray',
+                  }, '\u2715')
+                );
+              })
+            )
       ),
       // Recent history section
       history.length > 0 && h('div', null,
@@ -3489,46 +3528,46 @@ function CampaignApp(props) {
       'aria-label': 'Main navigation',
       role: 'navigation',
     },
-      // Roll — fires generate for active generator, closes any open panels
+      // Roll — fires generate for active generator
       h('button', {
-        className: 'bn-tab' + ((!prepView && !showSidebar) ? ' active' : ''),
+        className: 'bn-tab' + (!showSidebar && !canvasView ? ' active' : ''),
         onClick: function() {
           setShowSidebar(false);
-          if (prepView) setPrepView(false);
+          if (canvasView) closeCanvas();
           doGenerate();
         },
         'aria-label': 'Roll ' + (gen.label || 'generator'),
-        'aria-current': (!prepView && !showSidebar) ? 'page' : undefined,
+        'aria-current': (!showSidebar && !canvasView) ? 'page' : undefined,
         disabled: rolling,
       },
-        h('span', {className: 'bn-tab-ico', 'aria-hidden': 'true'}, rolling ? '…' : '🎲'),
+        h('span', {className: 'bn-tab-ico', 'aria-hidden': 'true'}, rolling ? '\u2026' : '\uD83C\uDFB2'),
         h('span', {className: 'bn-tab-lbl'}, gen.label ? gen.label.slice(0, 7) : 'Roll')
       ),
 
-      // Pinned — toggles Table Prep panel, shows card count badge
+      // Prep & Play — opens BoardApp (unified surface)
       h('button', {
-        className: 'bn-tab' + (prepView ? ' active' : ''),
+        className: 'bn-tab' + (canvasView ? ' active' : ''),
         onClick: function() {
           setShowSidebar(false);
-          setPrepView(function(v) { return !v; });
+          openCanvas();
         },
-        'aria-label': 'Table Prep' + (pinnedCards.length ? ' — ' + pinnedCards.length + ' cards' : ''),
-        'aria-pressed': String(prepView),
+        'aria-label': 'Prep & Play' + (pinnedCards.length ? ' \u2014 ' + pinnedCards.length + ' cards' : ''),
+        'aria-pressed': String(canvasView),
       },
-        h('span', {className: 'bn-tab-ico', 'aria-hidden': 'true'}, '📌'),
+        h('span', {className: 'bn-tab-ico', 'aria-hidden': 'true'}, '\u25A6'),
         pinnedCards.length > 0 && h('span', {className: 'bn-badge', 'aria-hidden': 'true'}, String(pinnedCards.length)),
-        h('span', {className: 'bn-tab-lbl'}, 'Pinned')
+        h('span', {className: 'bn-tab-lbl'}, 'Prep')
       ),
 
-      // Board — navigates to board page
+      // Board — navigates to board page (standalone, for bookmarking)
       h('a', {
         className: 'bn-tab',
         href: '../campaigns/board.html?world=' + campId,
         'aria-label': 'Board for ' + camp.meta.name,
         style: {textDecoration: 'none'},
       },
-        h('span', {className: 'bn-tab-ico', 'aria-hidden': 'true'}, '▦'),
-        h('span', {className: 'bn-tab-lbl'}, 'Board')
+        h('span', {className: 'bn-tab-ico', 'aria-hidden': 'true'}, '\uD83C\uDF10'),
+        h('span', {className: 'bn-tab-lbl'}, 'Live')
       ),
 
       // Menu — toggles the sidebar drawer
