@@ -637,9 +637,9 @@ function PopcornTracker(props) {
   var remaining = participants.filter(function(p) { return !p.done; }).length;
 
   return h('div', {style: {padding: '4px 0'}},
-    h('div', {style: {display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8}},
+    h('div', {style: {display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4}},
       h('div', {style: {fontSize: 'var(--text-label)', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--accent)'}},
-        '🏁 Popcorn Initiative'
+        '🏁 Turn Order'
       ),
       h('div', {style: {display: 'flex', gap: 4}},
         h('span', {style: {fontSize: 'var(--text-label)', color: remaining === 0 ? 'var(--c-green)' : 'var(--text-muted)'}},
@@ -651,6 +651,9 @@ function PopcornTracker(props) {
           title: 'New round - clear all checkmarks',
         }, '↺')
       )
+    ),
+    h('div', {style: {fontSize: 'var(--text-label)', color: 'var(--text-muted)', marginBottom: 8, lineHeight: 1.4}},
+      'After you act, choose who goes next \u2014 ally or enemy. No fixed order.'
     ),
     h('div', {style: {marginBottom: 8}},
       participants.map(function(p) {
@@ -883,7 +886,12 @@ function FatePointTracker(props) {
     h('div', {style: {display: 'flex', borderBottom: '1px solid var(--border)', marginBottom: 10}},
       h('button', {onClick: function() { setFpTab('fp'); }, style: TAB_STYLE('fp'), 'aria-pressed': String(fpTab==='fp')}, '◎ Fate Points'),
       h('button', {onClick: function() { setFpTab('ms'); }, style: TAB_STYLE('ms'), 'aria-pressed': String(fpTab==='ms')}, '⬡ Milestones'),
-      h('button', {onClick: function() { setFpTab('pi'); }, style: TAB_STYLE('pi'), 'aria-pressed': String(fpTab==='pi')}, '🏁 Initiative')
+      h('button', {
+        onClick: function() { setFpTab('pi'); },
+        style: TAB_STYLE('pi'),
+        'aria-pressed': String(fpTab==='pi'),
+        title: 'Turn Order (Popcorn) — after you act, choose who goes next. No fixed order.',
+      }, '🏁 Turn Order')
     ),
     // Tab: Fate Points
     fpTab === 'fp' && h(Fragment, null,
@@ -2401,6 +2409,24 @@ function CampaignApp(props) {
                   className:'sb-count-badge','aria-hidden':'true'
                 }, String(pinnedCards.length) + (trayCards.length > 0 ? '+' + trayCards.length : ''))
               ),
+              // Session Zero — moved from Binder into Play
+              h('a', {
+                href: '../campaigns/character-creation.html?world=' + campId,
+                className: 'sb-acc-item',
+                'aria-label': 'Session Zero — guided character creation',
+              },
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, '\u2605'),
+                h('span', {className:'sidebar-item-label'}, 'Session Zero')
+              ),
+              // Export — moved from action bar into Play
+              h('button', {
+                className: 'sb-acc-item',
+                onClick: function() { exportCards(); setShowSidebar(false); },
+                'aria-label': 'Export pinned cards as JSON',
+              },
+                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, '\u2193'),
+                h('span', {className:'sidebar-item-label'}, 'Export Cards')
+              ),
               h('button', {
                 className: 'sb-acc-item' + (showDoc ? ' active' : ''),
                 onClick: function() { setShowDoc(!showDoc); setShowSidebar(false); },
@@ -2410,38 +2436,6 @@ function CampaignApp(props) {
               },
                 h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, '\u270F'),
                 h('span', {className:'sidebar-item-label'}, 'Session Notes')
-              )
-            )
-          ),
-
-          // ── BINDER ─────────────────────────────────────────────────
-          h('div', {className: 'sb-acc-sec'},
-            h('button', {
-              className: 'sb-acc-hdr' + (sbAcc === 'binder' ? ' is-open' : ''),
-              onClick: function() { toggleAcc('binder'); },
-              'aria-expanded': String(sbAcc === 'binder'),
-              'aria-controls': 'sb-acc-binder',
-              'aria-label': 'Binder — ' + (pinnedCards.length > 0 ? pinnedCards.length + ' cards' : 'empty'),
-            },
-              h('span', {'aria-hidden':'true', className:'sb-acc-sec-ico'}, '\uD83D\uDCC1'),
-              h('span', {className:'sb-acc-sec-name'}, 'Binder'),
-              (pinnedCards.length > 0 || trayCards.length > 0)
-                ? h('span', {'aria-hidden':'true', className:'sb-acc-meta sb-acc-meta-badge'},
-                    String(pinnedCards.length) + (trayCards.length > 0 ? ' \xb7 \uD83D\uDDC2 ' + trayCards.length : ''))
-                : h('span', {'aria-hidden':'true', className:'sb-acc-meta'}, 'empty'),
-              h('span', {'aria-hidden':'true', className:'sb-acc-chev'}, '›')
-            ),
-            sbAcc === 'binder' && h('div', {
-              id: 'sb-acc-binder', className: 'sb-acc-body',
-              role: 'group', 'aria-label': 'Binder tools',
-            },
-              h('a', {
-                href: '../campaigns/character-creation.html?world=' + campId,
-                className: 'sb-acc-item',
-                'aria-label': 'Session Zero — guided character creation',
-              },
-                h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, '\u2605'),
-                h('span', {className:'sidebar-item-label'}, 'Session Zero')
               )
             )
           ),
@@ -2692,16 +2686,7 @@ function CampaignApp(props) {
         h('div', {style: {height: 8, flexShrink: 0}}),
 
         // ── Icon dock — nav links + online status, pinned to sidebar bottom ──
-        // WCAG: role="toolbar", aria-label, each button has aria-label, min 44px height
         h('div', {className: 'sb-dock', role: 'toolbar', 'aria-label': 'Site navigation and status'},
-          h('a', {
-            href: '../index.html',
-            className: 'sb-dock-btn',
-            'aria-label': 'All Worlds — return to world selection',
-          },
-            h('span', {'aria-hidden': 'true', className: 'sb-dock-ico'}, '\uD83C\uDF0D'),
-            h('span', {className: 'sb-dock-lbl'}, 'Worlds')
-          ),
           h('a', {
             href: '../help/learn-fate.html',
             className: 'sb-dock-btn',
@@ -2711,12 +2696,12 @@ function CampaignApp(props) {
             h('span', {className: 'sb-dock-lbl'}, 'Learn')
           ),
           h('a', {
-            href: '../help/index.html',
+            href: '../index.html',
             className: 'sb-dock-btn',
-            'aria-label': 'Help and wiki',
+            'aria-label': 'All Worlds — return to world selection',
           },
-            h('span', {'aria-hidden': 'true', className: 'sb-dock-ico', style: {fontSize: 13}}, '?'),
-            h('span', {className: 'sb-dock-lbl'}, 'Help')
+            h('span', {'aria-hidden': 'true', className: 'sb-dock-ico'}, '\uD83C\uDF0D'),
+            h('span', {className: 'sb-dock-lbl'}, 'Worlds')
           ),
           h('div', {
             className: 'sb-dock-btn sb-dock-status',
@@ -2821,7 +2806,7 @@ function CampaignApp(props) {
                   }, n);
                 })
               ),
-              // SECONDARY (pushed right): Pin + Export
+              // SECONDARY (pushed right): Pin only — Export moved to sidebar Play section
               h('div', {className: 'action-bar-secondary'},
                 // Pin to Table Prep
                 result && h('button', {
@@ -2846,17 +2831,7 @@ function CampaignApp(props) {
                       lineHeight: 1, pointerEvents: 'none',
                     },
                   }, pinnedCards.length > 9 ? '9+' : String(pinnedCards.length))
-                ),
-                // Export menu
-                h(ExportModal, {
-                  cards: pinnedCards,
-                  campName: camp.meta.name,
-                  onImport: importCards,
-                  onToast: showToast,
-                  onShareLink: result ? copyShareLink : null,
-                  currentResult: result || null,
-                  genId: activeGen,
-                })
+                )
               )
             ),
 

@@ -2,7 +2,7 @@
 // Strategy: cache-first for all static assets, network-first for CDN scripts.
 // Safari fix: redirected responses are cloned as non-redirected before caching.
 
-var CACHE_NAME = 'fate-generator-2026.03.377';
+var CACHE_NAME = 'fate-generator-2026.03.392';
 
 var APP_SHELL = [
   '/index.html',
@@ -194,23 +194,36 @@ self.addEventListener('fetch', function(event) {
   }
 
   // All other local assets: cache-first
+  // For versioned assets (?v=N), also try the bare URL on cache miss
+  // so a stale ?v=OLD request doesn't 404 when the cache has ?v=NEW.
   event.respondWith(
     caches.match(event.request).then(function(cached) {
       if (cached) return cached;
-      return fetch(event.request).then(function(response) {
-        if (response.ok && url.indexOf(self.location.origin) === 0) {
-          var r2 = response.clone();
-          cleanResponse(r2).then(function(clean) {
-            return caches.open(CACHE_NAME).then(function(cache) { return cache.put(event.request, clean); });
-          }).catch(function(err) {
-            console.warn('[SW] asset cache write failed:', err);
-          });
-        }
-        return response;
-      }).catch(function() {
-        // Stale versioned asset not on network — return empty 404 rather than rejecting
-        return new Response('', { status: 404, statusText: 'Not found (stale cache)' });
-      });
+      // Versioned asset miss — try bare URL (strips ?v=N)
+      var bareUrl = url.split('?')[0];
+      if (bareUrl !== url) {
+        return caches.match(bareUrl).then(function(bare) {
+          if (bare) return bare;
+          return fetchAndCache();
+        });
+      }
+      return fetchAndCache();
     })
   );
-});
+
+  function fetchAndCache() {
+    return fetch(event.request).then(function(response) {
+      if (response.ok && url.indexOf(self.location.origin) === 0) {
+        var r2 = response.clone();
+        cleanResponse(r2).then(function(clean) {
+          return caches.open(CACHE_NAME).then(function(cache) { return cache.put(event.request, clean); });
+        }).catch(function(err) {
+          console.warn('[SW] asset cache write failed:', err);
+        });
+      }
+      return response;
+    }).catch(function() {
+      // Stale versioned asset not on network — return empty 404 rather than rejecting
+      return new Response('', { status: 404, statusText: 'Not found (stale cache)' });
+    });
+  }

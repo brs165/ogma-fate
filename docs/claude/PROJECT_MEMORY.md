@@ -2,7 +2,7 @@
 
 > Snapshot of architecture state for model-switching and session continuity.
 > Keep in sync with ROADMAP.md and CHANGELOG.md.
-> **Last updated:** v2026.03.370
+> **Last updated:** v2026.03.387
 
 ---
 
@@ -12,7 +12,7 @@
 |-------|-------------|------|
 | **Engineering** | All sessions | Load order, encoding, syntax, no-build-step contract, `node --check` after every write |
 | **Rules / Content** | All sessions | FCon SRD compliance, world voice consistency, flags Fate Core bleed |
-| **QA** | All sessions | 198/198 · 59/59 · 89/89 · 128/128 gate, named assertions for every fixed bug |
+| **QA** | All sessions | 242/242 · 59/59 · 89/89 · 128/128 gate, named assertions for every fixed bug |
 | **UX** | UI / nav / discoverability work | Task completion, time-to-first-value, 44px touch targets, 375px parity, severity ratings |
 | **Product Strategist** | Feature decisions, prioritisation | User segment × impact × effort; "if users can't find it, it doesn't exist" |
 | **Mechanical Auditor** | World data / content work | Scores tables 1–10: Voice, Narrative Interconnectivity, Mechanical Integrity, Editorial Polish, Structural Pacing |
@@ -33,8 +33,8 @@ Offline-first browser PWA for Fate Condensed GMs. 16 generators × 8 worlds. Sou
 
 | Item | Value |
 |------|-------|
-| Version | `2026.03.370` |
-| Named QA | 205/205 |
+| Version | `2026.03.387` |
+| Named QA | 242/242 |
 | Unit tests | 59/59 |
 | Export round-trip | 89/89 |
 | Smoke | 128/128 (16 generators × 8 worlds) |

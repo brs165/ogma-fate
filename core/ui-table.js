@@ -353,130 +353,180 @@ function TpPlayerRow(props){
   );
 }
 
-// ── TpDicePanel — compact horizontal bar layout ────────────────────────────
-function TpDicePanel(props){
-  var players=props.players,selId=props.selId,spendFP=props.spendFP,onRoll=props.onRoll;
-  var _dice=useState([0,0,0,0]);var dice=_dice[0];var setDice=_dice[1];
-  var _spin=useState(false);var spinning=_spin[0];var setSpinning=_spin[1];
-  var _res=useState(null);var result=_res[0];var setResult=_res[1];
-  var _sk=useState(null);var activeSk=_sk[0];var setActiveSk=_sk[1];
-  var _boost=useState(false);var boosted=_boost[0];var setBoosted=_boost[1];
-  var _hist=useState([]);var history=_hist[0];var setHistory=_hist[1];
-  var _diff=useState(0);var diff=_diff[0];var setDiff=_diff[1]; // TC-20: opposition difficulty
-  var rollTimerRef=useRef(null); // leak fix: cancel on unmount
-  useEffect(function(){return function(){if(rollTimerRef.current)clearTimeout(rollTimerRef.current);};},[]);
-  var player=players.find(function(p){return p.id===selId;});
-  var mod=activeSk?activeSk.v:0;
-  var final=result!=null?result+mod+(boosted?2:0):null;
-  var DFMT={'-1':'\u2212',0:'\u25CB',1:'+'};
+// ── TpDicePanel — learn-fate visual language: large tiles, pop reveal ───────
+// Ladder colour map matching learn-fate ADJECTIVES palette
+var TP_LADDER_HEX = [
+  [-4,'#FF3B30'],[-3,'#FF6B4A'],[-2,'#FF9500'],[-1,'#FFCC00'],
+  [0,'#8E8E93'],[1,'#34C759'],[2,'#30D158'],[3,'#32ADE6'],
+  [4,'#5E5CE6'],[5,'#BF5AF2'],[6,'#FF375F'],[7,'#FF6ABD'],[8,'#FF6ABD']
+];
+function tpLcolHex(v) {
+  var e = TP_LADDER_HEX.find(function(x) { return x[0] === v; });
+  if (e) return e[1];
+  return v < -4 ? '#FF3B30' : '#FF6ABD';
+}
 
-  function doRoll(sk){
-    if(spinning)return;
-    setActiveSk(sk);setBoosted(false);setResult(null);setSpinning(true);
-    rollTimerRef.current=setTimeout(function(){
-      var r=[tpRollDF(),tpRollDF(),tpRollDF(),tpRollDF()];
-      var s=r.reduce(function(a,b){return a+b;},0);
-      setDice(r);setSpinning(false);setResult(s);
-      var total=s+sk.v;
-      setHistory(function(h){return [{who:player?player.name:'?',skill:sk.l||sk.name,total:total}].concat(h).slice(0,8);});
-      if(onRoll)onRoll({who:player?player.name:'?',skill:sk.l||sk.name,total:total});
-    },600);
+function TpDicePanel(props) {
+  var players = props.players, selId = props.selId, spendFP = props.spendFP, onRoll = props.onRoll;
+  var _dice = useState(['+','0','+','\u2212']); var dice = _dice[0]; var setDice = _dice[1];
+  var _phase = useState('idle'); var phase = _phase[0]; var setPhase = _phase[1];
+  var _reveal = useState(0); var revealCount = _reveal[0]; var setRevealCount = _reveal[1];
+  var _res = useState(null); var result = _res[0]; var setResult = _res[1];
+  var _sk = useState(null); var activeSk = _sk[0]; var setActiveSk = _sk[1];
+  var _boost = useState(false); var boosted = _boost[0]; var setBoosted = _boost[1];
+  var _hist = useState([]); var history = _hist[0]; var setHistory = _hist[1];
+  var _diff = useState(0); var diff = _diff[0]; var setDiff = _diff[1];
+  var _ladderOpen = useState(false); var ladderOpen = _ladderOpen[0]; var setLadderOpen = _ladderOpen[1];
+  var _flickerFaces = useState(['+','0','\u2212','+']); var flickerFaces = _flickerFaces[0]; var setFlickerFaces = _flickerFaces[1];
+  var flickerRef = useRef(null);
+  var revealRef = useRef(null);
+  useEffect(function() {
+    return function() {
+      if (flickerRef.current) clearInterval(flickerRef.current);
+      if (revealRef.current) clearInterval(revealRef.current);
+    };
+  }, []);
+
+  var player = players.find(function(p) { return p.id === selId; });
+  var mod = activeSk ? (activeSk.v != null ? activeSk.v : activeSk.r || 0) : 0;
+  var final = result != null ? result + mod + (boosted ? 2 : 0) : null;
+
+  function randomFace() { return ['+', '0', '\u2212'][Math.floor(Math.random() * 3)]; }
+
+  function doRoll(sk) {
+    if (phase === 'flicker' || phase === 'reveal') return;
+    setActiveSk(sk); setBoosted(false); setResult(null); setRevealCount(0);
+    var faces = [randomFace(), randomFace(), randomFace(), randomFace()];
+    setPhase('flicker');
+    var flicks = 0;
+    if (flickerRef.current) clearInterval(flickerRef.current);
+    flickerRef.current = setInterval(function() {
+      setFlickerFaces([randomFace(), randomFace(), randomFace(), randomFace()]);
+      flicks++;
+      if (flicks >= 5) {
+        clearInterval(flickerRef.current); flickerRef.current = null;
+        setDice(faces); setPhase('reveal'); setRevealCount(0);
+        var idx = 0;
+        if (revealRef.current) clearInterval(revealRef.current);
+        revealRef.current = setInterval(function() {
+          idx++;
+          setRevealCount(idx);
+          if (idx >= 4) {
+            clearInterval(revealRef.current); revealRef.current = null;
+            var raw = faces.reduce(function(s, f) { return s + (f === '+' ? 1 : f === '\u2212' ? -1 : 0); }, 0);
+            setResult(raw); setPhase('done');
+            var skVal = sk.v != null ? sk.v : sk.r || 0;
+            var total = raw + skVal;
+            setHistory(function(prev) { return [{who: player ? player.name : '?', skill: sk.l || sk.name, total: total}].concat(prev).slice(0, 8); });
+            if (onRoll) onRoll({who: player ? player.name : '?', skill: sk.l || sk.name, total: total});
+          }
+        }, 120);
+      }
+    }, 80);
   }
 
-  // Horizontal strip: [who] [dice] [result] [roll btn] [FP spend] | [skills] | [history]
-  return h('div',{style:{display:'flex',alignItems:'center',gap:10,padding:'6px 10px',flexWrap:'nowrap',overflowX:'auto',fontFamily:'var(--font-ui)',minHeight:52}},
+  function renderDie(index) {
+    if (phase === 'flicker') {
+      return h('span', {key: index, className: 'dr-die dr-die-hidden dr-die-spin', 'aria-hidden': 'true'}, flickerFaces[index]);
+    }
+    if (phase === 'reveal') {
+      if (index < revealCount) {
+        var f = dice[index];
+        return h('span', {key: index, className: 'dr-die dr-die-pop ' + (f === '+' ? 'dr-die-pos' : f === '\u2212' ? 'dr-die-neg' : 'dr-die-zero'), 'aria-hidden': 'true'}, f);
+      }
+      return h('span', {key: index, className: 'dr-die dr-die-hidden', 'aria-hidden': 'true'}, '?');
+    }
+    if (phase === 'done') {
+      var fd = dice[index];
+      return h('span', {key: index, className: 'dr-die ' + (fd === '+' ? 'dr-die-pos' : fd === '\u2212' ? 'dr-die-neg' : 'dr-die-zero'), 'aria-hidden': 'true'}, fd);
+    }
+    return h('span', {key: index, className: 'dr-die dr-die-hidden', 'aria-hidden': 'true'}, '?');
+  }
 
-    // ── Who is rolling ───────────────────────────────────────────
-    h('div',{style:{fontSize:11,fontWeight:700,color:player?player.color||'var(--accent)':'var(--text-muted)',
-      whiteSpace:'nowrap',flexShrink:0,minWidth:60,maxWidth:100,overflow:'hidden',textOverflow:'ellipsis'}},
-      player?player.name:'no player'),
+  var rolling = phase === 'flicker' || phase === 'reveal';
+  var outcomeEl = null;
+  if (phase === 'done' && final != null) {
+    var margin = final - diff;
+    var outcome = margin >= 3 ? 'Succeed w/ Style' : margin >= 1 ? 'Success' : margin === 0 ? 'Tie' : 'Fail';
+    var outCol = margin >= 3 ? '#32ADE6' : margin >= 1 ? '#34C759' : margin === 0 ? '#FFCC00' : '#FF3B30';
+    outcomeEl = h('span', {className: 'dr-outcome', style: {color: outCol, borderColor: outCol}}, outcome + (margin > 0 ? ' +' + margin : margin < 0 ? ' ' + margin : ''));
+  }
 
-    // ── 4 Fate dice ──────────────────────────────────────────────
-    h('div',{style:{display:'flex',gap:4,flexShrink:0}},
-      dice.map(function(v,i){
-        var cls='rs-die'+(spinning?' spin':v>0?' pos':v<0?' neg':' zero');
-        return h('div',{key:i,className:cls,style:{width:32,height:32,fontSize:16}},
-          spinning?'\u25C8':DFMT[v]||'\u25CB');
-      })
+  return h('div', {className: 'tp-dice-v2', role: 'region', 'aria-label': 'Dice roller'},
+    h('div', {className: 'tp-dice-who'},
+      player
+        ? h('span', {style: {color: player.color || 'var(--accent)'}}, player.name)
+        : h('span', {style: {color: 'var(--text-muted)'}}, '\u2191 Select a player')
     ),
-
-    // ── Result block ─────────────────────────────────────────────
-    result!=null&&!spinning&&h('div',{style:{display:'flex',alignItems:'baseline',gap:5,flexShrink:0}},
-      h('span',{style:{fontSize:22,fontWeight:900,color:tpLcol(final),lineHeight:1}},
-        final>=0?'+'+final:String(final)),
-      h('span',{style:{fontSize:11,fontWeight:700,color:tpLcol(final)}},tpLbl(final)),
-      activeSk&&h('span',{style:{fontSize:11,color:'var(--text-muted)'}},
-        '('+activeSk.l+(boosted?'+2)':')'))
+    h('div', {className: 'dr-dice-row', 'aria-live': 'polite', 'aria-atomic': 'true'},
+      renderDie(0), renderDie(1), renderDie(2), renderDie(3)
     ),
-    result==null&&!spinning&&h('span',{style:{fontSize:11,color:'var(--text-muted)',flexShrink:0}},
-      player?'roll below':'\u2191 select player'),
-
-    // ── Roll 4dF button ──────────────────────────────────────────
-    h('button',{
-      className:'btn btn-ghost',
-      disabled:spinning,
-      onClick:function(){doRoll({l:'4dF',v:0});},
-      style:{fontSize:12,flexShrink:0,whiteSpace:'nowrap'},
-    },'\uD83C\uDFB2 Roll 4dF'),
-
-    // ── FP spend ─────────────────────────────────────────────────
-    result!=null&&!spinning&&h('button',{
-      className:'btn btn-ghost'+(boosted?' active':''),
-      disabled:!player||player.fp<=0||boosted,
-      onClick:function(){if(!player||boosted||result==null)return;if(spendFP)spendFP(selId);setBoosted(true);},
-      style:{fontSize:11,flexShrink:0,whiteSpace:'nowrap'},
-      title:'Spend 1 FP for +2',
-    },boosted?'\u2705 +2 spent':'\u29BF FP +2'),
-
-    // TC-20: Opposition difficulty & outcome
-    h('div',{style:{display:'flex',alignItems:'center',gap:4,flexShrink:0}},
-      h('span',{style:{fontSize:11,color:'var(--text-muted)',whiteSpace:'nowrap'}},'vs'),
-      h('input',{type:'number',min:-4,max:8,value:diff,
-        onChange:function(e){setDiff(parseInt(e.target.value)||0);},
-        style:{width:40,background:'var(--inset)',border:'1px solid var(--border)',
-          borderRadius:5,padding:'2px 5px',fontSize:12,color:'var(--text)',
-          fontFamily:'var(--font-ui)',textAlign:'center',outline:'none'},
-        title:'Opposition difficulty (Fate Ladder: -4 to +8)',
-      }),
-      result!=null&&!spinning&&(function(){
-        var margin=final-diff;
-        var outcome=margin>=3?'Succeed w/ Style':margin>=1?'Success':margin===0?'Tie':'Fail';
-        var col=margin>=3?'var(--c-green)':margin>=1?'var(--accent)':margin===0?'var(--c-amber,#f4b942)':'var(--c-red)';
-        return h('span',{style:{fontSize:12,fontWeight:800,color:col,whiteSpace:'nowrap'}},outcome+(margin>0?' +'+margin:margin<0?' '+margin:''));
-      })()
+    h('div', {className: 'dr-result-row'},
+      phase === 'done' && final != null && h(Fragment, null,
+        h('span', {className: 'dr-total', style: {color: tpLcolHex(final)}}, (final >= 0 ? '+' : '') + final),
+        h('span', {className: 'dr-adj', style: {color: tpLcolHex(final)}}, tpLbl(final)),
+        outcomeEl
+      ),
+      phase === 'idle' && h('span', {className: 'dr-result-placeholder'}, player ? 'Pick a skill or roll 4dF' : '\u2014')
     ),
-    // Separator
-    h('div',{style:{width:1,height:28,background:'var(--border)',flexShrink:0}}),
-
-    // ── Skills as pill row ────────────────────────────────────────
-    player&&(player.skills||[]).length>0&&h('div',{style:{display:'flex',gap:4,flexWrap:'nowrap',overflowX:'auto',flex:1}},
-      player.skills.map(function(sk){
-        var isSel=activeSk&&(activeSk.l||activeSk.name)===(sk.l||sk.name);
-        var v=sk.v||sk.r||0;
-        return h('button',{key:sk.l||sk.name,
-          onClick:function(){doRoll(sk);},
-          style:{
-            background:isSel?'color-mix(in srgb,var(--accent) 12%,transparent)':'var(--inset)',
-            border:'1px solid '+(isSel?'var(--accent)':'var(--border)'),
-            borderRadius:6,padding:'3px 9px',cursor:'pointer',fontFamily:'var(--font-ui)',
-            display:'flex',alignItems:'center',gap:5,whiteSpace:'nowrap',flexShrink:0,
+    h('div', {className: 'tp-dice-controls'},
+      h('button', {className: 'dr-btn', disabled: rolling, onClick: function() { doRoll({l: '4dF', v: 0}); }, 'aria-label': 'Roll 4 Fate dice'}, rolling ? '\u2026' : '\uD83C\uDFB2 Roll 4dF'),
+      phase === 'done' && h('button', {
+        className: 'dr-btn' + (boosted ? ' tp-dice-boosted' : ''),
+        disabled: !player || (player.fp || 0) <= 0 || boosted,
+        onClick: function() { if (!player || boosted || result == null) return; if (spendFP) spendFP(selId); setBoosted(true); },
+        title: 'Spend 1 FP for +2', style: {minWidth: 0, padding: '6px 16px'},
+      }, boosted ? '\u2705 +2' : '\u29BF FP +2'),
+      h('div', {className: 'tp-dice-opp'},
+        h('span', {className: 'tp-dice-opp-label'}, 'vs'),
+        h('div', {className: 'tp-ladder-wrap'},
+          h('button', {
+            className: 'tp-ladder-sel',
+            onClick: function() { setLadderOpen(function(v){ return !v; }); },
+            'aria-expanded': String(ladderOpen),
+            'aria-haspopup': 'listbox',
+            title: 'Select opposition difficulty',
           },
-        },
-          h('span',{style:{fontSize:11,color:'var(--text)',fontWeight:600}},sk.l||sk.name),
-          h('span',{style:{fontSize:12,fontWeight:800,color:tpLcol(v)}},'+'+v),
-          h('span',{style:{fontSize:11}},spinning&&isSel?'\uD83C\uDFB2':'')
+            h('span', {className: 'tp-ladder-val', style: {color: tpLcolHex(diff)}},
+              (diff >= 0 ? '+' : '') + diff),
+            h('span', {className: 'tp-ladder-name'}, tpLbl(diff)),
+            h('span', {className: 'tp-ladder-chev'}, ladderOpen ? '\u25B4' : '\u25BE')
+          ),
+          ladderOpen && h('div', {className: 'tp-ladder-dropdown', role: 'listbox', 'aria-label': 'Fate Ladder'},
+            TP_LADDER.map(function(row) {
+              var sel = row.v === diff;
+              return h('button', {
+                key: row.v,
+                className: 'tp-ladder-opt' + (sel ? ' selected' : ''),
+                role: 'option', 'aria-selected': String(sel),
+                onClick: function() { setDiff(row.v); setLadderOpen(false); },
+              },
+                h('span', {className: 'tp-ladder-opt-val', style: {color: tpLcolHex(row.v)}},
+                  (row.v >= 0 ? '+' : '') + row.v),
+                h('span', {className: 'tp-ladder-opt-name'}, row.l)
+              );
+            })
+          )
+        )
+      )
+    ),
+    player && (player.skills || []).length > 0 && h('div', {className: 'tp-dice-skills'},
+      player.skills.map(function(sk) {
+        var v = sk.v != null ? sk.v : sk.r || 0;
+        var isSel = activeSk && (activeSk.l || activeSk.name) === (sk.l || sk.name);
+        return h('button', {key: sk.l || sk.name, className: 'tp-dice-skill-pill' + (isSel ? ' active' : ''), onClick: function() { doRoll(sk); }},
+          h('span', {className: 'tp-dice-skill-name'}, sk.l || sk.name),
+          h('span', {className: 'tp-dice-skill-val', style: {color: tpLcolHex(v)}}, (v >= 0 ? '+' : '') + v)
         );
       })
     ),
-    !player&&h('span',{style:{fontSize:11,color:'var(--text-muted)',flex:1}},'Select a player in the roster to roll their skills'),
-
-    // Separator + history (last 3, compact)
-    history.length>0&&h('div',{style:{width:1,height:28,background:'var(--border)',flexShrink:0}}),
-    history.length>0&&h('div',{style:{display:'flex',gap:5,alignItems:'center',flexShrink:0}},
-      history.slice(0,3).map(function(r,i){
-        return h('span',{key:i,style:{fontSize:11,color:'var(--text-muted)',whiteSpace:'nowrap'}},
-          h('span',{style:{fontWeight:800,color:tpLcol(r.total)}},r.total>=0?'+'+r.total:String(r.total)),
-          ' '+r.skill
+    history.length > 0 && h('div', {className: 'tp-dice-history'},
+      h('span', {className: 'tp-dice-hist-label'}, 'History'),
+      history.slice(0, 5).map(function(r, i) {
+        return h('span', {key: i, className: 'tp-dice-hist-entry'},
+          h('span', {style: {fontWeight: 800, color: tpLcolHex(r.total)}}, (r.total >= 0 ? '+' : '') + r.total),
+          ' ' + r.skill,
+          h('span', {style: {color: 'var(--text-muted)', fontSize: 10}}, ' \u00b7 ' + r.who)
         );
       })
     )

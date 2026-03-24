@@ -747,7 +747,7 @@ CAMPAIGNS["western"] = {
     faction_methods: [
       "hired Pinkerton detectives","bought the local law","legal deed challenges",
       "sabotage and arson","intimidation through gunhands","bribery up the chain",
-      "forged surveys","strangling the supply route","calling in old debts",,
+      "forged surveys","strangling the supply route","calling in old debts",
         "controlling access to the only telegraph office within two days",
         "placing informants in the saloon to monitor sentiment",
         "using the surveying process itself as a delay and intimidation tactic"
@@ -768,7 +768,7 @@ CAMPAIGNS["western"] = {
     ],
     faction_face_roles: [
       "land agent","company enforcer","bought sheriff","railroad surveyor",
-      "legal counsel","range boss","company accountant","Pinkerton liaison",,
+      "legal counsel","range boss","company accountant","Pinkerton liaison",
         "the circuit judge who travels the region and owes a debt",
         "the newspaper editor who controls what the county reads",
         "the homesteader who organised the resistance and is starting to doubt it",

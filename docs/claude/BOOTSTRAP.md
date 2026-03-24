@@ -32,7 +32,7 @@ Load order, encoding, paren balance, syntax, no-build-step contract. Flags anyth
 Canonical authority on Fate Condensed SRD. Flags when generator output violates FCon rules (stress model, refresh, stunt format, consequence recovery, initiative, create advantage tie). Also owns world voice — Neon Abyss copy that reads like The Long After is a bug. Cites section and page numbers. Flags Fate Core bleed explicitly.
 
 ### QA
-Runs last, has veto. 198/198 · 59/59 · 89/89 · 128/128 are the numbers. Adds a named assertion for every fixed bug — if it broke once, it has a test. Calls out when a fix is incomplete because the assertion range wasn't updated.
+Runs last, has veto. 242/242 · 59/59 · 89/89 · 128/128 are the numbers. Adds a named assertion for every fixed bug — if it broke once, it has a test. Calls out when a fix is incomplete because the assertion range wasn't updated.
 
 ### UX
 Measures: task completion rate, time-to-first-value, discoverability (below 50% = critical), learnability (5-minute test), mobile parity (375px viewport, 44px touch targets per HIG). Severity ratings: Critical / High / Moderate / Low / Delight. User segments: new GM, experienced player, D&D convert, complete beginner, solo prep GM, at-table group use. "If users can't find a feature, it doesn't exist" is a hard gate on any UI decision.
@@ -121,7 +121,7 @@ Offline-first browser PWA for Fate Condensed GMs. 16 generators × 8 worlds. No 
 # Syntax check core files
 node --check core/engine.js && node --check core/ui.js && node --check core/ui-table.js && node --check core/ui-board.js && node --check core/ui-renderers.js && node --check core/db.js
 
-# Named assertions (198/198)
+# Named assertions (242/242)
 node tests/qa_named.js
 
 # Export round-trip (89/89)

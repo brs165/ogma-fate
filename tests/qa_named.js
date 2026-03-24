@@ -1544,9 +1544,9 @@ assert('NA-12 React theme-toggle aria-label dynamic', uiSrc.includes("'Switch to
     ui.includes('onShareLink && currentResult') && ui.includes('Copy shareable link'),
     'ExportModal must have Copy Link button gated on onShareLink');
 
-  assert('NA-177: ExportMenu call site passes onToast and onShareLink',
-    ui.includes('onToast: showToast') && ui.includes('onShareLink: result ? copyShareLink : null'),
-    'ExportMenu call site must pass onToast and onShareLink');
+  assert('NA-177: Export accessible from sidebar Play section',
+    ui.includes('exportCards') && ui.includes("'Export Cards'"),
+    'Export must be in sidebar Play section as exportCards button');
 
   assert('NA-178: Session Zero link in sidebar At the table section',
     ui.includes('character-creation.html?world=') && ui.includes("'Session Zero'"),
@@ -1572,18 +1572,17 @@ assert('NA-12 React theme-toggle aria-label dynamic', uiSrc.includes("'Switch to
     ui.includes('var sbAcc') && ui.includes("toggleAcc("),
     'CampaignApp must have sbAcc state and toggleAcc helper');
 
-  assert('NA-182: Accordion has Play section first',
+  assert('NA-182: Accordion has Play section first, Generate second',
     (function() {
       var pi = ui.indexOf("sbAcc === 'play'");
-      var bi = ui.indexOf("sbAcc === 'binder'");
       var gi = ui.indexOf("sbAcc === 'generate'");
-      return pi > 0 && bi > pi && gi > bi;
+      return pi > 0 && gi > pi;
     })(),
-    'Play must come before Binder, Binder before Generate in nav order');
+    'Play must come before Generate in nav order (Binder removed)');
 
   assert('NA-183: All accordion headers have aria-expanded',
-    (ui.match(/'aria-expanded': String\(sbAcc ===/g)||[]).length >= 4,
-    'All four section headers must have aria-expanded');
+    (ui.match(/'aria-expanded': String\(sbAcc ===/g)||[]).length >= 3,
+    'All three section headers (Play, Generate, Settings) must have aria-expanded');
 
   assert('NA-184: Generate section has max-height scroll containment',
     css.includes('sb-acc-generate-body') && css.includes('max-height:55vh'),
@@ -1768,6 +1767,862 @@ assert('NA-12 React theme-toggle aria-label dynamic', uiSrc.includes("'Switch to
   assert('NA-211: V-03 Contest tie wording — must say situation aspect not boost (FCon p.33)',
     board.includes('situation aspect') && !board.includes('Tie = boost'),
     'Contest help text must describe unexpected twist / situation aspect, not boost');
+})();
+
+// ── Crash Prevention Tests (NA-212 – NA-216) ──────────────────────────────
+// Each assertion corresponds to a production crash or console error observed
+// in v374–v378. They would have caught the bug before the build shipped.
+
+// NA-212: No document.write() in any HTML file
+// Catches: "unbalanced tree" speculative parsing warning + CSP write-src blocks
+(function() {
+  var fs2 = require('fs');
+  var dirs = ['campaigns', 'help', '.'];
+  var badFiles = [];
+  dirs.forEach(function(dir) {
+    try {
+      fs2.readdirSync(dir).forEach(function(f) {
+        if (!f.endsWith('.html')) return;
+        var full = dir === '.' ? f : dir + '/' + f;
+        try {
+          var src = fs2.readFileSync(full, 'utf8');
+          if (src.includes('document.write(')) badFiles.push(full);
+        } catch(e) {}
+      });
+    } catch(e) {}
+  });
+  assert('NA-212: No document.write() in HTML files (causes speculative parsing warnings + CSP blocks)',
+    badFiles.length === 0,
+    'Found document.write() in: ' + badFiles.join(', '));
+})();
+
+// NA-213: campMeta defined before first use inside BoardApp
+// Catches: "campMeta is undefined" TypeError — hook calls must not reference
+// derived vars before they are declared in the component body.
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  var lines = src.split('\n');
+  var appStart = lines.findIndex(function(l) { return /^function BoardApp\(/.test(l); });
+  if (appStart === -1) { assert('NA-213: campMeta ordering', false, 'BoardApp function not found'); return; }
+  var app = lines.slice(appStart);
+  var defLine   = app.findIndex(function(l) { return /var campMeta\s*=/.test(l); });
+  var firstUse  = -1;
+  for (var i = 0; i < (defLine === -1 ? app.length : defLine); i++) {
+    if (/campMeta\.(name|icon|id|slug)\b/.test(app[i]) && !/var campMeta/.test(app[i])) {
+      firstUse = i; break;
+    }
+  }
+  assert('NA-213: campMeta defined before first property access in BoardApp',
+    defLine !== -1 && firstUse === -1,
+    firstUse !== -1
+      ? 'campMeta accessed at BoardApp+' + firstUse + ' before defined at BoardApp+' + defLine
+      : 'campMeta declaration not found');
+})();
+
+// NA-214: useBoardBinder called after campMeta definition in BoardApp
+// Catches: the specific ordering bug fixed in v378 — hook referenced campMeta.name
+// before campMeta was computed.
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  var lines = src.split('\n');
+  var appStart = lines.findIndex(function(l) { return /^function BoardApp\(/.test(l); });
+  if (appStart === -1) { assert('NA-214: useBoardBinder ordering', false, 'BoardApp not found'); return; }
+  var app = lines.slice(appStart);
+  var binderLine  = app.findIndex(function(l) { return /useBoardBinder\(/.test(l); });
+  var campMetLine = app.findIndex(function(l) { return /var campMeta\s*=/.test(l); });
+  assert('NA-214: useBoardBinder called after campMeta is defined (hook ordering guard)',
+    campMetLine !== -1 && binderLine !== -1 && campMetLine < binderLine,
+    'campMeta at BoardApp+' + campMetLine + ', useBoardBinder at BoardApp+' + binderLine +
+    ' — hook must come after derived var');
+})();
+
+// NA-215: CSP _headers file allows Google Fonts origins
+// Catches: Jost font blocked by Content-Security-Policy on production
+(function() {
+  var fs2 = require('fs');
+  var src = '';
+  try { src = fs2.readFileSync('_headers', 'utf8'); } catch(e) {
+    assert('NA-215: _headers CSP allows Google Fonts', false, '_headers file not found'); return;
+  }
+  assert('NA-215: CSP _headers allows fonts.googleapis.com (style-src) and fonts.gstatic.com (font-src)',
+    src.includes('https://fonts.googleapis.com') && src.includes('https://fonts.gstatic.com'),
+    'Missing from _headers: ' +
+      (!src.includes('https://fonts.googleapis.com') ? 'fonts.googleapis.com ' : '') +
+      (!src.includes('https://fonts.gstatic.com')    ? 'fonts.gstatic.com'     : ''));
+})();
+
+// NA-216: No guarded derived vars used before their declaration in BoardApp
+// Catches: the class of ordering bugs where campMeta / tables / campCanvasKey
+// are referenced (e.g. inside a hook call) before their var declaration.
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  var lines = src.split('\n');
+  var appStart = lines.findIndex(function(l) { return /^function BoardApp\(/.test(l); });
+  if (appStart === -1) { assert('NA-216: derived var ordering in BoardApp', false, 'BoardApp not found'); return; }
+  var app = lines.slice(appStart);
+  var guarded = ['campMeta', 'tables', 'campCanvasKey'];
+  var violations = [];
+  guarded.forEach(function(v) {
+    var defLine = app.findIndex(function(l) { return new RegExp('\\bvar ' + v + '\\s*=').test(l); });
+    if (defLine === -1) return;
+    for (var i = 0; i < defLine; i++) {
+      if (/^\s*\/\//.test(app[i])) continue; // skip comment lines
+      if (new RegExp('\\b' + v + '\\b').test(app[i]) && !new RegExp('var ' + v).test(app[i])) {
+        violations.push(v + ' used at BoardApp+' + i + ' before defined at BoardApp+' + defLine);
+        break;
+      }
+    }
+  });
+  assert('NA-216: campMeta, tables, campCanvasKey all used after their declaration in BoardApp',
+    violations.length === 0,
+    violations.join('; '));
+})();
+
+// ── NA-217 through NA-230: Hardened Load / Runtime Crash Prevention ─────────
+
+// NA-217: Version stamp consistency — all ?v=N in campaign HTML match sw.js build number
+// Catches: stale cache-busting stamps serving wrong file versions after a bump
+(function() {
+  var fs2 = require('fs');
+  var swSrc = fs2.readFileSync('sw.js', 'utf8');
+  var cacheMatch = swSrc.match(/CACHE_NAME\s*=\s*['"]fate-generator-[\d.]+\.(\d+)['"]/);
+  if (!cacheMatch) { assert('NA-217: version stamp sync', false, 'Could not parse build number from sw.js'); return; }
+  var buildNum = cacheMatch[1];
+
+  var badFiles = [];
+  ['campaigns','help','.'].forEach(function(dir) {
+    try { require('fs').readdirSync(dir).forEach(function(f) {
+      if (!f.endsWith('.html')) return;
+      var full = dir === '.' ? f : dir + '/' + f;
+      var src = fs2.readFileSync(full, 'utf8');
+      // Find all ?v=N stamps on local assets (not CDN)
+      var stamps = src.match(/(?:src|href)="[^"]*\.(?:js|css)\?v=(\d+)"/g) || [];
+      stamps.forEach(function(s) {
+        var m = s.match(/\?v=(\d+)/);
+        if (m && m[1] !== buildNum && m[1] !== '1' && m[1] !== '205') {
+          badFiles.push(full + ':' + s.slice(0,60));
+        }
+      });
+    }); } catch(e) {}
+  });
+  assert('NA-217: all ?v=N stamps match current build number (' + buildNum + ')',
+    badFiles.length === 0,
+    'Stale version stamps: ' + badFiles.slice(0,3).join(' | '));
+})();
+
+// NA-218: Every campaign page loads React before any core JS file
+// Catches: "React is not defined" crash when core files load before CDN
+(function() {
+  var fs2 = require('fs');
+  var camps = ['thelongafter','cyberpunk','fantasy','space','victorian','postapoc','western','dVentiRealm'];
+  var bad = [];
+  camps.forEach(function(c) {
+    var src = fs2.readFileSync('campaigns/' + c + '.html', 'utf8');
+    var reactIdx = src.indexOf('react.production.min.js');
+    var coreIdx  = Math.min(
+      src.includes('core/engine.js') ? src.indexOf('core/engine.js') : Infinity,
+      src.includes('core/ui.js')     ? src.indexOf('core/ui.js')     : Infinity,
+      src.includes('core/db.js')     ? src.indexOf('core/db.js')     : Infinity
+    );
+    if (reactIdx === -1) bad.push(c + ': React CDN missing');
+    else if (reactIdx > coreIdx) bad.push(c + ': React loaded after core files');
+  });
+  assert('NA-218: React CDN loaded before core JS on every campaign page',
+    bad.length === 0, bad.join(', '));
+})();
+
+// NA-219: Every campaign page loads Dexie before db.js
+// Catches: "Dexie is not defined" crash — db.js requires Dexie at load time
+(function() {
+  var fs2 = require('fs');
+  var camps = ['thelongafter','cyberpunk','fantasy','space','victorian','postapoc','western','dVentiRealm'];
+  var bad = [];
+  camps.forEach(function(c) {
+    var src = fs2.readFileSync('campaigns/' + c + '.html', 'utf8');
+    var dexieIdx = src.indexOf('dexie.min.js');
+    var dbIdx    = src.indexOf('core/db.js');
+    if (dexieIdx === -1) bad.push(c + ': Dexie CDN missing');
+    else if (dbIdx !== -1 && dexieIdx > dbIdx) bad.push(c + ': Dexie after db.js');
+  });
+  assert('NA-219: Dexie CDN loaded before db.js on every campaign page',
+    bad.length === 0, bad.join(', '));
+})();
+
+// NA-220: No core JS file loaded twice in any campaign page
+// Catches: double-execution corrupting global state (e.g. config.js loaded twice)
+(function() {
+  var fs2 = require('fs');
+  var camps = ['thelongafter','cyberpunk','fantasy','space','victorian','postapoc','western','dVentiRealm'];
+  var bad = [];
+  camps.forEach(function(c) {
+    var src = fs2.readFileSync('campaigns/' + c + '.html', 'utf8');
+    var scripts = src.match(/src="[^"]*\/core\/[^"]+"/g) || [];
+    var seen = {};
+    scripts.forEach(function(s) {
+      var name = s.replace(/\?v=\d+/, '');
+      if (seen[name]) bad.push(c + ': ' + name + ' loaded twice');
+      seen[name] = true;
+    });
+  });
+  assert('NA-220: no core JS file loaded twice in any campaign page',
+    bad.length === 0, bad.slice(0,3).join(' | '));
+})();
+
+// NA-221: OGMA_CONFIG.VERSION in config.js matches sw.js CACHE_NAME build
+// Catches: version displayed in UI mismatches the deployed cache key
+(function() {
+  var fs2 = require('fs');
+  var cfgSrc = fs2.readFileSync('core/config.js', 'utf8');
+  var swSrc  = fs2.readFileSync('sw.js', 'utf8');
+  var cfgMatch = cfgSrc.match(/VERSION['"]?\s*:\s*['"]([^'"]+)['"]/);
+  var swMatch  = swSrc.match(/CACHE_NAME\s*=\s*['"]fate-generator-([^'"]+)['"]/);
+  var cfgVer = cfgMatch ? cfgMatch[1] : null;
+  var swVer  = swMatch  ? swMatch[1]  : null;
+  assert('NA-221: OGMA_CONFIG.VERSION matches sw.js CACHE_NAME build',
+    cfgVer !== null && swVer !== null && cfgVer === swVer,
+    'config.js VERSION=' + cfgVer + ' sw.js CACHE_NAME build=' + swVer);
+})();
+
+// NA-222: h, useState, useEffect, useRef, useCallback, Fragment all defined in ui-primitives.js
+// Catches: React alias missing — every component file depends on these globals
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-primitives.js', 'utf8');
+  var required = ['h', 'useState', 'useEffect', 'useRef', 'useCallback', 'Fragment'];
+  var missing = required.filter(function(g) {
+    return !new RegExp('(?:const|var)\\s+' + g + '\\s*=').test(src);
+  });
+  assert('NA-222: React aliases (h, useState, useEffect, useRef, useCallback, Fragment) defined in ui-primitives.js',
+    missing.length === 0,
+    'Missing definitions: ' + missing.join(', '));
+})();
+
+// NA-223: No bare top-level const/let in ui.js or ui-board.js
+// const/let at top level of these files can cause TDZ errors when loaded as plain <script> tags
+// ui-primitives.js, engine.js, renderers.js, and landing.js intentionally use const — excluded
+(function() {
+  var fs2 = require('fs');
+  var checkFiles = ['core/ui.js', 'core/ui-board.js', 'core/ui-table.js',
+                    'core/ui-modals.js', 'core/db.js'];
+  var bad = [];
+  checkFiles.forEach(function(f) {
+    var lines = fs2.readFileSync(f, 'utf8').split('\n');
+    lines.forEach(function(l, i) {
+      if (/^const\s+\w|^let\s+\w/.test(l)) bad.push(f + ':L' + (i+1) + ': ' + l.trim().slice(0,60));
+    });
+  });
+  assert('NA-223: no top-level const/let in ui.js, ui-board.js, ui-table.js, ui-modals.js, db.js',
+    bad.length === 0, bad.slice(0,3).join(' | '));
+})();
+
+// NA-224: board.html redirect target exists
+// Catches: board.html pointing to a page that was renamed/deleted
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('campaigns/board.html', 'utf8');
+  // board.html should contain a script redirect or meta refresh
+  var hasRedirect = /window\.location|meta.*refresh|href.*board/i.test(src);
+  // The target page (one of the campaign pages) should load ui-board.js
+  var hasBoard = src.includes('ui-board.js') || src.includes('board.html');
+  assert('NA-224: campaigns/board.html exists and contains redirect or board UI',
+    fs2.existsSync('campaigns/board.html') && (hasRedirect || hasBoard),
+    'board.html missing or contains neither redirect nor ui-board.js reference');
+})();
+
+// NA-225: Each campaign page loads its own matching data file (not another world's)
+// Catches: copy-paste error where cyberpunk.html loads fantasy.js data
+(function() {
+  var fs2 = require('fs');
+  var camps = ['thelongafter','cyberpunk','fantasy','space','victorian','postapoc','western','dVentiRealm'];
+  var bad = [];
+  camps.forEach(function(c) {
+    var src = fs2.readFileSync('campaigns/' + c + '.html', 'utf8');
+    if (!src.includes('data/' + c + '.js')) {
+      bad.push(c + ': missing data/' + c + '.js');
+    }
+    // Also check it doesn't load ANOTHER world's data exclusively
+    camps.forEach(function(other) {
+      if (other === c) return;
+      if (src.includes('data/' + other + '.js') && !src.includes('data/' + c + '.js')) {
+        bad.push(c + ': loads ' + other + '.js instead of own data');
+      }
+    });
+  });
+  assert('NA-225: each campaign page loads its own matching data file',
+    bad.length === 0, bad.slice(0,3).join(' | '));
+})();
+
+// NA-226: node --check syntax validation for all JS files in core/ and data/
+// Catches: syntax errors that would silently fail in the browser
+(function() {
+  var fs2   = require('fs');
+  var child = require('child_process');
+  var bad   = [];
+  ['core','data','assets/js'].forEach(function(dir) {
+    try { fs2.readdirSync(dir).forEach(function(f) {
+      if (!f.endsWith('.js') || f.endsWith('.min.js')) return;
+      try {
+        child.execSync('node --check ' + dir + '/' + f + ' 2>&1', {encoding:'utf8'});
+      } catch(e) {
+        bad.push(dir + '/' + f + ': ' + e.stdout.trim().slice(0,80));
+      }
+    }); } catch(e) {}
+  });
+  assert('NA-226: node --check passes for all JS files in core/, data/, assets/js/',
+    bad.length === 0, bad.slice(0,3).join(' | '));
+})();
+
+// NA-227: ErrorBoundary class present in ui-primitives.js
+// Catches: missing error boundary — without it, React crashes show a blank white page
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-primitives.js', 'utf8');
+  assert('NA-227: ErrorBoundary class defined in ui-primitives.js',
+    src.includes('class ErrorBoundary') || src.includes('ErrorBoundary'),
+    'ErrorBoundary not found — React crashes will show blank page with no user feedback');
+})();
+
+// NA-228: sw.js APP_SHELL includes all 8 campaign pages
+// Catches: offline install missing a page — user gets blank screen on cached visit
+(function() {
+  var fs2 = require('fs');
+  var swSrc = fs2.readFileSync('sw.js', 'utf8');
+  var camps = ['thelongafter','cyberpunk','fantasy','space','victorian','postapoc','western','dVentiRealm'];
+  var missing = camps.filter(function(c) { return !swSrc.includes(c); });
+  assert('NA-228: sw.js APP_SHELL references all 8 campaign pages for offline install',
+    missing.length === 0, 'Missing from sw.js: ' + missing.join(', '));
+})();
+
+// NA-229: No undefined values in generated output across all worlds and generators
+// Catches: sparse array holes in data files (e.g. double-comma bug) producing "undefined" text
+(function() {
+  var badItems = [];
+  var genIds = ['npc_minor','npc_major','scene','campaign','encounter','seed',
+                'compel','challenge','contest','consequence','faction','complication'];
+  camps.forEach(function(camp) {
+    var t = filteredTables(mergeUniversal(CAMPAIGNS[camp].tables), {});
+    genIds.forEach(function(gen) {
+      for (var i = 0; i < 30; i++) {
+        try {
+          var r = generate(gen, t, 4);
+          // Check all string values recursively
+          var str = JSON.stringify(r);
+          if (str && (str.includes('"undefined"') || str.includes(':undefined'))) {
+            badItems.push(camp + '/' + gen);
+            return; // one hit per gen per world is enough
+          }
+          // Check for actual undefined values (lost by JSON.stringify)
+          function checkObj(obj, path) {
+            // null is intentional (e.g. stunt: null when no stunt rolled) — only flag undefined
+            if (obj === undefined) { badItems.push(camp+'/'+gen+' '+path+'=undefined'); return; }
+            if (obj === null) return; // intentional absence — skip
+            if (typeof obj === 'object') {
+              Object.keys(obj).forEach(function(k) {
+                if (obj[k] === undefined) badItems.push(camp+'/'+gen+'.'+k+'=undefined');
+                else checkObj(obj[k], path+'.'+k);
+              });
+            }
+          }
+          checkObj(r, '');
+          if (badItems.some(function(b){ return b.startsWith(camp+'/'+gen); })) return;
+        } catch(e) {}
+      }
+    });
+  });
+  var unique = badItems.filter(function(v,i,a){ return a.indexOf(v)===i; });
+  assert('NA-229: no undefined values in generated output across all worlds and generators',
+    unique.length === 0, unique.slice(0,5).join(', '));
+})();
+
+// NA-230: All custom hooks (useBoardX, useChromeHooks, useGeneratorSession) defined
+//         before their call sites in the same file
+// Catches: the class of ordering bug that caused the v378 crash — extended to all hooks
+(function() {
+  var fs2 = require('fs');
+  var filesToCheck = ['core/ui-board.js', 'core/ui.js'];
+  var violations = [];
+  filesToCheck.forEach(function(f) {
+    var lines = fs2.readFileSync(f, 'utf8').split('\n');
+    // Find all hook definitions and their first call sites
+    var hookDefs = {};
+    lines.forEach(function(l, i) {
+      var m = l.match(/^function (use[A-Z]\w+)\s*\(/);
+      if (m) hookDefs[m[1]] = i;
+    });
+    // Find first call to each hook
+    Object.keys(hookDefs).forEach(function(hook) {
+      var defLine = hookDefs[hook];
+      for (var i = 0; i < defLine; i++) {
+        if (new RegExp('\\b' + hook + '\\s*\\(').test(lines[i]) &&
+            !new RegExp('function\\s+' + hook).test(lines[i])) {
+          violations.push(f + ': ' + hook + ' called at L' + (i+1) + ' before defined at L' + (defLine+1));
+          break;
+        }
+      }
+    });
+  });
+  assert('NA-230: all custom hooks defined before their first call site',
+    violations.length === 0, violations.slice(0,3).join(' | '));
+})();
+
+
+
+// NA-231: UX-11 — "Quick Adventure Start" renamed to "Adventure Seed" everywhere
+// NOTE: "Quick Adventure Start Pack" in ui.js is a separate named feature and is intentionally preserved.
+// Catches: label drift between BOARD_GEN_GROUPS, shared.js GENERATORS, engine.js markdown
+(function() {
+  var fs2 = require('fs');
+  var hits = [];
+  ['core/ui-board.js','core/engine.js','data/shared.js','core/ui-renderers.js'].forEach(function(f) {
+    var src = fs2.readFileSync(f,'utf8');
+    // Allow the Pack feature name in ui.js — that's a separate named feature
+    var lines = src.split('\n');
+    lines.forEach(function(l,i) {
+      if (/Quick Adventure Start/.test(l) && !/Pack/.test(l))
+        hits.push(f+':L'+(i+1)+': '+l.trim().slice(0,80));
+    });
+  });
+  assert('NA-231: "Quick Adventure Start" fully renamed to "Adventure Seed" (UX-11)',
+    hits.length === 0, hits.join(' | '));
+})();
+
+
+
+// NA-232: UX-04 — syncRole passed in sync prop group to BoardTopbar
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-232: UX-04 syncRole passed to BoardTopbar sync prop (player room chip)',
+    src.includes('role: syncObj ? syncObj.role') && src.includes('bt-room-chip'),
+    'syncRole must be passed in sync prop and bt-room-chip must exist in render');
+})();
+
+// NA-233: UX-10 — "Popcorn Initiative" renamed to "Turn Order" with explanation
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui.js', 'utf8');
+  assert('NA-233: UX-10 Turn Order tab — renamed from Initiative, explanation text present',
+    src.includes('Turn Order') &&
+    src.includes('After you act, choose who goes next') &&
+    !src.includes("}, '🏁 Initiative')"),
+    'Tab must be renamed to Turn Order and include explanation text');
+})();
+
+
+
+// NA-234: UX-07 — blp-sub text present on generator items (subtitles in left panel)
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  // Every generator group entry should have a sub field
+  var groups = src.match(/id:\s*'seed'[^}]+sub:/);
+  assert('NA-234: UX-07 generator sub-text — seed entry has sub field in BOARD_GEN_GROUPS',
+    !!groups && src.includes('blp-sub') && src.includes('blp-label-wrap'),
+    'BOARD_GEN_GROUPS entries must have sub field and render blp-sub + blp-label-wrap');
+})();
+
+// NA-235: UX-13 — Canvas Tools group has separator flag
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-235: UX-13 Tools group has separator:true and blp-separator CSS class used in render',
+    src.includes("id: 'tools'") && src.includes('separator: true') &&
+    src.includes('blp-separator'),
+    'Tools group must have separator:true and render with blp-separator class');
+})();
+
+// NA-236: UX-03 — Stress hint text present on major NPC card renderer
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-renderers.js', 'utf8');
+  assert('NA-236: UX-03 stress ≠ HP hint on NPC card (D&D convert orientation)',
+    src.includes('Stress') && src.includes('clears end of scene') && src.includes('Physique/Will'),
+    'Major NPC card must include inline stress rule hint');
+})();
+
+// NA-237: UX-09 — mobile topbar max-width breakpoint for world select
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('assets/css/theme.css', 'utf8');
+  assert('NA-237: UX-09 mobile topbar — mid-width breakpoint limits bt-world-select to 90px',
+    src.includes('max-width:700px') && src.includes('max-width:90px'),
+    'theme.css must have 521-700px breakpoint with max-width:90px on bt-world-select');
+})();
+
+
+
+// NA-238: UX-06 — Session Zero "Start Local Session" button and sessionStorage handoff
+(function() {
+  var fs2 = require('fs');
+  var szSrc  = fs2.readFileSync('campaigns/character-creation.html', 'utf8');
+  var brdSrc = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-238: UX-06 Session Zero local session bridge present',
+    szSrc.includes('ogma_sz_handoff') &&
+    szSrc.includes('Start Local Session') &&
+    brdSrc.includes('ogma_sz_handoff') &&
+    brdSrc.includes('from_session_zero') === false &&  // check we used the right field
+    brdSrc.includes("from === 'session_zero'"),
+    'character-creation.html must write ogma_sz_handoff; BoardApp must read and consume it');
+})();
+
+// NA-239: board.html default mode is prep (not play) — Session Zero lands in Prep mode
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('campaigns/board.html', 'utf8');
+  assert('NA-239: board.html defaults to mode=prep so Session Zero bridge opens in Prep mode',
+    src.includes("|| 'prep'") && !src.includes("|| 'play'"),
+    'board.html must default mode to prep, not play');
+})();
+
+
+
+// NA-240: Custom Card — cv4FrontCustom defined and registered in CV4_FRONTS
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-renderers.js', 'utf8');
+  assert('NA-240: Custom Card — cv4FrontCustom renderer defined and CV4_FRONTS[custom] registered',
+    src.includes('function cv4FrontCustom') &&
+    src.includes("custom: function(gid") &&
+    src.includes('CV4_CUSTOM_TYPES') &&
+    src.includes("cat: 'custom'"),
+    'cv4FrontCustom must be defined and registered in CV4_FRONTS with CV4_CUSTOM_TYPES');
+})();
+
+// NA-241: Custom Card — generateCard handles custom genId without engine call
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-241: Custom Card — generateCard has custom path and rerollCard guards it',
+    src.includes("genId === 'custom'") &&
+    src.includes("Custom Card added") &&
+    src.includes("genId === 'sticky' || existing.genId === 'custom'"),
+    'generateCard must handle custom, rerollCard must skip it');
+})();
+
+// NA-242: Custom Card — onUpdate wired through to renderCard for custom genId
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-242: Custom Card — BoardCard passes live onUpdate to renderCard for custom genId',
+    src.includes("genId === 'custom'") &&
+    src.includes('extractCardTitle') &&
+    src.includes('extractCardSummary') &&
+    src.includes('extractCardTags'),
+    'BoardCard must pass onUpdate to renderCard for custom cards to persist inline edits');
+})();
+
+
+
+// NA-243: Dead CSS removed — retired class families must not reappear in theme.css
+// Guards against re-introduction of bdf-*, bds-*, cc-zone*, bt-live*, board-root, bd-pin etc.
+(function() {
+  var fs2 = require('fs');
+  var css = fs2.readFileSync('assets/css/theme.css', 'utf8');
+  var dead = ['bdf-section', 'bds-boxes', 'cc-zone-card', 'bt-live-badge', 'bt-live-dot',
+              'board-root{', 'board-root #root', 'bd-pin{', 'bd-fallback', 'bd-rendered',
+              'bt-world-name{', 'cc-gm-only', 'cc-free-invoke{', 'cc-hdr-acts', 'cc-new-ripple'];
+  var hits = dead.filter(function(c) { return css.includes(c); });
+  assert('NA-243: Retired CSS classes (bdf-*, bds-*, cc-zone*, bt-live*, board-root, bd-pin etc.) absent from theme.css',
+    hits.length === 0,
+    'Reintroduced dead classes: ' + hits.join(', '));
+})();
+
+
+
+// NA-244: State broadcast — broadcastRef and broadcastPlayState wired in BoardApp
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-244: GM state broadcast — broadcastRef, broadcastPlayState, and onTableChange hook present',
+    src.includes('broadcastRef') &&
+    src.includes('broadcastPlayState') &&
+    src.includes('onTableChange') &&
+    src.includes('syncObj.broadcastState'),
+    'BoardApp must have broadcastRef, broadcastPlayState, onTableChange, and call syncObj.broadcastState');
+})();
+
+// NA-245: Auto-join — ?room= URL param triggers player connection on mount
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-245: Auto-join effect — BoardApp connects as player when ?room= in URL on mount',
+    src.includes('AUTO-JOIN') &&
+    src.includes("createTableSync(roomCode, 'player'") &&
+    src.includes('roomCode.length !== 4'),
+    'BoardApp must auto-connect as player when roomCode is 4 chars on mount');
+})();
+
+// NA-246: Shareable join link — room code button copies URL, separate disconnect button
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-246: Room code button copies shareable join link; disconnect is a separate × button',
+    src.includes('Join link copied') &&
+    src.includes('navigator.clipboard.writeText') &&
+    src.includes('board.html?mode=play&room='),
+    'Room code button must copy join URL via clipboard API');
+})();
+
+// NA-247: SW stale version fix — bare URL fallback on versioned asset cache miss
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('sw.js', 'utf8');
+  assert('NA-247: SW fetch handler strips ?v=N query on cache miss to prevent stale-version crash',
+    src.includes('bareUrl') &&
+    src.includes("url.split('?')[0]") &&
+    src.includes('caches.match(bareUrl)'),
+    'sw.js must try bare URL (without query) on versioned asset cache miss');
+})();
+
+// NA-248: CSP — connect-src and style-src-elem include required origins
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('_headers', 'utf8');
+  assert('NA-248: CSP _headers — connect-src includes cloudflareinsights, style-src-elem set explicitly',
+    src.includes('static.cloudflareinsights.com') &&
+    src.includes('style-src-elem'),
+    '_headers must include cloudflareinsights in connect-src and explicit style-src-elem directive');
+})();
+
+
+
+// NA-249: PlayerSurface — component defined, syncState wired, player_action handled on GM side
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-249: PlayerSurface component present, syncState wired, player_action handled',
+    src.includes('function PlayerSurface') &&
+    src.includes('setSyncState') &&
+    src.includes('ps-surface') &&
+    src.includes("data.type === 'player_action'") &&
+    src.includes('stress_update') &&
+    src.includes('h(PlayerSurface'),
+    'PlayerSurface must be defined, rendered in play path, and GM must handle player_action stress updates');
+})();
+
+// NA-250: PlayerSurface CSS — core layout classes present in theme.css
+(function() {
+  var fs2 = require('fs');
+  var css = fs2.readFileSync('assets/css/theme.css', 'utf8');
+  assert('NA-250: PlayerSurface CSS classes present in theme.css',
+    css.includes('.ps-surface') &&
+    css.includes('.ps-topbar') &&
+    css.includes('.ps-player') &&
+    css.includes('.ps-stress-box') &&
+    css.includes('.ps-conseq-input'),
+    'theme.css must have ps-surface, ps-topbar, ps-player, ps-stress-box, ps-conseq-input');
+})();
+
+// NA-251: TpDicePanel uses learn-fate visual language — dr-die classes, phase-based rendering
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-table.js', 'utf8');
+  assert('NA-251: TpDicePanel uses learn-fate visual language with phase-based rendering',
+    src.includes('tp-dice-v2') &&
+    src.includes('dr-die dr-die-pop') &&
+    src.includes('dr-die-pos') &&
+    src.includes("phase === 'flicker'") &&
+    src.includes("phase === 'reveal'") &&
+    src.includes("phase === 'done'") &&
+    src.includes('tpLcolHex'),
+    'TpDicePanel must use tp-dice-v2 class, dr-die-pop animation, phase machine, and hex ladder colours');
+})();
+
+// NA-252: Scene End button renders in BoardTurnBar with confirm dialog
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-252: Scene End button in BoardTurnBar with confirm dialog',
+    src.includes('board-scene-end') &&
+    src.includes('onEndScene') &&
+    src.includes("confirm('End scene?"),
+    'BoardTurnBar must render board-scene-end button with confirm before calling onEndScene');
+})();
+
+// NA-253: endScene clears all stress arrays (FCon p.30)
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-253: endScene clears phy and men stress arrays',
+    src.includes('function endScene()') &&
+    src.includes('p.phy.map(function() { return false; })') &&
+    src.includes('p.men.map(function() { return false; })'),
+    'endScene must reset every phy and men box to false');
+})();
+
+// NA-254: tp-dice-v2 CSS classes present in theme.css
+(function() {
+  var fs2 = require('fs');
+  var css = fs2.readFileSync('assets/css/theme.css', 'utf8');
+  assert('NA-254: tp-dice-v2 CSS classes present in theme.css',
+    css.includes('.tp-dice-v2') &&
+    css.includes('.tp-dice-who') &&
+    css.includes('.tp-dice-controls') &&
+    css.includes('.tp-dice-skill-pill') &&
+    css.includes('.tp-dice-history') &&
+    css.includes('.board-scene-end'),
+    'theme.css must include tp-dice-v2 layout classes and board-scene-end button style');
+})();
+
+// NA-255: removeFromTable function exists in useBoardBinder and is returned
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-255: removeFromTable in useBoardBinder — removes card by sourceId',
+    src.includes('function removeFromTable(sourceId)') &&
+    src.includes("c.sourceId !== sourceId") &&
+    src.includes('removeFromTable: removeFromTable'),
+    'useBoardBinder must define removeFromTable filtering by sourceId and return it');
+})();
+
+// NA-256: BoardCard renders remove-from-table button when card is on table
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-256: BoardCard has onRemoveFromTable prop and bc-remove-table button',
+    src.includes('var onRemoveFromTable = props.onRemoveFromTable') &&
+    src.includes('bc-remove-table') &&
+    src.includes('onRemoveFromTable(card.id)'),
+    'BoardCard must destructure onRemoveFromTable and render bc-remove-table button');
+})();
+
+// NA-257: cv4Card uses CSS 3D flip (cv4-flip-container, cv4-flipper, rotateY)
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-renderers.js', 'utf8');
+  assert('NA-257: cv4Card flip architecture — container, flipper, front, back faces',
+    src.includes('cv4-flip-container') &&
+    src.includes('cv4-flipper') &&
+    src.includes('cv4-front fd-card') &&
+    src.includes('cv4-back') &&
+    src.includes("rotateY(180deg)") &&
+    src.includes('setFlipped'),
+    'cv4Card must use cv4-flip-container with front/back faces and rotateY(180deg)');
+})();
+
+// NA-258: cv4Card flip respects reduced motion — display toggle instead of transform
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-renderers.js', 'utf8');
+  assert('NA-258: cv4Card flip reduced-motion fallback hides/shows faces via display',
+    src.includes("reduced && flipped ? 'none' : 'flex'") &&
+    src.includes("reduced && !flipped ? 'none' : 'flex'") &&
+    src.includes("perspective: reduced ? 'none'") &&
+    src.includes("transformStyle: reduced ? 'flat'"),
+    'Reduced-motion must toggle display:none/flex instead of CSS 3D transforms');
+})();
+
+// NA-259: Free invoke pips on aspect stickies (INV-01)
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-259: Aspect stickies render free invoke pips with add/consume',
+    src.includes('sticky-invokes') &&
+    src.includes('sticky-inv-pip') &&
+    src.includes('freeInvokes') &&
+    src.includes('sticky-inv-add'),
+    'Sticky card must render invoke pip row with filled/empty states and add button');
+})();
+
+// NA-260: Free invoke CSS classes in theme.css
+(function() {
+  var fs2 = require('fs');
+  var css = fs2.readFileSync('assets/css/theme.css', 'utf8');
+  assert('NA-260: Free invoke CSS classes present in theme.css',
+    css.includes('.sticky-invokes') &&
+    css.includes('.sticky-inv-pip') &&
+    css.includes('.sticky-inv-add') &&
+    css.includes('.sticky-inv-label'),
+    'theme.css must include sticky-invokes, sticky-inv-pip, sticky-inv-add, sticky-inv-label');
+})();
+
+// NA-261: Character sheet section in PlayerSurface (CHR-01)
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-261: PlayerSurface has expandable My Character sheet',
+    src.includes('ps-sheet') &&
+    src.includes('ps-sheet-toggle') &&
+    src.includes('ps-sheet-body') &&
+    src.includes('ps-sheet-sk-pill') &&
+    src.includes('My Character'),
+    'PlayerSurface must render ps-sheet with toggle, body, skill pills, and aspects');
+})();
+
+// NA-262: Character sheet CSS classes in theme.css
+(function() {
+  var fs2 = require('fs');
+  var css = fs2.readFileSync('assets/css/theme.css', 'utf8');
+  assert('NA-262: Character sheet CSS classes present in theme.css',
+    css.includes('.ps-sheet') &&
+    css.includes('.ps-sheet-toggle') &&
+    css.includes('.ps-sheet-body') &&
+    css.includes('.ps-sheet-sk-row') &&
+    css.includes('.ps-sheet-asp-val'),
+    'theme.css must include ps-sheet layout, toggle, body, skill row, aspect value classes');
+})();
+
+// NA-263: Boost card type in BOARD_GEN_GROUPS and BOARD_TYPE_COLOR
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-263: Boost card registered in gen groups and colour map',
+    src.includes("id: 'boost'") &&
+    src.includes("boost:") &&
+    src.includes("genId === 'boost'"),
+    'Boost must appear in BOARD_GEN_GROUPS, BOARD_TYPE_COLOR, and have creation logic');
+})();
+
+// NA-264: Boost card renders with invoke button and expired state
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-264: Boost card rendering — use invoke, expired label',
+    src.includes('board-boost') &&
+    src.includes('boost-use-btn') &&
+    src.includes('boost-expired-label') &&
+    src.includes("expired: true"),
+    'BoardCard must render boost with use-invoke button and expired state');
+})();
+
+// NA-265: Boost CSS classes in theme.css
+(function() {
+  var fs2 = require('fs');
+  var css = fs2.readFileSync('assets/css/theme.css', 'utf8');
+  assert('NA-265: Boost CSS classes present in theme.css',
+    css.includes('.board-boost') &&
+    css.includes('.boost-use-btn') &&
+    css.includes('.boost-expired') &&
+    css.includes('.boost-header'),
+    'theme.css must include board-boost, boost-use-btn, boost-expired, boost-header');
+})();
+
+// NA-266: Opposition ladder dropdown replaces number input
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-table.js', 'utf8');
+  assert('NA-266: Opposition Fate Ladder dropdown in TpDicePanel',
+    src.includes('tp-ladder-wrap') &&
+    src.includes('tp-ladder-dropdown') &&
+    src.includes('tp-ladder-opt') &&
+    src.includes('ladderOpen') &&
+    !src.includes('tp-dice-opp-input'),
+    'TpDicePanel must use ladder dropdown, not number input');
+})();
+
+// NA-267: Opposition ladder CSS classes in theme.css
+(function() {
+  var fs2 = require('fs');
+  var css = fs2.readFileSync('assets/css/theme.css', 'utf8');
+  assert('NA-267: Opposition ladder CSS classes present in theme.css',
+    css.includes('.tp-ladder-wrap') &&
+    css.includes('.tp-ladder-sel') &&
+    css.includes('.tp-ladder-dropdown') &&
+    css.includes('.tp-ladder-opt'),
+    'theme.css must include tp-ladder-wrap, tp-ladder-sel, tp-ladder-dropdown, tp-ladder-opt');
 })();
 
 console.log('Named assertions: '+(pass+fail)+' total  pass:'+pass+'  fail:'+fail);

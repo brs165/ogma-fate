@@ -8,6 +8,200 @@
 
 ---
 
+## 2026.03.387 — Custom Card + dead code removal + doc update
+
+**Custom Card — fully inline-editable cv4 card:**
+- New Canvas Tools entry: ✏️ Custom Card (*blank — fill in as you play*)
+- Type pill cycles: Aspect → NPC → Location → Clue → Other — each tints the card accent colour (green, blue, gold, purple, grey)
+- Title: click to edit inline, single-line input, confirms on Enter/blur
+- Notes: click to open resizable textarea (400 char max), confirms on blur, cancel on Escape
+- All edits persist via `updateCard → persistCanvas` (same IDB path as every other mutation)
+- Send to Table, Binder, export all work normally. Reroll button hidden (nothing to reroll)
+- CV4_HELP back panel with what/when/rule/invoke/compel examples
+- Context menu (right-click canvas) entry added
+- NA-240–242 regression guards
+
+**Dead code removed:**
+- `mdHeader()` and `mdWinLose()` in `engine.js` — both defined but never called; `toMarkdown` builds headers inline
+
+**Docs updated:** BOOTSTRAP.md, PROJECT_MEMORY.md, ROADMAP.md all updated to v387, QA 242/242.
+
+242/242 named · 59/59 unit · 89/89 export · 128/128 smoke.
+
+---
+
+## 2026.03.386 — UX Sprint 5: Session Zero local session bridge
+
+**Session Zero → board bridge (UX-06):**
+- `▶ Start Local Session — {WorldName}` button added to Session Zero summary screen, in an accent-bordered "Ready to play?" card
+- Writes `ogma_sz_handoff` to sessionStorage (world, partySize, hook, timestamp, from)
+- Navigates to `board.html?world={campId}`
+- `board.html` default mode changed from `play` to `prep` — Session Zero arrivals land in Prep, not hosting screen
+- `BoardApp` FP load effect reads handoff on first open: pre-populates 4 "Player N" slots at Refresh 3, fires toast, consumes handoff (one-read, then deleted)
+
+All 12 UX sprint items shipped across v384–v386. NA-238–239.
+
+239/239 named · 59/59 unit · 89/89 export · 128/128 smoke.
+
+---
+
+## 2026.03.385 — UX Sprints 2–4: remote play, generator discoverability, in-play rules access
+
+**Sprint 2 — Remote play clarity:**
+- UX-04: Player topbar shows persistent `🔗 Room XXXX` blue chip when connected. GM "▶ Live" chip gated to `syncRole === 'gm'`. NA-232.
+- UX-10: FP tracker tab renamed "🏁 Initiative" → "🏁 Turn Order" with descriptive tooltip. PopcornTracker header updated, inline rule added: *"After you act, choose who goes next — ally or enemy. No fixed order."* NA-233.
+
+**Sprint 3 — Generator discoverability:**
+- UX-07: Every generator item in left panel now shows a one-line subtitle (`blp-sub`): e.g. "Compel — make an aspect cause trouble". NA-234.
+- UX-13: Canvas Tools group (Aspect Sticky, Section Label, Custom Card) separated from content generators by top border + rename. `separator: true` flag → `blp-separator` CSS class. NA-235.
+
+**Sprint 4 — In-play rules access:**
+- UX-03: Major NPC cards show inline stress rule hint beneath stress tracks: *"Stress ≠ HP — clears end of scene. Physique/Will ≥3 → 6 boxes."* NA-236.
+- UX-09: Mobile topbar — `521–700px` breakpoint caps `bt-world-select` to `max-width:90px`, preventing overflow. NA-237.
+
+237/237 named · 59/59 unit · 89/89 export · 128/128 smoke.
+
+---
+
+## 2026.03.384 — UX Sprint 1: first-run orientation
+
+- **UX-11:** "Quick Adventure Start" renamed to **"Adventure Seed"** across `BOARD_GEN_GROUPS`, `shared.js`, engine.js markdown heading, `ui-renderers.js`. NA-231.
+- **UX-02:** PREP/PLAY button `title` attributes now full sentences explaining each mode's purpose.
+- **UX-01:** Empty canvas coach mark — shown once on first visit (canvas loaded, empty, Prep mode). Non-blocking banner at bottom. Dismissed to `fate_prefs_v1.coach_canvas_dismissed`.
+- **UX-05:** PLAY mode entry coach mark — shown once on first PLAY toggle. Explains two-canvas model: *"Prep cards are private. Use ● Send to Table on any Prep card to share it with players."*
+
+231/231 named · 59/59 unit · 89/89 export · 128/128 smoke.
+
+---
+
+## 2026.03.383 — Content sweep complete: Neon Abyss + The Long Road
+
+**Neon Abyss (7 fixes):**
+- 4 trouble dupes: augments corp property ×2, loyalty-for-sale ×2, corp scanner ×2, addiction ×2
+- 3 stunt dupes: Ghost Routine ≈ Ghost Protocol → "Clean Exit"; Targeting Uplink ≈ Target Designation → "Suppression Fire"; Street Cred ≈ Street Dealer → "Corpo Mole"
+
+**The Long Road (9 fixes):**
+- 4 trouble dupes: methods-can't-justify ×2, loyalty-living/guilt-dead ×2, kept-one-person-alive ×3 collapsed to ×1
+- 5 stunt dupes: Jury-Rig = Jury Rig (literal dupe) → "Hotwire"; Wasteland Ghost ≈ Ghost of the Wastes → "Ambush Predator"; Makeshift Mechanic ≈ Scrap Engineering → "Herbalist"; Scrapper ≈ Scrap Engineering → "Trade Route Knowledge"; Sure Shot ≈ Dead Shot → "Warning Shot"
+
+All 8 worlds now fully audited. 230/230 named · all suites clean.
+
+---
+
+## 2026.03.382 — Session Zero guides (all 8) + Victorian + Void Runners audits
+
+**Session Zero deepening — 6 guides added (completes all 8):**
+Fantasy, Cyberpunk, Space, Victorian, The Long After, The Long Road now all have "Building Your Character" section with Step 1–3, visual pyramid, world-flavoured examples, Physique/Will callout.
+
+**Gaslight Chronicles (4 fixes):** Trouble dupe; Iron Will ≈ Iron Nerve → "Coroner's Detachment"; Occult Knowledge ≈ Occult Library → "Dead Languages"; Underworld Contacts ≈ Street Knowledge → "Press Connections".
+
+**Void Runners (8 fixes):** 5 trouble dupes (alien contact ×3 collapsed, failing-ship dupe, addiction dupe); 3 stunt dupes (Ace Pilot → "Hard Burn"; Ship's Mechanic → "Salvage Expert"; Multilingual Liaison → "Crew Loyalty").
+
+---
+
+## 2026.03.381 — useBoardCards hook extraction
+
+Extracted from BoardApp: `cards`, `loaded`, `cardsRef`, `lastRemovedRef`, `lastRerolledRef`, `lastPlacedRef`, `persistCanvas`, `generateCard`, `updateCard`, `deleteCard`, `rerollCard`, `undoLast`, `exportCanvas`, `importCanvas`, IDB canvas load `useEffect`. BoardApp drops from ~1,130 to 971 lines. `_bcOnChange` ref pattern wires hook → `useBoardBinder` without circular dependency. `selectGen` preserved inline (sets `activeGen` in BoardApp).
+
+---
+
+## 2026.03.380 — QA hardening: 14 new assertions, data bugs fixed
+
+**14 new QA assertions (NA-217–230):**
+- NA-217: All `?v=N` stamps in HTML match current build number (stale cache detection)
+- NA-218: React CDN loaded before any core JS on every campaign page
+- NA-219: Dexie CDN loaded before db.js on every campaign page
+- NA-220: No core JS file loaded twice in any campaign page
+- NA-221: `OGMA_CONFIG.VERSION` matches sw.js `CACHE_NAME` build
+- NA-222: React aliases (`h`, `useState`, `useEffect`, `useRef`, `useCallback`, `Fragment`) defined in ui-primitives.js
+- NA-223: No top-level `const`/`let` in ui.js, ui-board.js, ui-table.js, ui-modals.js, db.js
+- NA-224: board.html exists and contains redirect or board UI
+- NA-225: Each campaign page loads its own matching data file
+- NA-226: `node --check` passes for all JS files in core/, data/, assets/js/
+- NA-227: `ErrorBoundary` class present in ui-primitives.js
+- NA-228: sw.js APP_SHELL references all 8 campaign pages
+- NA-229: No `undefined` values in generated output across all worlds and generators
+- NA-230: All custom hooks defined before their first call site
+
+**Data bugs surfaced by NA-229:**
+- `dVentiRealm.js` line 316: double-comma created sparse array hole at index 22 of `seed_locations` — `pick()` returned `undefined` ~3% of the time
+- Additional double-commas found and removed from `dVentiRealm.js` (3 more) and `western.js` (2)
+- `pick()` hardened with sparse-array fallback guard
+
+230/230 named · 59/59 unit · 89/89 export · 128/128 smoke.
+
+---
+
+## 2026.03.379 — Crash prevention QA (NA-212–216)
+
+**Five crash-prevention assertions added:**
+- NA-212: No `document.write()` in any HTML file
+- NA-213: `campMeta` defined before first property access in `BoardApp`
+- NA-214: `useBoardBinder` called after `campMeta` is declared
+- NA-215: CSP `_headers` allows `fonts.googleapis.com` and `fonts.gstatic.com`
+- NA-216: `campMeta`, `tables`, `campCanvasKey` all used after their `var` declaration
+
+**Regression verification:** Reintroducing the v378 ordering bug causes NA-213 and NA-214 to FAIL with the correct line numbers — confirmed the assertions catch their target.
+
+211/211 named · 59/59 unit · 89/89 export · 128/128 smoke.
+
+---
+
+## 2026.03.378 — Three production error fixes
+
+**Crash: `campMeta is undefined` (TypeError in BoardApp)**
+- `useBoardBinder(campId, campMeta.name, ...)` was called at line 1919 during `useBoardBinder` hook extraction (v375)
+- `var campMeta = getWorldMeta(campId)` was not derived until line 2015
+- Fix: moved `campMeta` derivation to top of `BoardApp` before any hook calls
+
+**Warning: `document.write()` unbalanced tree (36 HTML files)**
+- Conditional base-href used `document.write("<base href=\"/\">")` — triggers speculative parsing warning and is blocked by some CSPs
+- Fix: replaced across all 36 HTML files with `var _b=document.createElement("base"); _b.href="/"; document.head.appendChild(_b)`
+
+**CSP: Google Fonts blocked on production**
+- `_headers` had `style-src 'self' 'unsafe-inline'` with no external origins
+- Fix: added `https://fonts.googleapis.com` to `style-src` and `https://fonts.gstatic.com` to `font-src`
+
+**Not fixable in repo:** Cloudflare beacon integrity hash mismatch is edge-injected.
+
+211/211 named · 59/59 unit · 89/89 export · 128/128 smoke.
+
+---
+
+## 2026.03.377 — FCon content audit: 7 text violations fixed
+
+**CT-01 · `help/generators.html`:** Major NPC described as "refresh of 2" — corrected to 3 (two stunts ≤ three free slots = no refresh penalty).
+
+**CT-02/03/06 · `core/engine.js` + `core/ui-renderers.js`:** Three uses of "initiative roll / act in initiative" — FCon has no initiative roll or stat. Replaced with "each exchange" / "first action in the exchange" / "acting in the conflict".
+
+**CT-04 · `help/faq.html`:** Mild consequence recovery skipped the treatment requirement. Rewrote with full treatment-first mechanic and correct difficulties for all three tiers (Fair +2 / Great +4 / Fantastic +6).
+
+**CT-05 · `help/learn-fate.html`:** Stress description missing the critical "mark multiple boxes per hit" nuance — D&D converts assume one box per hit. Added explicit clarification and "clears at end of every scene".
+
+**CT-07 · `help/at-the-table.html`:** Consequence shown as "−2 on next Athletics" mechanical modifier. Consequences are aspects that can be invoked/compelled — they have no automatic penalty. Reframed correctly.
+
+211/211 named · 59/59 unit · 89/89 export · 128/128 smoke.
+
+---
+
+## 2026.03.376 — CHANGELOG catch-up + Shattered Kingdoms audit + Session Zero deepening
+
+**CHANGELOG + ROADMAP:** Entries written for v372–v375 (previously undocumented). ROADMAP header updated to v375.
+
+**Shattered Kingdoms content audit (11 fixes):**
+- 4 trouble duplicates replaced: prophecy ×2 → unique compacts/debts; weapon ×2 → one kept, one replaced; kingdoms-burn ×2 → one kept, one replaced
+- 2 stunt fixes: Shield Wall → Last Line (distinct from Shield Bash); Words of the First Age mixed-skill corrected (Lore +2 CA, not Lore +2 Provoke)
+- 1 old wound pair reduced (kept the more specific entry)
+- 1 succession current issue de-duped (kept "The Broken Throne", replaced "The Succession War Ignites" with "The Inquisition's Reach Extends")
+
+**Session Zero deepening — Dust and Iron + dVentiRealm:**
+- Both guides now have "Building Your Character" section: 3-step PL-03 summary (aspects → skill pyramid → stunt), world-flavoured HC/Trouble examples, visual pyramid with world-appropriate skill suggestions, Physique/Will stress callout, links to both Session Zero tool and board PL-03 join flow
+- All `sessionzero.html` links updated to `character-creation.html`
+
+208/208 named · 59/59 unit · 89/89 export · 128/128 smoke.
+
+---
+
 ## 2026.03.375 — React Architect review: architecture, dead code, ARIA
 
 **Crashes fixed:**

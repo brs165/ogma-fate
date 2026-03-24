@@ -8,10 +8,10 @@
   <script>/* Theme restore - must run before CSS to prevent flash of unstyled dark mode */
   (function(){try{var p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');var t=p.theme||localStorage.getItem('fate_theme')||localStorage.getItem('fate-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})()</script>
 <meta charset="UTF-8">
-  <script>if(location.protocol!=="file:"){document.write("<base href="/">");}</script><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <script>if(location.protocol!=="file:"){var _b=document.createElement("base");_b.href="/";document.head.appendChild(_b);}</script><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Void Runners - Campaign Guide</title>
 <link rel="icon" type="image/svg+xml" href="../assets/favicons/icon.svg">
-<link rel="stylesheet" href="../assets/css/theme.css?v=377">
+<link rel="stylesheet" href="../assets/css/theme.css?v=392">
 <style>
 .cg{max-width:680px;margin:0 auto;padding:24px 20px 80px;position:relative;z-index:1}
 .cg h1{font-size:var(--text-hero);font-weight:800;color:var(--text);margin-bottom:4px;letter-spacing:-0.02em}
@@ -48,7 +48,7 @@
   </nav>
   <div class="topbar-status">
     <a href="../help/index.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#128218; Help</a>
-    <a href="/campaigns/sessionzero.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#127917; Session Zero</a>
+    <a href="/campaigns/character-creation.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#127917; Session Zero</a>
     <a href="../about.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">About</a>
     <button class="btn btn-icon btn-ghost" onclick="(function(){var n=document.documentElement.getAttribute('data-theme')=='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var _p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}}');_p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p));}catch(_e){}this.setAttribute('aria-label',n==='dark'?'Switch to light mode':'Switch to dark mode');})()" title="Toggle theme" aria-label="Switch to dark mode" id="theme-toggle-btn">◑</button>
     <button class="topbar-hamburger btn btn-icon btn-ghost" id="topnav-hbg-new"
@@ -56,7 +56,7 @@
       onclick="(function(btn){var dd=btn.nextElementSibling;var open=dd.classList.toggle('open');btn.setAttribute('aria-expanded',open);})(this)">&#9776;</button>
     <div class="land-topnav-dropdown" id="topnav-dd-new">
       <a href="../help/index.html">&#128218; Help &amp; Wiki</a>
-      <a href="/campaigns/sessionzero.html">&#127917; Session Zero</a>
+      <a href="/campaigns/character-creation.html">&#127917; Session Zero</a>
       <a href="../about.html">About</a>
       <button class="btn btn-icon btn-ghost" onclick="(function(){var n=document.documentElement.getAttribute('data-theme')=='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var _p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}}');_p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p));}catch(_e){}this.setAttribute('aria-label',n==='dark'?'Switch to light mode':'Switch to dark mode');})()" title="Toggle theme" aria-label="Switch to dark mode" id="theme-toggle-btn">◑</button>
     </div>
@@ -107,6 +107,36 @@
 <div class="cg-sample">A jump gate station at the edge of authority jurisdiction with a customs officer who asks too many questions</div>
 <div class="cg-sample">An alien megastructure that has been emitting a repeating signal for ninety years</div>
 <div class="cg-sample">A black-market station hidden inside a declared exclusion zone</div>
+
+<h2>Building Your Character</h2>
+<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="../campaigns/character-creation.html?world=space">Session Zero tool</a> walks you through every step — or use the guide below.</p>
+
+<div class="cg-card">
+  <p style="margin:0 0 10px"><strong>Step 1 — Two aspects</strong></p>
+  <p style="margin:0 0 6px;font-size:var(--text-sm);color:var(--text-dim)">Your <strong>High Concept</strong> is who you are in one phrase. It can always be invoked or compelled. Your <strong>Trouble</strong> is the thing that makes your life complicated. The generator has 50+ — roll until one bites.</p>
+  <div class="cg-sample">Jump-Sick Pilot Who Flies Routes No One Else Will Touch</div>
+  <div class="cg-sample">My Ship Is All I Have Left and She's Failing</div>
+</div>
+
+<div class="cg-card">
+  <p style="margin:0 0 10px"><strong>Step 2 — Skill pyramid</strong></p>
+  <p style="margin:0 0 8px;font-size:var(--text-sm);color:var(--text-dim)">Assign skills in this shape: one at +4 (Great), two at +3 (Good), three at +2 (Fair), four at +1 (Average). Everything else is +0.</p>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:4px;margin:8px 0;font-size:var(--text-sm)">
+    <div style="background:color-mix(in srgb,var(--accent) 15%,transparent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);border-radius:4px;padding:3px 16px;font-weight:700">+4 · Drive or Shoot</div>
+    <div style="background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 20%,transparent);border-radius:4px;padding:3px 12px">+3 · Notice &amp; Crafts</div>
+    <div style="background:var(--inset);border:1px solid var(--border);border-radius:4px;padding:3px 10px;color:var(--text-dim)">+2 · three skills</div>
+    <div style="background:var(--inset);border:1px solid var(--border);border-radius:4px;padding:3px 10px;color:var(--text-muted)">+1 · Contacts &amp; three others</div>
+  </div>
+  <p style="margin:6px 0 0;font-size:var(--text-label);color:var(--text-muted)">Physique sets physical stress boxes (Fair +2 → 4 boxes, Good +3 → 6). Will sets mental stress boxes. Characters with neither above +0 have 3 boxes each.</p>
+</div>
+
+<div class="cg-card">
+  <p style="margin:0 0 10px"><strong>Step 3 — Stunt</strong></p>
+  <p style="margin:0 0 6px;font-size:var(--text-sm);color:var(--text-dim)">Choose one stunt from the Void Runners list. Void Runners stunts cover ship handling, vacuum survival, cargo negotiation, and jump navigation. Your refresh starts at 3; each additional stunt costs 1.</p>
+</div>
+
+<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="../campaigns/character-creation.html?world=space">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
+
 <h2>Content Overview</h2>
 <div class="cg-card"><p style="margin:0;font-size:var(--text-sm);line-height:2;color:var(--text-dim)">
 <strong>NPCs:</strong> 76 first names, 38 epithets, variety-matrix concepts, 50 troubles, 28 stunts<br>
@@ -126,7 +156,7 @@
 
 <div class="cg-cta">
 <a href="/campaigns/space.html" style="background:var(--accent,var(--c-blue));color:#fff">🎲 Open Generator</a>
-<a href="/campaigns/sessionzero.html" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
+<a href="/campaigns/character-creation.html" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
 </div>
 </div>
 
@@ -146,7 +176,7 @@
 })();
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dexie/4.0.10/dexie.min.js" integrity="sha384-3VWLzUTczDc/wazaoH+b5qG4iME0duPONRO281rRiaFkfpV/b3w5uxrvod7rCHcW" crossorigin="anonymous"></script>
-  <script src="../core/db.js?v=377"></script>
-<script src="../core/intro.js?v=377"></script>
+  <script src="../core/db.js?v=392"></script>
+<script src="../core/intro.js?v=392"></script>
 </body>
 </html>

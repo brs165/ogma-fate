@@ -8,12 +8,12 @@
       try {
         var p = new URLSearchParams(window.location.search);
         var world = p.get('world') || p.get('campId') || 'thelongafter';
-        var mode  = p.get('mode')  || 'play';
+        var mode  = p.get('mode')  || 'prep';
         var room  = p.get('room')  || '';
         var dest  = '/campaigns/' + world + '.html?canvas=1&mode=' + mode + (room ? '&room=' + room : '');
         window.location.replace(dest);
       } catch(e) {
-        window.location.replace('/campaigns/thelongafter.html?canvas=1&mode=play');
+        window.location.replace('/campaigns/thelongafter.html?canvas=1&mode=prep');
       }
     })();
   </script>

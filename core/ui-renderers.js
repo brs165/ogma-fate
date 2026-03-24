@@ -383,7 +383,7 @@ function SeedResult(props) {
   const [activeScene, setActiveScene] = useState(0);
   const sceneColors = ['var(--c-blue)', 'var(--c-purple)', 'var(--c-red)'];
   return h(FDCard, null,
-    h(FDId, {name: 'Quick Adventure Start', type: 'Seed'}),
+    h(FDId, {name: 'Adventure Seed', type: 'Seed'}),
     h(FDHdr, null, 'Setup'),
     h(FDSect, null,
       h(FDInfoBox, {label: 'Location', text: d.location, color: 'var(--c-blue)', tip: 'Where Session 1 opens'}),
@@ -910,6 +910,7 @@ var CV4_CAT = {
   mechanics: { color: 'var(--c-red,#f87171)'       },
   tool:      { color: 'var(--c-purple,#a78bfa)'    },
   pressure:  { color: 'var(--c-green,#34d399)'     },
+  custom:    { color: 'var(--text-muted,#888)'      },
 };
 
 var CV4_META = {
@@ -930,6 +931,7 @@ var CV4_META = {
   obstacle:     { cat: 'pressure',  icon: '\u25b2'  },
   countdown:    { cat: 'pressure',  icon: '\u23f3'  },
   constraint:   { cat: 'pressure',  icon: '\u2298'  },
+  custom:       { cat: 'custom',    icon: '\u270e'  },
 };
 
 var CV4_HELP = {
@@ -1051,6 +1053,13 @@ var CV4_HELP = {
     rule: 'Constraints do not deal stress, they change the rules. Bypass requires specific fiction, not a high roll.',
     invoke: 'The constraint is \u201cNo Weapons Inside the Negotiation Chamber\u201d. Invoke it on a Contacts roll to establish that a PC has a contact who can smuggle one in \u2014 using the rule as the hook.',
     compel: 'Same constraint. A PC goes for their weapon anyway \u2014 compel their impulsive trouble. Guards move. The room goes hostile. Fate point, and the negotiation just became a conflict.',
+  },
+  custom: {
+    what: 'A blank card you fill in yourself \u2014 title, type, and notes all editable in place.',
+    when: 'Any time the generators produce something close but not quite right, or you need to capture an improvised NPC, location, aspect, or clue right now.',
+    rule: 'Click the title or notes to edit. Tap the type pill to cycle: Aspect \u2192 NPC \u2192 Location \u2192 Clue \u2192 Other. The type tints the card accent colour for quick visual scanning. Send to Table works normally.',
+    invoke: 'You improvised an NPC mid-scene and named them. Create a custom card with type NPC, write their aspect and peak skill in the notes. Now it\u2019s a real card you can send to the table and invoke from.',
+    compel: 'You noted a location detail as a custom Aspect card: \u201cThe Chandelier Is Hanging by One Chain.\u201d Compel it against the most reckless PC \u2014 they notice it, and they have an idea.',
   },
 };
 
@@ -1303,8 +1312,8 @@ function cv4BackPanel(genId, catColor) {
 }
 
 // ── Field Dispatch cv4Card ─────────────────────────────────────────────────
-// Auto-height. No fixed width/height. Stamp band top. No flip — GM guidance
-// lives in a collapsible footer section below the card content.
+// CSS 3D flip: front = card content, back = GM guidance. Front drives height,
+// back scrolls if taller. Reduced-motion: instant toggle, no transform.
 function cv4Card(props) {
   var genId    = props.genId;
   var campName = props.campName || '';
@@ -1312,10 +1321,10 @@ function cv4Card(props) {
   var frontFn  = props.frontFn;
   var onUpdate = props.onUpdate || null;
 
-  var _gmOpen = useState(false); var gmOpen = _gmOpen[0]; var setGmOpen = _gmOpen[1];
-  var _hov    = useState(false); var hovered = _hov[0];   var setHovered = _hov[1];
-  var _vis    = useState(true);  var visible = _vis[0];   var setVisible = _vis[1];
-  var reduced = cv4UseReducedMotion();
+  var _flipped = useState(false); var flipped = _flipped[0]; var setFlipped = _flipped[1];
+  var _hov     = useState(false); var hovered = _hov[0];     var setHovered = _hov[1];
+  var _vis     = useState(true);  var visible = _vis[0];     var setVisible = _vis[1];
+  var reduced  = cv4UseReducedMotion();
 
   var phyMax = typeof data.physical_stress === 'number' ? data.physical_stress : (typeof data.stress === 'number' ? data.stress : 0);
   var menMax = typeof data.mental_stress === 'number' ? data.mental_stress : 0;
@@ -1355,36 +1364,14 @@ function cv4Card(props) {
   var genLabel = genId.replace(/_/g, ' ').toUpperCase();
   var ariaLabel = genLabel + ' card' + (campName ? ' from ' + campName : '');
 
-  return h('div', {
-    className: 'fd-card',
-    role: 'region',
-    'aria-label': ariaLabel,
-    onMouseEnter: function() { setHovered(true); },
-    onMouseLeave: function() { setHovered(false); },
-    style: {
-      background: 'var(--cv-card-dark,var(--panel))',
-      border: '1px solid ' + (hovered ? catColor + 'AA' : 'var(--cv-card-bdr,var(--border))'),
-      borderRadius: 3,
-      overflow: 'hidden',
-      display: 'flex',
-      flexDirection: 'column',
-      boxShadow: hovered
-        ? '5px 7px 0 rgba(0,0,0,0.18), 0 0 0 1px ' + catColor + '44'
-        : '3px 3px 0 rgba(0,0,0,0.18)',
-      transform: hovered ? 'translateY(-3px) rotate(0.25deg)' : 'none',
-      transition: 'transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s ease, border-color 0.15s',
-      animation: reduced ? 'none' : 'fd-stamp-in 0.35s cubic-bezier(0.34,1.56,0.64,1) both',
-      opacity: visible ? 1 : 0,
-    },
-  },
-    // ── Stamp band ────────────────────────────────────────────────────────
-    h('div', {style:{
-      height: 5,
-      background: catColor,
-      flexShrink: 0,
-    }}),
-    // ── Header ────────────────────────────────────────────────────────────
-    h('div', {style:{
+  // Shared stamp band
+  function stampBand() {
+    return h('div', {style:{height: 5, background: catColor, flexShrink: 0}});
+  }
+
+  // Shared header
+  function cardHeader(label) {
+    return h('div', {style:{
       height: 34, flexShrink: 0,
       borderBottom: '1px solid ' + catColor + '33',
       display: 'flex', alignItems: 'center', padding: '0 14px', gap: 8,
@@ -1394,59 +1381,107 @@ function cv4Card(props) {
       h('span', {style:{
         fontSize:10, fontWeight:800, letterSpacing:'0.22em', color:catColor,
         fontFamily:CV4_MONO, textTransform:'uppercase'
-      }}, genLabel),
+      }}, label),
       h('div', {style:{flex:1}}),
       campName && h('span', {style:{
         fontSize:10, color:'var(--cv-card-text-muted)', fontFamily:CV4_MONO,
         letterSpacing:'0.08em', fontStyle:'italic'
       }}, campName)
-    ),
-    // ── Card body ─────────────────────────────────────────────────────────
-    h('div', {style:{flexShrink:0}},
-      frontFn(genId, data, campName, catColor, {state:cardState, upd:updState, phyMax:phyMax, menMax:menMax})
-    ),
-    // ── GM Guidance footer (expandable — smooth slide, BDR-03) ────────────
-    h('div', {
+    );
+  }
+
+  // Flip trigger button
+  function flipBtn(label, chevron) {
+    return h('button', {
+      onClick: function(e){ e.stopPropagation(); setFlipped(function(v){return !v;}); },
+      onKeyDown: function(e){ if(e.key==='Enter'||e.key===' '){e.preventDefault();setFlipped(function(v){return !v;});} },
+      'aria-label': flipped ? 'Show card front' : 'Show GM guidance',
       style:{
+        width:'100%', height:28, background:'transparent', border:'none',
         borderTop: '1px solid ' + catColor + '22',
-        flexShrink: 0,
-      }
+        cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
+        gap:6, fontFamily:CV4_MONO, fontSize:10, fontWeight:700, letterSpacing:'0.18em',
+        color: catColor,
+        textTransform:'uppercase',
+      },
+    }, h('span', {style:{fontSize:10, lineHeight:1}}, chevron), label);
+  }
+
+  return h('div', {
+    className: 'cv4-flip-container',
+    role: 'region',
+    'aria-label': ariaLabel,
+    onMouseEnter: function() { setHovered(true); },
+    onMouseLeave: function() { setHovered(false); },
+    style: {
+      perspective: reduced ? 'none' : '1000px',
+      animation: reduced ? 'none' : 'fd-stamp-in 0.35s cubic-bezier(0.34,1.56,0.64,1) both',
+      opacity: visible ? 1 : 0,
     },
-      h('button', {
-        onClick: function(e){ e.stopPropagation(); setGmOpen(function(v){return !v;}); },
-        onKeyDown: function(e){ if(e.key==='Enter'||e.key===' '){e.preventDefault();setGmOpen(function(v){return !v;});} },
-        'aria-expanded': String(gmOpen),
-        'aria-controls': 'gm-guide-'+genId,
-        style:{
-          width:'100%', height:28, background:'transparent', border:'none',
-          cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
-          gap:6, fontFamily:CV4_MONO, fontSize:10, fontWeight:700, letterSpacing:'0.18em',
-          color: gmOpen ? catColor : 'var(--cv-card-text-muted)',
-          textTransform:'uppercase',
-          transition:'color 0.18s',
+  },
+    h('div', {
+      className: 'cv4-flipper' + (flipped ? ' cv4-flipped' : ''),
+      style: {
+        position: 'relative',
+        transformStyle: reduced ? 'flat' : 'preserve-3d',
+        transition: reduced ? 'none' : 'transform 0.5s cubic-bezier(0.4,0,0.2,1)',
+        transform: flipped ? (reduced ? 'none' : 'rotateY(180deg)') : 'none',
+      },
+    },
+      // ── FRONT ─────────────────────────────────────────────────────────
+      h('div', {
+        className: 'cv4-face cv4-front fd-card',
+        style: {
+          backfaceVisibility: 'hidden',
+          WebkitBackfaceVisibility: 'hidden',
+          background: 'var(--cv-card-dark,var(--panel))',
+          border: '1px solid ' + (hovered ? catColor + 'AA' : 'var(--cv-card-bdr,var(--border))'),
+          borderRadius: 3,
+          overflow: 'hidden',
+          display: reduced && flipped ? 'none' : 'flex',
+          flexDirection: 'column',
+          boxShadow: hovered
+            ? '5px 7px 0 rgba(0,0,0,0.18), 0 0 0 1px ' + catColor + '44'
+            : '3px 3px 0 rgba(0,0,0,0.18)',
+          transform: hovered && !flipped ? 'translateY(-3px) rotate(0.25deg)' : 'none',
+          transition: 'transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s ease, border-color 0.15s',
         },
       },
-        h('span', {style:{
-          fontSize:10, lineHeight:1,
-          display:'inline-block',
-          transform: gmOpen ? 'rotate(90deg)' : 'rotate(0deg)',
-          transition:'transform 0.22s cubic-bezier(0.34,1.56,0.64,1)',
-        }}, '\u25ba'),
-        'GM Guidance'
+        stampBand(),
+        cardHeader(genLabel),
+        h('div', {style:{flexShrink:0}},
+          frontFn(genId, data, campName, catColor, {state:cardState, upd:updState, phyMax:phyMax, menMax:menMax, onUpdate:onUpdate})
+        ),
+        flipBtn('GM Guidance', '\u25ba')
       ),
+      // ── BACK ──────────────────────────────────────────────────────────
       h('div', {
-        id: 'gm-guide-'+genId,
-        'aria-hidden': String(!gmOpen),
-        style:{
-          borderTop: gmOpen ? '1px solid ' + catColor + '22' : 'none',
-          maxHeight: gmOpen ? '600px' : '0px',
+        className: 'cv4-face cv4-back',
+        style: {
+          backfaceVisibility: 'hidden',
+          WebkitBackfaceVisibility: 'hidden',
+          transform: reduced ? 'none' : 'rotateY(180deg)',
+          position: reduced ? 'relative' : 'absolute',
+          top: 0, left: 0, right: 0,
+          minHeight: '100%',
+          background: 'var(--cv-card-dark,var(--panel))',
+          border: '1px solid ' + (hovered ? catColor + 'AA' : 'var(--cv-card-bdr,var(--border))'),
+          borderRadius: 3,
           overflow: 'hidden',
-          transition: gmOpen
-            ? 'max-height 0.32s cubic-bezier(0.4,0,0.2,1), opacity 0.18s ease 0.06s'
-            : 'max-height 0.22s cubic-bezier(0.4,0,0.2,1), opacity 0.12s ease',
-          opacity: gmOpen ? 1 : 0,
-        }
-      }, cv4BackPanel(genId, catColor))
+          display: reduced && !flipped ? 'none' : 'flex',
+          flexDirection: 'column',
+          boxShadow: hovered
+            ? '5px 7px 0 rgba(0,0,0,0.18), 0 0 0 1px ' + catColor + '44'
+            : '3px 3px 0 rgba(0,0,0,0.18)',
+        },
+      },
+        stampBand(),
+        cardHeader('GM GUIDANCE'),
+        h('div', {style:{flex:1, overflowY:'auto', maxHeight:400}},
+          cv4BackPanel(genId, catColor)
+        ),
+        flipBtn('\u25c0 Back', '')
+      )
     )
   );
 }
@@ -1499,6 +1534,9 @@ function cv4FrontNpcMajor(genId, d, campName, catColor, ctx) {
     h('div',{style:{display:'flex',flexDirection:'column',gap:5}},
       cv4StressTrack('PHY', phyHits.length ? phyHits : Array(d.physical_stress||3).fill(false), setPhy, 'var(--gold,#fbbf24)'),
       cv4StressTrack('MEN', menHits.length ? menHits : Array(d.mental_stress||3).fill(false), setMen, 'var(--c-purple,#a78bfa)'),
+      h('div',{style:{fontSize:9,color:'var(--text-muted)',fontFamily:'var(--font-ui)',lineHeight:1.3,marginTop:1,fontStyle:'italic'}},
+        'Stress \u2260 HP \u2014 clears end of scene. Physique/Will \u22653 \u2192 6 boxes.'
+      ),
       h('div',{style:{display:'flex',flexDirection:'column',gap:3}},
         cv4Lbl('CONSEQUENCES',catColor),
         [['Mild','var(--c-blue,#60a5fa)',2],['Moderate','var(--gold,#fbbf24)',4],['Severe','var(--c-red,#f87171)',6]].map(function(row){
@@ -1922,12 +1960,130 @@ function cv4FrontPc(genId, d, campName, catColor) {
   ], 220);
 }
 
+// ── cv4FrontCustom — fully inline-editable blank card ─────────────────────
+// GM creates this during play. Title, type, and body are all editable in place.
+// Type cycles through common Fate card categories and tints the card accent.
+var CV4_CUSTOM_TYPES = [
+  {id:'aspect',   label:'Aspect',   color:'var(--c-green,#34d399)'},
+  {id:'npc',      label:'NPC',      color:'var(--c-blue,#60a5fa)'},
+  {id:'location', label:'Location', color:'var(--gold,#fbbf24)'},
+  {id:'clue',     label:'Clue',     color:'var(--c-purple,#a78bfa)'},
+  {id:'other',    label:'Other',    color:'var(--text-muted,#888)'},
+];
+
+function cv4FrontCustom(genId, d, campName, catColor, onUpdate) {
+  var _editTitle = useState(false); var editTitle = _editTitle[0]; var setEditTitle = _editTitle[1];
+  var _editBody  = useState(false); var editBody  = _editBody[0];  var setEditBody  = _editBody[1];
+  var _title = useState(d.title || 'Untitled'); var draftTitle = _title[0]; var setDraftTitle = _title[1];
+  var _body  = useState(d.body  || '');         var draftBody  = _body[0];  var setDraftBody  = _body[1];
+
+  var typeId    = d.type || 'aspect';
+  var typeEntry = CV4_CUSTOM_TYPES.find(function(t){return t.id===typeId;}) || CV4_CUSTOM_TYPES[0];
+  var typeColor = typeEntry.color;
+
+  function commitTitle() {
+    setEditTitle(false);
+    var val = draftTitle.trim() || 'Untitled';
+    setDraftTitle(val);
+    if (onUpdate && val !== d.title) onUpdate({title: val, body: d.body, type: d.type});
+  }
+  function commitBody() {
+    setEditBody(false);
+    if (onUpdate && draftBody !== d.body) onUpdate({title: d.title, body: draftBody, type: d.type});
+  }
+  function cycleType() {
+    var idx = CV4_CUSTOM_TYPES.findIndex(function(t){return t.id===typeId;});
+    var next = CV4_CUSTOM_TYPES[(idx+1) % CV4_CUSTOM_TYPES.length];
+    if (onUpdate) onUpdate({title: d.title, body: d.body, type: next.id});
+  }
+
+  return h('div', {style:{flex:1, padding:'10px 14px 12px', display:'flex', flexDirection:'column', gap:8}},
+
+    // ── Type pill (clickable — cycles through types) ──────────────────────
+    h('button', {
+      onClick: cycleType,
+      title: 'Click to change type',
+      style:{
+        alignSelf:'flex-start', background:'color-mix(in srgb,'+typeColor+' 15%,transparent)',
+        border:'1px solid color-mix(in srgb,'+typeColor+' 40%,transparent)',
+        borderRadius:4, padding:'2px 8px', fontSize:10, fontWeight:700,
+        fontFamily:CV4_MONO, color:typeColor, cursor:'pointer', letterSpacing:'0.12em',
+        textTransform:'uppercase', lineHeight:1.4,
+      },
+    }, typeEntry.label + ' \u00b7 tap to change'),
+
+    // ── Title ─────────────────────────────────────────────────────────────
+    editTitle
+      ? h('input', {
+          autoFocus: true,
+          value: draftTitle,
+          maxLength: 80,
+          style:{
+            fontSize:14, fontWeight:700, color:'var(--text)', background:'transparent',
+            border:'none', borderBottom:'2px solid '+typeColor, outline:'none',
+            width:'100%', fontFamily:CV4_MONO, padding:'2px 0',
+          },
+          onChange: function(e){ setDraftTitle(e.target.value); },
+          onBlur: commitTitle,
+          onKeyDown: function(e){
+            if(e.key==='Enter'){ e.preventDefault(); commitTitle(); }
+            if(e.key==='Escape'){ setDraftTitle(d.title||'Untitled'); setEditTitle(false); }
+          },
+          onClick: function(e){ e.stopPropagation(); },
+        })
+      : h('div', {
+          onClick: function(e){ e.stopPropagation(); setDraftTitle(draftTitle); setEditTitle(true); },
+          title: 'Click to edit title',
+          style:{
+            fontSize:14, fontWeight:700, color:'var(--text)', fontFamily:CV4_MONO,
+            cursor:'text', lineHeight:1.3, borderBottom:'1px dashed transparent',
+            paddingBottom:2,
+          },
+          onMouseEnter: function(e){ e.currentTarget.style.borderBottomColor=typeColor+'66'; },
+          onMouseLeave: function(e){ e.currentTarget.style.borderBottomColor='transparent'; },
+        }, draftTitle || h('span',{style:{color:'var(--text-muted)',fontStyle:'italic'}},'Untitled')),
+
+    // ── Body ──────────────────────────────────────────────────────────────
+    editBody
+      ? h('textarea', {
+          autoFocus: true,
+          value: draftBody,
+          maxLength: 400,
+          rows: 4,
+          style:{
+            fontSize:11, color:'var(--text)', background:'var(--inset,rgba(0,0,0,.08))',
+            border:'1px solid '+typeColor+'66', borderRadius:4, outline:'none',
+            width:'100%', resize:'vertical', fontFamily:CV4_SANS, padding:'6px 8px',
+            lineHeight:1.55,
+          },
+          onChange: function(e){ setDraftBody(e.target.value); },
+          onBlur: commitBody,
+          onKeyDown: function(e){
+            if(e.key==='Escape'){ setDraftBody(d.body||''); setEditBody(false); }
+          },
+          onClick: function(e){ e.stopPropagation(); },
+          placeholder: 'Notes, aspects, stats, anything\u2026',
+        })
+      : h('div', {
+          onClick: function(e){ e.stopPropagation(); setDraftBody(draftBody); setEditBody(true); },
+          title: 'Click to edit notes',
+          style:{
+            fontSize:11, color: draftBody ? 'var(--text-dim)' : 'var(--text-muted)',
+            fontStyle: draftBody ? 'normal' : 'italic',
+            lineHeight:1.55, cursor:'text', whiteSpace:'pre-wrap',
+            minHeight:40, padding:'4px 0',
+          },
+        }, draftBody || 'Click to add notes\u2026')
+  );
+}
+
 var CV4_FRONTS = {
   npc_minor:cv4FrontNpcMinor, npc_major:cv4FrontNpcMajor, faction:cv4FrontFaction,
   scene:cv4FrontScene, campaign:cv4FrontCampaign, encounter:cv4FrontEncounter, seed:cv4FrontSeed,
   compel:cv4FrontCompel, challenge:cv4FrontChallenge, contest:cv4FrontContest, consequence:cv4FrontConsequence,
   complication:cv4FrontComplication, pc:cv4FrontPc, backstory:cv4FrontBackstory, obstacle:cv4FrontObstacle,
   countdown:cv4FrontCountdown, constraint:cv4FrontConstraint,
+  custom: function(gid, d, cn, cc, opts) { return cv4FrontCustom(gid, d, cn, cc, opts && opts.onUpdate); },
 };
 
 function renderCard(genId, data, campId, onUpdate, worldStunts, onChainRoll) {

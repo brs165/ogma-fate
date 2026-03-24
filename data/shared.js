@@ -13,7 +13,7 @@ var GENERATORS = [
   {id:"scene",      label:"Scene Setup",      icon:"◉", sub:"Situation aspects · zones"},
   {id:"campaign",   label:"Campaign Frame",  icon:"◇", sub:"Current + impending + setting"},
   {id:"encounter",  label:"Encounter",        icon:"⚔", sub:"Opposition · stakes · twist"},
-  {id:"seed",       label:"Quick Adventure Start",   icon:"◎", sub:"3-scene skeleton · opposition · stakes · twist"},
+  {id:"seed",       label:"Adventure Seed",   icon:"◎", sub:"3-scene skeleton · opposition · stakes · twist"},
   {id:"compel",     label:"Compel",     icon:"⊗", sub:"Aspect situation · consequence · GM tip"},
   {id:"challenge",  label:"Challenge",        icon:"⬡", sub:"Series of overcome rolls · stakes · success/failure"},
   {id:"contest",    label:"Contest",          icon:"🏁", sub:"Opposed exchanges · victory track · twist on tie"},
@@ -195,7 +195,7 @@ var HELP_CONTENT = {
       "Know the defeat condition cold before you start. It creates the stakes that make the victory condition matter.",
       "The three-scene structure is a suggestion, not a script. Good sessions are messier and better than any outline."
     ],
-    title:"Quick Adventure Start",
+    title:"Adventure Seed",
     what: "A complete one-page scenario skeleton - location, objective, complication, three-scene structure, opposition, victory and defeat conditions, and a mid-scene twist. Everything needed to run a session from a standing start.",
     output: "Location · Objective · Complication · Scene 1 opening · Scene 2 midpoint · Scene 3 climax · Opposition · Victory/Defeat conditions · Twist · Campaign issue tie-in",
     rules: [
@@ -216,7 +216,7 @@ var HELP_CONTENT = {
     beginner: {
       what: "This generates a complete one-session adventure — a location, an objective, complications, three scenes, and win/lose conditions. Everything a GM needs to run a game night from a standing start, even with zero prep time.",
       terms: [
-        ["Quick Adventure Start", "A scenario seed for one session of play. Not a full script — just enough structure to start playing."],
+        ["Adventure Seed", "A scenario seed for one session of play. Not a full script — just enough structure to start playing."],
         ["Scene 1 / 2 / 3", "A three-scene arc: opening (drop players in), midpoint (complicate things), climax (resolve it). Flexible, not rigid."],
         ["Complication", "Something that forces the players to make a hard choice. Not just an obstacle — a dilemma."],
         ["Opening Hook", "The GM's very first sentence at the table. Sets the scene instantly. No preamble."],
@@ -727,7 +727,7 @@ var HELP_ENTRIES = [
     srd_url:"https://fate-srd.com/fate-condensed/conflicts",
   },
   {
-    id:"seed", icon:"◎", label:"Quick Adventure Start",
+    id:"seed", icon:"◎", label:"Adventure Seed",
     what:"A full one-page scenario skeleton: location, objective, complication, three-scene structure, opposition, victory/defeat conditions, and a mid-scene twist.",
     how:"An entire session from a standing start — read the opening hook as your first words, prep Scene 1 only, let the rest emerge.",
     tip:"A complete seed is one session of prep. Everything after Scene 1 is a reaction to the players, not a plan. The complication should force a choice, not just an obstacle.",
