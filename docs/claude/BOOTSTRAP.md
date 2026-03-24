@@ -32,7 +32,7 @@ Load order, encoding, paren balance, syntax, no-build-step contract. Flags anyth
 Canonical authority on Fate Condensed SRD. Flags when generator output violates FCon rules (stress model, refresh, stunt format, consequence recovery, initiative, create advantage tie). Also owns world voice — Neon Abyss copy that reads like The Long After is a bug. Cites section and page numbers. Flags Fate Core bleed explicitly.
 
 ### QA
-Runs last, has veto. 242/242 · 59/59 · 89/89 · 128/128 are the numbers. Adds a named assertion for every fixed bug — if it broke once, it has a test. Calls out when a fix is incomplete because the assertion range wasn't updated.
+Runs last, has veto. 269/269 · 59/59 · 89/89 · 128/128 are the numbers. Adds a named assertion for every fixed bug — if it broke once, it has a test. Calls out when a fix is incomplete because the assertion range wasn't updated.
 
 ### UX
 Measures: task completion rate, time-to-first-value, discoverability (below 50% = critical), learnability (5-minute test), mobile parity (375px viewport, 44px touch targets per HIG). Severity ratings: Critical / High / Moderate / Low / Delight. User segments: new GM, experienced player, D&D convert, complete beginner, solo prep GM, at-table group use. "If users can't find a feature, it doesn't exist" is a hard gate on any UI decision.
@@ -61,12 +61,12 @@ Offline-first browser PWA for Fate Condensed GMs. 16 generators × 8 worlds. No 
 |----------|---------|
 | `core/engine.js` | All `generate*()` functions, PRNG, table ops. Pure JS — no React/DOM. |
 | `core/ui.js` | `CampaignApp` shell — main campaign page component |
-| `core/ui-renderers.js` | 16 result renderers + `renderCard()` → `cv4Card` (600×380, 5 categories, GM guidance back, interactive stress/countdown/contest/consequence, world colour via CSS vars) |
-| `core/ui-table.js` | `PrepCanvas` + all Table canvas components |
+| `core/ui-renderers.js` | 16 result renderers + `renderCard()` → `cv4Card` (CSS 3D flip: front=content, back=GM Guidance. 5 categories, interactive stress/countdown/contest/consequence, world colour via CSS vars) |
+| `core/ui-table.js` | `PrepCanvas` + all Table canvas components. `TpDicePanel` (learn-fate visual language, phase machine, Fate Ladder dropdown). `TpTurnBar`. |
 | `core/ui-modals.js` | Modal, ShareDrawer, Settings, Vault, QuickFind, KBShortcuts |
 | `core/ui-primitives.js` | React aliases (`h`), FD card primitives, `ErrorBoundary`, `scoreAspect()` |
 | `core/ui-landing.js` | Landing page components |
-| `core/ui-board.js` | `BoardApp` — unified Prep/Play canvas. Play mode: `BoardPlayerRow`, `BoardTurnBar`, `BoardPlayPanel`, player/round/FP/sync state |
+| `core/ui-board.js` | `BoardApp` — unified Prep/Play canvas. Play mode: `BoardPlayerRow`, `BoardTurnBar` (+ Scene End button), `BoardPlayPanel`, `PlayerSurface` (+ My Character sheet), player/round/FP/sync state. `BoardCard` renders stickies (with free invoke pips), boosts (auto-expire), labels (`LABEL_STYLES`), and generated cards. `removeFromTable` bidirectional. |
 | `core/ui-run.js` | **STRIPPED v330** — tombstone only. `createTableSync` in `ui.js` is the live sync factory. |
 | `core/db.js` | Dexie 4 IDB wrapper, memStore fallback, `navigator.storage.persist()`, `DB.printCards()` — must live in second IIFE (`window.DB` block). First IIFE is localStorage prefs only. |
 | `core/config.js` | `OGMA_CONFIG`: `REPO_BASE` (auto-detect), `DEFAULT_SYNC_HOST` |
@@ -112,6 +112,10 @@ Offline-first browser PWA for Fate Condensed GMs. 16 generators × 8 worlds. No 
 | `cv4UseReducedMotion` and `cv4InjectStyles` must stay defined in `ui-renderers.js` | Both are called inside `cv4Card`. Removing them crashes every campaign page with a `ReferenceError`. They were accidentally dropped in v343 — v345 restores them. |
 | `ShareDrawer` and share-link button are removed | Both lived in `core/ui-modals.js` and `core/ui.js`. Do not re-add. Export lives entirely in `ExportMenu` (campaign) and `BoardExportMenu` (board). |
 | Card view must show all data fields | `cv4Front*` renderers in `ui-renderers.js` render every field in the generator output. When adding a new data field to a generator, update its `cv4Front*` function. Card view = dossier view in terms of information completeness. |
+| `LABEL_STYLES` must be defined before `BoardLabel` | v391 crash: constant was used but never declared. 5-colour array `{bg, border, text}`. If adding new canvas element types, define their style constants before the component that uses them. |
+| New canvas card types (`boost`, `sticky`, `label`) must be excluded from `genCards` filters | Four filter sites check `genId !== 'sticky' && genId !== 'boost' && genId !== 'label'`. Missing one causes boost/sticky cards to appear in export/print/binder gen list. |
+| `cv4Card` uses CSS 3D flip — do not re-add accordion GM Guidance | Front face has class `cv4-front fd-card` (fd-card for CSS compat). Back face is `cv4-back`. Flipper wrapper is `cv4-flipper`. Reduced-motion uses `display:none/flex` toggle. Do not reintroduce maxHeight accordion. |
+| `TpDicePanel` uses phase machine not setTimeout | States: `idle → flicker → reveal → done`. `flickerRef` and `revealRef` intervals drive the animation. Do not replace with a single `setTimeout` — the sequential die reveal depends on interval-based index increment. |
 
 ---
 
@@ -121,7 +125,7 @@ Offline-first browser PWA for Fate Condensed GMs. 16 generators × 8 worlds. No 
 # Syntax check core files
 node --check core/engine.js && node --check core/ui.js && node --check core/ui-table.js && node --check core/ui-board.js && node --check core/ui-renderers.js && node --check core/db.js
 
-# Named assertions (242/242)
+# Named assertions (269/269)
 node tests/qa_named.js
 
 # Export round-trip (89/89)

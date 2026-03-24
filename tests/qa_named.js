@@ -2625,5 +2625,679 @@ assert('NA-12 React theme-toggle aria-label dynamic', uiSrc.includes("'Switch to
     'theme.css must include tp-ladder-wrap, tp-ladder-sel, tp-ladder-dropdown, tp-ladder-opt');
 })();
 
+// NA-268: LABEL_STYLES defined before BoardLabel (v391 crash fix)
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  var defIdx = src.indexOf('var LABEL_STYLES');
+  var useIdx = src.indexOf('LABEL_STYLES[card.styleIdx');
+  assert('NA-268: LABEL_STYLES must be defined before BoardLabel uses it',
+    defIdx > 0 && useIdx > 0 && defIdx < useIdx,
+    'var LABEL_STYLES must appear before its first usage in BoardLabel');
+})();
+
+// NA-269: CSP connect-src includes Google Fonts domains for SW fetch
+(function() {
+  var fs2 = require('fs');
+  var hdr = fs2.readFileSync('_headers', 'utf8');
+  assert('NA-269: CSP connect-src includes fonts.googleapis.com and fonts.gstatic.com',
+    hdr.includes('connect-src') &&
+    hdr.includes('https://fonts.googleapis.com') &&
+    hdr.includes('https://fonts.gstatic.com'),
+    '_headers CSP connect-src must allow SW to fetch Google Fonts');
+})();
+
+// NA-270: renderCard accepts savedCardState (7th arg) and passes to cv4Card
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-renderers.js', 'utf8');
+  assert('NA-270: renderCard passes savedCardState to cv4Card',
+    src.includes('function renderCard(genId, data, campId, onUpdate, worldStunts, onChainRoll, savedCardState)') &&
+    src.includes('savedCardState:savedCardState'),
+    'renderCard must accept 7th arg savedCardState and pass it through to cv4Card props');
+})();
+
+// NA-271: cv4Card restores interactive state from savedCardState prop
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-renderers.js', 'utf8');
+  assert('NA-271: cv4Card accepts saved interactive state',
+    src.includes('var saved    = props.savedCardState') &&
+    src.includes('if (saved) return Object.assign'),
+    'cv4Card must read savedCardState prop and merge into initial useState');
+})();
+
+// NA-272: BoardCard wires onUpdate for non-custom generated cards (interactive state persistence)
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-272: BoardCard persists interactive state via onUpdate for all card types',
+    src.includes("onUpdate(card.id, { cardState: interactiveState })") &&
+    src.includes('card.cardState || null'),
+    'BoardCard must call onUpdate with cardState for generated cards and pass cardState to renderCard');
+})();
+
+// NA-273: Dice outcome hints with FCon explanations
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-table.js', 'utf8');
+  assert('NA-273: TpDicePanel shows FCon outcome explanations',
+    src.includes('tp-dice-outcome-hint') &&
+    src.includes('You get what you want + a boost') &&
+    src.includes('at a minor cost') &&
+    src.includes('may get worse'),
+    'TpDicePanel must render outcome hint with FCon p.21 explanations for SWS/Success/Tie/Fail');
+})();
+
+// NA-274: GM Fate Point Pool in useBoardPlayState
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-274: GM pool state + updGmPool + persistence + endScene reset',
+    src.includes('var gmPool') &&
+    src.includes('function updGmPool(delta)') &&
+    src.includes('gmPool: gmPool') &&
+    src.includes('var newPool = cleared.length'),
+    'useBoardPlayState must define gmPool, updGmPool, persist gmPool, and reset to player count on endScene');
+})();
+
+// NA-275: GM pool rendered in BoardPlayPanel with +/- buttons
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-275: BoardPlayPanel renders GM pool counter with controls',
+    src.includes('rs-gm-pool') &&
+    src.includes('GM Pool') &&
+    src.includes("updGmPool(-1)") &&
+    src.includes("updGmPool(1)"),
+    'BoardPlayPanel must render GM pool label, value, and +/- buttons');
+})();
+
+// NA-276: GM pool CSS in theme.css
+(function() {
+  var fs2 = require('fs');
+  var css = fs2.readFileSync('assets/css/theme.css', 'utf8');
+  assert('NA-276: GM pool CSS classes present in theme.css',
+    css.includes('.rs-gm-pool') &&
+    css.includes('.rs-gm-pool-label') &&
+    css.includes('.rs-gm-pool-val') &&
+    css.includes('.rs-gm-pool-hint'),
+    'theme.css must include rs-gm-pool layout, label, value, and hint classes');
+})();
+
+// NA-277: Outcome hint CSS in theme.css
+(function() {
+  var fs2 = require('fs');
+  var css = fs2.readFileSync('assets/css/theme.css', 'utf8');
+  assert('NA-277: Outcome hint CSS in theme.css',
+    css.includes('.tp-dice-outcome-hint'),
+    'theme.css must include tp-dice-outcome-hint class');
+})();
+
+// ── Sprint A assertions ──────────────────────────────────────────────────────
+
+// NA-278: Player dice rolling — psDoRoll exists in PlayerSurface
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-278: PlayerSurface has psDoRoll function with player_roll sync action',
+    src.includes('function psDoRoll(sk)') &&
+    src.includes("'player_roll'") &&
+    src.includes('ps-dice-skill-btn'),
+    'PlayerSurface must define psDoRoll, send player_roll action, and render skill buttons');
+})();
+
+// NA-279: Broadcast payload enriched with round, order, gmPool, rollHistory
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-279: broadcastPlayState includes round, order, gmPool, rollHistory',
+    src.includes("round: round, order: order, gmPool: gmPool, rollHistory: rollHistory"),
+    'Broadcast state must include round, order, gmPool, rollHistory for player visibility');
+})();
+
+// NA-280: Player turn indicator on PlayerSurface
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-280: PlayerSurface renders turn indicator bar',
+    src.includes('ps-turn-bar') &&
+    src.includes('ps-turn-you') &&
+    src.includes('Your turn!'),
+    'PlayerSurface must show turn bar with Your turn / You acted / All acted states');
+})();
+
+// NA-281: GM receives player_roll and adds to shared history
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-281: GM handles player_roll action — toast + addRoll + re-broadcast',
+    src.includes("data.action === 'player_roll'") &&
+    src.includes('addRoll(r)'),
+    'GM message handler must process player_roll, add to history, and re-broadcast');
+})();
+
+// NA-282: GM pool visible on PlayerSurface
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-282: PlayerSurface shows syncGmPool in turn bar',
+    src.includes('syncGmPool') &&
+    src.includes('ps-gm-pool'),
+    'PlayerSurface must read gmPool from syncState and render it');
+})();
+
+// ── Sprint B assertions ──────────────────────────────────────────────────────
+
+// NA-283: Session notes wired into BoardApp
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-283: Session notes floater rendered in BoardApp with SessionDoc',
+    src.includes('board-notes-floater') &&
+    src.includes('showNotes') &&
+    src.includes('SessionDoc'),
+    'BoardApp must render session notes floater using SessionDoc component');
+})();
+
+// NA-284: Help panel includes Conflicts with zones and exchanges
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-284: Help panel Conflicts section covers zones, exchanges, concede, taken out',
+    src.includes("'Zones'") &&
+    src.includes("'Exchange'") &&
+    src.includes("'Taken Out'") &&
+    src.includes('Challenges, Contests & Conflicts'),
+    'Help panel must have expanded Conflicts section');
+})();
+
+// NA-285: Player surface full-width cards
+(function() {
+  var fs2 = require('fs');
+  var css = fs2.readFileSync('assets/css/theme.css', 'utf8');
+  assert('NA-285: ps-card-wrap is full width, not 220px',
+    css.includes('.ps-card-wrap{width:100%}') &&
+    !css.includes('.ps-card-wrap{width:220px'),
+    'Player surface cards must be full-width');
+})();
+
+// NA-286: Quick NPC button in BoardPlayPanel
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-286: Quick NPC button in play mode',
+    src.includes('onQuickNpc') &&
+    src.includes("generateCard('npc_minor')") &&
+    src.includes('Quick NPC'),
+    'BoardPlayPanel must have Quick NPC button that generates npc_minor');
+})();
+
+// NA-287: Session start refresh — FCon p.19
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-287: startSession resets FP to max(refresh, current)',
+    src.includes('function startSession()') &&
+    src.includes('Math.max(p.ref || 3, p.fp || 0)') &&
+    src.includes('Start Session'),
+    'startSession must apply FCon p.19 refresh rule and render Start Session button');
+})();
+
+// NA-288: Keyboard shortcuts R=dice, F=fit-all
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-288: Keyboard R toggles dice roller, F fits all cards',
+    src.includes("e.key === 'r'") &&
+    src.includes('setShowDice') &&
+    src.includes("e.key === 'f'") &&
+    src.includes('fitAll()'),
+    'Keyboard handler must have R for dice and F for fit-all');
+})();
+
+// NA-289: Canvas zoom-to-fit function and button
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-289: fitAll function exists and button renders in zoom controls',
+    src.includes('function fitAll()') &&
+    src.includes("onClick: fitAll") &&
+    src.includes("'aria-label': 'Fit all cards'"),
+    'fitAll must compute bounds and set zoom/pan, with button in zoom bar');
+})();
+
+// NA-290: Player dice CSS classes in theme.css
+(function() {
+  var fs2 = require('fs');
+  var css = fs2.readFileSync('assets/css/theme.css', 'utf8');
+  assert('NA-290: Player surface dice and turn CSS present',
+    css.includes('.ps-dice-section') &&
+    css.includes('.ps-dice-skill-btn') &&
+    css.includes('.ps-turn-bar') &&
+    css.includes('.ps-turn-you') &&
+    css.includes('.ps-roll-history') &&
+    css.includes('.ps-gm-pool'),
+    'theme.css must include PS dice, turn indicator, roll history, and GM pool classes');
+})();
+
+// ── Sprint D assertions ──────────────────────────────────────────────────────
+
+// NA-291: Concede button in BoardPlayerRow
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-291: Concede button earns FP per consequence (FCon p.35)',
+    src.includes('rs-concede-btn') &&
+    src.includes('Concede') &&
+    src.includes('conseqCount'),
+    'BoardPlayerRow must have concede button with FP per consequence calculation');
+})();
+
+// NA-292: NPC cards in turn order
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-292: NPC cards rendered as pills in BoardTurnBar',
+    src.includes('npcCards') &&
+    src.includes('onToggleNpcActed') &&
+    src.includes('npc.acted'),
+    'BoardTurnBar must accept npcCards prop and render NPC pills with acted toggle');
+})();
+
+// NA-293: Consequence recovery hints on player row
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-293: Consequence recovery hints (end of scene/session/scenario)',
+    src.includes('end of next scene') &&
+    src.includes('end of session') &&
+    src.includes('end of scenario'),
+    'BoardPlayerRow must show recovery timeline hints for each consequence severity');
+})();
+
+// NA-294: Scene transition (clearTable + New Scene button)
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-294: Scene transition with clearTable and New Scene button',
+    src.includes('function clearTable()') &&
+    src.includes('onNewScene') &&
+    src.includes('New Scene'),
+    'useBoardBinder must have clearTable, BoardTurnBar must render New Scene button');
+})();
+
+// ── Sprint E assertions ──────────────────────────────────────────────────────
+
+// NA-295: Compel offer flow — GM button + broadcast + player banner
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-295: Compel offer flow (GM offer → player accept/refuse)',
+    src.includes('compelOffer') &&
+    src.includes("'compel_response'") &&
+    src.includes('ps-compel-banner') &&
+    src.includes('ps-compel-accept') &&
+    src.includes('ps-compel-refuse'),
+    'Must have compelOffer state, compel_response handler, and player banner with accept/refuse');
+})();
+
+// NA-296: Player creates aspect from device
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-296: Player create aspect (input → sync → GM gets sticky)',
+    src.includes("'player_create_aspect'") &&
+    src.includes('ps-create-aspect') &&
+    src.includes('psAspectName'),
+    'PlayerSurface must have create aspect input, send player_create_aspect, GM handles it');
+})();
+
+// ── Sprint F assertions ──────────────────────────────────────────────────────
+
+// NA-297: Quick reference section in help panel
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-297: Quick Reference section in BoardHelpPanel',
+    src.includes("id: 'quickref'") &&
+    src.includes('Quick Reference') &&
+    src.includes('Legendary'),
+    'Help panel must have Quick Reference section with full Fate Ladder');
+})();
+
+// NA-298: Inspiration prompts
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-298: What would happen inspiration prompts',
+    src.includes('INSPO_PROMPTS') &&
+    src.includes('bh-inspo-btn') &&
+    src.includes('rollInspo'),
+    'Help panel must have inspiration prompt array, button, and result display');
+})();
+
+// NA-299: Aspect coaching + Stunt format hint
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-299: Aspect coaching and stunt format tips in help panel',
+    src.includes('Aspect tip') &&
+    src.includes('invokable AND compellable') &&
+    src.includes('Stunt format') &&
+    src.includes('Because I'),
+    'Help panel must show aspect quality coaching and stunt format hint');
+})();
+
+// NA-300: Compel examples in Aspects section
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-300: Compel examples in Aspects & Invokes help section',
+    src.includes('Compel examples') &&
+    src.includes('Wanted By the Law') &&
+    src.includes('Curious to a Fault'),
+    'Help panel Aspects section must include world-neutral compel examples');
+})();
+
+// ── Board Export Panel assertions ────────────────────────────────────────────
+
+// NA-301: BoardExportPanel component with 8-format grid
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-301: BoardExportPanel has 8-format grid and card checklist',
+    src.includes('function BoardExportPanel') &&
+    src.includes('bep-fmt-grid') &&
+    src.includes('bep-card-list') &&
+    src.includes('bep-exec-btn') &&
+    src.includes("id:'md'") &&
+    src.includes("id:'json'") &&
+    src.includes("id:'prt'"),
+    'BoardExportPanel must render card checklist, 8-format grid, and execute button');
+})();
+
+// NA-302: Export page replaces canvas (not tab)
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-302: Export page renders as full canvas replacement',
+    src.includes('exportView') &&
+    src.includes('board-export-page') &&
+    src.includes('BoardExportPanel') &&
+    src.includes('onExportView'),
+    'BoardApp must have exportView state, render BoardExportPanel as full page, and wire onExportView to topbar');
+})();
+
+// NA-303: Export panel CSS classes
+(function() {
+  var fs2 = require('fs');
+  var css = fs2.readFileSync('assets/css/theme.css', 'utf8');
+  assert('NA-303: BoardExportPanel CSS present',
+    css.includes('.bep-fmt-grid') &&
+    css.includes('.bep-exec-btn') &&
+    css.includes('.bep-card-row') &&
+    css.includes('.bep-del-btn'),
+    'theme.css must include bep-fmt-grid, bep-exec-btn, bep-card-row, bep-del-btn');
+})();
+
+// ── Sprint G assertions ──────────────────────────────────────────────────────
+
+// NA-304: Multi-step undo stack
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-304: Multi-step undo stack replaces single refs',
+    src.includes('undoStackRef') &&
+    src.includes("type:'delete'") &&
+    src.includes("type:'reroll'") &&
+    src.includes('.slice(0, 10)'),
+    'useBoardCards must use undoStackRef with delete/reroll entries, max 10');
+})();
+
+// NA-305: Card search on canvas
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  var css = fs2.readFileSync('assets/css/theme.css', 'utf8');
+  assert('NA-305: Card search state + dimming + CSS',
+    src.includes('cardSearch') &&
+    src.includes('board-search') &&
+    src.includes('searchMatch') &&
+    css.includes('.board-search'),
+    'Board must have card search input, searchMatch filtering, and CSS');
+})();
+
+// NA-306: Move card to table removes from prep
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-306: Move to Table button (removes from prep)',
+    src.includes("title: 'Move to Table (removes from prep)'") &&
+    src.includes('onSendToTable(card); onDelete(card.id)'),
+    'BoardCard must have Move to Table button that sends then deletes');
+})();
+
+// NA-307: Session end summary
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-307: Session summary builds markdown log and copies to clipboard',
+    src.includes('Session Summary') &&
+    src.includes('onSessionSummary') &&
+    src.includes('Session summary copied'),
+    'Turn bar must have session summary button that builds and copies MD');
+})();
+
+// ── Sprint H assertions ──────────────────────────────────────────────────────
+
+// NA-308: Player reconnect recovery
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-308: Reconnect sends full state instead of duplicating player',
+    src.includes('reconnected') &&
+    src.includes('existing') &&
+    src.includes('broadcastRef.current'),
+    'GM handler must detect existing player on player_hello and re-broadcast');
+})();
+
+// NA-309: Toast queue for simultaneous messages
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-309: Toast queue drains sequentially',
+    src.includes('toastQueueRef') &&
+    src.includes('drainToast'),
+    'showToast must queue messages and drain with stagger');
+})();
+
+// NA-310: Max players guard
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-310: addPlayer rejects above 8 players',
+    src.includes('players.length >= 8'),
+    'addPlayer must guard at 8 max');
+})();
+
+// NA-311: Per-panel ErrorBoundary
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-311: BoardLeftPanel wrapped in ErrorBoundary',
+    src.includes('h(ErrorBoundary, null,') &&
+    src.includes('h(BoardLeftPanel,'),
+    'Left panel must be wrapped in per-panel ErrorBoundary');
+})();
+
+// NA-312: IDB storage quota warning
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-312: Storage quota check on mount',
+    src.includes('navigator.storage.estimate') &&
+    src.includes('Storage 80'),
+    'BoardApp must check storage.estimate on mount and warn at 80%');
+})();
+
+// NA-313: Export format versioning already present
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/db.js', 'utf8');
+  assert('NA-313: JSON exports include version field',
+    src.includes("version: 1, type: 'cards'") &&
+    src.includes("version: 1, type: 'canvas'"),
+    'Both exportCards and exportCanvasState must include version: 1');
+})();
+
+// NA-314: Print scene button in turn bar
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-314: Print scene button wired in BoardTurnBar',
+    src.includes('onPrintScene') &&
+    src.includes('Print'),
+    'Turn bar must have Print scene button');
+})();
+
+// ── Sprint C assertions ──────────────────────────────────────────────────────
+
+// NA-315: pendingInvoke state in BoardApp
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-315: pendingInvoke state exists in BoardApp',
+    src.includes('var _pendingInvoke') &&
+    src.includes('setPendingInvoke'),
+    'BoardApp must have pendingInvoke state for invoke workflow');
+})();
+
+// NA-316: TpDicePanel accepts and uses pendingInvoke
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-table.js', 'utf8');
+  assert('NA-316: TpDicePanel includes invoke bonus in roll total',
+    src.includes('var pendingInvoke = props.pendingInvoke') &&
+    src.includes('var invokeBonus = pendingInvoke ? 2 : 0') &&
+    src.includes('if (pendingInvoke) total += 2') &&
+    src.includes('onClearInvoke'),
+    'TpDicePanel must accept pendingInvoke, add +2 to total, and clear after roll');
+})();
+
+// NA-317: Invoke badge on dice panel
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-table.js', 'utf8');
+  var css = fs2.readFileSync('assets/css/theme.css', 'utf8');
+  assert('NA-317: Invoke badge renders on dice panel with CSS',
+    src.includes('tp-dice-invoke-badge') &&
+    src.includes('Free Invoke') &&
+    css.includes('.tp-dice-invoke-badge'),
+    'Dice panel must show invoke badge and CSS must be present');
+})();
+
+// NA-318: Free invoke on sticky triggers pendingInvoke
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-318: Sticky free invoke consume fires onInvoke',
+    src.includes("onInvoke({source: 'free', label: card.text") &&
+    src.includes('var onInvoke = props.onInvoke'),
+    'BoardCard sticky pip click must call onInvoke with source:free');
+})();
+
+// NA-319: Boost invoke triggers pendingInvoke
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-319: Boost use invoke fires onInvoke',
+    src.includes("onInvoke({source: 'free', label: card.text || 'Boost'}"),
+    'Boost useBoostInvoke must call onInvoke with source:free');
+})();
+
+// NA-320: Invoke button on generated cards
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-320: Invoke button in BoardCard action strip for generated cards',
+    src.includes("onInvoke({source: 'paid', label: card.title") &&
+    src.includes("title: 'Invoke aspect from this card (+2 next roll)'"),
+    'BoardCard must have invoke button for non-sticky/boost/label cards');
+})();
+
+// NA-321: Create Advantage outcome guide
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-table.js', 'utf8');
+  var css = fs2.readFileSync('assets/css/theme.css', 'utf8');
+  assert('NA-321: Create Advantage outcome guide in dice panel',
+    src.includes('tp-dice-ca-guide') &&
+    src.includes('Create Advantage') &&
+    src.includes('2 free invokes') &&
+    src.includes('1 free invoke') &&
+    src.includes('opponent gets free invoke') &&
+    css.includes('.tp-dice-ca-guide'),
+    'Dice panel must show CA outcome guide after roll with all 4 outcomes');
+})();
+
+// NA-322: onInvoke wired at BoardCard call site
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-322: onInvoke wired from BoardApp to BoardCard',
+    src.includes('onInvoke: function(inv) { setPendingInvoke(inv)') &&
+    src.includes('setShowDice(true)'),
+    'BoardCard call site must wire onInvoke to set pendingInvoke and open dice panel');
+})();
+
+// NA-323: Hook wiring audit script exists
+(function() {
+  var fs2 = require('fs');
+  assert('NA-323: Hook wiring audit script exists',
+    fs2.existsSync('tests/hook-wiring-audit.js'),
+    'tests/hook-wiring-audit.js must exist');
+})();
+
+// NA-324: Board card width 320px
+(function() {
+  var fs2 = require('fs');
+  var css = fs2.readFileSync('assets/css/theme.css', 'utf8');
+  assert('NA-324: Board card width is 320px for full-size cv4Cards',
+    css.includes('.board-card{') && css.includes('width:320px'),
+    'Board card must be 320px wide');
+})();
+
+// NA-325: Drag handle on board cards
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  var css = fs2.readFileSync('assets/css/theme.css', 'utf8');
+  assert('NA-325: Drag handle rendered on board cards',
+    src.includes('bc-drag-handle') && css.includes('.bc-drag-handle'),
+    'BoardCard must render bc-drag-handle and CSS must define it');
+})();
+
+// NA-326: cv4Card flip button labels
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-renderers.js', 'utf8');
+  assert('NA-326: Flip buttons say Tap for GM Guidance / Tap for Card Details',
+    src.includes('Tap for GM Guidance') &&
+    src.includes('Tap for Card Details'),
+    'cv4Card flip buttons must use tap-oriented labels');
+})();
+
+// NA-327: Export page CSS
+(function() {
+  var fs2 = require('fs');
+  var css = fs2.readFileSync('assets/css/theme.css', 'utf8');
+  assert('NA-327: Board export page CSS present',
+    css.includes('.board-export-page') &&
+    css.includes('.bep-back-btn') &&
+    css.includes('.bep-page-title'),
+    'theme.css must include export page, back button, and title CSS');
+})();
+
 console.log('Named assertions: '+(pass+fail)+' total  pass:'+pass+'  fail:'+fail);
 results.forEach(function(r){console.log(r);});

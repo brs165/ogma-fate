@@ -8,6 +8,35 @@
 
 ---
 
+## 2026.03.393 — Play sprint: 8 features across 4 sprints + 2 hotfixes
+
+**Sprint 1 — Dice roller redesign + Scene End:**
+- `TpDicePanel` rewritten with learn-fate visual language: 68px `dr-die` tiles, `flicker→reveal→done` phase machine with sequential pop animation, Fate Ladder hex colour palette via `tpLcolHex()`, vertical stacked layout (`tp-dice-v2`), expanded history (5 entries)
+- Scene End button in `BoardTurnBar`: `endScene()` clears all `phy`/`men` stress arrays to `false`, resets `acted` flags, persists to IDB, broadcasts to connected players, confirm dialog before clearing
+
+**Sprint 2 — Remove from table + Card flip:**
+- `removeFromTable(sourceId)` in `useBoardBinder`: filters play canvas IDB by `sourceId`, updates `playCardIds` Set, broadcasts, toasts "○ Removed from table"
+- Remove button on `BoardCard` table strip (✕) and `BoardDossier` footer ("○ Remove") — bidirectional table management
+- `cv4Card` rebuilt as CSS 3D flip: `cv4-flip-container > cv4-flipper > cv4-front + cv4-back`. Front = stamp band + header + card content + "▸ GM Guidance" trigger. Back = stamp band + "GM GUIDANCE" header + guidance body (scrollable 400px) + "◀ Back" trigger. 0.5s `rotateY(180deg)` transition. Reduced-motion fallback: `display:none/flex` toggle, no 3D transforms. `.fd-card` class preserved on front face for CSS selector compatibility
+
+**Sprint 3 — Free invoke counter + Character sheet:**
+- Aspect stickies: 4 invoke pips below text (filled = available, click = consume, "+" = add). Stored as `card.freeInvokes`. Dashed border separator
+- `PlayerSurface`: expandable "📋 My Character" accordion between topbar and scene cards. Shows HC, Trouble, extra aspects with labels, full skill pyramid grouped by rating (+4→+1) as pill badges, refresh value
+
+**Sprint 4 — Boost card type + Opposition ladder:**
+- Boost card: `genId:'boost'` in `BOARD_GEN_GROUPS` (⚡ icon), amber gradient rendering, editable text, "● Use Invoke" button that sets `expired:true` and greys card. Excluded from export/print filters. Listed in binder footer as "⚡ Boosts (N)"
+- Opposition Fate Ladder dropdown: replaces number `<input>` with clickable ladder selector showing +8 Legendary → −2 Terrible with hex colours. `ladderOpen` state in `TpDicePanel`
+
+**Hotfixes:**
+- `LABEL_STYLES` crash (pre-existing from v391): constant was used by `BoardLabel` but never defined. Added 5-colour array (accent, green, red, purple, amber) with `{bg, border, text}` shape
+- CSP `connect-src`: added `fonts.googleapis.com` and `fonts.gstatic.com` to allow SW `fetch()` for Google Fonts
+
+**New QA assertions:** NA-251 through NA-269 (19 new).
+
+269/269 named · 59/59 unit · 89/89 export · 128/128 smoke.
+
+---
+
 ## 2026.03.387 — Custom Card + dead code removal + doc update
 
 **Custom Card — fully inline-editable cv4 card:**

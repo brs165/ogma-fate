@@ -1320,6 +1320,7 @@ function cv4Card(props) {
   var data     = props.data || {};
   var frontFn  = props.frontFn;
   var onUpdate = props.onUpdate || null;
+  var saved    = props.savedCardState || null;
 
   var _flipped = useState(false); var flipped = _flipped[0]; var setFlipped = _flipped[1];
   var _hov     = useState(false); var hovered = _hov[0];     var setHovered = _hov[1];
@@ -1329,6 +1330,12 @@ function cv4Card(props) {
   var phyMax = typeof data.physical_stress === 'number' ? data.physical_stress : (typeof data.stress === 'number' ? data.stress : 0);
   var menMax = typeof data.mental_stress === 'number' ? data.mental_stress : 0;
   var _st = useState(function() {
+    // Restore interactive state from IDB if available, else fresh defaults
+    if (saved) return Object.assign({
+      phyHit: Array(phyMax).fill(false),
+      menHit: Array(menMax).fill(false),
+      cdFilled: 0, scoreA: 0, scoreB: 0, treated: false,
+    }, saved);
     return {
       phyHit: Array(phyMax).fill(false),
       menHit: Array(menMax).fill(false),
@@ -1452,7 +1459,7 @@ function cv4Card(props) {
         h('div', {style:{flexShrink:0}},
           frontFn(genId, data, campName, catColor, {state:cardState, upd:updState, phyMax:phyMax, menMax:menMax, onUpdate:onUpdate})
         ),
-        flipBtn('GM Guidance', '\u25ba')
+        flipBtn('Tap for GM Guidance', '\u25ba')
       ),
       // ── BACK ──────────────────────────────────────────────────────────
       h('div', {
@@ -1480,7 +1487,7 @@ function cv4Card(props) {
         h('div', {style:{flex:1, overflowY:'auto', maxHeight:400}},
           cv4BackPanel(genId, catColor)
         ),
-        flipBtn('\u25c0 Back', '')
+        flipBtn('Tap for Card Details', '\u25c0')
       )
     )
   );
@@ -2086,7 +2093,7 @@ var CV4_FRONTS = {
   custom: function(gid, d, cn, cc, opts) { return cv4FrontCustom(gid, d, cn, cc, opts && opts.onUpdate); },
 };
 
-function renderCard(genId, data, campId, onUpdate, worldStunts, onChainRoll) {
+function renderCard(genId, data, campId, onUpdate, worldStunts, onChainRoll, savedCardState) {
   var campName = '';
   try {
     if (typeof CAMPAIGNS !== 'undefined' && campId && CAMPAIGNS[campId] && CAMPAIGNS[campId].meta) {
@@ -2101,5 +2108,5 @@ function renderCard(genId, data, campId, onUpdate, worldStunts, onChainRoll) {
       )
     );
   };
-  return h(cv4Card, {genId:genId, campName:campName, data:data||{}, frontFn:frontFn, onUpdate:onUpdate||null});
+  return h(cv4Card, {genId:genId, campName:campName, data:data||{}, frontFn:frontFn, onUpdate:onUpdate||null, savedCardState:savedCardState||null});
 }

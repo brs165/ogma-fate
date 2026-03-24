@@ -1,8 +1,8 @@
 # Ogma — Roadmap
 
 > **Source of truth** for all planned work. Update whenever items change.
-> **Current version:** 2026.03.387 · QA: 242/242 named · 59/59 unit · 89/89 export
-> **Last revised:** 2026.03.387 — Custom Card (fully inline-editable cv4 card, type cycling, IDB persistence); UX sprint all 12 items shipped (coach marks, PREP/PLAY tooltips, player room chip, Turn Order tab, generator subtitles, Canvas Tools separator, stress hint, mobile topbar, Session Zero bridge); content audits complete all 8 worlds; useBoardCards hook extracted; dead code removed (mdHeader/mdWinLose); docs updated
+> **Current version:** 2026.03.393 · QA: 269/269 named · 59/59 unit · 89/89 export · 128/128 smoke
+> **Last revised:** 2026.03.393 — Play sprint (4 sprints): dice roller redesign (learn-fate visual), scene-end stress clear, remove card from table, cv4Card CSS 3D flip, free invoke counter on stickies, character sheet on player surface, boost card type, opposition Fate Ladder dropdown. LABEL_STYLES crash fix. CSP connect-src fix.
 
 ---
 
@@ -47,71 +47,133 @@
 
 ---
 
-## Open — in progress / next up
+## Workshop backlog — Play sprint plan
+
+> Added v2026.03.395. Six workshop voices × 100 iterations. Prioritised by "what unblocks real sessions."
+
+### Sprint A — Player comes alive (S)
 
 | ID | Title | Size | Notes |
 |----|-------|------|-------|
-| ~~**UNI-01**~~ ✅ | Unified surface — Binder (PREP) and BoardApp (PLAY) | L | See plan below. 4-sprint execution. Retire PrepCanvas on completion. |
-| ~~**UNI-02**~~ ✅ | Binder panel inside BoardApp | M | Load `card_{campId}_*` + `binder_tray_{campId}` from IDB directly in BoardApp. Render Binder panel with filter strip + Tray in a collapsible right panel. |
-| ~~**UNI-03**~~ ✅ | PREP/PLAY mode toggle — prominent | S | Replace small editMode toolbar button with persistent PREP\|PLAY badge in topbar. Visual state shift on toggle: gmOnly cards fade, edit controls collapse. |
-| ~~**UNI-04**~~ ✅ | Generate panel in PREP mode | S | `BoardLeftPanel` (Generate/Stunts/Help) already exists. Show it in both PREP and PLAY modes (not just PLAY). Currently swaps for BoardPlayPanel in PLAY. |
-| ~~**UNI-05**~~ ✅ | Player roster in PREP mode | S | Show collapsed player tracker in PREP mode (currently play-only). Allows GM to pre-fill players before switching to PLAY. |
-| ~~**UNI-06**~~ ✅ | Retire PrepCanvas | M | Remove PrepCanvas from CampaignApp. Replace `prepView`/`canvasView` with single `surfaceView`. Update sidebar: "Prep & Play" single entry point. |
-| ~~**BDR-01**~~ ✅ | Drafting Tray | S | Done. |
-| ~~**BDR-02**~~ ✅ | Binder filter strip | S | Done. |
-| ~~**BDR-03**~~ ✅ | cv4Card flip animation | S | Done. |
-| ~~**PL-03**~~ ✅ | Pre-join character builder | M | Done. |
-| ~~**TBL-01**~~ ✅ | Player waiting state | S | Done. |
-| ~~**MOB-15**~~ ✅ | Mobile nav spike | M | Done. |
+| **WS-20** | Player dice rolling | S | PlayerSurface skills inert. Add `doRoll` + `player_roll` sync action. Players must roll from their device. |
+| **WS-21** | Enrich broadcast payload | XS | `broadcastPlayState` sends `{cards, fp, players}` only. Add `round`, `order`, `gmPool`, `rollHistory`. |
+| **WS-22** | Player turn indicator | XS | PlayerSurface shows "Your turn" / "Waiting for X". Depends WS-21. |
+| **WS-23** | Roll result broadcast | S | Player rolls → GM toast + all-device history. New sync action `player_roll`. |
+| **WS-25** | GM pool visible to players | XS | `gmPool` not in broadcast. FCon FP economy requires transparency. |
+
+### Sprint B — Seven quick wins (XS each)
+
+| ID | Title | Size | Notes |
+|----|-------|------|-------|
+| **WS-24** | Session notes on board | XS | `SessionDoc` exists in `ui-modals.js`, never wired into BoardApp. One import. |
+| **WS-31** | Help panel: Conflicts | XS | Missing entry for zones, exchanges, taken out, conceding. Most common rules questions. |
+| **WS-34** | Player surface full-width cards | XS | `ps-card-scaler` at 88%/220px → full width, natural scroll. |
+| **WS-35** | Quick NPC in play mode | XS | One-click "⚡ Quick NPC" generates `npc_minor` onto canvas without opening generate panel. |
+| **WS-40** | Session start refresh | XS | FCon p.19: FP resets to max(refresh, current FP). "Start Session" button. |
+| **WS-42** | Keyboard shortcut for rolling | XS | Spacebar/Enter on focused skill triggers `doRoll`. |
+| **WS-43** | Canvas zoom-to-fit | XS | Button to auto-fit all cards in viewport. |
+
+### Sprint C — Invoke sprint (M)
+
+| ID | Title | Size | Notes |
+|----|-------|------|-------|
+| **WS-26** | Invoke workflow | M | Tap aspect → select player → deduct 1 FP (or free invoke) → "+2" flagged on dice → "invoked by X" trail. |
+| **WS-37** | Free invoke → dice bonus wiring | M | Consuming pip flags "+2 no FP cost" in dice panel for next roll. |
+| **WS-39** | Create Advantage outcome mapping | S | Success=1 free invoke, SWS=2, Tie=boost card, Fail=opponent gets invoke. |
+
+### Sprint D — Conflict completeness (S)
+
+| ID | Title | Size | Notes |
+|----|-------|------|-------|
+| **WS-28** | Concede button | S | Exit conflict → earn 1 FP per consequence taken. Remove from turn order. FCon p.35. |
+| **WS-29** | NPC cards in turn order | S | NPC-type cards as draggable pills in `BoardTurnBar`. |
+| **WS-45** | Consequence recovery on player row | S | `BoardPlayerRow` consequences have no treatment/recovery UI — only text. Add checkboxes. |
+| **WS-32** | Scene transition workflow | S | "New Scene": archive cards to binder, clear canvas, reset GM pool, prompt for scene aspect. |
+
+### Sprint E — Full FP economy (M)
+
+| ID | Title | Size | Notes |
+|----|-------|------|-------|
+| **WS-27** | Compel offer flow | M | GM taps aspect → offers FP → push to player → accept/refuse. Sync actions `compel_offer`/`compel_response`. |
+| **WS-30** | Player creates aspect | M | Create Advantage → player names aspect from device → sticky with free invokes on GM canvas. Sync `player_create_aspect`. |
+
+### Sprint F — Content teaching (S)
+
+| ID | Title | Size | Notes |
+|----|-------|------|-------|
+| **WS-55** | Quick reference overlay | S | Fate Ladder + four outcomes + four actions — toggleable overlay during play. |
+| **WS-56** | Aspect quality coaching | S | Tips on stickies/custom cards. `scoreAspect()` exists but unused on board. |
+| **WS-57** | Stunt validation hint | XS | Flag stunts not matching "Because I [X], +2 to [Skill] when [narrow]" template. |
+| **WS-60** | Compel example library | S | 3–5 world-specific examples per world. |
+| **WS-61** | "What would happen" prompts | S | Random twists/complications/NPC actions from world data. Inspiration button. |
+
+### Sprint G — GM polish (S–M)
+
+| ID | Title | Size | Notes |
+|----|-------|------|-------|
+| **WS-33** | Board export: Markdown | S | Board gets Markdown + Obsidian export (CampaignApp has 8 formats, board has 3). |
+| **WS-36** | Multi-step undo | S | Stack of 5–10 operations (delete, card state, player changes). |
+| **WS-38** | Session end summary | M | Export log: rolls, FP flow, consequences, cards generated. |
+| **WS-44** | Card search on canvas | S | Search/filter highlights or scrolls to matching cards. |
+| **WS-46** | Drag card between PREP and PLAY | S | Direct move (not copy) between canvases. |
+
+### Sprint H — Platform hardening (XS–S)
+
+| ID | Title | Size | Notes |
+|----|-------|------|-------|
+| **WS-47** | Player reconnect recovery | S | "Request full state" handshake on reconnect. |
+| **WS-48** | Simultaneous roll guard | XS | Queue toasts with stagger delay. |
+| **WS-49** | Max players guard | XS | Soft cap warning at 6, hard display cap. |
+| **WS-50** | Per-panel error boundary | S | Wrap each major panel independently. Single crash shouldn't kill the board. |
+| **WS-51** | IDB storage quota warning | XS | `navigator.storage.estimate()` check with toast. |
+| **WS-52** | Export format versioning | XS | Add `{version: 1}` wrapper to JSON exports. |
+| **WS-53** | Print-friendly scene state | S | Clean print layout: cards, roster, turn order. |
+| **WS-54** | Session state URL | M | Shareable snapshot of board state for async review. |
+
+### Rules items (not yet sprinted)
+
+| ID | Title | Size | Notes |
+|----|-------|------|-------|
+| **WS-41** | Extra mild consequence slot | XS | Superb (+5)+ Physique/Will. `engine.js` comments note "not implemented." |
+| **WS-74** | Bronze rule: everything is a character | M | Organizations, vehicles as tracked entities. FCon p.47. |
+| **WS-75** | Weapon/armor ratings | XS | FCon p.58 optional rule. Flag in help as optional. |
+| **WS-76** | Scale rules | S | FCon p.57. +2 per step difference. Rare but important. |
+
+### Content items (not yet sprinted)
+
+| ID | Title | Size | Notes |
+|----|-------|------|-------|
+| **WS-58** | Sample scenario per world | L | Pre-built loadable scene: 1 aspect, 2 zones, 2 NPCs, 1 countdown, 1 issue. |
+| **WS-59** | Opposition library | M | 5–8 curated NPCs per world, loadable from help panel. |
+| **WS-62** | Zone template library | M | Common environments with pre-built aspects and difficulties per world. |
+
+### UX / platform items (not yet sprinted)
+
+| ID | Title | Size | Notes |
+|----|-------|------|-------|
+| **WS-63** | Combat tracker density view | M | Compact table: all combatants inline with stress/FP/acted. |
+| **WS-64** | Campaign arc tracker | L | Current/impending issues + milestone progress across sessions. |
+| **WS-65** | Relationship map | L | Visual web of PC/NPC relationships from aspects. |
+| **WS-66** | Sound/ambience integration | M | Per-world ambient audio. Web audio API. |
+| **WS-69** | Dice statistics panel | S | Distribution curve, streaks, per-player averages. Post-session review. |
+| **WS-70** | Quick actions palette (⌘K) | M | Command palette for power users. |
+| **WS-71** | Colorblind-safe state indicators | S | Shapes/patterns/icons alongside colour for stress/FP/acted. |
+| **WS-72** | Player avatar selection | XS | Emoji/icon pick for visual identity in turn bar. |
+| **WS-73** | Table tent mode | XS | Large name+HC display on player device for physical table. |
 
 ---
 
-## UNI: Unified Surface — Design & Execution Plan
+## Completed — reference (moved from Open)
 
-### The problem
-Three surfaces exist where one should. A GM generating content (CampaignApp), managing a prep canvas (PrepCanvas), and running a live session (BoardApp) visits three separate UIs with three separate state stores and three separate navigation entries. This creates unnecessary hand-offs and cognitive load.
-
-### The solution
-**BoardApp becomes the single surface.** It already owns the hardest things: multiplayer sync (`useBoardSync`), player join flow (PL-03), role negotiation (GM vs player), the canvas, and the Generate/Stunts/Help panel. The missing pieces — Binder card library, Drafting Tray, Binder filter strip — are added to BoardApp. PrepCanvas is retired.
-
-### Three usage scenarios, one surface
-
-| Scenario | Mode | What GM sees |
-|---|---|---|
-| Solo prep | PREP | Generate panel left, Binder panel right, canvas centre, no sync |
-| In-person around one machine | Toggle PREP→PLAY | GM toggles to PLAY: gmOnly cards hide, edit controls collapse, turn bar appears |
-| Remote with players on own devices | PLAY + Host | GM hosts room, players join, see PLAY view on their device, interact with their own character card |
-
-### IDB key strategy
-BoardApp currently uses two canvas keys (`board_canvas_v1_{campId}` for prep, `board_play_v1_{campId}` for play). PrepCanvas uses `tp_canvas_{campId}`. These are separate stores — migration is **not** required. GMs start fresh on the unified surface. Old PrepCanvas data remains in IDB under the old key and is quietly abandoned.
-
-Binder cards (`card_{campId}_*`) are already shared — both CampaignApp and BoardApp read from `DB.loadCards(campId)`. No migration needed.
-
-Tray (`binder_tray_{campId}`) moves with the Binder — BoardApp loads it directly.
-
-### Sprint plan
-
-| Sprint | Items | What ships |
-|---|---|---|
-| 1 | UNI-02 | Binder panel (with filter strip + Tray) in BoardApp right panel. IDB load on mount. |
-| 2 | UNI-03 + UNI-04 | PREP/PLAY badge toggle. Generate panel visible in both modes. |
-| 3 | UNI-05 | Player roster accessible in PREP mode (collapsed). |
-| 4 | UNI-06 | PrepCanvas retired. CampaignApp sidebar simplified to single "Prep & Play" entry. QA full suite. |
-
-### What is NOT changing
-- BoardApp multiplayer sync (`useBoardSync`) — untouched
-- PL-03 player join flow — untouched  
-- Card schema, IDB structure, export formats — untouched
-- CampaignApp generator hub (Roll button, result panel) — stays as the quick-roll surface; only the canvas/table navigation collapses
-
----
-
-| ~~**BDR-01**~~ ✅ | Drafting Tray | S | Staging layer between Binder and Table. Strip at bottom of Binder panel. Cards dragged/sent here persist in IDB (`binder_tray_{campId}`). "Send all to Table" button. Shows count badge. |
-| ~~**BDR-02**~~ ✅ | Binder filter strip | S | Filter row above Binder card list: All · People · Scene · Story · Mechanics. Filters by genId group. State is local (resets on panel close). |
-| ~~**BDR-03**~~ ✅ | cv4Card flip animation | S | GM Guidance footer now uses CSS maxHeight + opacity transition with spring chevron rotation. Smooth slide open/close. |
-| ~~**PL-03**~~ ✅ | Pre-join character builder | M | 3-step wizard in waiting banner: name → aspects (HC/Trouble/free) → skills (FCon pyramid, 19 skills). Sends `{type:player_hello, name, pc:{hc,trouble,aspects,skills}}`. GM `addPlayer` derives stress from Physique/Will per FCon p.12. |
-| ~~**TBL-01**~~ ✅ | Player waiting state | S | Player joins via room code before GM adds them. Need "Waiting for GM to add you" overlay in Board Play mode. Auto-create empty player slot on join. |
-| ~~**MOB-15**~~ ✅ | Mobile nav spike | M | Board on mobile is pinch-to-zoom. Spike what a designed mobile response looks like. Bottom nav bar? Slide-in panel? Floating action pattern? |
+| ID | Status | Notes |
+|----|--------|-------|
+| ~~UNI-01–06~~ | ✅ | Unified surface. BoardApp is single PREP/PLAY surface. PrepCanvas retired. |
+| ~~BDR-01~~ | ✅ | Drafting Tray. |
+| ~~BDR-02~~ | ✅ | Binder filter strip. |
+| ~~BDR-03~~ | ✅ | cv4Card CSS 3D flip. |
+| ~~PL-03~~ | ✅ | Pre-join character builder. |
+| ~~TBL-01~~ | ✅ | Player waiting state. |
+| ~~MOB-15~~ | ✅ | Mobile nav spike. |
 
 ---
 
@@ -127,6 +189,11 @@ Tray (`binder_tray_{campId}`) moves with the Binder — BoardApp loads it direct
 | **PL-01** | Multi-GM mode | Needs CRDT |
 | **PL-02** | Native app wrapper | After PWA demand confirmed |
 | **EXP-01** | Fari App / Foundry VTT export | Code preserved. Revisit when VTT integration confirmed as user need. |
+| **WS-64** | Campaign arc tracker | Current/impending issues + milestone progress across sessions. |
+| **WS-65** | Relationship map | Visual web of PC/NPC relationships from aspects. |
+| **WS-66** | Sound/ambience integration | Per-world ambient audio. Web audio API. |
+| **WS-67** | Import from Fari / Foundry | Character and scene JSON schema mapping. |
+| **WS-68** | Session recording / replay | Log every action with timestamps. Read-only timeline. |
 
 ---
 
@@ -144,6 +211,7 @@ Tray (`binder_tray_{campId}`) moves with the Binder — BoardApp loads it direct
 
 | Version | What |
 |---------|------|
+| v2026.03.393 | **Play sprint (4 sprints, 8 features).** Sprint 1: TpDicePanel rewrite (learn-fate visual language, flicker→reveal→done phase machine, 68px dr-die tiles, Fate Ladder hex colours via tpLcolHex, vertical layout). Scene End button (endScene clears all phy/men stress, resets acted, confirm dialog, broadcasts). Sprint 2: removeFromTable (bidirectional — BoardCard ✕ button + BoardDossier ○ Remove button, IDB update, broadcast). cv4Card CSS 3D flip (rotateY 180deg, front=content, back=GM Guidance, reduced-motion display toggle). Sprint 3: Free invoke counter on aspect stickies (4 pips, add/consume, freeInvokes on card data). Character sheet on PlayerSurface (expandable My Character section, aspects + skill pyramid + refresh). Sprint 4: Boost card type (genId=boost, 1 free invoke, auto-expires on use, amber gradient, binder section). Opposition Fate Ladder dropdown (replaces number input, clickable ladder −2 to +8 with labels/colours). Hotfixes: LABEL_STYLES crash (pre-existing v391 — constant was used but never defined). CSP connect-src Google Fonts for SW fetch. NA-251–269. |
 | v2026.03.387 | **Custom Card.** Fully inline-editable cv4-frame card. Type pill cycles Aspect→NPC→Location→Clue→Other (tints accent colour). Title and notes both click-to-edit in place. Persists to IDB via updateCard. Reroll disabled. Send to Table, Binder, export all work normally. Context menu entry added. CV4_HELP back panel with invoke/compel examples. NA-240–242. Dead code removed: mdHeader, mdWinLose (engine.js). Docs updated to v387, QA 242/242. |
 | v2026.03.386 | **UX Sprint 5 — Session Zero bridge.** ▶ Start Local Session button on Session Zero completion screen writes ogma_sz_handoff to sessionStorage then navigates to board. BoardApp reads handoff on FP load, pre-populates tracker with 4 Player N slots at Refresh 3, fires toast. board.html default mode changed play→prep. NA-238–239. Sprint 5 of 5 complete — all 12 UX items shipped. |
 | v2026.03.385 | **UX Sprints 2–4.** Sprint 2 (remote): player room code chip in topbar (bt-room-chip); Turn Order tab renamed from Initiative + inline rule explanation. Sprint 3 (generators): one-line sub text on every generator item; Canvas Tools separator between generators and tools. Sprint 4 (rules access): stress ≠ HP hint on NPC cards; mobile topbar max-width breakpoint. NA-232–237. |

@@ -368,6 +368,8 @@ function tpLcolHex(v) {
 
 function TpDicePanel(props) {
   var players = props.players, selId = props.selId, spendFP = props.spendFP, onRoll = props.onRoll;
+  var pendingInvoke = props.pendingInvoke || null;
+  var onClearInvoke = props.onClearInvoke || null;
   var _dice = useState(['+','0','+','\u2212']); var dice = _dice[0]; var setDice = _dice[1];
   var _phase = useState('idle'); var phase = _phase[0]; var setPhase = _phase[1];
   var _reveal = useState(0); var revealCount = _reveal[0]; var setRevealCount = _reveal[1];
@@ -389,7 +391,8 @@ function TpDicePanel(props) {
 
   var player = players.find(function(p) { return p.id === selId; });
   var mod = activeSk ? (activeSk.v != null ? activeSk.v : activeSk.r || 0) : 0;
-  var final = result != null ? result + mod + (boosted ? 2 : 0) : null;
+  var invokeBonus = pendingInvoke ? 2 : 0;
+  var final = result != null ? result + mod + (boosted ? 2 : 0) + invokeBonus : null;
 
   function randomFace() { return ['+', '0', '\u2212'][Math.floor(Math.random() * 3)]; }
 
@@ -417,8 +420,12 @@ function TpDicePanel(props) {
             setResult(raw); setPhase('done');
             var skVal = sk.v != null ? sk.v : sk.r || 0;
             var total = raw + skVal;
+            // WS-26/37: Include pending invoke bonus in reported total
+            if (pendingInvoke) total += 2;
             setHistory(function(prev) { return [{who: player ? player.name : '?', skill: sk.l || sk.name, total: total}].concat(prev).slice(0, 8); });
-            if (onRoll) onRoll({who: player ? player.name : '?', skill: sk.l || sk.name, total: total});
+            if (onRoll) onRoll({who: player ? player.name : '?', skill: sk.l || sk.name, total: total, invoked: pendingInvoke ? pendingInvoke.label : null});
+            // Clear pending invoke after roll
+            if (pendingInvoke && onClearInvoke) onClearInvoke();
           }
         }, 120);
       }
@@ -445,11 +452,20 @@ function TpDicePanel(props) {
 
   var rolling = phase === 'flicker' || phase === 'reveal';
   var outcomeEl = null;
+  var outcomeHint = null;
   if (phase === 'done' && final != null) {
     var margin = final - diff;
     var outcome = margin >= 3 ? 'Succeed w/ Style' : margin >= 1 ? 'Success' : margin === 0 ? 'Tie' : 'Fail';
     var outCol = margin >= 3 ? '#32ADE6' : margin >= 1 ? '#34C759' : margin === 0 ? '#FFCC00' : '#FF3B30';
     outcomeEl = h('span', {className: 'dr-outcome', style: {color: outCol, borderColor: outCol}}, outcome + (margin > 0 ? ' +' + margin : margin < 0 ? ' ' + margin : ''));
+    // FCon p.21: one-line explanation of what the outcome means
+    var hints = {
+      'Succeed w/ Style': 'You get what you want + a boost',
+      'Success': 'You get what you want',
+      'Tie': 'You get what you want, at a minor cost',
+      'Fail': 'You don\u2019t get what you want, and it may get worse',
+    };
+    outcomeHint = h('div', {className: 'tp-dice-outcome-hint', style: {color: outCol}}, hints[outcome]);
   }
 
   return h('div', {className: 'tp-dice-v2', role: 'region', 'aria-label': 'Dice roller'},
@@ -468,6 +484,27 @@ function TpDicePanel(props) {
         outcomeEl
       ),
       phase === 'idle' && h('span', {className: 'dr-result-placeholder'}, player ? 'Pick a skill or roll 4dF' : '\u2014')
+    ),
+    outcomeHint,
+    // WS-26: Pending invoke badge
+    pendingInvoke && h('div', {className: 'tp-dice-invoke-badge'},
+      h('span', {style: {color: pendingInvoke.source === 'free' ? 'var(--c-green)' : 'var(--accent)'}},
+        (pendingInvoke.source === 'free' ? '\u2726 Free Invoke' : '\u29BF Invoke') + ' +2'),
+      h('span', {style: {fontSize: 10, color: 'var(--text-muted)', fontStyle: 'italic'}},
+        ' \u2014 ' + (pendingInvoke.label || 'aspect')),
+      h('button', {className: 'tp-dice-invoke-clear', onClick: onClearInvoke, 'aria-label': 'Cancel invoke'}, '\u2715')
+    ),
+    // WS-39: Create Advantage outcome guide (shows when phase is done)
+    phase === 'done' && final != null && h('div', {className: 'tp-dice-ca-guide'},
+      h('details', null,
+        h('summary', {style: {fontSize: 10, color: 'var(--text-muted)', cursor: 'pointer'}}, '\u2726 Create Advantage?'),
+        h('div', {style: {fontSize: 10, color: 'var(--text-dim)', lineHeight: 1.5, padding: '4px 0'}},
+          (final - diff) >= 3 ? '\u2705 SWS \u2014 create/discover aspect with 2 free invokes'
+          : (final - diff) >= 1 ? '\u2705 Success \u2014 create/discover aspect with 1 free invoke'
+          : (final - diff) === 0 ? '\u26A0 Tie \u2014 boost (1 free invoke, then gone)'
+          : '\u274C Fail \u2014 aspect exists but opponent gets free invoke'
+        )
+      )
     ),
     h('div', {className: 'tp-dice-controls'},
       h('button', {className: 'dr-btn', disabled: rolling, onClick: function() { doRoll({l: '4dF', v: 0}); }, 'aria-label': 'Roll 4 Fate dice'}, rolling ? '\u2026' : '\uD83C\uDFB2 Roll 4dF'),

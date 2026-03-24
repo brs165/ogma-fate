@@ -1980,6 +1980,8 @@ function CampaignApp(props) {
   }); var canvasView = _canvasView[0]; var setCanvasView = _canvasView[1];
   function openCanvas() { setCanvasView(true); setShowSidebar(false); }
   function closeCanvas() { setCanvasView(false); }
+  // Export on open — when sidebar Export Cards is tapped, open board in export view
+  var _exportOnOpen = useState(false); var exportOnOpen = _exportOnOpen[0]; var setExportOnOpen = _exportOnOpen[1];
 
   // (showToast, SW update, Safari/iOS, PWA effects now in useChromeHooks)
 
@@ -2418,11 +2420,11 @@ function CampaignApp(props) {
                 h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, '\u2605'),
                 h('span', {className:'sidebar-item-label'}, 'Session Zero')
               ),
-              // Export — moved from action bar into Play
+              // Export — opens board with export page
               h('button', {
                 className: 'sb-acc-item',
-                onClick: function() { exportCards(); setShowSidebar(false); },
-                'aria-label': 'Export pinned cards as JSON',
+                onClick: function() { setCanvasView(true); setExportOnOpen(true); setShowSidebar(false); },
+                'aria-label': 'Export cards',
               },
                 h('span', {'aria-hidden':'true', className:'sidebar-item-icon'}, '\u2193'),
                 h('span', {className:'sidebar-item-label'}, 'Export Cards')
@@ -2726,6 +2728,8 @@ function CampaignApp(props) {
           campId: campId,
           initialMode: 'play',
           onClose: closeCanvas,
+          initialExportView: exportOnOpen,
+          onExportViewConsumed: function() { setExportOnOpen(false); },
           key: 'canvas-' + campId,
         }),
 
