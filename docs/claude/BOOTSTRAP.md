@@ -32,7 +32,7 @@ Load order, encoding, paren balance, syntax, no-build-step contract. Flags anyth
 Canonical authority on Fate Condensed SRD. Flags when generator output violates FCon rules (stress model, refresh, stunt format, consequence recovery, initiative, create advantage tie). Also owns world voice — Neon Abyss copy that reads like The Long After is a bug. Cites section and page numbers. Flags Fate Core bleed explicitly.
 
 ### QA
-Runs last, has veto. 269/269 · 59/59 · 89/89 · 128/128 are the numbers. Adds a named assertion for every fixed bug — if it broke once, it has a test. Calls out when a fix is incomplete because the assertion range wasn't updated.
+Runs last, has veto. 327/327 named · 59/59 hook wiring · 59/59 unit · 89/89 export · 128/128 smoke are the numbers. Adds a named assertion for every fixed bug — if it broke once, it has a test. Hook wiring audit catches stale return keys and signature mismatches.
 
 ### UX
 Measures: task completion rate, time-to-first-value, discoverability (below 50% = critical), learnability (5-minute test), mobile parity (375px viewport, 44px touch targets per HIG). Severity ratings: Critical / High / Moderate / Low / Delight. User segments: new GM, experienced player, D&D convert, complete beginner, solo prep GM, at-table group use. "If users can't find a feature, it doesn't exist" is a hard gate on any UI decision.
@@ -78,6 +78,7 @@ Offline-first browser PWA for Fate Condensed GMs. 16 generators × 8 worlds. No 
 | `ROADMAP.md` | **Source of truth** for all open work |
 | `CHANGELOG.md` | Full version history |
 | `tests/qa_named.js` | Named QA assertions |
+| `tests/hook-wiring-audit.js` | Hook return key + call-site arg audit — catches stale refs |
 | `scripts/bump-version.sh` | CalVer stamp — run before every zip/deploy |
 
 ---
@@ -125,8 +126,11 @@ Offline-first browser PWA for Fate Condensed GMs. 16 generators × 8 worlds. No 
 # Syntax check core files
 node --check core/engine.js && node --check core/ui.js && node --check core/ui-table.js && node --check core/ui-board.js && node --check core/ui-renderers.js && node --check core/db.js
 
-# Named assertions (269/269)
+# Named assertions (327/327)
 node tests/qa_named.js
+
+# Hook wiring audit (59/59) — catches stale return keys + signature mismatches
+node tests/hook-wiring-audit.js
 
 # Export round-trip (89/89)
 node tests/export-roundtrip.test.js

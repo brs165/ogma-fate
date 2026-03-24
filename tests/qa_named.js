@@ -1180,9 +1180,7 @@ assert('NA-12 React theme-toggle aria-label dynamic', uiSrc.includes("'Switch to
     css.includes('[role="checkbox"]:focus-visible'),
     'Missing [role="checkbox"]:focus-visible — WCAG 2.2 SC 3.2.6');
 
-  assert('NA-115: rs-zone-input:focus has border-width:2px',
-    css.includes('rs-zone-input:focus{border-color:var(--accent);border-width:2px}'),
-    'Input focus must change border-width not just color — WCAG 2.2 SC 2.4.11');
+  // NA-115: removed — rs-zone-input class retired (dead CSS cleanup v407)
 
   assert('NA-116: body has scroll-padding-bottom for FAB',
     css.includes('scroll-padding-bottom: 80px') || (css.includes('scroll-padding-bottom: 80px') || css.includes('scroll-padding-bottom:80px')),
@@ -1340,9 +1338,9 @@ assert('NA-12 React theme-toggle aria-label dynamic', uiSrc.includes("'Switch to
     eng.includes('refresh: 3'),
     'PC refresh must be 3 at creation per FCon p.10');
 
-  assert('NA-148: PC consequences always [2,4,6]',
-    eng.includes('consequences: [2, 4, 6]'),
-    'PC must always have mild/moderate/severe consequences per FCon p.12');
+  assert('NA-148: PC consequences include [2,4,6] base slots (WS-41: +extra mild when Physique/Will ≥5)',
+    eng.includes('consequences:') && eng.includes('[2, 4, 6]'),
+    'PC must always have at least mild/moderate/severe consequences per FCon p.12');
 })();
 
 
@@ -3297,6 +3295,169 @@ assert('NA-12 React theme-toggle aria-label dynamic', uiSrc.includes("'Switch to
     css.includes('.bep-back-btn') &&
     css.includes('.bep-page-title'),
     'theme.css must include export page, back button, and title CSS');
+})();
+
+// ── Backlog assertions ───────────────────────────────────────────────────────
+
+// NA-328: WS-41 Extra mild consequence slot
+(function() {
+  var fs2 = require('fs');
+  var eng = fs2.readFileSync('core/engine.js', 'utf8');
+  var brd = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-328: Extra mild consequence from Physique/Will ≥5',
+    eng.includes('physR >= 5 || willR >= 5') &&
+    eng.includes('[2, 4, 6, 2]') &&
+    brd.includes('physique >= 5 || will >= 5') &&
+    brd.includes('extraMild'),
+    'generatePC and addPlayer must derive extra mild from Physique/Will ≥5');
+})();
+
+// NA-329: WS-75+76 Optional rules in help panel
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-329: Optional rules section with weapon/armor/scale',
+    src.includes("id: 'optional'") &&
+    src.includes('Weapon ratings') &&
+    src.includes('Armor ratings') &&
+    src.includes('Scale (FCon p.57)'),
+    'Help panel must have Optional Rules section');
+})();
+
+// NA-330: WS-72 Player avatar selection
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  var css = fs2.readFileSync('assets/css/theme.css', 'utf8');
+  assert('NA-330: Avatar picker in join wizard + stored on player',
+    src.includes('bwb-avatar-btn') &&
+    src.includes('pcDraft.avatar') &&
+    src.includes("avatar: pc.avatar || ''") &&
+    css.includes('.bwb-avatar-btn'),
+    'Join wizard must have avatar picker, pass to player_hello, store on player row');
+})();
+
+// NA-331: WS-72 Avatar in turn bar
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-331: Avatar shown in turn bar pill',
+    src.includes('rs-turn-avatar') &&
+    src.includes('p.avatar'),
+    'Turn bar pill must show avatar emoji when present');
+})();
+
+// NA-332: WS-73 Table tent mode
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  var css = fs2.readFileSync('assets/css/theme.css', 'utf8');
+  assert('NA-332: Table tent mode on PlayerSurface',
+    src.includes('tentMode') &&
+    src.includes('ps-tent') &&
+    src.includes('ps-tent-name') &&
+    src.includes('ps-tent-btn') &&
+    css.includes('.ps-tent'),
+    'PlayerSurface must have tent mode toggle, full-screen name/HC display');
+})();
+
+// NA-333: WS-69 Dice statistics panel
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-table.js', 'utf8');
+  var css = fs2.readFileSync('assets/css/theme.css', 'utf8');
+  assert('NA-333: Dice stats panel with avg/high/low and per-player breakdown',
+    src.includes('tp-dice-stats') &&
+    src.includes('tp-dice-stats-toggle') &&
+    src.includes('byPlayer') &&
+    css.includes('.tp-dice-stats'),
+    'TpDicePanel must have collapsible stats with avg/high/low + per-player');
+})();
+
+// NA-334: WS-71 Colorblind-safe patterns
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  var css = fs2.readFileSync('assets/css/theme.css', 'utf8');
+  assert('NA-334: Colorblind pattern toggle + CSS patterns',
+    src.includes('data-a11y-patterns') &&
+    css.includes('[data-a11y-patterns="true"]'),
+    'Topbar must have pattern toggle and CSS must define stripe patterns for acted/stress');
+})();
+
+// NA-335: WS-74 Bronze Rule in help panel
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-335: Advanced Concepts section with Bronze Rule',
+    src.includes("id: 'advanced'") &&
+    src.includes('Bronze Rule') &&
+    src.includes('Extras (FCon p.50)'),
+    'Help panel must have Advanced Concepts section with Bronze Rule and Extras');
+})();
+
+// NA-336: WS-70 Command palette
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  var css = fs2.readFileSync('assets/css/theme.css', 'utf8');
+  assert('NA-336: Command palette with keyboard shortcut',
+    src.includes('function CommandPalette') &&
+    src.includes('cmdPalette') &&
+    src.includes("e.key === 'k'") &&
+    src.includes('cmd-modal') &&
+    css.includes('.cmd-overlay'),
+    'Must have CommandPalette component, Ctrl+K toggle, and CSS');
+})();
+
+// NA-337: WS-63 Combat tracker density view
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  var css = fs2.readFileSync('assets/css/theme.css', 'utf8');
+  assert('NA-337: CombatTracker component with compact table',
+    src.includes('function CombatTracker') &&
+    src.includes('ct-table') &&
+    src.includes('showTracker') &&
+    css.includes('.ct-wrap'),
+    'Must have CombatTracker with table, toggle state, and CSS');
+})();
+
+// NA-338: WS-59 Opposition library in help panel
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-338: Opposition library with threat levels',
+    src.includes("id: 'opposition'") &&
+    src.includes('Mook') &&
+    src.includes('Lieutenant') &&
+    src.includes('Boss') &&
+    src.includes('Mob (group of mooks)'),
+    'Help panel must have Opposition Library with 6 threat templates');
+})();
+
+// NA-339: WS-62 Zone template library in help panel
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-339: Zone templates in help panel',
+    src.includes("id: 'zones'") &&
+    src.includes('Rooftop Chase') &&
+    src.includes('Burning Building') &&
+    src.includes('Custom zone tips'),
+    'Help panel must have Zone Templates with 6 templates');
+})();
+
+// NA-340: WS-58 Starter Scene button
+(function() {
+  var fs2 = require('fs');
+  var src = fs2.readFileSync('core/ui-board.js', 'utf8');
+  assert('NA-340: Starter Scene batch generation',
+    src.includes('onStarterScene') &&
+    src.includes('Starter Scene') &&
+    src.includes("generateCard('scene'") &&
+    src.includes("generateCard('countdown'"),
+    'BoardPlayPanel must have Starter Scene button that generates 5 cards');
 })();
 
 console.log('Named assertions: '+(pass+fail)+' total  pass:'+pass+'  fail:'+fail);

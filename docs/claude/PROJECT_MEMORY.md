@@ -2,7 +2,7 @@
 
 > Snapshot of architecture state for model-switching and session continuity.
 > Keep in sync with ROADMAP.md and CHANGELOG.md.
-> **Last updated:** v2026.03.393
+> **Last updated:** v2026.03.403
 
 ---
 
@@ -12,7 +12,7 @@
 |-------|-------------|------|
 | **Engineering** | All sessions | Load order, encoding, syntax, no-build-step contract, `node --check` after every write |
 | **Rules / Content** | All sessions | FCon SRD compliance, world voice consistency, flags Fate Core bleed |
-| **QA** | All sessions | 269/269 · 59/59 · 89/89 · 128/128 gate, named assertions for every fixed bug |
+| **QA** | All sessions | 327/327 named · 59/59 hook wiring · 59/59 unit · 89/89 export · 128/128 smoke gate, named assertions for every fixed bug |
 | **UX** | UI / nav / discoverability work | Task completion, time-to-first-value, 44px touch targets, 375px parity, severity ratings |
 | **Product Strategist** | Feature decisions, prioritisation | User segment × impact × effort; "if users can't find it, it doesn't exist" |
 | **Mechanical Auditor** | World data / content work | Scores tables 1–10: Voice, Narrative Interconnectivity, Mechanical Integrity, Editorial Polish, Structural Pacing |
@@ -33,8 +33,8 @@ Offline-first browser PWA for Fate Condensed GMs. 16 generators × 8 worlds. Sou
 
 | Item | Value |
 |------|-------|
-| Version | `2026.03.393` |
-| Named QA | 269/269 |
+| Version | `2026.03.403` |
+| Named QA | 327/327 |
 | Unit tests | 59/59 |
 | Export round-trip | 89/89 |
 | Smoke | 128/128 (16 generators × 8 worlds) |
@@ -79,7 +79,8 @@ Offline-first browser PWA for Fate Condensed GMs. 16 generators × 8 worlds. Sou
 | `sw.js` | Service worker — APP_SHELL cache-first |
 | `scripts/build.js` | Optional 3-tier build pipeline (see docs/BUILD.md) |
 | `scripts/bump-version.sh` | CalVer stamp — run before every zip/deploy |
-| `tests/qa_named.js` | 269 named assertions |
+| `tests/qa_named.js` | 327 named assertions |
+| `tests/hook-wiring-audit.js` | 59 hook return key + call-site arg checks |
 | `tests/engine.test.js` | 59 unit tests |
 | `tests/export-roundtrip.test.js` | 89 export/import round-trip assertions |
 | `ROADMAP.md` | Source of truth for all open work |
@@ -176,8 +177,11 @@ Board page: same to ui-primitives, then: ui-renderers → ui-table → ui-modals
 # Syntax
 node --check core/engine.js && node --check core/ui.js && node --check core/ui-table.js && node --check core/ui-board.js && node --check core/ui-renderers.js && node --check core/db.js
 
-# Named (269)
+# Named (327)
 node tests/qa_named.js
+
+# Hook wiring audit (59)
+node tests/hook-wiring-audit.js
 
 # Unit (59)
 node tests/engine.test.js

@@ -1,8 +1,8 @@
 # Ogma — Roadmap
 
 > **Source of truth** for all planned work. Update whenever items change.
-> **Current version:** 2026.03.393 · QA: 269/269 named · 59/59 unit · 89/89 export · 128/128 smoke
-> **Last revised:** 2026.03.393 — Play sprint (4 sprints): dice roller redesign (learn-fate visual), scene-end stress clear, remove card from table, cv4Card CSS 3D flip, free invoke counter on stickies, character sheet on player surface, boost card type, opposition Fate Ladder dropdown. LABEL_STYLES crash fix. CSP connect-src fix.
+> **Current version:** 2026.03.403 · QA: 327/327 named · 59/59 hook wiring · 59/59 unit · 89/89 export · 128/128 smoke
+> **Last revised:** 2026.03.403 — All 8 workshop sprints (A–H) shipped: 38/39 items. Full-size cv4Cards on canvas (320px, interactive). Export page (replaces canvas). Hook wiring audit test. Invoke workflow + FP economy. Player dice rolling + multiplayer enrichment. Concede, NPC turns, scene transitions. Content teaching (quick ref, compel examples, inspiration prompts). Platform hardening (reconnect, toast queue, max players, ErrorBoundary, IDB quota).
 
 ---
 
@@ -49,88 +49,37 @@
 
 ## Workshop backlog — Play sprint plan
 
-> Added v2026.03.395. Six workshop voices × 100 iterations. Prioritised by "what unblocks real sessions."
+> Added v2026.03.395. Six workshop voices × 100 iterations. **All 8 sprints shipped v397–v403.**
 
-### Sprint A — Player comes alive (S)
+### ✅ Sprint A — Player comes alive (v397)
+WS-20 Player dice rolling · WS-21 Enriched broadcast · WS-22 Turn indicator · WS-23 Roll broadcast · WS-25 GM pool visible
 
-| ID | Title | Size | Notes |
-|----|-------|------|-------|
-| **WS-20** | Player dice rolling | S | PlayerSurface skills inert. Add `doRoll` + `player_roll` sync action. Players must roll from their device. |
-| **WS-21** | Enrich broadcast payload | XS | `broadcastPlayState` sends `{cards, fp, players}` only. Add `round`, `order`, `gmPool`, `rollHistory`. |
-| **WS-22** | Player turn indicator | XS | PlayerSurface shows "Your turn" / "Waiting for X". Depends WS-21. |
-| **WS-23** | Roll result broadcast | S | Player rolls → GM toast + all-device history. New sync action `player_roll`. |
-| **WS-25** | GM pool visible to players | XS | `gmPool` not in broadcast. FCon FP economy requires transparency. |
+### ✅ Sprint B — Seven quick wins (v397)
+WS-24 Session notes on board · WS-31 Help: Conflicts · WS-34 Full-width player cards · WS-35 Quick NPC · WS-40 Session start refresh · WS-42 Keyboard R/F · WS-43 Zoom-to-fit
 
-### Sprint B — Seven quick wins (XS each)
+### ✅ Sprint C — Invoke sprint (v400)
+WS-26 Invoke workflow (3 paths: sticky/boost/card ⦿) · WS-37 Free invoke → dice +2 · WS-39 Create Advantage outcome guide
 
-| ID | Title | Size | Notes |
-|----|-------|------|-------|
-| **WS-24** | Session notes on board | XS | `SessionDoc` exists in `ui-modals.js`, never wired into BoardApp. One import. |
-| **WS-31** | Help panel: Conflicts | XS | Missing entry for zones, exchanges, taken out, conceding. Most common rules questions. |
-| **WS-34** | Player surface full-width cards | XS | `ps-card-scaler` at 88%/220px → full width, natural scroll. |
-| **WS-35** | Quick NPC in play mode | XS | One-click "⚡ Quick NPC" generates `npc_minor` onto canvas without opening generate panel. |
-| **WS-40** | Session start refresh | XS | FCon p.19: FP resets to max(refresh, current FP). "Start Session" button. |
-| **WS-42** | Keyboard shortcut for rolling | XS | Spacebar/Enter on focused skill triggers `doRoll`. |
-| **WS-43** | Canvas zoom-to-fit | XS | Button to auto-fit all cards in viewport. |
+### ✅ Sprint D — Conflict completeness (v398)
+WS-28 Concede button · WS-29 NPC turns · WS-45 Consequence recovery hints · WS-32 Scene transition (New Scene)
 
-### Sprint C — Invoke sprint (M)
+### ✅ Sprint E — Full FP economy (v398)
+WS-27 Compel offer flow · WS-30 Player creates aspect
 
-| ID | Title | Size | Notes |
-|----|-------|------|-------|
-| **WS-26** | Invoke workflow | M | Tap aspect → select player → deduct 1 FP (or free invoke) → "+2" flagged on dice → "invoked by X" trail. |
-| **WS-37** | Free invoke → dice bonus wiring | M | Consuming pip flags "+2 no FP cost" in dice panel for next roll. |
-| **WS-39** | Create Advantage outcome mapping | S | Success=1 free invoke, SWS=2, Tie=boost card, Fail=opponent gets invoke. |
+### ✅ Sprint F — Content teaching (v398)
+WS-55 Quick reference · WS-56 Aspect coaching · WS-57 Stunt hint · WS-60 Compel examples · WS-61 Inspiration prompts
 
-### Sprint D — Conflict completeness (S)
+### ✅ Sprint G — GM polish (v399 + v403)
+WS-33 Board export (8-format page) · WS-36 Multi-step undo (10-entry stack) · WS-38 Session summary · WS-44 Card search · WS-46 Move to table
 
-| ID | Title | Size | Notes |
-|----|-------|------|-------|
-| **WS-28** | Concede button | S | Exit conflict → earn 1 FP per consequence taken. Remove from turn order. FCon p.35. |
-| **WS-29** | NPC cards in turn order | S | NPC-type cards as draggable pills in `BoardTurnBar`. |
-| **WS-45** | Consequence recovery on player row | S | `BoardPlayerRow` consequences have no treatment/recovery UI — only text. Add checkboxes. |
-| **WS-32** | Scene transition workflow | S | "New Scene": archive cards to binder, clear canvas, reset GM pool, prompt for scene aspect. |
+### ✅ Sprint H — Platform hardening (v399)
+WS-47 Reconnect recovery · WS-48 Toast queue · WS-49 Max players (8) · WS-50 Per-panel ErrorBoundary · WS-51 IDB quota warning · WS-52 Export versioning (already present) · WS-53 Print scene · ~~WS-54~~ deferred (session state URL → parking lot)
 
-### Sprint E — Full FP economy (M)
+---
 
-| ID | Title | Size | Notes |
-|----|-------|------|-------|
-| **WS-27** | Compel offer flow | M | GM taps aspect → offers FP → push to player → accept/refuse. Sync actions `compel_offer`/`compel_response`. |
-| **WS-30** | Player creates aspect | M | Create Advantage → player names aspect from device → sticky with free invokes on GM canvas. Sync `player_create_aspect`. |
+## Open backlog — not yet sprinted
 
-### Sprint F — Content teaching (S)
-
-| ID | Title | Size | Notes |
-|----|-------|------|-------|
-| **WS-55** | Quick reference overlay | S | Fate Ladder + four outcomes + four actions — toggleable overlay during play. |
-| **WS-56** | Aspect quality coaching | S | Tips on stickies/custom cards. `scoreAspect()` exists but unused on board. |
-| **WS-57** | Stunt validation hint | XS | Flag stunts not matching "Because I [X], +2 to [Skill] when [narrow]" template. |
-| **WS-60** | Compel example library | S | 3–5 world-specific examples per world. |
-| **WS-61** | "What would happen" prompts | S | Random twists/complications/NPC actions from world data. Inspiration button. |
-
-### Sprint G — GM polish (S–M)
-
-| ID | Title | Size | Notes |
-|----|-------|------|-------|
-| **WS-33** | Board export: Markdown | S | Board gets Markdown + Obsidian export (CampaignApp has 8 formats, board has 3). |
-| **WS-36** | Multi-step undo | S | Stack of 5–10 operations (delete, card state, player changes). |
-| **WS-38** | Session end summary | M | Export log: rolls, FP flow, consequences, cards generated. |
-| **WS-44** | Card search on canvas | S | Search/filter highlights or scrolls to matching cards. |
-| **WS-46** | Drag card between PREP and PLAY | S | Direct move (not copy) between canvases. |
-
-### Sprint H — Platform hardening (XS–S)
-
-| ID | Title | Size | Notes |
-|----|-------|------|-------|
-| **WS-47** | Player reconnect recovery | S | "Request full state" handshake on reconnect. |
-| **WS-48** | Simultaneous roll guard | XS | Queue toasts with stagger delay. |
-| **WS-49** | Max players guard | XS | Soft cap warning at 6, hard display cap. |
-| **WS-50** | Per-panel error boundary | S | Wrap each major panel independently. Single crash shouldn't kill the board. |
-| **WS-51** | IDB storage quota warning | XS | `navigator.storage.estimate()` check with toast. |
-| **WS-52** | Export format versioning | XS | Add `{version: 1}` wrapper to JSON exports. |
-| **WS-53** | Print-friendly scene state | S | Clean print layout: cards, roster, turn order. |
-| **WS-54** | Session state URL | M | Shareable snapshot of board state for async review. |
-
-### Rules items (not yet sprinted)
+### Rules
 
 | ID | Title | Size | Notes |
 |----|-------|------|-------|
@@ -139,7 +88,7 @@
 | **WS-75** | Weapon/armor ratings | XS | FCon p.58 optional rule. Flag in help as optional. |
 | **WS-76** | Scale rules | S | FCon p.57. +2 per step difference. Rare but important. |
 
-### Content items (not yet sprinted)
+### Content
 
 | ID | Title | Size | Notes |
 |----|-------|------|-------|
@@ -147,14 +96,11 @@
 | **WS-59** | Opposition library | M | 5–8 curated NPCs per world, loadable from help panel. |
 | **WS-62** | Zone template library | M | Common environments with pre-built aspects and difficulties per world. |
 
-### UX / platform items (not yet sprinted)
+### UX / platform
 
 | ID | Title | Size | Notes |
 |----|-------|------|-------|
 | **WS-63** | Combat tracker density view | M | Compact table: all combatants inline with stress/FP/acted. |
-| **WS-64** | Campaign arc tracker | L | Current/impending issues + milestone progress across sessions. |
-| **WS-65** | Relationship map | L | Visual web of PC/NPC relationships from aspects. |
-| **WS-66** | Sound/ambience integration | M | Per-world ambient audio. Web audio API. |
 | **WS-69** | Dice statistics panel | S | Distribution curve, streaks, per-player averages. Post-session review. |
 | **WS-70** | Quick actions palette (⌘K) | M | Command palette for power users. |
 | **WS-71** | Colorblind-safe state indicators | S | Shapes/patterns/icons alongside colour for stress/FP/acted. |
@@ -211,6 +157,15 @@
 
 | Version | What |
 |---------|------|
+| v2026.03.403 | **Full-size cv4Cards + Export page + Hook wiring audit.** Board cards 224→320px, cv4Card at 100% (was 65% scaled pointer-events:none). Drag handle strip. Flip labels: "Tap for GM Guidance" / "Tap for Card Details". Export page replaces canvas (← Back). Topbar ⋯ overflow. Sidebar Export Cards opens board in export view. Card placement 3-col × 340px. Default zoom 60%. `tests/hook-wiring-audit.js` — 59 checks, catches stale return keys + signature mismatches. NA-323–327. |
+| v2026.03.402 | **Hotfix.** `sendToCanvas` took `setCards` param nobody passed. Replaced with `getCanvasCards()` + `persistCanvas()`. |
+| v2026.03.401 | **Hotfix.** `lastRemovedRef`/`lastRerolledRef` stale refs in `useBoardCards` return + BoardApp destructure after WS-36 undo stack refactor. |
+| v2026.03.400 | **Sprint C — Invoke sprint.** WS-26: Invoke workflow (3 paths: sticky free invoke, boost invoke, card ⦿ button → pendingInvoke → +2 on dice). WS-37: Free invoke → dice bonus wiring (badge, auto-clear). WS-39: Create Advantage outcome guide (SWS/Success/Tie/Fail). NA-315–322. |
+| v2026.03.399 | **Sprint G + H.** G: WS-36 multi-step undo (10-entry stack), WS-38 session summary (📋 clipboard), WS-44 card search (dimming), WS-46 move-to-table (➔). H: WS-47 reconnect recovery, WS-48 toast queue, WS-49 max players (8), WS-50 per-panel ErrorBoundary, WS-51 IDB quota warning, WS-53 print scene. NA-304–314. |
+| v2026.03.398 | **Sprint D + E + F + Board Export Panel.** D: WS-28 concede, WS-29 NPC turns, WS-45 consequence recovery, WS-32 scene transition. E: WS-27 compel flow, WS-30 player creates aspect. F: WS-55 quick ref, WS-56 aspect coaching, WS-57 stunt hint, WS-60 compel examples, WS-61 inspiration. Export panel: 8-format grid, card checklist, copy/download. NA-291–303. |
+| v2026.03.397 | **Sprint A + B.** A: WS-20 player dice rolling, WS-21 enriched broadcast, WS-22 turn indicator, WS-23 roll broadcast, WS-25 GM pool visible. B: WS-24 session notes on board, WS-31 help conflicts, WS-34 full-width cards, WS-35 quick NPC, WS-40 session start refresh, WS-42 keyboard R/F, WS-43 zoom-to-fit. NA-278–290. |
+| v2026.03.395 | **Workshop QoL.** Card interactive state persists to IDB. Dice outcome explanations (FCon p.21). GM Fate Point Pool (FCon p.20). NA-270–277. |
+| v2026.03.394 | **Docs-only bump.** ROADMAP, CHANGELOG, BOOTSTRAP, PROJECT_MEMORY all updated to v393 state. |
 | v2026.03.393 | **Play sprint (4 sprints, 8 features).** Sprint 1: TpDicePanel rewrite (learn-fate visual language, flicker→reveal→done phase machine, 68px dr-die tiles, Fate Ladder hex colours via tpLcolHex, vertical layout). Scene End button (endScene clears all phy/men stress, resets acted, confirm dialog, broadcasts). Sprint 2: removeFromTable (bidirectional — BoardCard ✕ button + BoardDossier ○ Remove button, IDB update, broadcast). cv4Card CSS 3D flip (rotateY 180deg, front=content, back=GM Guidance, reduced-motion display toggle). Sprint 3: Free invoke counter on aspect stickies (4 pips, add/consume, freeInvokes on card data). Character sheet on PlayerSurface (expandable My Character section, aspects + skill pyramid + refresh). Sprint 4: Boost card type (genId=boost, 1 free invoke, auto-expires on use, amber gradient, binder section). Opposition Fate Ladder dropdown (replaces number input, clickable ladder −2 to +8 with labels/colours). Hotfixes: LABEL_STYLES crash (pre-existing v391 — constant was used but never defined). CSP connect-src Google Fonts for SW fetch. NA-251–269. |
 | v2026.03.387 | **Custom Card.** Fully inline-editable cv4-frame card. Type pill cycles Aspect→NPC→Location→Clue→Other (tints accent colour). Title and notes both click-to-edit in place. Persists to IDB via updateCard. Reroll disabled. Send to Table, Binder, export all work normally. Context menu entry added. CV4_HELP back panel with invoke/compel examples. NA-240–242. Dead code removed: mdHeader, mdWinLose (engine.js). Docs updated to v387, QA 242/242. |
 | v2026.03.386 | **UX Sprint 5 — Session Zero bridge.** ▶ Start Local Session button on Session Zero completion screen writes ogma_sz_handoff to sessionStorage then navigates to board. BoardApp reads handoff on FP load, pre-populates tracker with 4 Player N slots at Refresh 3, fires toast. board.html default mode changed play→prep. NA-238–239. Sprint 5 of 5 complete — all 12 UX items shipped. |

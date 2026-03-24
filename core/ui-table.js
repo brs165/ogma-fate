@@ -566,6 +566,40 @@ function TpDicePanel(props) {
           h('span', {style: {color: 'var(--text-muted)', fontSize: 10}}, ' \u00b7 ' + r.who)
         );
       })
+    ),
+    // WS-69: Dice statistics (shows after 3+ rolls)
+    history.length >= 3 && h('details', {className: 'tp-dice-stats'},
+      h('summary', {className: 'tp-dice-stats-toggle'}, '\uD83D\uDCCA Stats (' + history.length + ' rolls)'),
+      h('div', {className: 'tp-dice-stats-body'},
+        (function() {
+          var totals = history.map(function(r) { return r.total; });
+          var avg = totals.reduce(function(a,b){return a+b;},0) / totals.length;
+          var hi = Math.max.apply(null, totals);
+          var lo = Math.min.apply(null, totals);
+          // Per-player breakdown
+          var byPlayer = {};
+          history.forEach(function(r) {
+            if (!byPlayer[r.who]) byPlayer[r.who] = [];
+            byPlayer[r.who].push(r.total);
+          });
+          return h(Fragment, null,
+            h('div', {className: 'tp-dice-stats-row'},
+              h('span', null, 'Avg: ', h('strong', {style:{color: tpLcolHex(Math.round(avg))}}, avg.toFixed(1))),
+              h('span', null, 'High: ', h('strong', {style:{color: tpLcolHex(hi)}}, '+' + hi)),
+              h('span', null, 'Low: ', h('strong', {style:{color: tpLcolHex(lo)}}, (lo >= 0 ? '+' : '') + lo))
+            ),
+            Object.keys(byPlayer).map(function(name) {
+              var rolls = byPlayer[name];
+              var pAvg = rolls.reduce(function(a,b){return a+b;},0) / rolls.length;
+              return h('div', {key: name, className: 'tp-dice-stats-player'},
+                h('span', null, name),
+                h('span', null, rolls.length + ' rolls'),
+                h('span', {style:{color: tpLcolHex(Math.round(pAvg)), fontWeight: 700}}, 'avg ' + pAvg.toFixed(1))
+              );
+            })
+          );
+        })()
+      )
     )
   );
 }

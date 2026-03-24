@@ -121,8 +121,7 @@ function generateMinorNPC(t) {
  *   Average (+1) or Fair (+2)  → 4 boxes  [1][1][1][1]
  *   Good (+3) or Great (+4)    → 6 boxes  [1][1][1][1][1][1]
  *   Superb (+5)+               → 6 boxes + second mild consequence slot
- *                                (Ogma never generates above +4 so the
- *                                 extra mild slot path is not implemented.)
+ *                                (WS-41: extra mild now implemented in generatePC and addPlayer.)
  *
  * @param {number} r - Skill rating (0 = not present/default).
  * @returns {number} Number of stress boxes: 3, 4, or 6.
@@ -653,7 +652,9 @@ function generatePC(t) {
     physical_stress: stressFromRating(physR),
     mental_stress:   stressFromRating(willR),
     // PCs always get all 3 consequence slots (FCon p.12)
-    consequences: [2, 4, 6],
+    // WS-41: Superb (+5)+ Physique/Will grants extra mild (FCon p.12)
+    consequences: (physR >= 5 || willR >= 5) ? [2, 4, 6, 2] : [2, 4, 6],
+    extraMild: physR >= 5 || willR >= 5,
     // FCon p.10: refresh 3 at creation, 3 free stunt slots
     refresh: 3,
     questions: questions,

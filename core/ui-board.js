@@ -614,24 +614,28 @@ function BoardPlayerRow(props) {
     expanded && h('div', {style: {padding: '0 8px 7px'}},
       h('div', {style: {fontSize: 11, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase',
         color: 'var(--text-muted)', marginBottom: 3}}, 'Consequences'),
-      ['Mild', 'Moderate', 'Severe'].map(function(sev, i) {
-        var recovery = ['end of next scene', 'end of session', 'end of scenario'][i];
-        return h('div', {key: i, style: {marginBottom: 4}},
-          h('div', {style: {display: 'flex', alignItems: 'center', gap: 3}},
-            h('span', {style: {fontSize: 11, color: 'var(--text-muted)', width: 46, flexShrink: 0}}, sev),
-            h('input', {type: 'text', value: conseq[i] || '', placeholder: 'empty',
-              'aria-label': sev + ' consequence',
-              onChange: function(e) { setConseq(i, e.target.value); },
-              style: {flex: 1, background: 'var(--inset)',
-                border: '1px solid ' + (conseq[i] ? 'var(--c-amber,#f4b942)' : 'var(--border)'),
-                borderRadius: 4, padding: '2px 5px', fontSize: 10, color: 'var(--text)',
-                fontFamily: 'var(--font-ui)', outline: 'none'}})
-          ),
-          // WS-45: Recovery hint when consequence is filled
-          conseq[i] && h('div', {style: {fontSize: 10, color: 'var(--text-muted)', marginLeft: 49, fontStyle: 'italic'}},
-            '\u21b3 clears ' + recovery)
-        );
-      }),
+      // WS-41: Extra mild consequence slot — dynamic labels based on conseq length
+      (function() {
+        var labels = conseq.length >= 4
+          ? [{name:'Mild', rec:'end of next scene'}, {name:'Moderate', rec:'end of session'}, {name:'Severe', rec:'end of scenario'}, {name:'Mild 2', rec:'end of next scene'}]
+          : [{name:'Mild', rec:'end of next scene'}, {name:'Moderate', rec:'end of session'}, {name:'Severe', rec:'end of scenario'}];
+        return labels.map(function(slot, i) {
+          return h('div', {key: i, style: {marginBottom: 4}},
+            h('div', {style: {display: 'flex', alignItems: 'center', gap: 3}},
+              h('span', {style: {fontSize: 11, color: 'var(--text-muted)', width: 46, flexShrink: 0}}, slot.name),
+              h('input', {type: 'text', value: conseq[i] || '', placeholder: 'empty',
+                'aria-label': slot.name + ' consequence',
+                onChange: function(e) { setConseq(i, e.target.value); },
+                style: {flex: 1, background: 'var(--inset)',
+                  border: '1px solid ' + (conseq[i] ? 'var(--c-amber,#f4b942)' : 'var(--border)'),
+                  borderRadius: 4, padding: '2px 5px', fontSize: 10, color: 'var(--text)',
+                  fontFamily: 'var(--font-ui)', outline: 'none'}})
+            ),
+            conseq[i] && h('div', {style: {fontSize: 10, color: 'var(--text-muted)', marginLeft: 49, fontStyle: 'italic'}},
+              '\u21b3 clears ' + slot.rec)
+          );
+        });
+      })(),
       // WS-28: Concede — earn 1 FP per consequence taken (FCon p.35)
       h('button', {
         className: 'rs-concede-btn',
@@ -656,6 +660,63 @@ function BoardPlayerRow(props) {
         title: 'FCon p.20: offer FP through aspect',
         style: {borderColor: 'var(--c-purple)', color: 'var(--c-purple)'},
       }, '\u21A9 Compel')
+    )
+  );
+}
+
+// WS-63: Combat tracker density view — compact table of all combatants
+function CombatTracker(props) {
+  var players = props.players || [];
+  var npcCards = props.npcCards || [];
+  var onToggleActed = props.onToggleActed;
+  var onToggleNpcActed = props.onToggleNpcActed;
+  var onUpd = props.onUpd;
+
+  return h('div', {className: 'ct-wrap'},
+    h('table', {className: 'ct-table', role: 'grid'},
+      h('thead', null,
+        h('tr', null,
+          h('th', null, ''),
+          h('th', null, 'Name'),
+          h('th', null, 'FP'),
+          h('th', null, 'PHY'),
+          h('th', null, 'MEN'),
+          h('th', null, 'Conseq'),
+          h('th', null, '\u2713')
+        )
+      ),
+      h('tbody', null,
+        players.map(function(p) {
+          var phyFilled = (p.phy||[]).filter(Boolean).length;
+          var menFilled = (p.men||[]).filter(Boolean).length;
+          var conseqFilled = (p.conseq||[]).filter(Boolean).length;
+          return h('tr', {key: p.id, className: p.acted ? 'ct-acted' : ''},
+            h('td', {className: 'ct-avatar'}, p.avatar || '\u25CF'),
+            h('td', {className: 'ct-name'}, p.name),
+            h('td', {className: 'ct-fp', style: {color: p.fp === 0 ? 'var(--c-red)' : 'var(--accent)'}}, String(p.fp || 0)),
+            h('td', null, phyFilled + '/' + (p.phy||[]).length),
+            h('td', null, menFilled + '/' + (p.men||[]).length),
+            h('td', {style: {color: conseqFilled > 0 ? 'var(--c-amber)' : 'var(--text-muted)'}}, conseqFilled > 0 ? conseqFilled + ' filled' : '\u2014'),
+            h('td', null, h('button', {className: 'ct-act-btn' + (p.acted ? ' acted' : ''),
+              onClick: function() { onToggleActed(p.id); },
+              'aria-label': (p.acted ? 'Mark unacted' : 'Mark acted') + ' ' + p.name,
+            }, p.acted ? '\u2713' : '\u25CB'))
+          );
+        }),
+        npcCards.map(function(npc) {
+          return h('tr', {key: npc.id, className: 'ct-npc' + (npc.acted ? ' ct-acted' : '')},
+            h('td', {className: 'ct-avatar'}, '\u25C6'),
+            h('td', {className: 'ct-name'}, npc.title || 'NPC'),
+            h('td', null, '\u2014'),
+            h('td', null, '\u2014'),
+            h('td', null, '\u2014'),
+            h('td', null, '\u2014'),
+            h('td', null, h('button', {className: 'ct-act-btn' + (npc.acted ? ' acted' : ''),
+              onClick: function() { if (onToggleNpcActed) onToggleNpcActed(npc.id); },
+            }, npc.acted ? '\u2713' : '\u25CB'))
+          );
+        })
+      )
     )
   );
 }
@@ -721,7 +782,9 @@ function BoardTurnBar(props) {
         onDragEnd: function() { setDragId(null); setOverId(null); },
         onClick: function() { onToggleActed(p.id); },
       },
-        h('div', {className: 'rs-turn-dot', style: {background: p.color || 'var(--accent)'}}),
+        p.avatar
+          ? h('span', {className: 'rs-turn-avatar'}, p.avatar)
+          : h('div', {className: 'rs-turn-dot', style: {background: p.color || 'var(--accent)'}}),
         h('span', {style: {fontSize: 10, fontWeight: 700,
           color: p.acted ? 'var(--c-green)' : 'var(--text)'}}, p.name),
         p.acted && h('span', {style: {fontSize: 10, color: 'var(--c-green)'}}, ' ✓')
@@ -788,6 +851,7 @@ function BoardPlayPanel(props) {
   var gmPool    = props.gmPool != null ? props.gmPool : 0;
   var updGmPool = props.updGmPool;
   var onQuickNpc = props.onQuickNpc;
+  var onStarterScene = props.onStarterScene;
   var onCompel = props.onCompel;
   var collapsed = props.collapsed; // UNI-05: true in PREP mode → compact accordion
   var _open = useState(false); var open = _open[0]; var setOpen = _open[1];
@@ -851,7 +915,9 @@ function BoardPlayPanel(props) {
       }),
       h('button', {className: 'rs-add-player', 'aria-label': 'Add player', onClick: onAdd}, '+ Add Player'),
       onQuickNpc && h('button', {className: 'rs-add-player', 'aria-label': 'Generate quick NPC', onClick: onQuickNpc,
-        style: {marginTop: 2, borderColor: 'var(--c-red)', color: 'var(--c-red)'}}, '\u26A1 Quick NPC')
+        style: {marginTop: 2, borderColor: 'var(--c-red)', color: 'var(--c-red)'}}, '\u26A1 Quick NPC'),
+      onStarterScene && h('button', {className: 'rs-add-player', 'aria-label': 'Generate starter scene', onClick: onStarterScene,
+        style: {marginTop: 2, borderColor: 'var(--c-blue)', color: 'var(--c-blue)'}}, '\uD83C\uDFAC Starter Scene')
     )
   );
 }
@@ -1320,6 +1386,46 @@ function BoardHelpPanel(props) {
         {head: 'Exchange', body: 'One exchange = every participant acts once (popcorn order). After acting, you choose who goes next. Repeat until conflict ends.'},
         {head: 'Concede', body: 'Before any roll, you can concede. You leave the conflict on your terms and earn 1 FP per consequence you took during this conflict. FCon p.35.'},
         {head: 'Taken Out', body: 'If you can\u2019t absorb all shifts from an attack, you\u2019re taken out. The attacker narrates what happens to you. Always offer concession first.'},
+      ]
+    },
+    {
+      id: 'optional', title: 'Optional Rules',
+      content: [
+        {head: 'Weapon ratings (FCon p.58)', body: 'A weapon with Weapon:2 adds 2 extra shifts on a successful hit. Doesn\u2019t change the roll \u2014 only the damage dealt. Use sparingly: it makes fights deadlier fast.'},
+        {head: 'Armor ratings (FCon p.58)', body: 'Armor:1 absorbs 1 shift from any hit. Stacks with stress. Makes characters harder to take out but slows conflicts. Best for bosses or named NPCs.'},
+        {head: 'Scale (FCon p.57)', body: 'When two entities differ in scale (personal vs. vehicle, individual vs. army), the larger side gets +2 per step of difference. The smaller side also gets +2 to Defend. This keeps asymmetric fights mechanically meaningful.'},
+        {head: 'Extra mild consequence (FCon p.12)', body: 'Physique or Will at Superb (+5)+ grants a second mild consequence slot (physical or mental only). Rare \u2014 most PCs peak at +4.'},
+      ]
+    },
+    {
+      id: 'advanced', title: 'Advanced Concepts',
+      content: [
+        {head: 'Bronze Rule (FCon p.47)', body: 'Everything can be a character. Organizations, vehicles, locations, magic items, factions \u2014 give them aspects, skills, stress tracks, and consequence slots. A pirate ship might have HC: "Fastest Sloop on the Coast", skills Sail +3, Cannons +2, and 4 stress boxes. Treat it mechanically like an NPC.'},
+        {head: 'When to use the Bronze Rule', body: 'Use it when a non-person entity: (1) takes actions in the fiction, (2) can be attacked or damaged, (3) has narrative weight worth tracking. Don\u2019t use it for flavour \u2014 a locked door is an Overcome roll, not a character.'},
+        {head: 'Bronze Rule examples', body: 'Faction: HC "Shadow Council Pulls the Strings", Contacts +3, Deceive +2. Vehicle: HC "Armored War Rig", Drive +4, Weapon:2. Magical artifact: HC "The Crown Commands Obedience", Will +5, one mild consequence.'},
+        {head: 'Extras (FCon p.50)', body: 'Special abilities, gear, or powers that go beyond stunts. An Extra is a permission (you can do X) plus a cost (it requires an aspect, a stunt slot, or a refresh point). Spaceships, magic systems, and cybernetics are all Extras.'},
+      ]
+    },
+    {
+      id: 'opposition', title: '\u2694 Opposition Library',
+      content: [
+        {head: 'Mook (threat: low)', body: 'HC: "Expendable Grunt." One skill at +1. 1 stress box, no consequences. Taken out in one hit. Use in groups of 2\u20134.'},
+        {head: 'Skilled operative (threat: medium)', body: 'HC: "Trained and Dangerous." Two aspects. Skills: peak +2, one at +1. 2 stress boxes, no consequences. Stunt: +2 to Defend when in cover.'},
+        {head: 'Lieutenant (threat: high)', body: 'HC: "The Boss\u2019s Right Hand." Three aspects including a trouble. Skills: peak +3, two at +2, three at +1. 3 stress boxes, mild consequence. One stunt.'},
+        {head: 'Boss (threat: extreme)', body: 'Full character. 5 aspects, full skill pyramid (+4 peak). Stress: 4 physical, 4 mental. All 3 consequence slots. 2\u20133 stunts. Give them a unique aspect the PCs must discover mid-fight.'},
+        {head: 'Mob (group of mooks)', body: 'Treat as one entity. Add +1 to skill per extra member (3 mooks = +3). Each stress box absorbed removes one member. Fast, scary, fragile.'},
+        {head: 'Environment as opposition', body: 'Set a flat difficulty (+2 to +6) for natural hazards, traps, or automated defences. No stress track \u2014 just a target number to overcome. Add a countdown if the threat escalates.'},
+      ]
+    },
+    {
+      id: 'zones', title: '\uD83D\uDDFA Zone Templates',
+      content: [
+        {head: 'Rooftop Chase (3 zones)', body: 'Zone 1: "Crowded Market Street" (free move). Zone 2: "Narrow Fire Escape" (Athletics +2 to cross, aspect: Rickety Railings). Zone 3: "Sloped Rooftop" (Athletics +3, aspect: Slippery Tiles). Good for: contests, chases.'},
+        {head: 'Ambush Site (2 zones)', body: 'Zone 1: "Open Clearing" (aspect: Exposed, No Cover). Zone 2: "Dense Tree Line" (aspect: Natural Cover, Stealth +2 to enter unseen). Good for: conflicts with ranged/melee split.'},
+        {head: 'Burning Building (4 zones)', body: 'Zone 1: "Lobby" (free). Zone 2: "Smoke-Filled Stairwell" (Physique +2, aspect: Choking Smoke). Zone 3: "Collapsing Floor" (Athletics +3, aspect: Floor Gives Way). Zone 4: "Roof Access" (blocked until Overcome +4). Add a 4-box countdown: "Building Collapses."'},
+        {head: 'Tense Negotiation (2 zones)', body: 'Zone 1: "The Table" (social \u2014 Rapport, Deceive, Provoke). Zone 2: "The Back Room" (physical \u2014 guards, weapons, escape). Moving between = narrative shift from words to action. Aspect: "Armed Guards at Every Door."'},
+        {head: 'Ship-to-Ship (3 zones)', body: 'Zone 1: "Your Deck" (free). Zone 2: "The Gap" (Athletics +3 to cross, aspect: Churning Sea). Zone 3: "Enemy Deck" (hostile territory, outnumbered). Boarding action structure.'},
+        {head: 'Custom zone tips', body: '2\u20134 zones per scene is ideal. Give each zone one aspect. Set barrier difficulties at +2 (easy) to +4 (hard). Free movement within a zone, one free zone move per exchange, barriers cost an Overcome.'},
       ]
     },
   ];
@@ -1947,6 +2053,16 @@ function BoardTopbar(props) {
         title: theme === 'dark' ? 'Light mode' : 'Dark mode',
         'aria-label': theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode',
       }, theme === 'dark' ? '\u2600' : '\u263D'),
+      // WS-71: Colorblind-safe patterns toggle
+      h('button', {
+        className: 'bt-icon-btn',
+        onClick: function() {
+          var on = document.body.getAttribute('data-a11y-patterns') === 'true';
+          document.body.setAttribute('data-a11y-patterns', on ? 'false' : 'true');
+        },
+        title: 'Toggle colorblind-safe patterns',
+        'aria-label': 'Toggle colorblind-safe patterns',
+      }, '\u25A8'),
       // Overflow menu — Export Cards
       props.onExportView && h('button', {
         className: 'bt-icon-btn',
@@ -2075,6 +2191,8 @@ function useBoardPlayState(campId, mode, loaded) {
     var men = will >= 3 ? [false,false,false,false,false,false]
             : will >= 1 ? [false,false,false,false]
             : [false,false,false];
+    // WS-41: Extra mild consequence — FCon p.12: Physique/Will ≥5 grants additional mild slot
+    var extraMild = (physique >= 5 || will >= 5);
     var np = {
       id: 'bp' + Date.now() + Math.random().toString(36).slice(2, 5),
       name: name,
@@ -2082,7 +2200,9 @@ function useBoardPlayState(campId, mode, loaded) {
       fp: 3, ref: 3,
       phy: phy, men: men,
       color: COLORS[players.length % COLORS.length],
-      acted: false, conseq: ['', '', ''],
+      acted: false, conseq: extraMild ? ['', '', '', ''] : ['', '', ''],
+      extraMild: extraMild,
+      avatar: pc.avatar || '',
       aspects: pc.aspects || [],
       skills: skills,
     };
@@ -2727,6 +2847,18 @@ function PlayerSurface(props) {
   var myAspects = myPlayer ? (myPlayer.aspects || []) : [];
   var myHc      = myPlayer ? (myPlayer.hc || '') : '';
   var mySkills  = myPlayer ? (myPlayer.skills || []) : [];
+  // WS-73: Table tent mode
+  var _tentMode = useState(false); var tentMode = _tentMode[0]; var setTentMode = _tentMode[1];
+
+  // Table tent — full screen name+HC
+  if (tentMode) {
+    return h('div', {className: 'ps-tent', onClick: function() { setTentMode(false); }},
+      myPlayer && myPlayer.avatar && h('div', {className: 'ps-tent-avatar'}, myPlayer.avatar),
+      h('div', {className: 'ps-tent-name'}, playerName),
+      myHc && h('div', {className: 'ps-tent-hc'}, myHc),
+      h('div', {className: 'ps-tent-hint'}, 'Tap anywhere to exit')
+    );
+  }
 
   return h('div', {className: 'ps-surface'},
 
@@ -2734,6 +2866,8 @@ function PlayerSurface(props) {
     h('div', {className: 'ps-topbar'},
       h('span', {className: 'ps-room-chip'}, '\uD83D\uDD17\u00a0' + roomCode),
       h('span', {className: 'ps-name'}, playerName),
+      h('button', {className: 'ps-tent-btn', onClick: function() { setTentMode(true); },
+        title: 'Table tent \u2014 large name display', 'aria-label': 'Table tent mode'}, '\u2B1C'),
       h('span', {
         className: 'ps-status' + (syncStatus === 'connected' ? ' ps-online' : ''),
       }, syncStatus === 'connected' ? '\u25CF\u00a0Live' : '\u25CB\u00a0Offline')
@@ -2992,6 +3126,53 @@ function PlayerSurface(props) {
   );
 }
 
+// WS-70: Command palette (⌘K / Ctrl+K)
+function CommandPalette(props) {
+  var actions = props.actions || [];
+  var onClose = props.onClose;
+  var _q = useState(''); var q = _q[0]; var setQ = _q[1];
+  var _sel = useState(0); var sel = _sel[0]; var setSel = _sel[1];
+  var inputRef = useRef(null);
+
+  useEffect(function() { if (inputRef.current) inputRef.current.focus(); }, []);
+
+  var filtered = q
+    ? actions.filter(function(a) { return a.label.toLowerCase().includes(q.toLowerCase()) || (a.sub||'').toLowerCase().includes(q.toLowerCase()); })
+    : actions;
+
+  function exec(action) { if (action.fn) action.fn(); onClose(); }
+
+  return h('div', {className: 'cmd-overlay', onClick: function(e) { if (e.target === e.currentTarget) onClose(); }},
+    h('div', {className: 'cmd-modal', role: 'dialog', 'aria-label': 'Command palette'},
+      h('input', {
+        ref: inputRef, className: 'cmd-input', type: 'text', value: q,
+        placeholder: 'Type a command\u2026', 'aria-label': 'Search commands',
+        onChange: function(e) { setQ(e.target.value); setSel(0); },
+        onKeyDown: function(e) {
+          if (e.key === 'Escape') { onClose(); return; }
+          if (e.key === 'ArrowDown') { e.preventDefault(); setSel(function(s) { return Math.min(s + 1, filtered.length - 1); }); }
+          if (e.key === 'ArrowUp') { e.preventDefault(); setSel(function(s) { return Math.max(s - 1, 0); }); }
+          if (e.key === 'Enter' && filtered[sel]) { e.preventDefault(); exec(filtered[sel]); }
+        },
+      }),
+      h('div', {className: 'cmd-list'},
+        filtered.length === 0 && h('div', {className: 'cmd-empty'}, 'No matching commands'),
+        filtered.map(function(a, i) {
+          return h('button', {
+            key: a.id, className: 'cmd-item' + (i === sel ? ' cmd-active' : ''),
+            onClick: function() { exec(a); },
+            onMouseEnter: function() { setSel(i); },
+          },
+            h('span', {className: 'cmd-icon'}, a.icon || ''),
+            h('span', {className: 'cmd-label'}, a.label),
+            a.shortcut && h('span', {className: 'cmd-shortcut'}, a.shortcut)
+          );
+        })
+      )
+    )
+  );
+}
+
 function BoardApp(props) {
   var campId       = props.campId || 'fantasy';
   var initialMode  = props.initialMode || 'prep';
@@ -3033,8 +3214,12 @@ function BoardApp(props) {
   var _dossierCard = useState(null);
   var dossierCard = _dossierCard[0];
   var setDossierCard = _dossierCard[1];
+  // WS-70: Command palette
+  var _cmdPalette = useState(false); var cmdPalette = _cmdPalette[0]; var setCmdPalette = _cmdPalette[1];
   // WS-44: Card search
   var _cardSearch = useState(''); var cardSearch = _cardSearch[0]; var setCardSearch = _cardSearch[1];
+  // WS-63: Combat tracker density view
+  var _showTracker = useState(false); var showTracker = _showTracker[0]; var setShowTracker = _showTracker[1];
   // Export page — replaces canvas content
   var _exportView = useState(initialExportView); var exportView = _exportView[0]; var setExportView = _exportView[1];
   // Consume the initialExportView flag so re-renders don't re-open
@@ -3202,7 +3387,7 @@ function BoardApp(props) {
   var playCardIds   = binder.playCardIds;
   // PL-03: pre-join character builder — step 0=name, 1=aspects, 2=skills
   var _pcStep = useState(0); var pcStep = _pcStep[0]; var setPcStep = _pcStep[1];
-  var _pcDraft = useState({hc:'',trouble:'',aspect3:'',skills:{}}); var pcDraft = _pcDraft[0]; var setPcDraft = _pcDraft[1];
+  var _pcDraft = useState({hc:'',trouble:'',aspect3:'',skills:{},avatar:''}); var pcDraft = _pcDraft[0]; var setPcDraft = _pcDraft[1];
   function updDraft(patch) { setPcDraft(function(d){ return Object.assign({},d,patch); }); }
   // FCon skill pyramid: 1×+4, 2×+3, 3×+2, 4×+1 — total 10 rated skills (FCon p.10)
   var PC_SKILL_LADDER = [{r:4,n:1},{r:3,n:2},{r:2,n:3},{r:1,n:4}];
@@ -3253,7 +3438,7 @@ function BoardApp(props) {
     var payload = {
       type: 'player_hello',
       name: playerJoinName.trim(),
-      pc: { hc: pcDraft.hc, trouble: pcDraft.trouble, aspects: aspects, skills: skills }
+      pc: { hc: pcDraft.hc, trouble: pcDraft.trouble, aspects: aspects, skills: skills, avatar: pcDraft.avatar || '' }
     };
     syncObj.ws.send(JSON.stringify(payload));
     setPlayerJoinSent(true);
@@ -3530,23 +3715,25 @@ function BoardApp(props) {
   // ── Drag ─────────────────────────────────────────────────────────────────
   function onDragStart(e, cardId) {
     if (e.button !== 0) return;
-    var canvas = canvasRef.current;
-    var r = canvas.getBoundingClientRect();
     var card = cardsRef.current.find(function(c) { return c.id === cardId; });
     if (!card) return;
 
-    // Bring to front
+    // Find the DOM element for this card
+    var el = e.target.closest('.board-card') || e.target.closest('.board-sticky') || e.target.closest('.board-boost') || e.target.closest('.board-label');
+    if (!el) return;
+
+    // Bring to front via direct DOM (no React)
     var topZ = Date.now();
-    setCards(function(prev) {
-      return prev.map(function(c) { return c.id === cardId ? Object.assign({}, c, {z: topZ}) : c; });
-    });
+    el.style.zIndex = topZ;
 
     dragRef.current = {
       cardId: cardId,
+      el: el,
       startMouseX: e.clientX,
       startMouseY: e.clientY,
       startCardX: card.x,
       startCardY: card.y,
+      topZ: topZ,
       moved: false,
     };
     e.preventDefault();
@@ -3554,19 +3741,21 @@ function BoardApp(props) {
 
   useEffect(function() {
     function onMouseMove(e) {
-      // Card drag
+      // Card drag — direct DOM, zero React overhead
       if (dragRef.current) {
         var dx = e.clientX - dragRef.current.startMouseX;
         var dy = e.clientY - dragRef.current.startMouseY;
         if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragRef.current.moved = true;
         var newX = dragRef.current.startCardX + dx / zoom;
         var newY = dragRef.current.startCardY + dy / zoom;
-        var id = dragRef.current.cardId;
-        setCards(function(prev) {
-          return prev.map(function(c) {
-            return c.id === id ? Object.assign({}, c, {x: newX, y: newY}) : c;
-          });
-        });
+        // Move via CSS transform — no state update during drag
+        dragRef.current.el.style.left = newX + 'px';
+        dragRef.current.el.style.top = newY + 'px';
+        dragRef.current.finalX = newX;
+        dragRef.current.finalY = newY;
+        if (!dragRef.current.el.classList.contains('drag-active')) {
+          dragRef.current.el.classList.add('drag-active');
+        }
       }
       // Canvas pan
       if (panRef.current) {
@@ -3577,9 +3766,31 @@ function BoardApp(props) {
     }
     function onMouseUp() {
       if (dragRef.current) {
-        var moved = dragRef.current.moved;
+        var d = dragRef.current;
         dragRef.current = null;
-        if (moved) persistCanvas(cardsRef.current);
+        if (d.el) d.el.classList.remove('drag-active');
+        if (d.moved) {
+          // Single state commit on drop
+          var id = d.cardId;
+          var fx = d.finalX != null ? d.finalX : d.startCardX;
+          var fy = d.finalY != null ? d.finalY : d.startCardY;
+          setCards(function(prev) {
+            return prev.map(function(c) {
+              return c.id === id ? Object.assign({}, c, {x: fx, y: fy, z: d.topZ}) : c;
+            });
+          });
+          persistCanvas(cardsRef.current.map(function(c) {
+            return c.id === id ? Object.assign({}, c, {x: fx, y: fy, z: d.topZ}) : c;
+          }));
+        } else {
+          // Click without move — just update z-index in state
+          var cid = d.cardId;
+          setCards(function(prev) {
+            return prev.map(function(c) {
+              return c.id === cid ? Object.assign({}, c, {z: d.topZ}) : c;
+            });
+          });
+        }
       }
       panRef.current = null;
     }
@@ -3617,6 +3828,12 @@ function BoardApp(props) {
   // ── Keyboard shortcuts ────────────────────────────────────────────────────
   useEffect(function() {
     function onKey(e) {
+      // WS-70: ⌘K / Ctrl+K — command palette (works from anywhere)
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setCmdPalette(function(v) { return !v; });
+        return;
+      }
       var tag = (e.target || {}).tagName || '';
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
       if (dossierCard) {
@@ -3764,6 +3981,14 @@ function BoardApp(props) {
           gmPool: gmPool,
           updGmPool: mode === 'play' ? updGmPool : null,
           onQuickNpc: mode === 'play' ? function() { generateCard('npc_minor'); showToast('\u26A1 Quick NPC added'); } : null,
+          onStarterScene: mode === 'play' ? function() {
+            generateCard('scene', 60, 60);
+            generateCard('npc_minor', 400, 60);
+            generateCard('npc_minor', 740, 60);
+            generateCard('encounter', 60, 480);
+            generateCard('countdown', 400, 480);
+            showToast('\uD83C\uDFAC Starter scene: 1 scene + 2 NPCs + encounter + countdown');
+          } : null,
           onCompel: mode === 'play' ? function(player) {
             var aspect = prompt('Compel which aspect?\n(' + player.name + '\u2019s HC: ' + (player.hc || '?') + ')');
             if (!aspect) return;
@@ -3846,6 +4071,20 @@ function BoardApp(props) {
               showToast('No cards to print');
             }
           },
+        }),
+
+        // WS-63: Combat tracker density toggle + view
+        mode === 'play' && players.length > 0 && h('div', {className: 'ct-toggle-row'},
+          h('button', {className: 'ct-toggle-btn', onClick: function() { setShowTracker(function(v) { return !v; }); },
+            'aria-pressed': String(showTracker), 'aria-label': 'Toggle combat tracker'},
+            showTracker ? '\u25BC Combat Tracker' : '\u25B6 Combat Tracker')
+        ),
+        showTracker && mode === 'play' && h(CombatTracker, {
+          players: players,
+          npcCards: cards.filter(function(c) { return c.genId === 'npc_minor' || c.genId === 'npc_major'; }),
+          onToggleActed: toggleActed,
+          onToggleNpcActed: function(id) { updateCard(id, {acted: !cards.find(function(c){return c.id===id;}).acted}); },
+          onUpd: updPlayer,
         }),
 
       // Canvas area
@@ -3955,6 +4194,17 @@ function BoardApp(props) {
                 onChange: function(e){ setPlayerJoinName(e.target.value); },
                 onKeyDown: function(e){ if(e.key==='Enter'&&playerJoinName.trim()) setPcStep(1); },
               }),
+              // WS-72: Avatar selection
+              h('div', {className:'bwb-avatar-row'},
+                ['\uD83E\uDDD9','\u2694','\uD83D\uDEE1','\uD83C\uDFAF','\uD83C\uDF1F','\uD83D\uDD25','\uD83C\uDF3F','\uD83D\uDC80'].map(function(em) {
+                  return h('button', {
+                    key: em, className: 'bwb-avatar-btn' + (pcDraft.avatar === em ? ' selected' : ''),
+                    onClick: function() { updDraft({avatar: em}); },
+                    'aria-label': 'Avatar ' + em,
+                    'aria-pressed': String(pcDraft.avatar === em),
+                  }, em);
+                })
+              ),
               h('div', {className:'bwb-row', style:{justifyContent:'flex-end'}},
                 h('button', {
                   className:'bwb-btn', disabled:!playerJoinName.trim(),
@@ -4356,6 +4606,29 @@ function BoardApp(props) {
         )
       )
     ),
+
+    // WS-70: Command palette (⌘K)
+    cmdPalette && h(CommandPalette, {
+      onClose: function() { setCmdPalette(false); },
+      actions: [
+        {id:'gen-npc', icon:'\uD83E\uDDD1', label:'Generate Minor NPC', shortcut:'Space', fn: function(){ generateCard('npc_minor'); }},
+        {id:'gen-major', icon:'\uD83D\uDC51', label:'Generate Major NPC', fn: function(){ generateCard('npc_major'); }},
+        {id:'gen-scene', icon:'\uD83D\uDD25', label:'Generate Scene', fn: function(){ generateCard('scene'); }},
+        {id:'gen-encounter', icon:'\u2694', label:'Generate Encounter', fn: function(){ generateCard('encounter'); }},
+        {id:'gen-seed', icon:'\uD83C\uDF31', label:'Generate Adventure Seed', fn: function(){ generateCard('seed'); }},
+        {id:'gen-sticky', icon:'\uD83D\uDCDD', label:'Add Aspect Sticky', fn: function(){ generateCard('sticky'); }},
+        {id:'gen-boost', icon:'\u26A1', label:'Add Boost', fn: function(){ generateCard('boost'); }},
+        {id:'gen-custom', icon:'\u270E', label:'Add Custom Card', fn: function(){ generateCard('custom'); }},
+        {id:'dice', icon:'\uD83C\uDFB2', label:'Toggle Dice Roller', shortcut:'R', fn: function(){ setShowDice(function(v){return !v;}); }},
+        {id:'fp', icon:'\u25CE', label:'Toggle FP Tracker', fn: function(){ setShowFP(function(v){return !v;}); }},
+        {id:'notes', icon:'\uD83D\uDCDD', label:'Toggle Session Notes', fn: function(){ setShowNotes(function(v){return !v;}); }},
+        {id:'export', icon:'\u2193', label:'Export Cards', fn: function(){ setExportView(true); }},
+        {id:'fit', icon:'\u2922', label:'Fit All Cards', shortcut:'F', fn: fitAll},
+        {id:'undo', icon:'\u21B6', label:'Undo', shortcut:'\u2318Z', fn: undoLast},
+        {id:'mode', icon:'\u25B6', label: mode === 'prep' ? 'Switch to Play' : 'Switch to Prep', fn: function(){ setMode(mode === 'prep' ? 'play' : 'prep'); }},
+        {id:'theme', icon:'\u263D', label:'Toggle Dark/Light', fn: toggleTheme},
+      ],
+    }),
 
     // Dossier modal — GM Guidance + actions (cv4Card visible inline on canvas)
     dossierCard && h(BoardDossier, {

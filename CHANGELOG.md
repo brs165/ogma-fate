@@ -8,6 +8,148 @@
 
 ---
 
+## 2026.03.403 — Full-size cv4Cards + Export page + Hook wiring audit
+
+**Full-size interactive cv4Cards on canvas:**
+- Board cards widened 224→320px. cv4Card renders at 100% with all interactions enabled (was 65% scaled with `pointer-events:none`)
+- Drag handle strip (≡) at top of each card for repositioning. Click inside card for stress boxes, flip, countdown, consequences
+- Flip button labels: "▸ Tap for GM Guidance" (front), "◀ Tap for Card Details" (back)
+- Card placement grid: 3 columns × 340px spacing, 420px row height. Default zoom 60%
+- `fitAll()` dimensions updated for new card size (320×400)
+
+**Export page (replaces canvas):**
+- Sidebar "Export Cards" opens BoardApp with export page as main content (not a tab)
+- Topbar ⋯ overflow button opens export page
+- ← Back button returns to canvas
+- `BoardExportPanel`: card checklist (All/None), 8-format grid, copy/download delivery
+- EXPORT tab removed from GENERATE|STUNTS|HELP strip
+
+**Hook wiring audit** (`tests/hook-wiring-audit.js`):
+- Parses every `function use*` hook, verifies return object keys resolve in scope
+- Checks function call-site arg counts (skips `obj.method()`, handles object literal args)
+- 59 checks, catches exact class of bugs that produced v401/v402 hotfixes
+
+**New QA assertions:** NA-323 through NA-327. NA-302 updated for export page.
+
+327/327 named · 59/59 hook wiring · 59/59 unit · 89/89 export · 128/128 smoke.
+
+---
+
+## 2026.03.402 — Hotfix: sendToCanvas setCards param
+
+- `sendToCanvas` in `useBoardBinder` took `setCards` as a parameter that no call site passed
+- Replaced with `getCanvasCards()` + `persistCanvas()` — same pattern `sendTrayToCanvas` already uses
+
+---
+
+## 2026.03.401 — Hotfix: stale undo refs after WS-36 refactor
+
+- WS-36 replaced `lastRemovedRef` + `lastRerolledRef` with `undoStackRef` but left stale names in `useBoardCards` return object and BoardApp destructure
+- Removed both stale references. Hook wiring audit would have caught this.
+
+---
+
+## 2026.03.400 — Sprint C: Invoke sprint (3 items)
+
+**WS-26: Invoke workflow — 3 invoke paths, all wired to dice panel:**
+- Sticky free invoke: consume pip → `onInvoke({source:'free'})` → `pendingInvoke` state → dice +2 → cleared after roll
+- Boost invoke: use invoke button → expires boost → same path
+- Generated card invoke: ⦿ button in BoardCard action strip → `onInvoke({source:'paid'})` → dice +2
+- All three open dice panel automatically and toast "✦ Invoke queued — +2 on next roll"
+
+**WS-37: Free invoke → dice bonus wiring:**
+- `TpDicePanel` accepts `pendingInvoke` prop, `invokeBonus = pendingInvoke ? 2 : 0`
+- Roll total includes +2. `onClearInvoke` callback clears after roll
+- Invoke badge shows source and aspect name. Cancel button (✕)
+
+**WS-39: Create Advantage outcome guide:**
+- Collapsible "✦ Create Advantage?" after every roll
+- SWS = 2 free invokes, Success = 1, Tie = boost, Fail = opponent gets invoke
+
+NA-315–322. 322/322 named · 59/59 unit · 89/89 export · 128/128 smoke.
+
+---
+
+## 2026.03.399 — Sprint G (GM polish) + Sprint H (Platform hardening)
+
+**Sprint G:**
+- WS-36: Multi-step undo — `undoStackRef` (10 entries) replaces two single refs. Delete + reroll both push
+- WS-38: Session summary — 📋 button in turn bar. Builds markdown log and copies to clipboard
+- WS-44: Card search — 🔍 input in zoom bar. Non-matching cards dim to 20% opacity. Escape clears
+- WS-46: Move to table — ➔ button in prep mode sends to table then deletes from prep
+
+**Sprint H:**
+- WS-47: Player reconnect — GM detects existing name on `player_hello`, re-broadcasts instead of duplicating
+- WS-48: Toast queue — `toastQueueRef` array with `drainToast()`. Sequential 1.8s drain
+- WS-49: Max players — `addPlayer` returns silently at 8
+- WS-50: Per-panel ErrorBoundary — BoardLeftPanel wrapped
+- WS-51: IDB quota warning — `navigator.storage.estimate()` on mount, toast at 80%+
+- WS-53: Print scene — 🖨 button in turn bar, calls `DB.printCards`
+
+NA-304–314. 314/314 named · 59/59 unit · 89/89 export · 128/128 smoke.
+
+---
+
+## 2026.03.398 — Sprint D + E + F + Board Export Panel
+
+**Sprint D — Conflict completeness:**
+- WS-28: Concede button in BoardPlayerRow. Earns 1 FP per consequence. Confirm dialog
+- WS-29: NPC cards in turn order. Pills with acted toggle. allActed includes NPCs. Separator bar
+- WS-45: Consequence recovery hints ("↳ clears end of next scene/session/scenario")
+- WS-32: Scene transition. `clearTable()` in useBoardBinder. "⟳ New Scene" button in turn bar
+
+**Sprint E — Full FP economy:**
+- WS-27: Compel flow. GM "↩ Compel" button → prompt → broadcast → player banner (accept/refuse) → FP transfer
+- WS-30: Player creates aspect. Input on PlayerSurface → sync `player_create_aspect` → sticky on GM canvas
+
+**Sprint F — Content teaching:**
+- WS-55: Quick Reference section (Ladder, outcomes, 4 actions, invoke)
+- WS-56: Aspect coaching tip. WS-57: Stunt format hint
+- WS-60: Compel examples (3 world-neutral). WS-61: Inspiration prompts (16 entries, 🎲 button)
+
+**Board Export Panel:**
+- `BoardExportPanel` component. Card checklist, 8-format grid, copy/download. Export tab in BoardLeftPanel
+
+NA-291–303. 303/303 named · 59/59 unit · 89/89 export · 128/128 smoke.
+
+---
+
+## 2026.03.397 — Sprint A (Player comes alive) + Sprint B (Seven quick wins)
+
+**Sprint A:**
+- WS-20: Player dice rolling (`psDoRoll`, skill pills, `player_roll` sync action)
+- WS-21: Enriched broadcast (`round`, `order`, `gmPool`, `rollHistory`)
+- WS-22: Turn indicator ("Your turn!" / "You acted — X's turn" / "All acted")
+- WS-23: Roll broadcast (GM toast + `addRoll` + re-broadcast)
+- WS-25: GM pool visible to players (`syncGmPool` in turn bar)
+
+**Sprint B:**
+- WS-24: Session notes on board (SessionDoc floater + topbar 📝)
+- WS-31: Help panel Conflicts expanded (zones, exchanges, concede, taken out)
+- WS-34: Player surface full-width cards
+- WS-35: Quick NPC button in BoardPlayPanel
+- WS-40: Session start refresh (FCon p.19). WS-42: Keyboard R/F. WS-43: Zoom-to-fit
+
+NA-278–290. 290/290 named · 59/59 unit · 89/89 export · 128/128 smoke.
+
+---
+
+## 2026.03.395 — Workshop QoL: card state + outcome hints + GM pool
+
+- Card interactive state persists to IDB (`cv4Card` accepts `savedCardState`, `BoardCard` wires `onUpdate` for all card types)
+- Dice outcome explanations (FCon p.21 one-liners for Fail/Tie/Succeed/SWS)
+- GM Fate Point Pool (`gmPool` in `useBoardPlayState`, IDB-persisted, +/− in BoardPlayPanel, resets on endScene)
+
+NA-270–277. 277/277 named · 59/59 unit · 89/89 export · 128/128 smoke.
+
+---
+
+## 2026.03.394 — Docs-only bump
+
+ROADMAP, CHANGELOG, BOOTSTRAP, PROJECT_MEMORY all updated to v393 state.
+
+---
+
 ## 2026.03.393 — Play sprint: 8 features across 4 sprints + 2 hotfixes
 
 **Sprint 1 — Dice roller redesign + Scene End:**
