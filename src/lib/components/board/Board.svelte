@@ -139,7 +139,19 @@
 
     // Subscribe to store values
     unsubs.push(canvas.cards.subscribe(v => cards = v));
-    unsubs.push(canvas.loaded.subscribe(v => loaded = v));
+    let binderLoadedOnce = false;
+    unsubs.push(canvas.loaded.subscribe(v => {
+      loaded = v;
+      if (v && !binderLoadedOnce) {
+        binderLoadedOnce = true;
+        setTimeout(() => {
+          const currentBinder = get(binder.binderCards);
+          if (currentBinder && currentBinder.length > 0) {
+            canvas.loadBinderToCanvas(currentBinder);
+          }
+        }, 100);
+      }
+    }));
     unsubs.push(play.players.subscribe(v => players = v));
     unsubs.push(play.round.subscribe(v => round = v));
     unsubs.push(play.order.subscribe(v => order = v));

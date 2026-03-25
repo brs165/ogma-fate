@@ -207,11 +207,45 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
     if (showToast) showToast('Session Zero PC added to canvas');
   }
 
+  function loadBinderToCanvas(binderCards) {
+    if (!binderCards || binderCards.length === 0) return;
+    const existing = get(cards);
+    if (existing.length > 0) return;
+
+    const CARD_W = 360;
+    const CARD_GAP = 24;
+    const COLS = 3;
+    const START_X = 24;
+    const START_Y = 24;
+
+    const placed = binderCards.map((bc, i) => {
+      const col = i % COLS;
+      const row = Math.floor(i / COLS);
+      return {
+        id: boardUid(),
+        genId: bc.genId,
+        title: bc.title || extractCardTitle(bc.genId, bc.data || {}),
+        summary: bc.summary || extractCardSummary(bc.genId, bc.data || {}),
+        tags: bc.tags || extractCardTags(bc.genId, bc.data || {}),
+        data: bc.data,
+        x: START_X + col * (CARD_W + CARD_GAP),
+        y: START_Y + row * (CARD_W + CARD_GAP),
+        z: Date.now() + i,
+        ts: Date.now(),
+        gmOnly: false,
+        _fromBinder: true,
+      };
+    });
+
+    mutate(() => placed);
+    if (showToast) showToast(placed.length + ' binder cards loaded to canvas');
+  }
+
   return {
     cards, loaded,
     getCards: () => get(cards),
     persistCanvas,
-    generateCard, generateCardWithData, updateCard, deleteCard, rerollCard,
+    generateCard, generateCardWithData, loadBinderToCanvas, updateCard, deleteCard, rerollCard,
     undoLast, exportCanvas, importCanvas,
   };
 }
