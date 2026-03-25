@@ -81,6 +81,9 @@
     <p><strong>Works offline</strong> &mdash; installable as a PWA. After first visit, works fully offline with no internet required.</p>
     <p><strong>Dark and light modes</strong> &mdash; campaign-tinted design with accessible touch targets (48dp minimum) and WCAG 2.1 AA compliance.</p>
 
+    <h2>Coming from D&amp;D?</h2>
+    <p>If you or your players are transitioning from D&amp;D 5e, the <a href="/help/dnd-transition">D&amp;D Transition guide</a> covers every major conceptual shift with side-by-side comparisons and concrete examples.</p>
+
     <h2>Running Offline</h2>
     <p>The suite is fully offline-capable. After your first visit, the service worker caches everything for use without an internet connection. There are two ways to access Ogma:</p>
     <p><strong>Option 1 &mdash; Install as a PWA.</strong> Visit the site in Chrome or Edge, then use the browser's install option (address bar or menu &rarr; "Install Fate Condensed Generator"). The app installs to your device and runs from the home screen with no internet required.</p>
@@ -103,6 +106,10 @@
       <strong style="color:var(--accent)">Documentation Lead</strong> &rarr; the Help &amp; Wiki &mdash; zero-questions standard
     </div>
 
+    <h2>Credits</h2>
+    <p>Ogma is an independent fan project. See the <a href="/license">License &amp; Attribution</a> page for full credits, Fate SRD attribution blocks, and open-source library notices.</p>
+
+    <h2>Help &amp; Wiki</h2>
     <div class="wiki-card-grid" style="margin-top:24px">
       <a href="/learn">
         <div style="font-size:18px">&#127922;</div>
