@@ -2510,6 +2510,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .board-card:hover .bc-actions{display:flex}
 .bc-btn{width:22px;height:22px;border-radius:4px;border:1px solid var(--border);background:var(--panel);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-muted);transition:background .1s}
 .bc-btn:hover{background:var(--hover);color:var(--text)}
+.bc-btn-connect.connecting{color:var(--accent);background:color-mix(in srgb,var(--accent) 15%,transparent)}
 /* "→ Table" / "● On table" strip below cv4Card */
 .bc-table-strip{display:flex;align-items:center;justify-content:center;
   height:28px;border-top:1px solid var(--border);border-radius:0 0 10px 10px;

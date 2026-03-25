@@ -51,6 +51,21 @@
   let dossierCard = null;
   let cmdPalette = false;
   let cardSearch = '';
+  let connectSourceId = null;
+  let connectorLines = [];
+
+  function handleConnectClick(cardId) {
+    if (!connectSourceId) {
+      connectSourceId = cardId;
+      showToast('Click another card to connect — Esc to cancel');
+    } else if (connectSourceId === cardId) {
+      connectSourceId = null;
+    } else {
+      canvas.addConnector(connectSourceId, cardId);
+      connectSourceId = null;
+      showToast('Connected');
+    }
+  }
   let showTracker = false;
   let exportView = false;
   let zoom = 0.6;
@@ -139,6 +154,7 @@
 
     // Subscribe to store values
     unsubs.push(canvas.cards.subscribe(v => cards = v));
+    unsubs.push(canvas.connectors.subscribe(v => connectorLines = v));
     let binderLoadedOnce = false;
     unsubs.push(canvas.loaded.subscribe(v => {
       loaded = v;
@@ -470,6 +486,7 @@
     }
     const tag = (e.target || {}).tagName || '';
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+    if (e.key === 'Escape' && connectSourceId) { connectSourceId = null; return; }
     if (dossierCard) {
       if (e.key === 'Escape') dossierCard = null;
       return;
@@ -726,6 +743,33 @@
             class="board-canvas-layer"
             style="transform:translate({pan.x}px,{pan.y}px) scale({zoom});transform-origin:0 0"
           >
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <svg class="board-connector-svg" aria-hidden="true"
+              style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:500">
+              {#each connectorLines as conn (conn.id)}
+                {@const fromCard = cards.find(c => c.id === conn.fromId)}
+                {@const toCard = cards.find(c => c.id === conn.toId)}
+                {#if fromCard && toCard}
+                  <line
+                    x1={fromCard.x + 170} y1={fromCard.y + 60}
+                    x2={toCard.x + 170} y2={toCard.y + 60}
+                    stroke="var(--accent)" stroke-width="2"
+                    stroke-dasharray="6 3" opacity="0.6"
+                  />
+                  <line
+                    x1={fromCard.x + 170} y1={fromCard.y + 60}
+                    x2={toCard.x + 170} y2={toCard.y + 60}
+                    stroke="transparent" stroke-width="12"
+                    style="pointer-events:stroke;cursor:pointer"
+                    on:click={() => canvas.removeConnector(conn.id)}
+                    role="button" tabindex="0"
+                    aria-label="Remove connection"
+                    on:keydown={e => e.key === 'Enter' && canvas.removeConnector(conn.id)}
+                  />
+                {/if}
+              {/each}
+            </svg>
+
             {#each cards as card (card.id)}
               {#if card.genId === 'label'}
                 <BoardLabel
@@ -750,6 +794,8 @@
                     {campId}
                     isOnTable={playCardIds.has(card.id)}
                     onInvoke={(inv) => { pendingInvoke = inv; showDice = true; showToast('\u2726 Invoke queued \u2014 +2 on next roll'); }}
+                    onConnect={handleConnectClick}
+                    isConnectSource={connectSourceId === card.id}
                   />
                 </div>
               {/if}

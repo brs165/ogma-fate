@@ -36,6 +36,8 @@
   export let mode              = 'prep';
   export let campId            = '';
   export let onInvoke          = null;
+  export let onConnect         = null;
+  export let isConnectSource   = false;
 
   $: C = BOARD_TYPE_COLOR[card.genId] || { stripe: '#888', tc: '#555', bg: '#f5f4f1' };
 
@@ -95,6 +97,10 @@
         on:click|stopPropagation={() => onInvoke({ source: 'paid', label: card.title || card.genId })}
         style="color:var(--accent); font-weight:800">⦿</button>
     {/if}
+    <button class="bc-btn bc-btn-connect" class:connecting={isConnectSource}
+      title="Draw connection line to another card"
+      on:click|stopPropagation={() => onConnect && onConnect(card.id)}
+      aria-label="Connect this card to another">&#x2341;</button>
     <button class="bc-btn" title="Pin to Table (copy)"
       on:click|stopPropagation={() => onSendToTable && onSendToTable(card)}>📌</button>
     {#if mode === 'prep'}

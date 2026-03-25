@@ -7,6 +7,7 @@ import { boardUid, extractCardTitle, extractCardSummary, extractCardTags, STICKY
 
 export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChange) {
   const cards  = writable([]);
+  const connectors = writable([]);
   const loaded = writable(false);
 
   let undoStack   = [];
@@ -18,6 +19,9 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
       if (saved && Array.isArray(saved.cards)) cards.set(saved.cards);
       loaded.set(true);
     }).catch(() => loaded.set(true));
+    DB.loadSession(campCanvasKey + '_connectors').then(saved => {
+      if (saved && Array.isArray(saved.connectors)) connectors.set(saved.connectors);
+    }).catch(() => {});
   } else {
     loaded.set(true);
   }
@@ -121,6 +125,7 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
   }
 
   function deleteCard(id) {
+    removeCardConnectors(id);
     cards.update(prev => {
       const removing = prev.find(c => c.id === id);
       if (removing) {
@@ -207,6 +212,36 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
     if (showToast) showToast('Session Zero PC added to canvas');
   }
 
+  function persistConnectors() {
+    if (!DB) return;
+    DB.saveSession(campCanvasKey + '_connectors', { connectors: get(connectors), ts: Date.now() }).catch(() => {});
+  }
+
+  function addConnector(fromId, toId) {
+    if (fromId === toId) return;
+    const existing = get(connectors);
+    if (existing.find(c => (c.fromId === fromId && c.toId === toId) || (c.fromId === toId && c.toId === fromId))) return;
+    connectors.update(cs => cs.concat([{ id: boardUid(), fromId, toId }]));
+    persistConnectors();
+  }
+
+  function removeConnector(connId) {
+    connectors.update(cs => cs.filter(c => c.id !== connId));
+    persistConnectors();
+  }
+
+  function removeCardConnectors(cardId) {
+    connectors.update(cs => cs.filter(c => c.fromId !== cardId && c.toId !== cardId));
+    persistConnectors();
+  }
+
+  function clearCanvas() {
+    connectors.set([]);
+    persistConnectors();
+    mutate(() => []);
+    if (showToast) showToast('Canvas cleared');
+  }
+
   function loadBinderToCanvas(binderCards) {
     if (!binderCards || binderCards.length === 0) return;
     const existing = get(cards);
@@ -242,10 +277,12 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
   }
 
   return {
-    cards, loaded,
+    cards, loaded, connectors,
     getCards: () => get(cards),
     persistCanvas,
-    generateCard, generateCardWithData, loadBinderToCanvas, updateCard, deleteCard, rerollCard,
+    generateCard, generateCardWithData, loadBinderToCanvas,
+    updateCard, deleteCard, rerollCard,
+    addConnector, removeConnector, removeCardConnectors, clearCanvas,
     undoLast, exportCanvas, importCanvas,
   };
 }
