@@ -2874,3 +2874,22 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .lic-shoutout-title{font-size:var(--text-base);font-weight:700;color:var(--text);margin-bottom:4px}
 .lic-shoutout-desc{font-size:var(--text-sm);color:var(--text-dim);line-height:1.6}
 .verbatim{font-size:var(--text-sm);font-family:var(--font-ui);line-height:1.7;color:var(--text-dim)}
+
+/* ── Prep Wizard progress track ───────────────────────────────────────── */
+.pw-track{display:flex;align-items:center;gap:0;margin-bottom:32px;width:100%;max-width:600px}
+.pw-track-step{display:flex;flex-direction:column;align-items:center;flex:1;position:relative}
+.pw-track-step::after{content:'';position:absolute;top:14px;left:50%;width:100%;height:2px;background:var(--border);z-index:0}
+.pw-track-step:last-child::after{display:none}
+.pw-track-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text-muted);z-index:1;transition:all .2s;flex-shrink:0}
+.pw-track-step.done .pw-track-dot{background:var(--c-green);border-color:var(--c-green);color:#fff}
+.pw-track-step.active .pw-track-dot{background:var(--accent);border-color:var(--accent);color:var(--bg);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 20%,transparent)}
+.pw-track-step.done::after{background:var(--c-green)}
+.pw-track-label{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-top:5px;text-align:center;white-space:nowrap}
+.pw-track-step.active .pw-track-label{color:var(--accent)}
+.pw-track-step.done .pw-track-label{color:var(--c-green)}
+/* Prep Wizard summary */
+.pw-summary-items{display:flex;flex-direction:column;gap:8px;margin-bottom:24px;text-align:left}
+.pw-summary-item{display:flex;align-items:baseline;gap:10px;padding:10px 14px;background:var(--inset);border:1px solid var(--border);border-radius:8px}
+.pw-summary-gen{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);min-width:80px;flex-shrink:0}
+.pw-summary-text{font-size:12px;font-style:italic;color:var(--text);flex:1}
+.pw-action-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}

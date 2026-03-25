@@ -17,6 +17,15 @@
   let npcData = null;
   let extras = [];
 
+  const STEPS = [
+    { id: 'world',   n: 1, label: 'World' },
+    { id: 'players', n: 2, label: 'Players' },
+    { id: 'seed',    n: 3, label: 'Seed' },
+    { id: 'scene',   n: 4, label: 'Scene' },
+    { id: 'npc',     n: 5, label: 'NPC' },
+    { id: 'done',    n: 6, label: 'Done' },
+  ];
+
   const WORLD_META = {
     thelongafter: { name: 'The Long After', icon: '◈', genre: 'Sword & Planet' },
     cyberpunk:    { name: 'Neon Abyss', icon: '⬡', genre: 'Cyberpunk' },
@@ -76,6 +85,31 @@
     window.location.href = '/campaigns/' + (campId || 'fantasy');
   }
 
+  function exportSession() {
+    const cards = [];
+    if (seedData) cards.push({ id: 'wiz_seed', genId: 'seed', title: seedData.location || 'Seed', data: seedData, tags: [], ts: Date.now() });
+    if (sceneData) cards.push({ id: 'wiz_scene', genId: 'scene', title: (sceneData.aspects && sceneData.aspects[0]) ? (sceneData.aspects[0].name || 'Scene') : 'Scene', data: sceneData, tags: [], ts: Date.now() });
+    if (npcData) cards.push({ id: 'wiz_npc', genId: 'npc_major', title: npcData.name || 'NPC', data: npcData, tags: [], ts: Date.now() });
+    backstories.forEach((b, i) => {
+      if (b) cards.push({ id: 'wiz_backstory_' + i, genId: 'backstory', title: 'Backstory ' + (i + 1), data: b, tags: [], ts: Date.now() });
+    });
+    const exportObj = {
+      ogma: true, version: 1, type: 'cards',
+      exported: new Date().toISOString(),
+      campaign: campId || '', campName: campName,
+      cards: cards,
+    };
+    const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (campId || 'ogma') + '-session-prep.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
   onMount(() => {
     try {
       const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}');
@@ -117,6 +151,16 @@
 
   <main id="main-content" style="flex:1;display:flex;flex-direction:column;align-items:center;padding:24px 16px 80px">
     <div style="width:100%;max-width:600px">
+
+      <!-- Progress tracker -->
+      <div class="pw-track" aria-label="Wizard progress" role="progressbar">
+        {#each STEPS as s, i}
+          <div class="pw-track-step" class:done={i < step} class:active={i === step}>
+            <div class="pw-track-dot">{i < step ? '✓' : s.n}</div>
+            <div class="pw-track-label">{s.label}</div>
+          </div>
+        {/each}
+      </div>
 
       <!-- ── STEP 1: Choose World ──────────────────────────────────── -->
       {#if step === 0}
@@ -282,38 +326,55 @@
 
       <!-- ── STEP 6: Done ──────────────────────────────────────────── -->
       {:else if step === 5}
-        <div style="font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:6px">STEP 6 OF 6</div>
-        <h1 style="font-size:26px;font-weight:800;letter-spacing:-.025em;color:var(--text);margin-bottom:8px;line-height:1.2">You're ready to play.</h1>
-        <p style="font-size:13px;color:var(--text-dim);line-height:1.65;margin-bottom:24px">You have a seed, a scene, and an NPC. Open the generator to run the session &mdash; or add more cards from the generator suite.</p>
+        <div style="text-align:center;padding:16px 0 0;margin-bottom:24px">
+          <div style="display:inline-flex;align-items:center;gap:8px;background:color-mix(in srgb,var(--c-green) 12%,transparent);border:1px solid color-mix(in srgb,var(--c-green) 25%,transparent);border-radius:100px;padding:8px 20px;font-size:14px;font-weight:800;color:var(--c-green);margin-bottom:20px;letter-spacing:.04em">&#10003; Ready to play</div>
+          <h1 style="font-size:24px;font-weight:800;color:var(--text);margin-bottom:8px;letter-spacing:-.02em">You have a session.</h1>
+          <p style="font-size:13px;color:var(--text-dim);line-height:1.65;margin-bottom:24px;max-width:440px;margin-left:auto;margin-right:auto">
+            Seed, scene, NPC{backstories.length > 0 ? `, and ${backstories.length} backstory hook${backstories.length > 1 ? 's' : ''}` : ''}. Open the generator and your cards are ready to play.
+          </p>
+        </div>
 
-        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px">
+        <div class="pw-summary-items">
           {#if seedData}
-            <div style="padding:10px 14px;background:var(--inset);border:1px solid var(--border);border-radius:8px">
-              <div style="font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:3px">Seed</div>
-              <div style="font-size:12px;color:var(--text)">{seedData.location || ''} &mdash; {seedData.objective || ''}</div>
+            <div class="pw-summary-item">
+              <span class="pw-summary-gen">Seed</span>
+              <span class="pw-summary-text">{seedData.location || ''} &mdash; {seedData.objective || ''}</span>
             </div>
           {/if}
           {#if sceneData}
-            <div style="padding:10px 14px;background:var(--inset);border:1px solid var(--border);border-radius:8px">
-              <div style="font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:3px">Scene</div>
-              <div style="font-size:12px;color:var(--text)">{Array.isArray(sceneData.aspects) ? sceneData.aspects.map(a => typeof a === 'string' ? a : a.name).join(' · ') : ''}</div>
+            <div class="pw-summary-item">
+              <span class="pw-summary-gen">Scene</span>
+              <span class="pw-summary-text">{Array.isArray(sceneData.aspects) && sceneData.aspects[0] ? (typeof sceneData.aspects[0] === 'string' ? sceneData.aspects[0] : sceneData.aspects[0].name || 'Scene ready') : 'Scene ready'}</span>
             </div>
           {/if}
           {#if npcData}
-            <div style="padding:10px 14px;background:var(--inset);border:1px solid var(--border);border-radius:8px">
-              <div style="font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:3px">NPC</div>
-              <div style="font-size:12px;color:var(--text)">{npcData.name || ''} &mdash; {npcData.aspects?.high_concept || ''}</div>
+            <div class="pw-summary-item">
+              <span class="pw-summary-gen">NPC</span>
+              <span class="pw-summary-text">{npcData.name || ''}{npcData.aspects?.high_concept ? ' — ' + npcData.aspects.high_concept : ''}</span>
             </div>
           {/if}
         </div>
 
-        <button
-          style="width:100%;padding:16px;background:var(--glass-bg);border:2px solid var(--accent);color:var(--text);font-weight:800;font-size:16px;border-radius:8px;cursor:pointer;box-shadow:0 0 12px color-mix(in srgb,var(--accent) 25%,transparent)"
-          on:click={goToBoard}
-        >&#9654; Open {campName} Generator</button>
+        <div class="pw-action-row">
+          <button
+            style="display:inline-flex;align-items:center;gap:8px;background:var(--glass-bg);border:2px solid var(--accent);border-radius:8px;padding:13px 28px;font-size:14px;font-weight:800;color:var(--text);cursor:pointer;box-shadow:0 0 10px color-mix(in srgb,var(--accent) 25%,transparent)"
+            on:click={goToBoard}
+          >&#127922; Open {campName} Generator</button>
+          <button
+            style="background:none;border:1px solid var(--border);border-radius:8px;padding:12px 20px;font-size:13px;font-weight:600;color:var(--text-dim);cursor:pointer"
+            on:click={exportSession}
+            title="Export all prep cards as Ogma JSON"
+            aria-label="Export session prep as JSON"
+          >&#8595; Export JSON</button>
+          <button
+            style="background:none;border:1px solid var(--border);border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700;color:var(--text-dim);cursor:pointer"
+            on:click={() => { if (typeof window !== 'undefined') window.print(); }}
+            title="Print your session sheet"
+          >&#128424; Print</button>
+        </div>
 
         <div style="text-align:center;margin-top:12px">
-          <a href="/" style="font-size:12px;color:var(--text-muted)">&larr; All Worlds</a>
+          <button style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;text-decoration:underline" on:click={() => { step = 0; campId = null; seedData = null; sceneData = null; npcData = null; backstories = []; }}>Start over</button>
         </div>
       {/if}
 
