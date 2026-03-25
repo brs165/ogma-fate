@@ -13,7 +13,7 @@
   export let campId = 'fantasy';
 
   // ── Derived ────────────────────────────────────────────────────────────────
-  $: camp = CAMPAIGNS[campId] || { meta: { name: campId, icon: '\u25C8' }, tables: {} };
+  $: camp = CAMPAIGNS[campId] || { meta: { name: campId, icon: '\u25C8' }, tables: {}, colors: {} };
   $: campName = camp.meta ? camp.meta.name : campId;
 
   // ── Local state ────────────────────────────────────────────────────────────
@@ -46,7 +46,7 @@
     unsubs = [];
 
     chrome = createChromeStore(campId);
-    session = createSessionStore(campId, camp.meta, camp.tables, prefs, chrome.showToast);
+    session = createSessionStore(campId, camp.meta, camp.tables || {}, prefs, chrome.showToast);
 
     unsubs.push(chrome.toast.subscribe(v => toast = v));
     unsubs.push(chrome.isOnline.subscribe(v => isOnline = v));
