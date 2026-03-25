@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-campaign="western">
+<head>
+  <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600;1,700&display=swap" rel="stylesheet">
+  <script>/* Theme restore - must run before CSS to prevent flash of unstyled dark mode */
+  (function(){try{var p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');var t=p.theme||localStorage.getItem('fate_theme')||localStorage.getItem('fate-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})()</script>
+<meta charset="UTF-8">
+  <script>if(location.protocol!=="file:"){var _b=document.createElement("base");_b.href="/";document.head.appendChild(_b);}</script><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Dust and Iron - Campaign Guide</title>
+<link rel="icon" type="image/svg+xml" href="../assets/favicons/icon.svg">
+<link rel="stylesheet" href="../assets/css/theme.css?v=412">
+<style>
+.cg{max-width:680px;margin:0 auto;padding:24px 20px 80px;position:relative;z-index:1}
+.cg h1{font-size:var(--text-hero);font-weight:800;color:var(--text);margin-bottom:4px;letter-spacing:-0.02em}
+.cg-sub{font-size:var(--text-md);color:var(--accent,var(--text-dim));font-weight:600;margin-bottom:16px}
+.cg h2{font-size:var(--text-xl);font-weight:800;color:var(--text);margin:32px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.cg p{font-size:var(--text-base);color:var(--text-dim);line-height:1.75;margin-bottom:14px}
+.cg strong{color:var(--text);font-weight:600}
+.cg a{color:var(--c-blue);text-decoration:none}.cg a:hover{text-decoration:underline}
+.cg-card{background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);border:1px solid var(--glass-border);border-radius:var(--glass-radius);padding:20px;margin:18px 0}
+.cg-stats{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.cg-stat{flex:1;min-width:90px;text-align:center;padding:12px 8px;background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);border:1px solid var(--glass-border);border-radius:var(--glass-radius-sm)}
+.cg-stat b{display:block;font-size:var(--text-xl);font-weight:800;color:var(--accent,var(--text))}
+.cg-stat span{font-size:var(--text-label);color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em}
+.cg-sample{border-left:3px solid var(--accent,var(--gold,#888));padding:10px 16px;margin:8px 0;font-style:italic;color:var(--text-dim);font-size:var(--text-sm);border-radius:0 var(--glass-radius-sm) var(--glass-radius-sm) 0;background:var(--inset)}
+.cg-cta{text-align:center;margin-top:32px}.cg-cta a{display:inline-block;padding:12px 28px;border-radius:100px;text-decoration:none;font-weight:700;font-size:var(--text-sm);margin:4px}
+.cg-ft{text-align:center;padding:28px 20px;font-size:var(--text-label);color:var(--text-muted);border-top:1px solid var(--border)}.cg-ft a{color:var(--text-dim);text-decoration:none}
+@media print{.land-topnav,.cg-ft,.cg-cta{display:none!important}body{background:#fff!important;color:#111!important}}
+
+  .cg-guide-nav{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+    margin:32px 0 0;padding:16px 20px;
+    background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);
+    border:1px solid var(--glass-border);border-radius:var(--glass-radius);font-size:var(--text-sm)}
+  .cg-guide-nav a{color:var(--accent);text-decoration:none;font-weight:600}
+  .cg-guide-nav a:hover{text-decoration:underline}
+</style>
+</head>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<body>
+<header class="land-topnav" role="banner">
+  <a href="../index.html" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
+  <div class="topbar-sep" aria-hidden="true"></div>
+  <nav class="topbar-crumb" aria-label="Breadcrumb">
+    <a href="../index.html" class="topbar-crumb-item">Home</a><span class="topbar-crumb-sep" aria-hidden="true">&#8250;</span><a href="/campaigns/western.html" class="topbar-crumb-item">Dust and Iron</a><span class="topbar-crumb-sep" aria-hidden="true">&#8250;</span><span class="topbar-crumb-item current" aria-current="page">Campaign Guide</span>
+  </nav>
+  <div class="topbar-status">
+    <a href="../help/index.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#128218; Help</a>
+    <a href="../campaigns/character-creation.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#127917; Session Zero</a>
+    <a href="../about.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">About</a>
+    <button class="btn btn-icon btn-ghost" onclick="var n=document.documentElement.getAttribute('data-theme')=='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var _p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}}');_p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p));}catch(_e){}" title="Toggle theme" aria-label="Switch to dark mode" id="theme-toggle-btn">&#9681;</button>
+    <button class="topbar-hamburger btn btn-icon btn-ghost" id="topnav-hbg-new"
+      aria-label="Open navigation" aria-expanded="false" aria-haspopup="true"
+      onclick="(function(btn){var dd=btn.nextElementSibling;var open=dd.classList.toggle('open');btn.setAttribute('aria-expanded',open);})(this)">&#9776;</button>
+    <div class="land-topnav-dropdown" id="topnav-dd-new">
+      <a href="../help/index.html">&#128218; Help &amp; Wiki</a>
+      <a href="../campaigns/character-creation.html">&#127917; Session Zero</a>
+      <a href="../about.html">About</a>
+      <button onclick="var n=document.documentElement.getAttribute('data-theme')=='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{var _p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}}');_p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(_p));}catch(_e){}">&#9681; Theme</button>
+    </div>
+  </div>
+</header>
+<div class="cg">
+<h1 id="main-content">★ Dust and Iron</h1>
+<div class="cg-sub">Frontier justice. Railroad money. The weight of the old war.</div>
+<p>The survey stakes went in at dawn. The Harker Company wants the land. The homesteaders pulled the stakes up. The law rides for the company. The circuit judge is two days out and the verdict is already written. You're somewhere in between — which means everybody needs something from you and nobody's going to say thank you.</p>
+<div class="cg-stats">
+<div class="cg-stat"><b>900+</b><span>Entries</span></div>
+<div class="cg-stat"><b>14</b><span>Opposition</span></div>
+<div class="cg-stat"><b>28</b><span>Stunts</span></div>
+<div class="cg-stat"><b>59</b><span>Names</span></div>
+<div class="cg-stat"><b>5</b><span>Challenges</span></div>
+</div>
+<div id="guide-intro-teaser" aria-label="Campaign introduction"></div>
+<script>(function(){
+  function tryInit(){
+    // Scroll to top so the intro teaser is visible from the beginning
+    if(document.getElementById('guide-intro-teaser')) {
+      document.getElementById('guide-intro-teaser').scrollIntoView({behavior:'instant',block:'start'});
+    }
+    if(typeof window.fateInitInline==='function'){
+      window.fateInitInline(document.getElementById('guide-intro-teaser'),
+        {worldKey:'western',titleOnly:true,freeze:true});
+    } else { setTimeout(tryInit,50); }
+  }
+  tryInit();
+})()</script>
+<h2>Tone &amp; Voice</h2>
+<p>Hard-earned and spare. The frontier strips things down to what they actually are. People are loyal or they aren't. Land is worth what someone will kill for. The darkness in this setting comes from human choices — greed, cowardice, the specific cruelty of men with institutional backing. Violence has weight. Death is rarely poetic. The railroad is coming whether anyone wants it or not.</p>
+<p>The territory is not lawless. It's worse: the law is present and it belongs to someone. Your characters are the people who aren't in that pocket — or who used to be and are trying to get out.</p>
+
+<h2>For Players</h2>
+<p>You ride with a past and a price. Every character has a debt, a reputation, and something they're trying to protect that is probably worth less than what it's going to cost them to protect it. The Troubles are the things that made you dangerous and the things that followed you here. The compels will find them. Use them first.</p>
+
+<h2>Key Factions</h2>
+<p>The Harker Company (land acquisition, bought law, corporate patience), the Cattlemen's Association (the old guard, fencing wars, diminishing leverage), the Railroad Trust (progress as inevitability, indifferent to what's in the way), homesteaders and small ranchers (the stakes are their lives and their children's lives), circuit judges and marshals (the law, such as it is, going where the money points), Pinkerton agents (hired trouble from back East, professional, thorough, loyal to the contract not the territory).</p>
+
+<h2>Inspirations</h2>
+<div class="cg-card"><p style="margin:0">Blood Meridian, Deadwood, True Grit, Lonesome Dove, No Country for Old Men, Hell on Wheels, Tombstone, The Assassination of Jesse James</p></div>
+
+<h2>Sample Troubles</h2>
+<p>Every PC has a Trouble — the thing that makes their life complicated:</p>
+<div class="cg-sample">Wanted Dead or Alive in Three Counties for Three Different Reasons</div>
+<div class="cg-sample">The Company Owns the Sheriff and the Judge and Probably the Clerk</div>
+<div class="cg-sample">The Debt Won't Let Me Leave and the Creditor Is Getting Impatient</div>
+<div class="cg-sample">Blood Feud Older Than Either Side Remembers and Neither Side Will Drop It</div>
+
+<h2>Sample Locations</h2>
+<p>Adventure seeds start here. Each suggests a situation, not just a place:</p>
+<div class="cg-sample">A ghost town that isn't quite empty — someone moved back in and won't say why</div>
+<div class="cg-sample">The county jail with the wrong man inside and the right man in the crowd outside</div>
+<div class="cg-sample">A remote homestead with fresh graves, a locked strongbox, and a deed that contradicts itself</div>
+<div class="cg-sample">The last honest assayer in the territory — for now — with three armed men waiting outside</div>
+
+<h2>Running Fate on the Frontier</h2>
+<p><strong>Gunfights are narrative, not tactical.</strong> Describe the cover, the light, the number of exchanges before someone's horse bolts. Stress is how long you stay in the fight — not how many bullets you absorb. A taken-out result is surrender, flight, or getting shot. Which one fits the fiction.</p>
+<p><strong>The law as opposition.</strong> The sheriff, the marshal, the Pinkerton — these are antagonists with professional standing and institutional backing. They can compel your aspects and invoke situation aspects against you. The Resources gap between the Harker Company and your players is the engine of every story in this setting.</p>
+<p><strong>The old war.</strong> The War Between the States ended on paper. Half the people on the frontier are running from what they did in it. Aspects and Troubles that reference the war give the GM free compels for life.</p>
+
+
+<h2>Building Your Character</h2>
+<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="../campaigns/character-creation.html?world=western">Session Zero tool</a> walks you through every step — or use the guide below.</p>
+
+<div class="cg-card">
+  <p style="margin:0 0 10px"><strong>Step 1 — Two aspects</strong></p>
+  <p style="margin:0 0 6px;font-size:var(--text-sm);color:var(--text-dim)">Your <strong>High Concept</strong> is who you are in one phrase. It can always be invoked or compelled. Your <strong>Trouble</strong> is the thing that makes your life complicated — the debt you ride with, the law that rides after you, or the thing you did in the war. The generator has 50 — roll until one bites.</p>
+  <div class="cg-sample">Former Pinkerton Turned Against the Hand That Hired Her</div>
+  <div class="cg-sample">The Company Owns the Sheriff and the Judge and Probably the Clerk</div>
+</div>
+
+<div class="cg-card">
+  <p style="margin:0 0 10px"><strong>Step 2 — Skill pyramid</strong></p>
+  <p style="margin:0 0 8px;font-size:var(--text-sm);color:var(--text-dim)">Assign skills in this shape: one at +4 (Great), two at +3 (Good), two at +2 (Fair), four at +1 (Average). Everything else is +0.</p>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:4px;margin:8px 0;font-size:var(--text-sm)">
+    <div style="background:color-mix(in srgb,var(--accent) 15%,transparent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);border-radius:4px;padding:3px 16px;font-weight:700">+4 · Shoot or Fight</div>
+    <div style="background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 20%,transparent);border-radius:4px;padding:3px 12px">+3 · Notice &amp; one other</div>
+    <div style="background:var(--inset);border:1px solid var(--border);border-radius:4px;padding:3px 10px;color:var(--text-dim)">+2 · Athletics or Ride &amp; one other</div>
+    <div style="background:var(--inset);border:1px solid var(--border);border-radius:4px;padding:3px 10px;color:var(--text-muted)">+1 · Contacts &amp; three others</div>
+  </div>
+  <p style="margin:6px 0 0;font-size:var(--text-label);color:var(--text-muted)">Physique sets physical stress boxes (Fair +2 → 3 boxes, Good +3 → 4). Will sets mental stress boxes. Characters with neither above +0 have 3 boxes each — plan accordingly.</p>
+</div>
+
+<div class="cg-card">
+  <p style="margin:0 0 10px"><strong>Step 3 — Stunt</strong></p>
+  <p style="margin:0 0 6px;font-size:var(--text-sm);color:var(--text-dim)">Choose one stunt from the Dust and Iron list. Dust and Iron stunts cover quick draw, tracking, intimidation, and wilderness survival. Your refresh starts at 3; each additional stunt costs 1.</p>
+</div>
+
+<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="../campaigns/character-creation.html?world=western">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
+<h2>Content Overview</h2>
+<div class="cg-card"><p style="margin:0;font-size:var(--text-sm);line-height:2;color:var(--text-dim)">
+<strong>NPCs:</strong> 33 first names, 26 surnames, variety-matrix minor + major concepts, 50 troubles, 28 stunts<br>
+<strong>Scenes:</strong> 6 zones, 8 movement, 8 cover, 8 usable objects, 8 scene tones<br>
+<strong>Adventures:</strong> 30 locations, 7 complications, 6 objectives<br>
+<strong>Encounters:</strong> 14 opposition, 30 twists, 5 victories, 5 defeats<br>
+<strong>Factions:</strong> 12 goals, 13 methods, 15 face roles<br>
+<strong>Compels:</strong> 35 situations, 6 consequences
+</p></div>
+
+<div class="cg-card" style="margin-top:20px;border-color:color-mix(in srgb,var(--accent) 25%,transparent)">
+  <h2 style="margin:0 0 8px;font-size:15px;color:var(--accent)">📄 Print &amp; Play — Coming Soon</h2>
+  <p style="margin:0 0 0;font-size:13px;color:var(--text-dim);line-height:1.6">
+    A print-ready world digest for this campaign is in the works — world lore, stat blocks, factions, and a starter scenario in one printable PDF. For now, use the generator above and jot it down the old-fashioned way.
+  </p>
+</div>
+
+<div class="cg-cta">
+<a href="/campaigns/western.html" style="background:var(--accent,var(--c-blue));color:#fff">🎲 Open Generator</a>
+<a href="../campaigns/character-creation.html" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
+</div>
+</div>
+<div class="cg-guide-nav">
+  <a href="../index.html">🌍 All Worlds</a>
+  <a href="/campaigns/western.html">⚔ Open Dust and Iron Generator</a>
+</div>
+<footer class="cg-ft"><div>Fate™ is a trademark of <a href="https://www.evilhat.com" target="_blank" rel="noreferrer">Evil Hat Productions, LLC</a>.</div>
+<div><a href="../license.html">CC BY 3.0</a> · <a href="../about.html">About</a></div></footer>
+<script>
+(function(){
+  var btn=document.getElementById('topnav-hbg');
+  var dd=document.getElementById('topnav-dd');
+  if(!btn||!dd) return;
+  btn.addEventListener('click',function(e){e.stopPropagation();dd.classList.toggle('open');btn.setAttribute('aria-expanded',dd.classList.contains('open'));});
+  document.addEventListener('click',function(){dd.classList.remove('open');btn.setAttribute('aria-expanded','false');});
+})();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dexie/4.0.10/dexie.min.js" integrity="sha384-3VWLzUTczDc/wazaoH+b5qG4iME0duPONRO281rRiaFkfpV/b3w5uxrvod7rCHcW" crossorigin="anonymous"></script>
+  <script src="../core/db.js?v=412"></script>
+<script src="../core/intro.js?v=412"></script>
+</body>
+</html>
