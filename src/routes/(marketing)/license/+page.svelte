@@ -136,6 +136,9 @@
     </div>
 
     <!-- Contributing -->
+    <h2>Icons</h2>
+    <p>Icons provided by <a href="https://fontawesome.com" target="_blank" rel="noreferrer">Font Awesome Free</a> (version 6), licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>. Font Awesome Free icons require attribution. See <a href="https://fontawesome.com/license/free" target="_blank" rel="noreferrer">fontawesome.com/license/free</a>.</p>
+
     <h2>Contributing</h2>
 
     <p>Ogma is an open project. Contributions, bug reports, and SRD accuracy corrections are welcome. All contributions are understood to be submitted under CC BY 3.0.</p>

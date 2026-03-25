@@ -89,26 +89,26 @@
   <!-- Action buttons -->
   <div class="bc-actions">
     {#if card.genId !== 'custom'}
-      <button class="bc-btn" title="Reroll"
-        on:click|stopPropagation={() => onReroll && onReroll(card.id)}>↻</button>
+      <button class="bc-btn" title="Reroll" aria-label="Reroll"
+        on:click|stopPropagation={() => onReroll && onReroll(card.id)}><i class="fa-solid fa-rotate-right" aria-hidden="true"></i></button>
     {/if}
     {#if onInvoke && card.genId !== 'sticky' && card.genId !== 'boost' && card.genId !== 'label'}
-      <button class="bc-btn" title="Invoke aspect from this card (+2 next roll)"
+      <button class="bc-btn" title="Invoke aspect from this card (+2 next roll)" aria-label="Invoke aspect"
         on:click|stopPropagation={() => onInvoke({ source: 'paid', label: card.title || card.genId })}
         style="color:var(--accent); font-weight:800">⦿</button>
     {/if}
     <button class="bc-btn bc-btn-connect" class:connecting={isConnectSource}
       title="Draw connection line to another card"
       on:click|stopPropagation={() => onConnect && onConnect(card.id)}
-      aria-label="Connect this card to another">&#x2341;</button>
-    <button class="bc-btn" title="Pin to Table (copy)"
-      on:click|stopPropagation={() => onSendToTable && onSendToTable(card)}>📌</button>
+      aria-label="Connect this card to another"><i class="fa-solid fa-link" aria-hidden="true"></i></button>
+    <button class="bc-btn" title="Pin to Table" aria-label="Pin to Table"
+      on:click|stopPropagation={() => onSendToTable && onSendToTable(card)}><i class="fa-solid fa-cart-plus" aria-hidden="true"></i></button>
     {#if mode === 'prep'}
-      <button class="bc-btn" title="Move to Table (removes from prep)"
-        on:click|stopPropagation={() => { if (onSendToTable) onSendToTable(card); if (onDelete) onDelete(card.id); }}>→</button>
+      <button class="bc-btn" title="Move to Table" aria-label="Move to Table"
+        on:click|stopPropagation={() => { if (onSendToTable) onSendToTable(card); if (onDelete) onDelete(card.id); }}><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
     {/if}
-    <button class="bc-btn" title="Delete"
-      on:click|stopPropagation={() => onDelete && onDelete(card.id)}>✕</button>
+    <button class="bc-btn" title="Delete" aria-label="Delete"
+      on:click|stopPropagation={() => onDelete && onDelete(card.id)}><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
   </div>
 
   <!-- Drag handle -->

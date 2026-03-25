@@ -83,11 +83,11 @@
 >
   <div class="bc-actions">
     {#if card.rotation}
-      <button class="bc-btn" title="Reset rotation"
-        on:click|stopPropagation={() => onUpdate && onUpdate(card.id, { rotation: 0 })}>&#x27F3;</button>
+      <button class="bc-btn" title="Reset rotation" aria-label="Reset rotation"
+        on:click|stopPropagation={() => onUpdate && onUpdate(card.id, { rotation: 0 })}><i class="fa-solid fa-rotate-right" aria-hidden="true"></i></button>
     {/if}
-    <button class="bc-btn" title="Delete"
-      on:click|stopPropagation={() => onDelete && onDelete(card.id)}>✕</button>
+    <button class="bc-btn" title="Delete" aria-label="Delete"
+      on:click|stopPropagation={() => onDelete && onDelete(card.id)}><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
   </div>
 
   <div class="board-sticky-label" style="color:{sc.label}">Aspect</div>

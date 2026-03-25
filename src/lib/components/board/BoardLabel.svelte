@@ -88,11 +88,11 @@
   on:keydown={onWrapperKeyDown}
 >
   <div class="bc-actions">
-    <button class="bc-btn" title="Toggle Zone Container"
+    <button class="bc-btn" title="Toggle Zone Container" aria-label="Toggle zone"
       on:click|stopPropagation={() => onUpdate(card.id, { zoneMode: !zoneMode, zoneW: 400, zoneH: 200 })}
-    >{zoneMode ? '⊟' : '⊞'}</button>
-    <button class="bc-btn" title="Change colour" on:click={cycleStyle}>🎨</button>
-    <button class="bc-btn" title="Delete" on:click={deleteLabel}>✕</button>
+    ><i class={zoneMode ? 'fa-solid fa-object-ungroup' : 'fa-solid fa-object-group'} aria-hidden="true"></i></button>
+    <button class="bc-btn" title="Change colour" aria-label="Change colour" on:click={cycleStyle}><i class="fa-solid fa-palette" aria-hidden="true"></i></button>
+    <button class="bc-btn" title="Delete" aria-label="Delete" on:click={deleteLabel}><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
   </div>
 
   {#if zoneMode}

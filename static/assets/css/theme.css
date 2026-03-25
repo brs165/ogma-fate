@@ -3031,3 +3031,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .seed-pack-grid{display:flex;flex-direction:column;gap:16px;padding:16px}
 .seed-pack-item{display:flex;flex-direction:column;gap:6px}
 .seed-pack-item-label{font-size:var(--text-label);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);padding:0 2px}
+
+/* ══ FONT AWESOME ICON SIZING ══ */
+.bc-btn i,.btn i{font-size:14px;line-height:1;pointer-events:none}
+.fa-cart-plus{font-size:15px}
