@@ -4,8 +4,8 @@
 // Also declares the CAMPAIGNS object that campaign files populate.
 // Must be loaded before any data/[campaign].js file.
 
-// Populated by data/[campaign].js files
-export const CAMPAIGNS = {};
+// Re-export merged CAMPAIGNS from the campaign registry
+export { CAMPAIGNS } from './index.js';
 
 export const GENERATORS = [
   {id:"npc_minor",  label:"Minor NPC",       icon:"◈", sub:"1–2 aspects · skills · stress"},
