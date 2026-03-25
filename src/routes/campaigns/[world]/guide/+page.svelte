@@ -8,6 +8,18 @@
 
   $: world = $page.params.world;
 
+  const WORLD_NAMES = {
+    thelongafter: 'The Long After',
+    cyberpunk: 'Neon Abyss',
+    fantasy: 'Shattered Kingdoms',
+    space: 'Void Runners',
+    victorian: 'The Gaslight Chronicles',
+    postapoc: 'The Long Road',
+    western: 'Dust and Iron',
+    dVentiRealm: 'dVenti Realm',
+  };
+  $: worldName = WORLD_NAMES[world] || 'Campaign Guide';
+
   const GUIDES = {
     fantasy: `<h1 id="main-content">✦ Shattered Kingdoms</h1>
 <div class="cg-sub">Dark Fantasy - The Weight of History</div>
@@ -55,11 +67,11 @@
 <div class="cg-card">
   <p style="margin:0 0 10px"><strong>Step 2 — Skill pyramid</strong></p>
   <p style="margin:0 0 8px;font-size:var(--text-sm);color:var(--text-dim)">Assign skills in this shape: one at +4 (Great), two at +3 (Good), three at +2 (Fair), four at +1 (Average). Everything else is +0.</p>
-  <div style="display:flex;flex-direction:column;align-items:center;gap:4px;margin:8px 0;font-size:var(--text-sm)">
-    <div style="background:color-mix(in srgb,var(--accent) 15%,transparent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);border-radius:4px;padding:3px 16px;font-weight:700">+4 · Fight or Lore</div>
-    <div style="background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 20%,transparent);border-radius:4px;padding:3px 12px">+3 · Athletics &amp; Notice</div>
-    <div style="background:var(--inset);border:1px solid var(--border);border-radius:4px;padding:3px 10px;color:var(--text-dim)">+2 · three skills</div>
-    <div style="background:var(--inset);border:1px solid var(--border);border-radius:4px;padding:3px 10px;color:var(--text-muted)">+1 · Contacts &amp; three others</div>
+  <div class="cg-pyramid">
+    <div class="cg-pyramid-row cg-pyramid-row--peak">+4 · Fight or Lore</div>
+    <div class="cg-pyramid-row cg-pyramid-row--high">+3 · Athletics &amp; Notice</div>
+    <div class="cg-pyramid-row cg-pyramid-row--mid">+2 · three skills</div>
+    <div class="cg-pyramid-row cg-pyramid-row--low">+1 · Contacts &amp; three others</div>
   </div>
   <p style="margin:6px 0 0;font-size:var(--text-label);color:var(--text-muted)">Physique sets physical stress boxes (Fair +2 → 4 boxes, Good +3 → 6). Will sets mental stress boxes. Characters with neither above +0 have 3 boxes each.</p>
 </div>
@@ -89,8 +101,8 @@
 </div>
 
 <div class="cg-cta">
-<a href="/campaigns/fantasy" style="background:var(--accent,var(--c-blue));color:#fff">🎲 Open Generator</a>
-<a href="/campaigns/character-creation" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
+<a href="/campaigns/fantasy" class="cg-cta-primary">🎲 Open Generator</a>
+<a href="/campaigns/character-creation" class="cg-cta-secondary">🎭 Session Zero</a>
 </div>
 </div>
 
@@ -143,11 +155,11 @@
 <div class="cg-card">
   <p style="margin:0 0 10px"><strong>Step 2 — Skill pyramid</strong></p>
   <p style="margin:0 0 8px;font-size:var(--text-sm);color:var(--text-dim)">Assign skills in this shape: one at +4 (Great), two at +3 (Good), three at +2 (Fair), four at +1 (Average). Everything else is +0.</p>
-  <div style="display:flex;flex-direction:column;align-items:center;gap:4px;margin:8px 0;font-size:var(--text-sm)">
-    <div style="background:color-mix(in srgb,var(--accent) 15%,transparent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);border-radius:4px;padding:3px 16px;font-weight:700">+4 · Stealth or Crafts</div>
-    <div style="background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 20%,transparent);border-radius:4px;padding:3px 12px">+3 · Notice &amp; Investigate</div>
-    <div style="background:var(--inset);border:1px solid var(--border);border-radius:4px;padding:3px 10px;color:var(--text-dim)">+2 · three skills</div>
-    <div style="background:var(--inset);border:1px solid var(--border);border-radius:4px;padding:3px 10px;color:var(--text-muted)">+1 · Contacts &amp; three others</div>
+  <div class="cg-pyramid">
+    <div class="cg-pyramid-row cg-pyramid-row--peak">+4 · Stealth or Crafts</div>
+    <div class="cg-pyramid-row cg-pyramid-row--high">+3 · Notice &amp; Investigate</div>
+    <div class="cg-pyramid-row cg-pyramid-row--mid">+2 · three skills</div>
+    <div class="cg-pyramid-row cg-pyramid-row--low">+1 · Contacts &amp; three others</div>
   </div>
   <p style="margin:6px 0 0;font-size:var(--text-label);color:var(--text-muted)">Physique sets physical stress boxes (Fair +2 → 4 boxes, Good +3 → 6). Will sets mental stress boxes. Characters with neither above +0 have 3 boxes each.</p>
 </div>
@@ -177,8 +189,8 @@
 </div>
 
 <div class="cg-cta">
-<a href="/campaigns/cyberpunk" style="background:var(--accent,var(--c-blue));color:#fff">🎲 Open Generator</a>
-<a href="/campaigns/character-creation" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
+<a href="/campaigns/cyberpunk" class="cg-cta-primary">🎲 Open Generator</a>
+<a href="/campaigns/character-creation" class="cg-cta-secondary">🎭 Session Zero</a>
 </div>
 </div>
 
@@ -231,11 +243,11 @@
 <div class="cg-card">
   <p style="margin:0 0 10px"><strong>Step 2 — Skill pyramid</strong></p>
   <p style="margin:0 0 8px;font-size:var(--text-sm);color:var(--text-dim)">Assign skills in this shape: one at +4 (Great), two at +3 (Good), three at +2 (Fair), four at +1 (Average). Everything else is +0.</p>
-  <div style="display:flex;flex-direction:column;align-items:center;gap:4px;margin:8px 0;font-size:var(--text-sm)">
-    <div style="background:color-mix(in srgb,var(--accent) 15%,transparent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);border-radius:4px;padding:3px 16px;font-weight:700">+4 · Athletics or Lore</div>
-    <div style="background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 20%,transparent);border-radius:4px;padding:3px 12px">+3 · Shoot &amp; Notice</div>
-    <div style="background:var(--inset);border:1px solid var(--border);border-radius:4px;padding:3px 10px;color:var(--text-dim)">+2 · three skills</div>
-    <div style="background:var(--inset);border:1px solid var(--border);border-radius:4px;padding:3px 10px;color:var(--text-muted)">+1 · Contacts &amp; three others</div>
+  <div class="cg-pyramid">
+    <div class="cg-pyramid-row cg-pyramid-row--peak">+4 · Athletics or Lore</div>
+    <div class="cg-pyramid-row cg-pyramid-row--high">+3 · Shoot &amp; Notice</div>
+    <div class="cg-pyramid-row cg-pyramid-row--mid">+2 · three skills</div>
+    <div class="cg-pyramid-row cg-pyramid-row--low">+1 · Contacts &amp; three others</div>
   </div>
   <p style="margin:6px 0 0;font-size:var(--text-label);color:var(--text-muted)">Physique sets physical stress boxes (Fair +2 → 4 boxes, Good +3 → 6). Will sets mental stress boxes. Characters with neither above +0 have 3 boxes each.</p>
 </div>
@@ -263,7 +275,7 @@
     Sometimes the best session prep is a stack of paper and a pen. This world digest gives you everything in one printable document — world lore, opposition stat blocks, factions, adventure seeds, and a three-act starter scenario. No screen required.
   </p>
   <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-    <a href="../assets/pdf/the_long_after.pdf" download="the_long_after.pdf"
+    <a href="/assets/pdf/the_long_after.pdf" download="the_long_after.pdf"
        style="display:inline-flex;align-items:center;gap:7px;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;text-decoration:none;font-family:var(--font-ui)">
       ⬇ Download PDF <span style="opacity:.75;font-weight:400">· 40pp</span>
     </a>
@@ -272,8 +284,8 @@
 </div>
 
 <div class="cg-cta">
-<a href="/campaigns/thelongafter" style="background:var(--accent,var(--c-blue));color:#fff">🎲 Open Generator</a>
-<a href="/campaigns/character-creation" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
+<a href="/campaigns/thelongafter" class="cg-cta-primary">🎲 Open Generator</a>
+<a href="/campaigns/character-creation" class="cg-cta-secondary">🎭 Session Zero</a>
 </div>
 </div>
 
@@ -326,11 +338,11 @@
 <div class="cg-card">
   <p style="margin:0 0 10px"><strong>Step 2 — Skill pyramid</strong></p>
   <p style="margin:0 0 8px;font-size:var(--text-sm);color:var(--text-dim)">Assign skills in this shape: one at +4 (Great), two at +3 (Good), three at +2 (Fair), four at +1 (Average). Everything else is +0.</p>
-  <div style="display:flex;flex-direction:column;align-items:center;gap:4px;margin:8px 0;font-size:var(--text-sm)">
-    <div style="background:color-mix(in srgb,var(--accent) 15%,transparent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);border-radius:4px;padding:3px 16px;font-weight:700">+4 · Drive or Shoot</div>
-    <div style="background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 20%,transparent);border-radius:4px;padding:3px 12px">+3 · Notice &amp; Crafts</div>
-    <div style="background:var(--inset);border:1px solid var(--border);border-radius:4px;padding:3px 10px;color:var(--text-dim)">+2 · three skills</div>
-    <div style="background:var(--inset);border:1px solid var(--border);border-radius:4px;padding:3px 10px;color:var(--text-muted)">+1 · Contacts &amp; three others</div>
+  <div class="cg-pyramid">
+    <div class="cg-pyramid-row cg-pyramid-row--peak">+4 · Drive or Shoot</div>
+    <div class="cg-pyramid-row cg-pyramid-row--high">+3 · Notice &amp; Crafts</div>
+    <div class="cg-pyramid-row cg-pyramid-row--mid">+2 · three skills</div>
+    <div class="cg-pyramid-row cg-pyramid-row--low">+1 · Contacts &amp; three others</div>
   </div>
   <p style="margin:6px 0 0;font-size:var(--text-label);color:var(--text-muted)">Physique sets physical stress boxes (Fair +2 → 4 boxes, Good +3 → 6). Will sets mental stress boxes. Characters with neither above +0 have 3 boxes each.</p>
 </div>
@@ -360,8 +372,8 @@
 </div>
 
 <div class="cg-cta">
-<a href="/campaigns/space" style="background:var(--accent,var(--c-blue));color:#fff">🎲 Open Generator</a>
-<a href="/campaigns/character-creation" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
+<a href="/campaigns/space" class="cg-cta-primary">🎲 Open Generator</a>
+<a href="/campaigns/character-creation" class="cg-cta-secondary">🎭 Session Zero</a>
 </div>
 </div>
 
@@ -414,11 +426,11 @@
 <div class="cg-card">
   <p style="margin:0 0 10px"><strong>Step 2 — Skill pyramid</strong></p>
   <p style="margin:0 0 8px;font-size:var(--text-sm);color:var(--text-dim)">Assign skills in this shape: one at +4 (Great), two at +3 (Good), three at +2 (Fair), four at +1 (Average). Everything else is +0.</p>
-  <div style="display:flex;flex-direction:column;align-items:center;gap:4px;margin:8px 0;font-size:var(--text-sm)">
-    <div style="background:color-mix(in srgb,var(--accent) 15%,transparent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);border-radius:4px;padding:3px 16px;font-weight:700">+4 · Investigate or Lore</div>
-    <div style="background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 20%,transparent);border-radius:4px;padding:3px 12px">+3 · Contacts &amp; Will</div>
-    <div style="background:var(--inset);border:1px solid var(--border);border-radius:4px;padding:3px 10px;color:var(--text-dim)">+2 · three skills</div>
-    <div style="background:var(--inset);border:1px solid var(--border);border-radius:4px;padding:3px 10px;color:var(--text-muted)">+1 · Deceive &amp; three others</div>
+  <div class="cg-pyramid">
+    <div class="cg-pyramid-row cg-pyramid-row--peak">+4 · Investigate or Lore</div>
+    <div class="cg-pyramid-row cg-pyramid-row--high">+3 · Contacts &amp; Will</div>
+    <div class="cg-pyramid-row cg-pyramid-row--mid">+2 · three skills</div>
+    <div class="cg-pyramid-row cg-pyramid-row--low">+1 · Deceive &amp; three others</div>
   </div>
   <p style="margin:6px 0 0;font-size:var(--text-label);color:var(--text-muted)">Physique sets physical stress boxes (Fair +2 → 4 boxes, Good +3 → 6). Will sets mental stress boxes. Characters with neither above +0 have 3 boxes each.</p>
 </div>
@@ -446,7 +458,7 @@
     Sometimes the best session prep is a stack of paper and a pen. This world digest gives you everything in one printable document — world lore, opposition stat blocks, factions, adventure seeds, and a three-act starter scenario. No screen required.
   </p>
   <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-    <a href="../assets/pdf/the_gaslight_chronicles.pdf" download="the_gaslight_chronicles.pdf"
+    <a href="/assets/pdf/the_gaslight_chronicles.pdf" download="the_gaslight_chronicles.pdf"
        style="display:inline-flex;align-items:center;gap:7px;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;text-decoration:none;font-family:var(--font-ui)">
       ⬇ Download PDF <span style="opacity:.75;font-weight:400">· 49pp</span>
     </a>
@@ -455,8 +467,8 @@
 </div>
 
 <div class="cg-cta">
-<a href="/campaigns/victorian" style="background:var(--accent,var(--c-blue));color:#fff">🎲 Open Generator</a>
-<a href="/campaigns/character-creation" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
+<a href="/campaigns/victorian" class="cg-cta-primary">🎲 Open Generator</a>
+<a href="/campaigns/character-creation" class="cg-cta-secondary">🎭 Session Zero</a>
 </div>
 </div>
 
@@ -509,11 +521,11 @@
 <div class="cg-card">
   <p style="margin:0 0 10px"><strong>Step 2 — Skill pyramid</strong></p>
   <p style="margin:0 0 8px;font-size:var(--text-sm);color:var(--text-dim)">Assign skills in this shape: one at +4 (Great), two at +3 (Good), three at +2 (Fair), four at +1 (Average). Everything else is +0.</p>
-  <div style="display:flex;flex-direction:column;align-items:center;gap:4px;margin:8px 0;font-size:var(--text-sm)">
-    <div style="background:color-mix(in srgb,var(--accent) 15%,transparent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);border-radius:4px;padding:3px 16px;font-weight:700">+4 · Notice or Crafts</div>
-    <div style="background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 20%,transparent);border-radius:4px;padding:3px 12px">+3 · Lore &amp; Fight</div>
-    <div style="background:var(--inset);border:1px solid var(--border);border-radius:4px;padding:3px 10px;color:var(--text-dim)">+2 · three skills</div>
-    <div style="background:var(--inset);border:1px solid var(--border);border-radius:4px;padding:3px 10px;color:var(--text-muted)">+1 · Contacts &amp; three others</div>
+  <div class="cg-pyramid">
+    <div class="cg-pyramid-row cg-pyramid-row--peak">+4 · Notice or Crafts</div>
+    <div class="cg-pyramid-row cg-pyramid-row--high">+3 · Lore &amp; Fight</div>
+    <div class="cg-pyramid-row cg-pyramid-row--mid">+2 · three skills</div>
+    <div class="cg-pyramid-row cg-pyramid-row--low">+1 · Contacts &amp; three others</div>
   </div>
   <p style="margin:6px 0 0;font-size:var(--text-label);color:var(--text-muted)">Physique sets physical stress boxes (Fair +2 → 4 boxes, Good +3 → 6). Will sets mental stress boxes. Characters with neither above +0 have 3 boxes each.</p>
 </div>
@@ -541,7 +553,7 @@
     Sometimes the best session prep is a stack of paper and a pen. This world digest gives you everything in one printable document — world lore, opposition stat blocks, factions, adventure seeds, and a three-act starter scenario. No screen required.
   </p>
   <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-    <a href="../assets/pdf/the_long_road.pdf" download="the_long_road.pdf"
+    <a href="/assets/pdf/the_long_road.pdf" download="the_long_road.pdf"
        style="display:inline-flex;align-items:center;gap:7px;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;text-decoration:none;font-family:var(--font-ui)">
       ⬇ Download PDF <span style="opacity:.75;font-weight:400">· 68pp</span>
     </a>
@@ -550,8 +562,8 @@
 </div>
 
 <div class="cg-cta">
-<a href="/campaigns/postapoc" style="background:var(--accent,var(--c-blue));color:#fff">🎲 Open Generator</a>
-<a href="/campaigns/character-creation" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
+<a href="/campaigns/postapoc" class="cg-cta-primary">🎲 Open Generator</a>
+<a href="/campaigns/character-creation" class="cg-cta-secondary">🎭 Session Zero</a>
 </div>
 </div>
 
@@ -616,11 +628,11 @@
 <div class="cg-card">
   <p style="margin:0 0 10px"><strong>Step 2 — Skill pyramid</strong></p>
   <p style="margin:0 0 8px;font-size:var(--text-sm);color:var(--text-dim)">Assign skills in this shape: one at +4 (Great), two at +3 (Good), two at +2 (Fair), four at +1 (Average). Everything else is +0.</p>
-  <div style="display:flex;flex-direction:column;align-items:center;gap:4px;margin:8px 0;font-size:var(--text-sm)">
-    <div style="background:color-mix(in srgb,var(--accent) 15%,transparent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);border-radius:4px;padding:3px 16px;font-weight:700">+4 · Shoot or Fight</div>
-    <div style="background:color-mix(in srgb,var(--accent) 10%,transparent);border:1px solid color-mix(in srgb,var(--accent) 20%,transparent);border-radius:4px;padding:3px 12px">+3 · Notice &amp; one other</div>
-    <div style="background:var(--inset);border:1px solid var(--border);border-radius:4px;padding:3px 10px;color:var(--text-dim)">+2 · Athletics or Ride &amp; one other</div>
-    <div style="background:var(--inset);border:1px solid var(--border);border-radius:4px;padding:3px 10px;color:var(--text-muted)">+1 · Contacts &amp; three others</div>
+  <div class="cg-pyramid">
+    <div class="cg-pyramid-row cg-pyramid-row--peak">+4 · Shoot or Fight</div>
+    <div class="cg-pyramid-row cg-pyramid-row--high">+3 · Notice &amp; one other</div>
+    <div class="cg-pyramid-row cg-pyramid-row--mid">+2 · Athletics or Ride &amp; one other</div>
+    <div class="cg-pyramid-row cg-pyramid-row--low">+1 · Contacts &amp; three others</div>
   </div>
   <p style="margin:6px 0 0;font-size:var(--text-label);color:var(--text-muted)">Physique sets physical stress boxes (Fair +2 → 3 boxes, Good +3 → 4). Will sets mental stress boxes. Characters with neither above +0 have 3 boxes each — plan accordingly.</p>
 </div>
@@ -649,8 +661,8 @@
 </div>
 
 <div class="cg-cta">
-<a href="/campaigns/western" style="background:var(--accent,var(--c-blue));color:#fff">🎲 Open Generator</a>
-<a href="../campaigns/character-creation" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
+<a href="/campaigns/western" class="cg-cta-primary">🎲 Open Generator</a>
+<a href="/campaigns/character-creation" class="cg-cta-secondary">🎭 Session Zero</a>
 </div>
 </div>
 <div class="cg-guide-nav">
@@ -722,11 +734,11 @@
 <div class="cg-card">
   <p style="margin:0 0 10px"><strong>Step 2 — Skill pyramid</strong></p>
   <p style="margin:0 0 8px;font-size:var(--text-sm);color:var(--text-dim)">Assign skills in this shape: one at +4 (Great), two at +3 (Good), two at +2 (Fair), four at +1 (Average). Everything else is +0.</p>
-  <div style="display:flex;flex-direction:column;align-items:center;gap:4px;margin:8px 0;font-size:var(--text-sm)">
-    <div style="background:color-mix(in srgb,var(--c-blue,#60a5fa) 15%,transparent);border:1px solid color-mix(in srgb,var(--c-blue,#60a5fa) 30%,transparent);border-radius:4px;padding:3px 16px;font-weight:700">+4 · Lore or Will</div>
-    <div style="background:color-mix(in srgb,var(--c-blue,#60a5fa) 10%,transparent);border:1px solid color-mix(in srgb,var(--c-blue,#60a5fa) 20%,transparent);border-radius:4px;padding:3px 12px">+3 · Investigate &amp; one other</div>
-    <div style="background:var(--inset);border:1px solid var(--border);border-radius:4px;padding:3px 10px;color:var(--text-dim)">+2 · Stealth or Crafts &amp; one other</div>
-    <div style="background:var(--inset);border:1px solid var(--border);border-radius:4px;padding:3px 10px;color:var(--text-muted)">+1 · Contacts &amp; three others</div>
+  <div class="cg-pyramid">
+    <div class="cg-pyramid-row cg-pyramid-row--peak">+4 · Lore or Will</div>
+    <div class="cg-pyramid-row cg-pyramid-row--high">+3 · Investigate &amp; one other</div>
+    <div class="cg-pyramid-row cg-pyramid-row--mid">+2 · Stealth or Crafts &amp; one other</div>
+    <div class="cg-pyramid-row cg-pyramid-row--low">+1 · Contacts &amp; three others</div>
   </div>
   <p style="margin:6px 0 0;font-size:var(--text-label);color:var(--text-muted)">Physique sets physical stress boxes (Fair +2 → 3 boxes, Good +3 → 4). Will sets mental stress boxes. Characters with neither above +0 have 3 boxes each — plan accordingly.</p>
 </div>
@@ -755,8 +767,8 @@
 </div>
 
 <div class="cg-cta">
-<a href="/campaigns/dVentiRealm" style="background:var(--accent,var(--c-blue));color:#fff">🎲 Open Generator</a>
-<a href="../campaigns/character-creation" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
+<a href="/campaigns/dVentiRealm" class="cg-cta-primary">🎲 Open Generator</a>
+<a href="/campaigns/character-creation" class="cg-cta-secondary">🎭 Session Zero</a>
 </div>
 </div></div>
 
@@ -794,8 +806,8 @@
 </script>
 
 <svelte:head>
-  <title>Campaign Guide — Ogma</title>
-  <meta name="description" content="Campaign guide and world lore for your Fate Condensed session." />
+  <title>{worldName} — Campaign Guide · Ogma</title>
+  <meta name="description" content="World guide, lore, and generator reference for {worldName} — a Fate Condensed campaign world." />
 </svelte:head>
 
 <div class="land-shell">
@@ -803,10 +815,17 @@
 
   <header class="land-topnav topbar" role="banner">
     <a href="/" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
+    <nav class="topbar-crumb" aria-label="Breadcrumb">
+      <a href="/" class="topbar-crumb-item">Home</a>
+      <span class="topbar-crumb-sep" aria-hidden="true">&#8250;</span>
+      <a href="/campaigns/{world}" class="topbar-crumb-item">{worldName}</a>
+      <span class="topbar-crumb-sep" aria-hidden="true">&#8250;</span>
+      <span class="topbar-crumb-item current" aria-current="page">Guide</span>
+    </nav>
     <div class="topbar-spacer" style="flex:1"></div>
     <div class="topbar-status">
-      <a href="/campaigns/{world}" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">&#9654; Generate</a>
-      <a href="/help" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">&#128218; Help</a>
+      <a href="/campaigns/{world}" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#9654; Generate</a>
+      <a href="/help" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#128218; Help</a>
       <button class="btn btn-icon btn-ghost" on:click={toggleTheme}
         aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
         style="width:44px;height:44px">{theme === 'dark' ? '☀️' : '◑'}</button>
