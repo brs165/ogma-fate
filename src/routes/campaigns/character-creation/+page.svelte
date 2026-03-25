@@ -362,9 +362,107 @@
         {/if}
       </div>
     {:else if stepId === 'skills'}
-      <div class="sz-body"><p>Skills and stunts. (Content coming in next pass.)</p></div>
+      <div class="sz-body">
+        <p>Your skill pyramid defines what your character is good at. Assign ratings in this shape:</p>
+
+        <div class="sz-skill-pyramid">
+          {#each [['Great (+4)', '1 skill'], ['Good (+3)', '2 skills'], ['Fair (+2)', '3 skills'], ['Average (+1)', '4 skills'], ['Mediocre (+0)', 'Everything else']] as row}
+            <div class="sz-skill-row-wrap">
+              <span class="sz-skill-label">{row[0]}</span>
+              <div class="sz-skill-row"><div class="sz-skill-slot">{row[1]}</div></div>
+            </div>
+          {/each}
+        </div>
+
+        <div class="sz-card">
+          <div class="sz-card-title">The 19 Skills</div>
+          <ul class="sz-skill-list">
+            {#each [
+              ['Academics', 'Mundane knowledge, education, history, sciences, medicine'],
+              ['Athletics', 'Physical potential — running, jumping, dodging attacks'],
+              ['Burglary', 'Bypassing security, picking pockets, committing crimes'],
+              ['Contacts', 'Knowing the right people, information networks'],
+              ['Crafts', 'Building, breaking, and repairing things'],
+              ['Deceive', 'Lying convincingly, creating false identities'],
+              ['Drive', 'Controlling vehicles under pressure'],
+              ['Empathy', 'Reading moods, spotting lies, understanding people'],
+              ['Fight', 'Hand-to-hand combat, melee weapons'],
+              ['Investigate', 'Deliberate study, piecing together clues'],
+              ['Lore', 'Specialized or arcane knowledge, the weird stuff'],
+              ['Notice', 'Spotting things in the moment, reacting quickly'],
+              ['Physique', 'Raw strength, toughness — also sets physical stress boxes'],
+              ['Provoke', 'Intimidation, goading, scaring people'],
+              ['Rapport', 'Building trust, making connections, persuasion'],
+              ['Resources', 'Access to money, gear, and material things'],
+              ['Shoot', 'Ranged combat — guns, bows, throwing weapons'],
+              ['Stealth', 'Staying unseen, escaping, blending in'],
+              ['Will', 'Mental fortitude, resisting pressure — also sets mental stress boxes'],
+            ] as sk}
+              <li><strong>{sk[0]}</strong> &mdash; {sk[1]}</li>
+            {/each}
+          </ul>
+        </div>
+
+        <div class="sz-dnd">D&amp;D has 6 ability scores + 18 skills. Fate has 19 skills that cover both. Your skill rating IS your expected result — no separate modifier calculation. A +3 in Fight means you reliably hit Good (+3) difficulty.</div>
+
+        <div class="sz-tip">Physique sets your physical stress boxes. Will sets your mental stress boxes. Characters with neither above +0 get 3 boxes each &mdash; which isn't much. Plan accordingly.</div>
+
+        <hr style="border:none; border-top:1px solid var(--border); margin:24px 0" />
+
+        <div class="sz-card">
+          <div class="sz-card-title">Stunts (3 free)</div>
+          <p>There are two types:</p>
+
+          <div class="sz-card" style="margin-top:8px">
+            <div class="sz-card-title">+2 Bonus Stunt</div>
+            <p>"Because I [describe why], I get +2 when I use [skill] to [overcome/create advantage/attack/defend] when [circumstance]."</p>
+          </div>
+
+          <div class="sz-card" style="margin-top:8px">
+            <div class="sz-card-title">Rule-Changing Stunt</div>
+            <p>"Because I [describe why], I can [special effect], but only [limitation]."</p>
+          </div>
+
+          <div class="sz-card" style="border-color:var(--c-green); background:rgba(80,184,120,0.06); margin-top:12px">
+            <div class="sz-card-title" style="color:var(--c-green)">&#10003; Leave All Three Blank</div>
+            <p>Define stunts the first time you wish you had one. "I wish I could do X right now" is the perfect moment to write a stunt. This is official Condensed design.</p>
+          </div>
+
+          <div class="sz-dnd" style="margin-top:12px">In D&amp;D, feats are picked at creation and rarely change. In Fate, stunts can be rewritten at every milestone (end of session). Pick what sounds fun now; change it when you learn what your character actually needs.</div>
+        </div>
+      </div>
+
     {:else if stepId === 'stress'}
-      <div class="sz-body"><p>Stress and consequences. (Content coming in next pass.)</p></div>
+      <div class="sz-body">
+        <p>Look at your Physique rating and your Will rating. Find them on the table below.</p>
+
+        <table class="sz-stress-table">
+          <thead><tr><th>Skill Rating</th><th>Stress Boxes</th></tr></thead>
+          <tbody>
+            <tr><td>Mediocre (+0)</td><td>&#9744; &#9744; &#9744; (3 boxes)</td></tr>
+            <tr><td>Average (+1) or Fair (+2)</td><td>&#9744; &#9744; &#9744; &#9744; (4 boxes)</td></tr>
+            <tr><td>Good (+3) or Great (+4)</td><td>&#9744; &#9744; &#9744; &#9744; &#9744; &#9744; (6 boxes)</td></tr>
+            <tr><td>Superb (+5)+</td><td>&#9744; &#9744; &#9744; &#9744; &#9744; &#9744; + extra mild consequence</td></tr>
+          </tbody>
+        </table>
+
+        <div class="sz-card">
+          <div class="sz-card-title">Consequences</div>
+          <p>Everyone starts with three consequence slots:</p>
+          <table class="sz-stress-table">
+            <tbody>
+              <tr><td>Mild</td><td>Absorbs 2 shifts</td><td>Clears: next scene after treatment</td></tr>
+              <tr><td>Moderate</td><td>Absorbs 4 shifts</td><td>Clears: full session after treatment</td></tr>
+              <tr><td>Severe</td><td>Absorbs 6 shifts</td><td>Clears: after a breakthrough + treatment</td></tr>
+            </tbody>
+          </table>
+          <p>Treatment requires a successful overcome roll: Academics for physical, Empathy for mental.</p>
+        </div>
+
+        <div class="sz-dnd">D&amp;D has hit points. Fate has stress (plot armour that clears every scene) and consequences (named aspects that stick). "Badly Burned Hands" isn't just damage &mdash; it's an aspect the GM can compel and enemies can invoke.</div>
+
+        <div class="sz-tip">Stress clears after every scene. Consequences stick around and can be compelled against you &mdash; but they also earn you fate points when they cause trouble.</div>
+      </div>
     {:else if stepId === 'questions'}
       <div class="sz-body"><p>Session zero questions. (Content coming in next pass.)</p></div>
     {:else if stepId === 'summary'}
