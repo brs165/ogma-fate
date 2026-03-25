@@ -371,6 +371,7 @@
             on:click={() => { if (typeof window !== 'undefined') window.print(); }}
             title="Print your session sheet"
           >&#128424; Print</button>
+          <a href="/campaigns/character-creation?world={campId}&mode=standard&from=sz" class="btn btn-ghost" style="font-size:13px;font-weight:600;padding:12px 20px">&rarr; Character Creation</a>
         </div>
 
         <div style="text-align:center;margin-top:12px">

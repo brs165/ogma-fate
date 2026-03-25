@@ -57,6 +57,9 @@
     pcDrafts = pcDrafts.slice(0, pcCount);
   }
   $: currentPc = pcDrafts[pcIndex] || { name: '', hc: '', trouble: '' };
+  let fromSessionZero = false;
+  let sentToPrep = false;
+
   function updateCurrentPc(field, value) {
     pcDrafts = pcDrafts.map((pc, i) => i === pcIndex ? { ...pc, [field]: value } : pc);
   }
@@ -68,13 +71,22 @@
       document.documentElement.setAttribute('data-theme', theme);
     } catch (e) {}
 
-    // Read ?world= param to pre-select campaign
+    // Read URL params — world, mode, from (Session Zero handoff)
     try {
       const params = new URLSearchParams(window.location.search);
       const w = params.get('world');
+      const m = params.get('mode');
+      const from = params.get('from');
       if (w && CAMPAIGNS[w]) {
         campId = w;
-        step = 1;
+        if (m && ['standard', 'trio', 'flashback'].includes(m)) mode = m;
+        if (from === 'sz') {
+          fromSessionZero = true;
+          step = STEPS.findIndex(s => s.id === 'pccount');
+          if (step < 0) step = 2;
+        } else {
+          step = 1;
+        }
       }
     } catch (e) {}
   });
@@ -297,6 +309,13 @@
     {/if}
 
     <!-- Progress bar -->
+    {#if fromSessionZero}
+      <div class="sz-handoff-banner">
+        <span class="sz-handoff-icon">&#10003;</span>
+        <span>World and mode carried from Session Zero &mdash; <strong>{camp ? camp.name : ''}</strong>, <strong>{mode}</strong></span>
+      </div>
+    {/if}
+
     <div class="sz-progress-wrap">
       <div class="sz-step-counter">Step {step + 1} of {totalSteps}</div>
       <div class="sz-progress-bar" role="progressbar"
