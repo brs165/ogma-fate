@@ -2073,8 +2073,29 @@ export function parseOgmaJSON(str) {
   if (!str) return null;
   try {
     var obj = JSON.parse(str);
+    if (!obj || typeof obj !== 'object') return null;
+
+    // Normalise old schema (ogma:true / cards:[]) to current format
+    if (obj.ogma === true && Array.isArray(obj.cards)) {
+      obj = {
+        format: OGMA_FORMAT,
+        version: String(obj.version || '1.0.0'),
+        campaign: obj.campName || obj.campaign || '',
+        campId: obj.campaign || '',
+        ts: obj.ts || Date.now(),
+        results: obj.cards.map(function(c) {
+          return {
+            generator: c.genId || c.generator || '',
+            label: c.title || c.genId || '',
+            data: c.data || {},
+            ts: c.ts || Date.now(),
+          };
+        }),
+      };
+    }
+
     // Validate envelope
-    if (!obj || obj.format !== OGMA_FORMAT) return null;
+    if (obj.format !== OGMA_FORMAT) return null;
     // Single result
     if (obj.generator && obj.data && typeof obj.data === 'object') {
       return { type: 'single', generator: obj.generator, data: obj.data,

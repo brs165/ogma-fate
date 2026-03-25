@@ -272,7 +272,7 @@ export const DB = {
 
     // ── Export / Import (JSON file) ──────────────────────────────────────────
     exportSession: function(session) {
-      var json = JSON.stringify({ ogma: true, version: 1, type: 'session', exported: new Date().toISOString(), session: session }, null, 2);
+      var json = JSON.stringify({ format: 'ogma', version: '2.0.0', type: 'session', exported: new Date().toISOString(), campaign: session.campaign || '', campId: session.campId || '', ts: Date.now(), session: session }, null, 2);
       var blob = new Blob([json], {type: 'application/json'});
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
@@ -283,7 +283,7 @@ export const DB = {
     },
 
     exportCard: function(card, campName) {
-      var json = JSON.stringify({ ogma: true, version: 1, type: 'card', exported: new Date().toISOString(), campaign: campName || '', card: card }, null, 2);
+      var json = JSON.stringify({ format: 'ogma', version: '2.0.0', generator: card.genId || '', campaign: campName || '', campId: card.campId || '', ts: Date.now(), data: card.data || card }, null, 2);
       var blob = new Blob([json], {type: 'application/json'});
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
@@ -296,10 +296,13 @@ export const DB = {
     // EXP-02: Export all pinned cards for a campaign as a JSON file
     exportCards: function(campId, campName, cards) {
       var json = JSON.stringify({
-        ogma: true, version: 1, type: 'cards',
-        exported: new Date().toISOString(),
-        campaign: campId, campName: campName || campId,
-        cards: cards
+        format: 'ogma', version: '2.0.0',
+        campaign: campName || campId,
+        campId: campId,
+        ts: Date.now(),
+        results: cards.map(function(c) {
+          return { generator: c.genId || c.generator || '', label: c.title || c.genId || '', data: c.data || {}, ts: c.ts || Date.now() };
+        })
       }, null, 2);
       var blob = new Blob([json], {type: 'application/json'});
       var url = URL.createObjectURL(blob);
@@ -317,9 +320,9 @@ export const DB = {
       return DB.loadSession(key).then(function(state) {
         if (!state) throw new Error('Nothing to export — canvas is empty');
         var json = JSON.stringify({
-          ogma: true, version: 1, type: 'canvas',
+          format: 'ogma', version: '2.0.0', type: 'canvas',
           exported: new Date().toISOString(),
-          key: key, state: state
+          ts: Date.now(), key: key, state: state
         }, null, 2);
         var blob = new Blob([json], {type: 'application/json'});
         var url = URL.createObjectURL(blob);

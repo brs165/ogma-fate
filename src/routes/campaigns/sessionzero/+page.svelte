@@ -86,18 +86,18 @@
   }
 
   function exportSession() {
-    const cards = [];
-    if (seedData) cards.push({ id: 'wiz_seed', genId: 'seed', title: seedData.location || 'Seed', data: seedData, tags: [], ts: Date.now() });
-    if (sceneData) cards.push({ id: 'wiz_scene', genId: 'scene', title: (sceneData.aspects && sceneData.aspects[0]) ? (sceneData.aspects[0].name || 'Scene') : 'Scene', data: sceneData, tags: [], ts: Date.now() });
-    if (npcData) cards.push({ id: 'wiz_npc', genId: 'npc_major', title: npcData.name || 'NPC', data: npcData, tags: [], ts: Date.now() });
+    const items = [];
+    if (seedData) items.push({ generator: 'seed', label: seedData.location || 'Seed', data: seedData, ts: Date.now() });
+    if (sceneData) items.push({ generator: 'scene', label: (sceneData.aspects && sceneData.aspects[0]) ? (sceneData.aspects[0].name || 'Scene') : 'Scene', data: sceneData, ts: Date.now() });
+    if (npcData) items.push({ generator: 'npc_major', label: npcData.name || 'NPC', data: npcData, ts: Date.now() });
     backstories.forEach((b, i) => {
-      if (b) cards.push({ id: 'wiz_backstory_' + i, genId: 'backstory', title: 'Backstory ' + (i + 1), data: b, tags: [], ts: Date.now() });
+      if (b) items.push({ generator: 'backstory', label: 'Backstory ' + (i + 1), data: b, ts: Date.now() });
     });
     const exportObj = {
-      ogma: true, version: 1, type: 'cards',
-      exported: new Date().toISOString(),
-      campaign: campId || '', campName: campName,
-      cards: cards,
+      format: 'ogma', version: '2.0.0',
+      campaign: campName || '', campId: campId || '',
+      ts: Date.now(),
+      results: items,
     };
     const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json;charset=utf-8' });
     const url = URL.createObjectURL(blob);
