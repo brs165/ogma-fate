@@ -2775,6 +2775,8 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 /* ── BRD-06: Section labels ──────────────────────────────────────────────── */
 .board-label{position:absolute;cursor:grab;user-select:none;min-width:80px}
 .board-label:hover .bc-actions{display:flex}
+.board-zone-container{position:absolute;top:0;left:0;border:2px dashed;border-radius:6px;z-index:0;pointer-events:none;opacity:0.4;transition:width 0.2s ease,height 0.2s ease}
+.board-label.zone-active .board-label-inner{position:relative;z-index:1}
 .board-label:focus{outline:2px solid var(--focus-ring,var(--accent));outline-offset:2px;border-radius:6px}
 .board-label:focus:not(:focus-visible){outline:none}
 .board-label.editing{cursor:default;z-index:600!important}

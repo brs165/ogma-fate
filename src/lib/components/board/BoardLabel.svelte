@@ -3,6 +3,7 @@
   export let onUpdate = () => {};
   export let onDelete = () => {};
   export let onDragStart = () => {};
+  export let childCards = [];
 
   const LABEL_STYLES = [
     { bg: 'color-mix(in srgb,var(--accent) 10%,var(--panel))', border: 'var(--accent)', text: 'var(--accent)' },
@@ -16,6 +17,13 @@
   let draft = card.text || 'Section';
 
   $: S = LABEL_STYLES[card.styleIdx || 0] || LABEL_STYLES[0];
+  $: zoneMode = card.zoneMode || false;
+  $: zoneW = zoneMode && childCards.length > 0
+    ? Math.max(400, ...childCards.map(c => (c.x - card.x) + 360)) + 40
+    : (card.zoneW || 400);
+  $: zoneH = zoneMode && childCards.length > 0
+    ? Math.max(200, ...childCards.map(c => (c.y - card.y) + 300)) + 40
+    : (card.zoneH || 200);
 
   function commit() {
     editing = false;
@@ -65,9 +73,12 @@
 <div
   class="board-label"
   class:editing
+  class:zone-active={zoneMode}
   style:left="{card.x}px"
   style:top="{card.y}px"
   style:z-index={card.z || 1}
+  style:width="{zoneMode ? zoneW + 'px' : 'auto'}"
+  style:height="{zoneMode ? zoneH + 'px' : 'auto'}"
   tabindex={editing ? -1 : 0}
   role="heading"
   aria-level="2"
@@ -77,9 +88,21 @@
   on:keydown={onWrapperKeyDown}
 >
   <div class="bc-actions">
+    <button class="bc-btn" title="Toggle Zone Container"
+      on:click|stopPropagation={() => onUpdate(card.id, { zoneMode: !zoneMode, zoneW: 400, zoneH: 200 })}
+    >{zoneMode ? '⊟' : '⊞'}</button>
     <button class="bc-btn" title="Change colour" on:click={cycleStyle}>🎨</button>
     <button class="bc-btn" title="Delete" on:click={deleteLabel}>✕</button>
   </div>
+
+  {#if zoneMode}
+    <div class="board-zone-container"
+      style:border-color={S.border}
+      style:background={S.bg}
+      style:width="{zoneW}px"
+      style:height="{zoneH}px"
+    ></div>
+  {/if}
 
   <div class="board-label-inner"
        style:background={S.bg}

@@ -362,6 +362,23 @@
         const fx = d.finalX != null ? d.finalX : d.startCardX;
         const fy = d.finalY != null ? d.finalY : d.startCardY;
         canvas.updateCard(d.cardId, { x: fx, y: fy, z: d.topZ });
+
+        // Zone assignment — check if card landed inside a zone label
+        const allCards = get(canvas.cards);
+        const zones = allCards.filter(c => c.genId === 'label' && c.zoneMode);
+        const droppedCard = allCards.find(c => c.id === d.cardId);
+        if (droppedCard && droppedCard.genId !== 'label') {
+          let assignedZone = null;
+          for (const zone of zones) {
+            const zW = zone.zoneW || 400;
+            const zH = zone.zoneH || 200;
+            if (fx >= zone.x && fx <= zone.x + zW && fy >= zone.y && fy <= zone.y + zH) {
+              assignedZone = zone.id;
+              break;
+            }
+          }
+          canvas.updateCard(d.cardId, { zoneId: assignedZone });
+        }
       } else if (canvas) {
         canvas.updateCard(d.cardId, { z: d.topZ });
       }
@@ -713,6 +730,7 @@
               {#if card.genId === 'label'}
                 <BoardLabel
                   {card}
+                  childCards={cards.filter(c => c.zoneId === card.id)}
                   onDelete={canvas ? canvas.deleteCard : () => {}}
                   onUpdate={canvas ? canvas.updateCard : () => {}}
                   {onDragStart}
