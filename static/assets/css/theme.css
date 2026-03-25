@@ -2996,3 +2996,19 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 /* Tip box in campaign step */
 .sz-info-box{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--glass-radius);font-size:var(--text-sm);color:var(--text-dim);line-height:1.6}
 .sz-info-icon{font-size:18px;flex-shrink:0}
+
+/* ══ RESULT HELP PANEL (rhp-shell) ══ */
+.rhp-empty-state{padding:24px 20px 32px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.rhp-ready-icon{font-size:40px;margin-bottom:4px;line-height:1}
+.rhp-ready-title{font-size:var(--text-md);font-weight:700;color:var(--text)}
+.rhp-ready-sub{font-size:var(--text-sm);color:var(--text-muted);text-align:center;margin-bottom:8px}
+.rhp-shell{width:100%;display:flex;flex-direction:column;gap:10px;margin-top:8px;text-align:left}
+.rhp-block{padding:12px 14px;background:var(--glass-bg);border:1px solid var(--border);border-radius:var(--glass-radius);display:flex;flex-direction:column;gap:6px}
+.rhp-block--gm{border-left:3px solid var(--accent);background:color-mix(in srgb,var(--accent) 5%,transparent)}
+.rhp-block--dnd{border-left:3px solid var(--c-blue);background:color-mix(in srgb,var(--c-blue) 5%,transparent)}
+.rhp-block-label{font-size:var(--text-label);font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted)}
+.rhp-block--gm .rhp-block-label{color:var(--accent)}
+.rhp-block--dnd .rhp-block-label{color:var(--c-blue)}
+.rhp-block-body{font-size:var(--text-sm);color:var(--text-dim);line-height:1.65}
+.rhp-rules-list{margin:0 0 0 16px;padding:0;display:flex;flex-direction:column;gap:4px}
+.rhp-rules-list li{font-size:var(--text-sm);color:var(--text-dim);line-height:1.55}

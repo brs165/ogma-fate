@@ -3,7 +3,7 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
   import { GENERATORS } from '../../engine.js';
-  import { CAMPAIGNS } from '../../../data/shared.js';
+  import { CAMPAIGNS, HELP_CONTENT } from '../../../data/shared.js';
   import { createSessionStore } from '../../stores/sessionStore.js';
   import { createChromeStore } from '../../stores/chromeStore.js';
   import DB from '../../db.js';
@@ -60,6 +60,7 @@
   }
 
   $: gen = GENERATORS.find(g => g.id === activeGen) || GENERATORS[0];
+  $: helpEntry = HELP_CONTENT[activeGen] || null;
 
   // ── Generator groups for sidebar ──────────────────────────────────────────
   const GENERATOR_GROUPS = [
@@ -374,10 +375,53 @@
                     </div>
                   </div>
                 {:else}
-                  <div style="padding:40px 20px;text-align:center;color:var(--text-muted)">
-                    <div style="font-size:48px;margin-bottom:12px">&#x1F3B2;</div>
-                    <div style="font-size:16px;font-weight:700;margin-bottom:6px">Ready to generate</div>
-                    <div style="font-size:13px">Click <strong>Roll</strong> or press <strong>Space</strong> to generate a {gen ? gen.label : 'result'}.</div>
+                  <div class="rhp-empty-state">
+                    <div class="rhp-ready-icon" aria-hidden="true">&#x1F3B2;</div>
+                    <div class="rhp-ready-title">Ready to generate</div>
+                    <div class="rhp-ready-sub">
+                      Click <strong>Roll</strong> or press <strong>Space</strong>
+                      to generate a {gen ? gen.label : 'result'}.
+                    </div>
+
+                    {#if helpEntry}
+                      <div class="rhp-shell">
+
+                        {#if helpEntry.what}
+                          <div class="rhp-block">
+                            <div class="rhp-block-label">What this generates</div>
+                            <div class="rhp-block-body">{helpEntry.what}</div>
+                          </div>
+                        {/if}
+
+                        {#if helpEntry.gm_running || (helpEntry.gm_tips && helpEntry.gm_tips.length)}
+                          <div class="rhp-block rhp-block--gm">
+                            <div class="rhp-block-label">For the GM</div>
+                            <div class="rhp-block-body">
+                              {helpEntry.gm_running || helpEntry.gm_tips[0]}
+                            </div>
+                          </div>
+                        {/if}
+
+                        {#if helpEntry.rules && helpEntry.rules.length}
+                          <div class="rhp-block">
+                            <div class="rhp-block-label">Key rules</div>
+                            <ul class="rhp-rules-list">
+                              {#each helpEntry.rules.slice(0, 3) as rule}
+                                <li>{rule}</li>
+                              {/each}
+                            </ul>
+                          </div>
+                        {/if}
+
+                        {#if helpEntry.dnd_notes}
+                          <div class="rhp-block rhp-block--dnd">
+                            <div class="rhp-block-label">Coming from D&amp;D?</div>
+                            <div class="rhp-block-body">{helpEntry.dnd_notes}</div>
+                          </div>
+                        {/if}
+
+                      </div>
+                    {/if}
                   </div>
                 {/if}
               </div>

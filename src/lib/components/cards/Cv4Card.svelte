@@ -208,7 +208,7 @@
     <!-- ── BACK ───────────────────────────────────────────────────────── -->
     <div
       class="cv4-face cv4-back"
-      style="backface-visibility:hidden; -webkit-backface-visibility:hidden; transform:{reduced ? 'none' : 'rotateY(180deg)'}; position:{reduced ? 'relative' : 'absolute'}; top:0; left:0; right:0; min-height:100%; background:var(--cv-card-dark,var(--panel)); border:1px solid {hovered ? catColor + 'AA' : 'var(--cv-card-bdr,var(--border))'}; border-radius:3px; overflow:hidden; display:{reduced && !flipped ? 'none' : 'flex'}; flex-direction:column; box-shadow:{hovered ? '5px 7px 0 rgba(0,0,0,0.18), 0 0 0 1px ' + catColor + '44' : '3px 3px 0 rgba(0,0,0,0.18)'}"
+      style="backface-visibility:hidden; -webkit-backface-visibility:hidden; transform:{reduced ? 'none' : 'rotateY(180deg)'}; position:{flipped && !reduced ? 'relative' : reduced ? 'relative' : 'absolute'}; top:0; left:0; right:0; background:var(--cv-card-dark,var(--panel)); border:1px solid {hovered ? catColor + 'AA' : 'var(--cv-card-bdr,var(--border))'}; border-radius:3px; overflow:hidden; display:{reduced && !flipped ? 'none' : 'flex'}; flex-direction:column; box-shadow:{hovered ? '5px 7px 0 rgba(0,0,0,0.18), 0 0 0 1px ' + catColor + '44' : '3px 3px 0 rgba(0,0,0,0.18)'}"
     >
       <!-- Stamp band -->
       <div style="height:5px; background:{catColor}; flex-shrink:0"></div>
@@ -220,7 +220,7 @@
         {#if campName}<span style="font-size:10px; color:var(--cv-card-text-muted); font-family:{CV4_MONO}; letter-spacing:0.08em; font-style:italic">{campName}</span>{/if}
       </div>
       <!-- Back panel content -->
-      <div style="flex:1; overflow-y:auto; max-height:400px">
+      <div style="flex:1; overflow-y:visible; min-height:0">
         <BackPanel {genId} {catColor} />
       </div>
       <!-- Flip button -->
