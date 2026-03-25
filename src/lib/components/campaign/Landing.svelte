@@ -97,6 +97,7 @@
     <a href="/" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
     <div class="topbar-spacer" style="flex:1"></div>
     <div class="topbar-status">
+      <a href="/campaigns/sessionzero" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">&#127922; Prep Wizard</a>
       <a href="/help" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">&#128218; Help</a>
       <a href="/about" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">About</a>
       <button
@@ -160,11 +161,11 @@
             </div>
             <span class="land-onboard-arrow">&#x203A;</span>
           </a>
-          <a href="/campaigns/fantasy" class="land-onboard-card">
+          <a href="/campaigns/sessionzero" class="land-onboard-card">
             <div class="land-onboard-icon">&#x26A1;</div>
             <div class="land-onboard-text">
               <div class="land-onboard-label">Prep a Session</div>
-              <div class="land-onboard-desc">Pick a world and generate NPCs, scenes, encounters, and more. Done in minutes.</div>
+              <div class="land-onboard-desc">The Prep Wizard walks you through world, players, seed, scene, and opening NPC in 10 minutes. Done screen sends cards straight to the Table.</div>
             </div>
             <span class="land-onboard-arrow">&#x203A;</span>
           </a>
@@ -213,26 +214,34 @@
         <h2 class="land-section-heading">Choose your world</h2>
         <div class="land-worlds-grid">
           {#each camps as camp, idx (camp.id)}
-            <a
-              href="/campaigns/{camp.id}"
+            <div
               class="land-world-card"
               data-campaign={camp.id}
               style="animation-delay:{idx * 0.05}s;position:relative;overflow:hidden"
+              role="group"
+              aria-label={camp.name}
             >
-              <div class="land-world-card-accent"></div>
-              <div class="land-world-card-body">
-                <div class="land-world-icon">{camp.icon}</div>
-                <div class="land-world-info">
-                  <div class="land-world-name">{camp.name}</div>
-                  <div class="land-world-genre">{camp.genre}</div>
-                  <div class="land-world-hook">{camp.hook}</div>
+              <a href="/campaigns/{camp.id}" class="land-world-card-link" aria-label="Open {camp.name} generator">
+                <div class="land-world-card-accent"></div>
+                <div class="land-world-card-body">
+                  <div class="land-world-icon">{camp.icon}</div>
+                  <div class="land-world-info">
+                    <div class="land-world-name">{camp.name}</div>
+                    <div class="land-world-genre">{camp.genre}</div>
+                    <div class="land-world-hook">{camp.hook}</div>
+                  </div>
+                  <div class="land-world-arrow">&#x203A;</div>
                 </div>
-                <div class="land-world-arrow">&#x203A;</div>
-              </div>
+              </a>
               <div class="land-world-footer">
                 <span class="land-world-vibes">{camp.vibes}</span>
+                <a
+                  href="/campaigns/{camp.id}/guide"
+                  class="land-world-guide-link"
+                  title="{camp.name} Campaign Guide"
+                >Campaign Guide &rarr;</a>
               </div>
-            </a>
+            </div>
           {/each}
         </div>
       </div>

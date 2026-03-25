@@ -1143,6 +1143,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 @media(max-width:560px){.land-worlds-grid{grid-template-columns:1fr}}
 .land-world-card{display:block;text-decoration:none;background:var(--panel);border:1.5px solid var(--border-mid);border-radius:var(--fd-stamp-radius,3px);overflow:hidden;transition:all 0.15s cubic-bezier(0.34,1.56,0.64,1);animation:fadeUp 0.35s ease both;position:relative;box-shadow:var(--fd-stamp-shadow)}
 .land-world-card:hover{border-color:var(--accent);transform:translateY(-3px) rotate(0.3deg);box-shadow:var(--fd-stamp-shadow-hover)}
+.land-world-card-link{display:block;text-decoration:none;color:inherit}
 .land-world-card-accent{height:3px;background:var(--accent)}
 .land-world-card-body{display:flex;align-items:center;gap:12px;padding:14px 16px 8px}
 .land-world-icon{font-size:24px;flex-shrink:0}
