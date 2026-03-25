@@ -36,6 +36,7 @@
   let activeGen = 'npc_minor';
   let result = null;
   let rolling = false;
+  let consequenceSev = '';
   let pinnedCards = [];
   let pinBouncing = false;
   let sessionPack = null;
@@ -57,6 +58,7 @@
     unsubs.push(session.pinBouncing.subscribe(v => pinBouncing = v));
     unsubs.push(session.sessionPack.subscribe(v => sessionPack = v));
     unsubs.push(session.resultAnim.subscribe(v => resultAnim = v));
+    if (session.consequenceSev) unsubs.push(session.consequenceSev.subscribe(v => consequenceSev = v));
   }
 
   $: gen = GENERATORS.find(g => g.id === activeGen) || GENERATORS[0];
@@ -386,6 +388,26 @@
                     {/if}
                   </div>
                 </div>
+
+                <!-- Consequence severity picker -->
+                {#if activeGen === 'consequence'}
+                  <div class="sev-picker" role="group" aria-label="Consequence severity">
+                    {#each [
+                      { id: '',         label: 'Any',      color: 'var(--text-muted)' },
+                      { id: 'mild',     label: 'Mild',     color: 'var(--c-blue)'     },
+                      { id: 'moderate', label: 'Moderate', color: 'var(--gold)'       },
+                      { id: 'severe',   label: 'Severe',   color: 'var(--c-red)'      },
+                    ] as sev}
+                      <button
+                        class="sev-btn"
+                        class:sev-active={consequenceSev === sev.id}
+                        style="--sev-color:{sev.color}"
+                        on:click={() => session.consequenceSev.set(sev.id)}
+                        aria-pressed={String(consequenceSev === sev.id)}
+                      >{sev.label}</button>
+                    {/each}
+                  </div>
+                {/if}
 
                 <!-- Result display -->
                 {#if result}
