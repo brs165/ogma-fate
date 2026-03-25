@@ -218,7 +218,7 @@ const { cards, addCard } = createCanvasStore('mykey');
 ## File Structure — Target
 
 ```
-ogma-svelte/
+ogma-fate/
 ├── src/
 │   ├── lib/
 │   │   ├── engine.js              ← copy from core/engine.js (no changes)

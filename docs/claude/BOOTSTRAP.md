@@ -1,6 +1,6 @@
 # Bootstrap — Session Startup Checklist
 
-Read this at the start of every Claude Code session on ogma-svelte.
+Read this at the start of every Claude Code session on ogma-fate.
 
 ---
 
@@ -8,7 +8,7 @@ Read this at the start of every Claude Code session on ogma-svelte.
 
 ```bash
 # Confirm you're in the right repo
-pwd                  # Should be …/-ogma-svelte
+pwd                  # Should be …/ogma-fate
 git branch           # Note current branch
 
 # Quick health check
