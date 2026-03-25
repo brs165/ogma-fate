@@ -412,13 +412,30 @@
                 <!-- Result display -->
                 {#if result}
                   <div class={resultAnim ? 'result-card-appear' : ''}>
-                    <div style="padding:16px">
-                      <Cv4Card
-                        genId={result.genId}
-                        data={result.data}
-                        campName={campName}
-                      />
-                    </div>
+                    {#if result.isSeedPack && result.pack}
+                      <div class="seed-pack-header">
+                        <span class="seed-pack-title">&#8853; Adventure Seed Pack</span>
+                        <span class="seed-pack-count">{result.pack.length} cards</span>
+                        <button class="btn btn-ghost seed-pack-pin-all"
+                          on:click={() => { result.pack.forEach(item => { session.pinResultDirect({ genId: item.genId, data: item.data }); }); }}
+                          title="Pin all cards to Table Prep"
+                        >Pin All</button>
+                      </div>
+                      <div class="seed-pack-grid">
+                        {#each result.pack as item, i (i)}
+                          <div class="seed-pack-item">
+                            {#if item.label}
+                              <div class="seed-pack-item-label">{item.label}</div>
+                            {/if}
+                            <Cv4Card genId={item.genId} data={item.data} campName={campName} />
+                          </div>
+                        {/each}
+                      </div>
+                    {:else}
+                      <div style="padding:16px">
+                        <Cv4Card genId={result.genId} data={result.data} campName={campName} />
+                      </div>
+                    {/if}
                   </div>
                 {:else}
                   <div class="rhp-empty-state">

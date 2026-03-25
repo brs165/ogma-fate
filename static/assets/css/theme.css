@@ -3022,3 +3022,12 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .sev-btn:hover{border-color:var(--sev-color);color:var(--sev-color)}
 .sev-btn.sev-active{border-color:var(--sev-color);background:color-mix(in srgb,var(--sev-color) 12%,transparent);color:var(--sev-color)}
 .sev-btn:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
+
+/* ══ SEED PACK DISPLAY ══ */
+.seed-pack-header{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--accent) 5%,transparent)}
+.seed-pack-title{font-size:var(--text-sm);font-weight:800;color:var(--accent);letter-spacing:0.04em;flex:1}
+.seed-pack-count{font-size:var(--text-label);color:var(--text-muted);font-family:var(--font-mono)}
+.seed-pack-pin-all{font-size:var(--text-sm);gap:6px}
+.seed-pack-grid{display:flex;flex-direction:column;gap:16px;padding:16px}
+.seed-pack-item{display:flex;flex-direction:column;gap:6px}
+.seed-pack-item-label{font-size:var(--text-label);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);padding:0 2px}

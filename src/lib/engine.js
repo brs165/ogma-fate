@@ -918,6 +918,57 @@ function mdStunt(s) {
     (s.type === 'special' ? 'ONCE/SCENE' : '+2 BONUS') + '`  \n' + s.desc;
 }
 
+// ── Seed Pack: generate a full adventure as multiple typed cards ──────────
+export function generateSeedPack(t, partySize) {
+  var ps = partySize || 4;
+  var seed = generate('seed', t, ps, {});
+  var pack = [];
+  pack.push({ genId: 'seed', data: seed, label: 'Adventure Summary' });
+
+  var s1 = generate('scene', t, ps, {});
+  s1._seedLabel = 'Scene 1: ' + (seed.scenes && seed.scenes[0] ? seed.scenes[0].type : 'OPENING');
+  s1._seedNote = seed.scenes && seed.scenes[0] ? seed.scenes[0].brief : '';
+  pack.push({ genId: 'scene', data: s1, label: 'Scene 1 — Opening' });
+
+  var s2 = generate('scene', t, ps, {});
+  s2._seedLabel = 'Scene 2: COMPLICATIONS';
+  s2._seedNote = seed.scenes && seed.scenes[1] ? seed.scenes[1].brief : '';
+  pack.push({ genId: 'scene', data: s2, label: 'Scene 2 — Complications' });
+
+  var enc = generate('encounter', t, ps, {});
+  enc._seedNote = seed.scenes && seed.scenes[2] ? seed.scenes[2].brief : '';
+  pack.push({ genId: 'encounter', data: enc, label: 'Scene 3 — Climax' });
+
+  if (seed.opposition && seed.opposition.length > 0) {
+    seed.opposition.forEach(function(opp) {
+      var npcType = opp.type === 'major' ? 'npc_major' : 'npc_minor';
+      pack.push({
+        genId: npcType,
+        data: {
+          name: opp.name || 'Unknown',
+          aspects: npcType === 'npc_major'
+            ? { high_concept: (opp.aspects || [])[0] || '', trouble: (opp.aspects || [])[1] || '', others: (opp.aspects || []).slice(2) }
+            : opp.aspects || [],
+          skills: opp.skills || [],
+          stunts: opp.stunt ? [opp.stunt] : [],
+          stress: opp.stress || 2,
+          physical_stress: opp.stress || 2,
+          mental_stress: 2,
+          refresh: 3,
+        },
+        label: 'Opposition: ' + (opp.name || 'NPC'),
+      });
+    });
+  }
+
+  var compel = generate('compel', t, ps, {});
+  compel._seedTwist = seed.twist;
+  compel.situation = seed.twist || compel.situation;
+  pack.push({ genId: 'compel', data: compel, label: 'Twist' });
+
+  return pack;
+}
+
 export function toMarkdown(genId, data, campName) {
   if (!genId || !data) return '';
   switch (genId) {

@@ -1,7 +1,7 @@
 // sessionStore.js — from useGeneratorSession (react-source/core/ui.js L1649-1862)
 // Factory: createSessionStore(campId, campMeta, tables, prefs, showToast)
 import { writable, get } from 'svelte/store';
-import { generate, mergeUniversal, filteredTables, GENERATORS } from '../engine.js';
+import { generate, generateSeedPack, mergeUniversal, filteredTables, GENERATORS } from '../engine.js';
 import DB from '../db.js';
 
 const TOAST_MS = 2500;
@@ -71,6 +71,24 @@ export function createSessionStore(campId, campMeta, tables, prefs, showToast) {
       const opts = {};
       if (genId === 'consequence' && csev) opts.severity = csev;
       const seed = Math.floor(Math.random() * 0xFFFFFF) + 1;
+
+      // Seed pack: generate multiple cards at once
+      if (genId === 'seed') {
+        let pack;
+        try { pack = generateSeedPack(eff, pSize); } catch(e) { pack = null; }
+        if (pack && pack.length > 0) {
+          setTimeout(() => {
+            if (!isMounted) return;
+            result.set({ genId: 'seed', isSeedPack: true, pack, _ts: Date.now() });
+            resultAnim.set(true);
+            setTimeout(() => { if (isMounted) resultAnim.set(false); }, 320);
+            history.update(h => [{ genId: 'seed', data: pack[0]?.data || {}, gen: (GENERATORS || []).find(g => g.id === 'seed') || {} }].concat(h).slice(0, 8));
+            rolling.set(false);
+          }, 220);
+          return;
+        }
+      }
+
       const data = generate(genId, eff, pSize, opts, seed);
       const gen  = (GENERATORS || []).find(g => g.id === genId) || {};
       const newResult = { genId, data, _seed: seed, _ts: Date.now() };
@@ -159,6 +177,18 @@ export function createSessionStore(campId, campMeta, tables, prefs, showToast) {
     if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(30);
   }
 
+  function pinResultDirect(item) {
+    if (!item || !item.data) return;
+    const card = {
+      id: String(Date.now()) + Math.random().toString(36).slice(2),
+      campId, genId: item.genId,
+      label: item.genId,
+      data: item.data, ts: Date.now(), state: null, visible: true,
+    };
+    pinnedCards.update(prev => [card].concat(prev));
+    if (DB) DB.saveCard(campId, card).catch(() => {});
+  }
+
   function unpinCard(cardId) {
     pinnedCards.update(prev => prev.filter(c => c.id !== cardId));
     if (DB) DB.deleteCard(campId, cardId).catch(err => console.warn('[Ogma] unpin delete failed:', err));
@@ -183,7 +213,7 @@ export function createSessionStore(campId, campMeta, tables, prefs, showToast) {
     pinnedCards, pinBouncing, sessionPack, packRolling,
     resultAnim, showStreakBadge, confPcs,
     doGenerate, doInspire, pickInspireResult,
-    selectGen, pinResult, unpinCard, restoreCard,
+    selectGen, pinResult, pinResultDirect, unpinCard, restoreCard,
     updatePrefs, destroy,
   };
 }
