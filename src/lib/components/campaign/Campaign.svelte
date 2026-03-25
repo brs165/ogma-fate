@@ -97,6 +97,30 @@
       const params = new URLSearchParams(window.location.search);
       if (params.get('canvas') === '1') canvasView = true;
     } catch (e) {}
+
+    // Session Zero auto-populate
+    try {
+      const szRaw = localStorage.getItem('ogma_sz_seed');
+      const szParams = new URLSearchParams(window.location.search);
+      if (szRaw && szParams.get('sz') === '1') {
+        const seed = JSON.parse(szRaw);
+        localStorage.removeItem('ogma_sz_seed');
+        if (seed.campId === campId && seed._sz_auto_pc) {
+          setTimeout(() => {
+            canvasView = true;
+            import('../../engine.js').then(({ generate: gen, mergeUniversal: mu, filteredTables: ft }) => {
+              const campData = CAMPAIGNS[campId];
+              if (!campData || !campData.tables) return;
+              const tables = ft(mu(campData.tables), {});
+              const pcData = gen('pc', tables, 4, {});
+              window.dispatchEvent(new CustomEvent('ogma:sz-pc', { detail: { genId: 'pc', data: pcData } }));
+            }).catch(e => console.warn('[Ogma] sz generate failed:', e));
+          }, 400);
+        }
+      }
+    } catch(e) {
+      console.warn('[Ogma] sz seed read failed:', e);
+    }
   });
 
   onDestroy(() => {

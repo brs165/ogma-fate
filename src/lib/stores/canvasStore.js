@@ -188,11 +188,30 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
     });
   }
 
+  function generateCardWithData(genId, data, x, y) {
+    if (!data) return;
+    const card = {
+      id: boardUid(),
+      genId,
+      title: extractCardTitle(genId, data),
+      summary: extractCardSummary(genId, data),
+      tags: extractCardTags(genId, data),
+      data,
+      x: x !== undefined ? x : 80,
+      y: y !== undefined ? y : 80,
+      z: Date.now(),
+      ts: Date.now(),
+      gmOnly: false,
+    };
+    mutate(prev => prev.concat([card]));
+    if (showToast) showToast('Session Zero PC added to canvas');
+  }
+
   return {
     cards, loaded,
     getCards: () => get(cards),
     persistCanvas,
-    generateCard, updateCard, deleteCard, rerollCard,
+    generateCard, generateCardWithData, updateCard, deleteCard, rerollCard,
     undoLast, exportCanvas, importCanvas,
   };
 }

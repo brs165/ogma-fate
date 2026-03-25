@@ -146,6 +146,31 @@
     }
   }
 
+  function copyJSON() {
+    const campName = camp ? camp.name : 'Unknown';
+    const modeLabel = mode === 'trio' ? 'Phase Trio' : mode === 'flashback' ? 'Flashback Slots' : 'Condensed Standard';
+    const aspectSlots = mode === 'standard'
+      ? ['High Concept', 'Trouble', 'Relationship', 'Free Aspect', 'Free Aspect']
+      : mode === 'trio'
+      ? ['High Concept', 'Trouble', 'Phase 1 Aspect', 'Phase 2 (Relationship)', 'Phase 3 Aspect']
+      : ['High Concept', 'Trouble', 'Flashback 1 (discover during play)', 'Flashback 2 (discover during play)', 'Flashback 3 (discover during play)'];
+    const payload = {
+      format: 'ogma', version: '2.0.0', generator: 'session_zero',
+      campaign: campName, campId: campId, ts: Date.now(),
+      data: {
+        mode: modeLabel, aspects: aspectSlots,
+        skillPyramid: { great4: 1, good3: 2, fair2: 3, average1: 4 },
+        stunts: 3, refresh: 3,
+        currentIssue: wd ? wd.current[ciIdx].name : '',
+        impendingIssue: wd ? wd.impending[iiIdx].name : '',
+      },
+    };
+    const json = JSON.stringify(payload, null, 2);
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(json).then(() => { copied = 'JSON Copied!'; setTimeout(() => { copied = ''; }, 2000); });
+    }
+  }
+
   function selectCamp(id) { campId = id; }
   function selectMode(id) { mode = id; }
 
@@ -153,56 +178,56 @@
   const WORLD_DATA = {
     thelongafter: {
       current:  [{ name: 'The Warlords Are Consolidating', desc: 'Three rival warlords have begun absorbing smaller settlements. Travel is dangerous. Tribute is mandatory.' }, { name: 'The Phade Vaults Are Waking Up', desc: 'Ancient automated systems are reactivating across the waste. Some offer miracles. Some enforce quarantine protocols.' }],
-      impending: [{ name: 'The God-Machine Stirs', desc: 'Something beneath the Cradle is broadcasting. The signal is old. The response will not be kind.' }],
+      impending: [{ name: 'The God-Machine Stirs', desc: 'Something beneath the Cradle is broadcasting. The signal is old. The response will not be kind.' }, { name: 'The Pilgrim Roads Are Being Taxed', desc: 'Movement between settlements now requires paying tribute to whoever controls the nearest checkpoint. Trade is dying. So is goodwill.' }],
       hc: ['Last Cartographer of the Before-Times', 'Scavenger-Priest of the Rusted Saints', 'Vault Delver Who Reads the Old Signs', 'Road Tax Collector with a Legitimate Monopoly'],
       troubles: ['The Map Shows a City That Shouldn\'t Exist', 'Faith Built on Parts That No Longer Fit', 'The Route That Pays My Salary Doesn\'t Exist Anymore', 'The Old Machines Listen to Me — and That Scares People'],
       questions: ['What do you carry from the Before-Times that you cannot use but will not abandon?', 'Which warlord\'s territory did you cross to get here, and what did you leave behind as payment?', 'What did the last Phade vault you entered show you that you wish you could forget?', 'Who taught you to survive, and why did they stop traveling with you?', 'What do you believe about the God-Machine, and how does that belief put you at odds with someone at this table?', 'What skill do you have that is useless in this world but defined who you were in the old one?'],
     },
     cyberpunk: {
       current:  [{ name: 'The Blackout Districts Are Expanding', desc: 'Corporate infrastructure is failing in the lower city. No grid, no law, no extraction.' }, { name: 'Neural Debt Is the New Slavery', desc: 'Corpo clinics offer free augmentation. The contract is lifetime. Default means repossession — of the implant, not the debt.' }],
-      impending: [{ name: 'The AI Quarantine Is Failing', desc: 'Something behind the Cage is learning to speak through people. The signs are subtle. The corps know.' }],
+      impending: [{ name: 'The AI Quarantine Is Failing', desc: 'Something behind the Cage is learning to speak through people. The signs are subtle. The corps know.' }, { name: 'The Mesh Is Going Dark in Patches', desc: 'Comms blackouts are spreading district by district. Someone is cutting the network deliberately. No one is claiming responsibility.' }],
       hc: ['Debt-Bonded Neural Translator', 'Ex-Corpo Medic Running an Unlicensed Clinic', 'Protest Archivist Who Films Everything', 'Street Doc with a Corporate Kill Switch'],
       troubles: ['My Employer Owns My Language Centers', 'Every Patient Is Evidence', 'The Footage Has Made Me a Target', 'The Kill Switch Has a Timer I Can\'t See'],
       questions: ['What piece of yourself did you sell to survive, and do you want it back?', 'Who in the lower city depends on you, and what happens to them if you disappear?', 'What corporate secret did you stumble onto, and why haven\'t they silenced you yet?', 'Which district do you refuse to enter, and what happened there?', 'What augmentation do you wish you\'d never installed?', 'Who was the last person you trusted completely, and how did that end?'],
     },
     fantasy: {
       current:  [{ name: 'The Blight Spreads East', desc: 'A slow fungal transformation that doesn\'t kill but rewrites. Three border towns have gone silent.' }, { name: 'The Inquisition Hunts Hedge Magic', desc: 'The Church has declared all unsanctioned magic heretical. Practitioners are disappearing.' }],
-      impending: [{ name: 'The Old Oaths Are Waking', desc: 'The dead are rising not as enemies, but as creditors. Ancient bargains demand payment.' }],
+      impending: [{ name: 'The Old Oaths Are Waking', desc: 'The dead are rising not as enemies, but as creditors. Ancient bargains demand payment.' }, { name: 'The Hedge Witches Are Disappearing', desc: 'One by one, the folk practitioners who kept the villages healthy are vanishing. The Church says nothing. The villages are starting to ask.' }],
       hc: ['Disgraced Knight-Inquisitor Who Saw What the Blight Actually Is', 'Hedge Witch Paid in Secrets', 'Exiled Prince Hiding as a Traveling Merchant', 'Battle-Surgeon Who Stitches with Scar-Thread'],
       troubles: ['The Crown\'s Spies Recognize My Hands', 'I Know Too Much to Be Safe Anywhere', 'The Magic Is Burning Out of Me', 'The Thread Remembers What It Healed'],
       questions: ['What oath did you break, and who still holds you to the original terms?', 'What did the Blight change about someone you loved?', 'Which faction offered you protection, and what did they ask in return?', 'What magic do you carry that you don\'t fully understand?', 'Who at this table wronged you before the campaign begins — and do they know?', 'What is the one thing you would never do, no matter the cost?'],
     },
     space: {
       current:  [{ name: 'The Belt Is Blockaded', desc: 'Fleet patrols have cut off the outer stations. Supply chains are breaking. Prices are tripling.' }, { name: 'Jump Drive Fuel Is Running Out', desc: 'The refinery at Ceres went dark. Without new supply, long-range travel stops within months.' }],
-      impending: [{ name: 'The Signal from Beyond the Gate', desc: 'Something is transmitting from outside charted space. The frequency matches no known language.' }],
+      impending: [{ name: 'The Signal from Beyond the Gate', desc: 'Something is transmitting from outside charted space. The frequency matches no known language.' }, { name: 'A New Faction Is Buying Debt', desc: 'Someone is purchasing outstanding station contracts at face value. No one knows who or why. Ships that take the offer stop being heard from.' }],
       hc: ['Jump Drive Mechanic Three Payments Behind', 'Retired Fleet Medic Running Cargo', 'Salvage Auctioneer with a Questionable Ledger', 'Station-Born Pilot Who\'s Never Touched Dirt'],
       troubles: ['The Drive Works. The Paperwork Doesn\'t.', 'The Fleet Wants Me Back and Won\'t Take No', 'Half My Inventory Has Prior Owners', 'I\'ve Never Breathed Air I Didn\'t Pay For'],
       questions: ['What did you leave behind on your last station, and why can\'t you go back for it?', 'What does your ship mean to you — is it a tool, a home, or an escape?', 'Who in the Fleet still has authority over you, and what would it take to sever that tie?', 'What cargo did you agree to carry without asking what was inside?', 'What happened the last time you trusted a stranger in the void?', 'What do you owe, and to whom, and what happens when they collect?'],
     },
     victorian: {
       current:  [{ name: 'The Fog Hides Things That Hunt', desc: 'Disappearances in Whitechapel are accelerating. The police have stopped investigating.' }, { name: 'The Royal Society Has a Secret Wing', desc: 'Behind the lectures and papers, something is being studied that defies natural law.' }],
-      impending: [{ name: 'The Threshold Is Thinning', desc: 'The boundary between what is real and what should not be is weakening. The signs are in the mirrors.' }],
+      impending: [{ name: 'The Threshold Is Thinning', desc: 'The boundary between what is real and what should not be is weakening. The signs are in the mirrors.' }, { name: 'The Clockwork Servants Are Dreaming', desc: 'Automated devices across the city are exhibiting unscheduled behaviours at night. The engineers who built them have no explanation.' }],
       hc: ['Alienist Who Studies What Studies Him Back', 'Society Photographer with a Darkroom Secret', 'Clockwork Surgeon Wanted by the College', 'Inspector Who Sees Patterns No One Else Can'],
       troubles: ['My Notes Are Starting to Write Themselves', 'Some Subjects Appear in the Negative That Weren\'t in the Room', 'My Methods Work. My Methods Are Illegal.', 'The Patterns Lead Somewhere I Don\'t Want to Go'],
       questions: ['What did you see that no one else believes?', 'Which institution protects you, and what do they expect in return?', 'What personal vice or obsession do you use to cope with what you know?', 'Who in your social circle would be destroyed if your true work were revealed?', 'What experiment or investigation went wrong, and what did it cost?', 'What draws you to the darkness — curiosity, duty, or something you can\'t name?'],
     },
     postapoc: {
       current:  [{ name: 'The Water War Has Started', desc: 'Two convoys are fighting over the last clean aquifer. Everyone else is choosing sides.' }, { name: 'Radio Silence from the Northern Settlements', desc: 'Three communities stopped broadcasting. Scouts haven\'t returned.' }],
-      impending: [{ name: 'Winter Is Coming Early', desc: 'The growing season is shortening. Food stores won\'t last. Migration or conflict is inevitable.' }],
+      impending: [{ name: 'Winter Is Coming Early', desc: 'The growing season is shortening. Food stores won\'t last. Migration or conflict is inevitable.' }, { name: 'The Seeds Aren\'t Germinating', desc: 'This season\'s planting has produced almost nothing. The soil isn\'t dead — something is in it that shouldn\'t be.' }],
       hc: ['Convoy Medic Who Buries What She Can\'t Fix', 'Water-Finder Who Charges What the Water\'s Worth', 'Radio Operator Who Heard Something in the Static', 'Former Teacher Keeping Knowledge Alive'],
       troubles: ['The Graves Are Catching Up', 'Everyone Needs Me. Nobody Trusts Me.', 'The Voice on the Radio Knows My Name', 'The Children Don\'t Understand What Was Lost'],
       questions: ['What do you remember about the world before, and how does that memory help or hurt you?', 'Who did you fail to save, and how does that shape what you do now?', 'What resource do you control or protect, and who wants to take it from you?', 'What rule have you made for yourself that you will not break?', 'Who at this table did you meet on the road, and what happened that made you decide to travel together?', 'What are you walking toward — a place, a person, or an idea?'],
     },
     western: {
       current:  [{ name: 'The Railroad Is Buying Everything', desc: 'Land agents are making offers that aren\'t optional. Holdouts are finding their water rights disputed.' }, { name: 'A Hanging Gone Wrong', desc: 'The wrong man swung. The real killer is still out there. The town knows but won\'t speak.' }],
-      impending: [{ name: 'The Army Is Coming', desc: 'Fort Reno is deploying a full regiment. Whatever they\'re responding to, the frontier won\'t be the same after.' }],
+      impending: [{ name: 'The Army Is Coming', desc: 'Fort Reno is deploying a full regiment. Whatever they\'re responding to, the frontier won\'t be the same after.' }, { name: 'The Water Rights Are Being Redrawn', desc: 'A federal surveyor arrived last week with new maps. By his reckoning, every claim downstream of the ridge belongs to the railroad now.' }],
       hc: ['Land Surveyor Working Both Sides of the Deed', 'Circuit Rider Preacher with a Warrant', 'Assay Office Clerk Who Knows Every Vein', 'Former Cavalry Scout Who Walked Away'],
       troubles: ['Three Towns Believe the Same Acre Is Theirs', 'The Lord\'s Work and the Law\'s Work Crossed Once', 'The Company Pays My Salary and Owns My Silence', 'I Saw What Happened at Sand Creek'],
       questions: ['What brought you west — opportunity, escape, or something you can\'t name?', 'What do you own that someone powerful wants?', 'Which side of the law are you on, and has that always been the case?', 'Who do you owe a debt to that money can\'t settle?', 'What happened in the last town that means you can\'t go back?', 'What do you believe about justice, and when was that belief last tested?'],
     },
     dVentiRealm: {
       current:  [{ name: 'The Senate Has Collapsed', desc: 'The governing body of the realm has dissolved. Regional powers are filling the vacuum. Law is local and contradictory.' }, { name: 'The Vaults Are Opening', desc: 'Ancient sealed repositories are cracking. What comes out is valuable, dangerous, and claimed by multiple factions.' }],
-      impending: [{ name: 'The Sealed Ones Are Waking', desc: 'The things that were locked in the Vaults are becoming aware. They are not grateful.' }],
+      impending: [{ name: 'The Sealed Ones Are Waking', desc: 'The things that were locked in the Vaults are becoming aware. They are not grateful.' }, { name: 'The Arbiters\' Guild Has Gone Quiet', desc: 'The guild that mediated disputes between the regional powers has stopped responding to summons. Without them, every disagreement becomes a confrontation.' }],
       hc: ['Vault Warden Who Lost Their Key', 'Senate Exile with Dangerous Testimony', 'Guild Artificer Whose Creations Malfunction Creatively', 'Wandering Arbiter with No Authority Left'],
       troubles: ['The Key Wasn\'t Lost — It Was Taken', 'My Testimony Would Destroy Three Houses', 'The Malfunctions Are Getting Smarter', 'I Judge by Laws That No Longer Exist'],
       questions: ['What was your role before the Senate fell, and what is it now?', 'Which Vault have you seen opened, and what came out?', 'What faction wants your loyalty, and what are they offering?', 'What skill or knowledge do you have that makes you valuable — and dangerous?', 'Who at this table do you know from before the collapse, and has your relationship changed?', 'What would you restore if you could — the Senate, the Vaults, or something else entirely?'],
@@ -211,7 +236,7 @@
 
   $: wd = campId ? WORLD_DATA[campId] : null;
   $: ciIdx = wd ? rerolls % wd.current.length : 0;
-  $: iiIdx = wd ? (rerolls + 1) % wd.impending.length : 0;
+  $: iiIdx = wd && wd.impending.length > 1 ? (rerolls + 1) % wd.impending.length : 0;
 
   function pickN(arr, n) {
     if (!arr || arr.length === 0) return [];
@@ -258,9 +283,15 @@
     {/if}
 
     <!-- Progress bar -->
-    <div class="sz-step-counter">Step {step + 1} of {totalSteps}</div>
-    <div style="width:100%; height:3px; border-radius:2px; background:var(--border); margin-bottom:12px; overflow:hidden">
-      <div style="width:{progress}%; height:100%; border-radius:2px; background:var(--accent, var(--gold, #888)); transition:width 0.3s ease"></div>
+    <div class="sz-progress-wrap">
+      <div class="sz-step-counter">Step {step + 1} of {totalSteps}</div>
+      <div class="sz-progress-bar" role="progressbar"
+        aria-valuenow={step + 1}
+        aria-valuemin={1}
+        aria-valuemax={totalSteps}
+        aria-label="Step {step + 1} of {totalSteps}">
+        <div class="sz-progress-fill" style="width:{progress}%"></div>
+      </div>
     </div>
 
     <!-- Step content -->
@@ -318,115 +349,107 @@
 
         <div class="sz-tip">Discuss for 5 minutes: What does this world feel like? Who has power? What's at stake? This shared understanding is the foundation everything else builds on.</div>
       </div>
-    {:else if stepId === 'aspects'}
+    {:else if stepId === 'highconcept'}
       <div class="sz-body">
-        <!-- High Concept -->
-        <div class="sz-card">
-          <div class="sz-card-title">1. High Concept</div>
-          <p>Go around the table. Each player says, in one phrase, who their character is. Not what they can do &mdash; who they are in the story.</p>
-          <div class="sz-prompt-box">"If someone asked <em>what's your character about?</em> at a bar, what would you say?"</div>
-          {#if hcExamples.length > 0}
-            <div class="sz-card" style="margin-top:12px">
-              <div class="sz-card-title">Setting Examples &mdash; {camp ? camp.name : ''}</div>
-              <ul class="sz-aspect-list">
-                {#each hcExamples as ex}<li>{ex}</li>{/each}
-              </ul>
-              <button class="btn btn-ghost sz-reroll" on:click={reroll} type="button">&#127922; New examples</button>
-            </div>
-          {/if}
-          <div class="sz-dnd">In D&amp;D, your class + race IS your character concept. In Fate, High Concept is a narrative phrase that can be invoked and compelled. "Disgraced Knight-Inquisitor" is not a class — it's a story.</div>
-          <div class="sz-tip">A High Concept that only works one way is a bad aspect. "Strong Fighter" can only help. "Sword-Sworn to a Dead King" can help AND cause problems. Double-edged = good.</div>
-        </div>
-
-        <!-- Trouble -->
-        <div class="sz-card">
-          <div class="sz-card-title">2. Trouble</div>
-          <p>Go around the table. What makes your character's life harder? This is the aspect that will earn you the most fate points &mdash; so make it good.</p>
-          <div class="sz-prompt-box">"When things go wrong for your character, <em>why</em> do they go wrong? What keeps pulling them back into trouble?"</div>
-          {#if trExamples.length > 0}
-            <div class="sz-card" style="margin-top:12px">
-              <div class="sz-card-title">Setting Examples</div>
-              <ul class="sz-aspect-list">
-                {#each trExamples as ex}<li>{ex}</li>{/each}
-              </ul>
-              <button class="btn btn-ghost sz-reroll" on:click={reroll} type="button">&#127922; New examples</button>
-            </div>
-          {/if}
-          <div class="sz-tip">A boring trouble earns you nothing. "Has Enemies" is flat. "The Warlord's Daughter Wants Me Dead" is a compel waiting to happen every single session.</div>
-        </div>
-
-        <!-- Mode-specific: Remaining Aspects -->
-        {#if mode === 'standard'}
+        <p>Go around the table. Each player says, in one phrase, who their character is. Not what they can do &mdash; who they are in the story.</p>
+        <div class="sz-prompt-box">"If someone asked <em>what's your character about?</em> at a bar, what would you say?"</div>
+        {#if hcExamples.length > 0}
           <div class="sz-card">
-            <div class="sz-card-title">3. Relationship</div>
-            <p>Pair up. Each player connects their character to one other PC. Good relationships have tension &mdash; not hostility, but imbalance.</p>
-            <div class="sz-card" style="margin-top:8px">
-              <div class="sz-card-title">Pick a Template</div>
-              <ul class="sz-template-list">
-                <li>We served together, but one of us got the other in trouble.</li>
-                <li>You saved my life. I still don't know why.</li>
-                <li>We want the same thing but disagree on how to get it.</li>
-                <li>I owe you something I can never repay.</li>
-                <li>We used to be close. Something changed.</li>
-              </ul>
-            </div>
-            <div class="sz-tip">The relationship aspect is the strongest compel material in the entire campaign. Cross-PC history is fuel. Invest here.</div>
-            <div class="sz-warn">Write this one down on paper now. It's your third aspect.</div>
-          </div>
-
-          <div class="sz-card">
-            <div class="sz-card-title">4 &amp; 5. Two Free Aspects</div>
-            <p>These can be anything &mdash; gear, history, reputation, a catchphrase, a connection to the setting. There are no restrictions beyond fitting the world.</p>
-            <div class="sz-card" style="border-color:var(--c-green); background:rgba(80,184,120,0.06)">
-              <div class="sz-card-title" style="color:var(--c-green)">&#10003; You Can Leave These Blank</div>
-              <p>This is an official Condensed rule (p.47), not cheating. Most experienced Fate GMs recommend leaving at least one blank. You'll know what your character needs after the first scene, not before it.</p>
-            </div>
-            <ul class="sz-aspect-list" style="margin-top:12px">
-              <li>A signature piece of equipment or weapon</li>
-              <li>A reputation or title that precedes you</li>
-              <li>A personal code or belief that drives decisions</li>
-              <li>A connection to a faction, place, or NPC in the setting</li>
-              <li>A catchphrase that captures your attitude</li>
+            <div class="sz-card-title">Setting Examples &mdash; {camp ? camp.name : ''}</div>
+            <ul class="sz-aspect-list">
+              {#each hcExamples as ex}<li>{ex}</li>{/each}
             </ul>
-          </div>
-
-        {:else if mode === 'trio'}
-          <div class="sz-card">
-            <div class="sz-card-title">Phase 1 &mdash; Your First Adventure</div>
-            <p>Go around the table. Each player tells a short story about something that happened to their character before the campaign begins.</p>
-            <div class="sz-prompt-box">"I was at <span class="sz-prompt-fill">[location]</span> when <span class="sz-prompt-fill">[threat]</span> happened, and I [solved it / survived / escaped] by <span class="sz-prompt-fill">______</span>."</div>
-            <div class="sz-example">"I was at the Sealed Phade Vault when the Servitors reactivated, and I survived by talking to the lead unit in a language I shouldn't know." &rarr; Aspect: "The Old Machines Listen to Me"</div>
-            <p>After you narrate, ask yourself: "What does this say about who I am?" Write that as an aspect.</p>
-          </div>
-
-          <div class="sz-card">
-            <div class="sz-card-title">Phase 2 &mdash; Guest Starring</div>
-            <p>Pass your Phase 1 story to the player on your left. They were there. How were they involved?</p>
-            <p>This produces your <strong>Relationship aspect</strong> &mdash; the same one Condensed requires, but now grounded in a shared story.</p>
-            <p>Narrate one sentence about how you were involved, then write the aspect.</p>
-          </div>
-
-          <div class="sz-card">
-            <div class="sz-card-title">Phase 3 &mdash; Guest Starring Again</div>
-            <p>Pass your Phase 1 story to the player on your <strong>right</strong> (a different player than Phase 2). They pick a role and narrate their involvement. This produces your fifth and final aspect.</p>
-            <div class="sz-tip">If someone is struggling, remind them: you only need one sentence. "I was the one who brought the rope" is enough. The aspect writes itself from there.</div>
-            <div class="sz-warn">After this step, every character should have five aspects: High Concept, Trouble, and three from the Phase Trio. Write them all down.</div>
-          </div>
-
-        {:else if mode === 'flashback'}
-          <div class="sz-card">
-            <div class="sz-card-title">Flashback Slots</div>
-            <div class="sz-card" style="border-color:var(--c-green); background:rgba(80,184,120,0.06)">
-              <div class="sz-card-title" style="color:var(--c-green)">The Rule</div>
-              <p style="font-size:var(--text-lg); line-height:1.7">At any point during play, when a dramatic moment calls for it, you may declare a flashback. Narrate a brief scene from your character's past that reveals a connection, a piece of history, or a previously unknown skill. Write the resulting aspect immediately and use it.</p>
-            </div>
-            <div class="sz-example">"Wait &mdash; I know this mercenary! We served together in the Siege of Orizon. He still owes me 50 credits." &rarr; Write the aspect: "Brothers in Arms from the Siege of Orizon" &rarr; Use it immediately.</div>
-            <p>Each flashback slot produces one aspect. You have three slots for: your Relationship aspect and your two free aspects. Use them whenever a dramatic moment calls for a connection, a piece of history, or a reveal.</p>
-            <div class="sz-tip">This method produces the best aspects because they emerge from actual dramatic need. The cost is starting Session 1 with a slightly incomplete sheet &mdash; which is perfectly legal and honestly better.</div>
-            <div class="sz-warn">For now, write down only your High Concept and Trouble. Leave the other three slots blank. You'll fill them during play.</div>
+            <button class="btn btn-ghost sz-reroll" on:click={reroll} type="button">&#127922; New examples</button>
           </div>
         {/if}
+        <div class="sz-dnd">In D&amp;D, your class + race IS your character concept. In Fate, High Concept is a narrative phrase that can be invoked and compelled. "Disgraced Knight-Inquisitor" is not a class &mdash; it's a story.</div>
+        <div class="sz-tip">A High Concept that only works one way is a bad aspect. "Strong Fighter" can only help. "Sword-Sworn to a Dead King" can help AND cause problems. Double-edged = good.</div>
       </div>
+
+    {:else if stepId === 'trouble'}
+      <div class="sz-body">
+        <p>Go around the table. What makes your character's life harder? This is the aspect that will earn you the most fate points &mdash; so make it good.</p>
+        <div class="sz-prompt-box">"When things go wrong for your character, <em>why</em> do they go wrong? What keeps pulling them back into trouble?"</div>
+        {#if trExamples.length > 0}
+          <div class="sz-card">
+            <div class="sz-card-title">Setting Examples</div>
+            <ul class="sz-aspect-list">
+              {#each trExamples as ex}<li>{ex}</li>{/each}
+            </ul>
+            <button class="btn btn-ghost sz-reroll" on:click={reroll} type="button">&#127922; New examples</button>
+          </div>
+        {/if}
+        <div class="sz-tip">A boring trouble earns you nothing. "Has Enemies" is flat. "The Warlord's Daughter Wants Me Dead" is a compel waiting to happen every single session.</div>
+      </div>
+
+    {:else if stepId === 'relationship'}
+      <div class="sz-body">
+        <p>Pair up. Each player connects their character to one other PC. Good relationships have tension &mdash; not hostility, but imbalance.</p>
+        <div class="sz-card">
+          <div class="sz-card-title">Pick a Template</div>
+          <ul class="sz-template-list">
+            <li>We served together, but one of us got the other in trouble.</li>
+            <li>You saved my life. I still don't know why.</li>
+            <li>We want the same thing but disagree on how to get it.</li>
+            <li>I owe you something I can never repay.</li>
+            <li>We used to be close. Something changed.</li>
+          </ul>
+        </div>
+        <div class="sz-tip">The relationship aspect is the strongest compel material in the entire campaign. Cross-PC history is fuel. Invest here.</div>
+        <div class="sz-warn">Write this one down on paper now. It's your third aspect.</div>
+      </div>
+
+    {:else if stepId === 'freeaspects'}
+      <div class="sz-body">
+        <p>These can be anything &mdash; gear, history, reputation, a catchphrase, a connection to the setting. No restrictions beyond fitting the world.</p>
+        <div class="sz-card sz-card--success">
+          <div class="sz-card-title">&#10003; You Can Leave These Blank</div>
+          <p>Official Condensed rule (p.47). Most experienced Fate GMs recommend leaving at least one blank. You'll know what your character needs after the first scene, not before it.</p>
+        </div>
+        <ul class="sz-aspect-list">
+          <li>A signature piece of equipment or weapon</li>
+          <li>A reputation or title that precedes you</li>
+          <li>A personal code or belief that drives decisions</li>
+          <li>A connection to a faction, place, or NPC in the setting</li>
+          <li>A catchphrase that captures your attitude</li>
+        </ul>
+      </div>
+
+    {:else if stepId === 'phase1'}
+      <div class="sz-body">
+        <p>Go around the table. Each player tells a short story about something that happened to their character before the campaign begins.</p>
+        <div class="sz-prompt-box">"I was at <span class="sz-prompt-fill">[location]</span> when <span class="sz-prompt-fill">[threat]</span> happened, and I survived by <span class="sz-prompt-fill">______</span>."</div>
+        <div class="sz-example">"I was at the Sealed Phade Vault when the Servitors reactivated, and I survived by talking to the lead unit in a language I shouldn't know." &rarr; Aspect: "The Old Machines Listen to Me"</div>
+        <p>After you narrate, ask yourself: "What does this say about who I am?" Write that as your third aspect.</p>
+      </div>
+
+    {:else if stepId === 'phase2'}
+      <div class="sz-body">
+        <p>Pass your Phase 1 story to the player on your left. They were there. How were they involved?</p>
+        <p>This produces your <strong>Relationship aspect</strong> &mdash; grounded in a shared story.</p>
+        <p>Narrate one sentence about how you were involved, then write the aspect.</p>
+        <div class="sz-tip">If someone is struggling: "I was the one who brought the rope" is enough. The aspect writes itself from there.</div>
+      </div>
+
+    {:else if stepId === 'phase3'}
+      <div class="sz-body">
+        <p>Pass your Phase 1 story to the player on your <strong>right</strong> (a different player than Phase 2). They pick a role and narrate their involvement. This produces your fifth and final aspect.</p>
+        <div class="sz-tip">After this step, every character should have five aspects: High Concept, Trouble, and three from the Phase Trio.</div>
+        <div class="sz-warn">Write all five aspects down before moving to Skills.</div>
+      </div>
+
+    {:else if stepId === 'flashbacks'}
+      <div class="sz-body">
+        <div class="sz-card sz-card--success">
+          <div class="sz-card-title">The Rule</div>
+          <p>At any point during play, when a dramatic moment calls for it, declare a flashback. Narrate a brief scene from your character's past. Write the resulting aspect and use it immediately.</p>
+        </div>
+        <div class="sz-example">"Wait &mdash; I know this mercenary! We served together in the Siege of Orizon." &rarr; Write the aspect: "Brothers in Arms from the Siege of Orizon" &rarr; Use it now.</div>
+        <p>You have three flashback slots for your Relationship aspect and two free aspects. Start Session 1 with only High Concept and Trouble written down.</p>
+        <div class="sz-tip">This method produces the best aspects because they emerge from actual dramatic need.</div>
+        <div class="sz-warn">For now, write only your High Concept and Trouble. Leave the other three slots blank.</div>
+      </div>
+
     {:else if stepId === 'skills'}
       <div class="sz-body">
         <p>Your skill pyramid defines what your character is good at. Assign ratings in this shape:</p>
@@ -472,30 +495,24 @@
         <div class="sz-dnd">D&amp;D has 6 ability scores + 18 skills. Fate has 19 skills that cover both. Your skill rating IS your expected result — no separate modifier calculation. A +3 in Fight means you reliably hit Good (+3) difficulty.</div>
 
         <div class="sz-tip">Physique sets your physical stress boxes. Will sets your mental stress boxes. Characters with neither above +0 get 3 boxes each &mdash; which isn't much. Plan accordingly.</div>
+      </div>
 
-        <hr style="border:none; border-top:1px solid var(--border); margin:24px 0" />
-
+    {:else if stepId === 'stunts'}
+      <div class="sz-body">
+        <p>There are two types of stunts:</p>
         <div class="sz-card">
-          <div class="sz-card-title">Stunts (3 free)</div>
-          <p>There are two types:</p>
-
-          <div class="sz-card" style="margin-top:8px">
-            <div class="sz-card-title">+2 Bonus Stunt</div>
-            <p>"Because I [describe why], I get +2 when I use [skill] to [overcome/create advantage/attack/defend] when [circumstance]."</p>
-          </div>
-
-          <div class="sz-card" style="margin-top:8px">
-            <div class="sz-card-title">Rule-Changing Stunt</div>
-            <p>"Because I [describe why], I can [special effect], but only [limitation]."</p>
-          </div>
-
-          <div class="sz-card" style="border-color:var(--c-green); background:rgba(80,184,120,0.06); margin-top:12px">
-            <div class="sz-card-title" style="color:var(--c-green)">&#10003; Leave All Three Blank</div>
-            <p>Define stunts the first time you wish you had one. "I wish I could do X right now" is the perfect moment to write a stunt. This is official Condensed design.</p>
-          </div>
-
-          <div class="sz-dnd" style="margin-top:12px">In D&amp;D, feats are picked at creation and rarely change. In Fate, stunts can be rewritten at every milestone (end of session). Pick what sounds fun now; change it when you learn what your character actually needs.</div>
+          <div class="sz-card-title">+2 Bonus Stunt</div>
+          <p>"Because I [describe why], I get +2 when I use [skill] to [action] when [circumstance]."</p>
         </div>
+        <div class="sz-card">
+          <div class="sz-card-title">Rule-Changing Stunt</div>
+          <p>"Because I [describe why], I can [special effect], but only [limitation]."</p>
+        </div>
+        <div class="sz-card sz-card--success">
+          <div class="sz-card-title">&#10003; Leave All Three Blank</div>
+          <p>Define stunts the first time you wish you had one. "I wish I could do X right now" is the perfect moment to write a stunt. This is official Condensed design.</p>
+        </div>
+        <div class="sz-dnd">In D&amp;D, feats are picked at creation and rarely change. In Fate, stunts can be rewritten at every milestone. Pick what sounds fun now; change it when you learn what your character actually needs.</div>
       </div>
 
     {:else if stepId === 'stress'}
@@ -620,8 +637,9 @@
 
         <!-- Export bar -->
         <div class="sz-export-bar">
-          <button class="btn btn-primary" on:click={copyMarkdown}>&#128203; Copy as Markdown</button>
-          <button class="btn btn-ghost" on:click={() => { if (typeof window !== 'undefined') window.print(); }}>&#128424; Print / Save PDF</button>
+          <button class="btn btn-primary" on:click={copyMarkdown}>&#128203; Markdown</button>
+          <button class="btn btn-ghost" on:click={copyJSON}>&#123; &#125; JSON</button>
+          <button class="btn btn-ghost" on:click={() => { if (typeof window !== 'undefined') window.print(); }}>&#128424; Print</button>
         </div>
         {#if copied}
           <div class="sz-copied">{copied}</div>
@@ -630,16 +648,24 @@
         <div class="sz-tip">Session 1 starts IN the situation. No tavern. No meeting. The opening hook drops the PCs directly into the action. Aspects you left blank will reveal themselves naturally in the first few scenes.</div>
 
         <!-- Start session -->
-        <div style="margin-top:24px; padding:16px; background:color-mix(in srgb,var(--accent) 8%,transparent); border:1px solid color-mix(in srgb,var(--accent) 25%,transparent); border-radius:8px">
-          <div style="font-size:13px; font-weight:700; color:var(--accent); margin-bottom:6px">&#127922; Ready to play?</div>
-          <div style="font-size:13px; color:var(--text-muted); margin-bottom:12px; line-height:1.5">
-            Start a local session on this device. The board opens in Prep mode with your world loaded.
-          </div>
-          <a
-            href="/campaigns/{campId || 'fantasy'}"
-            class="btn btn-primary"
-            style="font-size:var(--text-lg); padding:12px 28px; width:100%; display:block; text-align:center; text-decoration:none"
-          >&#9654; Open {campName} Generator</a>
+        <div class="sz-ready-box">
+          <div class="sz-ready-label">&#127922; Ready to play?</div>
+          <div class="sz-ready-desc">Start a local session on this device. The board opens in Prep mode with your world loaded.</div>
+          <button
+            class="btn btn-primary sz-ready-cta"
+            on:click={() => {
+              if (typeof window === 'undefined') return;
+              try {
+                localStorage.setItem('ogma_sz_seed', JSON.stringify({
+                  _sz_auto_pc: true, campId: campId || 'fantasy', ts: Date.now(),
+                  mode, currentIssue: wd ? wd.current[ciIdx].name : '',
+                  impendingIssue: wd ? wd.impending[iiIdx].name : '',
+                  hcExamples, trExamples,
+                }));
+              } catch(e) {}
+              window.location.href = '/campaigns/' + (campId || 'fantasy') + '?sz=1';
+            }}
+          >&#9654; Open {campName} Generator</button>
         </div>
 
         <div style="text-align:center; margin-top:16px">

@@ -212,7 +212,18 @@
     // Mouse move/up for drag
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('mouseup', onMouseUp);
+
+    // Session Zero auto-populate listener
+    window.addEventListener('ogma:sz-pc', onSzPc);
   });
+
+  function onSzPc(e) {
+    if (!e.detail || !e.detail.genId || !canvas) return;
+    const { genId, data } = e.detail;
+    if (canvas.generateCardWithData) {
+      canvas.generateCardWithData(genId, data, 80, 80);
+    }
+  }
 
   onDestroy(() => {
     unsubs.forEach(u => u());
@@ -222,6 +233,7 @@
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseup', onMouseUp);
       document.removeEventListener('keydown', onGlobalKey);
+      window.removeEventListener('ogma:sz-pc', onSzPc);
     }
     clearTimeout(toastTimer);
     document.documentElement.removeAttribute('data-campaign');
