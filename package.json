@@ -1,13 +1,14 @@
 {
 	"name": "ogma-fate",
 	"private": true,
-	"version": "2026.3.444",
+	"version": "2026.3.445",
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "bash scripts/bump-version.sh && vite build",
 		"qa": "node scripts/qa-hard.mjs",
-		"precheck": "node scripts/qa-hard.mjs && npm run build",
+		"qa:export": "node scripts/qa-export.mjs",
+		"precheck": "node scripts/qa-hard.mjs && node scripts/qa-export.mjs && npm run build",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''"
 	},
