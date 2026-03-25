@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <script>/* Theme restore */(function(){try{var p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{}');var t=p.theme||localStorage.getItem('fate_theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})()</script>
+  <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600;1,700&display=swap" rel="stylesheet">
+  <script>if(location.protocol!=="file:"){var _b=document.createElement("base");_b.href="/";document.head.appendChild(_b);}</script>
+  <meta name="description" content="Plain-language Fate Condensed mechanics reference — aspects, skills, stunts, stress, consequences, and fate points.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Fate Mechanics — Ogma Help</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/favicons/icon.svg">
+  <link rel="stylesheet" href="../assets/css/help-shared.css?v=412">
+  <link rel="stylesheet" href="../assets/css/theme.css?v=412">
+<script src="../assets/js/help-shared.js?v=412"></script>
+  <link rel="canonical" href="https://ogma.net/help/fate-mechanics.html">
+</head>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<header class="land-topnav" role="banner">
+  <a href="../index.html" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
+  <div class="topbar-sep" aria-hidden="true"></div>
+  <nav class="topbar-crumb" aria-label="Breadcrumb">
+    <a href="../index.html" class="topbar-crumb-item">Home</a>
+    <span class="topbar-crumb-sep" aria-hidden="true">&#8250;</span>
+    <a href="/help/index.html" class="topbar-crumb-item">Help &amp; Wiki</a>
+    <span class="topbar-crumb-sep" aria-hidden="true">&#8250;</span>
+    <span class="topbar-crumb-item current" aria-current="page">Fate Mechanics</span>
+  </nav>
+  <div class="topbar-status">
+    <a href="/help/index.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#128218; Help</a>
+    <a href="/help/learn-fate.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#128218; Quick Start</a>
+    <a href="../about.html" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">About</a>
+    <button class="btn btn-icon btn-ghost" onclick="(function(){{var n=document.documentElement.getAttribute('data-theme')=='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);try{{var p=JSON.parse(localStorage.getItem('fate_prefs_v1')||'{{}}');p.theme=n;localStorage.setItem('fate_prefs_v1',JSON.stringify(p));}}catch(e){{}}}})()" title="Toggle theme" aria-label="Switch to dark mode">&#9680;</button>
+    <button class="topbar-hamburger btn btn-icon btn-ghost" id="topnav-hbg" aria-label="Open navigation" aria-expanded="false" aria-haspopup="true" onclick="(function(b){var d=document.getElementById('topnav-dd');var o=d.classList.toggle('open');b.setAttribute('aria-expanded',String(o));if(o){var r=b.getBoundingClientRect();document.documentElement.style.setProperty('--dd-top',(r.bottom+6)+'px');document.documentElement.style.setProperty('--dd-right',(window.innerWidth-r.right)+'px');}})(this)">&#9776;</button>
+    <div class="land-topnav-dropdown" id="topnav-dd">
+      <a href="/help/index.html">&#128218; Help Home</a>
+      <a href="/help/getting-started.html">&#128640; Getting Started</a>
+      <a href="/help/generators.html">&#127922; Generators</a>
+      <a href="/help/fate-mechanics.html">&#127922; Fate Mechanics</a>
+      <a href="/help/at-the-table.html">&#127481; At the Table</a>
+      <a href="/help/export-share.html">&#128279; Export &amp; Share</a>
+      <a href="/help/customise.html">&#9881; Customise</a>
+      <a href="/help/faq.html">&#10067; FAQ</a>
+    </div>
+  </div>
+</header>
+<div class="wiki-shell">
+  <aside class="wiki-sidebar" role="navigation" aria-label="Help navigation">
+  
+  <div class="wiki-sidebar-section">
+    <div class="wiki-sidebar-label">Getting Started</div>
+    <a href="/help/index.html" class="wiki-sidebar-link"><span class="icon">&#127968;</span>Wiki Home</a>
+    <a href="/help/new-to-ogma.html" class="wiki-sidebar-link"><span class="icon">&#128075;</span>New to Ogma?</a>
+    <a href="/help/getting-started.html" class="wiki-sidebar-link"><span class="icon">&#128640;</span>Getting Started</a>
+  </div>
+  <div class="wiki-sidebar-divider"></div>
+  <div class="wiki-sidebar-section">
+    <div class="wiki-sidebar-label">Learn</div>
+    <a href="/help/learn-fate.html" class="wiki-sidebar-link"><span class="icon">&#127922;</span>Learn Fate</a>
+    <a href="/help/how-to-use-ogma.html" class="wiki-sidebar-link"><span class="icon">&#128218;</span>How to Use Ogma</a>
+    <a href="/help/dnd-transition.html" class="wiki-sidebar-link"><span class="icon">&#9876;</span>D&amp;D Transition</a>
+  </div>
+  <div class="wiki-sidebar-divider"></div>
+  <div class="wiki-sidebar-section">
+    <div class="wiki-sidebar-label">Prep &amp; Play</div>
+    <a href="/help/generators.html" class="wiki-sidebar-link"><span class="icon">&#127922;</span>Generator Suite</a>
+        <button class="wiki-sidebar-parent active" aria-expanded="true" data-children="mech-nav" onclick="toggleSideNav(this)">
+      <span class="wiki-sidebar-parent-label"><span class="icon">&#127922;</span>Fate Mechanics</span>
+      <span class="wiki-sidebar-chevron" aria-hidden="true">&#8250;</span>
+    </button>
+    <div id="mech-nav" class="wiki-sidebar-children open">
+      <a class="wiki-sidebar-child" href="/help/fate-mechanics.html#aspects">Aspects</a>
+      <a class="wiki-sidebar-child" href="/help/fate-mechanics.html#the-skill-ladder">Skill ladder</a>
+      <a class="wiki-sidebar-child" href="/help/fate-mechanics.html#stress">Stress</a>
+      <a class="wiki-sidebar-child" href="/help/fate-mechanics.html#consequences">Consequences</a>
+      <a class="wiki-sidebar-child" href="/help/fate-mechanics.html#fate-points-and-refresh">Fate points</a>
+      <a class="wiki-sidebar-child" href="/help/fate-mechanics.html#stunts">Stunts</a>
+      <a class="wiki-sidebar-child" href="/help/fate-mechanics.html#contests">Contests</a>
+      <a class="wiki-sidebar-child" href="/help/fate-mechanics.html#challenges">Challenges</a>
+      <a class="wiki-sidebar-child" href="/help/fate-mechanics.html#countdowns">Countdowns</a>
+      <a class="wiki-sidebar-child" href="/help/fate-mechanics.html#compels">Compels</a>
+      <a class="wiki-sidebar-child" href="/help/fate-mechanics.html#create-advantage">Create Advantage</a>
+      <a class="wiki-sidebar-child" href="/help/fate-mechanics.html#fate-point-economy-gm">FP economy (GM)</a>
+      <a class="wiki-sidebar-child" href="/help/fate-mechanics.html#what-gms-prepare">What GMs prepare</a>
+      <a class="wiki-sidebar-child" href="/help/fate-mechanics.html#common-errors">Common errors</a>
+      <a class="wiki-sidebar-child" href="/help/fate-mechanics.html#further-reading">Further reading</a>
+    </div>
+    <a href="/help/at-the-table.html" class="wiki-sidebar-link"><span class="icon">&#127481;</span>At the Table</a>
+  </div>
+  <div class="wiki-sidebar-divider"></div>
+  <div class="wiki-sidebar-section">
+    <div class="wiki-sidebar-label">Advanced</div>
+    <a href="/help/export-share.html" class="wiki-sidebar-link"><span class="icon">&#128279;</span>Export &amp; Share</a>
+    <a href="/help/customise.html" class="wiki-sidebar-link"><span class="icon">&#9881;</span>Customise</a>
+  </div>
+  <div class="wiki-sidebar-divider"></div>
+  <div class="wiki-sidebar-divider"></div>
+  <div class="wiki-sidebar-section">
+    <div class="wiki-sidebar-label">Hosting</div>
+    <a href="/help/hosting.html" class="wiki-sidebar-link"><span class="icon">&#127760;</span>Hosting &amp; Multiplayer</a>
+  </div>
+  <div class="wiki-sidebar-divider"></div>
+  <div class="wiki-sidebar-section">
+    <div class="wiki-sidebar-label">Help</div>
+    <a href="/help/faq.html" class="wiki-sidebar-link"><span class="icon">&#10067;</span>FAQ</a>
+  </div>
+  </aside>
+  <main class="wiki-content" id="main-content">
+    
+<div class="wiki-page-eyebrow">Fate Mechanics</div>
+<h1>Fate Condensed — the mechanics behind the generators</h1>
+<p class="wiki-page-desc">Ogma generates mechanically correct Fate Condensed content. This page explains the mechanics behind the generators, with deep dives into Create Advantage, the fate point economy, GM prep structure, common errors, and further reading.</p>
+
+<div class="callout callout-info">
+  <div class="callout-title">&#128218; New to Fate?</div>
+  <p>Start with the <a href="/help/learn-fate.html">Quick Start guide</a> or the <a href="/help/dnd-transition.html">D&amp;D Transition guide</a>. This page goes deeper into specific mechanics.</p>
+</div>
+
+<h2 id="aspects">Aspects</h2>
+<p>An <strong>Aspect</strong> is a short phrase that describes something true and important about a character, scene, or situation. Aspects can be <strong>invoked</strong> (spend a Fate Point for +2 or a reroll) or <strong>compelled</strong> (the GM offers a Fate Point to introduce a complication).</p>
+<p>Every NPC Ogma generates has:</p>
+<ul>
+  <li><strong>High Concept</strong> — the character in a phrase. "Chrome Fixer with a Debt to the Yakuza." Always invokable for the character's core competency.</li>
+  <li><strong>Trouble</strong> — the thing that makes their life complicated. "The Magic is Burning Out of Me." The GM's primary compel lever.</li>
+  <li><strong>Other aspects</strong> — supporting details. Can be invoked or compelled situationally.</li>
+</ul>
+
+<h2 id="the-skill-ladder">The Skill Ladder</h2>
+<p>Skills are rated on the <strong>Fate Ladder</strong>: Average (+1), Fair (+2), Good (+3), Great (+4), Superb (+5), Fantastic (+6), Epic (+7), Legendary (+8). Most NPCs have a peak skill of Good (+3) to Superb (+5). Major NPCs have 5 rated skills; Minor NPCs have 1.</p>
+<p>The four actions in Fate are <strong>Overcome</strong> (clear an obstacle), <strong>Create an Advantage</strong> (place or discover an aspect), <strong>Attack</strong> (inflict stress), and <strong>Defend</strong> (resist an action).</p>
+
+<div class="callout callout-dnd">
+  <div class="callout-title">&#9876; Coming from D&amp;D — skills</div>
+  <p>D&amp;D skills use a flat proficiency bonus (+2 to +6) added to an ability modifier. Fate's skill pyramid means you choose 10 skills you care about and rank them — everything else defaults to +0 (Mediocre). Your top skill IS your character's core competency. A +4 (Great) Fight character reliably hits Fair (+2) difficulty. A D&amp;D equivalent would be proficiency + ability modifier around +7 — Fate's narrower range keeps results tighter and less swingy.</p>
+</div>
+
+<h2 id="stress">Stress</h2>
+<p>Stress is <strong>not hit points</strong>. It measures how long a character can stay in a conflict before being taken out. All stress boxes clear at the end of every scene — there is no long-term attrition from stress alone.</p>
+<p>Fate Condensed uses <strong>1-point stress boxes</strong> (not escalating like Fate Core). Minor NPCs have 1–3 stress boxes. Major NPCs have physical and mental tracks separately, each 2–4 boxes depending on Physique/Will.</p>
+<p>Ogma's interactive stress track lets you tap boxes during play. When all boxes are filled, the character is <strong>Taken Out</strong> — the TAKEN OUT overlay fires .</p>
+
+<h2 id="consequences">Consequences</h2>
+<p>Consequences are lasting aspects that a character takes to avoid being Taken Out. They persist beyond the scene and must be treated:</p>
+<table class="wiki-table">
+  <thead><tr><th scope="col">Severity</th><th scope="col">Shifts absorbed</th><th scope="col">Treatment difficulty</th><th scope="col">Clears after</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Mild (−2)</strong></td><td>2 shifts</td><td>Fair (+2)</td><td>One full scene after treatment</td></tr>
+    <tr><td><strong>Moderate (−4)</strong></td><td>4 shifts</td><td>Great (+4)</td><td>One full session after treatment</td></tr>
+    <tr><td><strong>Severe (−6)</strong></td><td>6 shifts</td><td>Fantastic (+6)</td><td>After a Breakthrough</td></tr>
+  </tbody>
+</table>
+<p>The Consequence generator produces a named aspect ready to write on a character sheet. Always name it specifically — <em>"Badly Burned Hands"</em> not just <em>"Injured"</em>. The aspect must work as a compel hook.</p>
+
+<div class="callout callout-tip">
+  <div class="callout-title">&#128161; GM tip from the generator</div>
+  <p>Plan at least one compel on a consequence before it heals. A consequence that never got invoked or compelled was a missed dramatic opportunity.</p>
+</div>
+
+<h2 id="fate-points-and-refresh">Fate Points and Refresh</h2>
+<p>Fate Points are the economy of player agency. Players start each session with their <strong>Refresh</strong> (usually 3). They spend Fate Points to invoke aspects; they earn them when they accept compels.</p>
+<p>Major NPCs have a <strong>Refresh</strong> calculated as <code>max(1, 3 − stunts)</code>. The GM starts each scene with this many Fate Points for that NPC. The FP Tracker in Ogma manages this automatically.</p>
+<p>See the <a href="/help/at-the-table.html">At the Table guide</a> for how to use the FP Tracker during play.</p>
+
+<h2 id="stunts">Stunts</h2>
+<p>Stunts give characters specific mechanical advantages. Fate Condensed has two types:</p>
+<ul>
+  <li><strong>+2 Bonus stunts</strong> — when a specific condition applies, add +2 to a named skill. E.g. "When I bluff a mark face to face with Deceive, add +2."</li>
+  <li><strong>Once-per-scene stunts</strong> — a special mechanical effect beyond a simple +2. Can only be used once per scene. E.g. "Once per scene, I can treat a failed Physique roll as a tie."</li>
+</ul>
+<p>Each stunt a character has costs 1 point of Refresh (minimum Refresh 1). Major NPCs in Ogma have 1&ndash;2 stunts, and their Refresh is automatically reduced accordingly.</p>
+
+<h3>What makes a good stunt?</h3>
+<p>A stunt should do two things: name a specific skill, and name a specific condition. Vague stunts ("I'm better at fighting") aren't stunts — they're wishful thinking. Specific stunts create interesting moments:</p>
+<table class="rules-table">
+  <thead><tr><th scope="col">Weak ✗</th><th scope="col">Strong ✓</th></tr></thead>
+  <tbody>
+    <tr><td>+2 to Fight</td><td>+2 to Fight when attacking from an elevated position</td></tr>
+    <tr><td>I'm good at sneaking</td><td>+2 to Stealth when moving through crowd cover</td></tr>
+    <tr><td>Once per scene I can do something impressive</td><td>Once per scene, spend a Fate Point to automatically succeed on one Overcome roll with Crafts</td></tr>
+  </tbody>
+</table>
+
+<h3>Stunt browser — all world stunts in one place</h3>
+<p>The <strong>stunt browser</strong> is available in the sidebar under <strong>Generate</strong>. It shows every stunt from the current world plus the universal pool (56+ stunts total). Filter by skill, tag, or keyword. Click any stunt to copy its name and description to the clipboard — ready to paste into a character sheet or session notes.</p>
+<p>Stunt tags: <em>combat, stealth, subterfuge, social, negotiation, leadership, knowledge, investigation, technical, repair, survival, movement, intimidation, supernatural</em></p>
+
+<h3>Examples from each world</h3>
+<dl class="stunt-examples">
+  <dt>The Long After</dt>
+  <dd><em>Ruin Reader</em> (Lore): +2 to create advantages when examining pre-collapse artifacts or structures.</dd>
+  <dt>Neon Abyss</dt>
+  <dd><em>Ghost Protocol</em> (Stealth): +2 to overcome when moving undetected through surveilled corporate spaces.</dd>
+  <dt>Shattered Kingdoms</dt>
+  <dd><em>Wound-Lore</em> (Academics): +2 to overcome when treating consequences caused by magical means.</dd>
+  <dt>Void Runners</dt>
+  <dd><em>Jump Sense</em> (Pilot): +2 to create advantages when planning faster-than-light routes under time pressure.</dd>
+  <dt>The Gaslight Chronicles</dt>
+  <dd><em>Reading the Room</em> (Empathy): +2 to defend against Deceive when first meeting someone in a social setting.</dd>
+  <dt>The Long Road</dt>
+  <dd><em>Salvage Eye</em> (Notice): +2 to overcome when searching ruined structures for usable materials.</dd>
+  <dt>Dust and Iron</dt>
+  <dd><em>Dead Aim</em> (Shoot): +2 to attack when you have not moved this exchange.</dd>
+  <dt>The dVenti Realm</dt>
+  <dd><em>Senate Protocol</em> (Rapport): +2 to create advantages in formal political negotiations involving vault authority.</dd>
+</dl>
+
+<h2 id="contests">Contests</h2>
+<p>A Contest is used when two sides compete for the same goal without directly harming each other. Each exchange, both sides roll — the higher effort marks a victory. <strong>First to 3 victories wins.</strong> A tie (equal effort) means neither side scores; instead, introduce a twist aspect.</p>
+<p>The Contest generator gives you the two sides, their relevant skills, a situation aspect, and 3 pre-rolled twists. The interactive victory track lets you tap boxes during play — scores appear live .</p>
+
+<div class="callout callout-dnd">
+  <div class="callout-title">&#9876; Coming from D&amp;D — contests vs. opposed checks</div>
+  <p>D&amp;D uses opposed ability checks (both sides roll, higher wins) for everything from arm wrestling to chases. Fate separates Contests (race for a goal, first to 3 victories) from Conflicts (mutual harm) and Challenges (obstacle sequences). The distinction forces you to think about what the scene is <em>really about</em> — not just "who rolls higher."</p>
+</div>
+
+<h2 id="challenges">Challenges</h2>
+<p>A Challenge is a sequence of Overcome actions against different obstacles, each with its own skill and difficulty. The group succeeds on the whole challenge only if they pass all individual rolls — or accepts success at a cost when they fail some.</p>
+<p>The Challenge generator gives you a named challenge, success and failure consequences, and a situation aspect. Use it when the party needs to accomplish something complex before an external pressure resolves.</p>
+
+<h2 id="countdowns">Countdowns</h2>
+<p>A Countdown is a threat clock. It has 4–8 boxes and fills when a trigger condition occurs. When the last box fills, the outcome happens — no exceptions. Use countdowns to create temporal pressure the players can see building.</p>
+<p>The live countdown track fills as the GM marks boxes. When the clock hits zero, particles fire and the outcome appears.</p>
+
+<h2 id="compels">Compels</h2>
+<p>A Compel is when the GM offers a Fate Point to a player in exchange for an aspect making their character's life harder. The player can spend a Fate Point to refuse — but they have to spend one they already have.</p>
+<p>The Compel generator produces a ready-to-offer compel: the situation ("You've been made by the corporate drone") and the consequence if accepted ("Your only exit is the one they're watching"). Offer the Fate Point before you describe the consequence.</p>
+
+    <hr style="border:none;border-top:1px solid var(--border);margin:32px 0">
+
+    <h2 id="create-advantage">Create an Advantage — the most important action</h2>
+    <p><strong>Create an Advantage</strong> is the action new players skip and experienced players build entire sessions around. It places a new aspect on a scene, character, or situation — or discovers an existing hidden aspect — and gives you one or two free invokes on it.</p>
+    <p>Why it matters: a free invoke stacks on top of a paid invoke (+2 each). Stack two free invokes before your Attack and you're rolling at effectively +4 over your skill — without spending a single Fate Point.</p>
+    <div class="callout callout-scenario">
+      <div class="callout-title">&#127914; Worked example — fighting a skilled swordsman</div>
+      <p>Your Fight is Good (+3). The enemy's Fight is Great (+4) — you're at a mechanical disadvantage every exchange if you just attack.</p>
+      <p><strong>Without Create Advantage:</strong> You attack at Fight +3 vs. their Defend at +4. Odds are against you. Repeat until someone runs out of stress.</p>
+      <p><strong>With Create Advantage:</strong> You throw sand (Athletics +2) to Create Advantage "Sand in His Eyes" — a new situation aspect with one free invoke. You succeed. Next exchange, you Attack at Fight +3 <em>plus</em> your free invoke (+2) = effectively +5 vs. their +4. You're now the favourite.</p>
+      <p>The fight changed because you thought before you swung.</p>
+    </div>
+    <div class="callout callout-dnd">
+      <div class="callout-title">⚔ Coming from D&amp;D</div>
+      <p>D&amp;D has no equivalent to Create Advantage. The closest analogy is the Help action — but Help gives advantage to one ally on one roll. Create Advantage places a reusable aspect that <em>anyone</em> can invoke, stacks with other free invokes, and creates narrative facts the fiction must honour. It's fundamentally more powerful and more interesting than Help.</p>
+    </div>
+    <div class="callout callout-tip">
+      <div class="callout-title">&#127922; GM tip — aspects created by players are real</div>
+      <p>When a player successfully creates "Perched on the High Ground," that aspect exists in the fiction. It's true. It gives the player's side a free invoke. It also means the enemy should <em>react to it</em> — they might spend their action trying to remove it (Overcome), or the GM might compel it ("Your high ground also makes you the most visible target in the courtyard").</p>
+    </div>
+
+    <h2 id="fate-point-economy-gm">The fate point economy — a GM guide</h2>
+    <p>The economy breaks when GMs forget to compel. Here's the full cycle:</p>
+    <ol>
+      <li><strong>Session start:</strong> Each player gets fate points equal to their Refresh (usually 3). The GM gets 1 per PC per scene — not per NPC, not per encounter. A party of 4 = 4 GM fate points per scene.</li>
+      <li><strong>During the scene:</strong> GM offers compels to create complications. Players who accept earn 1 FP. Players who refuse spend 1 FP. The GM uses their pool for NPC invokes.</li>
+      <li><strong>End of scene:</strong> Reset GM pool to 1 per PC. Player pools carry over — they don't reset until a breakthrough.</li>
+    </ol>
+    <div class="callout callout-warning">
+      <div class="callout-title">&#9888; The economy stalls without compels</div>
+      <p>If the GM never compels, players hoard fate points they never spend (no dramatic moments needed them) and never earn new ones (no compels to accept). The game goes flat. Aim for at least 1–2 compels per session. Each one is a story beat, not a punishment.</p>
+    </div>
+    <div class="callout callout-tip">
+      <div class="callout-title">&#127922; GM tip — offer compels on troubles first</div>
+      <p>Troubles are pre-approved complications — the player wrote them specifically to be compelled. Start there. "Your trouble is <em>Always the Last to Know</em> — would your character hear about the ambush in time?" Offering the FP before describing the complication is the correct procedure. They can always refuse.</p>
+    </div>
+
+    <h2 id="what-gms-prepare">What the GM prepares — and what they don't</h2>
+    <p>Fate GMs don't write encounter maps or stat-blocked combat setpieces. They prepare <strong>situations</strong>. The formula:</p>
+    <ul>
+      <li><strong>A current issue</strong> — the problem already in motion that the PCs can engage with immediately.</li>
+      <li><strong>An impending issue</strong> — something approaching that will become a current issue if not addressed.</li>
+      <li><strong>3–5 NPCs with faces</strong> — who is doing what about each issue.</li>
+      <li><strong>2–3 locations with aspects</strong> — what is true and interesting about the places the story will visit.</li>
+    </ul>
+    <p>That's enough for a full session. The fiction fills in everything else. Ogma's generators — especially Campaign Frame, Adventure Seed, Faction, and NPC — produce all of these in under two minutes.</p>
+    <div class="callout callout-dnd">
+      <div class="callout-title">⚔ Coming from D&amp;D</div>
+      <p>D&amp;D GMs pre-write the plot. Fate GMs pre-write the situation and let the plot emerge from character choices. The key shift: stop asking "what will happen" and start asking "who wants what, and why can't they have it?"</p>
+    </div>
+
+    <h2 id="common-errors">Common errors and how to fix them</h2>
+    <div class="callout callout-info">
+      <div class="callout-title">&#128161; "We forgot to invoke aspects all session"</div>
+      <p><strong>Fix:</strong> At the start of next session, put a physical index card in front of each player with their aspects on it. Make aspects visible. Aspects that aren't visible don't get invoked. Once the habit forms, the cards become optional.</p>
+    </div>
+    <div class="callout callout-info">
+      <div class="callout-title">&#128161; "Players roll for everything, including obvious things"</div>
+      <p><strong>Fix:</strong> Apply the three-question test before any roll: (1) Is the outcome uncertain? (2) Would failure be interesting? (3) Does the outcome matter to the story? If any answer is no, don't roll — just narrate. A skilled lockpick opening a simple lock in a non-tense situation shouldn't roll.</p>
+    </div>
+    <div class="callout callout-info">
+      <div class="callout-title">&#128161; "Our conflicts take two hours"</div>
+      <p><strong>Fix:</strong> Introduce concession early. Tell players explicitly: "You can concede at any time before a roll. You control what happens to your character, and you earn fate points." Most long conflicts happen because players don't know concession exists. Design conflicts to have a clear "this side wins" condition so players can see when conceding is the smart move.</p>
+    </div>
+    <div class="callout callout-info">
+      <div class="callout-title">&#128161; "Nobody compels — the economy is dead"</div>
+      <p><strong>Fix:</strong> This is always a GM problem, not a player problem. Set a target: two compels per session minimum. Write your NPCs' situations so complications naturally arise from PC troubles. "Your trouble is <em>Owes Money to the Wrong People</em> — the loan shark just walked through the door" is a compel. Offer the FP before you describe what happens.</p>
+    </div>
+    <div class="callout callout-info">
+      <div class="callout-title">&#128161; "Players attack every round instead of Create Advantage"</div>
+      <p><strong>Fix:</strong> Have an NPC use Create Advantage against them. Let them feel "Sand in His Eyes" when it's used against a PC. Once players see how effective it is, they start using it. You can also explicitly suggest it: "You could attack, or you could try to Create Advantage — maybe 'Off Balance' after that near-miss?"</p>
+    </div>
+    <div class="callout callout-info">
+      <div class="callout-title">&#128161; "Stress feels like hit points and runs out too fast"</div>
+      <p><strong>Fix:</strong> Remind players that stress clears at end of scene. Encourage consequence-taking as a narrative choice, not a last resort. A player who takes "Winded and Desperate" as a consequence is making a story decision, not failing. Frame it positively: "Taking that consequence keeps you in the fight and gives the GM something interesting to work with."</p>
+    </div>
+
+    <h2 id="further-reading">Further reading</h2>
+    <p>The community resources that go deeper than the SRD:</p>
+    <ul>
+      <li><a href="https://bookofhanz.com/" target="_blank" rel="noreferrer"><strong>The Book of Hanz</strong></a> — Robert Hanz's collected essays on Fate philosophy. The single best resource for understanding <em>why</em> Fate works the way it does. Free to read online. Especially recommended: "Fate Doesn't Have a Damage System," "Aspects Are the Most Important Thing," and "Fate as a Narrative Game."</li>
+      <li><a href="https://fate-srd.com/fate-condensed" target="_blank" rel="noreferrer"><strong>Fate Condensed SRD</strong></a> — The complete rules, free. Use it as a reference during play. The GM chapter (p.41) is especially useful for difficulty-setting and NPC design.</li>
+      <li><a href="https://fate-srd.com/odds-ends/introducing-people-fate" target="_blank" rel="noreferrer"><strong>"Introducing People to Fate"</strong></a> — Official SRD community article on teaching the game to new players. Covers sequencing and what to de-emphasise in session zero.</li>
+      <li><a href="https://www.uptofourplayers.com/ready-to-roll/fate-core-rules/" target="_blank" rel="noreferrer"><strong>Up to Four Players — Fate Core Rules comic</strong></a> — Two-page visual summary of Fate Core mechanics. Widely cited as the fastest way to hand someone a Fate overview. Fate Core not Condensed, but the core concepts are identical.</li>
+    </ul>
+
+    <div class="wiki-footer">
+
+  <div>
+    <a href="/help/index.html">Wiki Home</a> &nbsp;·&nbsp;
+    <a href="../index.html">Open Ogma</a> &nbsp;·&nbsp;
+    <a href="../about.html">About</a> &nbsp;·&nbsp;
+    <a href="../license.html">Full Attribution</a> &nbsp;·&nbsp;
+    <!-- FARI_PARKED_2026.03.154 fari.app link --> &nbsp;·&nbsp;
+    <a href="https://fate-srd.com/" target="_blank" rel="noreferrer">fate-srd.com</a>
+  </div>
+  <div style="font-size:var(--text-label);color:var(--text-muted)">
+    Fate&#8482; is a trademark of Evil Hat Productions, LLC &nbsp;·&nbsp;
+    D&amp;D&#174; is a trademark of Wizards of the Coast LLC &nbsp;·&nbsp;
+    Released under <a href="../license.html">CC BY 3.0</a>
+  </div>
+</div>
+  </main>
+</div>
+<script>
+(function() {
+  var btn = document.getElementById('topnav-hbg');
+  if (btn) {
+    document.addEventListener('click', function(e) {
+      var dd = document.getElementById('topnav-dd');
+      if (dd && !btn.contains(e.target) && !dd.contains(e.target)) {
+        dd.classList.remove('open');
+        btn.setAttribute('aria-expanded','false');
+      }
+    });
+    window.addEventListener('resize', function() {
+      var dd = document.getElementById('topnav-dd');
+      if (dd) dd.classList.remove('open');
+    });
+  }
+})();
+</script>
+</html>
