@@ -2,12 +2,22 @@
 
 <script>
   import { onMount } from 'svelte';
+  import { generate, mergeUniversal, filteredTables } from '$lib/engine.js';
+  import { CAMPAIGNS } from '$lib/../data/shared.js';
 
   let theme = 'dark';
-  let selectedWorld = null;
-  let step = 1;
+  let step = 0;
+  let campId = null;
+  let playerCount = 3;
 
-  const CAMPAIGN_INFO = {
+  // Generated content per step
+  let backstories = [];
+  let seedData = null;
+  let sceneData = null;
+  let npcData = null;
+  let extras = [];
+
+  const WORLD_META = {
     thelongafter: { name: 'The Long After', icon: '◈', genre: 'Sword & Planet' },
     cyberpunk:    { name: 'Neon Abyss', icon: '⬡', genre: 'Cyberpunk' },
     fantasy:      { name: 'Shattered Kingdoms', icon: '✦', genre: 'Dark Fantasy' },
@@ -17,8 +27,54 @@
     western:      { name: 'Dust and Iron', icon: '◈', genre: 'Frontier Western' },
     dVentiRealm:  { name: 'dVenti Realm', icon: '⬟', genre: 'High Fantasy' },
   };
+  const WORLD_IDS = Object.keys(WORLD_META);
 
-  $: worlds = Object.entries(CAMPAIGN_INFO).map(([id, info]) => ({ id, ...info }));
+  $: campName = campId && WORLD_META[campId] ? WORLD_META[campId].name : '';
+
+  function roll(genId) {
+    if (!campId || !CAMPAIGNS[campId]) return null;
+    try {
+      const t = filteredTables(mergeUniversal(CAMPAIGNS[campId].tables), {});
+      return generate(genId, t, playerCount, {});
+    } catch (e) {
+      console.error('Prep Wizard generate failed:', genId, e);
+      return null;
+    }
+  }
+
+  function selectWorld(id) { campId = id; }
+
+  function nextStep() {
+    if (step === 0 && !campId) return;
+    step += 1;
+    // Auto-generate content for steps that need it
+    if (step === 1) generateBackstories();
+    if (step === 2 && !seedData) seedData = roll('seed');
+    if (step === 3 && !sceneData) sceneData = roll('scene');
+    if (step === 4 && !npcData) npcData = roll('npc_major');
+  }
+  function prevStep() { if (step > 0) step -= 1; }
+
+  function generateBackstories() {
+    backstories = [];
+    for (let i = 0; i < playerCount; i++) {
+      backstories.push(roll('backstory'));
+    }
+    backstories = backstories;
+  }
+
+  function rerollBackstory(i) {
+    backstories[i] = roll('backstory');
+    backstories = backstories;
+  }
+
+  function rerollSeed() { seedData = roll('seed'); }
+  function rerollScene() { sceneData = roll('scene'); }
+  function rerollNpc() { npcData = roll('npc_major'); }
+
+  function goToBoard() {
+    window.location.href = '/campaigns/' + (campId || 'fantasy');
+  }
 
   onMount(() => {
     try {
@@ -37,16 +93,6 @@
       localStorage.setItem('fate_prefs_v1', JSON.stringify(p));
     } catch (e) {}
   }
-
-  function selectWorld(id) {
-    selectedWorld = id;
-  }
-
-  function goToWorld() {
-    if (selectedWorld) {
-      window.location.href = '/campaigns/' + selectedWorld;
-    }
-  }
 </script>
 
 <svelte:head>
@@ -62,6 +108,7 @@
     <div class="topbar-spacer" style="flex:1"></div>
     <div class="topbar-status">
       <a href="/help" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">&#128218; Help</a>
+      <a href="/about" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">About</a>
       <button class="btn btn-icon btn-ghost" on:click={toggleTheme}
         aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
         style="width:44px;height:44px">{theme === 'dark' ? '☀️' : '◑'}</button>
@@ -70,32 +117,218 @@
 
   <main id="main-content" style="flex:1;display:flex;flex-direction:column;align-items:center;padding:24px 16px 80px">
     <div style="width:100%;max-width:600px">
-      <div style="font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:6px">STEP 1 OF 3</div>
-      <h1 style="font-size:26px;font-weight:800;letter-spacing:-.025em;color:var(--text);margin-bottom:8px;line-height:1.2">Choose your world</h1>
-      <p style="font-size:13px;color:var(--text-dim);line-height:1.65;margin-bottom:24px">Pick the campaign setting for this session. Each world has its own tone, NPCs, and themes.</p>
 
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:24px">
-        {#each worlds as w (w.id)}
-          <button
-            style="background:{selectedWorld === w.id ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'var(--glass-bg)'};border:1px solid {selectedWorld === w.id ? 'var(--accent)' : 'var(--glass-border)'};border-radius:10px;padding:14px;cursor:pointer;text-align:left;font-family:var(--font-ui);{selectedWorld === w.id ? 'box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent)' : ''}"
-            on:click={() => selectWorld(w.id)}
-            aria-pressed={String(selectedWorld === w.id)}
-          >
-            <div style="font-size:22px;margin-bottom:6px">{w.icon}</div>
-            <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px">{w.name}</div>
-            <div style="font-size:10px;color:var(--text-muted)">{w.genre}</div>
-          </button>
-        {/each}
+      <!-- ── STEP 1: Choose World ──────────────────────────────────── -->
+      {#if step === 0}
+        <div style="font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:6px">STEP 1 OF 6</div>
+        <h1 style="font-size:26px;font-weight:800;letter-spacing:-.025em;color:var(--text);margin-bottom:8px;line-height:1.2">Which world are you running?</h1>
+        <p style="font-size:13px;color:var(--text-dim);line-height:1.65;margin-bottom:24px">Pick a campaign setting. Everything after this is tailored to your world.</p>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:24px">
+          {#each WORLD_IDS as id}
+            <button
+              style="background:{campId === id ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'var(--glass-bg)'};border:1px solid {campId === id ? 'var(--accent)' : 'var(--glass-border)'};border-radius:10px;padding:14px;cursor:pointer;text-align:left;font-family:var(--font-ui);{campId === id ? 'box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent)' : ''}"
+              on:click={() => selectWorld(id)}
+              aria-pressed={String(campId === id)}
+            >
+              <div style="font-size:22px;margin-bottom:6px">{WORLD_META[id].icon}</div>
+              <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px">{WORLD_META[id].name}</div>
+              <div style="font-size:10px;color:var(--text-muted)">{WORLD_META[id].genre}</div>
+            </button>
+          {/each}
+        </div>
+
+      <!-- ── STEP 2: Player Count ──────────────────────────────────── -->
+      {:else if step === 1}
+        <div style="font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:6px">STEP 2 OF 6</div>
+        <h1 style="font-size:26px;font-weight:800;letter-spacing:-.025em;color:var(--text);margin-bottom:8px;line-height:1.2">How many players?</h1>
+        <p style="font-size:13px;color:var(--text-dim);line-height:1.65;margin-bottom:24px">This sets the opposition scale and generates a backstory hook for each player to kick off the session.</p>
+
+        <div style="display:flex;align-items:center;justify-content:center;gap:24px;margin-bottom:24px">
+          <button style="width:44px;height:44px;border-radius:50%;border:2px solid var(--border);background:var(--panel);color:var(--text);font-size:20px;font-weight:700;cursor:pointer" disabled={playerCount <= 1} on:click={() => { playerCount -= 1; generateBackstories(); }}>&minus;</button>
+          <div style="text-align:center">
+            <div style="font-size:48px;font-weight:900;color:var(--text);line-height:1">{playerCount}</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:4px">{playerCount === 1 ? 'player' : 'players'}</div>
+          </div>
+          <button style="width:44px;height:44px;border-radius:50%;border:2px solid var(--border);background:var(--panel);color:var(--text);font-size:20px;font-weight:700;cursor:pointer" disabled={playerCount >= 6} on:click={() => { playerCount += 1; generateBackstories(); }}>+</button>
+        </div>
+
+        {#if backstories.length > 0}
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px">Backstory hooks &mdash; one per player</div>
+          {#each backstories as b, i}
+            {#if b}
+              <div style="background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:8px;padding:12px;margin-bottom:8px">
+                <div style="font-size:10px;font-weight:700;color:var(--accent);margin-bottom:4px">Player {i + 1}</div>
+                {#if b.question}<div style="font-size:12px;color:var(--text-dim);font-style:italic;margin-bottom:4px">"{b.question}"</div>{/if}
+                {#if b.aspect}<div style="font-size:12px;color:var(--text);font-weight:600">{b.aspect}</div>{/if}
+                {#if b.hook}<div style="font-size:11px;color:var(--text-dim);margin-top:4px">{b.hook}</div>{/if}
+                <button style="margin-top:6px;font-size:11px;padding:4px 10px;border:1px solid var(--border);border-radius:4px;background:var(--panel);color:var(--text-muted);cursor:pointer" on:click={() => rerollBackstory(i)}>&#x21bb; New hook</button>
+              </div>
+            {/if}
+          {/each}
+        {/if}
+
+      <!-- ── STEP 3: Quick Adventure Start (Seed) ─────────────────── -->
+      {:else if step === 2}
+        <div style="font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:6px">STEP 3 OF 6</div>
+        <h1 style="font-size:26px;font-weight:800;letter-spacing:-.025em;color:var(--text);margin-bottom:8px;line-height:1.2">What's the situation?</h1>
+        <p style="font-size:13px;color:var(--text-dim);line-height:1.65;margin-bottom:24px">This is your scenario skeleton &mdash; the location, objective, and complication. Prep Scene 1 in full. Follow the players after that.</p>
+
+        {#if seedData}
+          <div style="background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:10px;overflow:hidden;margin-bottom:16px">
+            <div style="padding:10px 14px;background:color-mix(in srgb,var(--accent) 8%,transparent);border-bottom:1px solid var(--glass-border);display:flex;align-items:center;gap:8px">
+              <span style="font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)">Quick Adventure Start</span>
+              <span style="flex:1"></span>
+              <span style="font-size:13px;font-weight:700;color:var(--text)">{seedData.location || ''}</span>
+            </div>
+            <div style="padding:14px">
+              {#if seedData.objective}
+                <div style="margin-bottom:10px"><div style="font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:3px">Objective</div><div style="font-size:13px;color:var(--text)">{seedData.objective}</div></div>
+              {/if}
+              {#if seedData.complication}
+                <div style="margin-bottom:10px"><div style="font-size:10px;font-weight:700;color:var(--c-red,#f87171);margin-bottom:3px">Complication</div><div style="font-size:13px;color:var(--text-dim)">{seedData.complication}</div></div>
+              {/if}
+              {#if seedData.twist}
+                <div><div style="font-size:10px;font-weight:700;color:var(--c-purple,#a78bfa);margin-bottom:3px">Twist &mdash; reveal late</div><div style="font-size:13px;color:var(--text-dim);font-style:italic">{seedData.twist}</div></div>
+              {/if}
+            </div>
+            <div style="padding:8px 14px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--glass-border);font-style:italic">This is a situation, not a plot. The players' choices are the story.</div>
+          </div>
+          <button style="font-size:12px;padding:8px 16px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:var(--text-muted);cursor:pointer" on:click={rerollSeed}>&#x21bb; Reroll seed</button>
+        {:else}
+          <div style="text-align:center;padding:40px;color:var(--text-muted)">Generating&hellip;</div>
+        {/if}
+
+      <!-- ── STEP 4: Scene Setup ───────────────────────────────────── -->
+      {:else if step === 3}
+        <div style="font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:6px">STEP 4 OF 6</div>
+        <h1 style="font-size:26px;font-weight:800;letter-spacing:-.025em;color:var(--text);margin-bottom:8px;line-height:1.2">Where does Session 1 open?</h1>
+        <p style="font-size:13px;color:var(--text-dim);line-height:1.65;margin-bottom:24px">Read zone names aloud when you describe the scene. Reveal visible aspects now &mdash; keep hidden ones for discovery rolls.</p>
+
+        {#if sceneData}
+          <div style="background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:10px;overflow:hidden;margin-bottom:16px">
+            <div style="padding:10px 14px;background:color-mix(in srgb,var(--accent) 8%,transparent);border-bottom:1px solid var(--glass-border)">
+              <span style="font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)">Scene Setup</span>
+            </div>
+            <div style="padding:14px">
+              {#if Array.isArray(sceneData.aspects) && sceneData.aspects.length > 0}
+                <div style="font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:6px">Situation aspects</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
+                  {#each sceneData.aspects as a}
+                    <span style="font-size:11px;padding:3px 8px;background:var(--inset);border:1px solid var(--border);border-radius:4px;color:var(--text-dim);font-style:italic">{typeof a === 'string' ? a : (a.name || '')}</span>
+                  {/each}
+                </div>
+              {/if}
+              {#if Array.isArray(sceneData.zones) && sceneData.zones.length > 0}
+                <div style="font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:5px">Zones</div>
+                <div style="display:flex;flex-direction:column;gap:4px">
+                  {#each sceneData.zones.slice(0, 3) as z}
+                    <div style="font-size:11px;color:var(--text-dim)">
+                      <strong style="color:var(--text);margin-right:6px">{typeof z === 'string' ? z : (z.name || z[0] || '')}</strong>
+                      <span>{typeof z === 'object' ? (z.aspect || z[1] || '') : ''}</span>
+                    </div>
+                  {/each}
+                </div>
+              {/if}
+            </div>
+            <div style="padding:8px 14px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--glass-border);font-style:italic">Put at least one usable aspect in reach &mdash; players love having options.</div>
+          </div>
+          <button style="font-size:12px;padding:8px 16px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:var(--text-muted);cursor:pointer" on:click={rerollScene}>&#x21bb; Reroll scene</button>
+        {:else}
+          <div style="text-align:center;padding:40px;color:var(--text-muted)">Setting the scene&hellip;</div>
+        {/if}
+
+      <!-- ── STEP 5: Opening NPC ───────────────────────────────────── -->
+      {:else if step === 4}
+        <div style="font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:6px">STEP 5 OF 6</div>
+        <h1 style="font-size:26px;font-weight:800;letter-spacing:-.025em;color:var(--text);margin-bottom:8px;line-height:1.2">Who do the players meet first?</h1>
+        <p style="font-size:13px;color:var(--text-dim);line-height:1.65;margin-bottom:24px">Your opening NPC &mdash; could be an antagonist, a contact, or a bystander. Introduce them through what they're doing, not who they are.</p>
+
+        {#if npcData}
+          {@const asp = npcData.aspects || {}}
+          {@const skills = npcData.skills || []}
+          <div style="background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:10px;overflow:hidden;margin-bottom:16px">
+            <div style="padding:10px 14px;background:color-mix(in srgb,var(--accent) 8%,transparent);border-bottom:1px solid var(--glass-border);display:flex;align-items:center;gap:8px">
+              <span style="font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)">Major NPC</span>
+              <span style="flex:1"></span>
+              <span style="font-size:13px;font-weight:700;color:var(--text)">{npcData.name || ''}</span>
+            </div>
+            <div style="padding:14px">
+              {#if asp.high_concept}
+                <div style="margin-bottom:8px"><div style="font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:3px">High Concept</div><div style="font-size:13px;color:var(--text);font-style:italic">{asp.high_concept}</div></div>
+              {/if}
+              {#if asp.trouble}
+                <div style="margin-bottom:8px"><div style="font-size:10px;font-weight:700;color:var(--c-red,#f87171);margin-bottom:3px">Trouble</div><div style="font-size:13px;color:var(--text-dim);font-style:italic">{asp.trouble}</div></div>
+              {/if}
+              {#if skills.length > 0}
+                <div style="margin-top:8px">
+                  <div style="font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:5px">Top skills</div>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap">
+                    {#each skills.slice(0, 4) as s}
+                      <span style="font-size:11px;color:var(--text-dim);background:var(--inset);border:1px solid var(--border);border-radius:4px;padding:2px 7px">
+                        <strong style="color:var(--accent);font-family:var(--font-mono);margin-right:4px">+{s.r}</strong>{s.name}
+                      </span>
+                    {/each}
+                  </div>
+                </div>
+              {/if}
+            </div>
+            <div style="padding:8px 14px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--glass-border);font-style:italic">Refresh: {npcData.refresh || 3}. Introduce through action &mdash; let the players figure out who they are.</div>
+          </div>
+          <button style="font-size:12px;padding:8px 16px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:var(--text-muted);cursor:pointer" on:click={rerollNpc}>&#x21bb; Reroll NPC</button>
+        {:else}
+          <div style="text-align:center;padding:40px;color:var(--text-muted)">Generating your opening NPC&hellip;</div>
+        {/if}
+
+      <!-- ── STEP 6: Done ──────────────────────────────────────────── -->
+      {:else if step === 5}
+        <div style="font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:6px">STEP 6 OF 6</div>
+        <h1 style="font-size:26px;font-weight:800;letter-spacing:-.025em;color:var(--text);margin-bottom:8px;line-height:1.2">You're ready to play.</h1>
+        <p style="font-size:13px;color:var(--text-dim);line-height:1.65;margin-bottom:24px">You have a seed, a scene, and an NPC. Open the generator to run the session &mdash; or add more cards from the generator suite.</p>
+
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px">
+          {#if seedData}
+            <div style="padding:10px 14px;background:var(--inset);border:1px solid var(--border);border-radius:8px">
+              <div style="font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:3px">Seed</div>
+              <div style="font-size:12px;color:var(--text)">{seedData.location || ''} &mdash; {seedData.objective || ''}</div>
+            </div>
+          {/if}
+          {#if sceneData}
+            <div style="padding:10px 14px;background:var(--inset);border:1px solid var(--border);border-radius:8px">
+              <div style="font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:3px">Scene</div>
+              <div style="font-size:12px;color:var(--text)">{Array.isArray(sceneData.aspects) ? sceneData.aspects.map(a => typeof a === 'string' ? a : a.name).join(' · ') : ''}</div>
+            </div>
+          {/if}
+          {#if npcData}
+            <div style="padding:10px 14px;background:var(--inset);border:1px solid var(--border);border-radius:8px">
+              <div style="font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:3px">NPC</div>
+              <div style="font-size:12px;color:var(--text)">{npcData.name || ''} &mdash; {npcData.aspects?.high_concept || ''}</div>
+            </div>
+          {/if}
+        </div>
+
+        <button
+          style="width:100%;padding:16px;background:var(--glass-bg);border:2px solid var(--accent);color:var(--text);font-weight:800;font-size:16px;border-radius:8px;cursor:pointer;box-shadow:0 0 12px color-mix(in srgb,var(--accent) 25%,transparent)"
+          on:click={goToBoard}
+        >&#9654; Open {campName} Generator</button>
+
+        <div style="text-align:center;margin-top:12px">
+          <a href="/" style="font-size:12px;color:var(--text-muted)">&larr; All Worlds</a>
+        </div>
+      {/if}
+
+      <!-- ── Navigation ────────────────────────────────────────────── -->
+      <div style="display:flex;justify-content:space-between;margin-top:32px;padding-top:16px;border-top:1px solid var(--border)">
+        {#if step > 0}
+          <button style="padding:10px 20px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:var(--text-dim);cursor:pointer;font-size:14px;font-weight:600" on:click={prevStep}>&larr; Back</button>
+        {:else}
+          <div></div>
+        {/if}
+        {#if step < 5}
+          <button style="padding:10px 20px;border:2px solid var(--accent);border-radius:6px;background:var(--glass-bg);color:var(--text);cursor:pointer;font-size:14px;font-weight:700;box-shadow:0 0 8px color-mix(in srgb,var(--accent) 20%,transparent)" disabled={step === 0 && !campId} on:click={nextStep}>Next &rarr;</button>
+        {/if}
       </div>
 
-      {#if selectedWorld}
-        <button
-          style="width:100%;padding:14px;background:var(--accent);color:#000;font-weight:700;font-size:15px;border:none;border-radius:100px;cursor:pointer"
-          on:click={goToWorld}
-        >
-          Open {CAMPAIGN_INFO[selectedWorld].name} &rarr;
-        </button>
-      {/if}
     </div>
   </main>
 
