@@ -90,6 +90,16 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 [data-theme="light"][data-campaign="postapoc"]{--accent:#A04D12;--section-hdr:#A04D12;--accent-dim:#C06018;--gold:#7A3800;--tag-bg:rgba(160,77,18,0.07);--tag-border:rgba(160,77,18,0.18);--c-red:#C62828;--c-green:#2E7D32;--c-blue:#1565C0;--c-purple:#6A1B9A;--orb-a:rgba(240,128,48,0.12);--orb-b:rgba(200,100,30,0.08);--camp-bg:linear-gradient(160deg,#FFF4EE 0%,#FFE8D0 40%,#F8F0E8 100%);--focus-ring:#A04D12}
 [data-theme="light"][data-campaign="western"]{--accent:#8B4513;--section-hdr:#8B4513;--accent-dim:#A0522D;--gold:#6B3410;--tag-bg:rgba(139,69,19,0.08);--tag-border:rgba(139,69,19,0.20);--c-red:#B71C1C;--c-green:#2E7D32;--c-blue:#1565C0;--c-purple:#6A1B9A;--orb-a:rgba(192,120,48,0.10);--orb-b:rgba(160,90,20,0.07);--camp-bg:linear-gradient(160deg,#FFF8F0 0%,#FFF0DC 40%,#F8EED8 100%);--focus-ring:#8B4513}
 
+/* ── Campaign accent tokens (decorative only — borders, icons, glow) ── */
+[data-campaign="thelongafter"]{--campaign-accent:#c8a96e}
+[data-campaign="cyberpunk"]{--campaign-accent:#00f5ff}
+[data-campaign="fantasy"]{--campaign-accent:#9b6dff}
+[data-campaign="space"]{--campaign-accent:#4fc3f7}
+[data-campaign="victorian"]{--campaign-accent:#b5965a}
+[data-campaign="postapoc"]{--campaign-accent:#e07b54}
+[data-campaign="western"]{--campaign-accent:#a0522d}
+[data-campaign="dVentiRealm"]{--campaign-accent:#f9c74f}
+
 /* ══ ACCESSIBILITY ══ */
 .skip-link{position:absolute;top:-100%;left:0;background:var(--accent);color:var(--bg);padding:10px 18px;font-size:var(--text-base);font-weight:700;z-index:9999;text-decoration:none;border-radius:0 0 8px 0}
 .skip-link:focus{top:0}
@@ -112,19 +122,20 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .btn-ghost:hover{background:var(--glass-bg)}
 .btn:hover{box-shadow:var(--fd-stamp-shadow-hover);transform:translateY(-1px)}
 .btn:active{box-shadow:1px 1px 0 rgba(0,0,0,0.18);transform:translateY(2px) translateX(2px)}
-.btn-roll:hover{box-shadow:var(--fd-stamp-shadow-hover);transform:translateY(-2px)}
-.btn-roll:active{box-shadow:1px 1px 0 rgba(0,0,0,0.18);transform:translateY(3px) translateX(2px)}
+/* btn-roll hover/active defined below in Roll button section */
 .btn-icon{padding:8px 12px;min-width:44px;min-height:44px;font-size:var(--text-md);line-height:1;border-radius:50%}
 /* Compact button — replaces inline style:{fontSize:12,padding:'4px 12px',minHeight:0} (used 5x) */
 
 /* ══ CARDS ══ */
 
-/* ── Roll button ──────────────────────────────────────────────────────── */
-.btn-roll{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:16px 24px;font-size:var(--text-lg);font-weight:900;font-family:var(--font-display);letter-spacing:0.02em;border:none;border-radius:var(--fd-stamp-radius,3px);cursor:pointer;position:relative;overflow:hidden;transition:transform 0.1s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.1s;background:var(--accent);color:#fff;min-height:56px;box-shadow:var(--fd-stamp-shadow)}
-.btn-roll:hover{filter:brightness(1.12)}
-.btn-roll:active{filter:brightness(0.95);transform:scale(0.99)}
+/* ── Roll button (WCAG AA: accent on border/shadow only, never background/text) ── */
+.btn-roll{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px 24px;font-size:var(--text-lg);font-weight:900;font-family:var(--font-display);letter-spacing:0.02em;border:2px solid var(--campaign-accent,var(--accent));border-radius:6px;cursor:pointer;position:relative;overflow:hidden;transition:box-shadow 0.15s,border-color 0.15s,transform 0.1s;background:var(--glass-bg);color:var(--text);min-height:44px;box-shadow:0 0 10px color-mix(in srgb,var(--campaign-accent,var(--accent)) 25%,transparent)}
+.btn-roll:hover{box-shadow:0 0 18px color-mix(in srgb,var(--campaign-accent,var(--accent)) 45%,transparent);border-color:color-mix(in srgb,var(--campaign-accent,var(--accent)) 80%,white);transform:translateY(-1px)}
+.btn-roll:active{transform:translateY(0);box-shadow:0 0 6px color-mix(in srgb,var(--campaign-accent,var(--accent)) 20%,transparent)}
+.btn-roll:focus-visible{outline:2px solid var(--campaign-accent,var(--accent));outline-offset:3px}
 .btn-roll:disabled{opacity:0.55;cursor:not-allowed;filter:none;transform:none}
 .btn-roll.rolling{animation:rollPulse 0.6s ease}
+@media(prefers-reduced-motion:reduce){.btn-roll{transition:none;transform:none}.btn-roll:hover,.btn-roll:active{transform:none}}
 .action-bar-roll{flex:1}
 /* ── Streak pulse ──────────────────────────────────────────────────────── */
 .btn-roll.streak-pulse{animation:streakPop 0.35s ease}
@@ -210,9 +221,9 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 /* ═══ THE LONG AFTER — Phade Vault Activation ═══
    Orbiting glyph border via conic-gradient. Golden energy detonation on click. */
 [data-campaign="thelongafter"] .btn-roll {
-  background:linear-gradient(135deg,#2a1f0f,#1a1208);color:var(--accent);
-  border:1px solid color-mix(in srgb,var(--accent) 27%,transparent);border-radius:100px;
-  box-shadow:0 0 20px color-mix(in srgb,var(--accent) 25%,transparent);
+  background:linear-gradient(135deg,#2a1f0f,#1a1208);color:var(--text);
+  border:2px solid color-mix(in srgb,var(--campaign-accent) 40%,transparent);border-radius:100px;
+  box-shadow:0 0 20px color-mix(in srgb,var(--campaign-accent) 25%,transparent);
   animation:tla-idle 3s ease-in-out infinite;
 }
 [data-campaign="thelongafter"] .btn-roll::before {
@@ -236,10 +247,10 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 /* ═══ NEON ABYSS — Glitch Interface ═══
    Monospace, sharp corners, scanline idle, RGB-split glitch on click. */
 [data-campaign="cyberpunk"] .btn-roll {
-  background:#0a1418;color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);
+  background:#0a1418;color:var(--text);border:2px solid color-mix(in srgb,var(--campaign-accent) 40%,transparent);
   border-radius:4px;letter-spacing:0.06em;text-transform:uppercase;
-  text-shadow:0 0 8px color-mix(in srgb,var(--accent) 50%,transparent);
-  box-shadow:0 0 15px color-mix(in srgb,var(--accent) 30%,transparent);
+  text-shadow:0 0 8px color-mix(in srgb,var(--campaign-accent) 30%,transparent);
+  box-shadow:0 0 15px color-mix(in srgb,var(--campaign-accent) 30%,transparent);
   animation:neo-scan 3s linear infinite;
 }
 [data-campaign="cyberpunk"] .btn-roll::before {
@@ -259,9 +270,9 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 /* ═══ SHATTERED KINGDOMS — Rune Fracture ═══
    Warm stone, rune text-glow pulse, bright crack-flare on click. */
 [data-campaign="fantasy"] .btn-roll {
-  background:linear-gradient(135deg,#1a0f08,#2a1510);color:var(--accent);
-  border:1px solid color-mix(in srgb,var(--accent) 27%,transparent);border-radius:6px;
-  box-shadow:0 0 15px color-mix(in srgb,var(--accent) 25%,transparent);
+  background:linear-gradient(135deg,#1a0f08,#2a1510);color:var(--text);
+  border:2px solid color-mix(in srgb,var(--campaign-accent) 40%,transparent);border-radius:6px;
+  box-shadow:0 0 15px color-mix(in srgb,var(--campaign-accent) 25%,transparent);
   animation:fan-rune 4s ease-in-out infinite;
 }
 [data-campaign="fantasy"] .btn-roll::before {
@@ -279,9 +290,9 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 /* ═══ VOID RUNNERS — Engine Ignition ═══
    Deep purple, thruster-glow pulse, burn + forward thrust on click. */
 [data-campaign="space"] .btn-roll {
-  background:linear-gradient(135deg,#14081a,#1e1028);color:var(--accent);
-  border:1px solid color-mix(in srgb,var(--accent) 27%,transparent);border-radius:100px;
-  box-shadow:0 0 15px color-mix(in srgb,var(--accent) 25%,transparent);
+  background:linear-gradient(135deg,#14081a,#1e1028);color:var(--text);
+  border:2px solid color-mix(in srgb,var(--campaign-accent) 40%,transparent);border-radius:100px;
+  box-shadow:0 0 15px color-mix(in srgb,var(--campaign-accent) 25%,transparent);
   animation:sp-idle 2s ease-in-out infinite;
   transition:box-shadow 0.15s,transform 0.1s;
 }
@@ -305,10 +316,10 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 /* ═══ GASLIGHT CHRONICLES — Gas Flame ═══
    Warm amber, constant gas-lamp flicker, dramatic flare-up on click. */
 [data-campaign="victorian"] .btn-roll {
-  background:linear-gradient(180deg,#1a1608,#0f0e08);color:var(--accent);
-  border:1px solid color-mix(in srgb,var(--accent) 27%,transparent);border-radius:4px;
-  box-shadow:0 -4px 15px color-mix(in srgb,var(--accent) 25%,transparent),0 0 20px color-mix(in srgb,var(--accent) 18%,transparent);
-  text-shadow:0 0 6px color-mix(in srgb,var(--accent) 40%,transparent);
+  background:linear-gradient(180deg,#1a1608,#0f0e08);color:var(--text);
+  border:2px solid color-mix(in srgb,var(--campaign-accent) 40%,transparent);border-radius:4px;
+  box-shadow:0 -4px 15px color-mix(in srgb,var(--campaign-accent) 25%,transparent),0 0 20px color-mix(in srgb,var(--campaign-accent) 18%,transparent);
+  text-shadow:none;
   animation:vic-flicker 0.15s ease-in-out infinite alternate;
 }
 [data-campaign="victorian"] .btn-roll.rolling,
@@ -321,9 +332,9 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 /* ═══ THE LONG ROAD — Radio Static ═══
    Rust orange, static grain overlay, signal blink, static burst on click. */
 [data-campaign="postapoc"] .btn-roll {
-  background:#1a0e05;color:var(--accent);
-  border:1px solid color-mix(in srgb,var(--accent) 27%,transparent);border-radius:4px;
-  box-shadow:0 0 10px color-mix(in srgb,var(--accent) 18%,transparent);
+  background:#1a0e05;color:var(--text);
+  border:2px solid color-mix(in srgb,var(--campaign-accent) 40%,transparent);border-radius:4px;
+  box-shadow:0 0 10px color-mix(in srgb,var(--campaign-accent) 18%,transparent);
   animation:pa-blink 3s ease-in-out infinite;
 }
 [data-campaign="postapoc"] .btn-roll::before {
@@ -334,8 +345,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 [data-campaign="postapoc"] .btn-roll.rolling,
 [data-campaign="postapoc"] .btn-roll:active {
   animation:pa-static 0.08s steps(3) 4;
-  color:#fff;
-  box-shadow:0 0 50px color-mix(in srgb,var(--accent) 60%,transparent);
+  box-shadow:0 0 50px color-mix(in srgb,var(--campaign-accent) 60%,transparent);
 }
 [data-campaign="postapoc"] .btn-roll.rolling::before {
   opacity:0.15;animation:pa-grain 0.05s steps(2) infinite;
@@ -1652,8 +1662,8 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .app-shell[data-gen="countdown"][data-pressure="high"]    { --accent-vibe: color-mix(in srgb, var(--accent) 25%, #FF3B30 75%); }
 .app-shell[data-gen="countdown"][data-pressure="critical"]{ --accent-vibe: #FF3B30; }
 
-/* Apply --accent-vibe to the roll button (the highest-visibility accent element) */
-.app-shell[data-gen] .btn-roll { background: var(--accent-vibe, var(--accent)); }
+/* Apply --accent-vibe to the roll button border/glow (accent decorative only) */
+.app-shell[data-gen] .btn-roll { border-color: var(--accent-vibe, var(--campaign-accent, var(--accent))); box-shadow: 0 0 12px color-mix(in srgb, var(--accent-vibe, var(--campaign-accent, var(--accent))) 30%, transparent); }
 .app-shell[data-gen] .result-card-gen-line { background: var(--accent-vibe, var(--accent)); }
 .app-shell[data-gen] .rhp-tab.on { border-bottom-color: var(--accent-vibe, var(--accent)); color: var(--accent-vibe, var(--accent)); }
 .app-shell[data-gen] .sidebar-gen-item.active { color: var(--accent-vibe, var(--accent)); border-left-color: var(--accent-vibe, var(--accent)); }
@@ -1786,10 +1796,10 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 
 /* ── 3. dVenti Realm roll button — orbiting arcane rune ring ─────────── */
 [data-campaign="dVentiRealm"] .btn-roll {
-  background:#180a08;color:#E8402A;border:1px solid #E8402A55;border-radius:6px;
+  background:#180a08;color:var(--text);border:2px solid color-mix(in srgb,var(--campaign-accent) 40%,transparent);border-radius:6px;
   font-family:'Courier New',monospace;letter-spacing:0.06em;
   overflow:visible;
-  box-shadow:0 0 18px #E8402A22;animation:dventi-roll-idle 2.5s ease-in-out infinite;
+  box-shadow:0 0 18px color-mix(in srgb,var(--campaign-accent) 15%,transparent);animation:dventi-roll-idle 2.5s ease-in-out infinite;
 }
 [data-campaign="dVentiRealm"] .btn-roll::after {
   content:'';position:absolute;inset:0;pointer-events:none;border-radius:inherit;
@@ -1807,7 +1817,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 
 /* ── 4. Dust and Iron roll button — revolver style ───────────────────── */
 [data-campaign="western"] .btn-roll {
-  background:#1a1008;color:#C8864A;border:1px solid #C8864A44;border-radius:4px;
+  background:#1a1008;color:var(--text);border:2px solid color-mix(in srgb,var(--campaign-accent) 40%,transparent);border-radius:4px;
   font-family:'Courier New',monospace;letter-spacing:0.05em;
   overflow:visible;
   animation:wi-roll-idle 2s ease-in-out infinite;
