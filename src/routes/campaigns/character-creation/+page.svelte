@@ -253,7 +253,114 @@
         <div class="sz-tip">Discuss for 5 minutes: What does this world feel like? Who has power? What's at stake? This shared understanding is the foundation everything else builds on.</div>
       </div>
     {:else if stepId === 'aspects'}
-      <div class="sz-body"><p>Character aspects. (Content coming in next pass.)</p></div>
+      <div class="sz-body">
+        <!-- High Concept -->
+        <div class="sz-card">
+          <div class="sz-card-title">1. High Concept</div>
+          <p>Go around the table. Each player says, in one phrase, who their character is. Not what they can do &mdash; who they are in the story.</p>
+          <div class="sz-prompt-box">"If someone asked <em>what's your character about?</em> at a bar, what would you say?"</div>
+          {#if hcExamples.length > 0}
+            <div class="sz-card" style="margin-top:12px">
+              <div class="sz-card-title">Setting Examples &mdash; {camp ? camp.name : ''}</div>
+              <ul class="sz-aspect-list">
+                {#each hcExamples as ex}<li>{ex}</li>{/each}
+              </ul>
+              <button class="btn btn-ghost sz-reroll" on:click={reroll} type="button">&#127922; New examples</button>
+            </div>
+          {/if}
+          <div class="sz-dnd">In D&amp;D, your class + race IS your character concept. In Fate, High Concept is a narrative phrase that can be invoked and compelled. "Disgraced Knight-Inquisitor" is not a class — it's a story.</div>
+          <div class="sz-tip">A High Concept that only works one way is a bad aspect. "Strong Fighter" can only help. "Sword-Sworn to a Dead King" can help AND cause problems. Double-edged = good.</div>
+        </div>
+
+        <!-- Trouble -->
+        <div class="sz-card">
+          <div class="sz-card-title">2. Trouble</div>
+          <p>Go around the table. What makes your character's life harder? This is the aspect that will earn you the most fate points &mdash; so make it good.</p>
+          <div class="sz-prompt-box">"When things go wrong for your character, <em>why</em> do they go wrong? What keeps pulling them back into trouble?"</div>
+          {#if trExamples.length > 0}
+            <div class="sz-card" style="margin-top:12px">
+              <div class="sz-card-title">Setting Examples</div>
+              <ul class="sz-aspect-list">
+                {#each trExamples as ex}<li>{ex}</li>{/each}
+              </ul>
+              <button class="btn btn-ghost sz-reroll" on:click={reroll} type="button">&#127922; New examples</button>
+            </div>
+          {/if}
+          <div class="sz-tip">A boring trouble earns you nothing. "Has Enemies" is flat. "The Warlord's Daughter Wants Me Dead" is a compel waiting to happen every single session.</div>
+        </div>
+
+        <!-- Mode-specific: Remaining Aspects -->
+        {#if mode === 'standard'}
+          <div class="sz-card">
+            <div class="sz-card-title">3. Relationship</div>
+            <p>Pair up. Each player connects their character to one other PC. Good relationships have tension &mdash; not hostility, but imbalance.</p>
+            <div class="sz-card" style="margin-top:8px">
+              <div class="sz-card-title">Pick a Template</div>
+              <ul class="sz-template-list">
+                <li>We served together, but one of us got the other in trouble.</li>
+                <li>You saved my life. I still don't know why.</li>
+                <li>We want the same thing but disagree on how to get it.</li>
+                <li>I owe you something I can never repay.</li>
+                <li>We used to be close. Something changed.</li>
+              </ul>
+            </div>
+            <div class="sz-tip">The relationship aspect is the strongest compel material in the entire campaign. Cross-PC history is fuel. Invest here.</div>
+            <div class="sz-warn">Write this one down on paper now. It's your third aspect.</div>
+          </div>
+
+          <div class="sz-card">
+            <div class="sz-card-title">4 &amp; 5. Two Free Aspects</div>
+            <p>These can be anything &mdash; gear, history, reputation, a catchphrase, a connection to the setting. There are no restrictions beyond fitting the world.</p>
+            <div class="sz-card" style="border-color:var(--c-green); background:rgba(80,184,120,0.06)">
+              <div class="sz-card-title" style="color:var(--c-green)">&#10003; You Can Leave These Blank</div>
+              <p>This is an official Condensed rule (p.47), not cheating. Most experienced Fate GMs recommend leaving at least one blank. You'll know what your character needs after the first scene, not before it.</p>
+            </div>
+            <ul class="sz-aspect-list" style="margin-top:12px">
+              <li>A signature piece of equipment or weapon</li>
+              <li>A reputation or title that precedes you</li>
+              <li>A personal code or belief that drives decisions</li>
+              <li>A connection to a faction, place, or NPC in the setting</li>
+              <li>A catchphrase that captures your attitude</li>
+            </ul>
+          </div>
+
+        {:else if mode === 'trio'}
+          <div class="sz-card">
+            <div class="sz-card-title">Phase 1 &mdash; Your First Adventure</div>
+            <p>Go around the table. Each player tells a short story about something that happened to their character before the campaign begins.</p>
+            <div class="sz-prompt-box">"I was at <span class="sz-prompt-fill">[location]</span> when <span class="sz-prompt-fill">[threat]</span> happened, and I [solved it / survived / escaped] by <span class="sz-prompt-fill">______</span>."</div>
+            <div class="sz-example">"I was at the Sealed Phade Vault when the Servitors reactivated, and I survived by talking to the lead unit in a language I shouldn't know." &rarr; Aspect: "The Old Machines Listen to Me"</div>
+            <p>After you narrate, ask yourself: "What does this say about who I am?" Write that as an aspect.</p>
+          </div>
+
+          <div class="sz-card">
+            <div class="sz-card-title">Phase 2 &mdash; Guest Starring</div>
+            <p>Pass your Phase 1 story to the player on your left. They were there. How were they involved?</p>
+            <p>This produces your <strong>Relationship aspect</strong> &mdash; the same one Condensed requires, but now grounded in a shared story.</p>
+            <p>Narrate one sentence about how you were involved, then write the aspect.</p>
+          </div>
+
+          <div class="sz-card">
+            <div class="sz-card-title">Phase 3 &mdash; Guest Starring Again</div>
+            <p>Pass your Phase 1 story to the player on your <strong>right</strong> (a different player than Phase 2). They pick a role and narrate their involvement. This produces your fifth and final aspect.</p>
+            <div class="sz-tip">If someone is struggling, remind them: you only need one sentence. "I was the one who brought the rope" is enough. The aspect writes itself from there.</div>
+            <div class="sz-warn">After this step, every character should have five aspects: High Concept, Trouble, and three from the Phase Trio. Write them all down.</div>
+          </div>
+
+        {:else if mode === 'flashback'}
+          <div class="sz-card">
+            <div class="sz-card-title">Flashback Slots</div>
+            <div class="sz-card" style="border-color:var(--c-green); background:rgba(80,184,120,0.06)">
+              <div class="sz-card-title" style="color:var(--c-green)">The Rule</div>
+              <p style="font-size:var(--text-lg); line-height:1.7">At any point during play, when a dramatic moment calls for it, you may declare a flashback. Narrate a brief scene from your character's past that reveals a connection, a piece of history, or a previously unknown skill. Write the resulting aspect immediately and use it.</p>
+            </div>
+            <div class="sz-example">"Wait &mdash; I know this mercenary! We served together in the Siege of Orizon. He still owes me 50 credits." &rarr; Write the aspect: "Brothers in Arms from the Siege of Orizon" &rarr; Use it immediately.</div>
+            <p>Each flashback slot produces one aspect. You have three slots for: your Relationship aspect and your two free aspects. Use them whenever a dramatic moment calls for a connection, a piece of history, or a reveal.</p>
+            <div class="sz-tip">This method produces the best aspects because they emerge from actual dramatic need. The cost is starting Session 1 with a slightly incomplete sheet &mdash; which is perfectly legal and honestly better.</div>
+            <div class="sz-warn">For now, write down only your High Concept and Trouble. Leave the other three slots blank. You'll fill them during play.</div>
+          </div>
+        {/if}
+      </div>
     {:else if stepId === 'skills'}
       <div class="sz-body"><p>Skills and stunts. (Content coming in next pass.)</p></div>
     {:else if stepId === 'stress'}
