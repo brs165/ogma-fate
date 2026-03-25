@@ -1,9 +1,48 @@
 // canvasStore.js — from useBoardCards (react-source/core/ui-board.js L2387-2593)
 // Factory: createCanvasStore(campCanvasKey, tables, showToast, onCardsChange)
 import { writable, get } from 'svelte/store';
-import { generate, mergeUniversal, GENERATORS } from '../engine.js';
+import { generate, mergeUniversal, filteredTables, GENERATORS } from '../engine.js';
 import DB from '../db.js';
 import { boardUid, extractCardTitle, extractCardSummary, extractCardTags, STICKY_COLORS } from '../helpers.js';
+
+// ── Session Zero pack generator (standalone, no store dependency) ─────────
+export function generateSzPack(pcDrafts, campId, campName, campData, mode) {
+  const tables = filteredTables(mergeUniversal(campData.tables || {}), {});
+  const allCards = [];
+  const CARD_W = 360, CARD_GAP = 24, COLS = 3;
+
+  // Campaign Frame card
+  try {
+    const frameData = generate('campaign', tables, 4, {});
+    allCards.push({ id: boardUid(), genId: 'campaign', sourceCanvas: 'prep', title: campName + ' — Campaign Frame', summary: '', tags: [], data: frameData, x: 24, y: 24, z: Date.now(), ts: Date.now(), gmOnly: false });
+  } catch(e) {}
+
+  // Per-PC cards
+  pcDrafts.forEach((pc, idx) => {
+    const col = (idx + 1) % COLS;
+    const row = Math.floor((idx + 1) / COLS);
+    const baseX = 24 + col * (CARD_W + CARD_GAP);
+    const baseY = 24 + row * 600;
+
+    let pcData = {};
+    try { pcData = generate('pc', tables, 4, {}); } catch(e) {}
+    if (pc.name) pcData.name = pc.name;
+    if (pc.hc) pcData.aspects = { ...pcData.aspects, high_concept: pc.hc };
+    if (pc.trouble) pcData.aspects = { ...pcData.aspects, trouble: pc.trouble };
+
+    allCards.push({ id: boardUid(), genId: 'pc', sourceCanvas: 'prep', title: pc.name || ('Player ' + (idx + 1)), summary: pc.hc || '', tags: [], data: pcData, x: baseX, y: baseY, z: Date.now() + idx, ts: Date.now(), gmOnly: false });
+
+    if (pc.hc) allCards.push({ id: boardUid(), genId: 'sticky', sourceCanvas: 'prep', text: pc.hc, colorIdx: idx % 4, rotation: Math.random() * 4 - 2, x: baseX, y: baseY + 520, z: Date.now() + idx + 0.1, ts: Date.now() });
+    if (pc.trouble) allCards.push({ id: boardUid(), genId: 'sticky', sourceCanvas: 'prep', text: pc.trouble, colorIdx: (idx + 2) % 4, rotation: Math.random() * 4 - 2, x: baseX + CARD_W / 2, y: baseY + 520, z: Date.now() + idx + 0.2, ts: Date.now() });
+
+    try {
+      const bsData = generate('backstory', tables, 4, {});
+      allCards.push({ id: boardUid(), genId: 'backstory', sourceCanvas: 'prep', title: (pc.name || 'Player ' + (idx + 1)) + ' — Backstory', summary: '', tags: [], data: bsData, x: baseX, y: baseY + 660, z: Date.now() + idx + 0.3, ts: Date.now(), gmOnly: false });
+    } catch(e) {}
+  });
+
+  return allCards;
+}
 
 export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChange) {
   const cards  = writable([]);

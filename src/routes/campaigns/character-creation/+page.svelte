@@ -197,6 +197,25 @@
     }
   }
 
+  async function sendToPrep() {
+    if (!campId) return;
+    try {
+      const { generateSzPack } = await import('$lib/stores/canvasStore.js');
+      const { CAMPAIGNS: C } = await import('$lib/../data/shared.js');
+      const DB = (await import('$lib/db.js')).default;
+      const campData = C[campId];
+      if (!campData || !DB) return;
+      const campN = campData.meta?.name || campId;
+      const pack = generateSzPack(pcDrafts, campId, campN, campData, mode);
+      const prepKey = 'board_canvas_prep_v1_' + campId;
+      const existing = await DB.loadSession(prepKey).catch(() => null);
+      const prev = existing?.cards || [];
+      await DB.saveSession(prepKey, { cards: prev.concat(pack), ts: Date.now() });
+      sentToPrep = true;
+      setTimeout(() => { sentToPrep = false; }, 3000);
+    } catch(e) { console.error('[Ogma] sendToPrep failed:', e); }
+  }
+
   function selectCamp(id) { campId = id; }
   function selectMode(id) { mode = id; }
 
@@ -712,12 +731,16 @@
 
         <!-- Export bar -->
         <div class="sz-export-bar">
-          <button class="btn btn-primary" on:click={copyMarkdown}>&#128203; Markdown</button>
+          <button class="btn btn-primary" on:click={sendToPrep}><i class="fa-solid fa-cart-plus" aria-hidden="true"></i> Send to Table Prep</button>
+          <button class="btn btn-ghost" on:click={copyMarkdown}>&#128203; Markdown</button>
           <button class="btn btn-ghost" on:click={copyJSON}>&#123; &#125; JSON</button>
           <button class="btn btn-ghost" on:click={() => { if (typeof window !== 'undefined') window.print(); }}>&#128424; Print</button>
         </div>
         {#if copied}
           <div class="sz-copied">{copied}</div>
+        {/if}
+        {#if sentToPrep}
+          <div class="sz-copied">&#10003; {pcCount} character pack{pcCount > 1 ? 's' : ''} sent to prep canvas</div>
         {/if}
 
         <div class="sz-tip">Session 1 starts IN the situation. No tavern. No meeting. The opening hook drops the PCs directly into the action. Aspects you left blank will reveal themselves naturally in the first few scenes.</div>
@@ -738,9 +761,9 @@
                   hcExamples, trExamples,
                 }));
               } catch(e) {}
-              window.location.href = '/campaigns/' + (campId || 'fantasy') + '?sz=1';
+              window.location.href = '/campaigns/' + (campId || 'fantasy') + '?canvas=prep&sz=1';
             }}
-          >&#9654; Open {campName} Generator</button>
+          >&#9654; Open {campName} Prep Canvas</button>
         </div>
 
         <div style="text-align:center; margin-top:16px">
