@@ -1317,7 +1317,7 @@ export function toMarkdown(genId, data, campName) {
 // ════════════════════════════════════════════════════════════════════════
 
 const OGMA_FORMAT  = 'ogma';
-const OGMA_VERSION = '1';
+const OGMA_VERSION = '2026.03.412';
 
 /**
  * Serialise a single generator result to a Mermaid diagram string.

@@ -5,7 +5,7 @@
 </script>
 
 <svelte:head>
-  <title>Ogma — On-demand Generator for Masterful Adventures</title>
+  <title>Ogma v2026.03.412 — On-demand Generator for Masterful Adventures</title>
   <meta name="description" content="Rules-accurate Fate Condensed NPCs, scenes, and encounters - generated in one click. 16 generators, 8 campaign worlds, fully offline." />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Ogma — On-demand Generator for Masterful Adventures" />
