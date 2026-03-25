@@ -2822,3 +2822,44 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
   .board-dice-floater{right:8px}
   .board-fp-floater{width:auto}
 }
+
+/* ── About page ──────────────────────────────────────────────────────────── */
+.about{max-width:680px;margin:0 auto;padding:24px 20px 80px;position:relative;z-index:1}
+.about h1{font-size:var(--text-hero);font-weight:800;color:var(--text);margin-bottom:8px;letter-spacing:-0.02em}
+.about h2{font-size:var(--text-xl);font-weight:800;color:var(--text);margin:32px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.about p{font-size:var(--text-base);color:var(--text-dim);line-height:1.75;margin-bottom:14px}
+.about strong{color:var(--text);font-weight:600}
+.about a{color:var(--c-blue);text-decoration:none}
+.about a:hover{text-decoration:underline}
+.about-card{background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);border:1px solid var(--glass-border);border-radius:var(--glass-radius);padding:20px;margin:18px 0}
+.about-stat{display:inline-block;text-align:center;padding:12px 20px}
+.about-stat-n{font-size:var(--text-2xl);font-weight:800;color:var(--accent,var(--text))}
+.about-stat-l{font-size:var(--text-label);color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em}
+.wiki-card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0;margin:12px 0 0}
+@media(max-width:500px){.wiki-card-grid{grid-template-columns:repeat(2,1fr)}}
+.wiki-card-grid a{text-decoration:none;display:flex;flex-direction:column;gap:3px;padding:10px 12px;border-radius:var(--glass-radius-sm);border:1px solid var(--glass-border);background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);transition:background 0.12s;min-width:0}
+.wiki-card-grid a:hover{background:color-mix(in srgb,var(--accent) 8%,transparent)}
+
+/* ── License page ────────────────────────────────────────────────────────── */
+.lic{max-width:720px;margin:0 auto;padding:24px 20px 80px;position:relative;z-index:1}
+.lic h1{font-size:var(--text-hero);font-weight:800;color:var(--text);margin-bottom:8px;letter-spacing:-0.02em}
+.lic h2{font-size:var(--text-xl);font-weight:800;color:var(--text);margin:36px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.lic h3{font-size:var(--text-md);font-weight:700;color:var(--text);margin:20px 0 8px}
+.lic p{font-size:var(--text-base);color:var(--text-dim);line-height:1.75;margin-bottom:14px}
+.lic strong{color:var(--text);font-weight:600}
+.lic a{color:var(--c-blue);text-decoration:none}
+.lic a:hover{text-decoration:underline}
+.lic ul{padding-left:22px;color:var(--text-dim);font-size:var(--text-base);line-height:1.8;margin-bottom:14px}
+.lic-card{background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);border:1px solid var(--glass-border);border-radius:var(--glass-radius);padding:20px 24px;margin:14px 0}
+.lic-card p{margin-bottom:8px}
+.lic-card p:last-child{margin-bottom:0}
+.lic-badge{display:inline-flex;align-items:center;gap:10px;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--glass-radius);padding:14px 20px;margin:8px 0}
+.lic-badge-icon{font-size:28px}
+.lic-badge-text{display:flex;flex-direction:column}
+.lic-badge-title{font-size:var(--text-md);font-weight:700;color:var(--text)}
+.lic-badge-sub{font-size:var(--text-sm);color:var(--text-muted)}
+.lic-shoutout{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--glass-radius);padding:18px 22px;margin:14px 0;display:flex;align-items:flex-start;gap:14px}
+.lic-shoutout-icon{font-size:22px;flex-shrink:0;margin-top:2px}
+.lic-shoutout-title{font-size:var(--text-base);font-weight:700;color:var(--text);margin-bottom:4px}
+.lic-shoutout-desc{font-size:var(--text-sm);color:var(--text-dim);line-height:1.6}
+.verbatim{font-size:var(--text-sm);font-family:var(--font-ui);line-height:1.7;color:var(--text-dim)}

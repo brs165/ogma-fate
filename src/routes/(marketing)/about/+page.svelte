@@ -1,52 +1,9 @@
 <svelte:options runes={false} />
 
-<script>
-  import { onMount } from 'svelte';
-
-  let theme = 'dark';
-
-  onMount(() => {
-    try {
-      const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}');
-      theme = p.theme || 'dark';
-      document.documentElement.setAttribute('data-theme', theme);
-    } catch (e) {}
-  });
-
-  function toggleTheme() {
-    theme = theme === 'dark' ? 'light' : 'dark';
-    if (typeof document !== 'undefined') document.documentElement.setAttribute('data-theme', theme);
-    try {
-      const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}');
-      p.theme = theme;
-      localStorage.setItem('fate_prefs_v1', JSON.stringify(p));
-    } catch (e) {}
-  }
-</script>
-
 <svelte:head>
   <title>About Ogma - On-demand Generator for Masterful Adventures</title>
   <meta name="description" content="About Ogma - how it was built, what's inside, and how to use it offline." />
 </svelte:head>
-
-<div class="land-shell">
-  <a href="#main-content" class="skip-link">Skip to main content</a>
-
-  <header class="land-topnav topbar">
-    <a href="/" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
-    <div class="topbar-spacer" style="flex:1"></div>
-    <div class="topbar-status">
-      <a href="/learn" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">&#128218; Learn</a>
-      <a href="/license" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">License</a>
-      <button
-        class="btn btn-icon btn-ghost"
-        on:click={toggleTheme}
-        aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-        title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
-        style="width:44px;height:44px"
-      >{theme === 'dark' ? '☀️' : '◑'}</button>
-    </div>
-  </header>
 
   <main class="about" id="main-content">
     <h1>About Ogma</h1>
@@ -128,11 +85,3 @@
       </a>
     </div>
   </main>
-
-  <footer class="land-footer">
-    <div class="land-footer-inner">
-      <div>Fate&trade; is a trademark of Evil Hat Productions, LLC.</div>
-      <div><a href="/license">License &amp; Attribution</a> &middot; <a href="/learn">Learn Fate</a> &middot; <a href="/">Generator</a></div>
-    </div>
-  </footer>
-</div>

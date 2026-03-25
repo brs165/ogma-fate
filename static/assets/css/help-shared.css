@@ -1,0 +1,92 @@
+@import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600;1,700&display=swap');
+
+/* ── Wiki shared layout ─────────────────────────────────────────────────── */
+.wiki-shell{display:flex;min-height:calc(100vh - 52px)}
+.wiki-sidebar{width:220px;flex-shrink:0;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;scrollbar-width:none;border-right:1.5px solid var(--border-mid);background:var(--panel-raised);padding:16px 0}
+.wiki-sidebar::-webkit-scrollbar{display:none}
+.wiki-sidebar-section{padding:0 12px;margin-bottom:20px}
+.wiki-sidebar-label{font-size:10px;font-weight:800;letter-spacing:0.22em;text-transform:uppercase;color:var(--text-muted);padding:0 8px;margin-bottom:6px;font-family:var(--font-mono)}
+.wiki-sidebar-link{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:2px;font-size:12px;color:var(--text-dim);text-decoration:none;transition:all 0.12s cubic-bezier(0.34,1.56,0.64,1);line-height:1.3;font-family:var(--font-display);font-style:italic}
+.wiki-sidebar-link:hover{background:color-mix(in srgb,var(--accent) 8%,transparent);color:var(--text)}
+.wiki-sidebar-link.active{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent);font-weight:700;box-shadow:inset 2px 0 0 var(--accent)}
+.wiki-sidebar-link .icon{font-size:14px;flex-shrink:0;width:18px;text-align:center;font-style:normal}
+.wiki-sidebar-divider{height:1px;background:var(--border);margin:8px 12px}
+.wiki-content{flex:1;min-width:0;max-width:740px;padding:32px 32px 80px;margin:0 auto}
+@media(max-width:768px){.wiki-sidebar{display:none}.wiki-content{padding:20px 16px 60px}}
+kbd{display:inline-block;background:var(--panel);border:1px solid var(--border-mid);border-radius:4px;padding:1px 7px;font-family:var(--font-mono);font-size:11px;color:var(--text);box-shadow:0 1px 0 var(--border-mid);white-space:nowrap}
+.wiki-content h1{font-size:var(--text-2xl);font-weight:900;color:var(--text);margin:0 0 8px;letter-spacing:-0.03em;font-family:var(--font-display)}
+.wiki-content h2{font-size:var(--text-xl);font-weight:800;color:var(--text);margin:40px 0 12px;padding-bottom:8px;border-bottom:1.5px solid var(--border-mid);font-family:var(--font-display)}
+.wiki-content h2:first-of-type{margin-top:24px}
+.wiki-content h3{font-size:var(--text-lg);font-weight:700;color:var(--text);margin:28px 0 10px;font-family:var(--font-display)}
+.wiki-content h4{font-size:var(--text-base);font-weight:700;color:var(--text);margin:20px 0 8px}
+.wiki-content p{font-size:var(--text-base);color:var(--text-dim);line-height:1.8;margin-bottom:16px;font-family:var(--font-display)}
+.wiki-content strong{color:var(--text);font-weight:600}
+.wiki-content a{color:var(--c-blue);text-decoration:none}
+.wiki-content a:hover{text-decoration:underline}
+.wiki-content ul,.wiki-content ol{padding-left:24px;margin-bottom:14px}
+.wiki-content li{font-size:var(--text-base);color:var(--text-dim);line-height:1.7;margin-bottom:4px}
+.wiki-content li strong{color:var(--text)}
+.wiki-content code{font-family:var(--font-mono);font-size:11px;background:var(--inset);border:1px solid var(--border-mid);border-radius:2px;padding:1px 5px;color:var(--accent)}
+/* ── Callout boxes — 5 types: scenario / info / warning / dnd / tip ──────── */
+/* Base */
+.callout{border-radius:2px;padding:14px 18px;margin:18px 0;border-left:3px solid}
+.callout-title{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+.callout p,.callout li{margin:0 0 4px;font-size:var(--text-sm);color:var(--text-dim);line-height:1.65}
+.callout ul{margin:4px 0 0;padding-left:18px}
+.callout a{color:inherit;text-decoration:underline;opacity:.85}
+.callout a:hover{opacity:1}
+/* scenario — uses campaign accent, "try this" / "what to do next" CTAs */
+.callout-scenario{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 6%,transparent)}
+.callout-scenario .callout-title{color:var(--accent)}
+/* info — neutral blue, rules clarifications and context */
+.callout-info{border-color:var(--c-blue);background:color-mix(in srgb,var(--c-blue) 6%,transparent)}
+.callout-info .callout-title{color:var(--c-blue)}
+/* warning — red, rules violations / common mistakes / gotchas */
+.callout-warning{border-color:var(--c-red);background:color-mix(in srgb,var(--c-red) 6%,transparent)}
+.callout-warning .callout-title{color:var(--c-red)}
+/* dnd — blue-slate, D&D/Pathfinder convert bridges */
+.callout-dnd{border-color:#5b80e0;background:color-mix(in srgb,#5b80e0 6%,transparent)}
+.callout-dnd .callout-title{color:#6b90e8}
+[data-theme="light"] .callout-dnd .callout-title{color:#3a5dc0}
+/* tip — green, GM-facing actionable advice */
+.callout-tip{border-color:var(--c-green);background:color-mix(in srgb,var(--c-green) 6%,transparent)}
+.callout-tip .callout-title{color:var(--c-green)}
+.wiki-page-eyebrow{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px}
+.wiki-page-desc{font-size:var(--text-md,1rem);color:var(--text-muted);margin-bottom:32px;line-height:1.6}
+.gen-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin:16px 0}
+.gen-card{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--glass-radius-sm);padding:14px 16px;backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm)}
+.gen-card-icon{font-size:22px;margin-bottom:8px}
+.gen-card-name{font-size:var(--text-sm);font-weight:700;color:var(--text);margin-bottom:4px}
+.gen-card-desc{font-size:var(--text-label);color:var(--text-muted);line-height:1.5}
+.wiki-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:var(--text-sm)}
+.wiki-table th{text-align:left;padding:8px 12px;border-bottom:2px solid var(--border);color:var(--text-muted);font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase}
+.wiki-table td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text-dim);vertical-align:top;line-height:1.5}
+.wiki-table tr:last-child td{border-bottom:none}
+.wiki-table td strong{color:var(--text)}
+.steps{counter-reset:steps;list-style:none;padding:0;margin:16px 0}
+.steps li{counter-increment:steps;display:flex;gap:14px;margin-bottom:14px;align-items:flex-start}
+.steps li::before{content:counter(steps);display:flex;align-items:center;justify-content:center;min-width:26px;height:26px;background:color-mix(in srgb,var(--accent) 15%,transparent);border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);border-radius:50%;font-size:11px;font-weight:800;color:var(--accent);flex-shrink:0;margin-top:1px}
+.steps li .step-body{flex:1}
+.steps li .step-body strong{display:block;font-size:var(--text-sm);color:var(--text);margin-bottom:2px}
+.steps li .step-body span{font-size:var(--text-sm);color:var(--text-dim);line-height:1.6}
+.wiki-footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--border);display:flex;gap:16px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.wiki-footer a{font-size:var(--text-sm);color:var(--text-muted);text-decoration:none}
+.wiki-footer a:hover{color:var(--text)}
+/* ── Expandable sub-nav (sidebar sections with step/section lists) ────────── */
+.wiki-sidebar-parent{display:flex;align-items:center;justify-content:space-between;padding:7px 8px;border-radius:6px;font-size:12px;color:var(--text-dim);text-decoration:none;transition:all .12s;line-height:1.3;cursor:pointer;gap:8px;background:none;border:none;width:100%;text-align:left;font-family:var(--font-ui,inherit)}
+.wiki-sidebar-parent:hover{background:color-mix(in srgb,var(--accent) 8%,transparent);color:var(--text)}
+.wiki-sidebar-parent.active{color:var(--accent);font-weight:600}
+.wiki-sidebar-parent .icon{font-size:14px;flex-shrink:0;width:18px;text-align:center}
+.wiki-sidebar-parent-label{flex:1;display:flex;align-items:center;gap:8px}
+.wiki-sidebar-chevron{font-size:9px;color:var(--text-muted);transition:transform .15s;flex-shrink:0;display:inline-block}
+.wiki-sidebar-parent[aria-expanded="true"] .wiki-sidebar-chevron{transform:rotate(90deg)}
+.wiki-sidebar-children{display:none;flex-direction:column;gap:0;padding-left:14px;margin-top:1px}
+.wiki-sidebar-children.open{display:flex}
+.wiki-sidebar-child{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:5px;font-size:11px;color:var(--text-muted);text-decoration:none;transition:all .12s;line-height:1.4;position:relative}
+.wiki-sidebar-child::before{content:'';position:absolute;left:-6px;top:50%;transform:translateY(-50%);width:1px;height:60%;background:var(--border)}
+.wiki-sidebar-child:hover{background:color-mix(in srgb,var(--accent) 6%,transparent);color:var(--text-dim)}
+.wiki-sidebar-child.active{color:var(--accent);font-weight:600}
+/* step progress dots on learn-fate children */
+.wiki-sidebar-child .learn-step-dot{width:6px;height:6px;border-radius:50%;border:1.5px solid var(--border-mid);flex-shrink:0;transition:all .15s}
+.wiki-sidebar-child.done .learn-step-dot{background:var(--c-green);border-color:var(--c-green)}
+.wiki-sidebar-child.active .learn-step-dot{background:var(--accent);border-color:var(--accent)}
