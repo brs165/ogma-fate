@@ -1,0 +1,22 @@
+{
+  "name": "Ogma — On-demand Generator for Masterful Adventures",
+  "short_name": "Ogma",
+  "description": "Rules-accurate Fate Condensed NPCs, scenes, and encounters — generated in one click. 16 generators, 8 campaign worlds, fully offline.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0E0C09",
+  "theme_color": "#0E0C09",
+  "orientation": "any",
+  "categories": ["games", "utilities"],
+  "icons": [
+    { "src": "/assets/favicons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/assets/favicons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/assets/favicons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/assets/favicons/icon.svg",     "sizes": "any",     "type": "image/svg+xml" }
+  ],
+  "shortcuts": [
+    { "name": "Session Zero", "url": "/campaigns/character-creation", "description": "Guided character creation wizard" },
+    { "name": "D&D Transition Guide", "url": "/help/dnd-transition", "description": "D&D to Fate Condensed transition guide" },
+    { "name": "Shattered Kingdoms", "url": "/campaigns/fantasy", "description": "Dark Fantasy campaign" }
+  ]
+}
