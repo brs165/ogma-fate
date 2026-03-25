@@ -2,24 +2,47 @@
 
 <script>
   import { onMount } from 'svelte';
+  import { VERSION } from '$lib/version.js';
 
   let theme = 'dark';
   let step = 0;
 
-  const STEPS = [
-    { id: 'campaign',  title: 'Choose Your Campaign' },
-    { id: 'mode',      title: 'How Deep Do You Want to Go?' },
-    { id: 'setting',   title: "The World You're Playing In" },
-    { id: 'aspects',   title: 'Aspects — Who Are You?' },
-    { id: 'skills',    title: 'Skills & Stunts' },
-    { id: 'stress',    title: 'Stress & Consequences' },
-    { id: 'questions', title: 'Session Zero Questions' },
-    { id: 'summary',   title: 'Summary & Export' },
-  ];
+  $: STEPS = (() => {
+    const base = [
+      { id: 'campaign',    title: 'Choose Your Campaign' },
+      { id: 'mode',        title: 'How Deep Do You Want to Go?' },
+      { id: 'setting',     title: 'The World You\'re Playing In' },
+      { id: 'highconcept', title: 'High Concept' },
+      { id: 'trouble',     title: 'Trouble' },
+    ];
+    if (mode === 'trio') {
+      base.push(
+        { id: 'phase1', title: 'Phase 1 — Your First Adventure' },
+        { id: 'phase2', title: 'Phase 2 — Crossing Paths' },
+        { id: 'phase3', title: 'Phase 3 — Crossing Paths Again' },
+      );
+    } else if (mode === 'flashback') {
+      base.push({ id: 'flashbacks', title: 'Flashback Slots' });
+    } else {
+      base.push(
+        { id: 'relationship', title: 'Relationship Aspect' },
+        { id: 'freeaspects',  title: 'Free Aspects' },
+      );
+    }
+    base.push(
+      { id: 'skills',    title: 'Skills' },
+      { id: 'stunts',    title: 'Stunts' },
+      { id: 'stress',    title: 'Stress & Consequences' },
+      { id: 'questions', title: 'Session Zero Questions' },
+      { id: 'summary',   title: 'Summary & Export' },
+    );
+    return base;
+  })();
 
-  $: stepId = STEPS[step].id;
   $: totalSteps = STEPS.length;
+  $: stepId = STEPS[step] ? STEPS[step].id : 'campaign';
   $: progress = ((step + 1) / totalSteps * 100);
+  $: if (step >= STEPS.length) step = 0;
 
   function next() { if (step < totalSteps - 1) step += 1; }
   function back() { if (step > 0) step -= 1; }
@@ -638,10 +661,11 @@
     </div>
   </div>
 
-  <footer style="text-align:center; padding:20px; font-size:12px; color:var(--text-muted); border-top:1px solid var(--border); margin-top:20px">
+  <footer class="sz-footer">
     Fate&trade; is a trademark of Evil Hat Productions, LLC. &middot;
-    <a href="/license" style="color:var(--text-muted)">License &amp; Attribution</a> &middot;
-    <a href="/help" style="color:var(--text-muted)">Help &amp; Wiki</a> &middot;
-    <a href="/about" style="color:var(--text-muted)">About Ogma</a>
+    <a href="/license">License &amp; Attribution</a> &middot;
+    <a href="/help">Help &amp; Wiki</a> &middot;
+    <a href="/about">About Ogma</a>
+    <span class="about-version-badge">v{VERSION}</span>
   </footer>
 </div>
