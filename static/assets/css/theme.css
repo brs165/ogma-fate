@@ -3035,3 +3035,22 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 /* ══ FONT AWESOME ICON SIZING ══ */
 .bc-btn i,.btn i{font-size:14px;line-height:1;pointer-events:none}
 .fa-cart-plus{font-size:15px}
+
+/* ══ SESSION ZERO — PC INPUT FIELDS ══ */
+.sz-pc-count-row{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:8px}
+@media(max-width:480px){.sz-pc-count-row{grid-template-columns:repeat(3,1fr)}}
+.sz-pc-count-btn{text-align:center;padding:10px 4px;min-height:56px}
+.sz-pc-progress{display:flex;align-items:center;gap:12px;padding:8px 12px;background:color-mix(in srgb,var(--accent) 6%,transparent);border:1px solid color-mix(in srgb,var(--accent) 20%,transparent);border-radius:var(--glass-radius);margin-bottom:4px}
+.sz-pc-progress-label{font-size:var(--text-label);font-weight:700;color:var(--accent);letter-spacing:0.06em;text-transform:uppercase;flex:1}
+.sz-pc-progress-pips{display:flex;gap:6px}
+.sz-pc-pip{width:10px;height:10px;border-radius:50%;border:1.5px solid var(--border-mid);background:transparent;transition:all 0.15s}
+.sz-pc-pip.active{border-color:var(--accent);background:var(--accent)}
+.sz-pc-pip.done{border-color:var(--c-green);background:var(--c-green)}
+.sz-input-group{display:flex;flex-direction:column;gap:6px}
+.sz-input-label{font-size:var(--text-label);font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted)}
+.sz-input{width:100%;padding:10px 14px;background:var(--glass-bg);border:1.5px solid var(--border-mid);border-radius:var(--fd-stamp-radius,3px);color:var(--text);font-size:var(--text-base);font-family:var(--font-ui);min-height:44px;transition:border-color 0.12s}
+.sz-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 20%,transparent)}
+.sz-input::placeholder{color:var(--text-muted);font-style:italic}
+.sz-example-pick{background:none;border:none;cursor:pointer;color:var(--text-dim);font-size:var(--text-sm);text-align:left;padding:3px 0;font-family:var(--font-ui);line-height:1.5;transition:color 0.1s;width:100%}
+.sz-example-pick:hover{color:var(--accent)}
+.sz-example-pick:focus-visible{outline:2px solid var(--focus-ring);border-radius:2px}

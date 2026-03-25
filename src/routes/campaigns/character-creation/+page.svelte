@@ -11,6 +11,7 @@
     const base = [
       { id: 'campaign',    title: 'Choose Your Campaign' },
       { id: 'mode',        title: 'How Deep Do You Want to Go?' },
+      { id: 'pccount',     title: 'How Many Players?' },
       { id: 'setting',     title: 'The World You\'re Playing In' },
       { id: 'highconcept', title: 'High Concept' },
       { id: 'trouble',     title: 'Trouble' },
@@ -46,6 +47,19 @@
 
   function next() { if (step < totalSteps - 1) step += 1; }
   function back() { if (step > 0) step -= 1; }
+
+  // PC count and per-PC data collection
+  let pcCount = 2;
+  let pcIndex = 0;
+  let pcDrafts = [];
+  $: {
+    while (pcDrafts.length < pcCount) pcDrafts.push({ name: '', hc: '', trouble: '' });
+    pcDrafts = pcDrafts.slice(0, pcCount);
+  }
+  $: currentPc = pcDrafts[pcIndex] || { name: '', hc: '', trouble: '' };
+  function updateCurrentPc(field, value) {
+    pcDrafts = pcDrafts.map((pc, i) => i === pcIndex ? { ...pc, [field]: value } : pc);
+  }
 
   onMount(() => {
     try {
@@ -327,6 +341,20 @@
           </button>
         {/each}
       </div>
+    {:else if stepId === 'pccount'}
+      <div class="sz-body">
+        <p>How many players are at the table today? The wizard will collect a name, High Concept, and Trouble for each one.</p>
+        <div class="sz-pc-count-row">
+          {#each [1,2,3,4,5,6] as n}
+            <button class="sz-option sz-pc-count-btn" class:selected={pcCount === n} on:click={() => { pcCount = n; pcIndex = 0; }} type="button" aria-pressed={String(pcCount === n)}>
+              <div class="sz-option-title">{n}</div>
+              <div class="sz-option-sub">{n === 1 ? 'Solo' : n + ' players'}</div>
+            </button>
+          {/each}
+        </div>
+        <div class="sz-tip">You can run the wizard once per player if you prefer. This loops through all PCs in one pass.</div>
+      </div>
+
     {:else if stepId === 'setting'}
       <div class="sz-body">
         <p>Read these aloud. These are the pressures that define your campaign world. Everything your characters do will exist in the shadow of these issues.</p>
@@ -351,30 +379,58 @@
       </div>
     {:else if stepId === 'highconcept'}
       <div class="sz-body">
-        <p>Go around the table. Each player says, in one phrase, who their character is. Not what they can do &mdash; who they are in the story.</p>
+        {#if pcCount > 1}
+          <div class="sz-pc-progress">
+            <span class="sz-pc-progress-label">Player {pcIndex + 1} of {pcCount}</span>
+            <div class="sz-pc-progress-pips">
+              {#each pcDrafts as _, i}<div class="sz-pc-pip" class:active={i === pcIndex} class:done={i < pcIndex}></div>{/each}
+            </div>
+          </div>
+        {/if}
+        <div class="sz-input-group">
+          <label class="sz-input-label" for="pc-name">Character Name</label>
+          <input id="pc-name" type="text" class="sz-input" placeholder="Leave blank to fill in later" value={currentPc.name} on:input={e => updateCurrentPc('name', e.target.value)} autocomplete="off" />
+        </div>
+        <p>Who is this character? One phrase that captures their role in the story.</p>
         <div class="sz-prompt-box">"If someone asked <em>what's your character about?</em> at a bar, what would you say?"</div>
+        <div class="sz-input-group">
+          <label class="sz-input-label" for="pc-hc">High Concept</label>
+          <input id="pc-hc" type="text" class="sz-input" placeholder="e.g. Burned Ex-Corporate Fixer" value={currentPc.hc} on:input={e => updateCurrentPc('hc', e.target.value)} autocomplete="off" />
+        </div>
         {#if hcExamples.length > 0}
           <div class="sz-card">
-            <div class="sz-card-title">Setting Examples &mdash; {camp ? camp.name : ''}</div>
+            <div class="sz-card-title">{camp ? camp.name : ''} Examples</div>
             <ul class="sz-aspect-list">
-              {#each hcExamples as ex}<li>{ex}</li>{/each}
+              {#each hcExamples as ex}<li><button class="sz-example-pick" type="button" on:click={() => updateCurrentPc('hc', ex)}>{ex}</button></li>{/each}
             </ul>
             <button class="btn btn-ghost sz-reroll" on:click={reroll} type="button">&#127922; New examples</button>
           </div>
         {/if}
-        <div class="sz-dnd">In D&amp;D, your class + race IS your character concept. In Fate, High Concept is a narrative phrase that can be invoked and compelled. "Disgraced Knight-Inquisitor" is not a class &mdash; it's a story.</div>
-        <div class="sz-tip">A High Concept that only works one way is a bad aspect. "Strong Fighter" can only help. "Sword-Sworn to a Dead King" can help AND cause problems. Double-edged = good.</div>
+        <div class="sz-dnd">In D&amp;D, your class + race IS your character concept. In Fate, High Concept is a narrative phrase that can be invoked and compelled.</div>
+        <div class="sz-tip">Double-edged = good. "Sword-Sworn to a Dead King" helps AND causes problems.</div>
       </div>
 
     {:else if stepId === 'trouble'}
       <div class="sz-body">
-        <p>Go around the table. What makes your character's life harder? This is the aspect that will earn you the most fate points &mdash; so make it good.</p>
+        {#if pcCount > 1}
+          <div class="sz-pc-progress">
+            <span class="sz-pc-progress-label">Player {pcIndex + 1} of {pcCount} &mdash; Trouble</span>
+            <div class="sz-pc-progress-pips">
+              {#each pcDrafts as _, i}<div class="sz-pc-pip" class:active={i === pcIndex} class:done={i < pcIndex}></div>{/each}
+            </div>
+          </div>
+        {/if}
+        <p>What makes {currentPc.name || 'this character'}'s life harder? This is the aspect that will earn the most fate points.</p>
         <div class="sz-prompt-box">"When things go wrong for your character, <em>why</em> do they go wrong? What keeps pulling them back into trouble?"</div>
+        <div class="sz-input-group">
+          <label class="sz-input-label" for="pc-trouble">Trouble</label>
+          <input id="pc-trouble" type="text" class="sz-input" placeholder="e.g. The Handler Knows Everything" value={currentPc.trouble} on:input={e => updateCurrentPc('trouble', e.target.value)} autocomplete="off" />
+        </div>
         {#if trExamples.length > 0}
           <div class="sz-card">
             <div class="sz-card-title">Setting Examples</div>
             <ul class="sz-aspect-list">
-              {#each trExamples as ex}<li>{ex}</li>{/each}
+              {#each trExamples as ex}<li><button class="sz-example-pick" type="button" on:click={() => updateCurrentPc('trouble', ex)}>{ex}</button></li>{/each}
             </ul>
             <button class="btn btn-ghost sz-reroll" on:click={reroll} type="button">&#127922; New examples</button>
           </div>
@@ -682,7 +738,15 @@
         <div></div>
       {/if}
       {#if step < totalSteps - 1}
-        <button class="btn btn-primary" on:click={next} disabled={stepId === 'campaign' && !campId}>Next &rarr;</button>
+        <button class="btn btn-primary" on:click={() => {
+          if (stepId === 'trouble' && pcIndex < pcCount - 1) {
+            pcIndex += 1;
+            step = STEPS.findIndex(s => s.id === 'highconcept');
+          } else {
+            if (stepId === 'trouble') pcIndex = 0;
+            next();
+          }
+        }} disabled={stepId === 'campaign' && !campId}>{stepId === 'trouble' && pcIndex < pcCount - 1 ? 'Next Player \u2192' : 'Next \u2192'}</button>
       {/if}
     </div>
   </div>
