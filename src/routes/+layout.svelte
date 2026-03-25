@@ -11,6 +11,4 @@
   <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300..900;1,300..900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
 </svelte:head>
 
-<div class="app-shell" data-theme="dark">
-  <slot />
-</div>
+<slot />

@@ -1,0 +1,226 @@
+<svelte:options runes={false} />
+
+<script>
+  import { onMount } from 'svelte';
+  let theme = 'dark';
+  onMount(() => {
+    try {
+      const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}');
+      theme = p.theme || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) {}
+  });
+  function toggleTheme() {
+    theme = theme === 'dark' ? 'light' : 'dark';
+    if (typeof document !== 'undefined') document.documentElement.setAttribute('data-theme', theme);
+    try {
+      const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}');
+      p.theme = theme;
+      localStorage.setItem('fate_prefs_v1', JSON.stringify(p));
+    } catch (e) {}
+  }
+</script>
+
+<svelte:head>
+  <title>Learn Fate — Ogma Help</title>
+  <meta name="description" content="Learn the core Fate Condensed rules in 7 steps" />
+</svelte:head>
+
+<div class="land-shell">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <header class="land-topnav topbar" role="banner">
+    <a href="/" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
+    <div class="topbar-spacer" style="flex:1"></div>
+    <div class="topbar-status">
+      <a href="/help" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">&#128218; Help</a>
+      <a href="/about" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">About</a>
+      <button class="btn btn-icon btn-ghost" on:click={toggleTheme}
+        aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+        style="width:44px;height:44px">{theme === 'dark' ? '☀️' : '◑'}</button>
+    </div>
+  </header>
+
+  <main class="wiki-content" id="main-content">
+    <div class="wiki-page-eyebrow">Learn</div>
+    <h1>Learn Fate in 7 steps</h1>
+    <p class="wiki-page-desc">A guided walkthrough of the Fate Condensed rules — everything a player needs, plus the extras a GM needs on top.</p>
+
+    <div class="step-block" id="step-1">
+      <div class="step-num">Step 1</div>
+      <div class="step-title">Fiction first</div>
+      <div class="step-body">
+        <p>In Fate, you describe what your character does in the story, <strong>then</strong> choose the skill and action that fits. The fiction drives the rules, not the other way around. You don't say "I roll Athletics." You say "I leap over the counter and slide behind the bar" — and the GM says "that sounds like Athletics to overcome the obstacle."</p>
+        <div class="callout callout-dnd" role="note"><div class="callout-title">⚔ Coming from D&amp;D</div><p>In D&D you pick a skill, then describe the action. In Fate it's reversed. Describe first, mechanics second.</p></div>
+        <div class="callout callout-info" role="note"><div class="callout-title">&#128077; You will get this wrong at first — and that's fine</div><p>Every table plays Fate wrong for a few sessions. You'll forget to invoke aspects. Players will attack instead of Create Advantage. The GM won't compel enough. None of this breaks the game. Fate is resilient. Play first, refine as you go. The rules only matter in the moments they make the story better.</p></div>
+        <div class="callout callout-scenario" role="note">
+          <div class="callout-title">Try it — describe first, then roll</div>
+          <p>Say out loud what your character does. Then roll. Notice how the dice feel like they're answering the fiction, not replacing it.</p>
+          <p style="font-size:var(--text-sm);color:var(--text-muted);font-style:italic">Interactive dice roller available in the generator.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-block" id="step-2">
+      <div class="step-num">Step 2</div>
+      <div class="step-title">Aspects — the core of everything</div>
+      <div class="step-body">
+        <p>An <strong>aspect</strong> is a short phrase that is true about a character, scene, or situation. "Burned-Out Corp Fixer," "Slippery Deck in the Storm," "The Crown Owes Me a Favour." Aspects do two things: you can <strong>invoke</strong> them (spend a fate point for +2 on a roll when they're relevant) or they can be <strong>compelled</strong> (the GM offers you a fate point to accept a complication).</p>
+        <p>Your character has 5 aspects: a <strong>High Concept</strong> (who you are), a <strong>Trouble</strong> (what makes your life complicated), a <strong>Relationship</strong> (your connection to another PC), and two more.</p>
+        <div class="callout callout-dnd" role="note"><div class="callout-title">⚔ Coming from D&amp;D</div><p>Aspects replace ability scores, feats, and background features in one mechanic. "Strong as an Ox" is not a Strength score — it's a narrative truth you can invoke for +2 on any roll where being strong matters, and get compelled when being big is a problem.</p></div>
+        <div class="callout callout-tip" role="note"><div class="callout-title">✍ Writing good aspects</div><p>Test every aspect in both directions before writing it down. Can you imagine a moment where invoking it for +2 makes narrative sense? Can you imagine a moment where it causes you a problem worth a fate point? If not — rewrite it. "Skilled Fighter" only works one way. "Fights Before Thinking" works both.</p></div>
+        <div class="callout callout-scenario" role="note">
+          <div class="callout-title">Try an invoke — roll twice, pick the better result</div>
+          <p>Pick an aspect like <em>"Stronger Than I Look."</em> Roll 4dF. That's your base. Now roll again with <strong>+2</strong> (the invoke bonus) — that's your roll after spending a fate point. Feel the difference.</p>
+          <div class="learn-double-roll">
+            <p style="font-size:var(--text-sm);color:var(--text-muted);font-style:italic">Interactive dice roller available in the generator.</p>
+            <p style="font-size:var(--text-sm);color:var(--text-muted);font-style:italic">Interactive dice roller available in the generator.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-block" id="step-3">
+      <div class="step-num">Step 3</div>
+      <div class="step-title">Skills and dice</div>
+      <div class="step-body">
+        <p>Your character has 19 skills rated from +0 (Mediocre) to +4 (Great). When you act, you roll 4 Fate dice (each shows +1, 0, or −1), add the relevant skill, and compare to a target number. Results: <strong>Fail</strong> (below target), <strong>Tie</strong> (equal), <strong>Success</strong> (+1 or +2 over), <strong>Success with Style</strong> (+3 or more).</p>
+        <p>The four actions you can take: <strong>Overcome</strong> (get past an obstacle), <strong>Create an Advantage</strong> (place a new aspect on the scene), <strong>Attack</strong> (harm someone), <strong>Defend</strong> (stop someone's action).</p>
+        <div class="callout callout-dnd" role="note"><div class="callout-title">⚔ Coming from D&amp;D</div><p>4dF averages to 0 with a range of −4 to +4. Your skill rating IS your expected result. A +3 skill hits Fair (+2) difficulty most of the time. No d20 swingyness.</p></div>
+        <div class="callout callout-info" role="note"><div class="callout-title">📋 Ties succeed — with a cost</div><p>A tie (matching the difficulty exactly) is not a failure. The player achieves their goal, but something complicates it — they take a minor cost, the situation shifts, or a new complication enters the scene. <em>FCon SRD p.20.</em> Never use a tie to simply block forward progress.</p></div>
+        <div class="callout callout-scenario" role="note">
+          <div class="callout-title">Try a roll — Good (+3) Athlete vs. Fair (+2) difficulty</div>
+          <p>Your character has Athletics +3. Roll 4dF and add 3. <strong>+1 or +2 over target = Success. +3 or more = Success with Style. 0 = Tie. Below = Fail.</strong> Roll a few times — feel how rarely you land on extremes.</p>
+          <p style="font-size:var(--text-sm);color:var(--text-muted);font-style:italic">Interactive dice roller available in the generator.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-block" id="step-4">
+      <div class="step-num">Step 4</div>
+      <div class="step-title">Fate points — the economy</div>
+      <div class="step-body">
+        <p>You start each session with at least 3 <strong>fate points</strong>. Spend one to <strong>invoke</strong> an aspect for +2 on a roll (or a reroll). Earn one when you accept a <strong>compel</strong> — the GM offers a fate point and a complication based on one of your aspects. You can refuse a compel by spending a fate point instead.</p>
+        <p>The flow is: accept compels to earn points, spend points to invoke aspects on big rolls. This is the heartbeat of Fate. More compels = more fate points = more dramatic swings.</p>
+        <div class="callout callout-dnd" role="note"><div class="callout-title">⚔ Coming from D&amp;D</div><p>There is no equivalent in D&D. The closest analogy: imagine if every flaw on your character sheet gave you Inspiration when it caused problems, and you could spend Inspiration for +2 on any roll. That's the fate point economy.</p></div>
+        <div class="callout callout-tip" role="note"><div class="callout-title">🎲 GM tip — compel honestly</div><p>A compel is an offer, not a punishment. Frame it as a question: "Your aspect <em>Always Takes the Hard Way</em> — would your character take the obvious exit, or insist on going back for the contact?" The player decides what their character would actually do. If it feels like a gotcha, it's not a compel — it's a trap.</p></div>
+        <div class="callout callout-scenario" role="note">
+          <div class="callout-title">The compel moment — roll, then decide</div>
+          <p>You have a trouble: <em>"Always Takes the Hard Way."</em> Roll Stealth (+1) to sneak past the guard. If the result is bad, the GM offers you a fate point to have your character make noise on purpose. Accept and earn the point — or spend one to refuse.</p>
+          <p style="font-size:var(--text-sm);color:var(--text-muted);font-style:italic">Interactive dice roller available in the generator.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-block" id="step-5">
+      <div class="step-num">Step 5</div>
+      <div class="step-title">Stress and consequences</div>
+      <div class="step-body">
+        <p>When you take a hit, you absorb it with <strong>stress boxes</strong> (1 shift each, 3 per track by default — you can mark <em>as many as you need</em> per hit) or <strong>consequences</strong> (named aspects: Mild absorbs 2 shifts, Moderate absorbs 4, Severe absorbs 6). Stress clears at end of every scene. If you can't absorb all the shifts, you're <strong>taken out</strong> — the attacker narrates what happens. You can also <strong>concede</strong> before a roll to leave the scene on your terms and earn fate points.</p>
+        <p>Stress clears at the end of every scene. Consequences persist: Mild clears after a scene (with treatment), Moderate after a session, Severe after a breakthrough.</p>
+        <div class="callout callout-dnd" role="note"><div class="callout-title">⚔ Coming from D&amp;D</div><p>There are no hit points. Stress is plot armour — it goes away after every scene. Consequences are the real damage, and they're aspects that can be invoked and compelled. "Badly Burned Hands" affects you in every scene until it heals.</p></div>
+        <div class="callout callout-warning" role="note"><div class="callout-title">⚠ Common mistake — consequence recovery</div><p>Consequences don't heal automatically. They require a treatment roll first (Overcome against the consequence's difficulty), <em>then</em> the timer starts. Mild: Fair +2 difficulty, clears end of next scene. Moderate: Great +4, clears end of session. Severe: Fantastic +6, clears end of breakthrough. <em>FCon SRD p.30.</em></p></div>
+        <div class="callout callout-scenario" role="note">
+          <div class="callout-title">Try an attack roll — see how many shifts hit</div>
+          <p>An enemy has Fight +2. You defend with Athletics +1. Roll both — the difference is the shifts. Under 3 shifts: tick stress boxes. 3–5: take a consequence. 6+: you're in trouble.</p>
+          <div class="learn-double-roll">
+            <p style="font-size:var(--text-sm);color:var(--text-muted);font-style:italic">Interactive dice roller available in the generator.</p>
+            <p style="font-size:var(--text-sm);color:var(--text-muted);font-style:italic">Interactive dice roller available in the generator.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-block" id="step-6">
+      <div class="step-num">Step 6</div>
+      <div class="step-title">Stunts and advancement</div>
+      <div class="step-body">
+        <p><strong>Stunts</strong> give your character a special edge: +2 to a specific skill in a specific situation, or a once-per-scene special ability. You start with 3 free; each extra costs 1 Refresh (minimum Refresh 1).</p>
+        <p>Characters grow through <strong>milestones</strong> (end of session: swap skills, rewrite aspects or stunts) and <strong>breakthroughs</strong> (end of story arc: increase a skill, rewrite your high concept, begin consequence recovery). No XP. No levels.</p>
+        <div class="callout callout-dnd" role="note"><div class="callout-title">⚔ Coming from D&amp;D</div><p>Stunts replace feats but are narrower and cheaper. Milestones replace levelling up but happen every session. Characters change laterally (different) more than vertically (stronger).</p></div>
+        <div class="callout callout-info" role="note"><div class="callout-title">📋 Stunt format — two valid patterns</div><p><strong>Pattern 1 (most common):</strong> "+2 to [Skill] when [specific condition]." The condition must be narrow enough that it doesn't apply every roll. <strong>Pattern 2:</strong> "Once per scene, [special effect] when [trigger]." No fate point cost. Stunts should never charge a fate point — that's compels. <em>FCon SRD p.28.</em></p></div>
+        <div class="callout callout-scenario" role="note">
+          <div class="callout-title">See the stunt difference — roll with and without</div>
+          <p>A character has Deceive +2. Their stunt: <em>"Silver Tongue: +2 to Deceive when creating an advantage through misdirection."</em> The situation triggers it — they effectively roll at +4.</p>
+          <div class="learn-double-roll">
+            <p style="font-size:var(--text-sm);color:var(--text-muted);font-style:italic">Interactive dice roller available in the generator.</p>
+            <p style="font-size:var(--text-sm);color:var(--text-muted);font-style:italic">Interactive dice roller available in the generator.</p>
+          </div>
+        </div>
+        <div class="learn-npc-demo" id="step-6-npc" aria-label="Example NPC with stunts">
+          <div class="learn-npc-eyebrow">🎲 Generated NPC — see stunts in action</div>
+          <div class="learn-npc-name">Cassidy "Threadbare" Voss</div>
+          <div class="learn-npc-aspects">
+            <div class="learn-npc-asp-row"><span class="learn-npc-asp-label">High Concept</span><span class="learn-npc-asp-val">Debt-Collector Who Knows All the Exits</span></div>
+            <div class="learn-npc-asp-row"><span class="learn-npc-asp-label">Trouble</span><span class="learn-npc-asp-val">Owes the People She Collects For</span></div>
+          </div>
+          <div class="learn-npc-skills">Fight +3 · Contacts +3 · Deceive +2 · Athletics +2 · Notice +1</div>
+          <div class="learn-npc-stunts">
+            <div class="learn-npc-stunt"><strong>Exit Strategy:</strong> +2 to Athletics when escaping a location she has previously visited.</div>
+            <div class="learn-npc-stunt"><strong>I Know What You Owe:</strong> Once per scene, invoke a target's financial or social debt as a free aspect with one free invoke.</div>
+          </div>
+          <div class="learn-npc-note">Notice how both stunts are tied to her High Concept — "knows all the exits" is Exit Strategy, "knows what people owe" is the free invoke. Aspects and stunts reinforce each other.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-block" id="step-7">
+      <div class="step-num">Step 7 — For the GM</div>
+      <div class="step-title">Running the game</div>
+      <div class="step-body">
+        <p>As a GM, your main tools are: <strong>compels</strong> (offer fate points to create complications), <strong>scene aspects</strong> (set the stage with invokable/compellable truths), <strong>NPCs</strong> (minor = 1-2 aspects, no consequences; major = full character sheet), and the <strong>GM fate point pool</strong> (1 per PC, shared across all NPCs).</p>
+        <p>Set difficulty using the adjective ladder: Fair (+2) for routine, Good (+3) for challenging, Great (+4) for hard. Use <strong>challenges</strong> for multi-skill problems, <strong>contests</strong> for opposed races, and <strong>conflicts</strong> when both sides can hurt each other.</p>
+        <p>The golden rule: <strong>failure is never boring.</strong> On a failed roll, the situation changes — it doesn't stall. "Success at a cost" is your best friend: they get what they want, but something else goes wrong.</p>
+        <div class="callout callout-tip" role="note"><div class="callout-title">🎲 GM tip — failure moves the story</div><p>Never let a failed roll mean "nothing happens." On a failure, the situation changes — the character doesn't get what they wanted AND something new enters the fiction. A failed Stealth roll doesn't just mean the guard heard them; it means the guard is now between them and the exit, with backup on the way. <em>FCon SRD p.20: "Fail forward."</em></p></div>
+        <div class="callout callout-tip" role="note"><div class="callout-title">🎲 For the GM</div><p>Ogma's generators create all of this for you: NPCs with aspects and skills, scenes with zones and situation aspects, encounters with opposition and stake conditions, and more. The <strong>How</strong> tab below every result gives you running tips specific to that generator.</p></div>
+        <div class="callout callout-scenario" role="note">
+          <div class="callout-title">Set a difficulty — does the player beat it?</div>
+          <p>A player wants to pick a lock (Burglary +2). You set difficulty at Good (+3) — challenging but not impossible. Roll for the player and see if they succeed, tie (succeed at a cost), or fail (situation changes).</p>
+          <p style="font-size:var(--text-sm);color:var(--text-muted);font-style:italic">Interactive dice roller available in the generator.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout-scenario">
+      <div class="callout-title">Ready to try it?</div>
+      <p>Pick a <a href="/">campaign world</a> and roll a Minor NPC. Read the result, check the <strong>What</strong> tab to understand the mechanic, and check <strong>In play</strong> for an invoke/compel example. That's your first Fate moment.</p>
+    </div>
+
+    <div class="callout callout-info">
+      <div class="callout-title">&#128218; Go deeper</div>
+      <p>The community's #1 recommended resource for truly understanding Fate: <a href="https://bookofhanz.com/" target="_blank" rel="noreferrer"><strong>The Book of Hanz</strong></a> — Robert Hanz's essays on Fate philosophy. Free to read. Start with "Fate Doesn't Have a Damage System" and "Aspects Are the Most Important Thing."</p>
+      <p>For the full mechanics reference, common errors, and GM prep guide: <a href="//help/fate-mechanics"><strong>Fate Mechanics deep-dive &rarr;</strong></a></p>
+      <p>For a step-by-step worked conflict example: <a href="//help/at-the-table#conflict-walkthrough"><strong>At the Table — conflict walkthrough &rarr;</strong></a></p>
+    </div>
+
+    <div class="wiki-footer">
+      <a href="//help/how-to-use-ogma">&larr; How to Use Ogma</a>
+      <a href="//help/fate-mechanics">Fate Mechanics &rarr;</a>
+    </div>
+    <div class="wiki-footer" style="margin-top:16px">
+  <div>
+    <a href="/help">Wiki Home</a> &nbsp;·&nbsp;
+    <a href="/">Open Ogma</a> &nbsp;·&nbsp;
+    <a href="/about">About</a> &nbsp;·&nbsp;
+    <a href="/license">Full Attribution</a> &nbsp;·&nbsp;
+    <!-- FARI_PARKED_2026.03.154 fari.app link --> &nbsp;·&nbsp;
+    <a href="https://fate-srd.com/" target="_blank" rel="noreferrer">fate-srd.com</a>
+  </div>
+  <div style="font-size:var(--text-label);color:var(--text-muted)">
+    Fate&#8482; &amp; Evil Hat Productions, LLC &nbsp;·&nbsp; D&amp;D&#174; &amp; Wizards of the Coast LLC &nbsp;·&nbsp; <a href="/license">CC BY 3.0</a>
+  </div>
+</div>
+  </main>
+
+  <footer class="land-footer">
+    <div class="land-footer-inner">
+      <div style="font-style:italic;color:var(--text-muted);margin-bottom:4px">
+        <strong>O</strong>n-demand <strong>G</strong>enerator for <strong>M</strong>asterful <strong>A</strong>dventures
+      </div>
+      <div>
+        <a href="/license">Full Attribution</a> &middot;
+        <a href="/help">&#128218; Help</a> &middot;
+        <a href="/about">About</a>
+      </div>
+    </div>
+  </footer>
+</div>
