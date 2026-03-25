@@ -3,6 +3,7 @@
 <script>
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
+  import { VERSION } from '$lib/version.js';
 
   let theme = 'dark';
 
@@ -854,6 +855,9 @@
         <a href="/license">Full Attribution</a> &middot;
         <a href="/help">&#128218; Help</a> &middot;
         <a href="/about">About</a>
+      </div>
+      <div class="sz-center">
+        <span class="about-version-badge">v{VERSION}</span>
       </div>
     </div>
   </footer>
