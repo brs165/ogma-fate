@@ -78,6 +78,7 @@
   // Panel visibility
   let leftOpen = typeof window !== 'undefined' ? window.innerWidth > 520 : true;
   let showDice = false;
+  let showClearModal = false;
   let showFP = false;
   let showNotes = false;
   let mobileListView = false;
@@ -517,6 +518,7 @@
     { id: 'fp', icon: '\u25CE', label: 'Toggle FP Tracker', fn: () => { showFP = !showFP; } },
     { id: 'export', icon: '\u2193', label: 'Export Cards', fn: () => { exportView = true; } },
     { id: 'fit', icon: '\u2922', label: 'Fit All Cards', shortcut: 'F', fn: fitAll },
+    { id: 'clear', icon: '\u{1F5D1}', label: 'Clear Table', fn: () => { showClearModal = true; } },
     { id: 'undo', icon: '\u21B6', label: 'Undo', shortcut: '\u2318Z', fn: () => { if (canvas) canvas.undoLast(); } },
     { id: 'mode', icon: '\u25B6', label: mode === 'prep' ? 'Switch to Play' : 'Switch to Prep', fn: () => onModeChange(mode === 'prep' ? 'play' : 'prep') },
     { id: 'theme', icon: '\u263D', label: 'Toggle Dark/Light', fn: toggleTheme },
@@ -999,5 +1001,32 @@
       campName={campMeta.name}
       {campId}
     />
+  {/if}
+
+  <!-- Clear table modal -->
+  {#if showClearModal}
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <div class="modal-overlay" on:click={() => showClearModal = false} role="presentation">
+      <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+      <div class="modal-box modal-box-narrow" on:click|stopPropagation role="dialog" aria-modal="true" aria-label="Clear table options">
+        <div class="modal-header">
+          <span class="modal-title">Clear Table</span>
+          <button class="btn btn-ghost btn-icon" on:click={() => showClearModal = false} aria-label="Close">&#10005;</button>
+        </div>
+        <div class="modal-body">
+          <p class="rhp-ready-sub">Choose what to clear. This cannot be undone.</p>
+          <div class="sz-grid">
+            <button class="btn sz-option" on:click={() => { if (canvas) canvas.clearCanvas(); showClearModal = false; }}>
+              <div class="sz-option-title">Clear current canvas</div>
+              <div class="sz-option-sub">Removes all cards from the {mode} canvas</div>
+            </button>
+            <button class="btn sz-option" on:click={() => { showClearModal = false; showToast('Use Prep mode to clear prep canvas'); }}>
+              <div class="sz-option-title">Clear other canvas</div>
+              <div class="sz-option-sub">Switch to {mode === 'prep' ? 'play' : 'prep'} mode first to clear that canvas</div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   {/if}
 </div>
