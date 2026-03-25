@@ -1,0 +1,198 @@
+// canvasStore.js — from useBoardCards (react-source/core/ui-board.js L2387-2593)
+// Factory: createCanvasStore(campCanvasKey, tables, showToast, onCardsChange)
+import { writable, get } from 'svelte/store';
+import { generate, mergeUniversal, GENERATORS } from '../engine.js';
+import DB from '../db.js';
+import { boardUid, extractCardTitle, extractCardSummary, extractCardTags, STICKY_COLORS } from '../helpers.js';
+
+export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChange) {
+  const cards  = writable([]);
+  const loaded = writable(false);
+
+  let undoStack   = [];
+  const lastPlaced = { x: 60, y: 60, col: 0 };
+
+  // Load canvas from IDB when key changes
+  if (DB) {
+    DB.loadSession(campCanvasKey).then(saved => {
+      if (saved && Array.isArray(saved.cards)) cards.set(saved.cards);
+      loaded.set(true);
+    }).catch(() => loaded.set(true));
+  } else {
+    loaded.set(true);
+  }
+
+  function persistCanvas(nextCards) {
+    if (!DB) return;
+    DB.saveSession(campCanvasKey, { cards: nextCards, ts: Date.now() }).catch(() => {});
+    if (onCardsChange) onCardsChange(nextCards);
+  }
+
+  function mutate(fn) {
+    cards.update(prev => {
+      const next = fn(prev);
+      persistCanvas(next);
+      return next;
+    });
+  }
+
+  function generateCard(genId, x, y) {
+    if (genId === 'label') {
+      const newLabel = {
+        id: boardUid(), genId: 'label', text: 'Section',
+        x: x !== undefined ? x : lastPlaced.x,
+        y: y !== undefined ? y : Math.max(0, lastPlaced.y - 24),
+        z: Date.now(), ts: Date.now(), styleIdx: 0,
+      };
+      mutate(prev => prev.concat([newLabel]));
+      showToast('Section label added — double-click to rename');
+      return;
+    }
+    if (genId === 'sticky') {
+      const sc = STICKY_COLORS[Math.floor(Math.random() * STICKY_COLORS.length)];
+      const sticky = {
+        id: boardUid(), genId: 'sticky', text: '"New Aspect"',
+        colorIdx: STICKY_COLORS.indexOf(sc),
+        rotation: (Math.random() * 6 - 3),
+        x: x !== undefined ? x : (80 + Math.random() * 400),
+        y: y !== undefined ? y : (80 + Math.random() * 300),
+        z: Date.now(), ts: Date.now(),
+      };
+      mutate(prev => prev.concat([sticky]));
+      showToast('Aspect sticky added');
+      return;
+    }
+    if (genId === 'boost') {
+      const boostCard = {
+        id: boardUid(), genId: 'boost', text: '"New Boost"',
+        freeInvokes: 1, expired: false,
+        rotation: (Math.random() * 4 - 2),
+        x: x !== undefined ? x : (80 + Math.random() * 400),
+        y: y !== undefined ? y : (80 + Math.random() * 300),
+        z: Date.now(), ts: Date.now(),
+      };
+      mutate(prev => prev.concat([boostCard]));
+      showToast('⚡ Boost added — 1 free invoke');
+      return;
+    }
+    if (genId === 'custom') {
+      const customCard = {
+        id: boardUid(), genId: 'custom',
+        title: 'Custom Card', summary: '', tags: ['Aspect'],
+        data: { title: 'Custom Card', body: '', type: 'aspect' },
+        x: x !== undefined ? x : lastPlaced.x,
+        y: y !== undefined ? y : lastPlaced.y,
+        z: Date.now(), ts: Date.now(), gmOnly: false,
+      };
+      lastPlaced.col = (lastPlaced.col + 1) % 3;
+      if (lastPlaced.col === 0) { lastPlaced.x = 60; lastPlaced.y += 420; } else { lastPlaced.x += 340; }
+      mutate(prev => prev.concat([customCard]));
+      showToast('✎ Custom Card added — click title or notes to edit');
+      return;
+    }
+    let t = tables;
+    try { if (typeof mergeUniversal === 'function') t = mergeUniversal(t); } catch (e) {}
+    let data = null;
+    try { if (typeof generate === 'function') data = generate(genId, t, 4); } catch (e) { console.warn('[Board] generate failed:', e); }
+    if (!data) { showToast('Generation failed'); return; }
+    const genMeta = (GENERATORS || []).find(g => g.id === genId) || {};
+    let cardX, cardY;
+    if (x !== undefined) {
+      cardX = x; cardY = y;
+    } else {
+      cardX = lastPlaced.x; cardY = lastPlaced.y;
+      lastPlaced.col = (lastPlaced.col + 1) % 3;
+      if (lastPlaced.col === 0) { lastPlaced.x = 60; lastPlaced.y += 420; } else { lastPlaced.x += 340; }
+    }
+    const card = {
+      id: boardUid(), genId,
+      title: extractCardTitle(genId, data),
+      summary: extractCardSummary(genId, data),
+      tags: extractCardTags(genId, data),
+      data, x: cardX, y: cardY,
+      z: Date.now(), ts: Date.now(), gmOnly: false,
+    };
+    mutate(prev => prev.concat([card]));
+    showToast('Generated: ' + (genMeta.icon || '') + ' ' + (genMeta.label || genId));
+  }
+
+  function updateCard(id, patch) {
+    mutate(prev => prev.map(c => c.id === id ? Object.assign({}, c, patch) : c));
+  }
+
+  function deleteCard(id) {
+    cards.update(prev => {
+      const removing = prev.find(c => c.id === id);
+      if (removing) {
+        undoStack = [{ type: 'delete', card: removing }, ...undoStack].slice(0, 10);
+      }
+      const next = prev.filter(c => c.id !== id);
+      persistCanvas(next);
+      return next;
+    });
+    showToast('Deleted — Ctrl+Z to undo');
+  }
+
+  function rerollCard(id) {
+    const existing = get(cards).find(c => c.id === id);
+    if (!existing || existing.genId === 'sticky' || existing.genId === 'custom') return;
+    let t = tables;
+    try { if (typeof mergeUniversal === 'function') t = mergeUniversal(t); } catch (e) {}
+    let data = null;
+    try { if (typeof generate === 'function') data = generate(existing.genId, t, 4); } catch (e) {}
+    if (!data) return;
+    undoStack = [{ type: 'reroll', id, prev: existing }, ...undoStack].slice(0, 10);
+    mutate(prev => prev.map(c => {
+      if (c.id !== id) return c;
+      return Object.assign({}, c, {
+        title: extractCardTitle(existing.genId, data),
+        summary: extractCardSummary(existing.genId, data),
+        tags: extractCardTags(existing.genId, data),
+        data, ts: Date.now(),
+      });
+    }));
+    showToast('Rerolled — Ctrl+Z to undo');
+  }
+
+  function undoLast() {
+    if (undoStack.length === 0) { showToast('Nothing to undo'); return; }
+    const entry = undoStack[0];
+    undoStack = undoStack.slice(1);
+    if (entry.type === 'delete') {
+      mutate(prev => prev.concat([entry.card]));
+      showToast('Delete undone (' + undoStack.length + ' left)');
+    } else if (entry.type === 'reroll') {
+      mutate(prev => prev.map(c => c.id === entry.id ? entry.prev : c));
+      showToast('Reroll undone (' + undoStack.length + ' left)');
+    }
+  }
+
+  function exportCanvas(canvasKey, fname) {
+    if (!DB || !DB.exportCanvasState) { showToast('Export unavailable'); return; }
+    DB.exportCanvasState(canvasKey, fname).then(() => {
+      showToast('Board exported');
+    }).catch(err => {
+      showToast(err && err.message ? err.message : 'Export failed');
+    });
+  }
+
+  function importCanvas() {
+    if (!DB || !DB.importCanvasState) { showToast('Import unavailable'); return; }
+    DB.importCanvasState().then(data => {
+      if (!data || !data.state || !Array.isArray(data.state.cards)) { showToast('Invalid board file'); return; }
+      cards.set(data.state.cards);
+      persistCanvas(data.state.cards);
+      showToast('Board imported — ' + data.state.cards.length + ' cards loaded');
+    }).catch(err => {
+      if (err && err.message && err.message !== 'No file selected') showToast('Import failed: ' + err.message);
+    });
+  }
+
+  return {
+    cards, loaded,
+    getCards: () => get(cards),
+    persistCanvas,
+    generateCard, updateCard, deleteCard, rerollCard,
+    undoLast, exportCanvas, importCanvas,
+  };
+}

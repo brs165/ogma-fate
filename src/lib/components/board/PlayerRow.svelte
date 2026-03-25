@@ -1,0 +1,200 @@
+<script>
+  // ── PlayerRow — player FP, stress, consequences, concede, compel ─────────────
+  export let player   = {};
+  export let sel      = false;
+  export let onUpd    = null;
+  export let onSel    = null;
+  export let onCompel = null;
+
+  let expanded = false;
+
+  $: fpCol = player.fp === 0 ? 'var(--c-red)' : player.fp < player.ref ? 'var(--c-amber,#f4b942)' : 'var(--c-green)';
+  $: conseq = player.conseq || ['', '', ''];
+
+  function setConseq(i, val) {
+    const n = conseq.slice();
+    n[i] = val;
+    if (onUpd) onUpd({ conseq: n });
+  }
+
+  function toggleSel() {
+    if (onSel) onSel(sel ? null : player.id);
+  }
+
+  function toggleActed(e) {
+    e.stopPropagation();
+    if (onUpd) onUpd({ acted: !player.acted });
+  }
+
+  function onRowKeyDown(e) {
+    if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggleSel(); }
+  }
+
+  function togglePhy(i) {
+    const a = (player.phy || []).slice();
+    a[i] = !a[i];
+    if (onUpd) onUpd({ phy: a });
+  }
+
+  function toggleMen(i) {
+    const a = (player.men || []).slice();
+    a[i] = !a[i];
+    if (onUpd) onUpd({ men: a });
+  }
+
+  function onStressKeyDown(fn, i, e) {
+    if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); fn(i); }
+  }
+
+  function doConcedeClick() {
+    const conseqCount = (player.conseq || []).filter(c => c).length;
+    if (conseqCount === 0) return;
+    if (!confirm(player.name + ' concedes.\nEarns ' + conseqCount + ' FP (1 per consequence).')) return;
+    if (onUpd) onUpd({ fp: (player.fp || 0) + conseqCount, acted: true });
+  }
+
+  $: conseqFilled = (player.conseq || []).filter(c => c).length;
+
+  $: labels = conseq.length >= 4
+    ? [
+        {name:'Mild', rec:'end of next scene'},
+        {name:'Moderate', rec:'end of session'},
+        {name:'Severe', rec:'end of scenario'},
+        {name:'Mild 2', rec:'end of next scene'},
+      ]
+    : [
+        {name:'Mild', rec:'end of next scene'},
+        {name:'Moderate', rec:'end of session'},
+        {name:'Severe', rec:'end of scenario'},
+      ];
+</script>
+
+<div
+  class="rs-player{sel ? ' selected' : ''}"
+  style="border-left-color:{player.color || 'var(--accent)'}; border-left-width:3px"
+>
+  <!-- Header row -->
+  <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+  <div
+    class="rs-player-top"
+    role="button"
+    tabindex="0"
+    aria-expanded={String(!!sel)}
+    aria-label="{sel ? 'Collapse ' : 'Expand '}{player.name}"
+    on:click={toggleSel}
+    on:keydown={onRowKeyDown}
+  >
+    <div class="rs-player-dot" style="background:{player.color || 'var(--accent)'}"></div>
+    <div class="rs-player-name">{player.name}</div>
+    {#if sel}
+      <button
+        style="background:none; border:none; cursor:pointer; font-size:10px; color:var(--text-muted); padding:0 2px; flex-shrink:0"
+        on:click|stopPropagation={() => (expanded = !expanded)}
+      >{expanded ? '▲' : '▼'}</button>
+    {/if}
+    <button
+      style="background:none; border:none; cursor:pointer; font-size:12px; color:{player.acted ? 'var(--c-green)' : 'var(--border-mid)'}; padding:0 2px; flex-shrink:0; line-height:1"
+      on:click={toggleActed}
+      aria-label={player.acted ? 'Mark unacted' : 'Mark acted'}
+    >{player.acted ? '●' : '○'}</button>
+  </div>
+
+  <!-- High concept -->
+  {#if player.hc}
+    <div class="rs-player-hc">{player.hc}</div>
+  {/if}
+
+  <!-- FP row -->
+  <div class="rs-fp-row">
+    <span class="rs-fp-label">FP</span>
+    <button class="rs-fp-btn"
+      on:click={() => onUpd && onUpd({ fp: Math.max(0, player.fp - 1) })}
+      aria-label="Spend FP">−</button>
+    <span class="rs-fp-num" style="color:{fpCol}">{player.fp}</span>
+    <button class="rs-fp-btn"
+      on:click={() => onUpd && onUpd({ fp: player.fp + 1 })}
+      aria-label="Gain FP">+</button>
+  </div>
+
+  <!-- Stress row -->
+  <div class="rs-stress-row">
+    <span class="rs-fp-label">PHY</span>
+    <div style="display:flex; gap:2px">
+      {#each (player.phy || []) as v, i}
+        <div
+          class="rs-stress-box{v ? ' filled' : ''}"
+          role="checkbox"
+          aria-checked={String(!!v)}
+          aria-label="Physical stress {i + 1}"
+          tabindex="0"
+          on:click={() => togglePhy(i)}
+          on:keydown={e => onStressKeyDown(togglePhy, i, e)}
+        ></div>
+      {/each}
+    </div>
+    <span class="rs-fp-label" style="margin-left:4px">MEN</span>
+    <div style="display:flex; gap:2px">
+      {#each (player.men || []) as v, i}
+        <div
+          class="rs-stress-box{v ? ' filled' : ''}"
+          style="border-color:var(--c-purple)"
+          role="checkbox"
+          aria-checked={String(!!v)}
+          aria-label="Mental stress {i + 1}"
+          tabindex="0"
+          on:click={() => toggleMen(i)}
+          on:keydown={e => onStressKeyDown(toggleMen, i, e)}
+        ></div>
+      {/each}
+    </div>
+  </div>
+
+  <!-- Expanded: consequences + buttons -->
+  {#if expanded}
+    <div style="padding:0 8px 7px">
+      <div style="font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+                  color:var(--text-muted); margin-bottom:3px">Consequences</div>
+      {#each labels as slot, i}
+        <div style="margin-bottom:4px">
+          <div style="display:flex; align-items:center; gap:3px">
+            <span style="font-size:11px; color:var(--text-muted); width:46px; flex-shrink:0">{slot.name}</span>
+            <input
+              type="text"
+              value={conseq[i] || ''}
+              placeholder="empty"
+              aria-label="{slot.name} consequence"
+              on:input={e => setConseq(i, e.currentTarget.value)}
+              style="flex:1; background:var(--inset);
+                     border:1px solid {conseq[i] ? 'var(--c-amber,#f4b942)' : 'var(--border)'};
+                     border-radius:4px; padding:2px 5px; font-size:10px; color:var(--text);
+                     font-family:var(--font-ui); outline:none"
+            />
+          </div>
+          {#if conseq[i]}
+            <div style="font-size:10px; color:var(--text-muted); margin-left:49px; font-style:italic">
+              ↳ clears {slot.rec}
+            </div>
+          {/if}
+        </div>
+      {/each}
+
+      <button
+        class="rs-concede-btn"
+        on:click={doConcedeClick}
+        disabled={!player.conseq || !player.conseq.some(c => c)}
+        aria-label="Concede conflict"
+        title="FCon p.35: exit conflict, earn 1 FP per consequence taken"
+      >⚐ Concede ({conseqFilled} FP)</button>
+
+      {#if onCompel}
+        <button
+          class="rs-concede-btn"
+          on:click={() => onCompel(player)}
+          aria-label="Offer compel to {player.name}"
+          title="FCon p.20: offer FP through aspect"
+          style="border-color:var(--c-purple); color:var(--c-purple)"
+        >↩ Compel</button>
+      {/if}
+    </div>
+  {/if}
+</div>

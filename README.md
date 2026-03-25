@@ -1,313 +1,56 @@
-# Ogma - A Fate Condensed Generator Suite
+# Ogma — Tabletop RPG Content Generator
 
-An offline, browser-based random content generator for **Fate Condensed** tabletop RPG campaigns.
+A browser-based PWA that generates tabletop RPG content for **Fate Condensed** GMs. Supports 8 campaign worlds with 17+ generator types (NPCs, scenes, factions, encounters, and more).
 
-> *Named for the Celtic god of eloquence - the one who gave language its shape. Also a backronym: **Offline Game Master's Aid**.* Offline after first visit. Pure random tables with a clean UI.
+## Stack
 
-> **16 generators · 8 campaign worlds · offline after first load**
+- **SvelteKit** with Vite 7
+- **Svelte 5** (using `export let` props and `$:` reactivity)
+- **adapter-static** for PWA deployment
+- **Dexie 4** for IndexedDB persistence
+- **WebSocket** multiplayer sync
+- **51 components**, **6 stores**, **11 data modules**
 
-> *Every GM should be able to run a great Fate Condensed session, regardless of how much time they had to prep.*
-
----
-
-## Quick Start
-
-1. Download and unzip the archive - or clone this repo
-2. Open `index.html` in any modern browser
-3. Pick a campaign world
-4. Pick a generator and click **Roll**
-
-Live at **ogma.net** (Cloudflare Pages). Works fully offline after first load via service worker.
-
-
----
-
-## If you expect `npm install`
-
-| Your expectation | Reality in Ogma |
-|-----------------|-----------------|
-| `npm install` | Not required to run the app. Optional for build tools (terser, esbuild). Use `--ignore-scripts` to skip puppeteer browser download. |
-| `npm run dev` | Run `npx serve .` or any static server |
-| `npm run build` | Optional: runs `scripts/build.js` (3-tier terser/esbuild/concat → `dist/ogma.core.min.js`). Not required for deploy — source files are the app. |
-| `import` / `require` | Globals loaded by `<script>` tag order |
-| TypeScript | Plain JS with comments |
-| `.env` files | Config lives in `core/config.js` |
-| HMR / hot reload | Manual browser refresh |
-
----
-
-## Campaign Worlds
-
-| World | Genre | Tagline |
-|-------|-------|---------|
-| **The Long After** | Sword-and-planet dying earth | The world that replaced it thinks the debris is magic |
-| **Neon Abyss** | Cyberpunk dystopia | Your augments are your résumé and your leash |
-| **Shattered Kingdoms** | Dark fantasy | Magic is the scar tissue of a war that broke the world |
-| **Void Runners** | Blue-collar space western | Everyone else is trying to make the ship payment |
-| **The Gaslight Chronicles** | Gothic cosmic horror | The Enlightenment lied |
-| **The Long Road** | Lyrical post-apocalypse | The question is what kind of world you build with what you salvage |
-| **Dust and Iron** | Frontier western | Railroad money. Frontier justice. The weight of the old war. |
-| **The dVenti Realm** | High fantasy / D&D bridge | The Senate collapsed 30 years ago. The vaults are still here. |
-
-Each world has deep thematic table content. The same 16 generators produce tonally distinct output in every world.
-
----
-
-## Generators
-
-| Generator | Output |
-|-----------|--------|
-| **Minor NPC** | Name · 1–2 aspects · skills · stress track |
-| **Major NPC** | Name · 5 aspects · full skill pyramid · 2 stunts |
-| **Scene Setup** | 3–5 situation aspects by category · 2–4 zones · scene framing questions |
-| **Campaign Frame** | Current issue · impending issue · 3 setting aspects |
-| **Encounter** | Opposition stat blocks · scene aspects · victory/defeat conditions · twist |
-| **Adventure Seed** | 3-scene scenario skeleton · opposition · twist · campaign tie-in |
-| **Compel Offer** | Situation · consequence · event/decision framing template |
-| **Challenge** | Type · primary/opposing skills · success and failure states · stakes |
-| **Contest** | Opposed exchanges · two sides · victory track · tie-twists · stakes |
-| **Consequence** | Severity (random or selectable) · named aspect · context · compel hook |
-| **Faction** | Name · goal · method · weakness · named face NPC |
-| **Complication** | New aspect · arriving NPC · environment shift · spotlight note |
-| **PC Backstory** | Session zero questions · relationship web exercise · opening hook |
-| **Obstacle** *(universal)* | Hazard · Block · Distraction per Fate Condensed p.49–51 |
-| **Countdown** *(universal)* | Named clock · trigger condition · zero outcome |
-| **Constraint** *(universal)* | Limitation · Resistance with bypass method |
-
----
-
-## Features
-
-**Campaign Intros** - Each campaign opens with an animated intro sequence with a distinct voice per world. Skip anytime. Replay via **▶ Intro** in the nav or mobile **⋯** menu.
-
-**Fate Point Tracker** - ◎ FP opens a floating panel. Add PCs by name, set refresh, spend and recover. Persists to `localStorage`.
-
-**Inspiration Mode** - ✦ 3 draws three random results from different generators as a creative triptych.
-
-**GM Tips** - 🎭 adds coaching overlays: invoke/compel examples, D&D contrast notes, rules references inline with every result.
-
-**Table Manager** - 🎛 Customize lets you exclude entries, lock specific entries, or add your own custom content to any string table. Saved per campaign via IndexedDB.
-
-**Player View** - 👥 hides all GM coaching notes, leaving only player-facing content for projecting at the table.
-
-**Session Zero Wizard** - `campaigns/sessionzero.html` walks a new table through Fate Condensed character creation with D&D contrast notes at every step.
-
-**Coming from D&D?** - `campaigns/transition.html` is a side-by-side guide covering every major conceptual difference between D&D 5e and Fate Condensed.
-
-**Export / Import** - Download pinned cards as `.json` or full table state (players, cards, round, FP) for backup and transfer. Import from any Ogma export file.
-
-**Board** - `campaigns/board.html` — free-form canvas for prep and play. Generate cards directly onto the canvas, drag to arrange, add section labels, sticky notes. Includes: dice floater, Fate Point tracker, multiplayer host/join, Stunt browser tab, mobile list view, player waiting state auto-add.
-
-**v4 Cards (cv4Card)** - All 16 generators render as 600×380 landscape `cv4Card` components with category colour headers, GM guidance back panel (flip on footer), and world-specific accent colours. Stress boxes, countdown clocks, contest trackers, and consequence toggles are interactive. Keyboard-accessible (WCAG SC 4.1.2).
-
-**Run Session** - `campaigns/run.html` redirects to Board in Play mode. Board Play mode: player roster with FP/stress/consequences, round counter, turn order bar, multiplayer host/join.
-
-**Player join UX** - When a player joins via room code, they see a name prompt; submitting sends their name to the GM's Board, which auto-creates their player slot and shows a join toast.
-
-**Export** - Unified ⬡ export menu: 🖼 Image Pack (PNG zip for Miro/Figma), 🖨 Print, ↓ JSON export, ↑ Import. Menu opens downward from the action bar.
-
-**Pinned Results** - 📌 saves any result to a persistent pinned list (IndexedDB). Survives reloads.
-
-**Stunt Browser** - In the Board left panel, a Stunts tab shows all world + universal stunts (56+ per world). Filter by skill, tag, or keyword. Click any stunt to copy name and description to clipboard.
-
-**Mobile List View** - On the Board, a toggle button (≡/▦, visible ≤640px) switches the canvas to a scrollable card list: colour-coded by category, tap to open dossier, × to remove.
-
-**Left Sidebar Nav** - Campaign pages use a persistent left sidebar (no topbar). Desktop: sidebar always visible with header (OGMA wordmark + world chip) and an accordion nav — **Play** (Table, Session Notes) → **Binder** (Cards, Session Zero) → **Generate** (17 generators in 4 sub-groups, scroll-contained) → **Settings**. Mobile: 44px slim bar (hamburger + world name + theme toggle) opens sidebar overlay.
-
-**Complete Card View** - The ♥ Card view shows all generated data, matching the dossier: for Major NPCs, all aspects including `others[]`, full stunt descriptions, consequence slots; for Encounters, scene aspects, zones, opposition aspects and stunts; for all generators, every field the data contains.
-
-**Consequence Severity Selector** - When the Consequence generator is active, a severity bar appears: Random / Mild / Moderate / Severe.
-
-**Universal Content Toggle** - Merges 163 setting-agnostic entries into campaign tables. Default on. Saved to `localStorage`.
-
-**Dark / Light Mode** - ◑ toggle, saved to `localStorage`.
-
-**Offline / PWA** - Works fully offline after first load. Installable on iOS, Android, and desktop Chrome.
-
----
-
-## File Structure
-
-```
-fate-suite/
-├── index.html                    ← Landing page (loads all campaign data)
-│
-├── campaigns/
-│   ├── cyberpunk.html            ┐
-│   ├── fantasy.html              │
-│   ├── postapoc.html             ├─ Campaign generator pages
-│   ├── space.html                │
-│   ├── thelongafter.html         │
-│   ├── victorian.html            ┘
-│   ├── guide-cyberpunk.html      ┐
-│   ├── guide-fantasy.html        │
-│   ├── guide-postapoc.html       ├─ Campaign world guide pages (static HTML)
-│   ├── guide-space.html          │
-│   ├── guide-thelongafter.html   │
-│   ├── guide-victorian.html      ┘
-│   ├── sessionzero.html          ← Session Zero character creation wizard
-│   ├── transition.html           ← Coming from D&D? guide
-│   ├── board.html                ← JS redirect → {world}.html?canvas=1 (preserves ?world=, ?room=, ?mode=)
-│   └── run.html                  ← JS redirect → board.html?mode=play (preserves ?world= and ?room=)
-│
-├── core/
-│   ├── engine.js                 ← Pure logic - generators, table prefs, markdown export
-│   │                               Zero React/DOM dependencies - testable in Node
-│   ├── ui.js                     ← CampaignApp shell, sync, all campaign components
-│   ├── ui-renderers.js           ← 16 result renderers (dossier cards)
-│   ├── ui-table.js               ← PrepCanvas, TpDicePanel, FatePointTracker + Table components
-│   ├── ui-run.js                 ← Tombstone (v330): 9-line JS redirect. run.html → board.html → {world}.html?canvas=1
-│   ├── ui-board.js               ← BoardApp — board prep/play canvas components
-│   ├── ui-modals.js              ← Modal, ExportModal, Settings, Vault, QuickFind, KBShortcuts
-│   ├── ui-primitives.js          ← React aliases (h), FD primitives, ErrorBoundary
-│   ├── ui-landing.js             ← Landing page components
-│   ├── db.js                     ← IndexedDB wrapper with localStorage fallback
-│   ├── config.js                 ← OGMA_CONFIG (REPO_BASE, DEFAULT_SYNC_HOST)
-│   └── intro.js                  ← Campaign intro overlay engine (self-contained, no deps)
-│
-├── data/
-│   ├── shared.js                 ← GENERATORS, HELP_CONTENT, ALL_SKILLS, CAMPAIGNS = {}
-│   ├── universal.js              ← Setting-agnostic tables: obstacles, countdowns,
-│   │                               constraints, stunts, consequences, compels, templates
-│   ├── cyberpunk.js              ← Neon Abyss tables
-│   ├── fantasy.js                ← Shattered Kingdoms tables
-│   ├── postapoc.js               ← The Long Road tables
-│   ├── space.js                  ← Void Runners tables
-│   ├── thelongafter.js           ← The Long After tables
-│   ├── victorian.js              ← The Gaslight Chronicles tables
-│   ├── western.js                ← Dust and Iron tables
-│   └── dVentiRealm.js            ← dVenti Realm tables
-│
-├── assets/
-│   ├── css/theme.css             ← Design system, dark/light, print, campaign theming
-│   ├── img/og-default.png        ← OpenGraph social preview (1200×630)
-│   └── favicons/                 ← icon.svg, icon-32/192/512.png, apple-touch-icon.png
-│
-├── manifest.json                 ← PWA manifest (install, shortcuts, icons)
-├── sw.js                         ← Service worker - cache-first, offline-first
-├── ROADMAP.md                    ← Open work — source of truth for all planned work
-├── CHANGELOG.md                  ← Full version history
-├── ARCHITECTURE.md               ← Architecture deep-dive for contributors
-├── LICENSING.md                  ← CC BY 3.0 compliance and required attributions
-├── docs/                         ← Contributor reference docs + ADRs + AI session docs
-├── scripts/                      ← Build tools (bump-version.sh, PDF builders, CDN verify)
-├── tests/                        ← Test suite (engine.test.js, qa_named.js)
-└── README.md                     ← This file
-```
-
-### Script Load Order
-
-Each campaign page loads scripts in this exact order:
-
-```html
-<script src="https://cdnjs.cloudflare.com/.../react.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/.../react-dom.production.min.js"></script>
-<script src="../data/shared.js?v=N"></script>
-<script src="../data/universal.js?v=N"></script>
-<script src="../data/[campaign].js?v=N"></script>
-<script src="../core/config.js?v=1"></script>
-<script src="../core/engine.js?v=N"></script>
-<script src="https://cdnjs.cloudflare.com/.../dexie.min.js"></script>
-<script src="../core/db.js?v=N"></script>
-<script src="../core/ui-primitives.js?v=N"></script>
-<script src="../assets/js/partysocket.js?v=N"></script>
-<script src="../core/ui-renderers.js?v=N"></script>
-<script src="../core/ui-table.js?v=N"></script>
-<script src="../core/ui-modals.js?v=N"></script>
-<script src="../core/ui-landing.js?v=N"></script>
-<script src="../core/ui.js?v=N"></script>
-<script src="../core/intro.js?v=N"></script>
-```
-
-`index.html` loads all six campaign data files. The `?v=N` parameter is stamped by `bump-version.sh`.
-
----
-
-## Architecture Notes
-
-- **No build step.** Raw JavaScript via `<script>` tags. React 18 via CDN UMD.
-- `const`/`let` in `ui-primitives.js`, `ui-modals.js`, and `ui-landing.js`. `var` everywhere else. No ES modules, no bundler.
-- **Pure random tables.** Deterministic, instant, offline - no network calls of any kind.
-- **Variety Matrix.** Tables using `{t:[...], v:{...}}` produce thousands of unique combinations from compact data. `fillTemplate()` picks a template and substitutes `{VarName}` tokens.
-- **Universal layer.** `mergeUniversal()` concatenates setting-agnostic entries into campaign tables without mutating the originals.
-- **IndexedDB persistence.** Session state and table preferences stored per campaign, with in-memory fallback.
-
----
-
-## Smoke Test
-
-Verify all 128 generator/campaign combinations (16 generators × 8 worlds) after editing data files:
+## Getting started
 
 ```bash
-node -e "
-var CAMPAIGNS={};
-var fs=require('fs');
-eval(fs.readFileSync('data/shared.js','utf8'));
-eval(fs.readFileSync('data/universal.js','utf8'));
-['thelongafter','cyberpunk','fantasy','space','victorian','postapoc','western','dVentiRealm'].forEach(function(c){
-  eval(fs.readFileSync('data/'+c+'.js','utf8'));
-});
-eval(fs.readFileSync('core/engine.js','utf8'));
-var camps=['thelongafter','cyberpunk','fantasy','space','victorian','postapoc','western','dVentiRealm'];
-var gens=['npc_minor','npc_major','scene','campaign','encounter','seed','compel','challenge','contest','consequence','faction','complication','backstory','obstacle','countdown','constraint'];
-var errs=[];var total=0;
-camps.forEach(function(camp){
-  var t=filteredTables(mergeUniversal(CAMPAIGNS[camp].tables),{});
-  gens.forEach(function(gen){
-    try{var r=generate(gen,t,4);if(!r||typeof r!=='object')errs.push(camp+'/'+gen);total++;}
-    catch(e){errs.push(camp+'/'+gen+': '+e.message);}
-  });
-});
-console.log('Smoke: '+total+'/128  errors:'+errs.length);
-"
+npm install
+npm run dev          # Start dev server
+npm run build        # Production build → build/
+npm run preview      # Preview production build
 ```
 
-Expected: `Smoke: 128/128  errors:0`
+## Project structure
 
-For the full named assertion suite, run `node tests/qa_named.js` from the project root.
+```
+src/
+├── lib/
+│   ├── engine.js           # Pure-function content generator
+│   ├── db.js               # Dexie 4 IndexedDB wrapper
+│   ├── helpers.js           # Shared utilities
+│   ├── stores/              # 6 Svelte stores (canvas, play, binder, sync, session, chrome)
+│   └── components/
+│       ├── cards/           # Card rendering (CvLabel, CvTag, StressRow, ClockTrack, Cv4Card, BackPanel)
+│       │   └── fronts/      # 17 generator-specific card fronts
+│       ├── board/           # Game board (Board, BoardCard, Topbar, TurnBar, ExportPanel, etc.)
+│       ├── campaign/        # Campaign management (Campaign, Landing, FatePointTracker)
+│       ├── panels/          # Side panels (LeftPanel)
+│       ├── dice/            # Dice roller (DicePanel)
+│       └── player/          # Player device (PlayerSurface)
+├── data/                    # 11 campaign world data files
+├── routes/
+│   ├── +layout.svelte       # Global CSS + app shell
+│   ├── +page.svelte         # Landing page (/)
+│   └── campaigns/[world]/
+│       └── +page.svelte     # Game board (/campaigns/[world])
+└── app.html
+static/
+├── assets/css/theme.css     # Global stylesheet
+├── assets/fonts/            # Custom fonts
+└── manifest.json            # PWA manifest
+react-source/                # Original React codebase (read-only reference)
+```
 
----
+## History
 
-## Rules Accuracy
-
-Built against **Fate Condensed** (Evil Hat, 2020), audited against the full Fate SRD library:
-
-- Stress boxes are all single-point (not Fate Core's escalating model)
-- Major NPC stress calculated from Physique/Will per Fate Condensed p.12
-- Initiative is popcorn/Balsera-style - acting character picks who goes next
-- Stunts are `+2 to [Skill] when [Condition]` or a once-per-scene special effect
-- Full 19-skill list including Academics
-- GM fate point pool = 1 per PC (shared pool, not per-NPC)
-- Create Advantage tie on a new aspect yields a boost, not a free invoke
-- Consequence recovery requires a treatment overcome roll before clearing timers begin
-- Opposition follows the Fate Adversary Toolkit threat/hitter/boss/filler framework
-
----
-
-## Versioning
-
-**CalVer:** `YYYY.MM.B` - year · month · build within that month. Run `bump-version.sh` before every zip. No argument needed - the script reads the current version and auto-increments.
-
----
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) · [ARCHITECTURE.md](ARCHITECTURE.md)
-
-## CI
-
-Three GitHub Actions jobs: **Lint & Format** (`npm install` + eslint + prettier), **QA Assertions** (named + smoke + unit + CDN check), **CDN Integrity** (SRI hash verify). All must pass before merging.
-
-Most valuable contributions:
-1. **Rules accuracy reports** — cite the FCon SRD page
-2. **Content quality** — world voice, aspect quality bar
-3. **Accessibility** — WCAG 2.1 AA, keyboard nav, screen reader
-4. **Bug reports** — include world + generator type
-
----
-
-## License
-
-CC BY 3.0 - see `LICENSING.md` for required attribution blocks.
-
-Fate™ is a trademark of Evil Hat Productions, LLC. This is an independent fan project, not affiliated with or endorsed by Evil Hat Productions.
+Migrated from React 18 CDN UMD (no-build, `h()` calls) to SvelteKit in March 2026. See `MIGRATION.md` for the full migration spec and pattern translation guide.

@@ -1,198 +1,119 @@
-# Ogma — Project Memory (AI Session Handoff)
+# Project Memory — Ogma SvelteKit
 
-> Snapshot of architecture state for model-switching and session continuity.
-> Keep in sync with ROADMAP.md and CHANGELOG.md.
-> **Last updated:** v2026.03.403
-
----
-
-## Active voices (workshop mode)
-
-| Voice | When active | Owns |
-|-------|-------------|------|
-| **Engineering** | All sessions | Load order, encoding, syntax, no-build-step contract, `node --check` after every write |
-| **Rules / Content** | All sessions | FCon SRD compliance, world voice consistency, flags Fate Core bleed |
-| **QA** | All sessions | 327/327 named · 59/59 hook wiring · 59/59 unit · 89/89 export · 128/128 smoke gate, named assertions for every fixed bug |
-| **UX** | UI / nav / discoverability work | Task completion, time-to-first-value, 44px touch targets, 375px parity, severity ratings |
-| **Product Strategist** | Feature decisions, prioritisation | User segment × impact × effort; "if users can't find it, it doesn't exist" |
-| **Mechanical Auditor** | World data / content work | Scores tables 1–10: Voice, Narrative Interconnectivity, Mechanical Integrity, Editorial Polish, Structural Pacing |
-
-User segments: new GM · experienced player · D&D convert · complete beginner · solo prep GM · at-table group use.
-
-See `docs/claude/BOOTSTRAP.md` → Active voices for full role descriptions.
-
----
-
-
-
-Offline-first browser PWA for Fate Condensed GMs. 16 generators × 8 worlds. Source files are the deployed app — no build step required for development. Deployed at ogma.net (Cloudflare Pages). Repo: github.com/brs165/ogma-fate.
-
----
-
-## Current state
-
-| Item | Value |
-|------|-------|
-| Version | `2026.03.403` |
-| Named QA | 327/327 |
-| Unit tests | 59/59 |
-| Export round-trip | 89/89 |
-| Smoke | 128/128 (16 generators × 8 worlds) |
-| Working dir | repo root |
-| Deploy | Cloudflare Pages (push to main) |
+Persistent context for model-switching and session handoffs.
+Last updated: March 2026.
 
 ---
 
 ## Stack
 
-| Layer | Tech |
-|-------|------|
-| UI | React 18.2.0 via CDN UMD — `React.createElement` aliased as `h()` |
-| Storage | Dexie 4.0.10 (IndexedDB), `memStore` fallback |
-| Offline | Service Worker, cache-first, all APP_SHELL assets |
-| Multiplayer | `ogma-sync` Cloudflare Worker relay, PartySocket |
-| Styling | Vanilla CSS — Field Dispatch design system |
-| Fonts | Jost (Futura proxy, display+body), JetBrains Mono / Martian Mono (mono) |
-| Build | Optional: `scripts/build.js` (3-tier, see docs/BUILD.md) |
-| No | JSX, transpilation, ES modules, npm at runtime |
+| Layer | Technology |
+|-------|-----------|
+| Framework | SvelteKit (Svelte 5 engine, using Svelte 4 `export let` syntax) |
+| Build | Vite 7, `@sveltejs/adapter-static` |
+| State | Svelte stores (`writable`, `derived`) in plain JS |
+| Persistence | Dexie 4 (IndexedDB) |
+| Sync | WebSocket multiplayer (JSON `{type, ...payload}`) |
+| Styling | Global `static/assets/css/theme.css` (2,744 lines) |
+| PWA | Service worker + `manifest.json` |
 
 ---
 
-## File map
-
-| File | Purpose |
-|------|---------|
-| `core/engine.js` | All `generate*()` functions, PRNG, table ops. Pure JS. |
-| `core/ui.js` | `CampaignApp` — main campaign page shell |
-| `core/ui-renderers.js` | 16 result renderers + `cv4Card` (CSS 3D flip: front=content, back=GM Guidance. 5 categories, interactive stress/countdown/contest/consequence) |
-| `core/ui-table.js` | `PrepCanvas` + canvas card components. `TpDicePanel` (learn-fate visual, phase machine, Fate Ladder dropdown). `TpTurnBar`. |
-| `core/ui-modals.js` | Modal, ExportModal, Settings, Vault, QuickFind, KBShortcuts |
-| `core/ui-primitives.js` | `h` alias, FD card primitives, `ErrorBoundary`, `scoreAspect()` |
-| `core/ui-landing.js` | Landing page components |
-| `core/ui-board.js` | `BoardApp` — unified Prep/Play canvas. Scene End, free invoke pips on stickies, boost cards, `LABEL_STYLES`, `removeFromTable`, `PlayerSurface` (My Character sheet) |
-| `core/db.js` | Dexie 4 IDB wrapper (second IIFE = `window.DB`) |
-| `core/config.js` | `OGMA_CONFIG`: `REPO_BASE`, `DEFAULT_SYNC_HOST` |
-| `core/intro.js` | Campaign intro animation (DOM, not React) |
-| `data/shared.js` | `CAMPAIGNS={}`, `GENERATORS`, `ALL_SKILLS`, `HELP_CONTENT` |
-| `data/universal.js` | Cross-world content merged at runtime |
-| `data/[world].js` | 8 world data files |
-| `sw.js` | Service worker — APP_SHELL cache-first |
-| `scripts/build.js` | Optional 3-tier build pipeline (see docs/BUILD.md) |
-| `scripts/bump-version.sh` | CalVer stamp — run before every zip/deploy |
-| `tests/qa_named.js` | 327 named assertions |
-| `tests/hook-wiring-audit.js` | 59 hook return key + call-site arg checks |
-| `tests/engine.test.js` | 59 unit tests |
-| `tests/export-roundtrip.test.js` | 89 export/import round-trip assertions |
-| `ROADMAP.md` | Source of truth for all open work |
-| `CHANGELOG.md` | Full version history |
-| `docs/BUILD.md` | Build pipeline guide |
-| `docs/claude/BOOTSTRAP.md` | AI session startup checklist (read first) |
-| `docs/claude/CONVENTIONS.md` | Accessibility + engineering rules |
-| `docs/claude/WORLD-VOICES.md` | World tone notes for content work |
-
----
-
-## Architecture decisions
-
-| Decision | What |
-|----------|------|
-| No build step | Source files = deployed files. `build.js` is optional optimisation only. |
-| React 18 via CDN UMD | `h` alias. No JSX. No transpilation. |
-| Dexie 4 for IDB | Promise-based. Schema migrations via `version()`. |
-| Offline-first SW | Cache-first. All assets in APP_SHELL. CDN scripts excluded from intercept. |
-| `ErrorBoundary` | Sole permitted class component. Everything else is function components + hooks. |
-| Board inline | `canvasView` state in `CampaignApp`. `board.html` is a JS redirect. `openCanvas()` sets `canvasView=true`. |
-| Accordion nav | `sbAcc` state + `toggleAcc()`. Sections: Play → Binder → Generate → Settings. One open at a time. |
-| ExportModal | Full modal (not dropdown). Card checklist, 8 formats, copy/download toggle, import footer. |
-
----
-
-## Script load order (every campaign HTML)
+## File paths
 
 ```
-[React CDN] → [ReactDOM CDN] → shared.js → universal.js → [world].js →
-config.js → engine.js → [Dexie CDN] → db.js → ui-primitives.js → partysocket.js →
-ui-renderers.js → ui-table.js → ui-modals.js → ui-landing.js → ui.js → intro.js
+src/lib/engine.js           2,045 lines  Pure-function content generator
+src/lib/db.js                 996 lines  Dexie 4 IndexedDB wrapper
+src/lib/helpers.js            114 lines  Shared utilities
+src/lib/stores/               6 files    Svelte stores
+src/lib/components/          48 files    Svelte components
+src/lib/components/cards/fronts/  18 files    Card front renderers
+src/data/                    11 files    Campaign data modules
+src/routes/                   3 files    SvelteKit route pages
+static/assets/css/theme.css            Global stylesheet
+react-source/                          Original React codebase (read-only)
 ```
 
-Board page: same to ui-primitives, then: ui-renderers → ui-table → ui-modals → ui.js → ui-board.js (no ui-landing, no intro).
+---
+
+## Store inventory
+
+| Store | File | Lines | Purpose |
+|-------|------|-------|---------|
+| Canvas | `canvasStore.js` | 198 | Card CRUD, generate, delete, reroll, undo stack, IDB persist |
+| Play | `playStore.js` | 176 | Players, turn order, rounds, fate points, stress, GM pool |
+| Binder | `binderStore.js` | 141 | Binder cards, tray, pin/unpin, send to canvas |
+| Sync | `syncStore.js` | 135 | WebSocket connect/disconnect, room code, role |
+| Session | `sessionStore.js` | 189 | Active generator, result history, chain rolls, prefs |
+| Chrome | `chromeStore.js` | 115 | Toast queue, theme toggle, SW update, PWA lifecycle |
 
 ---
 
-## 8 worlds
+## Component inventory
 
-| World | ID | Voice |
-|-------|----|-------|
-| The Long After | `thelongafter` | Elegiac, mythic. Nostalgia as danger. |
-| Neon Abyss | `cyberpunk` | Transhumanist anxiety. Chrome as leash. |
-| Shattered Kingdoms | `fantasy` | Wound-lore. Magic costs compound. |
-| Void Runners | `space` | Blue-collar solidarity. Ship payment due. |
-| The Gaslight Chronicles | `victorian` | Horror in implication, not reveal. |
-| The Long Road | `postapoc` | Lyrical. Loss as texture. What you build. |
-| Dust and Iron | `western` | Frontier justice. Violence has aftermath. |
-| dVenti Realm | `dVentiRealm` | Political thriller. Bureaucracy as obstruction. |
-
----
-
-## 16 generators
-
-`npc_minor`, `npc_major`, `pc`, `scene`, `campaign`, `encounter`, `seed`, `compel`, `challenge`, `contest`, `consequence`, `faction`, `complication`, `backstory`, `obstacle`, `countdown`, `constraint`
-
-(17 listed in GENERATORS including `constraint` — smoke tests 16 of the legacy set for backward compat.)
+| Directory | Count | Key components |
+|-----------|-------|---------------|
+| `cards/` | 6 | CvLabel, CvTag, StressRow, ClockTrack, Cv4Card, BackPanel |
+| `cards/fronts/` | 18 | 18 generator-specific card fronts (NpcMinor through Custom, Pc) |
+| `board/` | 18 | Board (main), BoardCard, Topbar, TurnBar, PlayerRow, ExportPanel, HelpPanel, CommandPalette, etc. |
+| `campaign/` | 3 | Campaign, FatePointTracker, Landing |
+| `panels/` | 1 | LeftPanel |
+| `dice/` | 1 | DicePanel (4-phase state machine: idle→flicker→reveal→done) |
+| `player/` | 1 | PlayerSurface (join wizard, character sheet, dice, compel, tent mode) |
+| **Total** | **48** | + 3 route files = **51 `.svelte` files** |
 
 ---
 
-## Critical non-negotiables
+## Data modules (11 files in `src/data/`)
 
-- **Never redeclare** `h`, `useState`, `useEffect`, `useRef`, `useCallback`, `Fragment` — all `const` in `ui-primitives.js`.
-- **Python writes** → `open(f, 'w', encoding='utf-8')`. Emoji in JS strings → unicode escapes.
-- **`node --check <file> && echo OK`** after every write.
-- **`_headers` not in APP_SHELL** — CF Pages consumes it server-side.
-- **`partysocket.js` not replaceable with CDN** — no UMD build exists.
-- **`var foo = props.foo`** not `var foo = foo` — self-referential destructuring returns `undefined`.
-- **`printCards` in second IIFE** in `db.js` (`window.DB` block).
-- **No `_redirects` file** — CF Pages Pretty URLs handles `.html` stripping.
-- **`<base href="/">`** on all campaign HTML pages.
-- **`LABEL_STYLES` must be defined before `BoardLabel`** — v391 crash: constant used but never declared. Define style constants before the component that reads them.
-- **New canvas card types must be excluded from 4 filter sites** — `genCards`, `hasCards`, `printable`, and the board render filter all check `genId !== 'sticky' && genId !== 'boost' && genId !== 'label'`.
-- **`cv4Card` is a CSS 3D flip** — `cv4-flip-container > cv4-flipper > cv4-front + cv4-back`. Do not reintroduce the accordion GM Guidance pattern.
-- **`TpDicePanel` uses a phase machine** (`idle → flicker → reveal → done`) with interval-driven sequential die reveal. Do not flatten to a single `setTimeout`.
+`fantasy.js`, `cyberpunk.js`, `space.js`, `western.js`, `victorian.js`, `postapoc.js`, `thelongafter.js`, `dVentiRealm.js`, `shared.js`, `shared-lite.js`, `universal.js`
 
 ---
 
-## Open work (owner-gated)
+## QA gate numbers
 
-| ID | Title | Status |
-|----|-------|--------|
-| MP-07 | Two-tab multiplayer test | Needs owner testing |
-| MP-13 | Two-device / two-network test | Needs owner testing |
-| VIS-01 | Table visual redesign confirmation | Needs hard refresh + visual check |
-| WS-11 | r/FATErpg launch post | Parked → 2026.06.22 |
+| Check | Expected |
+|-------|----------|
+| `npm run dev` | Zero errors (warnings OK) |
+| `npm run build` | Prints "✔ done" |
+| `.svelte` file count | 51 |
+| Store file count | 6 |
+| Data module count | 11 |
+| Engine export count | 20 |
+| TODO/FIXME/STUB markers | 0 |
+| `react-source/` modifications | 0 (must stay pristine) |
 
 ---
 
-## QA commands
+## Key engineering rules
 
-```bash
-# Syntax
-node --check core/engine.js && node --check core/ui.js && node --check core/ui-table.js && node --check core/ui-board.js && node --check core/ui-renderers.js && node --check core/db.js
+### 1. Drag system — direct DOM, not reactive
+The canvas drag system uses direct DOM manipulation (`el.style.left/top`) during drag for performance. A single Svelte store update happens on drop. This was a deliberate performance decision from the React era. Do not make drag reactive.
 
-# Named (327)
-node tests/qa_named.js
+### 2. Card flip — CSS 3D transform
+`Cv4Card.svelte` uses `perspective`, `rotateY(180deg)`, `backface-visibility: hidden` for the flip animation. The `prefers-reduced-motion` media query replaces the flip with a `display:none` toggle. The flip state is a local `flipped` variable, not a store.
 
-# Hook wiring audit (59)
-node tests/hook-wiring-audit.js
+### 3. Sync protocol — preserved from React
+The WebSocket sync protocol uses JSON messages: `{type, ...payload}`. Message types: `player_hello`, `player_roll`, `compel_offer`, `compel_response`, `player_create_aspect`, `broadcast_state`. A React player must be able to connect to a Svelte GM and vice versa. Do not change the wire format.
 
-# Unit (59)
-node tests/engine.test.js
+### 4. IDB persistence — every state persists
+Canvas cards, play state, fate points, binder, tray — all persisted to IndexedDB via Dexie. Stores call `DB.saveSession()` / `DB.loadSession()` on mutation. Loss of persistence is a regression.
 
-# Export round-trip (89)
-node tests/export-roundtrip.test.js
+### 5. engine.js and db.js — pure libraries
+These files must never import from Svelte. They are framework-agnostic libraries. Stores import from them; they do not import from stores.
 
-# Smoke (128)
-node -e "var fs=require('fs');eval(fs.readFileSync('data/shared.js','utf8'));eval(fs.readFileSync('data/universal.js','utf8'));['thelongafter','cyberpunk','fantasy','space','victorian','postapoc','western','dVentiRealm'].forEach(function(c){eval(fs.readFileSync('data/'+c+'.js','utf8'));});eval(fs.readFileSync('core/engine.js','utf8'));var errs=[],total=0;['thelongafter','cyberpunk','fantasy','space','victorian','postapoc','western','dVentiRealm'].forEach(function(camp){var t=filteredTables(mergeUniversal(CAMPAIGNS[camp].tables),{});['npc_minor','npc_major','scene','campaign','encounter','seed','compel','challenge','contest','consequence','faction','complication','backstory','obstacle','countdown','constraint'].forEach(function(gen){try{var r=generate(gen,t,4);if(!r||typeof r!=='object')errs.push(camp+'/'+gen);total++;}catch(e){errs.push(camp+'/'+gen+': '+e.message);}});});console.log('Smoke: '+total+'/128 errors:'+errs.length);if(errs.length)process.exit(1);"
+### 6. CSS lives in theme.css
+All styling is in `static/assets/css/theme.css`. Components should not have `<style>` blocks unless adding animations that don't exist in theme.css. This is a deliberate architectural choice, not technical debt.
 
-# Bump + zip
-bash scripts/bump-version.sh
-cd .. && zip -r ogma-$(date +%Y.%m).XXX.zip fate-suite-new/ -x "*/node_modules/*" -x "*/.git/*" -x "*/\.*" -x "*/dist/*"
-```
+---
+
+## Model-switching handoff
+
+When switching between Claude models mid-session:
+
+1. Read `CLAUDE.md` for architecture rules and commands
+2. Read this file (`docs/claude/PROJECT_MEMORY.md`) for current state
+3. Run `npm run build` to verify the project compiles
+4. Run `find src -name "*.svelte" | wc -l` to confirm file count (51)
+5. Check `git status` for any in-progress work
+6. Continue from where the previous model left off
