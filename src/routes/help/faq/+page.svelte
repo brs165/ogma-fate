@@ -1,0 +1,193 @@
+<svelte:options runes={false} />
+
+<script>
+  import { onMount } from 'svelte';
+  let theme = 'dark';
+  onMount(() => {
+    try {
+      const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}');
+      theme = p.theme || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) {}
+  });
+  function toggleTheme() {
+    theme = theme === 'dark' ? 'light' : 'dark';
+    if (typeof document !== 'undefined') document.documentElement.setAttribute('data-theme', theme);
+    try {
+      const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}');
+      p.theme = theme;
+      localStorage.setItem('fate_prefs_v1', JSON.stringify(p));
+    } catch (e) {}
+  }
+</script>
+
+<svelte:head>
+  <title>FAQ — Ogma Help</title>
+  <meta name="description" content="Frequently asked questions about Ogma" />
+</svelte:head>
+
+<div class="land-shell">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <header class="land-topnav topbar" role="banner">
+    <a href="/" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
+    <div class="topbar-spacer" style="flex:1"></div>
+    <div class="topbar-status">
+      <a href="/help" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">&#128218; Help</a>
+      <a href="/about" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">About</a>
+      <button class="btn btn-icon btn-ghost" on:click={toggleTheme}
+        aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+        style="width:44px;height:44px">{theme === 'dark' ? '☀️' : '◑'}</button>
+    </div>
+  </header>
+
+  <main class="wiki-content" id="main-content">
+    
+<div class="wiki-page-eyebrow">FAQ & Troubleshooting</div>
+<h1>Common questions and fixes</h1>
+<p class="wiki-page-desc">Answers to everything that comes up. If something isn't here, check <a href="/about">About Ogma</a> or open the browser console for error details.</p>
+
+<h2>Fate rules — the questions everyone asks</h2>
+
+<h3>Is stress like hit points?</h3>
+<p><strong>No — and this is the most important difference to internalise.</strong> Stress is a scene-by-scene pacing buffer. All stress boxes clear at the end of every scene. A character with 0 stress boxes left isn't near death — they just can't absorb any more hits <em>this scene</em>. They're back to full after the scene ends.</p>
+<p>Consequences are the thing that persists. Recovery requires a treatment roll first (Overcome at the consequence's difficulty: Fair +2 for Mild, Great +4 for Moderate, Fantastic +6 for Severe) — only then does the timer start. A Mild consequence clears one full scene after treatment, a Moderate clears at end of session after treatment, a Severe clears at a major milestone after treatment. Untreated consequences do not clear. Consequences are aspects — the GM can invoke them against you, and players can compel them for fate points. <em>FCon SRD p.38.</em></p>
+
+<h3>When should I invoke an aspect vs. wait to be compelled?</h3>
+<p><strong>Invoke</strong> when you want to improve an outcome on a roll that matters. Spend a fate point, name the aspect, and get +2 or a reroll. It has to be narratively plausible — "Stronger Than I Look" works for lifting a portcullis, not for picking a lock.</p>
+<p><strong>Compels</strong> come from the GM (or another player). The GM offers you a fate point in exchange for your aspect creating a problem. You accept the complication and earn the point, or you spend a point to refuse. The rhythm: accept more compels early (earn fate points), spend them on the rolls that count.</p>
+
+<h3>When should the GM call for a roll?</h3>
+<p>Ask three questions. (1) Is the outcome uncertain? (2) Would failure be interesting — does it advance the story rather than stall it? (3) Does it matter to the story right now? If any answer is no, don't roll — just narrate the outcome and move forward. A master lockpick opening a basic lock in a low-stakes moment shouldn't roll. <em>FCon SRD p.14.</em></p>
+
+<h3>Why would I ever use Create Advantage instead of just attacking?</h3>
+<p>Because free invokes stack, and Attack into a defended +4 is a poor bet without them. Create Advantage places an aspect with free invokes you or your allies can spend later. Two free invokes = +4 on the attack that follows. The tactical loop: Create Advantage to build up free invokes, then Attack with them stacked. See the <a href="//help/fate-mechanics#create-advantage">Create Advantage deep-dive</a>.</p>
+
+<h3>How often should fate points change hands?</h3>
+<p>More than you think. Aim for at least 1–2 compels per session per player. A session where nobody earns or spends fate points is a session where the economy stalled — usually because the GM forgot to compel. The flow: GM compels → players earn points → players invoke aspects on big rolls → GM earns those points back for NPC invokes → repeat.</p>
+
+<h3>What makes a good aspect?</h3>
+<p>Test it in both directions. Can you imagine a moment where invoking it for +2 fits the fiction? Can you imagine a moment where it causes your character a problem worth accepting a fate point for? If both are yes, it's a good aspect. "Skilled Swordsman" only works one way. "Fights to Prove a Point" works both — invoke it when duelling with honour, accept compels when your pride overrides your judgement. <em>FCon SRD p.23.</em></p>
+
+<h3>What does the GM actually prepare for a Fate session?</h3>
+<p>Situations, not plots. Before a session you want: a current issue (problem already in motion), an impending issue (approaching threat), 3–5 named NPCs with faces and aspects, and 2–3 locations with situation aspects. That's it. Fate's scenario prep takes 20–30 minutes. Ogma's Campaign Frame, Adventure Seed, Faction, and NPC generators produce all of this in under 2 minutes. See <a href="//help/fate-mechanics#what-gms-prepare">What the GM prepares</a>.</p>
+
+<h3>Can I run a D&amp;D-style game in Fate?</h3>
+<p>You can run dungeon exploration, monster fights, and levelling arcs — but Fate will push back on the D&amp;D assumptions behind them. Fate works best when the players care about the characters as much as the challenges. If the goal is tactical encounter design, Fate is the wrong tool. If the goal is characters with personality navigating dangerous situations, Fate is excellent. The <a href="//help/dnd-transition">D&amp;D Transition guide</a> covers every specific difference.</p>
+
+<h3>How do zones work in conflicts?</h3>
+<p>Zones are abstract areas within a scene — not a grid. "The Rooftop," "The Fire Escape," "The Street Below" might be three zones in one conflict. Moving between adjacent zones costs an action or is free depending on whether anything is blocking the move. Zones can have situation aspects ("Smoke-Filled Corridor" in zone 2). The point is to give positioning narrative meaning without requiring a battle map. <em>FCon SRD p.29.</em></p>
+
+<h3>What's the difference between a challenge, contest, and conflict?</h3>
+<p><strong>Challenge:</strong> one side faces multiple obstacles in sequence (a series of Overcome rolls). Nobody is directly opposing them. Use when the stakes are "can the party pull this off before time runs out."</p>
+<p><strong>Contest:</strong> two sides race for the same goal without directly harming each other. First to 3 victories wins. Use for chases, debates, or competitive tasks.</p>
+<p><strong>Conflict:</strong> both sides can harm each other. Use when the stakes include taking characters out of the scene by force. <em>FCon SRD p.28–38.</em></p>
+
+<h3>Why do experienced gamers find Fate harder to learn than beginners?</h3>
+<p>Because unlearning is harder than learning. D&amp;D habits — optimising builds, attacking every round, treating the GM as an adversary, waiting for the GM to present the adventure — all actively undermine Fate. Beginners have nothing to uninstall. The single most useful thing an experienced TTRPG player can do when learning Fate is read the <a href="https://bookofhanz.com/" target="_blank" rel="noreferrer">Book of Hanz</a> before playing, specifically the chapters "Fiction, Not Physics" and "What is Fate?"</p>
+
+<h2>Data and storage</h2>
+
+<h3>I cleared my browser cache and lost my pinned results. Can I recover them?</h3>
+<p><strong>No — the data is gone if you cleared site data.</strong> Ogma stores everything locally in your browser. Clearing cache, cookies, or site data removes it permanently. There is no server backup.</p>
+<p>To prevent this in future:</p>
+<ul>
+  <li>Open History (📋), click "Copy all as Markdown" before clearing anything</li>
+  <li>On Chrome: when clearing data, untick "Hosted app data" or "IndexedDB/localStorage" — clear just the HTTP cache</li>
+  <li>In private/incognito mode, data is wiped when the window closes. Don't use incognito for Ogma unless you're exporting before you close.</li>
+</ul>
+
+<div class="callout callout-warning">
+  <div class="callout-title">&#9888; Data loss situations to avoid</div>
+  <ul>
+    <li>Clearing site data or cookies in browser settings</li>
+    <li>Using private/incognito mode without exporting first</li>
+    <li>Switching browsers (data does not sync between Chrome and Firefox)</li>
+    <li>Switching devices (data stays on the original device)</li>
+  </ul>
+</div>
+
+<h3>Where exactly is my data stored?</h3>
+<p><strong>IndexedDB</strong> stores: session state (last result, history ring, saved cards, FP tracker state). Database name: <code>fate_generator</code>.</p>
+<p><strong>localStorage</strong> stores: theme preference, universal merge preference, PWA install dismissal. Table customisations, session prep data (saved cards, prep packs, session notes), and visit state use IndexedDB for reliability.</p>
+<p>To view it: open browser DevTools → Application → Storage → IndexedDB / Local Storage → (your site origin).</p>
+
+<h3>Can I transfer my data to another device or browser?</h3>
+<p>Not directly. The workaround: export saved cards as Markdown from History, then paste them into a note or document on the new device. Ogma doesn't have an import-from-backup feature; what you export is the content, not the app state.</p>
+
+<h2>Offline and installation</h2>
+
+<h3>Does Ogma work offline?</h3>
+<p><strong>Yes — fully.</strong> After your first visit, the service worker caches all 740KB of the app. You can open the app with no internet, run sessions, pin results, export Markdown — everything works.</p>
+<p>The only thing that requires internet: the initial first load to install the service worker, and future update checks (which happen silently in the background).</p>
+
+<h3>I see "Update available — reload?" — should I click it?</h3>
+<p>Yes. This means a new version of Ogma has been deployed. Your data is not affected by updates. Clicking reload fetches the latest files and clears the old service worker cache. If you don't click it, the old version continues to work until you next close the tab.</p>
+
+<h3>The app isn't loading updates — it's stuck on an old version.</h3>
+<p>Force-refresh bypasses the service worker: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> (Windows/Linux) or <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> (Mac). Alternatively: DevTools → Application → Service Workers → click "Skip waiting" next to the waiting worker.</p>
+
+
+<table class="wiki-table">
+  <thead><tr><th scope="col">Browser</th><th scope="col">Status</th><th scope="col">Notes</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Chrome / Chromium</strong></td><td>&#10003; Full support</td><td>Recommended. PWA install works.</td></tr>
+    <tr><td><strong>Edge</strong></td><td>&#10003; Full support</td><td>PWA install works.</td></tr>
+    <tr><td><strong>Firefox</strong></td><td>&#10003; Full support</td><td>PWA install limited (no desktop install). BroadcastChannel works.</td></tr>
+    <tr><td><strong>Safari (macOS)</strong></td><td>&#10003; Full support</td><td>Add to Dock via File menu. Backdrop-filter supported.</td></tr>
+    <tr><td><strong>Safari (iOS)</strong></td><td>&#10003; Works</td><td>Add to Home Screen for full-screen mode. Some glass blur effects reduced on low-power mode.</td></tr>
+    <tr><td><strong>Internet Explorer</strong></td><td>&#10007; Not supported</td><td>React 18 requires modern JS. Use Edge.</td></tr>
+  </tbody>
+</table>
+
+<h2>Common UI questions</h2>
+
+<h3>What does ↺ Reset do in the FP Tracker?</h3>
+<p>It resets every PC's current Fate Points to their individual Refresh value. Use this at the start of each session. It does not affect saved cards, history, or any other app state.</p>
+
+<h3>The sidebar is showing a "Sessions" tab I haven't seen before.</h3>
+<p>The sidebar has two tabs: <strong>Generate</strong> (the 16 generators grouped by type) and <strong>Prep</strong> (tools: FP Tracker, History, Quick Prep Pack, and navigation). Click the tab labels at the top of the sidebar to switch.</p>
+
+<h3>How do I get back to the world list?</h3>
+<p>Click <strong>OGMA</strong> in the topbar (the wordmark) or the Home crumb in the breadcrumb. This returns you to the landing page where all 8 campaign worlds are listed.</p>
+
+<h3>I'm getting an error in the browser console — what do I do?</h3>
+<p>Open DevTools (F12), go to the Console tab, and look for red errors. The most common ones:</p>
+<ul>
+  <li><strong>LS is not defined</strong> — db.js failed to load. Usually caused by a script order issue in a custom deployment. Ensure db.js loads before ui.js.</li>
+  <li><strong>CAMPAIGNS is not defined</strong> — the campaign data file (e.g. <code>data/fantasy.js</code>) failed to load. Check the network tab for 404 errors.</li>
+  <li><strong>React is not defined</strong> — the CDN failed. Check your internet connection or use the offline ZIP.</li>
+</ul>
+
+<h3>Can I contribute content or report bugs?</h3>
+<p>Yes — the project is on GitHub: <a href="https://github.com/brs165/ogma-fate" target="_blank" rel="noreferrer">github.com/brs165/ogma-fate</a>. Open an issue for bugs, or a pull request for content additions. Table data lives in <code>data/[world].js</code> files.</p>
+
+    <div class="wiki-footer">
+  <div>
+    <a href="/help">Wiki Home</a> &nbsp;·&nbsp;
+    <a href="/">Open Ogma</a> &nbsp;·&nbsp;
+    <a href="/about">About</a> &nbsp;·&nbsp;
+    <a href="/license">Full Attribution</a> &nbsp;·&nbsp;
+    <!-- FARI_PARKED_2026.03.154 fari.app link --> &nbsp;·&nbsp;
+    <a href="https://fate-srd.com/" target="_blank" rel="noreferrer">fate-srd.com</a>
+  </div>
+  <div style="font-size:var(--text-label);color:var(--text-muted)">
+    Fate&#8482; is a trademark of Evil Hat Productions, LLC &nbsp;·&nbsp;
+    D&amp;D&#174; is a trademark of Wizards of the Coast LLC &nbsp;·&nbsp;
+    Released under <a href="/license">CC BY 3.0</a>
+  </div>
+</div>
+  </main>
+
+  <footer class="land-footer">
+    <div class="land-footer-inner">
+      <div style="font-style:italic;color:var(--text-muted);margin-bottom:4px">
+        <strong>O</strong>n-demand <strong>G</strong>enerator for <strong>M</strong>asterful <strong>A</strong>dventures
+      </div>
+      <div>
+        <a href="/license">Full Attribution</a> &middot;
+        <a href="/help">&#128218; Help</a> &middot;
+        <a href="/about">About</a>
+      </div>
+    </div>
+  </footer>
+</div>

@@ -211,6 +211,10 @@
                 <span aria-hidden="true" class="sidebar-item-icon">&#x2193;</span>
                 <span class="sidebar-item-label">Export Cards</span>
               </button>
+              <button class="sb-acc-item" on:click={() => { showSidebar = false; }}>
+                <span aria-hidden="true" class="sidebar-item-icon">&#x1F4DD;</span>
+                <span class="sidebar-item-label">Session Notes</span>
+              </button>
             </div>
           {/if}
         </div>
@@ -266,6 +270,18 @@
                 <span aria-hidden="true" class="sidebar-item-icon">{theme === 'dark' ? '\u2600' : '\u25D1'}</span>
                 <span class="sidebar-item-label">{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
               </button>
+              <a href="/help" class="sb-acc-item" style="text-decoration:none">
+                <span aria-hidden="true" class="sidebar-item-icon">&#x1F4D6;</span>
+                <span class="sidebar-item-label">Help &amp; Wiki</span>
+              </a>
+              <a href="/about" class="sb-acc-item" style="text-decoration:none">
+                <span aria-hidden="true" class="sidebar-item-icon">&#x2139;</span>
+                <span class="sidebar-item-label">About</span>
+              </a>
+              <a href="/license" class="sb-acc-item" style="text-decoration:none">
+                <span aria-hidden="true" class="sidebar-item-icon">&#xa9;</span>
+                <span class="sidebar-item-label">License</span>
+              </a>
             </div>
           {/if}
         </div>
@@ -275,6 +291,10 @@
 
       <!-- Dock -->
       <div class="sb-dock" role="toolbar" aria-label="Site navigation and status">
+        <a href="/help/learn-fate" class="sb-dock-btn" aria-label="Learn Fate">
+          <span aria-hidden="true" class="sb-dock-ico">&#x1F4D6;</span>
+          <span class="sb-dock-lbl">Learn</span>
+        </a>
         <a href="/" class="sb-dock-btn" aria-label="All Worlds">
           <span aria-hidden="true" class="sb-dock-ico">&#x1F30D;</span>
           <span class="sb-dock-lbl">Worlds</span>

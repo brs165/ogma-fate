@@ -1,0 +1,193 @@
+<svelte:options runes={false} />
+
+<script>
+  import { onMount } from 'svelte';
+
+  let theme = 'dark';
+
+  onMount(() => {
+    try {
+      const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}');
+      theme = p.theme || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) {}
+  });
+
+  function toggleTheme() {
+    theme = theme === 'dark' ? 'light' : 'dark';
+    if (typeof document !== 'undefined') document.documentElement.setAttribute('data-theme', theme);
+    try {
+      const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}');
+      p.theme = theme;
+      localStorage.setItem('fate_prefs_v1', JSON.stringify(p));
+    } catch (e) {}
+  }
+</script>
+
+<svelte:head>
+  <title>License &amp; Attribution — Ogma</title>
+  <meta name="description" content="Full licensing, attribution, and legal notices for Ogma — A Fate Condensed Generator Suite. CC BY 3.0." />
+</svelte:head>
+
+<div class="land-shell">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="land-topnav topbar">
+    <a href="/" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
+    <div class="topbar-spacer" style="flex:1"></div>
+    <div class="topbar-status">
+      <a href="/learn" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">&#128218; Learn</a>
+      <a href="/about" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">About</a>
+      <button
+        class="btn btn-icon btn-ghost"
+        on:click={toggleTheme}
+        aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+        title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+        style="width:44px;height:44px"
+      >{theme === 'dark' ? '☀️' : '◑'}</button>
+    </div>
+  </header>
+
+  <main class="lic" id="main-content">
+    <h1>License &amp; Attribution</h1>
+
+    <p>Ogma is built on the work of many people who made their creations open and free to build upon. Every credit on this page is both legally required and genuinely meant.</p>
+
+    <!-- This Work -->
+    <h2>This Work</h2>
+
+    <div class="lic-badge">
+      <span class="lic-badge-icon">&#169;</span>
+      <div class="lic-badge-text">
+        <span class="lic-badge-title">Ogma &mdash; A Fate Condensed Generator Suite</span>
+        <span class="lic-badge-sub">Released under <strong>Creative Commons Attribution 3.0 Unported (CC BY 3.0)</strong></span>
+      </div>
+    </div>
+
+    <p>All original code, generator logic, campaign data tables, NPC names, aspects, scene elements, and original prose in Ogma are released under CC BY 3.0. You are free to share, adapt, and build upon this work &mdash; including for commercial purposes &mdash; provided you give appropriate credit.</p>
+
+    <p>If you adapt or redistribute this work, your attribution must state that your work is based on Ogma, include the Fate SRD attribution blocks below, and link to the CC BY 3.0 license. You do not need to license your own work under the same terms.</p>
+
+    <p>This project is not affiliated with, endorsed by, or sponsored by Evil Hat Productions, LLC or Wizards of the Coast, LLC.</p>
+
+    <!-- Fate SRD -->
+    <h2>Fate System Reference Document</h2>
+
+    <p>The game mechanics, rules text, terminology, and structural content in Ogma are derived from the Fate SRD. The following attribution blocks are required by the CC BY 3.0 license.</p>
+
+    <div class="lic-card">
+      <h3>Fate Condensed</h3>
+      <p class="verbatim">This work is based on Fate Condensed (found at http://www.faterpg.com/), a product of Evil Hat Productions, LLC, developed, authored, and edited by PK Sullivan, Ed Turner, Leonard Balsera, Fred Hicks, Richard Bellingham, Robert Hanz, Ryan Macklin, and Sophie Lagac&eacute;, and licensed for our use under the Creative Commons Attribution 3.0 Unported license.</p>
+    </div>
+
+    <div class="lic-card">
+      <h3>Fate Core System and Fate Accelerated Edition</h3>
+      <p class="verbatim">This work is based on Fate Core System and Fate Accelerated Edition (found at http://www.faterpg.com/), products of Evil Hat Productions, LLC, developed, authored, and edited by Leonard Balsera, Brian Engard, Jeremy Keller, Ryan Macklin, Mike Olson, Clark Valentine, Amanda Valentine, Fred Hicks, and Rob Donoghue, and licensed for our use under the Creative Commons Attribution 3.0 Unported license.</p>
+    </div>
+
+    <div class="lic-card">
+      <h3>Fate System Toolkit</h3>
+      <p class="verbatim">This work is based on the Fate System Toolkit (found at http://www.faterpg.com/), a product of Evil Hat Productions, LLC, developed, authored, and edited by Robert Donoghue, Brian Engard, Brennan Taylor, Mike Olson, Mark Diaz Truman, Fred Hicks, and Matthew Gandy, and licensed for our use under the Creative Commons Attribution 3.0 Unported license.</p>
+    </div>
+
+    <div class="lic-card">
+      <h3>Fate Adversary Toolkit</h3>
+      <p class="verbatim">This work is based on the Fate Adversary Toolkit SRD (found at http://www.faterpg.com/), a product of Evil Hat Productions, LLC, developed, authored, and edited by Brian Engard, Lara Turner, Joshua Yearsley, and Anna Meade, and licensed for our use under the Creative Commons Attribution 3.0 Unported license.</p>
+    </div>
+
+    <div class="lic-card">
+      <h3>The Book of Hanz</h3>
+      <p class="verbatim">This work is based on The Book of Hanz (found at https://bookofhanz.com/), a product of Amazing Rando Design, developed, authored, and edited by Robert Hanz, John Adamus, and Randy Oest, and licensed for our use under the Creative Commons Attribution 3.0 Unported license.</p>
+    </div>
+
+    <!-- D&D SRD -->
+    <h2>Dungeons &amp; Dragons System Reference Document</h2>
+
+    <p>The dVenti Realm campaign world uses terminology, creature names, class feature names, and mechanical concepts derived from the Dungeons &amp; Dragons 5th Edition System Reference Document.</p>
+
+    <div class="lic-card">
+      <h3>D&amp;D SRD 5.2.1</h3>
+      <p class="verbatim">Dungeons &amp; Dragons 5th Edition System Reference Document v5.2.1 &copy; 2025 Wizards of the Coast LLC. Licensed under Creative Commons Attribution 4.0 International (CC BY 4.0).</p>
+      <p class="verbatim">This work is not affiliated with or endorsed by Wizards of the Coast LLC. Dungeons &amp; Dragons&reg;, D&amp;D&reg;, and related trademarks are property of Wizards of the Coast LLC.</p>
+    </div>
+
+    <!-- Trademark Notices -->
+    <h2>Trademark Notices</h2>
+
+    <p>Fate&trade; is a trademark of Evil Hat Productions, LLC. This project uses Fate mechanics under the Creative Commons license. Use of Fate mechanics does not imply endorsement or sponsorship by Evil Hat Productions, LLC.</p>
+    <p>The Fate Core font is &copy; Evil Hat Productions, LLC and is used with permission. The Four Actions icons were designed by Jeremy Keller.</p>
+    <p>Dungeons &amp; Dragons&reg;, D&amp;D&reg;, and the D&amp;D logo are trademarks of Wizards of the Coast LLC. Ogma is not affiliated with or endorsed by Wizards of the Coast LLC.</p>
+
+    <!-- Open-Source Libraries -->
+    <h2>Open-Source Libraries</h2>
+
+    <div class="lic-card">
+      <h3>Svelte &amp; SvelteKit &mdash; MIT License</h3>
+      <p class="verbatim">Svelte and SvelteKit are &copy; Svelte contributors. Licensed under the MIT License.</p>
+    </div>
+
+    <div class="lic-card">
+      <h3>Dexie.js 4 &mdash; Apache License 2.0</h3>
+      <p class="verbatim">Dexie.js is &copy; 2014&ndash;2024 David Fahlander. Licensed under the Apache License 2.0.</p>
+    </div>
+
+    <div class="lic-card">
+      <h3>PartyKit / partysocket API &mdash; MIT License</h3>
+      <p class="verbatim">The partysocket package and PartyKit platform are &copy; Sunil Pai and Cloudflare Inc., licensed under the MIT License.</p>
+    </div>
+
+    <div class="lic-card">
+      <h3>Icons &mdash; System Emoji</h3>
+      <p>All icons in Ogma are Unicode emoji rendered by your operating system or browser. No third-party icon font is loaded.</p>
+    </div>
+
+    <!-- With Thanks -->
+    <h2>With Thanks</h2>
+
+    <p>Ogma would not exist without these people and projects. They are not legally required credits &mdash; they are genuine ones.</p>
+
+    <div class="lic-shoutout">
+      <span class="lic-shoutout-icon">&#127922;</span>
+      <div class="lic-shoutout-body">
+        <div class="lic-shoutout-title">fate-srd.com &mdash; Randy Oest (Amazing Rando Design)</div>
+        <div class="lic-shoutout-desc">The canonical online reference for all Fate System Reference Documents. Randy hosts, maintains, and updates this resource as a labour of love &mdash; and won a Silver ENnie for it in 2014.</div>
+      </div>
+    </div>
+
+    <div class="lic-shoutout">
+      <span class="lic-shoutout-icon">&#127913;</span>
+      <div class="lic-shoutout-body">
+        <div class="lic-shoutout-title">Evil Hat Productions</div>
+        <div class="lic-shoutout-desc">The creators of Fate Condensed and the people who had the generosity to open-license the system under Creative Commons. Without that decision, none of this would exist. Buy their games. They make good ones.</div>
+      </div>
+    </div>
+
+    <div class="lic-shoutout">
+      <span class="lic-shoutout-icon">&#128214;</span>
+      <div class="lic-shoutout-body">
+        <div class="lic-shoutout-title">The Book of Hanz &mdash; Robert Hanz</div>
+        <div class="lic-shoutout-desc">The clearest writing ever produced about how Fate actually works at the table. If you're new to Fate and want to understand why it plays the way it does, start here. Free to read, invaluable to understand.</div>
+      </div>
+    </div>
+
+    <div class="lic-shoutout">
+      <span class="lic-shoutout-icon">&#128009;</span>
+      <div class="lic-shoutout-body">
+        <div class="lic-shoutout-title">D&amp;D SRD 5.2.1 &mdash; Wizards of the Coast</div>
+        <div class="lic-shoutout-desc">The dVenti Realm campaign world draws vocabulary and creature concepts from the D&amp;D 5e SRD. The SRD is released under CC BY 4.0, which means creators can build on it freely with attribution.</div>
+      </div>
+    </div>
+
+    <!-- Contributing -->
+    <h2>Contributing</h2>
+
+    <p>Ogma is an open project. Contributions, bug reports, and SRD accuracy corrections are welcome. All contributions are understood to be submitted under CC BY 3.0.</p>
+  </main>
+
+  <footer class="land-footer">
+    <div class="land-footer-inner">
+      <div>Ogma is released under CC BY 3.0 &middot; Fate&trade; is a trademark of Evil Hat Productions, LLC &middot; D&amp;D&reg; is a trademark of Wizards of the Coast LLC</div>
+      <div><a href="/about">About</a> &middot; <a href="/">Generator</a> &middot; <a href="/learn">Learn Fate</a></div>
+    </div>
+  </footer>
+</div>

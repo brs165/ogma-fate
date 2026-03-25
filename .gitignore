@@ -2,3 +2,4 @@ _redirects
 .claude/settings.local.json
 .svelte-kit/
 build/
+node_modules/

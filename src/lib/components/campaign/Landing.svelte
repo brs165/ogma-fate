@@ -9,26 +9,37 @@
   let joinErr = '';
 
   const CAMPAIGN_INFO = {
-    thelongafter: { name: 'The Long After', icon: '\u25C8', genre: 'Sword & Planet', vibes: 'Nausica\u00e4 \u00b7 Thundarr \u00b7 Book of the New Sun', hook: 'Warlords and ruined gods in the wreckage of civilisation' },
-    cyberpunk:    { name: 'Neon Abyss', icon: '\u2B21', genre: 'Cyberpunk', vibes: 'Neuromancer \u00b7 Blade Runner \u00b7 Edgerunners', hook: 'Chrome, corp-blood, and the city that eats its own' },
-    fantasy:      { name: 'Shattered Kingdoms', icon: '\u2726', genre: 'Dark Fantasy', vibes: 'Malazan \u00b7 Black Company \u00b7 Witcher', hook: 'Grim blades, older magic, and the weight of history' },
-    space:        { name: 'Void Runners', icon: '\u25EF', genre: 'Space Western', vibes: 'Firefly \u00b7 The Expanse \u00b7 Cowboy Bebop', hook: 'Hard vacuum, hard choices, and no one coming to help' },
-    victorian:    { name: 'The Gaslight Chronicles', icon: '\u2295', genre: 'Gothic Horror', vibes: 'Penny Dreadful \u00b7 From Hell \u00b7 The Prestige', hook: 'Gaslight and secrets and things that should not exist' },
-    postapoc:     { name: 'The Long Road', icon: '\u25FB', genre: 'Post-Apocalypse', vibes: 'Mad Max \u00b7 Last of Us \u00b7 Station Eleven', hook: 'The world already ended. Survive what comes next' },
-    western:      { name: 'Dust and Iron', icon: '\u25C8', genre: 'Frontier Western', vibes: 'Blood Meridian \u00b7 Deadwood \u00b7 True Grit', hook: 'Frontier justice. Railroad money and the weight of the old war' },
-    dVentiRealm:  { name: 'dVenti Realm', icon: '\u2B1F', genre: 'High Fantasy', vibes: 'D&D 5e \u00b7 Pathfinder \u00b7 Dragon Age', hook: 'The Senate collapsed. The Vaults are still here. So is everything sealed inside them.' },
+    thelongafter: { name: 'The Long After', icon: '◈', genre: 'Sword & Planet', vibes: 'Nausicaä · Thundarr · Book of the New Sun', hook: 'Warlords and ruined gods in the wreckage of civilisation' },
+    cyberpunk:    { name: 'Neon Abyss', icon: '⬡', genre: 'Cyberpunk', vibes: 'Neuromancer · Blade Runner · Edgerunners', hook: 'Chrome, corp-blood, and the city that eats its own' },
+    fantasy:      { name: 'Shattered Kingdoms', icon: '✦', genre: 'Dark Fantasy', vibes: 'Malazan · Black Company · Witcher', hook: 'Grim blades, older magic, and the weight of history' },
+    space:        { name: 'Void Runners', icon: '◯', genre: 'Space Western', vibes: 'Firefly · The Expanse · Cowboy Bebop', hook: 'Hard vacuum, hard choices, and no one coming to help' },
+    victorian:    { name: 'The Gaslight Chronicles', icon: '⊕', genre: 'Gothic Horror', vibes: 'Penny Dreadful · From Hell · The Prestige', hook: 'Gaslight and secrets and things that should not exist' },
+    postapoc:     { name: 'The Long Road', icon: '◻', genre: 'Post-Apocalypse', vibes: 'Mad Max · Last of Us · Station Eleven', hook: 'The world already ended. Survive what comes next' },
+    western:      { name: 'Dust and Iron', icon: '◈', genre: 'Frontier Western', vibes: 'Blood Meridian · Deadwood · True Grit', hook: 'Frontier justice. Railroad money and the weight of the old war' },
+    dVentiRealm:  { name: 'dVenti Realm', icon: '⬟', genre: 'High Fantasy', vibes: 'D&D 5e · Pathfinder · Dragon Age', hook: 'The Senate collapsed. The Vaults are still here. So is everything sealed inside them.' },
   };
 
   const NPC_POOL = [
-    { world: 'The Long After', icon: '\u{1F305}', concept: 'Last Cartographer of the Before-Times', trouble: "The Map Shows a City That Shouldn't Exist", skill: 'Lore +3', stunt: 'Living Archive: +2 to Lore when recalling pre-Collapse geography.' },
-    { world: 'Neon Abyss', icon: '\u{1F306}', concept: 'Debt-Bonded Neural Translator', trouble: 'My Employer Owns My Language Centers', skill: 'Empathy +4', stunt: 'Ghost Signal: once per session, intercept a private corporate data packet without triggering alerts.' },
-    { world: 'Shattered Kingdoms', icon: '\u2694\uFE0F', concept: 'Battle-Surgeon Who Stitches with Scar-Thread', trouble: 'The Thread Remembers What It Healed', skill: 'Crafts +3', stunt: 'Scar Lore: +2 to Empathy when reading the history of wounds on a willing subject.' },
-    { world: 'Void Runners', icon: '\u{1F680}', concept: 'Jump Drive Mechanic Three Payments Behind', trouble: "The Drive Works. The Paperwork Doesn't.", skill: 'Engineering +4', stunt: 'Hot Start: once per session, push a failing drive past its rated capacity.' },
-    { world: 'The Gaslight Chronicles', icon: '\u{1F3A9}', concept: 'Alienist Who Studies What Studies Him Back', trouble: 'My Notes Are Starting to Write Themselves', skill: 'Lore +4', stunt: 'Clinical Distance: +2 to Will when resisting mental consequence aspects.' },
-    { world: 'The Long Road', icon: '\u{1F6E3}\uFE0F', concept: "Convoy Medic Who Buries What She Can't Fix", trouble: 'The Graves Are Catching Up', skill: 'Medicine +3', stunt: 'Keep Moving: +2 to Will when treating consequences during active travel.' },
-    { world: 'Dust and Iron', icon: '\u{1F920}', concept: 'Land Surveyor Working Both Sides of the Deed', trouble: 'Three Towns Believe the Same Acre Is Theirs', skill: 'Lore +2', stunt: 'I Know This Land: +2 to Notice when reading terrain for cover or escape routes.' },
-    { world: 'dVenti Realm', icon: '\u2B1F', concept: 'Vault Warden Who Lost the Key Decades Ago', trouble: 'What Comes Out Cannot Be Put Back', skill: 'Will +3', stunt: 'Seal Knowledge: +2 to Lore when identifying magical containment wards.' },
-    { world: 'Neon Abyss', icon: '\u{1F306}', concept: 'Protest Archivist Who Films Everything', trouble: 'The Footage Has Made Me a Target', skill: 'Notice +3', stunt: "You're on Camera: once per scene, reveal a hidden aspect through documented evidence." },
+    { world: 'The Long After', icon: '🌅', concept: 'Last Cartographer of the Before-Times', trouble: "The Map Shows a City That Shouldn't Exist", skill: 'Lore +3', stunt: 'Living Archive: +2 to Lore when recalling pre-Collapse geography.' },
+    { world: 'The Long After', icon: '🌅', concept: 'Scavenger-Priest of the Rusted Saints', trouble: 'Faith Built on Parts That No Longer Fit', skill: 'Will +3', stunt: 'Lay on Hands (Mechanical): once per scene, repair one stress on a willing target with salvage tools.' },
+    { world: 'The Long After', icon: '🌅', concept: "Road Tax Collector with a Legitimate Monopoly", trouble: "The Route That Pays My Salary Doesn't Exist Anymore", skill: 'Provoke +2', stunt: "I Know What This Is Worth: +2 to Rapport when negotiating salvage value." },
+    { world: 'Neon Abyss', icon: '🌆', concept: 'Debt-Bonded Neural Translator', trouble: 'My Employer Owns My Language Centers', skill: 'Empathy +4', stunt: 'Ghost Signal: once per session, intercept a private corporate data packet without triggering alerts.' },
+    { world: 'Neon Abyss', icon: '🌆', concept: 'Ex-Corpo Medic Running an Unlicensed Clinic', trouble: 'Every Patient Is Evidence', skill: 'Medicine +3', stunt: 'Field Triage: +2 to overcome when treating consequences in the field with improvised tools.' },
+    { world: 'Neon Abyss', icon: '🌆', concept: 'Protest Archivist Who Films Everything', trouble: 'The Footage Has Made Me a Target', skill: 'Notice +3', stunt: "You're on Camera: once per scene, reveal you recorded a key moment — create a \"Documented Evidence\" aspect with one free invoke." },
+    { world: 'Shattered Kingdoms', icon: '⚔️', concept: 'Battle-Surgeon Who Stitches with Scar-Thread', trouble: 'The Thread Remembers What It Healed', skill: 'Crafts +3', stunt: 'Scar Lore: +2 to Empathy when reading the history of wounds on a willing subject.' },
+    { world: 'Shattered Kingdoms', icon: '⚔️', concept: 'Exiled Prince Hiding as a Traveling Merchant', trouble: "The Crown's Spies Recognize My Hands", skill: 'Deceive +3', stunt: "Merchant's Price: +2 to Rapport when using trade goods as social leverage." },
+    { world: 'Shattered Kingdoms', icon: '⚔️', concept: 'Hedge Witch Paid in Secrets', trouble: 'I Know Too Much to Be Safe Anywhere', skill: 'Lore +4', stunt: "Cost of Knowledge: once per session, name a secret someone present holds — they must confirm or deny it." },
+    { world: 'Void Runners', icon: '🚀', concept: 'Jump Drive Mechanic Three Payments Behind', trouble: "The Drive Works. The Paperwork Doesn't.", skill: 'Engineering +4', stunt: "Hot Start: once per session, push a failing drive past its rated capacity — it works, but takes a consequence." },
+    { world: 'Void Runners', icon: '🚀', concept: 'Retired Fleet Medic Running Cargo', trouble: "The Fleet Wants Me Back and Won't Take No", skill: 'Medicine +3', stunt: 'Combat Triage: +2 to overcome stress consequences in zero-g or vacuum conditions.' },
+    { world: 'Void Runners', icon: '🚀', concept: 'Salvage Auctioneer with a Questionable Ledger', trouble: 'Half My Inventory Has Prior Owners', skill: 'Contacts +3', stunt: "Finder's Cut: +2 to Contacts when locating hard-to-source ship components through informal channels." },
+    { world: 'The Gaslight Chronicles', icon: '🎩', concept: 'Alienist Who Studies What Studies Him Back', trouble: 'My Notes Are Starting to Write Themselves', skill: 'Lore +4', stunt: 'Clinical Distance: +2 to Will when resisting mental consequence aspects caused by eldritch phenomena.' },
+    { world: 'The Gaslight Chronicles', icon: '🎩', concept: 'Society Photographer with a Darkroom Secret', trouble: "Some Subjects Appear in the Negative That Weren't in the Room", skill: 'Notice +3', stunt: 'The Camera Sees True: once per session, reveal a hidden aspect of a location or person through developed photographs.' },
+    { world: 'The Gaslight Chronicles', icon: '🎩', concept: 'Clockwork Surgeon Wanted by the College', trouble: 'My Methods Work. My Methods Are Illegal.', skill: 'Crafts +3', stunt: 'Surgical Precision: once per scene, treat a Moderate consequence as Mild for the purpose of scene-end recovery.' },
+    { world: 'The Long Road', icon: '🛣️', concept: "Convoy Medic Who Buries What She Can't Fix", trouble: 'The Graves Are Catching Up', skill: 'Medicine +3', stunt: 'Keep Moving: +2 to Will when treating consequences during active travel under pressure.' },
+    { world: 'The Long Road', icon: '🛣️', concept: "Water-Finder Who Charges What the Water's Worth", trouble: 'Everyone Needs Me. Nobody Trusts Me.', skill: 'Investigate +3', stunt: 'Dowsing the Ruin: +2 to Investigate when searching pre-collapse structures for viable water sources.' },
+    { world: 'Dust and Iron', icon: '🤠', concept: 'Land Surveyor Working Both Sides of the Deed', trouble: 'Three Towns Believe the Same Acre Is Theirs', skill: 'Lore +2', stunt: 'I Know This Land: +2 to Notice when reading terrain for cover, ambush points, or escape routes.' },
+    { world: 'Dust and Iron', icon: '🤠', concept: 'Circuit Rider Preacher with a Warrant', trouble: "The Lord's Work and the Law's Work Crossed Once", skill: 'Provoke +3', stunt: "Fire and Brimstone: once per scene, compel a hostile NPC's conscience aspect without spending a fate point." },
+    { world: 'Dust and Iron', icon: '🤠', concept: 'Assay Office Clerk Who Knows Every Vein', trouble: 'The Company Pays My Salary and Owns My Silence', skill: 'Contacts +2', stunt: 'Supply Chain: +2 to Contacts when locating equipment or personnel through mining company networks.' },
   ];
 
   function pickThree() {
@@ -40,7 +51,6 @@
     return arr.slice(0, 3);
   }
 
-  // Shuffle worlds for display
   $: camps = (function() {
     const arr = Object.keys(CAMPAIGN_INFO).map(id => ({
       id, ...CAMPAIGN_INFO[id]
@@ -83,17 +93,19 @@
   <a href="#main" class="skip-link">Skip to main content</a>
 
   <!-- Topbar -->
-  <header class="land-topnav topbar">
+  <header class="land-topnav topbar" role="banner">
     <a href="/" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
     <div class="topbar-spacer" style="flex:1"></div>
     <div class="topbar-status">
+      <a href="/help" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">&#128218; Help</a>
+      <a href="/about" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">About</a>
       <button
         class="btn btn-icon btn-ghost"
         on:click={toggleTheme}
         aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
         title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
         style="width:44px;height:44px"
-      >{theme === 'dark' ? '\u2600\uFE0F' : '\u25D1'}</button>
+      >{theme === 'dark' ? '☀️' : '◑'}</button>
     </div>
   </header>
 
@@ -125,8 +137,44 @@
           <span class="land-hero-pill">&#x26A1; One click</span>
         </div>
         <div class="land-hero-ctas">
-          <a href="/campaigns/fantasy" class="land-cta-primary" aria-label="Start with a world">
+          <a href="/campaigns/fantasy" class="land-cta-primary" aria-label="Open the generator">
             &#x1F3B2; Pick a World &amp; Generate
+          </a>
+          <a href="#worlds" class="land-cta-secondary">
+            Pick a world &rarr;
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Onboarding: New here? -->
+    <div class="land-onboard-section">
+      <div class="land-worlds-inner">
+        <h2 class="land-section-heading">New here?</h2>
+        <div class="land-onboard-grid">
+          <a href="/help/learn-fate" class="land-onboard-card">
+            <div class="land-onboard-icon">&#x1F3B2;</div>
+            <div class="land-onboard-text">
+              <div class="land-onboard-label">Learn Fate</div>
+              <div class="land-onboard-desc">Step-by-step guide to the rules &mdash; as a player or a GM. Coming from D&amp;D? We cover that too.</div>
+            </div>
+            <span class="land-onboard-arrow">&#x203A;</span>
+          </a>
+          <a href="/campaigns/fantasy" class="land-onboard-card">
+            <div class="land-onboard-icon">&#x26A1;</div>
+            <div class="land-onboard-text">
+              <div class="land-onboard-label">Prep a Session</div>
+              <div class="land-onboard-desc">Pick a world and generate NPCs, scenes, encounters, and more. Done in minutes.</div>
+            </div>
+            <span class="land-onboard-arrow">&#x203A;</span>
+          </a>
+          <a href="/help/export-share" class="land-onboard-card">
+            <div class="land-onboard-icon">&#x1F517;</div>
+            <div class="land-onboard-text">
+              <div class="land-onboard-label">Export &amp; Play</div>
+              <div class="land-onboard-desc">Ogma JSON export, Markdown, print-ready cards, and shareable links. Take your prep to any table.</div>
+            </div>
+            <span class="land-onboard-arrow">&#x203A;</span>
           </a>
         </div>
       </div>
@@ -141,7 +189,7 @@
           <input
             class="land-join-input"
             type="text"
-            placeholder="Room code \u2014 e.g. A3KX"
+            placeholder="Room code — e.g. A3KX"
             bind:value={joinCode}
             maxlength="6"
             aria-label="Room code"
@@ -237,7 +285,12 @@
         <strong>O</strong>n-demand <strong>G</strong>enerator for <strong>M</strong>asterful <strong>A</strong>dventures
       </div>
       <div style="margin-bottom:4px">
-        Fate&trade; is a trademark of Evil Hat Productions, LLC. Released under CC BY 3.0.
+        Fate&trade; is a trademark of Evil Hat Productions, LLC. Released under <a href="/license">CC BY 3.0</a>.
+      </div>
+      <div>
+        <a href="/license">Full Attribution</a> &middot;
+        <a href="/help">&#128218; Help</a> &middot;
+        <a href="/about">About</a>
       </div>
     </div>
   </footer>
