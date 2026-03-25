@@ -19,37 +19,37 @@
     </div>
 
     <div class="gen-grid">
-      <a href="/help/getting-started" class="gen-card" style="text-decoration:none">
+      <a href="/help/getting-started" class="gen-card">
         <div class="gen-card-icon">&#128640;</div>
         <div class="gen-card-name">Getting Started</div>
         <div class="gen-card-desc">Local-first data model, first roll, keyboard shortcuts, and data backup.</div>
       </a>
-      <a href="/help/generators" class="gen-card" style="text-decoration:none">
+      <a href="/help/generators" class="gen-card">
         <div class="gen-card-icon">&#127922;</div>
         <div class="gen-card-name">Generator Suite</div>
         <div class="gen-card-desc">All 16 generators across 8 campaign worlds. 128 combinations explained.</div>
       </a>
-      <a href="/help/fate-mechanics" class="gen-card" style="text-decoration:none">
+      <a href="/help/fate-mechanics" class="gen-card">
         <div class="gen-card-icon">&#9855;</div>
         <div class="gen-card-name">Fate Mechanics</div>
         <div class="gen-card-desc">Stress, Consequences, Aspects, Skills, Fate Points, Stunts.</div>
       </a>
-      <a href="/help/at-the-table" class="gen-card" style="text-decoration:none">
+      <a href="/help/at-the-table" class="gen-card">
         <div class="gen-card-icon">&#127481;</div>
         <div class="gen-card-name">At the Table</div>
         <div class="gen-card-desc">FP Tracker, Inspiration, Quick Prep Pack, Export.</div>
       </a>
-      <a href="/help/export-share" class="gen-card" style="text-decoration:none">
+      <a href="/help/export-share" class="gen-card">
         <div class="gen-card-icon">&#128279;</div>
         <div class="gen-card-name">Export &amp; Share</div>
         <div class="gen-card-desc">Markdown, Ogma JSON, shareable links, batch export.</div>
       </a>
-      <a href="/help/customise" class="gen-card" style="text-decoration:none">
+      <a href="/help/customise" class="gen-card">
         <div class="gen-card-icon">&#9881;</div>
         <div class="gen-card-name">Customise</div>
         <div class="gen-card-desc">Result reference panel, Table Manager, Session Zero, theme, and more.</div>
       </a>
-      <a href="/help/faq" class="gen-card" style="text-decoration:none">
+      <a href="/help/faq" class="gen-card">
         <div class="gen-card-icon">&#10067;</div>
         <div class="gen-card-name">FAQ</div>
         <div class="gen-card-desc">Cache, offline use, data loss prevention, browser support.</div>

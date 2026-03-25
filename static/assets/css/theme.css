@@ -2893,3 +2893,14 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .pw-summary-gen{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);min-width:80px;flex-shrink:0}
 .pw-summary-text{font-size:12px;font-style:italic;color:var(--text);flex:1}
 .pw-action-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+
+/* ══ HELP SYSTEM — Wiki subpage classes ══ */
+.step-block{display:flex;gap:16px;padding:20px 0;border-bottom:1px solid var(--border)}
+.step-block:last-child{border-bottom:none}
+.step-num{flex-shrink:0;width:36px;height:36px;border-radius:50%;background:var(--accent);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:var(--text-base);font-weight:900;font-family:var(--font-display);line-height:1;margin-top:2px}
+.step-title{font-size:var(--text-md);font-weight:700;color:var(--text);margin-bottom:8px;font-family:var(--font-display)}
+.wiki-section{margin:32px 0}
+.wiki-section-title{font-size:var(--text-xl,1.25rem);font-weight:800;color:var(--text);margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid color-mix(in srgb,var(--accent) 30%,transparent);font-family:var(--font-display)}
+.wiki-back{display:inline-flex;align-items:center;gap:6px;font-size:var(--text-sm);color:var(--accent);text-decoration:none;margin-bottom:20px;opacity:0.8;transition:opacity 0.12s}
+.wiki-back:hover{opacity:1}
+@media(max-width:640px){.step-block{flex-direction:column;gap:10px}.step-num{width:28px;height:28px;font-size:var(--text-sm)}}
