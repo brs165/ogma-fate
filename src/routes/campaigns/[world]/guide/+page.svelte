@@ -43,7 +43,7 @@
 <div class="cg-sample">A ruined mage tower with wards that are still actively hostile</div>
 
 <h2>Building Your Character</h2>
-<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="../campaigns/character-creation.html?world=fantasy">Session Zero tool</a> walks you through every step — or use the guide below.</p>
+<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="/campaigns/character-creation?world=fantasy">Session Zero tool</a> walks you through every step — or use the guide below.</p>
 
 <div class="cg-card">
   <p style="margin:0 0 10px"><strong>Step 1 — Two aspects</strong></p>
@@ -69,7 +69,7 @@
   <p style="margin:0 0 6px;font-size:var(--text-sm);color:var(--text-dim)">Choose one stunt from the Shattered Kingdoms list. Shattered Kingdoms stunts cover swordcraft, hedge magic, field medicine, and Blight-lore. Your refresh starts at 3; each additional stunt costs 1.</p>
 </div>
 
-<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="../campaigns/character-creation.html?world=fantasy">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
+<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="/campaigns/character-creation?world=fantasy">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
 
 <h2>Content Overview</h2>
 <div class="cg-card"><p style="margin:0;font-size:var(--text-sm);line-height:2;color:var(--text-dim)">
@@ -89,14 +89,14 @@
 </div>
 
 <div class="cg-cta">
-<a href="//campaigns/fantasy" style="background:var(--accent,var(--c-blue));color:#fff">🎲 Open Generator</a>
-<a href="/campaigns/character-creation.html" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
+<a href="/campaigns/fantasy" style="background:var(--accent,var(--c-blue));color:#fff">🎲 Open Generator</a>
+<a href="/campaigns/character-creation" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
 </div>
 </div>
 
 <div class="cg-guide-nav">
   <a href="/">🌍 All Worlds</a>
-  <a href="//campaigns/fantasy">⚔ Open Shattered Kingdoms Generator</a>`,
+  <a href="/campaigns/fantasy">⚔ Open Shattered Kingdoms Generator</a>`,
     cyberpunk: `<h1 id="main-content">⬡ Neon Abyss</h1>
 <div class="cg-sub">Corporate Dystopia in Meridian</div>
 <p>Meridian is a vertical city where altitude equals wealth. Corporations own the infrastructure, the law, and increasingly the bodies of their employees through augmentation contracts. The street economy runs on fixers, black clinics, and data brokerage. The net is throttled by district. The augments have kill switches.</p>
@@ -131,7 +131,7 @@
 <div class="cg-sample">A luxury arcology whose internal systems have been compromised for three days</div>
 
 <h2>Building Your Character</h2>
-<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="../campaigns/character-creation.html?world=cyberpunk">Session Zero tool</a> walks you through every step — or use the guide below.</p>
+<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="/campaigns/character-creation?world=cyberpunk">Session Zero tool</a> walks you through every step — or use the guide below.</p>
 
 <div class="cg-card">
   <p style="margin:0 0 10px"><strong>Step 1 — Two aspects</strong></p>
@@ -157,7 +157,7 @@
   <p style="margin:0 0 6px;font-size:var(--text-sm);color:var(--text-dim)">Choose one stunt from the Neon Abyss list. Neon Abyss stunts cover hacking, augment exploitation, social engineering, and black-market access. Your refresh starts at 3; each additional stunt costs 1.</p>
 </div>
 
-<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="../campaigns/character-creation.html?world=cyberpunk">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
+<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="/campaigns/character-creation?world=cyberpunk">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
 
 <h2>Content Overview</h2>
 <div class="cg-card"><p style="margin:0;font-size:var(--text-sm);line-height:2;color:var(--text-dim)">
@@ -177,14 +177,14 @@
 </div>
 
 <div class="cg-cta">
-<a href="//campaigns/cyberpunk" style="background:var(--accent,var(--c-blue));color:#fff">🎲 Open Generator</a>
-<a href="/campaigns/character-creation.html" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
+<a href="/campaigns/cyberpunk" style="background:var(--accent,var(--c-blue));color:#fff">🎲 Open Generator</a>
+<a href="/campaigns/character-creation" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
 </div>
 </div>
 
 <div class="cg-guide-nav">
   <a href="/">🌍 All Worlds</a>
-  <a href="//campaigns/cyberpunk">⚔ Open Neon Abyss Generator</a>`,
+  <a href="/campaigns/cyberpunk">⚔ Open Neon Abyss Generator</a>`,
     thelongafter: `<h1 id="main-content">◈ The Long After</h1>
 <div class="cg-sub">Sword-and-Planet Dying Earth</div>
 <p>The world ended. The world that replaced it thinks the debris is magic. Ancient Phade vaults litter a landscape of sand, fungal forests, and city-states ruled by warlords who claim divine authority because they can read the error messages. Delvers descend into the ruins to recover what was lost. The vaults are not empty. The technology is not dead.</p>
@@ -219,7 +219,7 @@
 <div class="cg-sample">An arena city where the games have been suspended without explanation</div>
 
 <h2>Building Your Character</h2>
-<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="../campaigns/character-creation.html?world=thelongafter">Session Zero tool</a> walks you through every step — or use the guide below.</p>
+<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="/campaigns/character-creation?world=thelongafter">Session Zero tool</a> walks you through every step — or use the guide below.</p>
 
 <div class="cg-card">
   <p style="margin:0 0 10px"><strong>Step 1 — Two aspects</strong></p>
@@ -245,7 +245,7 @@
   <p style="margin:0 0 6px;font-size:var(--text-sm);color:var(--text-dim)">Choose one stunt from the The Long After list. The Long After stunts cover ruin navigation, Phade identification, desert survival, and arena tactics. Your refresh starts at 3; each additional stunt costs 1.</p>
 </div>
 
-<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="../campaigns/character-creation.html?world=thelongafter">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
+<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="/campaigns/character-creation?world=thelongafter">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
 
 <h2>Content Overview</h2>
 <div class="cg-card"><p style="margin:0;font-size:var(--text-sm);line-height:2;color:var(--text-dim)">
@@ -272,14 +272,14 @@
 </div>
 
 <div class="cg-cta">
-<a href="//campaigns/thelongafter" style="background:var(--accent,var(--c-blue));color:#fff">🎲 Open Generator</a>
-<a href="/campaigns/character-creation.html" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
+<a href="/campaigns/thelongafter" style="background:var(--accent,var(--c-blue));color:#fff">🎲 Open Generator</a>
+<a href="/campaigns/character-creation" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
 </div>
 </div>
 
 <div class="cg-guide-nav">
   <a href="/">🌍 All Worlds</a>
-  <a href="//campaigns/thelongafter">⚔ Open The Long After Generator</a>`,
+  <a href="/campaigns/thelongafter">⚔ Open The Long After Generator</a>`,
     space: `<h1 id="main-content">◯ Void Runners</h1>
 <div class="cg-sub">Blue-Collar Space Western</div>
 <p>The Colonial Transit Authority controls the jump routes, taxes the fuel, and enforces the law when profitable. Everyone else is trying to make the ship payment. The fuel monopoly means every job is a calculation. The Ghost Fleet suggests someone is building something. The Signal - coordinates and a date - suggests someone is expecting something.</p>
@@ -314,7 +314,7 @@
 <div class="cg-sample">A black-market station hidden inside a declared exclusion zone</div>
 
 <h2>Building Your Character</h2>
-<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="../campaigns/character-creation.html?world=space">Session Zero tool</a> walks you through every step — or use the guide below.</p>
+<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="/campaigns/character-creation?world=space">Session Zero tool</a> walks you through every step — or use the guide below.</p>
 
 <div class="cg-card">
   <p style="margin:0 0 10px"><strong>Step 1 — Two aspects</strong></p>
@@ -340,7 +340,7 @@
   <p style="margin:0 0 6px;font-size:var(--text-sm);color:var(--text-dim)">Choose one stunt from the Void Runners list. Void Runners stunts cover ship handling, vacuum survival, cargo negotiation, and jump navigation. Your refresh starts at 3; each additional stunt costs 1.</p>
 </div>
 
-<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="../campaigns/character-creation.html?world=space">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
+<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="/campaigns/character-creation?world=space">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
 
 <h2>Content Overview</h2>
 <div class="cg-card"><p style="margin:0;font-size:var(--text-sm);line-height:2;color:var(--text-dim)">
@@ -360,14 +360,14 @@
 </div>
 
 <div class="cg-cta">
-<a href="//campaigns/space" style="background:var(--accent,var(--c-blue));color:#fff">🎲 Open Generator</a>
-<a href="/campaigns/character-creation.html" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
+<a href="/campaigns/space" style="background:var(--accent,var(--c-blue));color:#fff">🎲 Open Generator</a>
+<a href="/campaigns/character-creation" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
 </div>
 </div>
 
 <div class="cg-guide-nav">
   <a href="/">🌍 All Worlds</a>
-  <a href="//campaigns/space">⚔ Open Void Runners Generator</a>`,
+  <a href="/campaigns/space">⚔ Open Void Runners Generator</a>`,
     victorian: `<h1 id="main-content">⊕ The Gaslight Chronicles</h1>
 <div class="cg-sub">Gothic Cosmic Horror in Gaslit London</div>
 <p>The Enlightenment promised reason would banish the darkness. It lied. In the gaslit streets, the veil between the rational and the incomprehensible is very thin. The Obsidian Lodge contains what it can. Scotland Yard investigates what it understands. And beneath everything - in the fog, in the mirrors - something ancient is paying attention.</p>
@@ -402,7 +402,7 @@
 <div class="cg-sample">A hospital wing that was closed for renovation and has not been opened - the renovation never began</div>
 
 <h2>Building Your Character</h2>
-<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="../campaigns/character-creation.html?world=victorian">Session Zero tool</a> walks you through every step — or use the guide below.</p>
+<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="/campaigns/character-creation?world=victorian">Session Zero tool</a> walks you through every step — or use the guide below.</p>
 
 <div class="cg-card">
   <p style="margin:0 0 10px"><strong>Step 1 — Two aspects</strong></p>
@@ -428,7 +428,7 @@
   <p style="margin:0 0 6px;font-size:var(--text-sm);color:var(--text-dim)">Choose one stunt from the Gaslight Chronicles list. Gaslight Chronicles stunts cover forensic investigation, occult scholarship, social navigation, and self-control under the uncanny. Your refresh starts at 3; each additional stunt costs 1.</p>
 </div>
 
-<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="../campaigns/character-creation.html?world=victorian">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
+<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="/campaigns/character-creation?world=victorian">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
 
 <h2>Content Overview</h2>
 <div class="cg-card"><p style="margin:0;font-size:var(--text-sm);line-height:2;color:var(--text-dim)">
@@ -455,14 +455,14 @@
 </div>
 
 <div class="cg-cta">
-<a href="//campaigns/victorian" style="background:var(--accent,var(--c-blue));color:#fff">🎲 Open Generator</a>
-<a href="/campaigns/character-creation.html" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
+<a href="/campaigns/victorian" style="background:var(--accent,var(--c-blue));color:#fff">🎲 Open Generator</a>
+<a href="/campaigns/character-creation" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
 </div>
 </div>
 
 <div class="cg-guide-nav">
   <a href="/">🌍 All Worlds</a>
-  <a href="//campaigns/victorian">⚔ Open The Gaslight Chronicles Generator</a>`,
+  <a href="/campaigns/victorian">⚔ Open The Gaslight Chronicles Generator</a>`,
     postapoc: `<h1 id="main-content">◻ The Long Road</h1>
 <div class="cg-sub">The Beautiful Apocalypse</div>
 <p>The world collapsed. Nature came back. The highways are forests. The cities are coral reefs of concrete and vine. Survivors scavenge what the old world left - lethal, tempting, occasionally still powered on. The Water Wars define local politics. The Reclamation Cult preaches that scavenging is sin. And somewhere, the Clean Zone draws people like a compass needle.</p>
@@ -497,7 +497,7 @@
 <div class="cg-sample">A dead city with a functioning power grid and no obvious source for the power</div>
 
 <h2>Building Your Character</h2>
-<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="../campaigns/character-creation.html?world=postapoc">Session Zero tool</a> walks you through every step — or use the guide below.</p>
+<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="/campaigns/character-creation?world=postapoc">Session Zero tool</a> walks you through every step — or use the guide below.</p>
 
 <div class="cg-card">
   <p style="margin:0 0 10px"><strong>Step 1 — Two aspects</strong></p>
@@ -523,7 +523,7 @@
   <p style="margin:0 0 6px;font-size:var(--text-sm);color:var(--text-dim)">Choose one stunt from the The Long Road list. The Long Road stunts cover scavenging, field medicine, road navigation, and salvage trading. Your refresh starts at 3; each additional stunt costs 1.</p>
 </div>
 
-<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="../campaigns/character-creation.html?world=postapoc">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
+<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="/campaigns/character-creation?world=postapoc">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
 
 <h2>Content Overview</h2>
 <div class="cg-card"><p style="margin:0;font-size:var(--text-sm);line-height:2;color:var(--text-dim)">
@@ -550,14 +550,14 @@
 </div>
 
 <div class="cg-cta">
-<a href="//campaigns/postapoc" style="background:var(--accent,var(--c-blue));color:#fff">🎲 Open Generator</a>
-<a href="/campaigns/character-creation.html" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
+<a href="/campaigns/postapoc" style="background:var(--accent,var(--c-blue));color:#fff">🎲 Open Generator</a>
+<a href="/campaigns/character-creation" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
 </div>
 </div>
 
 <div class="cg-guide-nav">
   <a href="/">🌍 All Worlds</a>
-  <a href="//campaigns/postapoc">⚔ Open The Long Road Generator</a>`,
+  <a href="/campaigns/postapoc">⚔ Open The Long Road Generator</a>`,
     western: `<h1 id="main-content">★ Dust and Iron</h1>
 <div class="cg-sub">Frontier justice. Railroad money. The weight of the old war.</div>
 <p>The survey stakes went in at dawn. The Harker Company wants the land. The homesteaders pulled the stakes up. The law rides for the company. The circuit judge is two days out and the verdict is already written. You're somewhere in between — which means everybody needs something from you and nobody's going to say thank you.</p>
@@ -604,7 +604,7 @@
 
 
 <h2>Building Your Character</h2>
-<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="../campaigns/character-creation.html?world=western">Session Zero tool</a> walks you through every step — or use the guide below.</p>
+<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="/campaigns/character-creation?world=western">Session Zero tool</a> walks you through every step — or use the guide below.</p>
 
 <div class="cg-card">
   <p style="margin:0 0 10px"><strong>Step 1 — Two aspects</strong></p>
@@ -630,7 +630,7 @@
   <p style="margin:0 0 6px;font-size:var(--text-sm);color:var(--text-dim)">Choose one stunt from the Dust and Iron list. Dust and Iron stunts cover quick draw, tracking, intimidation, and wilderness survival. Your refresh starts at 3; each additional stunt costs 1.</p>
 </div>
 
-<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="../campaigns/character-creation.html?world=western">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
+<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="/campaigns/character-creation?world=western">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
 <h2>Content Overview</h2>
 <div class="cg-card"><p style="margin:0;font-size:var(--text-sm);line-height:2;color:var(--text-dim)">
 <strong>NPCs:</strong> 33 first names, 26 surnames, variety-matrix minor + major concepts, 50 troubles, 28 stunts<br>
@@ -649,13 +649,13 @@
 </div>
 
 <div class="cg-cta">
-<a href="//campaigns/western" style="background:var(--accent,var(--c-blue));color:#fff">🎲 Open Generator</a>
-<a href="../campaigns/character-creation.html" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
+<a href="/campaigns/western" style="background:var(--accent,var(--c-blue));color:#fff">🎲 Open Generator</a>
+<a href="../campaigns/character-creation" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
 </div>
 </div>
 <div class="cg-guide-nav">
   <a href="/">🌍 All Worlds</a>
-  <a href="//campaigns/western">⚔ Open Dust and Iron Generator</a>`,
+  <a href="/campaigns/western">⚔ Open Dust and Iron Generator</a>`,
     dVentiRealm: `<h1 id="main-content">⚔ dVenti Realm</h1>
 <div class="cg-sub">The Senate fell. The dragons followed. The world is still learning what that means.</div>
 <p>The Arcane Senate collapsed thirty years ago and left a legal vacuum that guilds, temples, and liches have been fighting over ever since. Eighteen months ago, the last known great wyrm died — and the world is only now understanding what dragons were actually <em>for</em>. Their territorial claims kept ancient things sealed underground. Their hoards grounded wild magic. Their presence suppressed what lived in the deep places. All of that is gone now. The dungeons are still there. The contracts are still binding. The things that were being contained are not.</p>
@@ -710,7 +710,7 @@
 
 
 <h2>Building Your Character</h2>
-<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="../campaigns/character-creation.html?world=dVentiRealm">Session Zero tool</a> walks you through every step — or use the guide below.</p>
+<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="/campaigns/character-creation?world=dVentiRealm">Session Zero tool</a> walks you through every step — or use the guide below.</p>
 
 <div class="cg-card">
   <p style="margin:0 0 10px"><strong>Step 1 — Two aspects</strong></p>
@@ -736,7 +736,7 @@
   <p style="margin:0 0 6px;font-size:var(--text-sm);color:var(--text-dim)">Choose one stunt from the dVenti Realm list. All 28 dVenti stunts are translated D&D class features — Sneak Attack, Counterspell, Bardic Inspiration and more. Your class is your High Concept; your signature move is your stunt. Your refresh starts at 3; each additional stunt costs 1.</p>
 </div>
 
-<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="../campaigns/character-creation.html?world=dVentiRealm">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
+<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="/campaigns/character-creation?world=dVentiRealm">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
 <h2>Content Overview</h2>
 <div class="cg-card"><p style="margin:0;font-size:var(--text-sm);line-height:2;color:var(--text-dim)">
 <strong>NPCs:</strong> 80 first names, 50 epithets, variety-matrix concepts, 40 troubles, 28 stunts<br>
@@ -755,14 +755,14 @@
 </div>
 
 <div class="cg-cta">
-<a href="//campaigns/dVentiRealm" style="background:var(--accent,var(--c-blue));color:#fff">🎲 Open Generator</a>
-<a href="../campaigns/character-creation.html" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
+<a href="/campaigns/dVentiRealm" style="background:var(--accent,var(--c-blue));color:#fff">🎲 Open Generator</a>
+<a href="../campaigns/character-creation" style="border:1px solid var(--accent,var(--c-blue));color:var(--accent,var(--c-blue));background:transparent">🎭 Session Zero</a>
 </div>
 </div></div>
 
 <div class="cg-guide-nav">
   <a href="/">🌍 All Worlds</a>
-  <a href="//campaigns/dVentiRealm">⚔ Open dVenti Realm Generator</a>`
+  <a href="/campaigns/dVentiRealm">⚔ Open dVenti Realm Generator</a>`
   };
 
   $: guideHtml = GUIDES[world] || null;

@@ -95,6 +95,9 @@
 
       <div class="wiki-sidebar-section">
         <div class="wiki-sidebar-label">Prep &amp; Play</div>
+        <a href="/campaigns/character-creation" class="wiki-sidebar-link" aria-label="Session Zero — guided character creation">
+          <span class="icon">&#127917;</span>Session Zero
+        </a>
         <a href="/help/generators" class="wiki-sidebar-link" class:active={isActive('/help/generators')}>
           <span class="icon">&#127922;</span>Generator Suite
         </a>
