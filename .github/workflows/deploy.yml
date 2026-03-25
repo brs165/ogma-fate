@@ -10,7 +10,6 @@ permissions:
   pages: write
   id-token: write
 
-# Only one deployment at a time; cancel in-progress if a new push arrives
 concurrency:
   group: pages
   cancel-in-progress: true
@@ -25,14 +24,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload the entire repo root — no build step needed
-          path: '.'
+          path: 'build'
 
       - name: Deploy to GitHub Pages
         id: deployment
