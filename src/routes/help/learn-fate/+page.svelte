@@ -1,5 +1,9 @@
 <svelte:options runes={false} />
 
+<script>
+  import HelpDiceRoller from '$lib/components/shared/HelpDiceRoller.svelte';
+</script>
+
 <svelte:head>
   <title>Learn Fate — Ogma Help</title>
   <meta name="description" content="Learn the core Fate Condensed rules in 7 steps" />
@@ -20,7 +24,7 @@
         <div class="callout callout-scenario" role="note">
           <div class="callout-title">Try it — describe first, then roll</div>
           <p>Say out loud what your character does. Then roll. Notice how the dice feel like they're answering the fiction, not replacing it.</p>
-          <p style="font-size:var(--text-sm);color:var(--text-muted);font-style:italic">Interactive dice roller available in the generator.</p>
+          <HelpDiceRoller mode="basic" label="4dF — raw roll" />
         </div>
       </div>
     </div>
@@ -37,8 +41,8 @@
           <div class="callout-title">Try an invoke — roll twice, pick the better result</div>
           <p>Pick an aspect like <em>"Stronger Than I Look."</em> Roll 4dF. That's your base. Now roll again with <strong>+2</strong> (the invoke bonus) — that's your roll after spending a fate point. Feel the difference.</p>
           <div class="learn-double-roll">
-            <p style="font-size:var(--text-sm);color:var(--text-muted);font-style:italic">Interactive dice roller available in the generator.</p>
-            <p style="font-size:var(--text-sm);color:var(--text-muted);font-style:italic">Interactive dice roller available in the generator.</p>
+            <HelpDiceRoller mode="basic" label="Without invoke" />
+            <HelpDiceRoller mode="skill" skill={2} label="With invoke (+2)" />
           </div>
         </div>
       </div>
@@ -55,7 +59,7 @@
         <div class="callout callout-scenario" role="note">
           <div class="callout-title">Try a roll — Good (+3) Athlete vs. Fair (+2) difficulty</div>
           <p>Your character has Athletics +3. Roll 4dF and add 3. <strong>+1 or +2 over target = Success. +3 or more = Success with Style. 0 = Tie. Below = Fail.</strong> Roll a few times — feel how rarely you land on extremes.</p>
-          <p style="font-size:var(--text-sm);color:var(--text-muted);font-style:italic">Interactive dice roller available in the generator.</p>
+          <HelpDiceRoller mode="skill" skill={3} label="Athletics +3" />
         </div>
       </div>
     </div>
@@ -71,7 +75,7 @@
         <div class="callout callout-scenario" role="note">
           <div class="callout-title">The compel moment — roll, then decide</div>
           <p>You have a trouble: <em>"Always Takes the Hard Way."</em> Roll Stealth (+1) to sneak past the guard. If the result is bad, the GM offers you a fate point to have your character make noise on purpose. Accept and earn the point — or spend one to refuse.</p>
-          <p style="font-size:var(--text-sm);color:var(--text-muted);font-style:italic">Interactive dice roller available in the generator.</p>
+          <HelpDiceRoller mode="skill" skill={1} label="Stealth +1 (trouble in play)" />
         </div>
       </div>
     </div>
@@ -88,8 +92,8 @@
           <div class="callout-title">Try an attack roll — see how many shifts hit</div>
           <p>An enemy has Fight +2. You defend with Athletics +1. Roll both — the difference is the shifts. Under 3 shifts: tick stress boxes. 3–5: take a consequence. 6+: you're in trouble.</p>
           <div class="learn-double-roll">
-            <p style="font-size:var(--text-sm);color:var(--text-muted);font-style:italic">Interactive dice roller available in the generator.</p>
-            <p style="font-size:var(--text-sm);color:var(--text-muted);font-style:italic">Interactive dice roller available in the generator.</p>
+            <HelpDiceRoller mode="skill" skill={2} label="Enemy Attack (Fight +2)" />
+            <HelpDiceRoller mode="skill" skill={1} label="Your Defence (Athletics +1)" />
           </div>
         </div>
       </div>
@@ -107,8 +111,8 @@
           <div class="callout-title">See the stunt difference — roll with and without</div>
           <p>A character has Deceive +2. Their stunt: <em>"Silver Tongue: +2 to Deceive when creating an advantage through misdirection."</em> The situation triggers it — they effectively roll at +4.</p>
           <div class="learn-double-roll">
-            <p style="font-size:var(--text-sm);color:var(--text-muted);font-style:italic">Interactive dice roller available in the generator.</p>
-            <p style="font-size:var(--text-sm);color:var(--text-muted);font-style:italic">Interactive dice roller available in the generator.</p>
+            <HelpDiceRoller mode="skill" skill={2} label="Deceive +2 (no stunt)" />
+            <HelpDiceRoller mode="skill" skill={4} label="Deceive +4 (stunt active)" />
           </div>
         </div>
         <div class="learn-npc-demo" id="step-6-npc" aria-label="Example NPC with stunts">
@@ -140,7 +144,7 @@
         <div class="callout callout-scenario" role="note">
           <div class="callout-title">Set a difficulty — does the player beat it?</div>
           <p>A player wants to pick a lock (Burglary +2). You set difficulty at Good (+3) — challenging but not impossible. Roll for the player and see if they succeed, tie (succeed at a cost), or fail (situation changes).</p>
-          <p style="font-size:var(--text-sm);color:var(--text-muted);font-style:italic">Interactive dice roller available in the generator.</p>
+          <HelpDiceRoller mode="skill" skill={2} label="Burglary +2 vs Good (+3) lock" />
         </div>
       </div>
     </div>
@@ -153,13 +157,13 @@
     <div class="callout callout-info">
       <div class="callout-title">&#128218; Go deeper</div>
       <p>The community's #1 recommended resource for truly understanding Fate: <a href="https://bookofhanz.com/" target="_blank" rel="noreferrer"><strong>The Book of Hanz</strong></a> — Robert Hanz's essays on Fate philosophy. Free to read. Start with "Fate Doesn't Have a Damage System" and "Aspects Are the Most Important Thing."</p>
-      <p>For the full mechanics reference, common errors, and GM prep guide: <a href="//help/fate-mechanics"><strong>Fate Mechanics deep-dive &rarr;</strong></a></p>
-      <p>For a step-by-step worked conflict example: <a href="//help/at-the-table#conflict-walkthrough"><strong>At the Table — conflict walkthrough &rarr;</strong></a></p>
+      <p>For the full mechanics reference, common errors, and GM prep guide: <a href="/help/fate-mechanics"><strong>Fate Mechanics deep-dive &rarr;</strong></a></p>
+      <p>For a step-by-step worked conflict example: <a href="/help/at-the-table#conflict-walkthrough"><strong>At the Table — conflict walkthrough &rarr;</strong></a></p>
     </div>
 
     <div class="wiki-footer">
-      <a href="//help/how-to-use-ogma">&larr; How to Use Ogma</a>
-      <a href="//help/fate-mechanics">Fate Mechanics &rarr;</a>
+      <a href="/help/how-to-use-ogma">&larr; How to Use Ogma</a>
+      <a href="/help/fate-mechanics">Fate Mechanics &rarr;</a>
     </div>
     <div class="wiki-footer" style="margin-top:16px">
   <div>

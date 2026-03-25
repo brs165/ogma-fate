@@ -13,7 +13,7 @@
 
 <div class="callout callout-info">
   <div class="callout-title">&#128218; New to Fate?</div>
-  <p>Start with the <a href="/help/learn-fate">Quick Start guide</a> or the <a href="//help/dnd-transition">D&amp;D Transition guide</a>. This page goes deeper into specific mechanics.</p>
+  <p>Start with the <a href="/help/learn-fate">Quick Start guide</a> or the <a href="/help/dnd-transition">D&amp;D Transition guide</a>. This page goes deeper into specific mechanics.</p>
 </div>
 
 <h2 id="aspects">Aspects</h2>
@@ -59,7 +59,7 @@
 <h2 id="fate-points-and-refresh">Fate Points and Refresh</h2>
 <p>Fate Points are the economy of player agency. Players start each session with their <strong>Refresh</strong> (usually 3). They spend Fate Points to invoke aspects; they earn them when they accept compels.</p>
 <p>Major NPCs have a <strong>Refresh</strong> calculated as <code>max(1, 3 − stunts)</code>. The GM starts each scene with this many Fate Points for that NPC. The FP Tracker in Ogma manages this automatically.</p>
-<p>See the <a href="//help/at-the-table">At the Table guide</a> for how to use the FP Tracker during play.</p>
+<p>See the <a href="/help/at-the-table">At the Table guide</a> for how to use the FP Tracker during play.</p>
 
 <h2 id="stunts">Stunts</h2>
 <p>Stunts give characters specific mechanical advantages. Fate Condensed has two types:</p>
