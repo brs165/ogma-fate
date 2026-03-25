@@ -82,6 +82,10 @@
   on:keydown={onKeyDown}
 >
   <div class="bc-actions">
+    {#if card.rotation}
+      <button class="bc-btn" title="Reset rotation"
+        on:click|stopPropagation={() => onUpdate && onUpdate(card.id, { rotation: 0 })}>&#x27F3;</button>
+    {/if}
     <button class="bc-btn" title="Delete"
       on:click|stopPropagation={() => onDelete && onDelete(card.id)}>✕</button>
   </div>
