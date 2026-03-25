@@ -10,7 +10,10 @@
   $: currentPath = $page.url.pathname;
 
   function isActive(href) {
-    return currentPath === href;
+    // Handle trailing slash variations
+    const clean = currentPath.replace(/\/$/, '') || '/';
+    const target = href.replace(/\/$/, '') || '/';
+    return clean === target;
   }
 
   onMount(() => {
