@@ -2,6 +2,18 @@
 // scripts/qa-hard.mjs — Hardened pre-build QA for Ogma
 // Run: node scripts/qa-hard.mjs
 // Exit 0 = all pass, Exit 1 = failures found
+//
+// ASSERT play-canvas-never-shows-prep-cards (MANUAL TEST)
+// Cards with sourceCanvas:'prep' must be filtered out of any canvas
+// store initialised with a play key. This is the Session Zero play
+// isolation guarantee.
+//
+// VERIFY manually:
+//   1. Run Session Zero → character creation → Send to Table Prep
+//   2. Navigate to /campaigns/[world] (play board)
+//   3. Confirm zero Session Zero cards appear on play canvas
+//   4. GM clicks "→ Table" on a prep card
+//   5. Confirm card NOW appears on play canvas with sourceCanvas:'play'
 
 const results = [];
 const warnings = [];

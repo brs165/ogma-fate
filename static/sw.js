@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ogma-2026.03.450';
+const CACHE_NAME = 'ogma-2026.03.451';
 
 self.addEventListener('install', event => {
   event.waitUntil(

@@ -166,4 +166,8 @@
       {/if}
     </div>
   {/if}
+
+  {#if card.sourceCanvas === 'prep' && mode === 'prep'}
+    <div class="bc-source-badge">PREP</div>
+  {/if}
 </div>

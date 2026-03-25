@@ -55,7 +55,15 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
   // Load canvas from IDB when key changes
   if (DB) {
     DB.loadSession(campCanvasKey).then(saved => {
-      if (saved && Array.isArray(saved.cards)) cards.set(saved.cards);
+      if (saved && Array.isArray(saved.cards)) {
+        let loadedCards = saved.cards;
+        // Play canvas guard: strip any prep-sourced cards
+        const isPlayCanvas = campCanvasKey.includes('board_play');
+        if (isPlayCanvas) {
+          loadedCards = loadedCards.filter(c => c.sourceCanvas !== 'prep');
+        }
+        cards.set(loadedCards);
+      }
       loaded.set(true);
     }).catch(() => loaded.set(true));
     DB.loadSession(campCanvasKey + '_connectors').then(saved => {
