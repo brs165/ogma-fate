@@ -1316,8 +1316,9 @@ export function toMarkdown(genId, data, campName) {
 // Import:  parseOgmaJSON(str) → {type:'single'|'batch', ...} or null
 // ════════════════════════════════════════════════════════════════════════
 
+import { VERSION } from './version.js';
 const OGMA_FORMAT  = 'ogma';
-const OGMA_VERSION = '2026.03.412';
+const OGMA_VERSION = VERSION;
 
 /**
  * Serialise a single generator result to a Mermaid diagram string.

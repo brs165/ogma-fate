@@ -1,5 +1,9 @@
 <svelte:options runes={false} />
 
+<script>
+  import { VERSION } from '$lib/version.js';
+</script>
+
 <svelte:head>
   <title>About Ogma - On-demand Generator for Masterful Adventures</title>
   <meta name="description" content="About Ogma - how it was built, what's inside, and how to use it offline." />
@@ -9,7 +13,7 @@
     <h1>About Ogma</h1>
 
     <div class="about-version" role="status" aria-label="Suite version information">
-      <span class="about-version-badge">v2026.03.412</span>
+      <span class="about-version-badge">v{VERSION}</span>
       <div class="about-version-meta">
         <strong style="color:var(--text)">Ogma - A Fate Condensed Generator Suite</strong><br>
         March 2026 &middot; 16 generators &middot; 8 campaign worlds &middot; 9,900+ table entries

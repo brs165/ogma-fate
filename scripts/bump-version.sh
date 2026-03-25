@@ -1,0 +1,15 @@
+#!/bin/bash
+YEAR=$(date +%Y)
+MONTH=$(date +%m)
+# Read current build number, increment
+CURRENT=$(grep -oP "'\d+\.\d+\.\d+'" src/lib/version.js | tr -d "'")
+BUILD=$(echo "$CURRENT" | cut -d. -f3)
+NEXT=$((BUILD + 1))
+NEW="${YEAR}.${MONTH}.${NEXT}"
+# Update version.js
+sed -i "s/export const VERSION = .*/export const VERSION = '${NEW}';/" src/lib/version.js
+# Update sw.js cache name
+sed -i "s/const CACHE_NAME = .*/const CACHE_NAME = 'ogma-${NEW}';/" static/sw.js
+# Update package.json
+npm version "${YEAR}.${MONTH}.${NEXT}" --no-git-tag-version --allow-same-version
+echo "Bumped: ${CURRENT} → ${NEW}"
