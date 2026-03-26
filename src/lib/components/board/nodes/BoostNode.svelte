@@ -1,13 +1,9 @@
-<svelte:options runes={false} />
-
 <script>
   import { Handle, Position } from '@xyflow/svelte';
   import BoardBoost from '../BoardBoost.svelte';
-  import { getContext } from 'svelte';
-  export let id = '';
-  export let data = {};
-  const ctx = getContext('ogma_canvas') || {};
-</script>
+  import { getContext } from 'svelte';  const ctx = getContext('ogma_canvas') || {};
+
+  let { id = '', data = {} } = $props();</script>
 
 <div class="ogma-node-wrap">
   <Handle type="source" position={Position.Right} id="src" />

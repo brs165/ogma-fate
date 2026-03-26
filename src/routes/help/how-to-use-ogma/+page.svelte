@@ -1,5 +1,3 @@
-<svelte:options runes={false} />
-
 <svelte:head>
   <title>How to Use Ogma — Ogma Help</title>
   <meta name="description" content="Full walkthrough of the Ogma generator suite — how to roll, pin, export, and bring prep to the table." />

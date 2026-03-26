@@ -1,5 +1,3 @@
-<svelte:options runes={false} />
-
 <script>
   // Fonts loaded via svelte:head; theme.css loaded via app.html link tag
 </script>

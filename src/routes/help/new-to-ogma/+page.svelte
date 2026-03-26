@@ -1,5 +1,3 @@
-<svelte:options runes={false} />
-
 <svelte:head>
   <title>New to Ogma? — Ogma Help</title>
   <meta name="description" content="New to Ogma? Learn what it does, how to pick a campaign world, and how to run your first session in under 10 minutes." />

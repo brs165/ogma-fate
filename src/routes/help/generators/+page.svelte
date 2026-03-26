@@ -1,5 +1,3 @@
-<svelte:options runes={false} />
-
 <svelte:head>
   <title>Generator Suite — Ogma Help</title>
   <meta name="description" content="Complete reference for all 16 Ogma generators — NPCs, scenes, encounters, compels, countdowns, and more." />

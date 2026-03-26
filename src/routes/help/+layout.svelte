@@ -1,5 +1,3 @@
-<svelte:options runes={false} />
-
 <script>
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
@@ -7,7 +5,7 @@
   let theme = 'dark';
   let learnOpen = false;
 
-  $: currentPath = $page.url.pathname;
+  let currentPath = $derived($page.url.pathname);
 
   function isActive(href) {
     // Handle trailing slash variations
@@ -44,7 +42,7 @@
     <div class="topbar-status">
       <a href="/help" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">&#128218; Help</a>
       <a href="/about" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">About</a>
-      <button class="btn btn-icon btn-ghost" on:click={toggleTheme}
+      <button class="btn btn-icon btn-ghost" onclick={toggleTheme}
         aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
         style="width:44px;height:44px">{theme === 'dark' ? '☀️' : '◑'}</button>
     </div>
@@ -71,7 +69,7 @@
         <div class="wiki-sidebar-label">Learn</div>
         <button class="wiki-sidebar-parent" class:active={currentPath.startsWith('/help/learn-fate')}
           aria-expanded={String(learnOpen || currentPath.startsWith('/help/learn-fate'))}
-          on:click={() => { learnOpen = !learnOpen; }}>
+          onclick={() => { learnOpen = !learnOpen; }}>
           <span class="wiki-sidebar-parent-label"><span class="icon">&#127922;</span>Learn Fate</span>
           <span class="wiki-sidebar-chevron" aria-hidden="true">&#8250;</span>
         </button>

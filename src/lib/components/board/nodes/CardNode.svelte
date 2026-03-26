@@ -1,14 +1,8 @@
-<svelte:options runes={false} />
-
 <script>
   import { Handle, Position } from '@xyflow/svelte';
   import BoardCard from '../BoardCard.svelte';
   import { getContext } from 'svelte';
-
-  export let id = '';
-  export let data = {};
-  export let selected = false;
-
+  let { id = '', data = {}, selected = false } = $props();
   const ctx = getContext('ogma_canvas') || {};
 </script>
 

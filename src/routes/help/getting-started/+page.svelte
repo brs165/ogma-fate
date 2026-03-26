@@ -1,5 +1,3 @@
-<svelte:options runes={false} />
-
 <svelte:head>
   <title>Getting Started — Ogma Help</title>
   <meta name="description" content="Set up Ogma, roll your first generator, and learn how to save and back up your prep. Start here." />

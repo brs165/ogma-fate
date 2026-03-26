@@ -1,5 +1,3 @@
-<svelte:options runes={false} />
-
 <script>
   import { onMount } from 'svelte';
   import { generate, mergeUniversal, filteredTables } from '$lib/engine.js';
@@ -38,7 +36,7 @@
   };
   const WORLD_IDS = Object.keys(WORLD_META);
 
-  $: campName = campId && WORLD_META[campId] ? WORLD_META[campId].name : '';
+  let campName = $derived(campId && WORLD_META[campId] ? WORLD_META[campId].name : '');
 
   function roll(genId) {
     if (!campId || !CAMPAIGNS[campId]) return null;
@@ -143,7 +141,7 @@
     <div class="topbar-status">
       <a href="/help" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">&#128218; Help</a>
       <a href="/about" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">About</a>
-      <button class="btn btn-icon btn-ghost" on:click={toggleTheme}
+      <button class="btn btn-icon btn-ghost" onclick={toggleTheme}
         aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
         style="width:44px;height:44px">{theme === 'dark' ? '☀️' : '◑'}</button>
     </div>
@@ -172,7 +170,7 @@
           {#each WORLD_IDS as id}
             <button
               style="background:{campId === id ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'var(--glass-bg)'};border:1px solid {campId === id ? 'var(--accent)' : 'var(--glass-border)'};border-radius:10px;padding:14px;cursor:pointer;text-align:left;font-family:var(--font-ui);{campId === id ? 'box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent)' : ''}"
-              on:click={() => selectWorld(id)}
+              onclick={() => selectWorld(id)}
               aria-pressed={String(campId === id)}
             >
               <div style="font-size:22px;margin-bottom:6px">{WORLD_META[id].icon}</div>
@@ -189,12 +187,12 @@
         <p style="font-size:13px;color:var(--text-dim);line-height:1.65;margin-bottom:24px">This sets the opposition scale and generates a backstory hook for each player to kick off the session.</p>
 
         <div style="display:flex;align-items:center;justify-content:center;gap:24px;margin-bottom:24px">
-          <button style="width:44px;height:44px;border-radius:50%;border:2px solid var(--border);background:var(--panel);color:var(--text);font-size:20px;font-weight:700;cursor:pointer" disabled={playerCount <= 1} on:click={() => { playerCount -= 1; generateBackstories(); }}>&minus;</button>
+          <button style="width:44px;height:44px;border-radius:50%;border:2px solid var(--border);background:var(--panel);color:var(--text);font-size:20px;font-weight:700;cursor:pointer" disabled={playerCount <= 1} onclick={() => { playerCount -= 1; generateBackstories(); }}>&minus;</button>
           <div style="text-align:center">
             <div style="font-size:48px;font-weight:900;color:var(--text);line-height:1">{playerCount}</div>
             <div style="font-size:11px;color:var(--text-muted);margin-top:4px">{playerCount === 1 ? 'player' : 'players'}</div>
           </div>
-          <button style="width:44px;height:44px;border-radius:50%;border:2px solid var(--border);background:var(--panel);color:var(--text);font-size:20px;font-weight:700;cursor:pointer" disabled={playerCount >= 6} on:click={() => { playerCount += 1; generateBackstories(); }}>+</button>
+          <button style="width:44px;height:44px;border-radius:50%;border:2px solid var(--border);background:var(--panel);color:var(--text);font-size:20px;font-weight:700;cursor:pointer" disabled={playerCount >= 6} onclick={() => { playerCount += 1; generateBackstories(); }}>+</button>
         </div>
 
         {#if backstories.length > 0}
@@ -206,7 +204,7 @@
                 {#if b.question}<div style="font-size:12px;color:var(--text-dim);font-style:italic;margin-bottom:4px">"{b.question}"</div>{/if}
                 {#if b.aspect}<div style="font-size:12px;color:var(--text);font-weight:600">{b.aspect}</div>{/if}
                 {#if b.hook}<div style="font-size:11px;color:var(--text-dim);margin-top:4px">{b.hook}</div>{/if}
-                <button style="margin-top:6px;font-size:11px;padding:4px 10px;border:1px solid var(--border);border-radius:4px;background:var(--panel);color:var(--text-muted);cursor:pointer" on:click={() => rerollBackstory(i)}>&#x21bb; New hook</button>
+                <button style="margin-top:6px;font-size:11px;padding:4px 10px;border:1px solid var(--border);border-radius:4px;background:var(--panel);color:var(--text-muted);cursor:pointer" onclick={() => rerollBackstory(i)}>&#x21bb; New hook</button>
               </div>
             {/if}
           {/each}
@@ -238,7 +236,7 @@
             </div>
             <div style="padding:8px 14px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--glass-border);font-style:italic">This is a situation, not a plot. The players' choices are the story.</div>
           </div>
-          <button style="font-size:12px;padding:8px 16px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:var(--text-muted);cursor:pointer" on:click={rerollSeed}>&#x21bb; Reroll seed</button>
+          <button style="font-size:12px;padding:8px 16px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:var(--text-muted);cursor:pointer" onclick={rerollSeed}>&#x21bb; Reroll seed</button>
         {:else}
           <div style="text-align:center;padding:40px;color:var(--text-muted)">Generating&hellip;</div>
         {/if}
@@ -277,7 +275,7 @@
             </div>
             <div style="padding:8px 14px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--glass-border);font-style:italic">Put at least one usable aspect in reach &mdash; players love having options.</div>
           </div>
-          <button style="font-size:12px;padding:8px 16px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:var(--text-muted);cursor:pointer" on:click={rerollScene}>&#x21bb; Reroll scene</button>
+          <button style="font-size:12px;padding:8px 16px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:var(--text-muted);cursor:pointer" onclick={rerollScene}>&#x21bb; Reroll scene</button>
         {:else}
           <div style="text-align:center;padding:40px;color:var(--text-muted)">Setting the scene&hellip;</div>
         {/if}
@@ -319,7 +317,7 @@
             </div>
             <div style="padding:8px 14px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--glass-border);font-style:italic">Refresh: {npcData.refresh || 3}. Introduce through action &mdash; let the players figure out who they are.</div>
           </div>
-          <button style="font-size:12px;padding:8px 16px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:var(--text-muted);cursor:pointer" on:click={rerollNpc}>&#x21bb; Reroll NPC</button>
+          <button style="font-size:12px;padding:8px 16px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:var(--text-muted);cursor:pointer" onclick={rerollNpc}>&#x21bb; Reroll NPC</button>
         {:else}
           <div style="text-align:center;padding:40px;color:var(--text-muted)">Generating your opening NPC&hellip;</div>
         {/if}
@@ -358,36 +356,36 @@
         <div class="pw-action-row">
           <button
             style="display:inline-flex;align-items:center;gap:8px;background:var(--glass-bg);border:2px solid var(--accent);border-radius:8px;padding:13px 28px;font-size:14px;font-weight:800;color:var(--text);cursor:pointer;box-shadow:0 0 10px color-mix(in srgb,var(--accent) 25%,transparent)"
-            on:click={goToBoard}
+            onclick={goToBoard}
           >&#127922; Open {campName} Generator</button>
           <button
             style="background:none;border:1px solid var(--border);border-radius:8px;padding:12px 20px;font-size:13px;font-weight:600;color:var(--text-dim);cursor:pointer"
-            on:click={exportSession}
+            onclick={exportSession}
             title="Export all prep cards as Ogma JSON"
             aria-label="Export session prep as JSON"
           >&#8595; Export JSON</button>
           <button
             style="background:none;border:1px solid var(--border);border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700;color:var(--text-dim);cursor:pointer"
-            on:click={() => { if (typeof window !== 'undefined') window.print(); }}
+            onclick={() => { if (typeof window !== 'undefined') window.print(); }}
             title="Print your session sheet"
           >&#128424; Print</button>
           <a href="/campaigns/character-creation?world={campId}&mode=standard&from=sz" class="btn btn-ghost" style="font-size:13px;font-weight:600;padding:12px 20px">&rarr; Character Creation</a>
         </div>
 
         <div style="text-align:center;margin-top:12px">
-          <button style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;text-decoration:underline" on:click={() => { step = 0; campId = null; seedData = null; sceneData = null; npcData = null; backstories = []; }}>Start over</button>
+          <button style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;text-decoration:underline" onclick={() => { step = 0; campId = null; seedData = null; sceneData = null; npcData = null; backstories = []; }}>Start over</button>
         </div>
       {/if}
 
       <!-- ── Navigation ────────────────────────────────────────────── -->
       <div style="display:flex;justify-content:space-between;margin-top:32px;padding-top:16px;border-top:1px solid var(--border)">
         {#if step > 0}
-          <button style="padding:10px 20px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:var(--text-dim);cursor:pointer;font-size:14px;font-weight:600" on:click={prevStep}>&larr; Back</button>
+          <button style="padding:10px 20px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:var(--text-dim);cursor:pointer;font-size:14px;font-weight:600" onclick={prevStep}>&larr; Back</button>
         {:else}
           <div></div>
         {/if}
         {#if step < 5}
-          <button style="padding:10px 20px;border:2px solid var(--accent);border-radius:6px;background:var(--glass-bg);color:var(--text);cursor:pointer;font-size:14px;font-weight:700;box-shadow:0 0 8px color-mix(in srgb,var(--accent) 20%,transparent)" disabled={step === 0 && !campId} on:click={nextStep}>Next &rarr;</button>
+          <button style="padding:10px 20px;border:2px solid var(--accent);border-radius:6px;background:var(--glass-bg);color:var(--text);cursor:pointer;font-size:14px;font-weight:700;box-shadow:0 0 8px color-mix(in srgb,var(--accent) 20%,transparent)" disabled={step === 0 && !campId} onclick={nextStep}>Next &rarr;</button>
         {/if}
       </div>
 

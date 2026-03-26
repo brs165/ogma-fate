@@ -1,5 +1,3 @@
-<svelte:options runes={false} />
-
 <footer class="land-footer">
   <div class="land-footer-inner">
     <div style="font-style:italic;color:var(--text-muted);margin-bottom:4px">

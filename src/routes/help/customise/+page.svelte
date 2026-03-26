@@ -1,5 +1,3 @@
-<svelte:options runes={false} />
-
 <svelte:head>
   <title>Customise — Ogma Help</title>
   <meta name="description" content="Customise Ogma — world themes, result reference depth, table filtering, and session preferences." />

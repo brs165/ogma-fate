@@ -1,5 +1,3 @@
-<svelte:options runes={false} />
-
 <svelte:head>
   <title>FAQ — Ogma Help</title>
   <meta name="description" content="Frequently asked questions about Ogma" />

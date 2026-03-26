@@ -1,5 +1,3 @@
-<svelte:options runes={false} />
-
 <svelte:head>
   <title>DnD Transition Guide — Ogma Help</title>
   <meta name="description" content="Transitioning from DnD to Fate Condensed" />

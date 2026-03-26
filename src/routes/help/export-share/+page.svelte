@@ -1,5 +1,3 @@
-<svelte:options runes={false} />
-
 <svelte:head>
   <title>Export and Share — Ogma Help</title>
   <meta name="description" content="Export and share your generated content" />

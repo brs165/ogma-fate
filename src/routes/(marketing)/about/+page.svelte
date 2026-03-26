@@ -1,5 +1,3 @@
-<svelte:options runes={false} />
-
 <script>
   import { VERSION } from '$lib/version.js';
 </script>

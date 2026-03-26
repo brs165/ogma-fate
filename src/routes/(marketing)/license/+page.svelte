@@ -1,5 +1,3 @@
-<svelte:options runes={false} />
-
 <svelte:head>
   <title>License &amp; Attribution — Ogma</title>
   <meta name="description" content="Full licensing, attribution, and legal notices for Ogma — A Fate Condensed Generator Suite. CC BY 3.0." />
