@@ -1,4 +1,6 @@
 <script>
+export const ssr = falseS;
+export const prerender = false;
   // Fonts loaded via svelte:head; theme.css loaded via app.html link tag
 </script>
 
