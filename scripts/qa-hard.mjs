@@ -301,6 +301,51 @@ for (const world of WORLDS) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
+// BL-02: STUNT DATA VALIDATION
+// ══════════════════════════════════════════════════════════════════════════
+{
+  const CANONICAL_TAGS = new Set([
+    'combat','stealth','subterfuge','social','negotiation','leadership',
+    'knowledge','investigation','technical','repair','survival','movement',
+    'intimidation','supernatural',
+    // World-specific extensions
+    'augments','tech','endurance','exploration'
+  ]);
+
+  let stuntOk = true;
+  for (const [world, campData] of Object.entries(CAMPAIGNS)) {
+    const tables = filteredTables(mergeUniversal(campData.tables), {});
+    const stunts = tables.stunts || [];
+    if (stunts.length === 0) {
+      fail(`stunts-exist-${world}`, 'No stunts in merged tables');
+      stuntOk = false;
+      continue;
+    }
+    for (const s of stunts) {
+      if (!s.name || !s.skill || !s.desc) {
+        fail(`stunt-fields-${world}-${s.name || 'unnamed'}`, `Missing name/skill/desc`);
+        stuntOk = false;
+      }
+      if (!s.type || !['bonus','special'].includes(s.type)) {
+        fail(`stunt-type-${world}-${s.name}`, `Invalid type: ${s.type}`);
+        stuntOk = false;
+      }
+      if (!Array.isArray(s.tags) || s.tags.length === 0) {
+        fail(`stunt-tags-${world}-${s.name}`, `Missing or empty tags array`);
+        stuntOk = false;
+      } else {
+        for (const tag of s.tags) {
+          if (!CANONICAL_TAGS.has(tag)) {
+            warn(`stunt-tag-unknown-${world}-${s.name}`, `Unknown tag "${tag}" (not in canonical list)`);
+          }
+        }
+      }
+    }
+  }
+  if (stuntOk) pass('stunt-data-valid');
+}
+
+// ══════════════════════════════════════════════════════════════════════════
 // STATIC ANALYSIS — Dangerous Svelte 5 Patterns
 // ══════════════════════════════════════════════════════════════════════════
 {

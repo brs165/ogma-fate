@@ -2961,6 +2961,59 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .about-stat{display:inline-block;text-align:center;padding:12px 20px}
 .about-stat-n{font-size:var(--text-2xl);font-weight:800;color:var(--accent,var(--text))}
 .about-stat-l{font-size:var(--text-label);color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em}
+/* ── Mobile Nav — shared hamburger/drawer pattern for marketing + help ── */
+.mn-hamburger{display:none;width:44px;height:44px;background:none;border:none;color:var(--text);cursor:pointer;font-size:18px;flex-shrink:0;align-items:center;justify-content:center;border-radius:4px}
+.mn-hamburger:hover{background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.mn-backdrop{display:none}
+.mn-desktop-only{display:inline-flex}
+.mn-drawer{display:none}
+.mn-drawer-section{padding:8px 0}
+.mn-drawer-label{font-size:10px;font-weight:800;letter-spacing:0.14em;color:var(--text-muted);text-transform:uppercase;padding:8px 16px 4px}
+.mn-drawer-link{display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:14px;color:var(--text-dim);text-decoration:none;transition:background 0.12s}
+.mn-drawer-link:hover{background:color-mix(in srgb,var(--accent) 8%,transparent);color:var(--text)}
+.mn-drawer-divider{height:1px;background:var(--border);margin:4px 12px}
+
+/* ── Wiki sidebar — desktop layout ──────────────────────────────────── */
+.wiki-shell{display:flex;flex:1;min-height:0}
+.wiki-sidebar{width:240px;flex-shrink:0;background:var(--panel-raised);border-right:1px solid var(--border);overflow-y:auto;padding:12px 0;display:flex;flex-direction:column;gap:2px}
+.wiki-sidebar-section{padding:2px 8px}
+.wiki-sidebar-label{font-size:10px;font-weight:800;letter-spacing:0.14em;color:var(--text-muted);text-transform:uppercase;padding:8px 8px 4px}
+.wiki-sidebar-divider{height:1px;background:var(--border);margin:4px 12px}
+.wiki-sidebar-link{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:4px;font-size:13px;color:var(--text-dim);text-decoration:none;transition:background 0.12s}
+.wiki-sidebar-link:hover{background:color-mix(in srgb,var(--accent) 8%,transparent);color:var(--text)}
+.wiki-sidebar-link.active{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent);font-weight:600}
+.wiki-sidebar-link .icon{width:20px;text-align:center;flex-shrink:0;font-size:14px;color:var(--text-muted)}
+.wiki-sidebar-link.active .icon{color:var(--accent)}
+.wiki-sidebar-parent{display:flex;align-items:center;justify-content:space-between;width:100%;padding:7px 10px;border-radius:4px;font-size:13px;color:var(--text-dim);background:none;border:none;cursor:pointer;text-align:left;transition:background 0.12s}
+.wiki-sidebar-parent:hover{background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.wiki-sidebar-parent.active{color:var(--accent)}
+.wiki-sidebar-parent-label{display:flex;align-items:center;gap:8px}
+.wiki-sidebar-chevron{font-size:10px;transition:transform 0.15s;color:var(--text-muted)}
+.wiki-sidebar-parent[aria-expanded="true"] .wiki-sidebar-chevron{transform:rotate(90deg)}
+.wiki-sidebar-children{padding:2px 0 2px 28px;display:flex;flex-direction:column;gap:1px}
+.wiki-sidebar-child{font-size:12px;color:var(--text-muted);text-decoration:none;padding:4px 8px;border-radius:3px;transition:color 0.12s}
+.wiki-sidebar-child:hover{color:var(--accent)}
+
+/* ── Mobile: ≤640px — hamburger + drawer ──────────────────────────── */
+@media(max-width:640px){
+  .mn-hamburger{display:inline-flex}
+  .mn-desktop-only{display:none!important}
+
+  /* Backdrop */
+  .mn-backdrop{display:block;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:299;animation:bsheet-fade 0.2s ease both}
+
+  /* Marketing drawer */
+  .mn-drawer{display:flex;flex-direction:column;position:fixed;top:52px;left:0;bottom:0;width:280px;z-index:300;background:var(--panel-raised);border-right:1px solid var(--border);overflow-y:auto;transform:translateX(-100%);transition:transform 0.22s cubic-bezier(0.4,0,0.2,1);box-shadow:8px 0 32px rgba(0,0,0,0.5)}
+  .mn-drawer.mn-open{transform:translateX(0)}
+
+  /* Help wiki sidebar — becomes drawer on mobile */
+  .wiki-sidebar{position:fixed;top:52px;left:0;bottom:0;width:280px;z-index:300;transform:translateX(-100%);transition:transform 0.22s cubic-bezier(0.4,0,0.2,1);box-shadow:8px 0 32px rgba(0,0,0,0.5)}
+  .wiki-sidebar.mn-open{transform:translateX(0)}
+
+  /* Content takes full width */
+  .wiki-shell{flex-direction:column}
+}
+
 .wiki-card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0;margin:12px 0 0}
 @media(max-width:500px){.wiki-card-grid{grid-template-columns:repeat(2,1fr)}}
 .wiki-card-grid a{text-decoration:none;display:flex;flex-direction:column;gap:3px;padding:10px 12px;border-radius:var(--glass-radius-sm);border:1px solid var(--glass-border);background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);transition:background 0.12s;min-width:0}

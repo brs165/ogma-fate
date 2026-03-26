@@ -33,18 +33,46 @@ import Dexie from 'dexie';
 
     // ── Schema defaults — ensure all known keys have a value ──────────────
     var DEFAULTS = {
-      _v:              LS_VERSION,
-      theme:           'dark',
-      textsize:        0,
-      universal_merge: true,
-      help_level:      'new_fate',
-      gm_mode:         true,
-      intro_seen:      {},
+      _v:                      LS_VERSION,
+      theme:                   'dark',
+      textsize:                0,
+      universal_merge:         true,
+      help_level:              'new_fate',
+      gm_mode:                 true,
+      intro_seen:              {},
+      coach_canvas_dismissed:  false,
+      coach_play_dismissed:    false,
+      pwa_nudge_dismissed:     false,
+      safari_warn_dismissed:   false,
+      ios_install_dismissed:   false,
+      visit_counts:            {},
     };
     var changed = false;
     Object.keys(DEFAULTS).forEach(function(k) {
       if (prefs[k] === undefined) { prefs[k] = DEFAULTS[k]; changed = true; }
     });
+
+    // ── BL-01: Migrate straggler bare localStorage keys into prefs ──────
+    var STRAGGLER_BOOLS = ['pwa_nudge_dismissed', 'safari_warn_dismissed', 'ios_install_dismissed'];
+    STRAGGLER_BOOLS.forEach(function(k) {
+      if (!prefs[k]) {
+        try { if (localStorage.getItem(k)) { prefs[k] = true; changed = true; localStorage.removeItem(k); } } catch(e) {}
+      }
+    });
+    // Migrate visit_count_* keys
+    try {
+      var allKeys = Object.keys(localStorage);
+      allKeys.forEach(function(k) {
+        if (k.startsWith('visit_count_')) {
+          var campId = k.replace('visit_count_', '');
+          var val = parseInt(localStorage.getItem(k) || '0', 10) || 0;
+          if (!prefs.visit_counts) prefs.visit_counts = {};
+          if (!prefs.visit_counts[campId]) { prefs.visit_counts[campId] = val; changed = true; }
+          localStorage.removeItem(k);
+        }
+      });
+    } catch(e) {}
+
     if (!prefs._v) { prefs._v = LS_VERSION; changed = true; }
     if (changed) savePrefs(prefs);
 
@@ -81,6 +109,17 @@ export const LS = {
       var p = ensurePrefs();
       if (p.intro_seen) delete p.intro_seen[worldKey];
       savePrefs(p);
+    },
+    // Visit counts per campaign
+    getVisitCount: function(campId) {
+      return (ensurePrefs().visit_counts || {})[campId] || 0;
+    },
+    incrementVisitCount: function(campId) {
+      var p = ensurePrefs();
+      if (!p.visit_counts) p.visit_counts = {};
+      p.visit_counts[campId] = (p.visit_counts[campId] || 0) + 1;
+      savePrefs(p);
+      return p.visit_counts[campId];
     },
 
 };

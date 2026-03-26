@@ -4,7 +4,7 @@
   import { CAMPAIGNS, HELP_CONTENT } from '../../../data/shared.js';
   import { createSessionStore } from '../../stores/sessionStore.js';
   import { createChromeStore } from '../../stores/chromeStore.js';
-  import DB from '../../db.js';
+  import DB, { LS } from '../../db.js';
   import Cv4Card from '../cards/Cv4Card.svelte';
   import Board from '../board/Board.svelte';
 
@@ -77,8 +77,7 @@
 
     // Theme
     try {
-      const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}');
-      theme = p.theme || 'dark';
+      theme = LS.get('theme') || 'dark';
       document.documentElement.setAttribute('data-theme', theme);
     } catch (e) {}
 
@@ -86,7 +85,7 @@
     document.documentElement.setAttribute('data-campaign', campId);
 
     // GM mode
-    try { gmMode = (JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}').gm_mode !== false); } catch (e) {}
+    try { gmMode = (LS.get('gm_mode') !== false); } catch (e) {}
     document.documentElement.setAttribute('data-gm-mode', gmMode ? 'on' : 'off');
 
     // Keyboard shortcuts
@@ -136,11 +135,7 @@
   function toggleTheme() {
     theme = theme === 'dark' ? 'light' : 'dark';
     if (typeof document !== 'undefined') document.documentElement.setAttribute('data-theme', theme);
-    try {
-      const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}');
-      p.theme = theme;
-      localStorage.setItem('fate_prefs_v1', JSON.stringify(p));
-    } catch (e) {}
+    LS.set('theme', theme);
   }
 
   // ── Actions ────────────────────────────────────────────────────────────────

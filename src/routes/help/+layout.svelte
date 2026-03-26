@@ -2,10 +2,12 @@
     let { children } = $props();
 import { onMount } from 'svelte';
   import { page } from '$app/stores';
+  import { LS } from '$lib/db.js';
   import Footer from '$lib/components/shared/Footer.svelte';
 
   let theme = $state('dark');
   let learnOpen = $state(false);
+  let navOpen = $state(false);
 
   let currentPath = $derived($page.url.pathname);
 
@@ -15,10 +17,15 @@ import { onMount } from 'svelte';
     return clean === target;
   }
 
+  // Close nav on route change
+  $effect(() => {
+    void currentPath;
+    navOpen = false;
+  });
+
   onMount(() => {
     try {
-      const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}');
-      theme = p.theme || 'dark';
+      theme = LS.get('theme') || 'dark';
       document.documentElement.setAttribute('data-theme', theme);
     } catch (e) {}
   });
@@ -26,11 +33,7 @@ import { onMount } from 'svelte';
   function toggleTheme() {
     theme = theme === 'dark' ? 'light' : 'dark';
     if (typeof document !== 'undefined') document.documentElement.setAttribute('data-theme', theme);
-    try {
-      const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}');
-      p.theme = theme;
-      localStorage.setItem('fate_prefs_v1', JSON.stringify(p));
-    } catch (e) {}
+    LS.set('theme', theme);
   }
 </script>
 
@@ -38,19 +41,31 @@ import { onMount } from 'svelte';
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
   <header class="land-topnav topbar">
+    <!-- Hamburger — mobile only -->
+    <button
+      class="mn-hamburger"
+      onclick={() => { navOpen = !navOpen; }}
+      aria-label={navOpen ? 'Close navigation' : 'Open navigation'}
+      aria-expanded={String(navOpen)}
+    ><i class={navOpen ? 'fa-solid fa-xmark' : 'fa-solid fa-bars'} aria-hidden="true"></i></button>
     <a href="/" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
     <div class="topbar-spacer" style="flex:1"></div>
     <div class="topbar-status">
-      <a href="/help" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Help</a>
-      <a href="/about" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">About</a>
+      <a href="/help" class="btn btn-ghost topbar-nav-btn mn-desktop-only" style="font-size:13px;text-decoration:none"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Help</a>
+      <a href="/about" class="btn btn-ghost topbar-nav-btn mn-desktop-only" style="font-size:13px;text-decoration:none">About</a>
       <button class="btn btn-icon btn-ghost" onclick={toggleTheme}
         aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
         style="width:44px;height:44px"><i class={theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-circle-half-stroke'} aria-hidden="true"></i></button>
     </div>
   </header>
 
+  <!-- Mobile backdrop -->
+  {#if navOpen}
+    <div class="mn-backdrop" onclick={() => { navOpen = false; }} aria-hidden="true"></div>
+  {/if}
+
   <div class="wiki-shell">
-    <aside class="wiki-sidebar" role="navigation" aria-label="Help navigation">
+    <aside class="wiki-sidebar" class:mn-open={navOpen} role="navigation" aria-label="Help navigation">
       <div class="wiki-sidebar-section">
         <div class="wiki-sidebar-label">Getting Started</div>
         <a href="/help" class="wiki-sidebar-link" class:active={isActive('/help')}>

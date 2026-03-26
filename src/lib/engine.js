@@ -61,6 +61,40 @@ function pickN(arr, n) {
 function rand(a, b) { return Math.floor(_rng() * (b - a + 1)) + a; }
 
 /**
+ * Pick stunts that match the character's skills. Prefers skill-matching stunts
+ * but falls back to random if not enough matches exist.
+ * @param {Array} pool - All available stunts.
+ * @param {number} n - How many to pick.
+ * @param {Array} skills - Character's skills [{name,r},...].
+ * @returns {Array} Selected stunts, no duplicates.
+ */
+function pickStuntsForSkills(pool, n, skills) {
+  if (!pool || !pool.length) return [];
+  var skillNames = {};
+  (skills || []).forEach(function(s) { skillNames[s.name] = true; });
+  // Partition: matching (stunt.skill in character's skills) vs rest
+  var matching = [];
+  var rest = [];
+  pool.forEach(function(st) {
+    if (st.skill && skillNames[st.skill]) matching.push(st);
+    else if (st.skill === 'varies') matching.push(st); // "varies" stunts always match
+    else rest.push(st);
+  });
+  // Shuffle both pools
+  matching = pickN(matching, matching.length);
+  rest = pickN(rest, rest.length);
+  // Take from matching first, then fill from rest
+  var out = [];
+  var seen = {};
+  var combined = matching.concat(rest);
+  for (var i = 0; i < combined.length && out.length < n; i++) {
+    var key = combined[i].name;
+    if (!seen[key]) { seen[key] = true; out.push(combined[i]); }
+  }
+  return out;
+}
+
+/**
  * Variety Matrix engine — picks a random template and substitutes {Token} placeholders.
  *
  * @param {object|Array|null} tblObj
@@ -111,7 +145,7 @@ function generateMinorNPC(t) {
   var skills = chosenSkills.map(function(s, i) { return {name: s, r: Math.max(1, rating - i)}; });
   var hasStunt = _rng() > 0.5;
   var bonusStunts = (t.stunts || []).filter(function(s) { return s.type === 'bonus'; });
-  var stunt = hasStunt && bonusStunts.length > 0 ? pick(bonusStunts) : null;
+  var stunt = hasStunt && bonusStunts.length > 0 ? pickStuntsForSkills(bonusStunts, 1, skills)[0] || null : null;
   // FCon: minor NPCs have 1–2 stress boxes (not 3 — that is the default for full characters)
   var stress = rand(1, 2);
   return {name: name, aspects: aspects, skills: skills, stunt: stunt, stress: stress};
@@ -165,7 +199,7 @@ function generateMajorNPC(t) {
     {name: chosen[1], r: peak - 1}, {name: chosen[2], r: peak - 1},
     {name: chosen[3], r: peak - 2}, {name: chosen[4], r: peak - 2}, {name: chosen[5], r: peak - 2},
   ].filter(function(s) { return s.r > 0; });
-  var stunts = pickN(t.stunts || [], 2);
+  var stunts = pickStuntsForSkills(t.stunts || [], 2, skills);
   // Calculate stress from assigned Physique/Will ratings (default +0 if not assigned)
   var physR = 0, willR = 0;
   skills.forEach(function(s) {
@@ -625,7 +659,7 @@ export function generatePC(t) {
 
   // 3 stunts at creation (each costs 1 Refresh; 3 stunts = refresh 3 - 0 net spend if taken free)
   // FCon p.10: players start with 3 free stunt slots. Refresh starts at 3.
-  var stunts = pickN(t.stunts || [], 3);
+  var stunts = pickStuntsForSkills(t.stunts || [], 3, skills);
 
   // Stress derived from Physique / Will per FCon p.12
   var physR = 0, willR = 0;

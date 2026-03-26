@@ -1,5 +1,5 @@
 # Stunt Data Specification — Ogma
-> BL-02 · last updated: 2026.03.326
+> BL-02 · COMPLETE as of v2026.03.624+ · last updated: 2026.03.624
 
 ## Canonical stunt object shape
 
@@ -32,7 +32,7 @@
 
 ### Canonical tag list
 
-`combat` · `stealth` · `subterfuge` · `social` · `negotiation` · `leadership` · `knowledge` · `investigation` · `technical` · `repair` · `survival` · `movement` · `intimidation` · `supernatural`
+`combat` · `stealth` · `subterfuge` · `social` · `negotiation` · `leadership` · `knowledge` · `investigation` · `technical` · `repair` · `survival` · `movement` · `intimidation` · `supernatural` · `augments` · `tech` · `endurance` · `exploration`
 
 ---
 

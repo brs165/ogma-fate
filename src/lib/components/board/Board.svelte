@@ -1,6 +1,7 @@
 <script>
   import { onMount, onDestroy, setContext } from 'svelte';
   import { get, writable } from 'svelte/store';
+  import { Tooltip } from 'bits-ui';
   import { SvelteFlow, Background, BackgroundVariant, MiniMap, Controls } from '@xyflow/svelte';
   import '@xyflow/svelte/dist/style.css';
   import { nodeTypes } from './nodeTypes.js';
@@ -9,7 +10,7 @@
   import { createPlayStore } from '../../stores/playStore.js';
   import { createBinderStore } from '../../stores/binderStore.js';
   import { createSyncStore } from '../../stores/syncStore.js';
-  import DB from '../../db.js';
+  import DB, { LS } from '../../db.js';
 
   // Child components
   import Topbar from './Topbar.svelte';
@@ -241,8 +242,7 @@
 
     // Theme restore
     try {
-      const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}');
-      const t = p.theme || localStorage.getItem('fate_theme') || 'dark';
+      const t = LS.get('theme') || 'dark';
       theme = t;
       document.documentElement.setAttribute('data-theme', t);
     } catch (e) {}
@@ -252,8 +252,7 @@
 
     // Coach mark
     try {
-      const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}');
-      if (!p.coach_canvas_dismissed) coachCanvas = true;
+      if (!LS.get('coach_canvas_dismissed')) coachCanvas = true;
     } catch (e) {}
 
     // Online/offline
@@ -307,8 +306,7 @@
   // ── Play mode coach mark ──────────────────────────────────────────────────
   $effect(() => { if (mode === 'play') {
     try {
-      const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}');
-      if (!p.coach_play_dismissed) coachPlay = true;
+      if (!LS.get('coach_play_dismissed')) coachPlay = true;
     } catch (e) {}
   } });
 
@@ -316,21 +314,17 @@
   function toggleTheme() {
     theme = theme === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', theme);
-    try {
-      const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}');
-      p.theme = theme;
-      localStorage.setItem('fate_prefs_v1', JSON.stringify(p));
-    } catch (e) {}
+    LS.set('theme', theme);
   }
 
   // ── Coach mark dismiss ────────────────────────────────────────────────────
   function dismissCoachCanvas() {
     coachCanvas = false;
-    try { const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}'); p.coach_canvas_dismissed = true; localStorage.setItem('fate_prefs_v1', JSON.stringify(p)); } catch (e) {}
+    LS.set('coach_canvas_dismissed', true);
   }
   function dismissCoachPlay() {
     coachPlay = false;
-    try { const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}'); p.coach_play_dismissed = true; localStorage.setItem('fate_prefs_v1', JSON.stringify(p)); } catch (e) {}
+    LS.set('coach_play_dismissed', true);
   }
 
   // ── Generator select (left panel click = generate immediately) ────────────
@@ -421,6 +415,10 @@
     } else if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
       e.preventDefault();
       if (canvas) canvas.undoLast();
+    } else if ((e.ctrlKey || e.metaKey) && (e.key === 'a' || e.key === 'A')) {
+      e.preventDefault();
+      // Ctrl+A = select all nodes; Ctrl+Shift+A = deselect all
+      flowNodes.update(nodes => nodes.map(n => ({ ...n, selected: !e.shiftKey })));
     } else if (e.key === 'r' || e.key === 'R') {
       showDice = !showDice;
     } else if (e.key === 'f' || e.key === 'F') {
@@ -442,6 +440,7 @@
     { id: 'fit', icon: '\u2922', label: 'Fit All Cards', shortcut: 'F', fn: fitAll },
     { id: 'clear', icon: '\u{1F5D1}', label: 'Clear Table', fn: () => { showClearModal = true; } },
     { id: 'undo', icon: '\u21B6', label: 'Undo', shortcut: '\u2318Z', fn: () => { if (canvas) canvas.undoLast(); } },
+    { id: 'selectAll', icon: '\u2610', label: 'Select All Nodes', shortcut: '\u2318A', fn: () => { flowNodes.update(ns => ns.map(n => ({ ...n, selected: true }))); } },
     { id: 'mode', icon: '\u25B6', label: mode === 'prep' ? 'Switch to Play' : 'Switch to Prep', fn: () => onModeChange(mode === 'prep' ? 'play' : 'prep') },
     { id: 'theme', icon: '\u263D', label: 'Toggle Dark/Light', fn: toggleTheme },
   ]);
@@ -462,6 +461,7 @@
 
 <!-- ── Template ─────────────────────────────────────────────────────────────── -->
 
+<Tooltip.Provider>
 <div class="board-app" data-theme={theme} data-mode={mode} onclick={() => ctx = null}>
 
   <!-- ── Topbar ────────────────────────────────────────────────────────────── -->
@@ -912,3 +912,4 @@
     </div>
   {/if}
 </div>
+</Tooltip.Provider>

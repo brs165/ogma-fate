@@ -1,6 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import { VERSION } from '$lib/version.js';
+  import { LS } from '$lib/db.js';
   import Footer from '$lib/components/shared/Footer.svelte';
 
   let theme = $state('dark');
@@ -65,8 +66,7 @@
 
   onMount(() => {
     try {
-      const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}');
-      theme = p.theme || 'dark';
+      theme = LS.get('theme') || 'dark';
       document.documentElement.setAttribute('data-theme', theme);
     } catch (e) {}
 
@@ -93,11 +93,7 @@
   function toggleTheme() {
     theme = theme === 'dark' ? 'light' : 'dark';
     if (typeof document !== 'undefined') document.documentElement.setAttribute('data-theme', theme);
-    try {
-      const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}');
-      p.theme = theme;
-      localStorage.setItem('fate_prefs_v1', JSON.stringify(p));
-    } catch (e) {}
+    LS.set('theme', theme);
   }
 
   // ── Campaign data ──────────────────────────────────────────────────────
