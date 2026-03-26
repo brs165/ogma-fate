@@ -1,5 +1,3 @@
-<svelte:options runes={false} />
-
 <script>
   import { onMount, onDestroy } from 'svelte';
   import BackPanel from './BackPanel.svelte';
@@ -79,11 +77,7 @@
   const CV4_MONO = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
 
   // ── Props ────────────────────────────────────────────────────────────────
-  export let genId          = 'npc_minor';
-  export let campName       = '';
-  export let data           = {};
-  export let onUpdate       = null;
-  export let savedCardState = null;
+  let { genId = 'npc_minor', campName = '', data = {}, onUpdate = null, savedCardState = null } = $props();
 
   // ── UI state ─────────────────────────────────────────────────────────────
   let flipped  = false;
@@ -105,28 +99,29 @@
 
   // ── Entry fade (triggers on genId/data change) ────────────────────────────
   let fadeTimer;
-  $: if (!reduced) {
-    // Reference both deps so Svelte tracks them
-    void genId; void data;
-    visible = false;
-    clearTimeout(fadeTimer);
-    fadeTimer = setTimeout(() => { visible = true; }, 30);
-  }
+  $effect(() => {
+    if (!reduced) {
+      void genId; void data;
+      visible = false;
+      clearTimeout(fadeTimer);
+      fadeTimer = setTimeout(() => { visible = true; }, 30);
+    }
+  });
 
   onDestroy(() => clearTimeout(fadeTimer));
 
   // ── Derived ───────────────────────────────────────────────────────────────
-  $: meta      = CV4_META[genId] || { cat: 'mechanics', icon: '◈' };
-  $: cat       = CV4_CAT[meta.cat] || CV4_CAT.mechanics;
-  $: catColor  = cat.color;
-  $: genLabel  = genId.replace(/_/g, ' ').toUpperCase();
-  $: ariaLabel = genLabel + ' card' + (campName ? ' from ' + campName : '');
-  $: FrontComponent = FRONTS[genId] || null;
+  let meta      = $derived(CV4_META[genId] || { cat: 'mechanics', icon: '◈' });
+  let cat       = $derived(CV4_CAT[meta.cat] || CV4_CAT.mechanics);
+  let catColor  = $derived(cat.color);
+  let genLabel  = $derived(genId.replace(/_/g, ' ').toUpperCase());
+  let ariaLabel = $derived(genLabel + ' card' + (campName ? ' from ' + campName : ''));
+  let FrontComponent = $derived(FRONTS[genId] || null);
 
   // ── Interactive card state ────────────────────────────────────────────────
-  $: phyMax = typeof data.physical_stress === 'number' ? data.physical_stress
-            : typeof data.stress           === 'number' ? data.stress : 0;
-  $: menMax = typeof data.mental_stress   === 'number' ? data.mental_stress : 0;
+  let phyMax = $derived(typeof data.physical_stress === 'number' ? data.physical_stress
+            : typeof data.stress           === 'number' ? data.stress : 0);
+  let menMax = $derived(typeof data.mental_stress   === 'number' ? data.mental_stress : 0);
 
   // Initialize once (like React useState initializer)
   let cardState = (() => {
@@ -161,8 +156,8 @@
   class="cv4-flip-container"
   role="region"
   aria-label={ariaLabel}
-  on:mouseenter={() => hovered = true}
-  on:mouseleave={() => hovered = false}
+  onmouseenter={() => hovered = true}
+  onmouseleave={() => hovered = false}
   style="perspective:{reduced ? 'none' : '1000px'}; animation:{reduced ? 'none' : 'fd-stamp-in 0.35s cubic-bezier(0.34,1.56,0.64,1) both'}; opacity:{visible ? 1 : 0}"
 >
   <!-- ── Flipper ──────────────────────────────────────────────────────── -->
@@ -200,8 +195,8 @@
       {/if}
       <!-- Flip button -->
       <button
-        on:click={toggleFlip}
-        on:keydown={onFlipKeydown}
+        onclick={toggleFlip}
+        onkeydown={onFlipKeydown}
         aria-label={flipped ? 'Show card front' : 'Show GM guidance'}
         style="width:100%; height:28px; background:transparent; border:none; border-top:1px solid {catColor}22; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; font-family:{CV4_MONO}; font-size:10px; font-weight:700; letter-spacing:0.18em; color:{catColor}; text-transform:uppercase"
       ><span style="font-size:10px; line-height:1">▶</span> TAP FOR GM GUIDANCE</button>
@@ -227,8 +222,8 @@
       </div>
       <!-- Flip button -->
       <button
-        on:click={toggleFlip}
-        on:keydown={onFlipKeydown}
+        onclick={toggleFlip}
+        onkeydown={onFlipKeydown}
         aria-label="Show card front"
         style="width:100%; height:28px; background:transparent; border:none; border-top:1px solid {catColor}22; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; font-family:{CV4_MONO}; font-size:10px; font-weight:700; letter-spacing:0.18em; color:{catColor}; text-transform:uppercase"
       ><span style="font-size:10px; line-height:1">◀</span> TAP FOR CARD DETAILS</button>
