@@ -3029,7 +3029,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 
 /* ══ CONSEQUENCE SEVERITY PICKER ══ */
 .sev-picker{display:flex;gap:6px;padding:8px 12px;background:var(--inset);border-bottom:1px solid var(--border);flex-wrap:wrap}
-.sev-btn{padding:5px 14px;min-height:32px;border-radius:var(--fd-stamp-radius,3px);border:1.5px solid var(--border-mid);background:transparent;color:var(--text-muted);font-size:var(--text-sm);font-weight:700;font-family:var(--font-mono);letter-spacing:0.04em;cursor:pointer;transition:all 0.12s}
+.sev-btn{padding:5px 14px;min-height:44px;border-radius:var(--fd-stamp-radius,3px);border:1.5px solid var(--border-mid);background:transparent;color:var(--text-muted);font-size:var(--text-sm);font-weight:700;font-family:var(--font-mono);letter-spacing:0.04em;cursor:pointer;transition:all 0.12s}
 .sev-btn:hover{border-color:var(--sev-color);color:var(--sev-color)}
 .sev-btn.sev-active{border-color:var(--sev-color);background:color-mix(in srgb,var(--sev-color) 12%,transparent);color:var(--sev-color)}
 .sev-btn:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
