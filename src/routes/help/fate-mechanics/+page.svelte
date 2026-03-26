@@ -10,7 +10,7 @@
 <p class="wiki-page-desc">Ogma generates mechanically correct Fate Condensed content. This page explains the mechanics behind the generators, with deep dives into Create Advantage, the fate point economy, GM prep structure, common errors, and further reading.</p>
 
 <div class="callout callout-info">
-  <div class="callout-title">&#128218; New to Fate?</div>
+  <div class="callout-title"><i class="fa-solid fa-book-open" aria-hidden="true"></i> New to Fate?</div>
   <p>Start with the <a href="/help/learn-fate">Quick Start guide</a> or the <a href="/help/dnd-transition">D&amp;D Transition guide</a>. This page goes deeper into specific mechanics.</p>
 </div>
 
@@ -50,7 +50,7 @@
 <p>The Consequence generator produces a named aspect ready to write on a character sheet. Always name it specifically — <em>"Badly Burned Hands"</em> not just <em>"Injured"</em>. The aspect must work as a compel hook.</p>
 
 <div class="callout callout-tip">
-  <div class="callout-title">&#128161; GM tip from the generator</div>
+  <div class="callout-title"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> GM tip from the generator</div>
   <p>Plan at least one compel on a consequence before it heals. A consequence that never got invoked or compelled was a missed dramatic opportunity.</p>
 </div>
 
@@ -129,7 +129,7 @@
     <p><strong>Create an Advantage</strong> is the action new players skip and experienced players build entire sessions around. It places a new aspect on a scene, character, or situation — or discovers an existing hidden aspect — and gives you one or two free invokes on it.</p>
     <p>Why it matters: a free invoke stacks on top of a paid invoke (+2 each). Stack two free invokes before your Attack and you're rolling at effectively +4 over your skill — without spending a single Fate Point.</p>
     <div class="callout callout-scenario">
-      <div class="callout-title">&#127914; Worked example — fighting a skilled swordsman</div>
+      <div class="callout-title"><i class="fa-solid fa-gamepad" aria-hidden="true"></i> Worked example — fighting a skilled swordsman</div>
       <p>Your Fight is Good (+3). The enemy's Fight is Great (+4) — you're at a mechanical disadvantage every exchange if you just attack.</p>
       <p><strong>Without Create Advantage:</strong> You attack at Fight +3 vs. their Defend at +4. Odds are against you. Repeat until someone runs out of stress.</p>
       <p><strong>With Create Advantage:</strong> You throw sand (Athletics +2) to Create Advantage "Sand in His Eyes" — a new situation aspect with one free invoke. You succeed. Next exchange, you Attack at Fight +3 <em>plus</em> your free invoke (+2) = effectively +5 vs. their +4. You're now the favourite.</p>
@@ -140,7 +140,7 @@
       <p>D&amp;D has no equivalent to Create Advantage. The closest analogy is the Help action — but Help gives advantage to one ally on one roll. Create Advantage places a reusable aspect that <em>anyone</em> can invoke, stacks with other free invokes, and creates narrative facts the fiction must honour. It's fundamentally more powerful and more interesting than Help.</p>
     </div>
     <div class="callout callout-tip">
-      <div class="callout-title">&#127922; GM tip — aspects created by players are real</div>
+      <div class="callout-title"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> GM tip — aspects created by players are real</div>
       <p>When a player successfully creates "Perched on the High Ground," that aspect exists in the fiction. It's true. It gives the player's side a free invoke. It also means the enemy should <em>react to it</em> — they might spend their action trying to remove it (Overcome), or the GM might compel it ("Your high ground also makes you the most visible target in the courtyard").</p>
     </div>
 
@@ -152,11 +152,11 @@
       <li><strong>End of scene:</strong> Reset GM pool to 1 per PC. Player pools carry over — they don't reset until a breakthrough.</li>
     </ol>
     <div class="callout callout-warning">
-      <div class="callout-title">&#9888; The economy stalls without compels</div>
+      <div class="callout-title"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> The economy stalls without compels</div>
       <p>If the GM never compels, players hoard fate points they never spend (no dramatic moments needed them) and never earn new ones (no compels to accept). The game goes flat. Aim for at least 1–2 compels per session. Each one is a story beat, not a punishment.</p>
     </div>
     <div class="callout callout-tip">
-      <div class="callout-title">&#127922; GM tip — offer compels on troubles first</div>
+      <div class="callout-title"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> GM tip — offer compels on troubles first</div>
       <p>Troubles are pre-approved complications — the player wrote them specifically to be compelled. Start there. "Your trouble is <em>Always the Last to Know</em> — would your character hear about the ambush in time?" Offering the FP before describing the complication is the correct procedure. They can always refuse.</p>
     </div>
 
@@ -176,27 +176,27 @@
 
     <h2 id="common-errors">Common errors and how to fix them</h2>
     <div class="callout callout-info">
-      <div class="callout-title">&#128161; "We forgot to invoke aspects all session"</div>
+      <div class="callout-title"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> "We forgot to invoke aspects all session"</div>
       <p><strong>Fix:</strong> At the start of next session, put a physical index card in front of each player with their aspects on it. Make aspects visible. Aspects that aren't visible don't get invoked. Once the habit forms, the cards become optional.</p>
     </div>
     <div class="callout callout-info">
-      <div class="callout-title">&#128161; "Players roll for everything, including obvious things"</div>
+      <div class="callout-title"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> "Players roll for everything, including obvious things"</div>
       <p><strong>Fix:</strong> Apply the three-question test before any roll: (1) Is the outcome uncertain? (2) Would failure be interesting? (3) Does the outcome matter to the story? If any answer is no, don't roll — just narrate. A skilled lockpick opening a simple lock in a non-tense situation shouldn't roll.</p>
     </div>
     <div class="callout callout-info">
-      <div class="callout-title">&#128161; "Our conflicts take two hours"</div>
+      <div class="callout-title"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> "Our conflicts take two hours"</div>
       <p><strong>Fix:</strong> Introduce concession early. Tell players explicitly: "You can concede at any time before a roll. You control what happens to your character, and you earn fate points." Most long conflicts happen because players don't know concession exists. Design conflicts to have a clear "this side wins" condition so players can see when conceding is the smart move.</p>
     </div>
     <div class="callout callout-info">
-      <div class="callout-title">&#128161; "Nobody compels — the economy is dead"</div>
+      <div class="callout-title"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> "Nobody compels — the economy is dead"</div>
       <p><strong>Fix:</strong> This is always a GM problem, not a player problem. Set a target: two compels per session minimum. Write your NPCs' situations so complications naturally arise from PC troubles. "Your trouble is <em>Owes Money to the Wrong People</em> — the loan shark just walked through the door" is a compel. Offer the FP before you describe what happens.</p>
     </div>
     <div class="callout callout-info">
-      <div class="callout-title">&#128161; "Players attack every round instead of Create Advantage"</div>
+      <div class="callout-title"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> "Players attack every round instead of Create Advantage"</div>
       <p><strong>Fix:</strong> Have an NPC use Create Advantage against them. Let them feel "Sand in His Eyes" when it's used against a PC. Once players see how effective it is, they start using it. You can also explicitly suggest it: "You could attack, or you could try to Create Advantage — maybe 'Off Balance' after that near-miss?"</p>
     </div>
     <div class="callout callout-info">
-      <div class="callout-title">&#128161; "Stress feels like hit points and runs out too fast"</div>
+      <div class="callout-title"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> "Stress feels like hit points and runs out too fast"</div>
       <p><strong>Fix:</strong> Remind players that stress clears at end of scene. Encourage consequence-taking as a narrative choice, not a last resort. A player who takes "Winded and Desperate" as a consequence is making a story decision, not failing. Frame it positively: "Taking that consequence keeps you in the fight and gives the GM something interesting to work with."</p>
     </div>
 

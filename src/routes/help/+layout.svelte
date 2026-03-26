@@ -2,6 +2,7 @@
     let { children } = $props();
 import { onMount } from 'svelte';
   import { page } from '$app/stores';
+  import Footer from '$lib/components/shared/Footer.svelte';
 
   let theme = $state('dark');
   let learnOpen = $state(false);
@@ -9,7 +10,6 @@ import { onMount } from 'svelte';
   let currentPath = $derived($page.url.pathname);
 
   function isActive(href) {
-    // Handle trailing slash variations
     const clean = currentPath.replace(/\/$/, '') || '/';
     const target = href.replace(/\/$/, '') || '/';
     return clean === target;
@@ -41,11 +41,11 @@ import { onMount } from 'svelte';
     <a href="/" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
     <div class="topbar-spacer" style="flex:1"></div>
     <div class="topbar-status">
-      <a href="/help" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">&#128218; Help</a>
+      <a href="/help" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Help</a>
       <a href="/about" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">About</a>
       <button class="btn btn-icon btn-ghost" onclick={toggleTheme}
         aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-        style="width:44px;height:44px">{theme === 'dark' ? '☀️' : '◑'}</button>
+        style="width:44px;height:44px"><i class={theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-circle-half-stroke'} aria-hidden="true"></i></button>
     </div>
   </header>
 
@@ -54,13 +54,13 @@ import { onMount } from 'svelte';
       <div class="wiki-sidebar-section">
         <div class="wiki-sidebar-label">Getting Started</div>
         <a href="/help" class="wiki-sidebar-link" class:active={isActive('/help')}>
-          <span class="icon">&#127968;</span>Wiki Home
+          <span class="icon"><i class="fa-solid fa-house" aria-hidden="true"></i></span>Wiki Home
         </a>
         <a href="/help/new-to-ogma" class="wiki-sidebar-link" class:active={isActive('/help/new-to-ogma')}>
-          <span class="icon">&#128075;</span>New to Ogma?
+          <span class="icon"><i class="fa-solid fa-hand" aria-hidden="true"></i></span>New to Ogma?
         </a>
         <a href="/help/getting-started" class="wiki-sidebar-link" class:active={isActive('/help/getting-started')}>
-          <span class="icon">&#128640;</span>Getting Started
+          <span class="icon"><i class="fa-solid fa-rocket" aria-hidden="true"></i></span>Getting Started
         </a>
       </div>
 
@@ -71,8 +71,8 @@ import { onMount } from 'svelte';
         <button class="wiki-sidebar-parent" class:active={currentPath.startsWith('/help/learn-fate')}
           aria-expanded={String(learnOpen || currentPath.startsWith('/help/learn-fate'))}
           onclick={() => { learnOpen = !learnOpen; }}>
-          <span class="wiki-sidebar-parent-label"><span class="icon">&#127922;</span>Learn Fate</span>
-          <span class="wiki-sidebar-chevron" aria-hidden="true">&#8250;</span>
+          <span class="wiki-sidebar-parent-label"><span class="icon"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i></span>Learn Fate</span>
+          <span class="wiki-sidebar-chevron" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></span>
         </button>
         {#if learnOpen || currentPath.startsWith('/help/learn-fate')}
           <nav class="wiki-sidebar-children open" aria-label="Step progress">
@@ -86,10 +86,10 @@ import { onMount } from 'svelte';
           </nav>
         {/if}
         <a href="/help/how-to-use-ogma" class="wiki-sidebar-link" class:active={isActive('/help/how-to-use-ogma')}>
-          <span class="icon">&#128218;</span>How to Use Ogma
+          <span class="icon"><i class="fa-solid fa-book-open" aria-hidden="true"></i></span>How to Use Ogma
         </a>
         <a href="/help/dnd-transition" class="wiki-sidebar-link" class:active={isActive('/help/dnd-transition')}>
-          <span class="icon">&#9876;</span>D&amp;D Transition
+          <span class="icon"><i class="fa-solid fa-right-left" aria-hidden="true"></i></span>D&amp;D Transition
         </a>
       </div>
 
@@ -98,16 +98,16 @@ import { onMount } from 'svelte';
       <div class="wiki-sidebar-section">
         <div class="wiki-sidebar-label">Prep &amp; Play</div>
         <a href="/campaigns/character-creation" class="wiki-sidebar-link" aria-label="Session Zero — guided character creation">
-          <span class="icon">&#127917;</span>Session Zero
+          <span class="icon"><i class="fa-solid fa-masks-theater" aria-hidden="true"></i></span>Session Zero
         </a>
         <a href="/help/generators" class="wiki-sidebar-link" class:active={isActive('/help/generators')}>
-          <span class="icon">&#127922;</span>Generator Suite
+          <span class="icon"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i></span>Generator Suite
         </a>
         <a href="/help/fate-mechanics" class="wiki-sidebar-link" class:active={isActive('/help/fate-mechanics')}>
-          <span class="icon">&#127922;</span>Fate Mechanics
+          <span class="icon"><i class="fa-solid fa-gears" aria-hidden="true"></i></span>Fate Mechanics
         </a>
         <a href="/help/at-the-table" class="wiki-sidebar-link" class:active={isActive('/help/at-the-table')}>
-          <span class="icon">&#127481;</span>At the Table
+          <span class="icon"><i class="fa-solid fa-users" aria-hidden="true"></i></span>At the Table
         </a>
       </div>
 
@@ -116,10 +116,10 @@ import { onMount } from 'svelte';
       <div class="wiki-sidebar-section">
         <div class="wiki-sidebar-label">Advanced</div>
         <a href="/help/export-share" class="wiki-sidebar-link" class:active={isActive('/help/export-share')}>
-          <span class="icon">&#128279;</span>Export &amp; Share
+          <span class="icon"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i></span>Export &amp; Share
         </a>
         <a href="/help/customise" class="wiki-sidebar-link" class:active={isActive('/help/customise')}>
-          <span class="icon">&#9881;</span>Customise
+          <span class="icon"><i class="fa-solid fa-gear" aria-hidden="true"></i></span>Customise
         </a>
       </div>
 
@@ -128,7 +128,7 @@ import { onMount } from 'svelte';
       <div class="wiki-sidebar-section">
         <div class="wiki-sidebar-label">Hosting</div>
         <a href="/help/hosting" class="wiki-sidebar-link" class:active={isActive('/help/hosting')}>
-          <span class="icon">&#127760;</span>Hosting &amp; Multiplayer
+          <span class="icon"><i class="fa-solid fa-globe" aria-hidden="true"></i></span>Hosting &amp; Multiplayer
         </a>
       </div>
 
@@ -137,7 +137,7 @@ import { onMount } from 'svelte';
       <div class="wiki-sidebar-section">
         <div class="wiki-sidebar-label">Help</div>
         <a href="/help/faq" class="wiki-sidebar-link" class:active={isActive('/help/faq')}>
-          <span class="icon">&#10067;</span>FAQ
+          <span class="icon"><i class="fa-solid fa-circle-question" aria-hidden="true"></i></span>FAQ
         </a>
       </div>
     </aside>
@@ -145,16 +145,5 @@ import { onMount } from 'svelte';
     {@render children?.()}
   </div>
 
-  <footer class="land-footer">
-    <div class="land-footer-inner">
-      <div style="font-style:italic;color:var(--text-muted);margin-bottom:4px">
-        <strong>O</strong>n-demand <strong>G</strong>enerator for <strong>M</strong>asterful <strong>A</strong>dventures
-      </div>
-      <div>
-        <a href="/license">Full Attribution</a> &middot;
-        <a href="/help">&#128218; Help</a> &middot;
-        <a href="/about">About</a>
-      </div>
-    </div>
-  </footer>
+  <Footer />
 </div>

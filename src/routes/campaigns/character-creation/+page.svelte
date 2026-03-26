@@ -1,6 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import { VERSION } from '$lib/version.js';
+  import Footer from '$lib/components/shared/Footer.svelte';
 
   let theme = $state('dark');
   let step = $state(0);
@@ -309,7 +310,7 @@
     <a href="/" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
     <div class="topbar-spacer" style="flex:1"></div>
     <div class="topbar-status">
-      <a href="/help" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">&#128218; Help</a>
+      <a href="/help" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Help</a>
       <a href="/about" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">About</a>
       <button class="btn btn-icon btn-ghost" onclick={toggleTheme}
         aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
@@ -328,7 +329,7 @@
     <!-- Progress bar -->
     {#if fromSessionZero}
       <div class="sz-handoff-banner">
-        <span class="sz-handoff-icon">&#10003;</span>
+        <span class="sz-handoff-icon"><i class="fa-solid fa-check"></i></span>
         <span>World and mode carried from Session Zero &mdash; <strong>{camp ? camp.name : ''}</strong>, <strong>{mode}</strong></span>
       </div>
     {/if}
@@ -351,7 +352,7 @@
       <div class="sz-body">
         <p>Which world are you playing in? This determines the setting details, example aspects, and story prompts throughout the wizard.</p>
         <div style="display:flex; align-items:flex-start; gap:10px; padding:10px 14px; background:var(--glass-bg); border:1px solid var(--glass-border); border-radius:var(--glass-radius); margin:8px 0 4px; font-size:var(--text-sm); color:var(--text-dim); line-height:1.6">
-          <span style="font-size:18px; flex-shrink:0">&#128161;</span>
+          <span style="font-size:18px; flex-shrink:0"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i></span>
           <span><strong style="color:var(--text); font-weight:600">Works solo or with your full table. </strong>Run it alone to prep your campaign and print character sheets, or share your screen and walk through it together as a group.</span>
         </div>
       </div>
@@ -408,7 +409,7 @@
             <div class="sz-issue-desc">{wd.impending[iiIdx].desc}</div>
           </div>
 
-          <button class="btn btn-ghost sz-reroll" onclick={reroll} type="button">&#127922; Different issues</button>
+          <button class="btn btn-ghost sz-reroll" onclick={reroll} type="button"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> Different issues</button>
         {/if}
 
         <div class="sz-tip">Discuss for 5 minutes: What does this world feel like? Who has power? What's at stake? This shared understanding is the foundation everything else builds on.</div>
@@ -439,7 +440,7 @@
             <ul class="sz-aspect-list">
               {#each hcExamples as ex}<li><button class="sz-example-pick" type="button" onclick={() => updateCurrentPc('hc', ex)}>{ex}</button></li>{/each}
             </ul>
-            <button class="btn btn-ghost sz-reroll" onclick={reroll} type="button">&#127922; New examples</button>
+            <button class="btn btn-ghost sz-reroll" onclick={reroll} type="button"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> New examples</button>
           </div>
         {/if}
         <div class="sz-dnd">In D&amp;D, your class + race IS your character concept. In Fate, High Concept is a narrative phrase that can be invoked and compelled.</div>
@@ -468,7 +469,7 @@
             <ul class="sz-aspect-list">
               {#each trExamples as ex}<li><button class="sz-example-pick" type="button" onclick={() => updateCurrentPc('trouble', ex)}>{ex}</button></li>{/each}
             </ul>
-            <button class="btn btn-ghost sz-reroll" onclick={reroll} type="button">&#127922; New examples</button>
+            <button class="btn btn-ghost sz-reroll" onclick={reroll} type="button"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> New examples</button>
           </div>
         {/if}
         <div class="sz-tip">A boring trouble earns you nothing. "Has Enemies" is flat. "The Warlord's Daughter Wants Me Dead" is a compel waiting to happen every single session.</div>
@@ -495,7 +496,7 @@
       <div class="sz-body">
         <p>These can be anything &mdash; gear, history, reputation, a catchphrase, a connection to the setting. No restrictions beyond fitting the world.</p>
         <div class="sz-card sz-card--success">
-          <div class="sz-card-title">&#10003; You Can Leave These Blank</div>
+          <div class="sz-card-title"><i class="fa-solid fa-check" aria-hidden="true"></i> You Can Leave These Blank</div>
           <p>Official Condensed rule (p.47). Most experienced Fate GMs recommend leaving at least one blank. You'll know what your character needs after the first scene, not before it.</p>
         </div>
         <ul class="sz-aspect-list">
@@ -601,7 +602,7 @@
           <p>"Because I [describe why], I can [special effect], but only [limitation]."</p>
         </div>
         <div class="sz-card sz-card--success">
-          <div class="sz-card-title">&#10003; Leave All Three Blank</div>
+          <div class="sz-card-title"><i class="fa-solid fa-check" aria-hidden="true"></i> Leave All Three Blank</div>
           <p>Define stunts the first time you wish you had one. "I wish I could do X right now" is the perfect moment to write a stunt. This is official Condensed design.</p>
         </div>
         <div class="sz-dnd">In D&amp;D, feats are picked at creation and rarely change. In Fate, stunts can be rewritten at every milestone. Pick what sounds fun now; change it when you learn what your character actually needs.</div>
@@ -614,10 +615,10 @@
         <table class="sz-stress-table">
           <thead><tr><th>Skill Rating</th><th>Stress Boxes</th></tr></thead>
           <tbody>
-            <tr><td>Mediocre (+0)</td><td>&#9744; &#9744; &#9744; (3 boxes)</td></tr>
-            <tr><td>Average (+1) or Fair (+2)</td><td>&#9744; &#9744; &#9744; &#9744; (4 boxes)</td></tr>
-            <tr><td>Good (+3) or Great (+4)</td><td>&#9744; &#9744; &#9744; &#9744; &#9744; &#9744; (6 boxes)</td></tr>
-            <tr><td>Superb (+5)+</td><td>&#9744; &#9744; &#9744; &#9744; &#9744; &#9744; + extra mild consequence</td></tr>
+            <tr><td>Mediocre (+0)</td><td><i class="fa-regular fa-square" style="font-size:12px"></i> <i class="fa-regular fa-square" style="font-size:12px"></i> <i class="fa-regular fa-square" style="font-size:12px"></i> (3 boxes)</td></tr>
+            <tr><td>Average (+1) or Fair (+2)</td><td><i class="fa-regular fa-square" style="font-size:12px"></i> <i class="fa-regular fa-square" style="font-size:12px"></i> <i class="fa-regular fa-square" style="font-size:12px"></i> <i class="fa-regular fa-square" style="font-size:12px"></i> (4 boxes)</td></tr>
+            <tr><td>Good (+3) or Great (+4)</td><td><i class="fa-regular fa-square" style="font-size:12px"></i> <i class="fa-regular fa-square" style="font-size:12px"></i> <i class="fa-regular fa-square" style="font-size:12px"></i> <i class="fa-regular fa-square" style="font-size:12px"></i> <i class="fa-regular fa-square" style="font-size:12px"></i> <i class="fa-regular fa-square" style="font-size:12px"></i> (6 boxes)</td></tr>
+            <tr><td>Superb (+5)+</td><td><i class="fa-regular fa-square" style="font-size:12px"></i> <i class="fa-regular fa-square" style="font-size:12px"></i> <i class="fa-regular fa-square" style="font-size:12px"></i> <i class="fa-regular fa-square" style="font-size:12px"></i> <i class="fa-regular fa-square" style="font-size:12px"></i> <i class="fa-regular fa-square" style="font-size:12px"></i> + extra mild consequence</td></tr>
           </tbody>
         </table>
 
@@ -650,7 +651,7 @@
                 <li style="padding:3px 0">{q}</li>
               {/each}
             </ol>
-            <button class="btn btn-ghost sz-reroll" onclick={reroll} type="button">&#127922; Different questions</button>
+            <button class="btn btn-ghost sz-reroll" onclick={reroll} type="button"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> Different questions</button>
           </div>
         {/if}
 
@@ -704,7 +705,7 @@
 
         <!-- Checklist -->
         <div class="sz-card">
-          <div class="sz-card-title">&#10003; Quick Checklist</div>
+          <div class="sz-card-title"><i class="fa-solid fa-check" aria-hidden="true"></i> Quick Checklist</div>
           <ul class="sz-aspect-list">
             <li>High Concept written down</li>
             <li>Trouble written down</li>
@@ -729,23 +730,23 @@
 
         <!-- Export bar -->
         <div class="sz-export-bar">
-          <button class="btn btn-primary" onclick={sendToPrep}><i class="fa-solid fa-cart-plus" aria-hidden="true"></i> Send to Table Prep</button>
-          <button class="btn btn-ghost" onclick={copyMarkdown}>&#128203; Markdown</button>
+          <button class="btn btn-primary" onclick={sendToPrep}>⊞ Send to Table Prep</button>
+          <button class="btn btn-ghost" onclick={copyMarkdown}><i class="fa-solid fa-clipboard" aria-hidden="true"></i> Markdown</button>
           <button class="btn btn-ghost" onclick={copyJSON}>&#123; &#125; JSON</button>
-          <button class="btn btn-ghost" onclick={() => { if (typeof window !== 'undefined') window.print(); }}>&#128424; Print</button>
+          <button class="btn btn-ghost" onclick={() => { if (typeof window !== 'undefined') window.print(); }}><i class="fa-solid fa-print" aria-hidden="true"></i> Print</button>
         </div>
         {#if copied}
           <div class="sz-copied">{copied}</div>
         {/if}
         {#if sentToPrep}
-          <div class="sz-copied">&#10003; {pcCount} character pack{pcCount > 1 ? 's' : ''} sent to prep canvas</div>
+          <div class="sz-copied"><i class="fa-solid fa-check" aria-hidden="true"></i> {pcCount} character pack{pcCount > 1 ? 's' : ''} sent to prep canvas</div>
         {/if}
 
         <div class="sz-tip">Session 1 starts IN the situation. No tavern. No meeting. The opening hook drops the PCs directly into the action. Aspects you left blank will reveal themselves naturally in the first few scenes.</div>
 
         <!-- Start session -->
         <div class="sz-ready-box">
-          <div class="sz-ready-label">&#127922; Ready to play?</div>
+          <div class="sz-ready-label"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> Ready to play?</div>
           <div class="sz-ready-desc">Start a local session on this device. The board opens in Prep mode with your world loaded.</div>
           <button
             class="btn btn-primary sz-ready-cta"
@@ -761,7 +762,7 @@
               } catch(e) {}
               window.location.href = '/campaigns/' + (campId || 'fantasy') + '?canvas=prep&sz=1';
             }}
-          >&#9654; Open {campName} Prep Canvas</button>
+          ><i class="fa-solid fa-play" aria-hidden="true"></i> Open {campName} Prep Canvas</button>
         </div>
 
         <div style="text-align:center; margin-top:16px">
@@ -791,11 +792,5 @@
     </div>
   </div>
 
-  <footer class="sz-footer">
-    Fate&trade; is a trademark of Evil Hat Productions, LLC. &middot;
-    <a href="/license">License &amp; Attribution</a> &middot;
-    <a href="/help">Help &amp; Wiki</a> &middot;
-    <a href="/about">About Ogma</a>
-    <span class="about-version-badge">v{VERSION}</span>
-  </footer>
+  <Footer />
 </div>

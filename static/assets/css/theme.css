@@ -128,6 +128,91 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 
 /* ══ CARDS ══ */
 
+/* ── Fate Sheet tokens — FateX-style off-white character sheets ────────
+   Cards render as physical sheets: off-white body, campaign-tinted header,
+   dark text. Same appearance in both dark and light mode (like paper on a table).
+   Phase 1 tokens — applied to .fate-sheet class on Cv4Card. ──────────── */
+:root {
+  --fs-bg:#F5F0E8;
+  --fs-bg-inset:#EDE8DF;
+  --fs-border:rgba(28,20,10,0.12);
+  --fs-border-mid:rgba(28,20,10,0.18);
+  --fs-text:#1a1a2e;
+  --fs-text-dim:rgba(26,26,46,0.72);
+  --fs-text-muted:rgba(26,26,46,0.45);
+  --fs-section:#1a3a5c;
+  --fs-trouble:#c0392b;
+  --fs-stress-phy:#2980b9;
+  --fs-stress-men:#8e44ad;
+  --fs-con-mild:#2980b9;
+  --fs-con-mod:#b8860b;
+  --fs-con-sev:#c0392b;
+  --fs-badge-text:#fff;
+  --fs-stunt-bg:rgba(28,20,10,0.04);
+  --fs-stunt-border:rgba(28,20,10,0.10);
+  --fs-shadow:0 2px 8px rgba(0,0,0,0.12);
+  --fs-radius:6px;
+  /* Campaign-tinted header gradients (dark gradient of each world's accent) */
+  --fs-hdr-default:linear-gradient(135deg,#1a3a5c,#0e2240);
+  --fs-hdr-thelongafter:linear-gradient(135deg,#3a2800,#1a1208);
+  --fs-hdr-cyberpunk:linear-gradient(135deg,#041e28,#0a2830);
+  --fs-hdr-fantasy:linear-gradient(135deg,#2a2000,#1a1608);
+  --fs-hdr-space:linear-gradient(135deg,#1a0830,#200e40);
+  --fs-hdr-victorian:linear-gradient(135deg,#2a1a00,#1a1208);
+  --fs-hdr-postapoc:linear-gradient(135deg,#3a1800,#1a0e08);
+  --fs-hdr-western:linear-gradient(135deg,#2a1208,#1a0e08);
+  --fs-hdr-dVentiRealm:linear-gradient(135deg,#0e1828,#1a2840);
+}
+/* Campaign-specific section/badge accent overrides for fate-sheet cards */
+[data-campaign="thelongafter"]  { --fs-section:#6B4400; --fs-badge-bg:#C8944A; }
+[data-campaign="cyberpunk"]     { --fs-section:#064858; --fs-badge-bg:#0891A2; }
+[data-campaign="fantasy"]       { --fs-section:#4a3800; --fs-badge-bg:#D4A860; }
+[data-campaign="space"]         { --fs-section:#3a1860; --fs-badge-bg:#9B59B6; }
+[data-campaign="victorian"]     { --fs-section:#4a3200; --fs-badge-bg:#C8A050; }
+[data-campaign="postapoc"]      { --fs-section:#5a2800; --fs-badge-bg:#E07030; }
+[data-campaign="western"]       { --fs-section:#4a2010; --fs-badge-bg:#A0522D; }
+[data-campaign="dVentiRealm"]   { --fs-section:#1a3050; --fs-badge-bg:#5AC8FA; }
+
+/* ── Fate Sheet structural classes ──────────────────────────────────── */
+.fs-card{background:var(--fs-bg);color:var(--fs-text);border-radius:var(--fs-radius);overflow:hidden;box-shadow:var(--fs-shadow);font-family:var(--font-ui)}
+.fs-header{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;color:#fff;border-bottom:1px solid rgba(255,255,255,0.1)}
+.fs-refresh{width:40px;height:40px;border-radius:50%;border:2.5px solid #fff;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;flex-shrink:0}
+.fs-world{font-size:10px;text-transform:uppercase;letter-spacing:0.12em;opacity:0.65;margin-bottom:2px}
+.fs-name{font-size:18px;font-weight:800;line-height:1.15}
+.fs-body{padding:14px 16px}
+.fs-section-hdr{font-size:10px;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;color:var(--fs-section);border-bottom:2px solid var(--fs-section);padding-bottom:4px;margin-bottom:8px}
+.fs-aspect-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1px}
+.fs-aspect-label-hc{color:var(--fs-section)}
+.fs-aspect-label-tr{color:var(--fs-trouble)}
+.fs-aspect-label-other{color:var(--fs-text-muted)}
+.fs-aspect-val{font-size:13px;font-weight:600;color:var(--fs-text);font-style:italic;margin-bottom:6px}
+.fs-skill-row{display:flex;align-items:center;gap:6px;margin-bottom:3px}
+.fs-skill-badge{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:20px;border-radius:3px;background:var(--fs-badge-bg,var(--fs-section));color:var(--fs-badge-text);font-size:12px;font-weight:800;padding:0 4px}
+.fs-skill-name{font-size:13px;font-weight:600;color:var(--fs-text)}
+.fs-skill-ladder{font-size:11px;color:var(--fs-text-muted);margin-left:2px}
+.fs-stress-track{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.fs-stress-label{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--fs-text-muted);width:56px;flex-shrink:0}
+.fs-stress-boxes{display:flex;gap:4px}
+.fs-stress-box{width:26px;height:26px;border-radius:3px;border:2px solid;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;font-weight:800;transition:all 0.1s;background:transparent}
+.fs-stress-box[aria-pressed="true"]{color:#fff}
+.fs-stress-box-phy{border-color:var(--fs-stress-phy);color:var(--fs-stress-phy)}
+.fs-stress-box-phy[aria-pressed="true"]{background:var(--fs-stress-phy)}
+.fs-stress-box-men{border-color:var(--fs-stress-men);color:var(--fs-stress-men)}
+.fs-stress-box-men[aria-pressed="true"]{background:var(--fs-stress-men)}
+.fs-con-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.fs-con-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;width:80px;flex-shrink:0}
+.fs-con-label-mild{color:var(--fs-con-mild)}
+.fs-con-label-mod{color:var(--fs-con-mod)}
+.fs-con-label-sev{color:var(--fs-con-sev)}
+.fs-con-line{flex:1;border-bottom:1.5px solid var(--fs-border-mid);min-height:20px}
+.fs-stunt{padding:6px 10px;background:var(--fs-stunt-bg);border:1px solid var(--fs-stunt-border);border-radius:3px;margin-bottom:6px}
+.fs-stunt-name{font-size:12px;font-weight:800;color:var(--fs-section)}
+.fs-stunt-desc{font-size:12px;color:var(--fs-text-dim);line-height:1.45;margin-top:2px}
+.fs-section-gap{margin-bottom:14px}
+.fs-flip-btn{width:100%;height:30px;background:var(--fs-bg-inset);border:none;border-top:1px solid var(--fs-border);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:var(--font-ui);font-size:10px;font-weight:700;letter-spacing:0.14em;color:var(--fs-section);text-transform:uppercase}
+.fs-flip-btn:hover{background:var(--fs-border)}
+.fs-flip-btn:focus-visible{outline:2px solid var(--fs-section);outline-offset:-2px}
+
 /* ── Roll button (WCAG AA: accent on border/shadow only, never background/text) ── */
 .btn-roll{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px 24px;font-size:var(--text-lg);font-weight:900;font-family:var(--font-display);letter-spacing:0.02em;border:2px solid var(--campaign-accent,var(--accent));border-radius:6px;cursor:pointer;position:relative;overflow:hidden;transition:box-shadow 0.15s,border-color 0.15s,transform 0.1s;background:var(--glass-bg);color:var(--text);min-height:44px;box-shadow:0 0 10px color-mix(in srgb,var(--campaign-accent,var(--accent)) 25%,transparent)}
 .btn-roll:hover{box-shadow:0 0 18px color-mix(in srgb,var(--campaign-accent,var(--accent)) 45%,transparent);border-color:color-mix(in srgb,var(--campaign-accent,var(--accent)) 80%,white);transform:translateY(-1px)}
@@ -1193,6 +1278,10 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .land-footer{margin-top:auto;padding:24px 20px;border-top:1px solid var(--border);font-size:var(--text-label);color:var(--text-muted);text-align:center}
 .land-footer-inner{max-width:800px;margin:0 auto}
 .land-footer a{color:var(--text-dim);text-decoration:none}.land-footer a:hover{color:var(--accent)}
+.footer-tagline{font-style:italic;color:var(--text-muted);margin-bottom:4px}
+.footer-legal{margin-bottom:4px}
+.footer-links{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap}
+.footer-sep{color:var(--text-muted)}
 
 /* ── R-13: Sticky Roll FAB ─────────────────────────────────────────────────── */
 .roll-fab{position:fixed;bottom:calc(24px + env(safe-area-inset-bottom, 0px));right:max(20px, env(safe-area-inset-right, 20px));z-index:250;width:56px;height:56px;border-radius:50%;background:var(--accent);border:none;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;transition:transform 0.15s,opacity 0.15s;animation:fadeUp 0.2s ease both}
@@ -2807,7 +2896,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
   overflow:hidden;
   animation:fadeUp .2s ease both;
 }
-.board-dice-floater{right:24px;min-width:380px;max-width:min(90vw,600px)}
+.board-dice-floater{right:24px;max-width:min(90vw,600px)}
 .board-fp-floater{right:24px;width:320px}
 .board-notes-floater{right:24px;width:360px;max-height:60vh;overflow-y:auto}
 .board-fp-floater .fp-tracker{max-height:calc(100vh - 120px);overflow-y:auto}
@@ -3046,7 +3135,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 
 /* ══ FONT AWESOME ICON SIZING ══ */
 .bc-btn i,.btn i{font-size:14px;line-height:1;pointer-events:none}
-.fa-cart-plus{font-size:15px}
+
 
 /* ══ SESSION ZERO — PC INPUT FIELDS ══ */
 .sz-pc-count-row{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:8px}
@@ -3425,3 +3514,206 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 
 /* ══ GM POOL SHAKE AT 0 ══ */
 .rs-gm-pool-empty .rs-gm-pool-val { animation:gm-pool-pulse 1.5s ease-in-out infinite, cd-shake 0.5s ease 0.2s; }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   MOBILE UX — iPhone 13 target (390×844) — all fixes
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* M01 — Consequence input: prevent iOS zoom (font-size must be ≥16px) */
+.rs-conseq-input {
+  flex:1; background:var(--inset);
+  border:1px solid var(--border);
+  border-radius:4px; padding:4px 8px;
+  font-size:16px;   /* iOS zooms < 16px — must stay at 16 */
+  color:var(--text); font-family:var(--font-ui); outline:none;
+  -webkit-appearance:none; appearance:none;
+  transition:border-color .15s;
+}
+.rs-conseq-input.filled { border-color:var(--c-amber,#f4b942); }
+.rs-conseq-input::placeholder { color:var(--text-muted); }
+/* Visually shrink on pointer:fine (desktop) */
+@media(pointer:fine) {
+  .rs-conseq-input { font-size:11px; padding:2px 5px; }
+}
+
+/* M02 — Mobile generate FAB */
+.gen-fab {
+  position:fixed; bottom:calc(24px + env(safe-area-inset-bottom,0px));
+  right:max(20px, env(safe-area-inset-right,20px));
+  width:56px; height:56px; border-radius:50%;
+  background:var(--accent); color:#000; border:none;
+  font-size:28px; font-weight:300; line-height:1;
+  cursor:pointer; z-index:300;
+  display:none; /* hidden on desktop */
+  align-items:center; justify-content:center;
+  box-shadow:0 4px 20px rgba(0,0,0,.4), 0 0 0 2px rgba(255,255,255,.1);
+  transition:transform .15s cubic-bezier(.34,1.56,.64,1), opacity .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.gen-fab:active { transform:scale(0.92); }
+@media(max-width:640px) {
+  .gen-fab { display:flex; }
+}
+.gen-fab-content {
+  background:var(--panel-raised); border:1.5px solid var(--border-mid);
+  border-radius:12px; padding:6px; min-width:200px;
+  box-shadow:0 8px 32px rgba(0,0,0,.4);
+  animation:fadeDown .15s cubic-bezier(.34,1.56,.64,1);
+  z-index:9000; max-height:70vh; overflow-y:auto;
+}
+.gen-fab-label {
+  padding:6px 12px 4px; font-size:10px; font-weight:800;
+  letter-spacing:.18em; color:var(--text-muted); text-transform:uppercase;
+  font-family:var(--font-mono);
+}
+.gen-fab-item {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 12px; border-radius:8px; cursor:pointer;
+  background:none; border:none; width:100%; text-align:left;
+  font-size:13px; font-weight:600; color:var(--text);
+  transition:background .1s; min-height:44px; outline:none;
+  -webkit-tap-highlight-color:transparent;
+}
+.gen-fab-item:hover, .gen-fab-item[data-highlighted] { background:var(--hover); }
+.gen-fab-item.active { color:var(--accent); }
+.gen-fab-icon { font-size:18px; width:24px; text-align:center; flex-shrink:0; }
+.gen-fab-name { flex:1; }
+
+/* M03 — bt-icon-btn: 44px touch target on coarse pointer */
+@media(pointer:coarse) {
+  .bt-icon-btn { width:44px; height:44px; }
+}
+
+/* M04 — Turn pills: 44px touch target on coarse pointer */
+@media(pointer:coarse) {
+  .rs-turn-pill { min-height:44px; padding:0 12px; font-size:12px; }
+}
+
+/* M05 — FP ± buttons: 44px on coarse pointer */
+@media(pointer:coarse) {
+  .rs-fp-btn { width:44px; height:44px; font-size:18px; }
+}
+
+/* M06 already done inline (min-width:380px removed) */
+
+/* M07 — Drawer backdrop */
+.blp-backdrop {
+  display:none; /* desktop: off */
+}
+@media(max-width:640px) {
+  .blp-backdrop {
+    display:block;
+    position:fixed; inset:0; z-index:199;
+    background:rgba(0,0,0,.5);
+    backdrop-filter:blur(2px);
+    -webkit-backdrop-filter:blur(2px);
+    animation:fadeIn .2s ease;
+  }
+}
+
+/* M08 — Overflow menu */
+.bt-overflow-btn { font-size:18px; letter-spacing:.1em; }
+.bt-overflow-content {
+  background:var(--panel-raised); border:1.5px solid var(--border-mid);
+  border-radius:10px; padding:6px; min-width:200px;
+  box-shadow:0 8px 24px rgba(0,0,0,.3);
+  animation:fadeDown .14s ease; z-index:9000;
+}
+.bt-overflow-item {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 12px; border-radius:6px; cursor:pointer;
+  background:none; border:none; width:100%; text-align:left;
+  font-size:13px; color:var(--text); transition:background .1s;
+  min-height:44px; outline:none;
+}
+.bt-overflow-item:hover, .bt-overflow-item[data-highlighted] { background:var(--hover); }
+.bt-overflow-icon { font-size:16px; width:22px; text-align:center; flex-shrink:0; }
+
+/* M09 — Floater safe-area padding at bottom */
+@media(max-width:640px) {
+  .board-floater {
+    padding-bottom:env(safe-area-inset-bottom, 16px);
+  }
+}
+
+/* M10 — Scene control bar: always visible below turn pills */
+.board-scene-bar {
+  display:flex; align-items:center; flex-wrap:wrap; gap:6px;
+  padding:4px 10px 4px;
+  background:var(--glass-bg); border-bottom:1px solid var(--border);
+  backdrop-filter:var(--glass-blur-sm);
+  -webkit-backdrop-filter:var(--glass-blur-sm);
+  flex-shrink:0; overflow:hidden;
+}
+/* On desktop the bar is compact */
+@media(pointer:fine) {
+  .board-scene-bar { padding:3px 10px; }
+  .board-scene-end { min-height:28px; }
+}
+/* On mobile give proper tap targets */
+@media(pointer:coarse) {
+  .board-scene-end { min-height:44px; padding:0 14px; font-size:12px; }
+  .board-scene-bar { gap:8px; padding:6px 10px; }
+}
+
+/* M11 — Stress boxes: larger tap target on coarse pointer */
+@media(pointer:coarse) {
+  .rs-stress-box {
+    width:22px; height:22px;
+    padding:11px; margin:-11px; /* expand tap target to ~44px */
+    font-size:13px;
+  }
+}
+
+/* M12 — Topbar safe-area-inset-top when installed as PWA */
+@supports(padding-top: env(safe-area-inset-top)) {
+  .bt-bar {
+    padding-top:env(safe-area-inset-top, 0px);
+    height:calc(46px + env(safe-area-inset-top, 0px));
+  }
+  /* Adjust board-body to account for taller topbar */
+  .board-app {
+    --topbar-h: calc(46px + env(safe-area-inset-top, 0px));
+  }
+}
+
+/* ══ PREP-07: Search dim ══ */
+.ogma-node-wrap.sf-dimmed {
+  opacity:0.18; filter:saturate(0.08) grayscale(0.4);
+  transition:opacity .25s ease, filter .25s ease;
+  pointer-events:none;
+}
+.ogma-node-wrap:not(.sf-dimmed) {
+  transition:opacity .25s ease, filter .25s ease;
+}
+
+/* ══ WC-04: Card minimise/expand ══ */
+.bc-btn-minimise { font-size:9px; font-weight:900; letter-spacing:.05em; }
+.bc-mini-strip {
+  display:flex; align-items:center; gap:7px;
+  padding:8px 10px; cursor:pointer;
+  border-radius:8px; background:var(--panel);
+  user-select:none; transition:background .12s;
+  min-height:36px;
+}
+.bc-mini-strip:hover { background:var(--hover); }
+.bc-mini-icon { font-size:14px; flex-shrink:0; }
+.bc-mini-title {
+  font-size:11px; font-weight:700; color:var(--text);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  max-width:180px; flex:1; min-width:0;
+}
+
+/* ══ WC-03: Edge labels ══ */
+/* SvelteFlow edge label styling */
+.svelte-flow__edge-text { font-size:10px !important; font-weight:600 !important; }
+.svelte-flow__edge-textbg { fill:var(--panel) !important; fill-opacity:0.9 !important; rx:3px; }
+/* Clickable edges get a pointer cursor */
+.svelte-flow__edge { cursor:pointer; }
+.svelte-flow__edge:hover .svelte-flow__edge-path {
+  stroke:var(--accent) !important; stroke-width:2.5 !important; opacity:0.9 !important;
+}
+/* Edge label hint on hover */
+.svelte-flow__edge:hover .svelte-flow__edge-text {
+  fill:var(--accent) !important;
+}

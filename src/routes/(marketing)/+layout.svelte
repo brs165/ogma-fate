@@ -1,6 +1,7 @@
 <script>
     let { children } = $props();
 import { onMount } from 'svelte';
+import Footer from '$lib/components/shared/Footer.svelte';
 
   let theme = $state('dark');
 
@@ -30,30 +31,16 @@ import { onMount } from 'svelte';
     <a href="/" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
     <div class="topbar-spacer" style="flex:1"></div>
     <div class="topbar-status">
-      <a href="/help" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">&#128218; Help</a>
+      <a href="/help" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Help</a>
       <a href="/about" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">About</a>
       <button class="btn btn-icon btn-ghost" onclick={toggleTheme}
         aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
         title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
-        style="width:44px;height:44px">{theme === 'dark' ? '☀️' : '◑'}</button>
+        style="width:44px;height:44px"><i class={theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-circle-half-stroke'} aria-hidden="true"></i></button>
     </div>
   </header>
 
   {@render children?.()}
 
-  <footer class="land-footer">
-    <div class="land-footer-inner">
-      <div style="font-style:italic;color:var(--text-muted);margin-bottom:4px">
-        <strong>O</strong>n-demand <strong>G</strong>enerator for <strong>M</strong>asterful <strong>A</strong>dventures
-      </div>
-      <div style="margin-bottom:4px">
-        Fate&trade; is a trademark of Evil Hat Productions, LLC. Released under <a href="/license">CC BY 3.0</a>.
-      </div>
-      <div>
-        <a href="/license">Full Attribution</a> &middot;
-        <a href="/help">&#128218; Help</a> &middot;
-        <a href="/about">About</a>
-      </div>
-    </div>
-  </footer>
+  <Footer />
 </div>

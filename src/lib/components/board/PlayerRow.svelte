@@ -187,10 +187,7 @@
               placeholder="empty"
               aria-label="{slot.name} consequence"
               oninput={e => setConseq(i, e.currentTarget.value)}
-              style="flex:1; background:var(--inset);
-                     border:1px solid {conseq[i] ? 'var(--c-amber,#f4b942)' : 'var(--border)'};
-                     border-radius:4px; padding:2px 5px; font-size:10px; color:var(--text);
-                     font-family:var(--font-ui); outline:none"
+              class="rs-conseq-input{conseq[i] ? ' filled' : ''}"
             />
           </div>
           {#if conseq[i]}

@@ -18,7 +18,7 @@
     </ul>
 
     <div class="callout callout-warning">
-      <div class="callout-title">&#9888; Before you clear your browser cache</div>
+      <div class="callout-title"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Before you clear your browser cache</div>
       <p>Clearing your browser cache, cookies, or site data will <strong>permanently delete</strong> your session history, pinned results, FP tracker state, and table customisations. There is no server backup. Always <a href="/help/export-share">export your pinned results as Markdown</a> before clearing storage.</p>
     </div>
 
@@ -27,8 +27,8 @@
     <p>When a new version of Ogma is deployed, the service worker detects the change and shows an <strong>"Update available — reload?"</strong> toast. Clicking it reloads with the latest version. Your data is not affected by updates.</p>
 
     <div class="callout callout-tip">
-      <div class="callout-title">&#128247; Install as a PWA</div>
-      <p>Ogma is a Progressive Web App. On desktop Chrome/Edge, look for an install icon in the address bar. On iOS Safari, tap Share &#8594; Add to Home Screen. This gives you a dedicated app icon and a cleaner full-screen experience.</p>
+      <div class="callout-title"><i class="fa-solid fa-camera" aria-hidden="true"></i> Install as a PWA</div>
+      <p>Ogma is a Progressive Web App. On desktop Chrome/Edge, look for an install icon in the address bar. On iOS Safari, tap Share → Add to Home Screen. This gives you a dedicated app icon and a cleaner full-screen experience.</p>
     </div>
 
     <h2>Choosing your campaign world</h2>
@@ -51,11 +51,11 @@
       <li><div class="step-body"><strong>Pick a generator</strong><span>Use the sidebar on the left — generators are grouped into Characters, Scenes, Pacing, and World. Start with <em>Minor NPC</em> for something immediately useful.</span></div></li>
       <li><div class="step-body"><strong>Roll</strong><span>Press <kbd>Space</kbd> or click the big Roll button. A complete, mechanically-correct result appears in the right panel.</span></div></li>
       <li><div class="step-body"><strong>Read the result</strong><span>The result card shows the full output. Below it, the <strong>For GM</strong> tab gives running tips and rules references. If you're coming from D&amp;D, the <strong>&#9876; D&amp;D?</strong> tab compares the mechanic.</span></div></li>
-      <li><div class="step-body"><strong>Keep it if you want to save it</strong><span>Press <kbd>P</kbd> or click the Save to Binder button. The result goes to your <strong>Binder</strong> (sidebar &#8594; Binder) where you can review or export it later.</span></div></li>
+      <li><div class="step-body"><strong>Keep it if you want to save it</strong><span>Press <kbd>P</kbd> or click the Save to Binder button. The result goes to your <strong>Binder</strong> (sidebar → Binder) where you can review or export it later.</span></div></li>
     </ol>
 
     <div class="callout callout-scenario">
-      <div class="callout-title">&#127914; Scenario: You need a quick NPC mid-session</div>
+      <div class="callout-title"><i class="fa-solid fa-gamepad" aria-hidden="true"></i> Scenario: You need a quick NPC mid-session</div>
       <p>Your players just knocked on an unexpected door. Press <kbd>Space</kbd> with Minor NPC selected. A name, two aspects (high concept + weakness), skill level, and stress track appear in under a second. The result is thematically appropriate to your campaign world — no generic fantasy names in a cyberpunk game. Press <kbd>P</kbd> to pin it, <kbd>V</kbd> to show it on your second screen.</p>
     </div>
 
@@ -63,7 +63,7 @@
     <p>Ogma does not have an auto-sync or cloud backup. To preserve your work:</p>
     <ul>
       <li><strong>Keep results you want to save</strong> — press <kbd>P</kbd> after any roll.</li>
-      <li><strong>Export pinned results</strong> — open History (&#128203;), then use the "Copy all as Markdown" button to get a full Markdown document of every pinned card.</li>
+      <li><strong>Export pinned results</strong> — open History (<i class="fa-solid fa-clipboard" aria-hidden="true"></i>), then use the "Copy all as Markdown" button to get a full Markdown document of every pinned card.</li>
       <li><strong>Download the ZIP</strong> — from the About page, download the full Ogma ZIP file. This is the entire app as a folder you can run from your desktop with no internet ever.</li>
     </ul>
 

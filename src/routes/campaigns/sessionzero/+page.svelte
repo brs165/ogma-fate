@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { generate, mergeUniversal, filteredTables } from '$lib/engine.js';
   import { CAMPAIGNS } from '$lib/../data/shared.js';
+  import Footer from '$lib/components/shared/Footer.svelte';
 
   let theme = $state('dark');
   let step = $state(0);
@@ -139,7 +140,7 @@
     <a href="/" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
     <div class="topbar-spacer" style="flex:1"></div>
     <div class="topbar-status">
-      <a href="/help" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">&#128218; Help</a>
+      <a href="/help" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Help</a>
       <a href="/about" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">About</a>
       <button class="btn btn-icon btn-ghost" onclick={toggleTheme}
         aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
@@ -204,7 +205,7 @@
                 {#if b.question}<div style="font-size:12px;color:var(--text-dim);font-style:italic;margin-bottom:4px">"{b.question}"</div>{/if}
                 {#if b.aspect}<div style="font-size:12px;color:var(--text);font-weight:600">{b.aspect}</div>{/if}
                 {#if b.hook}<div style="font-size:11px;color:var(--text-dim);margin-top:4px">{b.hook}</div>{/if}
-                <button style="margin-top:6px;font-size:11px;padding:4px 10px;border:1px solid var(--border);border-radius:4px;background:var(--panel);color:var(--text-muted);cursor:pointer" onclick={() => rerollBackstory(i)}>&#x21bb; New hook</button>
+                <button style="margin-top:6px;font-size:11px;padding:4px 10px;border:1px solid var(--border);border-radius:4px;background:var(--panel);color:var(--text-muted);cursor:pointer" onclick={() => rerollBackstory(i)}><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> New hook</button>
               </div>
             {/if}
           {/each}
@@ -236,7 +237,7 @@
             </div>
             <div style="padding:8px 14px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--glass-border);font-style:italic">This is a situation, not a plot. The players' choices are the story.</div>
           </div>
-          <button style="font-size:12px;padding:8px 16px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:var(--text-muted);cursor:pointer" onclick={rerollSeed}>&#x21bb; Reroll seed</button>
+          <button style="font-size:12px;padding:8px 16px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:var(--text-muted);cursor:pointer" onclick={rerollSeed}><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> Reroll seed</button>
         {:else}
           <div style="text-align:center;padding:40px;color:var(--text-muted)">Generating&hellip;</div>
         {/if}
@@ -275,7 +276,7 @@
             </div>
             <div style="padding:8px 14px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--glass-border);font-style:italic">Put at least one usable aspect in reach &mdash; players love having options.</div>
           </div>
-          <button style="font-size:12px;padding:8px 16px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:var(--text-muted);cursor:pointer" onclick={rerollScene}>&#x21bb; Reroll scene</button>
+          <button style="font-size:12px;padding:8px 16px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:var(--text-muted);cursor:pointer" onclick={rerollScene}><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> Reroll scene</button>
         {:else}
           <div style="text-align:center;padding:40px;color:var(--text-muted)">Setting the scene&hellip;</div>
         {/if}
@@ -317,7 +318,7 @@
             </div>
             <div style="padding:8px 14px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--glass-border);font-style:italic">Refresh: {npcData.refresh || 3}. Introduce through action &mdash; let the players figure out who they are.</div>
           </div>
-          <button style="font-size:12px;padding:8px 16px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:var(--text-muted);cursor:pointer" onclick={rerollNpc}>&#x21bb; Reroll NPC</button>
+          <button style="font-size:12px;padding:8px 16px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:var(--text-muted);cursor:pointer" onclick={rerollNpc}><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> Reroll NPC</button>
         {:else}
           <div style="text-align:center;padding:40px;color:var(--text-muted)">Generating your opening NPC&hellip;</div>
         {/if}
@@ -325,7 +326,7 @@
       <!-- ── STEP 6: Done ──────────────────────────────────────────── -->
       {:else if step === 5}
         <div style="text-align:center;padding:16px 0 0;margin-bottom:24px">
-          <div style="display:inline-flex;align-items:center;gap:8px;background:color-mix(in srgb,var(--c-green) 12%,transparent);border:1px solid color-mix(in srgb,var(--c-green) 25%,transparent);border-radius:100px;padding:8px 20px;font-size:14px;font-weight:800;color:var(--c-green);margin-bottom:20px;letter-spacing:.04em">&#10003; Ready to play</div>
+          <div style="display:inline-flex;align-items:center;gap:8px;background:color-mix(in srgb,var(--c-green) 12%,transparent);border:1px solid color-mix(in srgb,var(--c-green) 25%,transparent);border-radius:100px;padding:8px 20px;font-size:14px;font-weight:800;color:var(--c-green);margin-bottom:20px;letter-spacing:.04em"><i class="fa-solid fa-check" aria-hidden="true"></i> Ready to play</div>
           <h1 style="font-size:24px;font-weight:800;color:var(--text);margin-bottom:8px;letter-spacing:-.02em">You have a session.</h1>
           <p style="font-size:13px;color:var(--text-dim);line-height:1.65;margin-bottom:24px;max-width:440px;margin-left:auto;margin-right:auto">
             Seed, scene, NPC{backstories.length > 0 ? `, and ${backstories.length} backstory hook${backstories.length > 1 ? 's' : ''}` : ''}. Open the generator and your cards are ready to play.
@@ -357,18 +358,18 @@
           <button
             style="display:inline-flex;align-items:center;gap:8px;background:var(--glass-bg);border:2px solid var(--accent);border-radius:8px;padding:13px 28px;font-size:14px;font-weight:800;color:var(--text);cursor:pointer;box-shadow:0 0 10px color-mix(in srgb,var(--accent) 25%,transparent)"
             onclick={goToBoard}
-          >&#127922; Open {campName} Generator</button>
+          ><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> Open {campName} Generator</button>
           <button
             style="background:none;border:1px solid var(--border);border-radius:8px;padding:12px 20px;font-size:13px;font-weight:600;color:var(--text-dim);cursor:pointer"
             onclick={exportSession}
             title="Export all prep cards as Ogma JSON"
             aria-label="Export session prep as JSON"
-          >&#8595; Export JSON</button>
+          ><i class="fa-solid fa-arrow-down" aria-hidden="true"></i> Export JSON</button>
           <button
             style="background:none;border:1px solid var(--border);border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700;color:var(--text-dim);cursor:pointer"
             onclick={() => { if (typeof window !== 'undefined') window.print(); }}
             title="Print your session sheet"
-          >&#128424; Print</button>
+          ><i class="fa-solid fa-print" aria-hidden="true"></i> Print</button>
           <a href="/campaigns/character-creation?world={campId}&mode=standard&from=sz" class="btn btn-ghost" style="font-size:13px;font-weight:600;padding:12px 20px">&rarr; Character Creation</a>
         </div>
 
@@ -392,16 +393,5 @@
     </div>
   </main>
 
-  <footer class="land-footer">
-    <div class="land-footer-inner">
-      <div style="font-style:italic;color:var(--text-muted);margin-bottom:4px">
-        <strong>O</strong>n-demand <strong>G</strong>enerator for <strong>M</strong>asterful <strong>A</strong>dventures
-      </div>
-      <div>
-        <a href="/license">Full Attribution</a> &middot;
-        <a href="/help">&#128218; Help</a> &middot;
-        <a href="/about">About</a>
-      </div>
-    </div>
-  </footer>
+  <Footer />
 </div>

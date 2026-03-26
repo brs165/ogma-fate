@@ -34,7 +34,7 @@
 
 {#if cards.length === 0}
   <div class="bml-empty">
-    <div style="font-size:32px;margin-bottom:10px">&#x1F3B2;</div>
+    <div style="font-size:32px;margin-bottom:10px"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i></div>
     <div style="font-size:14px;font-weight:700;color:var(--text)">Canvas is empty</div>
     <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Use Generate tab to add cards.</div>
   </div>
@@ -61,13 +61,13 @@
       </div>
     {/each}
     {#if stickyCards.length > 0}
-      <div class="bml-section">&#x1F4CC; Sticky notes ({stickyCards.length})</div>
+      <div class="bml-section"><i class="fa-solid fa-thumbtack" aria-hidden="true"></i> Sticky notes ({stickyCards.length})</div>
     {/if}
     {#if boostCards.length > 0}
-      <div class="bml-section">&#x26A1; Boosts ({boostCards.length})</div>
+      <div class="bml-section"><i class="fa-solid fa-bolt" aria-hidden="true"></i> Boosts ({boostCards.length})</div>
     {/if}
     {#if labelCards.length > 0}
-      <div class="bml-section">&#x1F3F7; Labels ({labelCards.length})</div>
+      <div class="bml-section"><i class="fa-solid fa-tag" aria-hidden="true"></i> Labels ({labelCards.length})</div>
     {/if}
   </div>
 {/if}

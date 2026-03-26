@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import Footer from '$lib/components/shared/Footer.svelte';
 
   let theme = $state('dark');
   let demoNpcs = $state([]);
@@ -95,8 +96,8 @@
     <a href="/" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
     <div class="topbar-spacer" style="flex:1"></div>
     <div class="topbar-status">
-      <a href="/campaigns/sessionzero" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">&#127922; Prep Wizard</a>
-      <a href="/help" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">&#128218; Help</a>
+      <a href="/campaigns/sessionzero" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> Prep Wizard</a>
+      <a href="/help" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Help</a>
       <a href="/about" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">About</a>
       <button
         class="btn btn-icon btn-ghost"
@@ -130,10 +131,10 @@
           Every GM should be able to run a great Fate Condensed session, regardless of how much time they had to prep.
         </p>
         <div class="land-hero-pills">
-          <span class="land-hero-pill">&#x1F4F4; Fully offline</span>
-          <span class="land-hero-pill">&#x1F513; Free forever</span>
-          <span class="land-hero-pill">&#x1F5A8; Print-ready</span>
-          <span class="land-hero-pill">&#x26A1; One click</span>
+          <span class="land-hero-pill"><i class="fa-solid fa-tower-broadcast" aria-hidden="true"></i> Fully offline</span>
+          <span class="land-hero-pill"><i class="fa-solid fa-lock-open" aria-hidden="true"></i> Free forever</span>
+          <span class="land-hero-pill"><i class="fa-solid fa-print" aria-hidden="true"></i> Print-ready</span>
+          <span class="land-hero-pill"><i class="fa-solid fa-bolt" aria-hidden="true"></i> One click</span>
         </div>
         <div class="land-hero-ctas">
           <a href="/campaigns/fantasy" class="land-cta-primary" aria-label="Open the generator">
@@ -168,7 +169,7 @@
           {/each}
         </div>
         <div class="land-intro-cta">
-          <a href="/campaigns/fantasy" class="land-cta-primary">&#127922; Try it now</a>
+          <a href="/campaigns/fantasy" class="land-cta-primary"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> Try it now</a>
           <a href="/help/generators" class="land-cta-secondary">All 17 generators &rarr;</a>
         </div>
       </div>
@@ -180,28 +181,28 @@
         <h2 class="land-section-heading">New here?</h2>
         <div class="land-onboard-grid">
           <a href="/help/learn-fate" class="land-onboard-card">
-            <div class="land-onboard-icon">&#x1F3B2;</div>
+            <div class="land-onboard-icon"><i class="fa-solid fa-dice-d20"></i></div>
             <div class="land-onboard-text">
               <div class="land-onboard-label">Learn Fate</div>
               <div class="land-onboard-desc">Step-by-step guide to the rules &mdash; as a player or a GM. Coming from D&amp;D? We cover that too.</div>
             </div>
-            <span class="land-onboard-arrow">&#x203A;</span>
+            <span class="land-onboard-arrow"><i class="fa-solid fa-chevron-right"></i></span>
           </a>
           <a href="/campaigns/sessionzero" class="land-onboard-card">
-            <div class="land-onboard-icon">&#x26A1;</div>
+            <div class="land-onboard-icon"><i class="fa-solid fa-bolt"></i></div>
             <div class="land-onboard-text">
               <div class="land-onboard-label">Prep a Session</div>
               <div class="land-onboard-desc">The Prep Wizard walks you through world, players, seed, scene, and opening NPC in 10 minutes. Done screen sends cards straight to the Table.</div>
             </div>
-            <span class="land-onboard-arrow">&#x203A;</span>
+            <span class="land-onboard-arrow"><i class="fa-solid fa-chevron-right"></i></span>
           </a>
           <a href="/help/export-share" class="land-onboard-card">
-            <div class="land-onboard-icon">&#x1F517;</div>
+            <div class="land-onboard-icon"><i class="fa-solid fa-link"></i></div>
             <div class="land-onboard-text">
               <div class="land-onboard-label">Export &amp; Play</div>
               <div class="land-onboard-desc">Ogma JSON export, Markdown, print-ready cards, and shareable links. Take your prep to any table.</div>
             </div>
-            <span class="land-onboard-arrow">&#x203A;</span>
+            <span class="land-onboard-arrow"><i class="fa-solid fa-chevron-right"></i></span>
           </a>
         </div>
       </div>
@@ -256,7 +257,7 @@
                     <div class="land-world-genre">{camp.genre}</div>
                     <div class="land-world-hook">{camp.hook}</div>
                   </div>
-                  <div class="land-world-arrow">&#x203A;</div>
+                  <div class="land-world-arrow"><i class="fa-solid fa-chevron-right"></i></div>
                 </div>
               </a>
               <div class="land-world-footer">
@@ -283,7 +284,7 @@
             <p class="land-npc-demo-sub">High concept, trouble, top skill, and a stunt &mdash; rules-accurate, fiction-first.</p>
           </div>
           <button class="btn btn-ghost land-npc-shuffle-btn" onclick={() => { demoNpcs = pickThree(); }} aria-label="Show three different NPCs">
-            &#x1F3B2; Shuffle
+            <i class="fa-solid fa-dice-d20" aria-hidden="true"></i> Shuffle
           </button>
         </div>
         <div class="land-npc-demo-grid">
@@ -315,19 +316,5 @@
   </main>
 
   <!-- Footer -->
-  <footer class="land-footer">
-    <div class="land-footer-inner">
-      <div style="font-style:italic;color:var(--text-muted);margin-bottom:4px">
-        <strong>O</strong>n-demand <strong>G</strong>enerator for <strong>M</strong>asterful <strong>A</strong>dventures
-      </div>
-      <div style="margin-bottom:4px">
-        Fate&trade; is a trademark of Evil Hat Productions, LLC. Released under <a href="/license">CC BY 3.0</a>.
-      </div>
-      <div>
-        <a href="/license">Full Attribution</a> &middot;
-        <a href="/help">&#128218; Help</a> &middot;
-        <a href="/about">About</a>
-      </div>
-    </div>
-  </footer>
+  <Footer />
 </div>

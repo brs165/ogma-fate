@@ -18,7 +18,7 @@
 </ul>
 
 <div class="callout callout-scenario">
-  <div class="callout-title">&#127914; Scenario: Tracking a tense contest</div>
+  <div class="callout-title"><i class="fa-solid fa-gamepad" aria-hidden="true"></i> Scenario: Tracking a tense contest</div>
   <p>You've rolled a Contest — two gangs racing to reach the weapons cache. As each exchange resolves, you tap the victory boxes on your screen. The left track (Crimson Scars) and right track (Iron Saints) fill up. On the third tie, the twist aspect — "The Cache is Already Open" — gets revealed. Export the final state as Ogma JSON so players can see it on their devices.</p>
 </div>
 
@@ -80,20 +80,20 @@
       <li><strong>Denouement</strong> — consequences are named and tended to, loose ends are noted for next session, milestone conversation happens. 5 minutes. Don't skip it.</li>
     </ol>
     <div class="callout callout-tip">
-      <div class="callout-title">&#127922; The "so" test for scenes</div>
+      <div class="callout-title"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> The "so" test for scenes</div>
       <p>After every scene ask: "So what changed?" If the answer is "nothing — we just got information," that's fine occasionally, but information scenes should be short. If the answer is "an NPC's loyalty shifted, a consequence was taken, a new aspect appeared" — that's a real scene. Ogma's Complication generator is specifically for injecting scene-changers mid-session.</p>
     </div>
 
     <h2 id="conflict-walkthrough">A conflict, step by step</h2>
     <p>This walkthrough shows a single 3-exchange conflict. Use it as a reference for your first few sessions.</p>
     <div class="callout callout-scenario">
-      <div class="callout-title">&#127914; Setup — warehouse chase gone wrong</div>
+      <div class="callout-title"><i class="fa-solid fa-gamepad" aria-hidden="true"></i> Setup — warehouse chase gone wrong</div>
       <p><strong>Scene:</strong> The PCs are cornered in a warehouse by a hired enforcer. Two zones: <em>Warehouse Floor</em> (crates, cover) and <em>Loading Dock</em> (open, exit). Situation aspects: "Crates Everywhere" and "One Exit."</p>
       <p><strong>Enforcer (minor NPC):</strong> Fight +3, Athletics +2. 2 stress boxes. Aspect: <em>Gets Paid to Finish the Job.</em></p>
       <p><strong>PC:</strong> Fight +2, Athletics +3. 3 stress boxes. Trouble: <em>Too Proud to Run.</em></p>
     </div>
     <div class="callout callout-scenario">
-      <div class="callout-title">&#127914; Exchange 1 — PC goes first (fiction determines order)</div>
+      <div class="callout-title"><i class="fa-solid fa-gamepad" aria-hidden="true"></i> Exchange 1 — PC goes first (fiction determines order)</div>
       <p><strong>PC declares:</strong> "I knock over a stack of crates to get between us."</p>
       <p><strong>Action:</strong> Create Advantage with Athletics. Difficulty: Fair (+2) — not many crates, but doable fast.</p>
       <p><strong>Result:</strong> Success — "Stack of Crates Between Us" aspect placed, 1 free invoke.</p>
@@ -101,20 +101,20 @@
       <p><strong>PC absorbs:</strong> Spends the free invoke on "Stack of Crates Between Us" (+2) to reduce damage to 0. Narrates: the crates absorbed the hit.</p>
     </div>
     <div class="callout callout-scenario">
-      <div class="callout-title">&#127914; Exchange 2 — escalation</div>
+      <div class="callout-title"><i class="fa-solid fa-gamepad" aria-hidden="true"></i> Exchange 2 — escalation</div>
       <p><strong>GM offers a compel:</strong> "Your trouble — <em>Too Proud to Run</em> — the loading dock exit is right there, but your character won't take it, will they? Take this fate point and stay to fight." Player accepts, earns 1 FP.</p>
       <p><strong>PC attacks:</strong> Fight +2 plus 1 FP invoke on "Stack of Crates Between Us" (still true!) = effectively Fight +4. Enforcer defends at Fight +3. PC wins by 2 shifts.</p>
       <p><strong>Enforcer absorbs:</strong> Takes 2 stress (boxes ticked). Aspect "<em>Gets Paid to Finish the Job</em>" is invoked by the enforcer (GM spends 1 FP): +2 to their next attack.</p>
     </div>
     <div class="callout callout-scenario">
-      <div class="callout-title">&#127914; Exchange 3 — resolution</div>
+      <div class="callout-title"><i class="fa-solid fa-gamepad" aria-hidden="true"></i> Exchange 3 — resolution</div>
       <p><strong>Enforcer attacks:</strong> Fight +3 + 2 (invoke) = +5. PC defends: Fight +2 + spend FP on their own aspect = +4. 1 shift through.</p>
       <p><strong>PC options:</strong> Tick a stress box (absorbs 1 shift), take a Mild consequence ("Bruised Ribs" — written as an aspect on the sheet; GM can invoke it against relevant rolls or compel it for a fate point), or concede.</p>
       <p><strong>PC concedes:</strong> "I don't want to take the consequence. I concede — my character bolts for the loading dock, dignity wounded." Earns 1 FP. Player narrates: they escape, but the enforcer saw their face.</p>
       <p><strong>Result:</strong> PC is out of the scene on their terms, story has moved (enforcer knows who they are), and a future complication is seeded. No one "lost" — the story got richer.</p>
     </div>
     <div class="callout callout-info">
-      <div class="callout-title">&#128196; Key takeaways from this conflict</div>
+      <div class="callout-title"><i class="fa-solid fa-file-lines" aria-hidden="true"></i> Key takeaways from this conflict</div>
       <p>Create Advantage shaped the whole exchange. The compel created a story moment. Concession ended it quickly with consequences that matter narratively. The whole conflict took 10 minutes. That's Fate at its best.</p>
     </div>
 

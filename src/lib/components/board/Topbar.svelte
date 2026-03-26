@@ -1,6 +1,6 @@
 <script>
   import ExportMenu from './ExportMenu.svelte';
-  import { ToggleGroup, Tooltip, Select } from 'bits-ui';
+  import { ToggleGroup, Tooltip, Select, DropdownMenu } from 'bits-ui';
 
   let { campMeta = {}, mode = 'prep', onModeChange = () => {}, campId = '', onCampChange = () => {}, isOnline = true, sync = {}, panels = {}, counts = {}, exportActions = {}, cards = [], campName = '', onExportCanvas = () => {}, onImportCanvas = () => {}, onPrint = () => {}, onToggleMobileList = null, mobileListView = false, onExportView = null } = $props();
 
@@ -133,13 +133,13 @@
       <span class="bt-chip bt-offline">&hourglass; Connecting&hellip;</span>
     {/if}
     {#if syncRole === 'player' && syncStatus === 'connected' && roomCode}
-      <span class="bt-chip bt-room-chip">&#x1F517;&nbsp;Room&nbsp;{roomCode}</span>
+      <span class="bt-chip bt-room-chip"><i class="fa-solid fa-link" aria-hidden="true"></i>&nbsp;Room&nbsp;{roomCode}</span>
     {/if}
     {#if !isOnline}
-      <span class="bt-chip bt-offline">&#x26A1; Offline</span>
+      <span class="bt-chip bt-offline"><i class="fa-solid fa-bolt" aria-hidden="true"></i> Offline</span>
     {/if}
     {#if mode === 'prep' && onTableCount > 0}
-      <span class="bt-chip bt-ontable-chip">&#x25CF;&nbsp;{onTableCount} on table</span>
+      <span class="bt-chip bt-ontable-chip"><i class="fa-solid fa-circle" aria-hidden="true" style="font-size:8px"></i>&nbsp;{onTableCount} on table</span>
     {/if}
 
     <!-- Binder (Prep) -->
@@ -151,7 +151,7 @@
           aria-pressed={String(binderOpen)}
           style="position:relative"
         >
-          &#x1F4CB;
+          <i class="fa-solid fa-clipboard" aria-hidden="true"></i>
           {#if binderCount > 0 || trayCount > 0}
             <span class="bt-count" style="position:absolute;top:-4px;right:-4px">
               {trayCount > 0 ? trayCount : binderCount}
@@ -170,7 +170,7 @@
         onclick={onToggleDice}
         aria-label={showDice ? 'Close dice roller' : 'Open dice roller'}
         aria-pressed={String(showDice)}
-      >&#x1F3B2;</Tooltip.Trigger>
+      ><i class="fa-solid fa-dice-d20" aria-hidden="true"></i></Tooltip.Trigger>
       <Tooltip.Portal>
         <Tooltip.Content class="bt-tooltip">Dice Roller <kbd class="bt-kbd">R</kbd></Tooltip.Content>
       </Tooltip.Portal>
@@ -182,36 +182,22 @@
         onclick={onToggleFP}
         aria-label={showFP ? 'Close Fate Point tracker' : 'Open Fate Point tracker'}
         aria-pressed={String(showFP)}
-      >&#x25CE;</Tooltip.Trigger>
+      ><i class="fa-solid fa-bullseye" aria-hidden="true"></i></Tooltip.Trigger>
       <Tooltip.Portal>
         <Tooltip.Content class="bt-tooltip">Fate Point Tracker</Tooltip.Content>
       </Tooltip.Portal>
     </Tooltip.Root>
 
-    <!-- Session notes -->
-    {#if onToggleNotes}
-      <Tooltip.Root openDelay={400}>
-        <Tooltip.Trigger class="bt-icon-btn{showNotes ? ' active' : ''}"
-          onclick={onToggleNotes}
-          aria-label={showNotes ? 'Close notes' : 'Open session notes'}
-          aria-pressed={String(showNotes)}
-        >&#x1F4DD;</Tooltip.Trigger>
-        <Tooltip.Portal>
-          <Tooltip.Content class="bt-tooltip">Session Notes</Tooltip.Content>
-        </Tooltip.Portal>
-      </Tooltip.Root>
-    {/if}
-
     <!-- Host / room code -->
     {#if mode === 'play' && syncStatus === 'offline'}
-      <button class="bt-nav" onclick={onHost} title="Host a live session">&#x1F310; Host</button>
+      <button class="bt-nav" onclick={onHost} title="Host a live session"><i class="fa-solid fa-globe" aria-hidden="true"></i> Host</button>
     {/if}
     {#if mode === 'play' && syncStatus === 'connected'}
       <span style="display:flex;align-items:center;gap:3px">
         <button class="bt-nav"
           style="color:var(--c-green,#30d158);border-color:var(--c-green,#30d158);font-variant-numeric:tabular-nums"
           title="Click to copy player join link" onclick={copyJoinLink}
-        >&#x1F517;&nbsp;{roomCode}</button>
+        ><i class="fa-solid fa-link" aria-hidden="true"></i>&nbsp;{roomCode}</button>
         <button class="bt-icon-btn" style="font-size:12px;opacity:0.6;width:22px;height:22px;min-width:0"
           title="Disconnect" onclick={onDisconnect} aria-label="Disconnect">&times;</button>
       </span>
@@ -220,7 +206,7 @@
     <!-- Export menu -->
     <ExportMenu {cards} {campName} {onExportCanvas} {onImportCanvas} {onPrint} {mode} />
 
-    <!-- Mobile list/canvas -->
+    <!-- Mobile list/canvas — visible on mobile only -->
     {#if onToggleMobileList}
       <Tooltip.Root openDelay={400}>
         <Tooltip.Trigger class="bt-icon-btn bt-mob-view-toggle"
@@ -234,40 +220,35 @@
       </Tooltip.Root>
     {/if}
 
-    <!-- Theme -->
-    <Tooltip.Root openDelay={400}>
-      <Tooltip.Trigger class="bt-icon-btn"
-        onclick={onToggleTheme}
-        aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-      >{theme === 'dark' ? '\u2600' : '\u263D'}</Tooltip.Trigger>
-      <Tooltip.Portal>
-        <Tooltip.Content class="bt-tooltip">{theme === 'dark' ? 'Light mode' : 'Dark mode'}</Tooltip.Content>
-      </Tooltip.Portal>
-    </Tooltip.Root>
-
-    <!-- A11y patterns -->
-    <Tooltip.Root openDelay={400}>
-      <Tooltip.Trigger class="bt-icon-btn"
-        onclick={toggleA11yPatterns}
-        aria-label="Toggle colorblind-safe patterns"
-      >&diams;</Tooltip.Trigger>
-      <Tooltip.Portal>
-        <Tooltip.Content class="bt-tooltip">Colorblind patterns</Tooltip.Content>
-      </Tooltip.Portal>
-    </Tooltip.Root>
-
-    <!-- Export page -->
-    {#if onExportView}
-      <Tooltip.Root openDelay={400}>
-        <Tooltip.Trigger class="bt-icon-btn"
-          onclick={onExportView}
-          aria-label="Open export page"
-        >&ctdot;</Tooltip.Trigger>
-        <Tooltip.Portal>
-          <Tooltip.Content class="bt-tooltip">Export Cards</Tooltip.Content>
-        </Tooltip.Portal>
-      </Tooltip.Root>
-    {/if}
+    <!-- Overflow menu — groups low-priority actions, shown on all sizes but essential on mobile -->
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger class="bt-icon-btn bt-overflow-btn" aria-label="More options">&hellip;</DropdownMenu.Trigger>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content class="bt-overflow-content" align="end" sideOffset={6}>
+          <DropdownMenu.Item class="bt-overflow-item" onSelect={onToggleTheme}>
+            <span class="bt-overflow-icon">{theme === 'dark' ? '\u2600' : '\u263D'}</span>
+            {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item class="bt-overflow-item" onSelect={toggleA11yPatterns}>
+            <span class="bt-overflow-icon">&diams;</span>
+            Colorblind patterns
+          </DropdownMenu.Item>
+          {#if onToggleNotes}
+            <DropdownMenu.Item class="bt-overflow-item" onSelect={onToggleNotes}>
+              <span class="bt-overflow-icon"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i></span>
+              Session notes
+            </DropdownMenu.Item>
+          {/if}
+          {#if onExportView}
+            <DropdownMenu.Separator class="export-dd-sep" />
+            <DropdownMenu.Item class="bt-overflow-item" onSelect={onExportView}>
+              <span class="bt-overflow-icon">&ctdot;</span>
+              Export cards
+            </DropdownMenu.Item>
+          {/if}
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
 
   </div>
 </div>

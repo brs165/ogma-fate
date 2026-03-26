@@ -277,6 +277,11 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
     persistConnectors();
   }
 
+  function updateConnector(connId, patch) {
+    connectors.update(cs => cs.map(c => c.id === connId ? Object.assign({}, c, patch) : c));
+    persistConnectors();
+  }
+
   function removeCardConnectors(cardId) {
     connectors.update(cs => cs.filter(c => c.fromId !== cardId && c.toId !== cardId));
     persistConnectors();
@@ -344,6 +349,9 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
       type: 'smoothstep',
       animated: false,
       deletable: true,
+      label: conn.label || '',
+      labelStyle: { fontSize: '10px', fontWeight: 600, fill: 'var(--text)', fontFamily: 'inherit' },
+      labelBgStyle: { fill: 'var(--panel)', fillOpacity: 0.85 },
       data: conn,
     }))
   );
@@ -365,7 +373,7 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
     persistCanvas,
     generateCard, generateCardWithData, loadBinderToCanvas,
     updateCard, deleteCard, rerollCard,
-    addConnector, removeConnector, removeCardConnectors, clearCanvas,
+    addConnector, removeConnector, updateConnector, removeCardConnectors, clearCanvas,
     syncNodePositions,
     undoLast, exportCanvas, importCanvas,
   };

@@ -1,5 +1,5 @@
 # Canvas Workshop — SvelteFlow Prep & Play Surface
-# Date: March 2026 | Version: 2026.03.576+
+# Date: March 2026 | Version: 2026.03.600
 
 Full team workshop on the SvelteFlow canvas integration.
 Six voices, two surfaces (Prep + Play).
@@ -223,31 +223,34 @@ The `acted` field is already on card data — just needs CSS treatment in the no
 
 ## Implementation priority (next sprint)
 
-### Sprint 1 — Fix the broken (this session)
+### Sprint 1 — Fix the broken ✅ COMPLETE
 - [x] BUG-01: useSvelteFlow outside tree
 - [x] BUG-02: Double positioning
 - [x] BUG-03: Drag conflict
-- [ ] BUG-04: Context menu coords (needs CanvasOverlay child component)
-- [ ] BUG-05: toastQueue.shift() mutation
-- [ ] BUG-06: unsubs $state unnecessary
+- [x] BUG-04: CanvasContextMenu child component (proper canvas coords)
+- [x] BUG-05: toastQueue.slice() $state-safe
+- [x] BUG-06: unsubs plain let
 
-### Sprint 2 — Play mode must-haves
-- [ ] PLAY-01: Play mode tabs (Players | Generate)
-- [ ] PLAY-02: Replace confirm() with AlertDialog
-- [ ] PLAY-05: GM pool visual urgency
-- [ ] PLAY-08: Compel offer modal
-- [ ] WC-01: fitView on load
+### Sprint 2 — Play mode ✅ COMPLETE
+- [x] PLAY-01: Play mode Players | Generate tabs
+- [x] PLAY-02: AlertDialog for TurnBar confirms
+- [x] PLAY-05: GM pool pulse+shake at 0
+- [x] PLAY-08: Compel offer modal with auto FP transfer
+- [x] WC-01: fitView on load when restoring existing cards
+- [x] PLAY-03: Stress colour coding (amber=phy, purple=men)
+- [x] PLAY-07: "Rnd" → "XCHG" (exchange)
 
-### Sprint 3 — Prep power features
-- [ ] PREP-03: fitView on first load with existing cards
-- [ ] PREP-05: Connect mode visual feedback
-- [ ] PREP-07: Search dim on SF nodes
-- [ ] WC-04: Card minimise/expand
-- [ ] WC-03: Edge labels
+### Sprint 3 — Prep power features ✅ COMPLETE
+- [x] PREP-05: Connect mode visual feedback (dashed outline + crosshair)
+- [x] PREP-07: Search dim on SF nodes (all 4 node types)
+- [x] WC-04: Card minimise/expand (double-click or ▲ button)
+- [x] WC-03: Edge labels (click edge to cycle: Knows/Opposes/Ally/Fears/Owes/Loves/Rival/Commands/Seeks)
+- [x] WC-10: NPC acted state on canvas (greyed when acted)
 
-### Sprint 4 — World class
-- [ ] WC-02: Node groups
-- [ ] WC-05: Canvas templates
-- [ ] WC-07: Player-facing gmOnly cards
-- [ ] WC-08: Consequence stickies
-- [ ] WC-10: NPC acted state on canvas
+### Sprint 4 — World class (backlog)
+- [ ] WC-02: Node groups (scene spatial grouping)
+- [ ] WC-05: Canvas templates (starter scene layouts)
+- [ ] WC-07: Player-facing gmOnly card toggle
+- [ ] WC-08: Consequence stickies auto-placed from player tracker
+- [ ] PREP-06: Undo covers card moves (currently delete+reroll only)
+- [ ] PREP-08: Ctrl+A select all nodes

@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
   import { VERSION } from '$lib/version.js';
+  import Footer from '$lib/components/shared/Footer.svelte';
 
   let theme = $state('dark');
 
@@ -816,15 +817,15 @@
     <a href="/" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
     <nav class="topbar-crumb" aria-label="Breadcrumb">
       <a href="/" class="topbar-crumb-item">Home</a>
-      <span class="topbar-crumb-sep" aria-hidden="true">&#8250;</span>
+      <span class="topbar-crumb-sep" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></span>
       <a href="/campaigns/{world}" class="topbar-crumb-item">{worldName}</a>
-      <span class="topbar-crumb-sep" aria-hidden="true">&#8250;</span>
+      <span class="topbar-crumb-sep" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></span>
       <span class="topbar-crumb-item current" aria-current="page">Guide</span>
     </nav>
     <div class="topbar-spacer" style="flex:1"></div>
     <div class="topbar-status">
-      <a href="/campaigns/{world}" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#9654; Generate</a>
-      <a href="/help" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#128218; Help</a>
+      <a href="/campaigns/{world}" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none"><i class="fa-solid fa-play" aria-hidden="true"></i> Generate</a>
+      <a href="/help" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Help</a>
       <button class="btn btn-icon btn-ghost" onclick={toggleTheme}
         aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
         style="width:44px;height:44px">{theme === 'dark' ? '☀️' : '◑'}</button>
@@ -837,26 +838,12 @@
     </main>
   {:else}
     <main id="main-content" style="max-width:680px;margin:0 auto;padding:40px 20px;text-align:center">
-      <div style="font-size:48px;margin-bottom:16px">&#128218;</div>
+      <div style="font-size:48px;margin-bottom:16px"><i class="fa-solid fa-book-open" aria-hidden="true" style="font-size:48px"></i></div>
       <h1 style="font-size:var(--text-xl);margin-bottom:8px">Campaign Guide Not Found</h1>
       <p style="color:var(--text-dim)">No guide available for this world.</p>
-      <a href="/" style="color:var(--accent);text-decoration:none;margin-top:16px;display:inline-block">&#8592; Back to worlds</a>
+      <a href="/" style="color:var(--accent);text-decoration:none;margin-top:16px;display:inline-block"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to worlds</a>
     </main>
   {/if}
 
-  <footer class="land-footer">
-    <div class="land-footer-inner">
-      <div style="font-style:italic;color:var(--text-muted);margin-bottom:4px">
-        <strong>O</strong>n-demand <strong>G</strong>enerator for <strong>M</strong>asterful <strong>A</strong>dventures
-      </div>
-      <div>
-        <a href="/license">Full Attribution</a> &middot;
-        <a href="/help">&#128218; Help</a> &middot;
-        <a href="/about">About</a>
-      </div>
-      <div class="sz-center">
-        <span class="about-version-badge">v{VERSION}</span>
-      </div>
-    </div>
-  </footer>
+  <Footer />
 </div>

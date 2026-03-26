@@ -10,7 +10,7 @@
 <p class="wiki-page-desc">You already know how to play TTRPGs. Here's every major mechanical and philosophical difference between D&amp;D 5e and Fate Condensed — section by section, with concrete play examples.</p>
 
 <div class="callout callout-info">
-  <div class="callout-title">&#128218; Where this fits</div>
+  <div class="callout-title"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Where this fits</div>
   <p>This is the deep-dive reference. For a quick overview of the three biggest shifts, see <a href="/help/new-to-ogma#from-dnd">New to Ogma? → I play D&amp;D</a>. For Fate mechanics without D&amp;D comparison, see <a href="/help/fate-mechanics">Fate Mechanics</a>.</p>
 </div>
 
@@ -32,7 +32,7 @@
 </table>
 
 <div class="callout callout-scenario">
-  <div class="callout-title">&#127914; Example — D&amp;D character vs Fate character</div>
+  <div class="callout-title"><i class="fa-solid fa-gamepad" aria-hidden="true"></i> Example — D&amp;D character vs Fate character</div>
   <p><strong>D&amp;D:</strong> Human Rogue 5, STR 10 DEX 18 CON 12 INT 14 WIS 13 CHA 16. Expertise in Stealth and Sleight of Hand. Uncanny Dodge. Evasion.</p>
   <p><strong>Fate:</strong> High Concept: <em>"Chrome-Fingered Pickpocket Who Knows Every Face in the Market."</em> Trouble: <em>"I Owe the Syndicate a Debt I Can't Pay."</em> Stunt: "When I palm a small object in a crowd, I get +2 to Stealth."</p>
   <p>The Fate version tells you who she is and what will get her in trouble. The D&amp;D version tells you what she can do. Both are valid — they're answering different questions.</p>
@@ -84,7 +84,7 @@
 </table>
 
 <div class="callout callout-warning">
-  <div class="callout-title">&#9888; Stress is NOT hit points</div>
+  <div class="callout-title"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Stress is NOT hit points</div>
   <p>Stress boxes each absorb exactly 1 shift and clear at the end of every scene. There is no "5 HP remaining" equivalent. A character who took 3 stress boxes in scene 1 is fully reset in scene 2. The persistent damage track is the <strong>consequence slots</strong> — not stress.</p>
 </div>
 

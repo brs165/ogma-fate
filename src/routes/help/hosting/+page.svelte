@@ -19,7 +19,7 @@
     </ul>
 
     <div class="callout callout-info">
-      <div class="callout-title">&#9432; What players can do</div>
+      <div class="callout-title"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> What players can do</div>
       <p>Remote players can see the full scene board (non-GM cards), claim their own character, and edit their own FP, stress boxes, and consequences. They cannot add or remove cards, generate content, or see GM-only notes.</p>
     </div>
 
@@ -27,14 +27,14 @@
     <p>If you just want to play right now and someone else (or Ogma's hosted instance) is running the server, this is all you need:</p>
     <ol>
       <li>Open any campaign page (e.g. <strong>The Gaslight Chronicles</strong>), do your prep, then click <strong>Table</strong> in the top nav.</li>
-      <li>Click <strong>&#127760; Host</strong> in the toolbar. A room code like <code>7K3F</code> appears with a &#128203; copy button.</li>
-      <li>Click &#128203; to copy the join link and paste it into Discord, iMessage, or wherever your players are.</li>
+      <li>Click <strong><i class="fa-solid fa-globe" aria-hidden="true"></i> Host</strong> in the toolbar. A room code like <code>7K3F</code> appears with a <i class="fa-solid fa-clipboard" aria-hidden="true"></i> copy button.</li>
+      <li>Click <i class="fa-solid fa-clipboard" aria-hidden="true"></i> to copy the join link and paste it into Discord, iMessage, or wherever your players are.</li>
       <li>Players open the link — they see a "Joining Room 7K3F" screen, enter their name, and they're in.</li>
       <li>Players click <strong>This is me</strong> next to their character to claim it and unlock their own controls.</li>
     </ol>
 
     <div class="callout callout-scenario">
-      <div class="callout-title">&#127914; Scenario: starting a remote session</div>
+      <div class="callout-title"><i class="fa-solid fa-gamepad" aria-hidden="true"></i> Scenario: starting a remote session</div>
       <p>You're running The Long After online. Before the session you generate a Seed, two NPCs, and a Scene card and save them to the Table canvas. At session time you click Host, share the link in Discord. Your three players open it and each claim their character. You open the Dice tab and ask the first player to roll their Shoot skill — they click it on their screen, the result appears as a toast on everyone's display. Five minutes from link to first roll.</p>
     </div>
 
@@ -80,7 +80,7 @@ git push -u origin main</code></pre>
     </table>
 
     <div class="callout callout-warning">
-      <div class="callout-title">&#9888; Two secrets are required</div>
+      <div class="callout-title"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Two secrets are required</div>
       <p>The deploy action needs both the API token <em>and</em> the account ID. Missing either one causes the action to fail silently or time out.</p>
     </div>
 
@@ -113,28 +113,28 @@ jobs:
     <p>That's your sync server URL — copy it, you'll need it in Step 4. You can also trigger the deploy manually any time: Actions tab &rarr; <strong>Deploy to Cloudflare Workers</strong> &rarr; <strong>Run workflow</strong>.</p>
 
     <div class="callout callout-tip">
-      <div class="callout-title">&#128161; Tip: custom domain</div>
+      <div class="callout-title"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> Tip: custom domain</div>
       <p>If ogma.net is on Cloudflare, add a CNAME DNS record: name <code>sync</code>, target <code>ogma-sync.your-subdomain.workers.dev</code>, proxy <strong>off</strong> (grey cloud — WebSockets don't work through the Cloudflare proxy). Then set your sync server to <code>sync.ogma.net</code>.</p>
     </div>
 
     <div class="callout callout-warning">
-      <div class="callout-title">&#9888; Free tier requires <code>new_sqlite_classes</code></div>
+      <div class="callout-title"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Free tier requires <code>new_sqlite_classes</code></div>
       <p>The <code>wrangler.toml</code> in the repo uses <code>new_sqlite_classes</code> (not <code>new_classes</code>) in the <code>[[migrations]]</code> block. Cloudflare's free tier changed to SQLite-backed Durable Objects in 2024 — the old key returns error <code>10097</code> and the deploy fails silently.</p>
     </div>
 
     <h3>Step 4 — Point Ogma at your server</h3>
-    <p>In the Table toolbar, click the small <strong>&#9881;</strong> button (visible when not connected, next to the Join button). Paste your worker URL. Ogma saves it to your browser preferences — you only need to do this once per device.</p>
+    <p>In the Table toolbar, click the small <strong><i class="fa-solid fa-gear" aria-hidden="true"></i></strong> button (visible when not connected, next to the Join button). Paste your worker URL. Ogma saves it to your browser preferences — you only need to do this once per device.</p>
 
     <h2 id="host-a-session">Hosting a session</h2>
-    <p>Open any campaign's <strong>Table</strong> canvas. Click <strong>&#127760; Host</strong> in the toolbar. Ogma generates a 4-character room code and connects to the sync server. A green pill appears in the toolbar showing the code and how many players are online.</p>
-    <p>Click the &#128203; icon inside the pill to copy a full join link. Share it anywhere — Discord, iMessage, email. Players who open it go directly to the join screen.</p>
+    <p>Open any campaign's <strong>Table</strong> canvas. Click <strong><i class="fa-solid fa-globe" aria-hidden="true"></i> Host</strong> in the toolbar. Ogma generates a 4-character room code and connects to the sync server. A green pill appears in the toolbar showing the code and how many players are online.</p>
+    <p>Click the <i class="fa-solid fa-clipboard" aria-hidden="true"></i> icon inside the pill to copy a full join link. Share it anywhere — Discord, iMessage, email. Players who open it go directly to the join screen.</p>
     <p>The toolbar also shows a live count of connected players. When a player joins you'll see the number tick up — no separate notification needed.</p>
     <p>Click <strong>Stop</strong> in the pill to end the session. Players see a "GM disconnected" toast. If you accidentally close the tab, reopen it, click Host with the same room code (if you remember it) and everyone reconnects. Card state is saved locally in your browser's IndexedDB regardless of connectivity.</p>
 
     <h2 id="join-a-session">Joining a session</h2>
     <p>Open the join link your GM shared. You'll see:</p>
     <blockquote>
-      <strong>&#127760; Joining Room 7K3F</strong><br>
+      <strong><i class="fa-solid fa-globe" aria-hidden="true"></i> Joining Room 7K3F</strong><br>
       You've been invited to a live Ogma session. Enter your name to join as a player.
     </blockquote>
     <p>Type your name and click <strong>Join Session</strong>. If your name matches a character already on the GM's board, you're auto-claimed as that character. Otherwise you join as a spectator and can click <strong>This is me</strong> next to any character to claim it.</p>
@@ -158,7 +158,7 @@ jobs:
 
     <h2 id="custom-server">Custom sync server</h2>
     <p>The sync server is open source at <code>github.com/brs165/ogma-sync</code>. Anyone can deploy their own instance for free using Cloudflare's free tier (100,000 WebSocket message-days per month — enough for roughly 125 four-hour sessions). The <strong>Deploy to Cloudflare</strong> button in the repo README does the whole setup in one click if you prefer not to use the command line.</p>
-    <p>To point your Ogma installation at a custom server, click &#9881; in the toolbar (visible when not connected) and enter the server URL. This is saved in your browser and used for all future sessions on that device.</p>
+    <p>To point your Ogma installation at a custom server, click <i class="fa-solid fa-gear" aria-hidden="true"></i> in the toolbar (visible when not connected) and enter the server URL. This is saved in your browser and used for all future sessions on that device.</p>
 
     <h2 id="troubleshooting">Troubleshooting</h2>
 

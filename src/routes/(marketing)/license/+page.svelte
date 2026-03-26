@@ -32,22 +32,22 @@
 
     <div class="lic-card">
       <h3>Fate Condensed</h3>
-      <p class="verbatim">This work is based on Fate Condensed (found at http://www.faterpg.com/), a product of Evil Hat Productions, LLC, developed, authored, and edited by PK Sullivan, Ed Turner, Leonard Balsera, Fred Hicks, Richard Bellingham, Robert Hanz, Ryan Macklin, and Sophie Lagac&eacute;, and licensed for our use under the Creative Commons Attribution 3.0 Unported license.</p>
+      <p class="verbatim">This work is based on Fate Condensed (found at <a href="https://www.faterpg.com/" target="_blank" rel="noreferrer">https://www.faterpg.com/</a>), a product of Evil Hat Productions, LLC, developed, authored, and edited by PK Sullivan, Lara Turner, Fred Hicks, Richard Bellingham, Robert Hanz, and Sophie Lagac&eacute;, and licensed for our use under the <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noreferrer">Creative Commons Attribution 3.0 Unported license</a>.</p>
     </div>
 
     <div class="lic-card">
       <h3>Fate Core System and Fate Accelerated Edition</h3>
-      <p class="verbatim">This work is based on Fate Core System and Fate Accelerated Edition (found at http://www.faterpg.com/), products of Evil Hat Productions, LLC, developed, authored, and edited by Leonard Balsera, Brian Engard, Jeremy Keller, Ryan Macklin, Mike Olson, Clark Valentine, Amanda Valentine, Fred Hicks, and Rob Donoghue, and licensed for our use under the Creative Commons Attribution 3.0 Unported license.</p>
+      <p class="verbatim">This work is based on Fate Core System and Fate Accelerated Edition (found at <a href="https://www.faterpg.com/" target="_blank" rel="noreferrer">https://www.faterpg.com/</a>), products of Evil Hat Productions, LLC, developed, authored, and edited by Leonard Balsera, Brian Engard, Jeremy Keller, Ryan Macklin, Mike Olson, Clark Valentine, Amanda Valentine, Fred Hicks, and Rob Donoghue, and licensed for our use under the <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noreferrer">Creative Commons Attribution 3.0 Unported license</a>.</p>
     </div>
 
     <div class="lic-card">
       <h3>Fate System Toolkit</h3>
-      <p class="verbatim">This work is based on the Fate System Toolkit (found at http://www.faterpg.com/), a product of Evil Hat Productions, LLC, developed, authored, and edited by Robert Donoghue, Brian Engard, Brennan Taylor, Mike Olson, Mark Diaz Truman, Fred Hicks, and Matthew Gandy, and licensed for our use under the Creative Commons Attribution 3.0 Unported license.</p>
+      <p class="verbatim">This work is based on the Fate System Toolkit (found at <a href="https://www.faterpg.com/" target="_blank" rel="noreferrer">https://www.faterpg.com/</a>), a product of Evil Hat Productions, LLC, developed, authored, and edited by Robert Donoghue, Brian Engard, Brennan Taylor, Mike Olson, Mark Diaz Truman, Fred Hicks, and Matthew Gandy, and licensed for our use under the <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noreferrer">Creative Commons Attribution 3.0 Unported license</a>.</p>
     </div>
 
     <div class="lic-card">
       <h3>Fate Adversary Toolkit</h3>
-      <p class="verbatim">This work is based on the Fate Adversary Toolkit SRD (found at http://www.faterpg.com/), a product of Evil Hat Productions, LLC, developed, authored, and edited by Brian Engard, Lara Turner, Joshua Yearsley, and Anna Meade, and licensed for our use under the Creative Commons Attribution 3.0 Unported license.</p>
+      <p class="verbatim">This work is based on the Fate Adversary Toolkit SRD (found at <a href="https://www.faterpg.com/" target="_blank" rel="noreferrer">https://www.faterpg.com/</a>), a product of Evil Hat Productions, LLC, developed, authored, and edited by Brian Engard, Lara Turner, Joshua Yearsley, and Anna Meade, and licensed for our use under the <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noreferrer">Creative Commons Attribution 3.0 Unported license</a>.</p>
     </div>
 
     <div class="lic-card">
@@ -62,7 +62,8 @@
 
     <div class="lic-card">
       <h3>D&amp;D SRD 5.2.1</h3>
-      <p class="verbatim">Dungeons &amp; Dragons 5th Edition System Reference Document v5.2.1 &copy; 2025 Wizards of the Coast LLC. Licensed under Creative Commons Attribution 4.0 International (CC BY 4.0).</p>
+      <p class="verbatim">This work includes material from the System Reference Document 5.2.1 (&ldquo;SRD 5.2.1&rdquo;) by Wizards of the Coast LLC, available at <a href="https://www.dndbeyond.com/srd" target="_blank" rel="noreferrer">https://www.dndbeyond.com/srd</a>. The SRD 5.2.1 is licensed under the Creative Commons Attribution 4.0 International License, available at <a href="https://creativecommons.org/licenses/by/4.0/legalcode" target="_blank" rel="noreferrer">https://creativecommons.org/licenses/by/4.0/legalcode</a>.</p>
+      <p class="verbatim">Section 5 of CC-BY-4.0 includes a Disclaimer of Warranties and Limitation of Liability that limits Wizards of the Coast LLC&rsquo;s liability to you.</p>
       <p class="verbatim">This work is not affiliated with or endorsed by Wizards of the Coast LLC. Dungeons &amp; Dragons&reg;, D&amp;D&reg;, and related trademarks are property of Wizards of the Coast LLC.</p>
     </div>
 
@@ -70,7 +71,6 @@
     <h2>Trademark Notices</h2>
 
     <p>Fate&trade; is a trademark of Evil Hat Productions, LLC. This project uses Fate mechanics under the Creative Commons license. Use of Fate mechanics does not imply endorsement or sponsorship by Evil Hat Productions, LLC.</p>
-    <p>The Fate Core font is &copy; Evil Hat Productions, LLC and is used with permission. The Four Actions icons were designed by Jeremy Keller.</p>
     <p>Dungeons &amp; Dragons&reg;, D&amp;D&reg;, and the D&amp;D logo are trademarks of Wizards of the Coast LLC. Ogma is not affiliated with or endorsed by Wizards of the Coast LLC.</p>
 
     <!-- Open-Source Libraries -->
@@ -92,8 +92,8 @@
     </div>
 
     <div class="lic-card">
-      <h3>Icons &mdash; System Emoji</h3>
-      <p>All icons in Ogma are Unicode emoji rendered by your operating system or browser. No third-party icon font is loaded.</p>
+      <h3>Font Awesome Free 7.2 &mdash; CC BY 4.0 / OFL 1.1 / MIT</h3>
+      <p class="verbatim">Icons provided by <a href="https://fontawesome.com" target="_blank" rel="noreferrer">Font Awesome Free</a> (version 7.2). Icon SVGs are licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>. Fonts are licensed under <a href="https://openfontlicense.org/" target="_blank" rel="noreferrer">OFL 1.1</a>. CSS and code are licensed under <a href="https://opensource.org/licenses/MIT" target="_blank" rel="noreferrer">MIT</a>. See <a href="https://fontawesome.com/license/free" target="_blank" rel="noreferrer">fontawesome.com/license/free</a>.</p>
     </div>
 
     <!-- With Thanks -->
@@ -102,7 +102,7 @@
     <p>Ogma would not exist without these people and projects. They are not legally required credits &mdash; they are genuine ones.</p>
 
     <div class="lic-shoutout">
-      <span class="lic-shoutout-icon">&#127922;</span>
+      <span class="lic-shoutout-icon"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i></span>
       <div class="lic-shoutout-body">
         <div class="lic-shoutout-title">fate-srd.com &mdash; Randy Oest (Amazing Rando Design)</div>
         <div class="lic-shoutout-desc">The canonical online reference for all Fate System Reference Documents. Randy hosts, maintains, and updates this resource as a labour of love &mdash; and won a Silver ENnie for it in 2014.</div>
@@ -110,7 +110,7 @@
     </div>
 
     <div class="lic-shoutout">
-      <span class="lic-shoutout-icon">&#127913;</span>
+      <span class="lic-shoutout-icon"><i class="fa-solid fa-hat-wizard" aria-hidden="true"></i></span>
       <div class="lic-shoutout-body">
         <div class="lic-shoutout-title">Evil Hat Productions</div>
         <div class="lic-shoutout-desc">The creators of Fate Condensed and the people who had the generosity to open-license the system under Creative Commons. Without that decision, none of this would exist. Buy their games. They make good ones.</div>
@@ -118,7 +118,7 @@
     </div>
 
     <div class="lic-shoutout">
-      <span class="lic-shoutout-icon">&#128214;</span>
+      <span class="lic-shoutout-icon"><i class="fa-solid fa-book" aria-hidden="true"></i></span>
       <div class="lic-shoutout-body">
         <div class="lic-shoutout-title">The Book of Hanz &mdash; Robert Hanz</div>
         <div class="lic-shoutout-desc">The clearest writing ever produced about how Fate actually works at the table. If you're new to Fate and want to understand why it plays the way it does, start here. Free to read, invaluable to understand.</div>
@@ -126,7 +126,7 @@
     </div>
 
     <div class="lic-shoutout">
-      <span class="lic-shoutout-icon">&#128009;</span>
+      <span class="lic-shoutout-icon"><i class="fa-solid fa-dragon" aria-hidden="true"></i></span>
       <div class="lic-shoutout-body">
         <div class="lic-shoutout-title">D&amp;D SRD 5.2.1 &mdash; Wizards of the Coast</div>
         <div class="lic-shoutout-desc">The dVenti Realm campaign world draws vocabulary and creature concepts from the D&amp;D 5e SRD. The SRD is released under CC BY 4.0, which means creators can build on it freely with attribution.</div>
@@ -134,9 +134,6 @@
     </div>
 
     <!-- Contributing -->
-    <h2>Icons</h2>
-    <p>Icons provided by <a href="https://fontawesome.com" target="_blank" rel="noreferrer">Font Awesome Free</a> (version 6), licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>. Font Awesome Free icons require attribution. See <a href="https://fontawesome.com/license/free" target="_blank" rel="noreferrer">fontawesome.com/license/free</a>.</p>
-
     <h2>Contributing</h2>
 
     <p>Ogma is an open project. Contributions, bug reports, and SRD accuracy corrections are welcome. All contributions are understood to be submitted under CC BY 3.0.</p>

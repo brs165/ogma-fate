@@ -41,9 +41,9 @@
 
 <div class="fp-tracker">
   <div class="fp-header">
-    <span class="fp-title">&#x25CE; Fate Tools</span>
+    <span class="fp-title"><i class="fa-solid fa-coins" aria-hidden="true"></i> Fate Tools</span>
     {#if fpTab === 'fp'}
-      <button class="btn btn-ghost" onclick={resetAll} title="Reset all to refresh" style="font-size:12px;padding:2px 8px;min-height:0">&#x21BA; Reset</button>
+      <button class="btn btn-ghost" onclick={resetAll} title="Reset all to refresh" style="font-size:12px;padding:2px 8px;min-height:0"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> Reset</button>
     {/if}
   </div>
 

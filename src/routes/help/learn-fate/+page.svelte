@@ -18,7 +18,7 @@
       <div class="step-body">
         <p>In Fate, you describe what your character does in the story, <strong>then</strong> choose the skill and action that fits. The fiction drives the rules, not the other way around. You don't say "I roll Athletics." You say "I leap over the counter and slide behind the bar" — and the GM says "that sounds like Athletics to overcome the obstacle."</p>
         <div class="callout callout-dnd" role="note"><div class="callout-title">⚔ Coming from D&amp;D</div><p>In D&D you pick a skill, then describe the action. In Fate it's reversed. Describe first, mechanics second.</p></div>
-        <div class="callout callout-info" role="note"><div class="callout-title">&#128077; You will get this wrong at first — and that's fine</div><p>Every table plays Fate wrong for a few sessions. You'll forget to invoke aspects. Players will attack instead of Create Advantage. The GM won't compel enough. None of this breaks the game. Fate is resilient. Play first, refine as you go. The rules only matter in the moments they make the story better.</p></div>
+        <div class="callout callout-info" role="note"><div class="callout-title"><i class="fa-solid fa-thumbs-up" aria-hidden="true"></i> You will get this wrong at first — and that's fine</div><p>Every table plays Fate wrong for a few sessions. You'll forget to invoke aspects. Players will attack instead of Create Advantage. The GM won't compel enough. None of this breaks the game. Fate is resilient. Play first, refine as you go. The rules only matter in the moments they make the story better.</p></div>
         <div class="callout callout-scenario" role="note">
           <div class="callout-title">Try it — describe first, then roll</div>
           <p>Say out loud what your character does. Then roll. Notice how the dice feel like they're answering the fiction, not replacing it.</p>
@@ -153,7 +153,7 @@
     </div>
 
     <div class="callout callout-info">
-      <div class="callout-title">&#128218; Go deeper</div>
+      <div class="callout-title"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Go deeper</div>
       <p>The community's #1 recommended resource for truly understanding Fate: <a href="https://bookofhanz.com/" target="_blank" rel="noreferrer"><strong>The Book of Hanz</strong></a> — Robert Hanz's essays on Fate philosophy. Free to read. Start with "Fate Doesn't Have a Damage System" and "Aspects Are the Most Important Thing."</p>
       <p>For the full mechanics reference, common errors, and GM prep guide: <a href="/help/fate-mechanics"><strong>Fate Mechanics deep-dive &rarr;</strong></a></p>
       <p>For a step-by-step worked conflict example: <a href="/help/at-the-table#conflict-walkthrough"><strong>At the Table — conflict walkthrough &rarr;</strong></a></p>

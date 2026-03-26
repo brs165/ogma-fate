@@ -10,45 +10,45 @@
     <p class="wiki-page-desc">Ogma is a <strong>local-first, offline-ready generator suite</strong> for Fate Condensed. This wiki covers every feature — from your first roll to session export.</p>
 
     <div class="callout callout-scenario">
-      <div class="callout-title">&#9654; Start here — pick your path</div>
-      <p><strong>&#127922; New to Fate Condensed?</strong>&nbsp; <a href="/help/learn-fate">Learn Fate in 7 steps</a> — fiction first, aspects, dice, fate points, stress, stunts, and your first scene. 15 minutes.</p>
+      <div class="callout-title"><i class="fa-solid fa-play" aria-hidden="true"></i> Start here — pick your path</div>
+      <p><strong><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> New to Fate Condensed?</strong>&nbsp; <a href="/help/learn-fate">Learn Fate in 7 steps</a> — fiction first, aspects, dice, fate points, stress, stunts, and your first scene. 15 minutes.</p>
       <p><strong>&#9876; Coming from D&amp;D?</strong>&nbsp; <a href="/help/dnd-transition">D&amp;D Transition guide</a> — every D&amp;D habit that breaks Fate, and what to do instead.</p>
       <p><strong>&#128640; Already know Fate, new to Ogma?</strong>&nbsp; <a href="/help/getting-started">Getting Started</a> — your first roll, pinning results, exporting, and offline use.</p>
     </div>
 
     <div class="gen-grid">
       <a href="/help/getting-started" class="gen-card">
-        <div class="gen-card-icon">&#128640;</div>
+        <div class="gen-card-icon"><i class="fa-solid fa-rocket" aria-hidden="true"></i></div>
         <div class="gen-card-name">Getting Started</div>
         <div class="gen-card-desc">Local-first data model, first roll, keyboard shortcuts, and data backup.</div>
       </a>
       <a href="/help/generators" class="gen-card">
-        <div class="gen-card-icon">&#127922;</div>
+        <div class="gen-card-icon"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i></div>
         <div class="gen-card-name">Generator Suite</div>
         <div class="gen-card-desc">All 16 generators across 8 campaign worlds. 128 combinations explained.</div>
       </a>
       <a href="/help/fate-mechanics" class="gen-card">
-        <div class="gen-card-icon">&#9855;</div>
+        <div class="gen-card-icon"><i class="fa-solid fa-wheelchair" aria-hidden="true"></i></div>
         <div class="gen-card-name">Fate Mechanics</div>
         <div class="gen-card-desc">Stress, Consequences, Aspects, Skills, Fate Points, Stunts.</div>
       </a>
       <a href="/help/at-the-table" class="gen-card">
-        <div class="gen-card-icon">&#127481;</div>
+        <div class="gen-card-icon"><i class="fa-solid fa-users" aria-hidden="true"></i></div>
         <div class="gen-card-name">At the Table</div>
         <div class="gen-card-desc">FP Tracker, Inspiration, Quick Prep Pack, Export.</div>
       </a>
       <a href="/help/export-share" class="gen-card">
-        <div class="gen-card-icon">&#128279;</div>
+        <div class="gen-card-icon"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i></div>
         <div class="gen-card-name">Export &amp; Share</div>
         <div class="gen-card-desc">Markdown, Ogma JSON, shareable links, batch export.</div>
       </a>
       <a href="/help/customise" class="gen-card">
-        <div class="gen-card-icon">&#9881;</div>
+        <div class="gen-card-icon"><i class="fa-solid fa-gear" aria-hidden="true"></i></div>
         <div class="gen-card-name">Customise</div>
         <div class="gen-card-desc">Result reference panel, Table Manager, Session Zero, theme, and more.</div>
       </a>
       <a href="/help/faq" class="gen-card">
-        <div class="gen-card-icon">&#10067;</div>
+        <div class="gen-card-icon"><i class="fa-solid fa-circle-question" aria-hidden="true"></i></div>
         <div class="gen-card-name">FAQ</div>
         <div class="gen-card-desc">Cache, offline use, data loss prevention, browser support.</div>
       </a>

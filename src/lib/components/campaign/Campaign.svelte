@@ -218,26 +218,26 @@
             onclick={() => toggleAcc('play')}
             aria-expanded={String(sbAcc === 'play')}
           >
-            <span aria-hidden="true" class="sb-acc-sec-ico">&#x25B6;</span>
+            <span aria-hidden="true" class="sb-acc-sec-ico"><i class="fa-solid fa-play"></i></span>
             <span class="sb-acc-sec-name">Play</span>
             <span aria-hidden="true" class="sb-acc-meta">{isOnline ? 'online' : 'offline'}</span>
-            <span aria-hidden="true" class="sb-acc-chev">&#x203A;</span>
+            <span aria-hidden="true" class="sb-acc-chev"><i class="fa-solid fa-chevron-right"></i></span>
           </button>
           {#if sbAcc === 'play'}
             <div class="sb-acc-body" role="group" aria-label="Play tools">
               <button class="sb-acc-item" class:active={canvasView} onclick={openCanvas} aria-pressed={String(canvasView)}>
-                <span aria-hidden="true" class="sidebar-item-icon">&#x25A6;</span>
+                <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-solid fa-table-cells"></i></span>
                 <span class="sidebar-item-label">Prep & Play</span>
                 {#if pinnedCards.length > 0}
                   <span class="sb-count-badge" aria-hidden="true">{pinnedCards.length}</span>
                 {/if}
               </button>
               <button class="sb-acc-item" onclick={() => { canvasView = true; showSidebar = false; }}>
-                <span aria-hidden="true" class="sidebar-item-icon">&#x2193;</span>
+                <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-solid fa-arrow-down"></i></span>
                 <span class="sidebar-item-label">Export Cards</span>
               </button>
               <button class="sb-acc-item" onclick={() => { showSidebar = false; }}>
-                <span aria-hidden="true" class="sidebar-item-icon">&#x1F4DD;</span>
+                <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-solid fa-pen-to-square"></i></span>
                 <span class="sidebar-item-label">Session Notes</span>
               </button>
             </div>
@@ -251,10 +251,10 @@
             onclick={() => toggleAcc('generate')}
             aria-expanded={String(sbAcc === 'generate')}
           >
-            <span aria-hidden="true" class="sb-acc-sec-ico">&#x1F3B2;</span>
+            <span aria-hidden="true" class="sb-acc-sec-ico"><i class="fa-solid fa-dice-d20"></i></span>
             <span class="sb-acc-sec-name">Generate</span>
             <span aria-hidden="true" class="sb-acc-meta">{gen ? gen.label.split(' ').slice(0, 2).join(' ') : ''}</span>
-            <span aria-hidden="true" class="sb-acc-chev">&#x203A;</span>
+            <span aria-hidden="true" class="sb-acc-chev"><i class="fa-solid fa-chevron-right"></i></span>
           </button>
           {#if sbAcc === 'generate'}
             <div class="sb-acc-body sb-acc-generate-body" role="group" aria-label="Generators">
@@ -285,9 +285,9 @@
             onclick={() => toggleAcc('settings')}
             aria-expanded={String(sbAcc === 'settings')}
           >
-            <span aria-hidden="true" class="sb-acc-sec-ico sb-acc-sec-ico-sm">&#x2699;</span>
+            <span aria-hidden="true" class="sb-acc-sec-ico sb-acc-sec-ico-sm"><i class="fa-solid fa-gear"></i></span>
             <span class="sb-acc-sec-name sb-acc-sec-name-muted">Settings</span>
-            <span aria-hidden="true" class="sb-acc-chev">&#x203A;</span>
+            <span aria-hidden="true" class="sb-acc-chev"><i class="fa-solid fa-chevron-right"></i></span>
           </button>
           {#if sbAcc === 'settings'}
             <div class="sb-acc-body" role="group" aria-label="Settings">
@@ -296,15 +296,15 @@
                 <span class="sidebar-item-label">{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
               </button>
               <a href="/help" class="sb-acc-item" style="text-decoration:none">
-                <span aria-hidden="true" class="sidebar-item-icon">&#x1F4D6;</span>
+                <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-solid fa-book-open"></i></span>
                 <span class="sidebar-item-label">Help &amp; Wiki</span>
               </a>
               <a href="/about" class="sb-acc-item" style="text-decoration:none">
-                <span aria-hidden="true" class="sidebar-item-icon">&#x2139;</span>
+                <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-solid fa-circle-info"></i></span>
                 <span class="sidebar-item-label">About</span>
               </a>
               <a href="/license" class="sb-acc-item" style="text-decoration:none">
-                <span aria-hidden="true" class="sidebar-item-icon">&#xa9;</span>
+                <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-regular fa-copyright"></i></span>
                 <span class="sidebar-item-label">License</span>
               </a>
             </div>
@@ -317,11 +317,11 @@
       <!-- Dock -->
       <div class="sb-dock" role="toolbar" aria-label="Site navigation and status">
         <a href="/help/learn-fate" class="sb-dock-btn" aria-label="Learn Fate">
-          <span aria-hidden="true" class="sb-dock-ico">&#x1F4D6;</span>
+          <span aria-hidden="true" class="sb-dock-ico"><i class="fa-solid fa-book-open"></i></span>
           <span class="sb-dock-lbl">Learn</span>
         </a>
         <a href="/" class="sb-dock-btn" aria-label="All Worlds">
-          <span aria-hidden="true" class="sb-dock-ico">&#x1F30D;</span>
+          <span aria-hidden="true" class="sb-dock-ico"><i class="fa-solid fa-earth-americas"></i></span>
           <span class="sb-dock-lbl">Worlds</span>
         </a>
         <div class="sb-dock-btn sb-dock-status" role="status" aria-live="polite" aria-label={isOnline ? 'Online' : 'Offline'} tabindex="-1">
@@ -361,7 +361,7 @@
                       {#if rolling}
                         <span class="dice-spinning"><span aria-hidden="true">&#x1F3B2;</span></span> Rolling&hellip;
                       {:else}
-                        <span aria-hidden="true">&#x1F3B2;</span> Roll {gen ? gen.label : ''}
+                        <span aria-hidden="true"><i class="fa-solid fa-dice-d20"></i></span> Roll {gen ? gen.label : ''}
                       {/if}
                     </span>
                   </button>
@@ -376,7 +376,7 @@
                         aria-label="Save to Table Prep{pinnedCards.length > 0 ? ' (' + pinnedCards.length + ' saved)' : ''}"
                         style="position:relative"
                       >
-                        &#x1F4CC;
+                        <i class="fa-solid fa-thumbtack" aria-hidden="true"></i>
                         {#if pinnedCards.length > 0}
                           <span aria-hidden="true" style="position:absolute;top:1px;right:1px;width:14px;height:14px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">
                             {pinnedCards.length > 9 ? '9+' : pinnedCards.length}
@@ -412,7 +412,7 @@
                   <div class={resultAnim ? 'result-card-appear' : ''}>
                     {#if result.isSeedPack && result.pack}
                       <div class="seed-pack-header">
-                        <span class="seed-pack-title">&#8853; Adventure Seed Pack</span>
+                        <span class="seed-pack-title"><i class="fa-solid fa-square-plus" aria-hidden="true"></i> Adventure Seed Pack</span>
                         <span class="seed-pack-count">{result.pack.length} cards</span>
                         <button class="btn btn-ghost seed-pack-pin-all"
                           onclick={() => { result.pack.forEach(item => { session.pinResultDirect({ genId: item.genId, data: item.data }); }); }}
@@ -437,7 +437,7 @@
                   </div>
                 {:else}
                   <div class="rhp-empty-state">
-                    <div class="rhp-ready-icon" aria-hidden="true">&#x1F3B2;</div>
+                    <div class="rhp-ready-icon" aria-hidden="true"><i class="fa-solid fa-dice-d20"></i></div>
                     <div class="rhp-ready-title">Ready to generate</div>
                     <div class="rhp-ready-sub">
                       Click <strong>Roll</strong> or press <strong>Space</strong>
@@ -472,7 +472,7 @@
                                 <li class="rhp-rule-row">
                                   <span class="rhp-rule-text">{rule}</span>
                                   {#if srdPath}
-                                    <a href="https://fate-srd.com{srdPath}" class="rhp-srd-link" target="_blank" rel="noreferrer noopener" aria-label="Read on the Fate SRD (opens in new tab)">SRD &#8599;</a>
+                                    <a href="https://fate-srd.com{srdPath}" class="rhp-srd-link" target="_blank" rel="noreferrer noopener" aria-label="Read on the Fate SRD (opens in new tab)">SRD <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:10px"></i></a>
                                   {/if}
                                 </li>
                               {/each}

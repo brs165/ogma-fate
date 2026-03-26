@@ -28,6 +28,14 @@
 
   let genEntry = $derived((GENERATORS || []).find(g => g.id === card.genId));
 
+  // WC-04: minimise/expand — double-click card to collapse to title strip
+  let minimised = $derived(card.minimised === true);
+
+  function toggleMinimise(e) {
+    e.stopPropagation();
+    if (onUpdate) onUpdate(card.id, { minimised: !minimised });
+  }
+
   function onKeyDown(e) {
     if (e.key === 'Delete' || e.key === 'Backspace') {
       e.preventDefault();
@@ -68,7 +76,7 @@
   <div class="bc-actions nodrag nopan">
     {#if card.genId !== 'custom'}
       <button class="bc-btn" title="Reroll" aria-label="Reroll"
-        onclick={(e) => { e.stopPropagation(); (() => onReroll && onReroll(card.id))(e); }}><i class="fa-solid fa-rotate-right" aria-hidden="true"></i></button>
+        onclick={(e) => { e.stopPropagation(); (() => onReroll && onReroll(card.id))(e); }}>↻</button>
     {/if}
     {#if onInvoke && card.genId !== 'sticky' && card.genId !== 'boost' && card.genId !== 'label'}
       <button class="bc-btn" title="Invoke aspect from this card (+2 next roll)" aria-label="Invoke aspect"
@@ -78,21 +86,30 @@
     <button class="bc-btn bc-btn-connect" class:connecting={isConnectSource}
       title="Draw connection line to another card"
       onclick={(e) => { e.stopPropagation(); if (onConnect) onConnect && onConnect(card.id); }}
-      aria-label="Connect this card to another"><i class="fa-solid fa-link" aria-hidden="true"></i></button>
+      aria-label="Connect this card to another">⤢</button>
     <button class="bc-btn" title="Pin to Table" aria-label="Pin to Table"
-      onclick={(e) => { e.stopPropagation(); (() => onSendToTable && onSendToTable(card))(e); }}><i class="fa-solid fa-cart-plus" aria-hidden="true"></i></button>
+      onclick={(e) => { e.stopPropagation(); (() => onSendToTable && onSendToTable(card))(e); }}>⊞</button>
     {#if mode === 'prep'}
       <button class="bc-btn" title="Move to Table" aria-label="Move to Table"
-        onclick={(e) => { e.stopPropagation(); (() => { if (onSendToTable) onSendToTable(card); if (onDelete) onDelete(card.id); })(e); }}><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
+        onclick={(e) => { e.stopPropagation(); (() => { if (onSendToTable) onSendToTable(card); if (onDelete) onDelete(card.id); })(e); }}>→</button>
     {/if}
+    <button class="bc-btn bc-btn-minimise" title="{minimised ? 'Expand card' : 'Minimise card'}" aria-label="{minimised ? 'Expand' : 'Minimise'}"
+      onclick={toggleMinimise}>{minimised ? '▼' : '▲'}</button>
     <button class="bc-btn" title="Delete" aria-label="Delete"
-      onclick={(e) => { e.stopPropagation(); (() => onDelete && onDelete(card.id))(e); }}><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+      onclick={(e) => { e.stopPropagation(); (() => onDelete && onDelete(card.id))(e); }}>✕</button>
   </div>
 
   <!-- Drag handle -->
 
-  <!-- Card content -->
-  <div class="bc-cv4-wrap nodrag nopan">
+  <!-- Minimised title strip (collapsed state) -->
+  {#if minimised}
+    <div class="bc-mini-strip" ondblclick={toggleMinimise} title="Double-click to expand">
+      <span class="bc-mini-icon" aria-hidden="true">{genEntry ? genEntry.icon : '◈'}</span>
+      <span class="bc-mini-title">{card.title || (genEntry ? genEntry.label : card.genId)}</span>
+    </div>
+  {:else}
+  <!-- Card content — double-click to minimise -->
+  <div class="bc-cv4-wrap nodrag nopan" ondblclick={toggleMinimise} title="Double-click to minimise">
     {#if card.data}
       <div class="bc-cv4-scaler">
         <Cv4Card
@@ -138,5 +155,6 @@
 
   {#if card.sourceCanvas === 'prep' && mode === 'prep'}
     <div class="bc-source-badge">PREP</div>
+  {/if}
   {/if}
 </div>

@@ -26,6 +26,7 @@
   import ExportPanel from './ExportPanel.svelte';
   import DicePanel from '../dice/DicePanel.svelte';
   import CanvasContextMenu from './CanvasContextMenu.svelte';
+  import GenerateFAB from './GenerateFAB.svelte';
   import FatePointTracker from '../campaign/FatePointTracker.svelte';
 
   // ── Props ──────────────────────────────────────────────────────────────────
@@ -79,6 +80,7 @@
   // Coach marks
   let coachCanvas = $state(false);
   let coachPlay = $state(false);
+  let coachEdge = $state(false);
 
   // Panel visibility
   let leftOpen = $state(typeof window !== 'undefined' ? window.innerWidth > 520 : true);
@@ -148,12 +150,14 @@
     get campId() { return campId; },
     get playCardIds() { return playCardIds; },
     get connectSourceId() { return connectSourceId; },
+    get cardSearch() { return cardSearch; },
     onDelete: (id) => canvas && canvas.deleteCard(id),
     onReroll: (id) => canvas && canvas.rerollCard(id),
     onUpdate: (id, patch) => canvas && canvas.updateCard(id, patch),
     onSendToTable: (card) => binder && binder.sendToTable(card),
     onOpen: (card) => { dossierCard = card; },
     onInvoke: (opts) => { pendingInvoke = opts; showDice = true; showToast('\u2726 Invoke queued \u2014 +2 on next roll'); },
+    onUpdateConnector: (id, patch) => canvas && canvas.updateConnector && canvas.updateConnector(id, patch),
   });
 
   function initStores() {
@@ -518,6 +522,11 @@
   <!-- ── Body: left panel + canvas column ──────────────────────────────────── -->
   <div class="board-body">
 
+    <!-- Mobile drawer backdrop — tap to close left panel -->
+    {#if leftOpen}
+      <div class="blp-backdrop" onclick={() => { leftOpen = false; }} aria-hidden="true"></div>
+    {/if}
+
     <!-- Left panel: generators / stunts / help + play panel -->
     <div class="blp-wrap" class:blp-hidden={!leftOpen}>
       <LeftPanel
@@ -677,6 +686,18 @@
             on:edgedelete={(e) => {
               if (canvas && e.detail && e.detail.edges) e.detail.edges.forEach(edge => canvas.removeConnector(edge.id));
             }}
+            on:edgeclick={(e) => {
+              if (!canvas || !e.detail?.edge) return;
+              if (!coachEdge) {
+                coachEdge = true;
+                showToast('\u21D4 Click edge to cycle relationship label');
+              }
+              const edge = e.detail.edge;
+              const LABELS = ['', 'Knows', 'Opposes', 'Ally', 'Fears', 'Owes', 'Loves', 'Rival', 'Commands', 'Seeks'];
+              const current = edge.data?.label || '';
+              const next = LABELS[(LABELS.indexOf(current) + 1) % LABELS.length];
+              canvas.updateConnector(edge.id, { label: next });
+            }}
           >
             <Background variant={BackgroundVariant.Dots} gap={24} size={1} />
             <Controls />
@@ -721,6 +742,12 @@
     </div>
   </div>
 
+  <!-- Mobile generate FAB — hidden on desktop, visible on mobile -->
+  <GenerateFAB
+    {activeGen}
+    onGenerate={(genId) => { if (canvas) canvas.generateCard(genId); }}
+  />
+
   <!-- Binder right panel (Prep mode only) -->
   {#if mode === 'prep' && binderOpenVal}
     <div class="bbp-wrap">
@@ -743,7 +770,7 @@
   {#if showDice}
     <div class="board-floater board-dice-floater" onclick={(e) => e.stopPropagation()}>
       <div class="board-floater-hdr">
-        <span class="board-floater-title">&#x1F3B2; Dice</span>
+        <span class="board-floater-title"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> Dice</span>
         <button class="board-floater-close" onclick={() => { showDice = false; }} aria-label="Close dice roller">&times;</button>
       </div>
       <DicePanel
@@ -769,7 +796,7 @@
   {#if showFP}
     <div class="board-floater board-fp-floater" onclick={(e) => e.stopPropagation()}>
       <div class="board-floater-hdr">
-        <span class="board-floater-title">&#x25CE; Fate Points</span>
+        <span class="board-floater-title"><i class="fa-solid fa-coins" aria-hidden="true"></i> Fate Points</span>
         <button class="board-floater-close" onclick={() => { showFP = false; }} aria-label="Close Fate Point tracker">&times;</button>
       </div>
       {#if fpState}
@@ -785,7 +812,7 @@
   {#if showNotes}
     <div class="board-floater board-notes-floater" onclick={(e) => e.stopPropagation()}>
       <div class="board-floater-hdr">
-        <span class="board-floater-title">&#x1F4DD; Session Notes</span>
+        <span class="board-floater-title"><i class="fa-solid fa-note-sticky" aria-hidden="true"></i> Session Notes</span>
         <button class="board-floater-close" onclick={() => { showNotes = false; }} aria-label="Close session notes">&times;</button>
       </div>
       <div style="padding:12px;color:var(--text-muted);font-size:13px">
@@ -866,7 +893,7 @@
       <div class="modal-box modal-box-narrow" onclick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Clear table options">
         <div class="modal-header">
           <span class="modal-title">Clear Table</span>
-          <button class="btn btn-ghost btn-icon" onclick={() => showClearModal = false} aria-label="Close">&#10005;</button>
+          <button class="btn btn-ghost btn-icon" onclick={() => showClearModal = false} aria-label="Close"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
         </div>
         <div class="modal-body">
           <p class="rhp-ready-sub">Choose what to clear. This cannot be undone.</p>

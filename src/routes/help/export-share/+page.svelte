@@ -26,7 +26,7 @@
 <p>The URL format is: <code>/campaigns/[world]?gen=[generator]&amp;seed=[hex-seed]</code></p>
 
 <div class="callout callout-scenario">
-  <div class="callout-title">&#127914; Scenario: Sharing prep with your co-GM</div>
+  <div class="callout-title"><i class="fa-solid fa-gamepad" aria-hidden="true"></i> Scenario: Sharing prep with your co-GM</div>
   <p>You rolled a fantastic Major NPC in your solo prep session. Press <kbd>L</kbd> — the URL updates and goes to your clipboard. Paste it into your Discord prep channel. Your co-GM opens the link and sees the exact same NPC, right down to the stunt descriptions. No export file, no attachment, no formatting work.</p>
 </div>
 

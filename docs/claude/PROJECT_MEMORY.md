@@ -1,7 +1,6 @@
-# Project Memory — Ogma SvelteKit
-
-Persistent context for model-switching and session handoffs.
-Last updated: March 2026 (post Svelte 5 migration + SvelteFlow integration).
+# Project Memory — Ogma
+_Persistent context for model-switching and session handoffs._
+_Last updated: 2026.03.600_
 
 ---
 
@@ -9,63 +8,68 @@ Last updated: March 2026 (post Svelte 5 migration + SvelteFlow integration).
 
 | Layer | Technology |
 |-------|-----------|
-| Framework | SvelteKit + Svelte 5.51.0 (runes mode — `$state`, `$derived`, `$props`, `$effect`) |
+| Framework | SvelteKit + Svelte 5.51.0 (full runes mode) |
 | Build | Vite 7, `@sveltejs/adapter-static`, `npx vite build` |
-| Canvas | `@xyflow/svelte` (Svelte Flow) — pan/zoom/connect/minimap |
-| UI Primitives | `bits-ui@2.16.3` — headless accessible components |
-| State | Svelte stores (`writable`, `derived`) in plain JS + `$state` in components |
+| Canvas | `@xyflow/svelte` — pan/zoom/connect/minimap/node types |
+| UI Primitives | `bits-ui@2.16.3` — Dialog, Accordion, DropdownMenu, ToggleGroup, Tooltip, AlertDialog, Collapsible, Select, Popover |
+| Icons | Font Awesome 7.2 Free via jsDelivr CDN (cached by SW for offline) |
+| Card Design | FateX-inspired fate-sheet tokens (`--fs-*`) — off-white `#F5F0E8` body, campaign-tinted headers |
+| State | Svelte `writable`/`derived` stores in plain JS + `$state` in components |
 | Persistence | Dexie 4 (IndexedDB) |
-| Sync | WebSocket multiplayer via PartySocket |
-| Styling | Global `static/assets/css/theme.css` — no `<style>` blocks |
-| PWA | `static/sw.js` service worker + `static/manifest.json` |
+| Sync | WebSocket multiplayer via PartySocket (`syncStore.js`) |
+| Styling | Global `static/assets/css/theme.css` — no `<style>` blocks in components |
+| PWA | `static/sw.js` + `static/manifest.json` |
 | Deploy | Cloudflare Pages (auto-deploy from `main`), `static/_redirects` for SPA routing |
+| Offline | `build/` directory with `start.sh/.bat/.command` launcher scripts + README.txt |
 
 ---
 
-## File paths
+## Key file paths
 
 ```
-src/lib/engine.js           Pure-function content generator (no Svelte imports)
-src/lib/db.js               Dexie 4 IndexedDB wrapper (no Svelte imports)
-src/lib/helpers.js          Shared utility functions
-src/lib/stores/             6 Svelte stores (canvas, play, binder, sync, session, chrome)
-src/lib/components/         51+ .svelte components across 7 directories
-src/lib/components/board/nodes/   4 SvelteFlow custom node components
-src/data/                   11 campaign data modules (ES exports)
-src/routes/                 SvelteKit route pages
-src/routes/+layout.js       export const ssr = false; export const prerender = false;
-static/assets/css/theme.css Global stylesheet — ALL styling lives here
-static/sw.js                Service worker — cache name updated by bump-version.sh
-static/_redirects           Cloudflare Pages SPA routing: /* /index.html 200
-scripts/bump-version.sh     Version bump script — run before every zip delivery
+src/lib/engine.js                    Pure-function content generator (no Svelte imports)
+src/lib/db.js                        Dexie 4 IndexedDB wrapper (no Svelte imports)
+src/lib/helpers.js                   Shared utility functions
+src/lib/stores/canvasStore.js        Canvas: card CRUD, generate, connectors, undo, SvelteFlow derived stores
+src/lib/stores/playStore.js          Play mode: players, turn order, FP, stress, GM pool
+src/lib/stores/binderStore.js        Binder: saved cards, tray, pin/unpin
+src/lib/stores/syncStore.js          WebSocket: connect/disconnect, room code, role
+src/lib/stores/sessionStore.js       Session: active generator, result history, prefs
+src/lib/stores/chromeStore.js        Chrome: toast queue, theme, SW update
+src/lib/components/board/Board.svelte         Main app shell
+src/lib/components/board/nodes/              4 SvelteFlow node components
+src/lib/components/board/nodeTypes.js        SvelteFlow node registry (module-level)
+src/data/                            8 campaign data files + shared + universal + index
+src/routes/+layout.js                ssr=false, prerender=false
+static/assets/css/theme.css          ALL styling — never add <style> to components
+static/sw.js                         Service worker — cache name bumped by bump-version.sh
+static/_redirects                    /* /index.html 200
+scripts/bump-version.sh              Run before every zip delivery
+docs/claude/BOOTSTRAP.md             Session startup checklist
+docs/claude/CANVAS-WORKSHOP.md       Canvas sprint status and backlog
 ```
 
 ---
 
-## Svelte 5 runes rules (CRITICAL)
+## Svelte 5 runes rules (CRITICAL — applies to all 81 components)
 
-All 51 components are on Svelte 5 runes. These rules apply everywhere:
-
-- `let x = $state(value)` — ALL mutable local state (never plain `let` for mutated vars)
-- `let x = $derived(expr)` — computed values (reactive, no `$state` needed)
-- `let { prop = default } = $props()` — component props (never `export let`)
-- `$effect(() => { ... })` — side effects (replaces `$: { ... }`)
-- `onclick={}` not `on:click={}` — Svelte 5 event syntax
-- `{@render children?.()}` not `<slot />` — snippet rendering
-- **NO `$state()` inside function bodies** — only at component top level
-- **NO `<svelte:options runes={false} />`** — zero legacy components remain
+- `let x = $state(value)` — ALL mutable local state. Never plain `let` for reassigned vars.
+- `let x = $derived(expr)` — computed values. Expression only, never a wrapping function.
+- `let { prop = default } = $props()` — component props. Never `export let`.
+- `$effect(() => { ... })` — side effects. Replaces `$: { ... }`.
+- `onclick={}` not `on:click={}` — Svelte 5 event syntax throughout.
+- `{@render children?.()}` not `<slot />` — snippet rendering.
+- **`$state()` only at component top level** — never inside function bodies.
+- **Zero `runes={false}` files** — all components are on runes mode.
 
 ---
 
 ## SvelteFlow canvas architecture
 
-Cards are stored in IDB as `{ id, genId, title, summary, data, x, y, z, ts, gmOnly }`.
-SvelteFlow receives them as derived stores:
-
 ```
 canvasStore.cards (writable)
-  → canvasStore.nodes (derived) — maps x/y → position, passes full card as data
-  → canvasStore.edges (derived) — from canvasStore.connectors
+  → canvasStore.nodes (derived) — maps x/y → position, card as data, edge labels
+  → canvasStore.edges (derived) — from canvasStore.connectors (with label field)
 
 Board.svelte:
   flowNodes = writable([])   ← MUST be writable store, NOT $state([])
@@ -74,77 +78,136 @@ Board.svelte:
   canvas.edges.subscribe(v => flowEdges.set(v))
 ```
 
-**Critical:** SvelteFlow subscribes to `nodes`/`edges` internally. They MUST be Svelte
-writable stores. `$state([])` does not work — SvelteFlow won't react to updates.
+**Critical rules for card components:**
+- No `style="left:Xpx; top:Ypx"` — SvelteFlow positions nodes
+- No `onmousedown` drag handlers — SvelteFlow handles dragging
+- No `position:absolute` — SvelteFlow handles layout
+- `nodrag nopan` class on interactive zones (buttons, inputs) inside nodes
 
-Node components live in `src/lib/components/board/nodes/`:
-- `CardNode.svelte` — all generator cards (21 genIds map to this)
-- `StickyNode.svelte` — free-text aspect stickies
-- `BoostNode.svelte` — boost cards with invoke counter
-- `LabelNode.svelte` — section labels
-
-Node type registry: `src/lib/components/board/nodeTypes.js`
-**Must be module-level stable object — never inside a component or reactive block.**
-
-Card components (BoardCard, BoardSticky, BoardBoost) MUST NOT have:
-- `style="left:{x}px; top:{y}px"` — SvelteFlow positions nodes, not the card
-- `onmousedown` drag handlers — SvelteFlow handles dragging
-- `position:absolute` in CSS — SvelteFlow node containers handle layout
+**ogma_canvas context** (set in Board.svelte, read by node components):
+```js
+{ mode, campId, playCardIds, connectSourceId, cardSearch,
+  onDelete, onReroll, onUpdate, onSendToTable, onOpen, onInvoke, onUpdateConnector }
+```
 
 ---
 
-## Store inventory
+## Component inventory (82 .svelte files)
 
-| Store | File | Purpose |
-|-------|------|---------|
-| Canvas | `canvasStore.js` | Card CRUD, generate, connectors, IDB persist, SF derived stores |
-| Play | `playStore.js` | Players, turn order, rounds, fate points, stress, GM pool |
-| Binder | `binderStore.js` | Saved cards, tray, pin/unpin, send to canvas |
-| Sync | `syncStore.js` | WebSocket connect/disconnect, room code, role |
-| Session | `sessionStore.js` | Active generator, result history, chain rolls, prefs |
-| Chrome | `chromeStore.js` | Toast queue, theme toggle, SW update, PWA lifecycle |
+```
+src/lib/components/
+├── cards/           6    CvLabel, CvTag, StressRow, ClockTrack, Cv4Card, BackPanel
+│   └── fronts/     18    NpcMinor, NpcMajor, Scene, Campaign, Encounter, Seed,
+│                         Compel, Challenge, Contest, Consequence, Faction,
+│                         Complication, Backstory, Obstacle, Countdown, Constraint,
+│                         Custom, Pc
+├── board/          20    Board, BoardCard, BoardLabel, BoardSticky, BoardBoost,
+│                         TurnBar, PlayerRow, CombatTracker, PlayPanel, BinderPanel,
+│                         DossierModal, Topbar, ExportMenu, ExportPanel, HelpPanel,
+│                         StuntPanel, MobileList, CommandPalette,
+│                         CanvasContextMenu, GenerateFAB
+│   └── nodes/       4    CardNode, StickyNode, BoostNode, LabelNode
+├── campaign/        3    Campaign, FatePointTracker, Landing
+├── panels/          1    LeftPanel
+├── dice/            1    DicePanel
+├── player/          1    PlayerSurface
+└── shared/          2    HelpDiceRoller, Footer
 
----
-
-## Component inventory (54 files)
-
-| Directory | Count | Key components |
-|-----------|-------|---------------|
-| `cards/` | 6 | CvLabel, CvTag, StressRow, ClockTrack, Cv4Card, BackPanel |
-| `cards/fronts/` | 18 | NpcMinor…Custom, Pc |
-| `board/` | 18 | Board, BoardCard, BoardSticky, BoardBoost, BoardLabel + 13 others |
-| `board/nodes/` | 4 | CardNode, StickyNode, BoostNode, LabelNode (SvelteFlow nodes) |
-| `campaign/` | 3 | Campaign, FatePointTracker, Landing |
-| `panels/` | 1 | LeftPanel |
-| `dice/` | 1 | DicePanel |
-| `player/` | 1 | PlayerSurface |
-| `shared/` | 2 | HelpDiceRoller, Footer |
+src/routes/                26 route page/layout files
+```
 
 ---
 
-## Known issues / backlog
+## Campaign worlds (8)
 
-### 🔴 Critical (fix immediately)
-- **BL-SF-01:** Cards double-displaced — BoardCard/Sticky/Boost still have `left/top` style + `position:absolute`. Remove and let SvelteFlow position them.
-- **BL-SF-02:** Drag conflict — BoardCard/Sticky still have `onmousedown` drag handlers fighting SvelteFlow.
-- **BL-SF-03:** MiniMap unstyled — no `nodeColor` function, all nodes appear grey.
+| Key | Name |
+|-----|------|
+| `fantasy` | Shattered Kingdoms |
+| `cyberpunk` | Neon Abyss |
+| `postapoc` | The Long After |
+| `space` | Void Runners |
+| `victorian` | Gaslight Chronicles |
+| `western` | Dust and Iron |
+| `thelongafter` | The Long Road |
+| `dVentiRealm` | dVenti Realm |
 
-### 🟡 Important
-- **BL-SF-04:** Context menu screen coords — uses `screenX/Y` (viewport), should use canvas coords.
-- **BL-SF-05:** No `on:nodeclick` z-index — clicked cards don't come to front.
-- **BL-SF-06:** Multi-select toolbar — wire `on:selectionchange` for batch delete/send to table.
-- **BL-01:** localStorage schema — structured prefs object.
-- **BL-03:** Victorian adjective pass — content quality.
-- **BL-07:** GM Tips depth — richer help content.
+---
 
-### 🟢 Improvements
-- **BL-SF-07:** Edge labels — relationship types (Knows/Opposes/Ally).
-- **BL-SF-08:** Snap-to-grid toggle — `snapToGrid snapGrid={[20,20]}`.
-- **BL-SF-09:** NodeResizer on major cards.
-- **BL-05:** Stunt UI improvements.
-- **BL-06:** Shareable links.
-- **BL-08:** Western world expansion.
-- **BL-16:** Ogma rebrand.
+## What's complete
+
+**Svelte 5 migration** — all 82 components on runes, zero legacy files.
+
+**SvelteFlow canvas** — pan/zoom/connect/minimap, 4 node types, modal dossier,
+edge labels (click to cycle: Knows/Opposes/Ally/Fears/Owes/Loves/Rival/Commands/Seeks),
+card minimise/expand (double-click or ▲ button), search dim (non-matching nodes fade),
+connect mode visual, NPC acted state, clock trigger ring, card entrance animation,
+empty canvas hint, fitView on load.
+
+**Play mode** — Players | Generate tabs, exchange tracker (XCHG), stress colour coding
+(amber=physical, purple=mental), FP coin-flip animation, compel offer modal (+1 FP),
+GM pool urgency pulse, AlertDialog confirms, NPC acted state on canvas.
+
+**FateX-style card restyling (v600)** — all 18 card fronts + Cv4Card shell + StressRow +
+ClockTrack rewritten with `--fs-*` fate-sheet design tokens. Off-white `#F5F0E8` card body
+(WCAG AAA), campaign-tinted gradient headers for all 8 worlds, FA icons in headers,
+FateX five-aspect layout on character cards (NpcMajor/NpcMinor/Pc), skill ladder with
+`+N` badges, stress tracks (physical blue/mental purple), consequence write-in slots,
+stunt blocks. Non-character cards adopt same visual tokens with their own data layouts.
+All interactive elements preserved (stress toggles, contest scoring, countdown clock,
+consequence treated checkbox, custom card inline editing).
+
+**Font Awesome 7.2 Free (v593)** — loaded via jsDelivr CDN, cached by service worker
+for offline. ~200 emoji→FA replacements across ~45 files. Zero emoji HTML entities
+remain in any .svelte file. All icons use `aria-hidden="true"`.
+
+**Legal compliance (v586)** — Fate Condensed attribution corrected to fate-srd.com
+canonical text (Lara Turner, correct author list). D&D SRD 5.2.1 exact required
+attribution text. All HTTP→HTTPS. Shared Footer.svelte on all 6 page layouts with
+Help/About/License links. FA 7.2 Free attribution with tri-license (CC BY 4.0 / OFL 1.1 / MIT).
+
+**Mobile UX (iPhone 13 target)** — 12 fixes: iOS zoom fix on inputs, GenerateFAB for
+canvas generation (right-click unavailable on iOS), 44px touch targets throughout
+(topbar icons, turn pills, FP buttons, stress boxes, scene controls), drawer backdrop,
+topbar overflow `···` menu, floater safe-area-inset-bottom, scene controls always visible
+(extracted from horizontal scroll strip), topbar safe-area-inset-top for PWA.
+
+**Offline distribution** — `build/` directory with launcher scripts (`start.sh`,
+`start.bat`, `start.command`), README.txt, service worker precaching all assets + FA CDN.
+Distributed as `ogma-offline-YYYY-MM-NNN.zip`.
+
+**Repo cleanup** — `react-source/` deleted, stale docs removed, adapters pruned.
+
+---
+
+## Active backlog (next priorities)
+
+### Tier 1 — Polish card restyling
+- BackPanel (GM guidance back-face) audit — may still use old `--cv-card-*` tokens
+- Canvas integration check — verify fs-card appearance inside SvelteFlow nodes at various zoom levels
+- Export formats (Markdown/print/PDF) — may need updated formatting to match new card layout
+- CvLabel and CvTag components — now orphaned (no remaining imports), candidates for deletion
+- **BL-03** Victorian adjective pass [S] — weakest world voice
+
+### Tier 2 — Features & content
+- **BL-01** localStorage schema [S] — structured prefs (needed for BL-09, BL-10)
+- **BL-02** Stunt data implementation [M] — spec in `docs/stunt-data-spec.md`
+- **BL-07** GM Tips depth [M]
+- **BL-08** Western world content depth [M] — more tables
+- **BL-15** Mobile nav overhaul spike [M]
+- **WC-02** Node groups — scene spatial grouping on canvas [M]
+- **WC-05** Canvas templates — starter scene layouts [M]
+- **WC-07** Player-facing gmOnly card toggle [S]
+- **WC-08** Consequence stickies auto-placed from player tracker [M]
+- **PREP-06** Undo covers card moves (currently delete+reroll only) [M]
+- **PREP-08** Ctrl+A select all nodes [S]
+
+### Tier 3 — Parked
+- **BL-06** Shareable links [M]
+- **BL-09** PWA install nudge [S, needs BL-01]
+- **BL-10** Milestone tracker panel tab [M, needs BL-01]
+- **BL-16** Ogma rebrand [M, needs GitHub username confirmation]
+- **BL-25** Spike — FateX Sheet Setup / Edit mode concepts for canvas, Session Zero, and Character Creation [M]
+- Session Zero Tool — design agreed, not built
 
 ---
 
@@ -152,14 +215,13 @@ Card components (BoardCard, BoardSticky, BoardBoost) MUST NOT have:
 
 - **URL:** ogma.net
 - **Platform:** Cloudflare Pages — auto-deploys from `main` branch
+- **Repo:** github.com/brs165/ogma-fate
 - **Build command:** `npm run build` (runs `bash scripts/bump-version.sh && npx vite build`)
 - **Build output:** `build/`
 - **SPA routing:** `static/_redirects` → `/* /index.html 200`
-- **Service worker:** `static/sw.js` — cache name bumped by `scripts/bump-version.sh`
-- **GitHub Pages:** DISABLED (deploy.yml.disabled)
-
-## Version format: `YYYY.MM.NNN` (e.g. `2026.03.575`)
-## Zip naming: `YYYY.MM.NNN.zip` (e.g. `2026.03.576.zip`)
+- **Version format:** `YYYY.MM.NNN` (e.g. `2026.03.600`)
+- **Zip naming:** source = `YYYY-MM-NNN.zip`, offline = `ogma-offline-YYYY-MM-NNN.zip`
+- **Current version:** `2026.03.600`
 
 ---
 
@@ -167,18 +229,18 @@ Card components (BoardCard, BoardSticky, BoardBoost) MUST NOT have:
 
 ```bash
 # 1. Orient
-pwd && git branch && git log --oneline -3
+pwd && git branch && git log --oneline -5
 
-# 2. Health check
-npm run build 2>&1 | tail -5
+# 2. Build health check
+npm run build 2>&1 | tail -5   # Must print "✔ done"
 
-# 3. Read live files
-# Always fetch from GitHub before editing:
+# 3. Fetch live files before editing (always)
 # https://raw.githubusercontent.com/brs165/ogma-fate/main/static/assets/css/theme.css
 # https://raw.githubusercontent.com/brs165/ogma-fate/main/src/lib/engine.js
-# Add others as needed per task
+# Add others per task
 
-# 4. QA gate (must pass before any zip delivery)
+# 4. QA gate before every zip delivery
 node scripts/qa-hard.mjs
 node scripts/qa-export.mjs
+npm run build
 ```

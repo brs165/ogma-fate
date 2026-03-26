@@ -2,6 +2,69 @@
 
 ---
 
+## [2026.03.600] — March 2026 — FateX Card Restyling (Option A)
+
+### Card design overhaul — all 18 types
+- `Cv4Card.svelte` rewritten: off-white `#F5F0E8` body (WCAG AAA), campaign-tinted gradient headers, FA icons, clean shadow, restyled flip button
+- 80+ lines of `--fs-*` fate-sheet design tokens added to theme.css
+- `.fs-*` structural CSS classes: section headers, aspect labels, skill badges, stress boxes, consequence slots, stunt blocks
+- Per-campaign header gradients for all 8 worlds
+- **Character cards** (NpcMajor, NpcMinor, Pc): FateX five-aspect layout, skill ladder with `+N` badges and ladder labels, physical/mental stress tracks, consequence write-in slots
+- **All other cards** (Scene, Encounter, Seed, Campaign, Compel, Challenge, Contest, Consequence, Faction, Complication, Backstory, Obstacle, Countdown, Constraint, Custom): same visual tokens, own data layouts
+- `StressRow.svelte` rewritten with `fs-*` classes — all interactive toggles preserved
+- `ClockTrack.svelte` updated to `fs-*` tokens
+- Scene category tags: translucent pills → solid-fill badges with white text
+- Free Invoke: small green "FI" text → solid green "FREE INVOKE" badge
+- All interactive elements verified: stress toggles, contest +1/reset, countdown clock, consequence treated checkbox, custom card inline editing
+
+---
+
+## [2026.03.593] — March 2026 — Font Awesome 7.2 Free Migration Complete
+
+### FA icon migration
+- ~200 emoji→FA replacements across ~45 files
+- Zero emoji HTML entities remaining in any .svelte file
+- Every icon uses `<i class="fa-solid fa-name" aria-hidden="true"></i>` pattern
+- Help sidebar: 12 nav icons replaced (house, hand, rocket, dice-d20, book-open, etc.)
+- All topbars (marketing, help, board): Help link, theme toggle
+- Board components: Topbar toolbar (9 icons), Board floaters (4), MobileList sections (4)
+- Campaign.svelte: sidebar icons (17), roll buttons, thumbtack, seed pack
+- Landing.svelte: hero pills, CTAs, onboarding steps (13 icons)
+- All 13 help content pages: callout icons, gen-card icons
+- License page shoutout icons (dice-d20, hat-wizard, book, dragon)
+- Character-creation, sessionzero, guide, learn, about pages
+- PlayerSurface, CommandPalette, BackPanel, FatePointTracker
+
+### Backlog
+- **BL-25** logged: FateX Sheet Setup/Edit mode concepts spike
+
+---
+
+## [2026.03.586] — March 2026 — Legal Compliance + FA 7.2 + Footer
+
+### Legal compliance
+- Fate Condensed attribution corrected: Lara Turner (was "Ed Turner"), author list matches fate-srd.com canonical text (removed Leonard Balsera, Ryan Macklin — Fate Core authors, not FCon)
+- D&D SRD 5.2.1: exact required attribution block with dndbeyond.com/srd link and Section 5 disclaimer of warranties
+- All `http://www.faterpg.com` → `https://www.faterpg.com` with live links
+- Removed stale "Fate Core font used with permission" claim (font not loaded)
+- FA attribution updated: "version 6 / system emoji" → FA Free 7.2 with tri-license (CC BY 4.0 / OFL 1.1 / MIT)
+
+### Font Awesome 7.2 Free
+- CDN link added to `app.html` via jsDelivr
+- Service worker updated to precache FA CSS + woff2 webfonts for offline
+- Orphan `.fa-cart-plus` CSS rule removed from theme.css
+
+### Shared Footer
+- `Footer.svelte` component created with Help/About/License links
+- Wired into 6 layouts: Landing, marketing, help, campaign guide, session zero, character creation
+- Replaced 6 inline footer blocks with single shared component
+
+### About page
+- 16→17 generators, 128→136 combinations, 97→187 QA checks
+- "GitHub Pages" → "Cloudflare Pages"
+
+---
+
 ## [2026.03.579] — March 2026 — Bits UI Sprint + Repo Cleanup
 
 ### Bits UI components adopted

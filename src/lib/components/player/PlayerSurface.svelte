@@ -103,7 +103,7 @@
     <!-- Compel banner -->
     {#if compelOffer && myPlayer && compelOffer.playerId === myPlayer.id}
       <div class="ps-compel-banner" role="alert">
-        <div class="ps-compel-icon">&#x21A9;</div>
+        <div class="ps-compel-icon"><i class="fa-solid fa-rotate-left"></i></div>
         <div class="ps-compel-text">
           <strong>Compel:</strong> {compelOffer.aspect}
         </div>
@@ -130,13 +130,13 @@
     <!-- Quick actions -->
     <div class="ps-actions">
       <button class="ps-action-btn" onclick={() => rollFateDice('Roll', 0)} disabled={diceRolling}>
-        &#x1F3B2; Roll Fate Dice
+        <i class="fa-solid fa-dice-d20" aria-hidden="true"></i> Roll Fate Dice
       </button>
       <button class="ps-action-btn" onclick={createAspect}>
-        &#x2726; Create Aspect
+        <i class="fa-solid fa-diamond" aria-hidden="true"></i> Create Aspect
       </button>
       <button class="ps-action-btn" onclick={() => { showSheet = !showSheet; }}>
-        &#x1F4CB; {showSheet ? 'Hide Sheet' : 'Character Sheet'}
+        <i class="fa-solid fa-clipboard" aria-hidden="true"></i> {showSheet ? 'Hide Sheet' : 'Character Sheet'}
       </button>
     </div>
 

@@ -11,10 +11,12 @@ for GMs. Built with SvelteKit + Svelte 5 + SvelteFlow. Deployed at ogma.net via 
 - **Build:** Vite 7, `@sveltejs/adapter-static`, `npx vite build`
 - **Canvas:** `@xyflow/svelte` — SvelteFlow for the Prep & Play board
 - **UI:** `bits-ui@2.16.3` — headless accessible primitives
+- **Icons:** Font Awesome 7.2 Free via jsDelivr CDN (cached by SW for offline)
 - **State:** Svelte stores (`writable`, `derived`) in plain JS + `$state` in components
 - **Persistence:** Dexie 4 (IndexedDB)
 - **Sync:** WebSocket multiplayer via PartySocket
 - **Styling:** `static/assets/css/theme.css` — ALL styling here, no `<style>` blocks
+- **Card design:** FateX-inspired fate-sheet tokens (`--fs-*`) — off-white body, campaign-tinted headers
 - **PWA:** `static/sw.js` + `static/manifest.json`
 - **Deploy:** Cloudflare Pages, auto-deploy from `main`, `static/_redirects` for SPA routing
 
@@ -38,20 +40,20 @@ for GMs. Built with SvelteKit + Svelte 5 + SvelteFlow. Deployed at ogma.net via 
 | `docs/claude/BOOTSTRAP.md` | Session startup checklist |
 | `docs/claude/PROJECT_MEMORY.md` | Full project state, known issues, backlog |
 
-## Component inventory (54 .svelte files)
+## Component inventory (82 .svelte files)
 
 | Directory | Count | Contents |
 |-----------|-------|---------|
 | `cards/` | 6 | CvLabel, CvTag, StressRow, ClockTrack, Cv4Card, BackPanel |
-| `cards/fronts/` | 18 | 18 generator card fronts |
-| `board/` | 18 | Board, BoardCard, BoardSticky, BoardBoost, BoardLabel + 13 others |
+| `cards/fronts/` | 18 | 18 generator card fronts (all use `fs-*` fate-sheet tokens) |
+| `board/` | 20 | Board, BoardCard, BoardSticky, BoardBoost, BoardLabel, Topbar, TurnBar, PlayerRow, CombatTracker, PlayPanel, BinderPanel, DossierModal, ExportMenu, ExportPanel, HelpPanel, StuntPanel, MobileList, CommandPalette, CanvasContextMenu, GenerateFAB |
 | `board/nodes/` | 4 | CardNode, StickyNode, BoostNode, LabelNode |
 | `campaign/` | 3 | Campaign, FatePointTracker, Landing |
 | `panels/` | 1 | LeftPanel |
 | `dice/` | 1 | DicePanel |
 | `player/` | 1 | PlayerSurface |
 | `shared/` | 2 | HelpDiceRoller, Footer |
-| `routes/` | 3+ | +layout, +page, campaigns/[world]/+page, etc. |
+| `routes/` | 26 | Layouts + pages (marketing, help, campaigns) |
 
 ## Architecture rules
 

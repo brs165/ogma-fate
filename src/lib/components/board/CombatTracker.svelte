@@ -11,7 +11,7 @@
         <th>PHY</th>
         <th>MEN</th>
         <th>Conseq</th>
-        <th>&#x2713;</th>
+        <th><i class="fa-solid fa-check"></i></th>
       </tr>
     </thead>
     <tbody>

@@ -10,36 +10,36 @@
     <p class="wiki-page-desc">Ogma is a Fate Condensed generator suite. Before diving into the tool, pick the guide that matches where you're coming from. Five minutes of reading will save hours of confusion at the table.</p>
 
     <div class="callout callout-tip">
-      <div class="callout-title">&#9660; Already know Fate? Skip to the tool.</div>
-      <p><a href="/">Open Ogma &#8594;</a> Pick a campaign world and hit Space. The reference sheet below every result explains what each generator produces and how to run it at the table. You don't need this page.</p>
+      <div class="callout-title"><i class="fa-solid fa-caret-down" aria-hidden="true"></i> Already know Fate? Skip to the tool.</div>
+      <p><a href="/">Open Ogma →</a> Pick a campaign world and hit Space. The reference sheet below every result explains what each generator produces and how to run it at the table. You don't need this page.</p>
     </div>
 
     <h2>Choose your background</h2>
 
     <div class="gen-grid" style="grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px">
       <a href="#new-ttrpg" style="text-decoration:none" class="gen-card">
-        <div class="gen-card-icon">&#127807;</div>
+        <div class="gen-card-icon"><i class="fa-solid fa-seedling" aria-hidden="true"></i></div>
         <div class="gen-card-name">I've never played a TTRPG</div>
         <div class="gen-card-desc">Start from zero. What the game is, what dice do, what a GM does. No jargon.</div>
       </a>
       <a href="#from-dnd" style="text-decoration:none" class="gen-card">
-        <div class="gen-card-icon">&#9876;</div>
+        <div class="gen-card-icon"><i class="fa-solid fa-burst" aria-hidden="true"></i></div>
         <div class="gen-card-name">I play D&amp;D (4e, 5e, or similar)</div>
         <div class="gen-card-desc">You know TTRPGs. The three things D&amp;D taught you that will actively mislead you in Fate.</div>
       </a>
       <a href="#from-other" style="text-decoration:none" class="gen-card">
-        <div class="gen-card-icon">&#127922;</div>
+        <div class="gen-card-icon"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i></div>
         <div class="gen-card-name">I play other RPGs</div>
         <div class="gen-card-desc">PbtA, Savage Worlds, CoC, Blades — what Fate does differently and why it matters.</div>
       </a>
       <a href="#run-better" style="text-decoration:none" class="gen-card">
-        <div class="gen-card-icon">&#127917;</div>
+        <div class="gen-card-icon"><i class="fa-solid fa-masks-theater" aria-hidden="true"></i></div>
         <div class="gen-card-name">I know Fate — help me GM better</div>
         <div class="gen-card-desc">Scene framing, the compel rhythm, fail forward, Create Advantage cascades.</div>
       </a>
     </div>
 
-    <h2 id="new-ttrpg">&#127807; I've never played a TTRPG</h2>
+    <h2 id="new-ttrpg"><i class="fa-solid fa-seedling" aria-hidden="true"></i> I've never played a TTRPG</h2>
 
     <p>Imagine four people around a table. One of them — the <strong>Game Master (GM)</strong> — describes a world: a rain-soaked town, a locked door, a nervous stranger. The other three describe characters who live in that world. When something uncertain happens ("I try to pick the lock"), you roll dice. The dice don't tell you what happens — they tell you <em>how well it goes</em>. Everything else is a conversation.</p>
 
@@ -58,7 +58,7 @@
     </ul>
 
     <div class="callout callout-scenario">
-      <div class="callout-title">&#127914; What a session looks like</div>
+      <div class="callout-title"><i class="fa-solid fa-gamepad" aria-hidden="true"></i> What a session looks like</div>
       <p>The GM describes a scene: "You're in the back room of a diner. The lights are dim. A woman you've never met is sitting at your usual table." You decide what your character does: "I sit down across from her and say nothing." The GM decides if that needs a roll: "She's sizing you up — roll Rapport to see if you make a good impression." You roll, add your skill number, and the result tells you how it goes. A session lasts 2–3 hours. Most of it is talking and deciding. Dice come out maybe 15–20 times.</p>
     </div>
 
@@ -82,11 +82,11 @@
     <p><strong>3. Getting in trouble makes you stronger.</strong> In D&amp;D, you minimise bad outcomes. In Fate, you <em>accept</em> complications (compels) to earn fate points — the currency you spend to be awesome later. Embracing your character's flaws is the optimal strategy.</p>
 
     <div class="callout callout-info">
-      <div class="callout-title">&#128218; The full transition guide</div>
+      <div class="callout-title"><i class="fa-solid fa-book-open" aria-hidden="true"></i> The full transition guide</div>
       <p>We have a comprehensive section-by-section guide covering every major D&amp;D &#8594; Fate difference: aspects vs ability scores, stress vs HP, fate points vs inspiration, popcorn initiative, Create Advantage, the three scene types, and an 8-question FAQ. <a href="/help/dnd-transition"><strong>Read the D&amp;D Transition Guide &#8594;</strong></a></p>
     </div>
 
-    <h2 id="from-other">&#127922; I play other RPGs</h2>
+    <h2 id="from-other"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> I play other RPGs</h2>
 
     <p>You know what a GM is, what dice do, what a skill check means. Here's what makes Fate Condensed different from whatever system you're coming from, in five concepts:</p>
 
@@ -98,7 +98,7 @@
 
     <p><strong>Stress Is Not Hit Points.</strong> Stress boxes are binary (checked/unchecked), each absorbs 1 shift, and they clear every scene. They're plot armor, not health. Consequences (Mild=2, Moderate=4, Severe=6) are the real injuries — they're aspects that persist and can be invoked against you.</p>
 
-    <p><strong>The Fate Point Cycle.</strong> Start with Refresh (default 3). Spend to invoke aspects. Earn by accepting compels. The rhythm: <strong>accept trouble now &#8594; be awesome later.</strong></p>
+    <p><strong>The Fate Point Cycle.</strong> Start with Refresh (default 3). Spend to invoke aspects. Earn by accepting compels. The rhythm: <strong>accept trouble now → be awesome later.</strong></p>
 
     <h3>Where to go next</h3>
     <ul>
@@ -106,7 +106,7 @@
       <li><a href="/help/generators">Generator Suite</a> — how the 16 generators work</li>
     </ul>
 
-    <h2 id="run-better">&#127917; Help me run Fate better</h2>
+    <h2 id="run-better"><i class="fa-solid fa-masks-theater" aria-hidden="true"></i> Help me run Fate better</h2>
 
     <p>You understand the rules. You've read the book. Now you need to make it <em>work at the table</em>.</p>
 

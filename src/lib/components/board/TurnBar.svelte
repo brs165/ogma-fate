@@ -163,41 +163,37 @@
   {#if allActed}
     <div class="rs-all-acted">✦ All acted — new round?</div>
   {/if}
-
-  <!-- Scene controls -->
-  {#if onEndScene}
-    <button class="board-scene-end" onclick={endScene}
-      title="End scene — clears all stress (FCon p.30)" aria-label="End scene">
-      {stressedCount > 0 ? '⏹ End Scene (' + stressedCount + ' stressed)' : '⏹ End Scene'}
-    </button>
-  {/if}
-
-  {#if onStartSession}
-    <button class="board-scene-end" onclick={startSession}
-      title="Start session — refresh FP (FCon p.19)" aria-label="Start new session"
-      style="border-color:var(--c-green); color:var(--c-green)">
-      ▶ Start Session
-    </button>
-  {/if}
-
-  {#if onNewScene}
-    <button class="board-scene-end" onclick={newScene}
-      title="New scene — clears table and stress" aria-label="New scene"
-      style="border-color:var(--c-blue); color:var(--c-blue)">
-      ⟳ New Scene
-    </button>
-  {/if}
-
-  {#if onSessionSummary}
-    <button class="board-scene-end" onclick={onSessionSummary}
-      title="Copy session summary to clipboard" aria-label="Session summary"
-      style="border-color:var(--text-muted); color:var(--text-muted)">
-      📋 Summary
-    </button>
-    <button class="board-scene-end" onclick={() => onPrintScene && onPrintScene()}
-      title="Print current scene state" aria-label="Print scene"
-      style="border-color:var(--text-muted); color:var(--text-muted)">
-      ⎙ Print
-    </button>
-  {/if}
 </div>
+
+<!-- Scene control bar — separate row, always visible, not inside the scroll strip -->
+{#if onEndScene || onStartSession || onNewScene || onSessionSummary}
+  <div class="board-scene-bar">
+    {#if onEndScene}
+      <button class="board-scene-end" onclick={endScene}
+        title="End scene — clears all stress (FCon p.30)" aria-label="End scene">
+        {stressedCount > 0 ? '⏹ End Scene (' + stressedCount + ' stressed)' : '⏹ End Scene'}
+      </button>
+    {/if}
+    {#if onStartSession}
+      <button class="board-scene-end" onclick={startSession}
+        title="Start session — refresh FP (FCon p.19)" aria-label="Start new session"
+        style="border-color:var(--c-green); color:var(--c-green)">
+        ▶ Session
+      </button>
+    {/if}
+    {#if onNewScene}
+      <button class="board-scene-end" onclick={newScene}
+        title="New scene — clears table and stress" aria-label="New scene"
+        style="border-color:var(--c-blue); color:var(--c-blue)">
+        ⟳ New Scene
+      </button>
+    {/if}
+    {#if onSessionSummary}
+      <button class="board-scene-end" onclick={onSessionSummary}
+        title="Copy session summary to clipboard" aria-label="Session summary"
+        style="border-color:var(--text-muted); color:var(--text-muted)">
+        📋 Summary
+      </button>
+    {/if}
+  </div>
+{/if}

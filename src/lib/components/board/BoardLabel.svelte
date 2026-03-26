@@ -85,9 +85,9 @@
   <div class="bc-actions">
     <button class="bc-btn" title="Toggle Zone Container" aria-label="Toggle zone"
       onclick={(e) => { e.stopPropagation(); (() => onUpdate(card.id, { zoneMode: !zoneMode, zoneW: 400, zoneH: 200 }))(e); }}
-    ><i class={zoneMode ? 'fa-solid fa-object-ungroup' : 'fa-solid fa-object-group'} aria-hidden="true"></i></button>
-    <button class="bc-btn" title="Change colour" aria-label="Change colour" onclick={cycleStyle}><i class="fa-solid fa-palette" aria-hidden="true"></i></button>
-    <button class="bc-btn" title="Delete" aria-label="Delete" onclick={deleteLabel}><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+    >{zoneMode ? "⊞" : "⊟"}</button>
+    <button class="bc-btn" title="Change colour" aria-label="Change colour" onclick={cycleStyle}>◐</button>
+    <button class="bc-btn" title="Delete" aria-label="Delete" onclick={deleteLabel}>✕</button>
   </div>
 
   {#if zoneMode}

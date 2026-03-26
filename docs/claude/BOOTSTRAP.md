@@ -1,21 +1,21 @@
 # Bootstrap — Session Startup Checklist
 
-Read this at the start of every Claude Code session on ogma-fate.
+Read this at the start of every session on ogma-fate.
 
 ---
 
 ## 1. Orient
 
 ```bash
-pwd                   # Should be …/ogma-fate
-git branch            # Note current branch (main)
-git log --oneline -5  # See recent work
-npm run build 2>&1 | tail -5  # Must print "✔ done"
+pwd                          # Should be …/ogma-fate
+git branch                   # Confirm on main
+git log --oneline -5         # See recent work
+npm run build 2>&1 | tail -5 # Must print "✔ done"
 ```
 
 ## 2. Fetch live files before editing
 
-Always pull these raw URLs at session start so you have current state:
+Always pull these before touching anything:
 
 ```
 https://raw.githubusercontent.com/brs165/ogma-fate/main/static/assets/css/theme.css
@@ -26,97 +26,113 @@ Add others per task (e.g. `src/lib/stores/canvasStore.js`, `src/lib/components/b
 
 ---
 
-## 3. Key files
+## 3. Key files quick reference
 
 | Path | What it is |
 |------|-----------|
-| `CLAUDE.md` | Architecture rules, commands, component inventory |
-| `docs/claude/PROJECT_MEMORY.md` | Current stack, known issues, backlog |
-| `src/lib/engine.js` | Pure-function content generator. No Svelte imports. |
-| `src/lib/db.js` | Dexie 4 IndexedDB wrapper. No Svelte imports. |
-| `src/lib/helpers.js` | Shared utility functions |
+| `CLAUDE.md` | Architecture rules, commands |
+| `docs/claude/PROJECT_MEMORY.md` | Full current state, backlog |
+| `docs/claude/CANVAS-WORKSHOP.md` | Canvas sprint status |
+| `src/lib/engine.js` | Pure-function generator. No Svelte imports. |
+| `src/lib/db.js` | Dexie 4 IDB wrapper. No Svelte imports. |
 | `src/lib/stores/` | 6 stores: canvas, play, binder, sync, session, chrome |
-| `src/lib/components/board/Board.svelte` | Main app shell — 800+ lines |
-| `src/lib/components/board/nodes/` | SvelteFlow custom node components (4 files) |
-| `src/lib/components/board/nodeTypes.js` | SvelteFlow node type registry (module-level) |
-| `src/data/` | 11 campaign data modules |
-| `src/routes/+layout.js` | `ssr=false, prerender=false` — client-only SPA |
-| `static/assets/css/theme.css` | ALL styling lives here — no `<style>` blocks |
+| `src/lib/components/board/Board.svelte` | Main app shell |
+| `src/lib/components/board/nodes/` | 4 SvelteFlow node components |
+| `src/lib/components/board/nodeTypes.js` | SvelteFlow node registry (module-level only) |
+| `src/data/` | 8 campaign data files + shared/universal/index |
+| `src/routes/+layout.js` | `ssr=false, prerender=false` |
+| `static/assets/css/theme.css` | ALL styling — no `<style>` blocks in components |
 | `static/sw.js` | Service worker — bumped by bump-version.sh |
-| `static/_redirects` | Cloudflare Pages SPA: `/* /index.html 200` |
-| `scripts/bump-version.sh` | Run before every zip delivery |
+| `scripts/bump-version.sh` | Run before every zip |
 
 ---
 
-## 4. Stack facts
+## 4. Stack facts (critical)
 
-- **Svelte 5.51.0** — full runes mode. Zero `runes={false}` files remain.
-- **`$state()`** on every mutable `let`. Never plain `let` for reassigned vars.
-- **`$props()`** for all component props. Never `export let`.
-- **`onclick=`** not `on:click=`. Svelte 5 event syntax throughout.
-- **SvelteFlow nodes/edges** MUST be `writable([])` stores, NOT `$state([])`.
-- **No `left/top/position:absolute`** on card components — SvelteFlow positions them.
-- **No drag handlers** on card components — SvelteFlow handles dragging.
-- **`adapter-static`** + `fallback: 'index.html'` + `static/_redirects`.
-- **`npx vite build`** in package.json build script (not bare `vite`).
+**Svelte 5 runes — 82 components, zero legacy:**
+- `$state()` on every mutable `let` — never plain `let` for reassigned vars
+- `$props()` for all component props — never `export let`
+- `onclick=` not `on:click=` — Svelte 5 event syntax
+- `$derived(expr)` — expression only, never a wrapping `() => {}`
+- `$state()` only at component top level — never inside function bodies
+
+**SvelteFlow — non-negotiable rules:**
+- `flowNodes`/`flowEdges` MUST be `writable([])` stores, NOT `$state([])`
+- Card components must NOT have `left/top` style or `onmousedown` handlers
+- `nodeTypes.js` must be module-level — never inside a component or reactive block
+- `nodrag nopan` on buttons/inputs inside node components
+
+**CSS:**
+- `static/assets/css/theme.css` only — never add `<style>` blocks to components
+- Card fronts use `fs-*` CSS classes (fate-sheet design tokens) — never inline old `--cv-card-*` vars
+
+**Icons:**
+- Font Awesome 7.2 Free via jsDelivr CDN — cached by service worker for offline
+- All icons use `<i class="fa-solid fa-name" aria-hidden="true"></i>` pattern
+- Zero emoji HTML entities in any .svelte file — FA icons throughout
 
 ---
 
-## 5. Component inventory (54 .svelte files)
+## 5. Component inventory (82 files)
 
 ```
 src/lib/components/
-├── cards/           6 files   CvLabel, CvTag, StressRow, ClockTrack, Cv4Card, BackPanel
-│   └── fronts/     18 files   NpcMinor, NpcMajor, Scene, Campaign, Encounter, Seed,
-│                               Compel, Challenge, Contest, Consequence, Faction,
-│                               Complication, Backstory, Obstacle, Countdown, Constraint,
-│                               Custom, Pc
-├── board/          18 files   Board, BoardCard, BoardLabel, BoardSticky, BoardBoost,
-│                               TurnBar, PlayerRow, CombatTracker, PlayPanel, BinderPanel,
-│                               DossierModal, Topbar, ExportMenu, ExportPanel, HelpPanel,
-│                               StuntPanel, MobileList, CommandPalette
-│   └── nodes/       4 files   CardNode, StickyNode, BoostNode, LabelNode
-├── campaign/        3 files   Campaign, FatePointTracker, Landing
-├── panels/          1 file    LeftPanel
-├── dice/            1 file    DicePanel
-├── player/          1 file    PlayerSurface
-└── shared/          2 files   HelpDiceRoller, Footer
+├── cards/fronts/   18    NpcMinor, NpcMajor, Scene, Campaign, Encounter, Seed,
+│                         Compel, Challenge, Contest, Consequence, Faction,
+│                         Complication, Backstory, Obstacle, Countdown,
+│                         Constraint, Custom, Pc
+├── cards/           6    CvLabel, CvTag, StressRow, ClockTrack, Cv4Card, BackPanel
+├── board/          20    Board, BoardCard, BoardSticky, BoardBoost, BoardLabel,
+│                         TurnBar, PlayerRow, CombatTracker, PlayPanel, BinderPanel,
+│                         DossierModal, Topbar, ExportMenu, ExportPanel, HelpPanel,
+│                         StuntPanel, MobileList, CommandPalette,
+│                         CanvasContextMenu, GenerateFAB
+│   └── nodes/       4    CardNode, StickyNode, BoostNode, LabelNode
+├── campaign/        3    Campaign, FatePointTracker, Landing
+├── dice/            1    DicePanel
+├── panels/          1    LeftPanel
+├── player/          1    PlayerSurface
+└── shared/          2    HelpDiceRoller, Footer
+
+src/routes/         26    route pages/layouts
 ```
 
 ---
 
-## 6. QA gate — run before every zip delivery
+## 6. QA gate — must pass before every zip delivery
 
 ```bash
-node scripts/qa-hard.mjs    # Must exit 0
-node scripts/qa-export.mjs  # Must exit 0
+node scripts/qa-hard.mjs    # Content + engine checks
+node scripts/qa-export.mjs  # Export round-trip
 npm run build               # Must print "✔ done"
 ```
 
 ---
 
-## 7. Zip delivery format
+## 7. Zip delivery
 
 ```bash
-# Bump version first
+# Source zip (for GitHub push)
 bash scripts/bump-version.sh
-
-# Then zip (exclude node_modules, .svelte-kit, build, .git)
-zip -rq YYYY.MM.NNN.zip . \
+zip -rq YYYY-MM-NNN.zip . \
   -x "node_modules/*" -x ".svelte-kit/*" -x "build/*" -x ".git/*"
+
+# Offline distribution zip (pre-built, for end users)
+npx vite build
+cd build && zip -rq ../ogma-offline-YYYY-MM-NNN.zip .
 ```
 
-Zip name matches version: `2026.03.576.zip`
+Current version: `2026.03.582`
 
 ---
 
-## 8. Architecture rules
+## 8. Architecture rules (non-negotiable)
 
 1. One component per `.svelte` file
 2. CSS in `static/assets/css/theme.css` only — no `<style>` blocks
 3. `engine.js` and `db.js` are pure JS — no Svelte imports ever
-4. Stores are plain `.js` files — no Svelte syntax
+4. Stores are plain `.js` — no Svelte syntax
 5. Components import from stores; stores never import from components
 6. Preserve all a11y: `role`, `aria-label`, `aria-pressed`, `aria-expanded`
-7. SvelteFlow node components must NOT have their own drag/position logic
-8. `nodeTypes.js` must be module-level — never inside a reactive block
+7. SvelteFlow nodes must NOT have their own drag/position logic
+8. `nodeTypes.js` must be at module level — never reactive

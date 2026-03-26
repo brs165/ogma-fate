@@ -24,6 +24,7 @@ Generate world-specific content, run sessions, track players — all in one tab.
 - **SvelteKit** + **Svelte 5** (runes: `$state`, `$derived`, `$props`)
 - **@xyflow/svelte** — canvas pan/zoom/connect
 - **bits-ui** — accessible headless UI components
+- **Font Awesome 7.2 Free** — icons (cached by SW for offline)
 - **Dexie 4** — IndexedDB persistence
 - **Vite 7** + `adapter-static` — build
 - **Cloudflare Pages** — deploy
@@ -50,7 +51,7 @@ node scripts/qa-export.mjs  # Export round-trip checks (must exit 0)
 
 ```bash
 bash scripts/bump-version.sh   # Bump version
-# Zip: YYYY.MM.NNN.zip (excluding node_modules, .svelte-kit, build, .git)
+# Zip: YYYY-MM-NNN.zip (excluding node_modules, .svelte-kit, build, .git)
 ```
 
 ---

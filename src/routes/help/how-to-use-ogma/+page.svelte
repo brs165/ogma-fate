@@ -10,19 +10,19 @@
     <p class="wiki-page-desc">Three paths depending on what you need right now. Each takes about 2 minutes to read.</p>
 
     <div id="prep" class="callout">
-      <div class="callout-title">&#128220; Path 1: Use Ogma to prep a session</div>
+      <div class="callout-title"><i class="fa-solid fa-scroll" aria-hidden="true"></i> Path 1: Use Ogma to prep a session</div>
       <p>You're a GM getting ready for game night. You want material you can use at the table.</p>
       <ol>
         <li><strong>Pick a campaign world</strong> — choose one of the 8 worlds from the landing page, or use any world's generators for setting-agnostic content.</li>
         <li><strong>Pick a generator</strong> — the sidebar groups all 16 generators by category: NPCs, Scenes, Campaign, Encounters, and Toolbox. Start with whatever you need most.</li>
-        <li><strong>Roll and read</strong> — tap the Roll button (or press Space). Read the result. If you like it, tap the &#9733; keep button. If not, roll again.</li>
+        <li><strong>Roll and read</strong> — tap the Roll button (or press Space). Read the result. If you like it, tap the <i class="fa-solid fa-star" aria-hidden="true"></i> keep button. If not, roll again.</li>
         <li><strong>Build up your session</strong> — pin 4-6 cards: a scene, an NPC or two, an encounter, maybe a compel hook. Each roll gives you a self-contained piece of prep.</li>
         <li><strong>Export</strong> — open the History panel to see all saved cards. Copy as Markdown, save as Ogma JSON, download a session .md file, or share a seed link.</li>
       </ol>
     </div>
 
     <div id="gm-table" class="callout">
-      <div class="callout-title">&#127911; Path 2: Use Ogma as a GM at the table</div>
+      <div class="callout-title"><i class="fa-solid fa-headphones" aria-hidden="true"></i> Path 2: Use Ogma as a GM at the table</div>
       <p>Your session is live. You need something right now — an NPC name, a scene twist, an encounter complication.</p>
       <ol>
         <li><strong>Open your campaign page</strong> — if you prepped earlier, your saved cards are still there (saved automatically).</li>
@@ -34,7 +34,7 @@
     </div>
 
     <div id="player" class="callout">
-      <div class="callout-title">&#127922; Path 3: Use Ogma as a player</div>
+      <div class="callout-title"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> Path 3: Use Ogma as a player</div>
       <p>Your GM uses Ogma. Here's what you need to know.</p>
       <ol>
         <li><strong>Ask your GM for exports</strong> — your GM can share session content via Ogma JSON, printed cards, or Markdown files. Ogma generates the content; your table tool of choice displays it.</li>

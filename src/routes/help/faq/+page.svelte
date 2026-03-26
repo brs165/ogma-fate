@@ -60,7 +60,7 @@
 </ul>
 
 <div class="callout callout-warning">
-  <div class="callout-title">&#9888; Data loss situations to avoid</div>
+  <div class="callout-title"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Data loss situations to avoid</div>
   <ul>
     <li>Clearing site data or cookies in browser settings</li>
     <li>Using private/incognito mode without exporting first</li>
@@ -93,12 +93,12 @@
 <table class="wiki-table">
   <thead><tr><th scope="col">Browser</th><th scope="col">Status</th><th scope="col">Notes</th></tr></thead>
   <tbody>
-    <tr><td><strong>Chrome / Chromium</strong></td><td>&#10003; Full support</td><td>Recommended. PWA install works.</td></tr>
-    <tr><td><strong>Edge</strong></td><td>&#10003; Full support</td><td>PWA install works.</td></tr>
-    <tr><td><strong>Firefox</strong></td><td>&#10003; Full support</td><td>PWA install limited (no desktop install). BroadcastChannel works.</td></tr>
-    <tr><td><strong>Safari (macOS)</strong></td><td>&#10003; Full support</td><td>Add to Dock via File menu. Backdrop-filter supported.</td></tr>
-    <tr><td><strong>Safari (iOS)</strong></td><td>&#10003; Works</td><td>Add to Home Screen for full-screen mode. Some glass blur effects reduced on low-power mode.</td></tr>
-    <tr><td><strong>Internet Explorer</strong></td><td>&#10007; Not supported</td><td>React 18 requires modern JS. Use Edge.</td></tr>
+    <tr><td><strong>Chrome / Chromium</strong></td><td><i class="fa-solid fa-check" aria-hidden="true" style="color:var(--c-green)"></i> Full support</td><td>Recommended. PWA install works.</td></tr>
+    <tr><td><strong>Edge</strong></td><td><i class="fa-solid fa-check" aria-hidden="true" style="color:var(--c-green)"></i> Full support</td><td>PWA install works.</td></tr>
+    <tr><td><strong>Firefox</strong></td><td><i class="fa-solid fa-check" aria-hidden="true" style="color:var(--c-green)"></i> Full support</td><td>PWA install limited (no desktop install). BroadcastChannel works.</td></tr>
+    <tr><td><strong>Safari (macOS)</strong></td><td><i class="fa-solid fa-check" aria-hidden="true" style="color:var(--c-green)"></i> Full support</td><td>Add to Dock via File menu. Backdrop-filter supported.</td></tr>
+    <tr><td><strong>Safari (iOS)</strong></td><td><i class="fa-solid fa-check" aria-hidden="true" style="color:var(--c-green)"></i> Works</td><td>Add to Home Screen for full-screen mode. Some glass blur effects reduced on low-power mode.</td></tr>
+    <tr><td><strong>Internet Explorer</strong></td><td><i class="fa-solid fa-xmark" aria-hidden="true" style="color:var(--c-red)"></i> Not supported</td><td>React 18 requires modern JS. Use Edge.</td></tr>
   </tbody>
 </table>
 

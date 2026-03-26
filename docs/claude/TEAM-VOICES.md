@@ -135,7 +135,7 @@ skill assignment validity, stress/consequence coherence in generated NPCs.
 **Hard vetoes:**
 - Any generated content with `undefined` in visible fields
 - Skills not in the FCon skill list (e.g. `Ride` for non-western worlds)
-- Major NPC refresh value != 3 (hardcoded bug to watch for)
+- Major NPC refresh value incorrect (fixed in v586 — verify stays correct after engine changes)
 - Aspects over 15 words (unusable at table)
 
 ---

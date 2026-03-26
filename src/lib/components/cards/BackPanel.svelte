@@ -212,7 +212,7 @@
          target="_blank"
          rel="noreferrer noopener"
          aria-label="Read on the Fate SRD (opens in new tab)"
-      >SRD &#8599;</a>
+      >SRD <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:10px"></i></a>
     {/if}
   </div>
 

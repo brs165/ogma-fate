@@ -34,7 +34,7 @@
     <Dialog.Content class="cmd-content" aria-describedby={undefined}>
       <Dialog.Title class="sr-only">Command Palette</Dialog.Title>
       <div class="cmd-input-wrap">
-        <span class="cmd-search-icon" aria-hidden="true">&#8981;</span>
+        <span class="cmd-search-icon" aria-hidden="true"><i class="fa-solid fa-magnifying-glass"></i></span>
         <input
           bind:value={q}
           class="cmd-input"

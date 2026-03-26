@@ -1,4 +1,12 @@
-const CACHE_NAME = 'ogma-2026.03.580';
+const CACHE_NAME = 'ogma-2026.03.604';
+
+// Font Awesome CDN resources to precache for offline
+const FA_CDN = [
+  'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css',
+  'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/webfonts/fa-solid-900.woff2',
+  'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/webfonts/fa-regular-400.woff2',
+  'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/webfonts/fa-brands-400.woff2',
+];
 
 self.addEventListener('install', event => {
   event.waitUntil(
@@ -7,7 +15,8 @@ self.addEventListener('install', event => {
         '/',
         '/assets/css/theme.css',
         '/assets/css/help-shared.css',
-        '/manifest.json'
+        '/manifest.json',
+        ...FA_CDN
       ]);
     })
   );
@@ -26,11 +35,12 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  // Only handle same-origin GET requests
-  // Let cross-origin requests (analytics, CDN) pass through unhandled
   const url = new URL(event.request.url);
   if (event.request.method !== 'GET') return;
-  if (url.origin !== self.location.origin) return;
+
+  // Handle Font Awesome CDN requests (cache-first for offline)
+  const isFA = url.hostname === 'cdn.jsdelivr.net' && url.pathname.includes('fontawesome');
+  if (url.origin !== self.location.origin && !isFA) return;
 
   event.respondWith(
     caches.match(event.request).then(cached => {

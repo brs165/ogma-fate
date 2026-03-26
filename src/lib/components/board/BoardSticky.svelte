@@ -73,10 +73,10 @@
   <div class="bc-actions nodrag nopan">
     {#if card.rotation}
       <button class="bc-btn" title="Reset rotation" aria-label="Reset rotation"
-        onclick={(e) => { e.stopPropagation(); (() => onUpdate && onUpdate(card.id, { rotation: 0 }))(e); }}><i class="fa-solid fa-rotate-right" aria-hidden="true"></i></button>
+        onclick={(e) => { e.stopPropagation(); (() => onUpdate && onUpdate(card.id, { rotation: 0 }))(e); }}>↻</button>
     {/if}
     <button class="bc-btn" title="Delete" aria-label="Delete"
-      onclick={(e) => { e.stopPropagation(); (() => onDelete && onDelete(card.id))(e); }}><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+      onclick={(e) => { e.stopPropagation(); (() => onDelete && onDelete(card.id))(e); }}>✕</button>
   </div>
 
   <div class="board-sticky-label" style="color:{sc.label}">Aspect</div>
