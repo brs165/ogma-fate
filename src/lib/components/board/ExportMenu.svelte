@@ -1,20 +1,11 @@
-<svelte:options runes={false} />
-
 <script>
   // ── ExportMenu — topbar export/import dropdown ────────────────────────────────
   import { onMount, onDestroy } from 'svelte';
   import { DB } from '../../db.js';
-
-  export let cards           = [];
-  export let campName        = '';
-  export let onExportCanvas  = null;
-  export let onImportCanvas  = null;
-  export let onPrint         = null;
-  export let mode            = 'prep';
-
-  $: hasCards = cards.filter(c =>
+  let { cards = [], campName = '', onExportCanvas = null, onImportCanvas = null, onPrint = null, mode = 'prep' } = $props();
+  let hasCards = $derived(cards.filter(c =>
     c.genId && c.genId !== 'sticky' && c.genId !== 'boost' && c.genId !== 'label'
-  ).length > 0;
+  ).length > 0);
 
   let open    = false;
   let menuPos = { top: 0, right: 0 };
@@ -61,7 +52,7 @@
   <button
     bind:this={btnEl}
     class="bt-icon-btn{open ? ' active' : ''}"
-    on:click={toggle}
+    onclick={toggle}
     title="Export / Import"
     aria-label="Export and import options"
     aria-expanded={String(open)}
@@ -83,7 +74,7 @@
                   font-family:var(--font-mono); border-bottom:1px solid var(--border)">Export</div>
 
       <!-- JSON -->
-      <button role="menuitem" on:click={doExportCanvas} class="export-menu-item" aria-label="Export board canvas as JSON">
+      <button role="menuitem" onclick={doExportCanvas} class="export-menu-item" aria-label="Export board canvas as JSON">
         <div class="export-menu-item-icon">{'{ }'}</div>
         <div class="export-menu-item-body">
           <div class="export-menu-item-label">JSON</div>
@@ -93,7 +84,7 @@
 
       <!-- Image Pack -->
       {#if hasCards}
-        <button role="menuitem" on:click={doImagePack} class="export-menu-item" aria-label="Export cards as PNG image pack">
+        <button role="menuitem" onclick={doImagePack} class="export-menu-item" aria-label="Export cards as PNG image pack">
           <div class="export-menu-item-icon">▣</div>
           <div class="export-menu-item-body">
             <div class="export-menu-item-label">Image Pack</div>
@@ -104,7 +95,7 @@
 
       <!-- Print -->
       {#if mode !== 'play' && hasCards}
-        <button role="menuitem" on:click={doPrint} class="export-menu-item" aria-label="Print cards">
+        <button role="menuitem" onclick={doPrint} class="export-menu-item" aria-label="Print cards">
           <div class="export-menu-item-icon">⎙</div>
           <div class="export-menu-item-body">
             <div class="export-menu-item-label">Print</div>
@@ -117,7 +108,7 @@
       <div role="separator" style="height:1px; background:var(--border); margin:4px 0"></div>
 
       <!-- Import -->
-      <button role="menuitem" on:click={doImportCanvas} class="export-menu-item" aria-label="Import board from JSON file">
+      <button role="menuitem" onclick={doImportCanvas} class="export-menu-item" aria-label="Import board from JSON file">
         <div class="export-menu-item-icon">↑</div>
         <div class="export-menu-item-body">
           <div class="export-menu-item-label">Import</div>

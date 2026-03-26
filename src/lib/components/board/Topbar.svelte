@@ -1,64 +1,41 @@
-<svelte:options runes={false} />
-
 <script>
   import ExportMenu from './ExportMenu.svelte';
-
-  export let campMeta = {};
-  export let mode = 'prep';
-  export let onModeChange = () => {};
-  export let campId = '';
-  export let onCampChange = () => {};
-  export let isOnline = true;
-
   // Grouped props
-  export let sync = {};
-  export let panels = {};
-  export let counts = {};
-  export let exportActions = {};
-
   // Cards & extra callbacks
-  export let cards = [];
-  export let campName = '';
-  export let onExportCanvas = () => {};
-  export let onImportCanvas = () => {};
-  export let onPrint = () => {};
-  export let onToggleMobileList = null;
-  export let mobileListView = false;
-  export let onExportView = null;
-
   // Destructure sync
-  $: syncStatus = sync.status || 'offline';
-  $: roomCode = sync.roomCode || '';
-  $: syncRole = sync.role || null;
-  $: onHost = sync.onHost || (() => {});
-  $: onDisconnect = sync.onDisconnect || (() => {});
-  $: showToast = sync.onToast || (() => {});
+  let { campMeta = {}, mode = 'prep', onModeChange = () => {}, campId = '', onCampChange = () => {}, isOnline = true, sync = {}, panels = {}, counts = {}, exportActions = {}, cards = [], campName = '', onExportCanvas = () => {}, onImportCanvas = () => {}, onPrint = () => {}, onToggleMobileList = null, mobileListView = false, onExportView = null } = $props();
+  let syncStatus = $derived(sync.status || 'offline');
+  let roomCode = $derived(sync.roomCode || '');
+  let syncRole = $derived(sync.role || null);
+  let onHost = $derived(sync.onHost || (() => {}));
+  let onDisconnect = $derived(sync.onDisconnect || (() => {}));
+  let showToast = $derived(sync.onToast || (() => {}));
 
   // Destructure panels
-  $: leftOpen = panels.leftOpen;
-  $: onToggleLeft = panels.onToggleLeft || (() => {});
-  $: showDice = panels.showDice;
-  $: onToggleDice = panels.onToggleDice || (() => {});
-  $: showFP = panels.showFP;
-  $: onToggleFP = panels.onToggleFP || (() => {});
-  $: binderOpen = panels.binderOpen;
-  $: onToggleBinder = panels.onToggleBinder || (() => {});
-  $: showNotes = panels.showNotes;
-  $: onToggleNotes = panels.onToggleNotes || null;
+  let leftOpen = $derived(panels.leftOpen);
+  let onToggleLeft = $derived(panels.onToggleLeft || (() => {}));
+  let showDice = $derived(panels.showDice);
+  let onToggleDice = $derived(panels.onToggleDice || (() => {}));
+  let showFP = $derived(panels.showFP);
+  let onToggleFP = $derived(panels.onToggleFP || (() => {}));
+  let binderOpen = $derived(panels.binderOpen);
+  let onToggleBinder = $derived(panels.onToggleBinder || (() => {}));
+  let showNotes = $derived(panels.showNotes);
+  let onToggleNotes = $derived(panels.onToggleNotes || null);
 
   // Destructure counts
-  $: onTableCount = counts.onTable || 0;
-  $: binderCount = counts.binder || 0;
-  $: trayCount = counts.tray || 0;
+  let onTableCount = $derived(counts.onTable || 0);
+  let binderCount = $derived(counts.binder || 0);
+  let trayCount = $derived(counts.tray || 0);
 
   // Destructure export actions
-  $: theme = exportActions.theme || 'dark';
-  $: onToggleTheme = exportActions.onToggleTheme || (() => {});
+  let theme = $derived(exportActions.theme || 'dark');
+  let onToggleTheme = $derived(exportActions.onToggleTheme || (() => {}));
 
   // Worlds list
-  $: worlds = typeof globalThis.CAMPAIGNS !== 'undefined'
+  let worlds = $derived(typeof globalThis.CAMPAIGNS !== 'undefined'
     ? Object.keys(globalThis.CAMPAIGNS).map(id => ({ id, name: ((globalThis.CAMPAIGNS[id] || {}).meta || {}).name || id }))
-    : [{ id: campId, name: (campMeta && campMeta.name) || campId }];
+    : [{ id: campId, name: (campMeta && campMeta.name) || campId }]);
 
   function copyJoinLink() {
     const joinUrl = window.location.origin + '/campaigns/' + campId + '?mode=play&room=' + roomCode;
@@ -85,7 +62,7 @@
     <select
       class="bt-world-select"
       value={campId}
-      on:change={(e) => onCampChange(e.target.value)}
+      onchange={(e) => onCampChange(e.target.value)}
       title="Switch world"
       aria-label="Switch world"
     >
@@ -99,7 +76,7 @@
   {#if mode === 'play'}
     <button
       class="bt-icon-btn bt-panel-toggle"
-      on:click={onToggleLeft}
+      onclick={onToggleLeft}
       title={leftOpen ? 'Hide generators' : 'Show generators'}
       aria-label={leftOpen ? 'Hide generator panel' : 'Show generator panel'}
       aria-expanded={String(!!leftOpen)}
@@ -110,13 +87,13 @@
   <div class="bt-mode">
     <button
       class="bt-mode-btn" class:active={mode === 'prep'}
-      on:click={() => onModeChange('prep')}
+      onclick={() => onModeChange('prep')}
       title="Prep \u2014 generate and arrange cards privately. Players cannot see this canvas."
       aria-pressed={String(mode === 'prep')}
     >Prep</button>
     <button
       class="bt-mode-btn" class:active={mode === 'play'}
-      on:click={() => onModeChange('play')}
+      onclick={() => onModeChange('play')}
       title="Play \u2014 live session view. Cards you send to table are visible to connected players."
       aria-pressed={String(mode === 'play')}
     >Play</button>
@@ -150,7 +127,7 @@
     {#if mode === 'prep'}
       <button
         class="bt-icon-btn" class:active={binderOpen}
-        on:click={onToggleBinder}
+        onclick={onToggleBinder}
         title={binderOpen ? 'Hide Binder' : 'Show Binder' + (binderCount > 0 ? ' (' + binderCount + ' cards)' : '')}
         aria-label={binderOpen ? 'Hide Binder' : 'Open Binder'}
         aria-pressed={String(binderOpen)}
@@ -168,7 +145,7 @@
     <!-- Dice toggle -->
     <button
       class="bt-icon-btn" class:active={showDice}
-      on:click={onToggleDice}
+      onclick={onToggleDice}
       title="Dice roller"
       aria-label={showDice ? 'Close dice roller' : 'Open dice roller'}
       aria-pressed={String(showDice)}
@@ -177,7 +154,7 @@
     <!-- FP tracker toggle -->
     <button
       class="bt-icon-btn" class:active={showFP}
-      on:click={onToggleFP}
+      onclick={onToggleFP}
       title="Fate Point tracker"
       aria-label={showFP ? 'Close Fate Point tracker' : 'Open Fate Point tracker'}
       aria-pressed={String(showFP)}
@@ -187,7 +164,7 @@
     {#if onToggleNotes}
       <button
         class="bt-icon-btn" class:active={showNotes}
-        on:click={onToggleNotes}
+        onclick={onToggleNotes}
         title="Session notes"
         aria-label={showNotes ? 'Close session notes' : 'Open session notes'}
         aria-pressed={String(showNotes)}
@@ -196,7 +173,7 @@
 
     <!-- Host button (Play mode, offline) -->
     {#if mode === 'play' && syncStatus === 'offline'}
-      <button class="bt-nav" on:click={onHost} title="Host a live session \u2014 share room code with players">
+      <button class="bt-nav" onclick={onHost} title="Host a live session \u2014 share room code with players">
         &#x1F310; Host
       </button>
     {/if}
@@ -208,13 +185,13 @@
           class="bt-nav"
           style="color:var(--c-green,#30d158);border-color:var(--c-green,#30d158);font-variant-numeric:tabular-nums"
           title="Click to copy player join link"
-          on:click={copyJoinLink}
+          onclick={copyJoinLink}
         >&#x1F517;&nbsp;{roomCode}</button>
         <button
           class="bt-icon-btn"
           style="font-size:12px;opacity:0.6;width:22px;height:22px;min-width:0"
           title="Disconnect from live session"
-          on:click={onDisconnect}
+          onclick={onDisconnect}
           aria-label="Disconnect"
         >&times;</button>
       </span>
@@ -234,7 +211,7 @@
     {#if onToggleMobileList}
       <button
         class="bt-icon-btn bt-mob-view-toggle"
-        on:click={onToggleMobileList}
+        onclick={onToggleMobileList}
         title={mobileListView ? 'Switch to canvas' : 'Switch to card list'}
         aria-label={mobileListView ? 'Canvas view' : 'List view'}
         aria-pressed={String(!!mobileListView)}
@@ -244,7 +221,7 @@
     <!-- Theme toggle -->
     <button
       class="bt-icon-btn"
-      on:click={onToggleTheme}
+      onclick={onToggleTheme}
       title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
       aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
     >{theme === 'dark' ? '\u2600' : '\u263D'}</button>
@@ -252,7 +229,7 @@
     <!-- Colorblind patterns toggle -->
     <button
       class="bt-icon-btn"
-      on:click={toggleA11yPatterns}
+      onclick={toggleA11yPatterns}
       title="Toggle colorblind-safe patterns"
       aria-label="Toggle colorblind-safe patterns"
     >&diams;</button>
@@ -261,7 +238,7 @@
     {#if onExportView}
       <button
         class="bt-icon-btn"
-        on:click={onExportView}
+        onclick={onExportView}
         title="Export Cards"
         aria-label="Open export page"
       >&ctdot;</button>

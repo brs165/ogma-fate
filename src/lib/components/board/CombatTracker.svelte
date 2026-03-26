@@ -1,11 +1,5 @@
-<svelte:options runes={false} />
-
 <script>
-  export let players = [];
-  export let npcCards = [];
-  export let onToggleActed = () => {};
-  export let onToggleNpcActed = () => {};
-</script>
+  let { players = [], npcCards = [], onToggleActed = () => {}, onToggleNpcActed = () => {} } = $props();</script>
 
 <div class="ct-wrap">
   <table class="ct-table" role="grid">
@@ -38,7 +32,7 @@
             <button
               class="ct-act-btn"
               class:acted={p.acted}
-              on:click={() => onToggleActed(p.id)}
+              onclick={() => onToggleActed(p.id)}
               aria-label="{p.acted ? 'Mark unacted' : 'Mark acted'} {p.name}"
             >
               {p.acted ? '✓' : '○'}
@@ -59,7 +53,7 @@
             <button
               class="ct-act-btn"
               class:acted={npc.acted}
-              on:click={() => onToggleNpcActed && onToggleNpcActed(npc.id)}
+              onclick={() => onToggleNpcActed && onToggleNpcActed(npc.id)}
             >
               {npc.acted ? '✓' : '○'}
             </button>

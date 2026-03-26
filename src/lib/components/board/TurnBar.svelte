@@ -1,39 +1,22 @@
-<svelte:options runes={false} />
-
 <script>
   // ── TurnBar — draggable turn order strip for Play mode ────────────────────────
-  export let players         = [];
-  export let order           = [];
-  export let setOrder        = null;
-  export let onToggleActed   = null;
-  export let round           = 1;
-  export let onNewRound      = null;
-  export let onPrevRound     = null;
-  export let roundFlash      = false;
-  export let onEndScene      = null;
-  export let onStartSession  = null;
-  export let onNewScene      = null;
-  export let onSessionSummary = null;
-  export let onPrintScene    = null;
-  export let npcCards        = [];
-  export let onToggleNpcActed = null;
-
+  let { players = [], order = [], setOrder = null, onToggleActed = null, round = 1, onNewRound = null, onPrevRound = null, roundFlash = false, onEndScene = null, onStartSession = null, onNewScene = null, onSessionSummary = null, onPrintScene = null, npcCards = [], onToggleNpcActed = null } = $props();
   let dragId = null;
   let overId = null;
 
-  $: orderedPlayers = (() => {
+  let orderedPlayers = $derived((() => {
     const op = order.map(id => players.find(p => p.id === id)).filter(Boolean);
     players.forEach(p => { if (order.indexOf(p.id) < 0) op.push(p); });
     return op;
-  })();
+  })());
 
-  $: allActed = players.length > 0
+  let allActed = $derived(players.length > 0
     && players.every(p => p.acted)
-    && npcCards.every(n => n.acted);
+    && npcCards.every(n => n.acted));
 
-  $: stressedCount = players.filter(p =>
+  let stressedCount = $derived(players.filter(p =>
     (p.phy || []).some(Boolean) || (p.men || []).some(Boolean)
-  ).length;
+  ).length);
 
   function onDragStart(e, id) {
     dragId = id;
@@ -93,10 +76,10 @@
 <div class="board-turn-bar">
   <!-- Round pill -->
   <div class="rs-round-pill{roundFlash ? ' rs-round-flash' : ''}" style="flex-shrink:0">
-    <button class="rs-round-btn" on:click={onPrevRound} aria-label="Prev round">−</button>
+    <button class="rs-round-btn" onclick={onPrevRound} aria-label="Prev round">−</button>
     <span style="font-size:11px; color:var(--text-muted); margin-right:2px">Rnd</span>
     <span class="rs-round-num" aria-live="polite" aria-atomic="true" aria-label="Round {round}">{round}</span>
-    <button class="rs-round-btn" on:click={onNewRound} aria-label="New round">+</button>
+    <button class="rs-round-btn" onclick={onNewRound} aria-label="New round">+</button>
   </div>
 
   <span class="rs-turn-label" style="flex-shrink:0">Turn:</span>
@@ -109,12 +92,12 @@
       role="button"
       tabindex="0"
       aria-label="{p.name}{p.acted ? ' (acted)' : ''}"
-      on:dragstart={e => onDragStart(e, p.id)}
-      on:dragover={e => onDragOver(e, p.id)}
-      on:drop={e => onDrop(e, p.id)}
-      on:dragend={onDragEnd}
-      on:click={() => onToggleActed && onToggleActed(p.id)}
-      on:keydown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggleActed && onToggleActed(p.id); } }}
+      ondragstart={e => onDragStart(e, p.id)}
+      ondragover={e => onDragOver(e, p.id)}
+      ondrop={e => onDrop(e, p.id)}
+      ondragend={onDragEnd}
+      onclick={() => onToggleActed && onToggleActed(p.id)}
+      onkeydown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggleActed && onToggleActed(p.id); } }}
     >
       {#if p.avatar}
         <span class="rs-turn-avatar">{p.avatar}</span>
@@ -134,8 +117,8 @@
         class="rs-turn-pill{npc.acted ? ' acted' : ''}"
         role="button"
         tabindex="0"
-        on:click={() => onToggleNpcActed && onToggleNpcActed(npc.id)}
-        on:keydown={e => onNpcKeyDown(e, npc)}
+        onclick={() => onToggleNpcActed && onToggleNpcActed(npc.id)}
+        onkeydown={e => onNpcKeyDown(e, npc)}
         style="border-color:{npc.acted ? 'var(--c-green)' : 'var(--c-red)'}"
       >
         <div class="rs-turn-dot" style="background:var(--c-red)"></div>
@@ -151,14 +134,14 @@
 
   <!-- Scene controls -->
   {#if onEndScene}
-    <button class="board-scene-end" on:click={endScene}
+    <button class="board-scene-end" onclick={endScene}
       title="End scene — clears all stress (FCon p.30)" aria-label="End scene">
       {stressedCount > 0 ? '⏹ End Scene (' + stressedCount + ' stressed)' : '⏹ End Scene'}
     </button>
   {/if}
 
   {#if onStartSession}
-    <button class="board-scene-end" on:click={startSession}
+    <button class="board-scene-end" onclick={startSession}
       title="Start session — refresh FP (FCon p.19)" aria-label="Start new session"
       style="border-color:var(--c-green); color:var(--c-green)">
       ▶ Start Session
@@ -166,7 +149,7 @@
   {/if}
 
   {#if onNewScene}
-    <button class="board-scene-end" on:click={newScene}
+    <button class="board-scene-end" onclick={newScene}
       title="New scene — clears table and stress" aria-label="New scene"
       style="border-color:var(--c-blue); color:var(--c-blue)">
       ⟳ New Scene
@@ -174,12 +157,12 @@
   {/if}
 
   {#if onSessionSummary}
-    <button class="board-scene-end" on:click={onSessionSummary}
+    <button class="board-scene-end" onclick={onSessionSummary}
       title="Copy session summary to clipboard" aria-label="Session summary"
       style="border-color:var(--text-muted); color:var(--text-muted)">
       📋 Summary
     </button>
-    <button class="board-scene-end" on:click={() => onPrintScene && onPrintScene()}
+    <button class="board-scene-end" onclick={() => onPrintScene && onPrintScene()}
       title="Print current scene state" aria-label="Print scene"
       style="border-color:var(--text-muted); color:var(--text-muted)">
       ⎙ Print
