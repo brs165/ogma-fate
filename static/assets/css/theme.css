@@ -3072,6 +3072,28 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .wiki-back{display:inline-flex;align-items:center;gap:6px;font-size:var(--text-sm);color:var(--accent);text-decoration:none;margin-bottom:20px;opacity:0.8;transition:opacity 0.12s}
 .wiki-back:hover{opacity:1}
 @media(max-width:640px){.step-block{flex-direction:column;gap:10px}.step-num{width:28px;height:28px;font-size:var(--text-sm)}}
+.step-body{flex:1;min-width:0}
+.step-body p{margin:0 0 10px;font-size:var(--text-sm);color:var(--text-dim);line-height:1.7}
+
+/* ── Callouts — learn-fate + deep-dive ── */
+.callout{margin:14px 0;padding:14px 16px;border-radius:8px;border:1px solid var(--border);font-size:var(--text-sm);line-height:1.65;color:var(--text-dim)}
+.callout p{margin:0}
+.callout-title{font-size:12px;font-weight:800;letter-spacing:0.04em;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.callout-info{background:color-mix(in srgb,var(--accent) 6%,transparent);border-color:color-mix(in srgb,var(--accent) 20%,transparent)}
+.callout-info .callout-title{color:var(--accent)}
+.callout-tip{background:color-mix(in srgb,#2e7d32 6%,transparent);border-color:color-mix(in srgb,#2e7d32 20%,transparent)}
+.callout-tip .callout-title{color:#2e7d32}
+.callout-dnd{background:color-mix(in srgb,#c62828 5%,transparent);border-color:color-mix(in srgb,#c62828 18%,transparent)}
+.callout-dnd .callout-title{color:#c62828}
+.callout-scenario{background:color-mix(in srgb,#6a4c93 6%,transparent);border-color:color-mix(in srgb,#6a4c93 20%,transparent)}
+.callout-scenario .callout-title{color:#6a4c93}
+
+/* ── Play-by-post walkthrough ── */
+.pbt-exchange{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid color-mix(in srgb,var(--border) 50%,transparent)}
+.pbt-exchange:last-child{border-bottom:none}
+.pbt-label{flex-shrink:0;width:64px;font-size:11px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:var(--accent);padding-top:2px}
+.pbt-roll{color:#6a4c93}
+.pbt-text{flex:1;font-size:var(--text-sm);color:var(--text-dim);line-height:1.7}
 
 /* ══ SESSION ZERO — Character Creation Wizard ══ */
 /* Layout */

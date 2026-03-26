@@ -1,6 +1,6 @@
 # Project Memory — Ogma
 _Persistent context for model-switching and session handoffs._
-_Last updated: 2026.03.644_
+_Last updated: 2026.03.652_
 
 ---
 
@@ -219,9 +219,9 @@ Distributed as `ogma-offline-YYYY-MM-NNN.zip`.
 - **Build command:** `npm run build` (runs `bash scripts/bump-version.sh && npx vite build`)
 - **Build output:** `build/`
 - **SPA routing:** `static/_redirects` → `/* /index.html 200`
-- **Version format:** `YYYY.MM.NNN` (e.g. `2026.03.644`)
+- **Version format:** `YYYY.MM.NNN` (e.g. `2026.03.652`)
 - **Zip naming:** source = `YYYY-MM-NNN.zip`, offline = `ogma-offline-YYYY-MM-NNN.zip`
-- **Current version:** `2026.03.644`
+- **Current version:** `2026.03.652`
 
 ---
 

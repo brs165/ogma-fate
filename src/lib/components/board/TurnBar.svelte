@@ -1,6 +1,6 @@
 <script>
   // ── TurnBar — draggable turn order strip for Play mode ────────────────────────
-  import { AlertDialog, Tooltip } from 'bits-ui';
+  import { AlertDialog } from 'bits-ui';
 
   let { players = [], order = [], setOrder = null, onToggleActed = null, round = 1, onNewRound = null, onPrevRound = null, roundFlash = false, onEndScene = null, onStartSession = null, onNewScene = null, onSessionSummary = null, onPrintScene = null, npcCards = [], onToggleNpcActed = null } = $props();
   let dragId = $state(null);

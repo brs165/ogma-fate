@@ -116,15 +116,15 @@
           <span style="white-space:nowrap"><strong class="ogma-letter" style="--i:3">A</strong>dventures</span>
         </p>
         <h1 class="land-hero-title">
-          Your session is in two hours.
+          Learn Fate. Build worlds.
           <br/>
-          <span class="land-hero-sub">Pick a world. Roll. Play.</span>
+          <span class="land-hero-sub">Solo prep or group play &mdash; one click away.</span>
         </h1>
         <p class="land-hero-desc">
           Rules-accurate NPCs, scenes, and encounters &mdash; generated in one click, ready for the table.
         </p>
         <p class="land-hero-desc" style="font-size:var(--text-sm);color:var(--text-muted);margin-top:4px">
-          Every GM should be able to run a great Fate Condensed session, regardless of how much time they had to prep.
+          Learn the rules, generate your world, and prep your session &mdash; whether you have two hours or two minutes.
         </p>
         <div class="land-hero-pills">
           <span class="land-hero-pill"><i class="fa-solid fa-tower-broadcast" aria-hidden="true"></i> Fully offline</span>

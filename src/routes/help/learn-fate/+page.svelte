@@ -154,9 +154,9 @@
 
     <div class="callout callout-info">
       <div class="callout-title"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Go deeper</div>
-      <p>The community's #1 recommended resource for truly understanding Fate: <a href="https://bookofhanz.com/" target="_blank" rel="noreferrer"><strong>The Book of Hanz</strong></a> — Robert Hanz's essays on Fate philosophy. Free to read. Start with "Fate Doesn't Have a Damage System" and "Aspects Are the Most Important Thing."</p>
-      <p>For the full mechanics reference, common errors, and GM prep guide: <a href="/help/fate-mechanics"><strong>Fate Mechanics deep-dive &rarr;</strong></a></p>
-      <p>For a step-by-step worked conflict example: <a href="/help/at-the-table#conflict-walkthrough"><strong>At the Table — conflict walkthrough &rarr;</strong></a></p>
+      <p><strong>Ready for more?</strong> <a href="/help/learn-fate-deep"><strong>Learn Fate — Deep Dive</strong></a> has an interactive tutorial scene, a full play-by-post walkthrough, a strategy guide covering Create Advantage and the FP economy, and a first session checklist.</p>
+      <p>The community's #1 recommended resource for truly understanding Fate: <a href="https://bookofhanz.com/" target="_blank" rel="noreferrer"><strong>The Book of Hanz</strong></a> — Robert Hanz's essays on Fate philosophy. Free to read. Start with "Fate Doesn't Have a Damage System."</p>
+      <p>For the full mechanics reference: <a href="/help/fate-mechanics"><strong>Fate Mechanics &rarr;</strong></a> · For a conflict walkthrough: <a href="/help/at-the-table#conflict-walkthrough"><strong>At the Table &rarr;</strong></a></p>
     </div>
 
     <div class="wiki-footer">

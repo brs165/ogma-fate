@@ -98,6 +98,7 @@ import { onMount } from 'svelte';
             <a class="wiki-sidebar-child" href="/help/learn-fate#step-5">5. Stress</a>
             <a class="wiki-sidebar-child" href="/help/learn-fate#step-6">6. Stunts</a>
             <a class="wiki-sidebar-child" href="/help/learn-fate#step-7">7. For the GM</a>
+            <a class="wiki-sidebar-child" href="/help/learn-fate-deep" style="font-weight:600;color:var(--accent)"><i class="fa-solid fa-graduation-cap" aria-hidden="true" style="font-size:10px"></i> Deep Dive</a>
           </nav>
         {/if}
         <a href="/help/how-to-use-ogma" class="wiki-sidebar-link" class:active={isActive('/help/how-to-use-ogma')}>

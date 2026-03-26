@@ -539,7 +539,25 @@
         {players}
         {selPlayer}
         onSel={(p) => { if (play) play.selPlayer.set(p); }}
-        onUpd={(id, patch) => { if (play) play.updPlayer(id, patch); }}
+        onUpd={(id, patch) => {
+          if (play) {
+            // WC-08: Auto-create consequence sticky when a consequence is written
+            if (patch.conseq && canvas) {
+              const oldPlayer = players.find(p => p.id === id);
+              const oldConseq = oldPlayer ? (oldPlayer.conseq || ['', '', '']) : ['', '', ''];
+              const SEVERITY = ['Mild', 'Moderate', 'Severe'];
+              const STICKY_COLOR = [3, 0, 2]; // purple, yellow, orange
+              patch.conseq.forEach((text, i) => {
+                if (text && text.trim() && (!oldConseq[i] || !oldConseq[i].trim())) {
+                  const label = (oldPlayer ? oldPlayer.name : '?') + ' \u2014 ' + SEVERITY[i];
+                  canvas.addStickyWithText(label + ': ' + text, STICKY_COLOR[i]);
+                  showToast(SEVERITY[i] + ' consequence sticky added');
+                }
+              });
+            }
+            play.updPlayer(id, patch);
+          }
+        }}
         onAdd={(name) => { if (play) play.addPlayer(name); }}
         collapsed={mode === 'prep'}
         {gmPool}

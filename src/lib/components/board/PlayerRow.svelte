@@ -1,5 +1,5 @@
 <script>
-  import { Collapsible, Tooltip } from 'bits-ui';
+  import { Collapsible } from 'bits-ui';
   // ── PlayerRow — player FP, stress, consequences, concede, compel ─────────────
   let { player = {}, sel = false, onUpd = null, onSel = null, onCompel = null } = $props();
   let expanded = $state(false);
@@ -78,7 +78,6 @@
       ]);
 </script>
 
-<Tooltip.Provider>
 <div
   class="rs-player{sel ? ' selected' : ''}"
   style="border-left-color:{player.color || 'var(--accent)'}; border-left-width:3px"
@@ -131,43 +130,31 @@
     <span class="rs-fp-label rs-stress-label-phy">PHY</span>
     <div style="display:flex; gap:2px">
       {#each (player.phy || []) as v, i}
-        <Tooltip.Root openDelay={600}>
-          <Tooltip.Trigger
-            class="rs-stress-box rs-stress-phy{v ? ' filled' : ''}"
-            role="checkbox"
-            aria-checked={String(!!v)}
-            aria-label="Physical stress {i + 1}"
-            tabindex="0"
-            onclick={() => { togglePhy(i); }}
-            onkeydown={e => onStressKeyDown(togglePhy, i, e)}
-          ></Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content class="bt-tooltip">
-              {v ? 'Clear' : 'Mark'} Physical {i + 1}
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
+        <div
+          class="rs-stress-box rs-stress-phy{v ? ' filled' : ''}"
+          role="checkbox"
+          aria-checked={String(!!v)}
+          aria-label="Physical stress {i + 1}"
+          title="{v ? 'Clear' : 'Mark'} Physical {i + 1}"
+          tabindex="0"
+          onclick={() => { togglePhy(i); }}
+          onkeydown={e => onStressKeyDown(togglePhy, i, e)}
+        ></div>
       {/each}
     </div>
     <span class="rs-fp-label rs-stress-label-men" style="margin-left:4px">MEN</span>
     <div style="display:flex; gap:2px">
       {#each (player.men || []) as v, i}
-        <Tooltip.Root openDelay={600}>
-          <Tooltip.Trigger
-            class="rs-stress-box rs-stress-men{v ? ' filled' : ''}"
-            role="checkbox"
-            aria-checked={String(!!v)}
-            aria-label="Mental stress {i + 1}"
-            tabindex="0"
-            onclick={() => { toggleMen(i); }}
-            onkeydown={e => onStressKeyDown(toggleMen, i, e)}
-          ></Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content class="bt-tooltip">
-              {v ? 'Clear' : 'Mark'} Mental {i + 1}
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
+        <div
+          class="rs-stress-box rs-stress-men{v ? ' filled' : ''}"
+          role="checkbox"
+          aria-checked={String(!!v)}
+          aria-label="Mental stress {i + 1}"
+          title="{v ? 'Clear' : 'Mark'} Mental {i + 1}"
+          tabindex="0"
+          onclick={() => { toggleMen(i); }}
+          onkeydown={e => onStressKeyDown(toggleMen, i, e)}
+        ></div>
       {/each}
     </div>
   </div>
@@ -220,4 +207,3 @@
   </Collapsible.Content>
   </Collapsible.Root>
 </div>
-</Tooltip.Provider>

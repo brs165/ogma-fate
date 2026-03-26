@@ -138,7 +138,7 @@ npx vite build
 cd build && zip -rq ../ogma-offline-YYYY-MM-NNN.zip .
 ```
 
-Current version: `2026.03.644`
+Current version: `2026.03.652`
 
 ---
 

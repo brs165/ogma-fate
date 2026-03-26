@@ -216,6 +216,9 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
     } else if (entry.type === 'reroll') {
       mutate(prev => prev.map(c => c.id === entry.id ? entry.prev : c));
       showToast('Reroll undone (' + undoStack.length + ' left)');
+    } else if (entry.type === 'move') {
+      mutate(prev => prev.map(c => entry.positions[c.id] ? Object.assign({}, c, entry.positions[c.id]) : c));
+      showToast('Move undone (' + undoStack.length + ' left)');
     }
   }
 
@@ -358,13 +361,42 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
 
   function syncNodePositions(changedNodes) {
     if (!changedNodes || !changedNodes.length) return;
+    // Capture old positions for undo
+    const currentCards = get(cards);
+    const oldPositions = {};
+    changedNodes.forEach(n => {
+      const card = currentCards.find(c => c.id === n.id);
+      if (card) oldPositions[n.id] = { x: card.x, y: card.y, z: card.z };
+    });
     const posMap = {};
     changedNodes.forEach(n => {
       if (n.position) {
         posMap[n.id] = { x: Math.round(n.position.x), y: Math.round(n.position.y), z: n.zIndex || Date.now() };
       }
     });
+    // Only push undo if positions actually changed
+    const moved = Object.keys(posMap).some(id => {
+      const old = oldPositions[id];
+      const nw = posMap[id];
+      return old && nw && (Math.abs(old.x - nw.x) > 2 || Math.abs(old.y - nw.y) > 2);
+    });
+    if (moved) {
+      undoStack = [{ type: 'move', positions: oldPositions }, ...undoStack].slice(0, 10);
+    }
     mutate(prev => prev.map(c => posMap[c.id] ? Object.assign({}, c, posMap[c.id]) : c));
+  }
+
+  // WC-08: Create a sticky with pre-filled text (used by consequence auto-placement)
+  function addStickyWithText(text, colorIdx, rotation) {
+    const sticky = {
+      id: boardUid(), genId: 'sticky', text: text || '"Aspect"',
+      colorIdx: colorIdx != null ? colorIdx : Math.floor(Math.random() * STICKY_COLORS.length),
+      rotation: rotation != null ? rotation : (Math.random() * 6 - 3),
+      x: 80 + Math.random() * 400,
+      y: 80 + Math.random() * 300,
+      z: Date.now(), ts: Date.now(),
+    };
+    mutate(prev => prev.concat([sticky]));
   }
 
   return {
@@ -374,7 +406,7 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
     generateCard, generateCardWithData, loadBinderToCanvas,
     updateCard, deleteCard, rerollCard,
     addConnector, removeConnector, updateConnector, removeCardConnectors, clearCanvas,
-    syncNodePositions,
+    syncNodePositions, addStickyWithText,
     undoLast, exportCanvas, importCanvas,
   };
 }
