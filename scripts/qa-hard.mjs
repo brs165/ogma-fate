@@ -301,6 +301,110 @@ for (const world of WORLDS) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
+// STATIC ANALYSIS — Dangerous Svelte 5 Patterns
+// ══════════════════════════════════════════════════════════════════════════
+{
+  const fs = await import('fs');
+  const path = await import('path');
+
+  function findSvelteFiles(dir) {
+    let files = [];
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.name === 'node_modules' || entry.name === '.svelte-kit' || entry.name === 'build') continue;
+      if (entry.isDirectory()) files = files.concat(findSvelteFiles(full));
+      else if (entry.name.endsWith('.svelte')) files.push(full);
+    }
+    return files;
+  }
+
+  const svelteFiles = findSvelteFiles('src');
+  let staticOk = true;
+
+  // CHECK: $state() timer/timeout variables read inside $effect (infinite loop risk)
+  for (const file of svelteFiles) {
+    const src = fs.readFileSync(file, 'utf-8');
+    const short = file.replace(/^src\//, '');
+
+    // Find all $state timer-like variables
+    const stateTimerRe = /let\s+(\w*[Tt]imer\w*|\w*[Tt]imeout\w*)\s*=\s*\$state\b/g;
+    let match;
+    while ((match = stateTimerRe.exec(src)) !== null) {
+      const varName = match[1];
+      // Check if this variable is read inside a $effect block
+      const effectRe = /\$effect\s*\(\s*\(\)\s*=>\s*\{([^}]*(?:\{[^}]*\}[^}]*)*)\}/gs;
+      let em;
+      while ((em = effectRe.exec(src)) !== null) {
+        const body = em[1];
+        if (body.includes(varName)) {
+          fail(`svelte5-state-timer-in-effect-${short}`,
+            `'${varName}' is $state() AND read inside $effect — infinite loop risk. Use plain 'let' instead.`);
+          staticOk = false;
+        }
+      }
+    }
+
+    // CHECK: $state() inside function body (invalid in Svelte 5)
+    const lines = src.split('\n');
+    let inScript = false;
+    let braceDepth = 0;
+    let inFunction = false;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (line.includes('<script')) inScript = true;
+      if (line.includes('</script')) { inScript = false; braceDepth = 0; inFunction = false; }
+      if (!inScript) continue;
+
+      // Track function depth (simplified — catches most cases)
+      if (/\bfunction\b/.test(line) || /=>\s*\{/.test(line)) {
+        if (braceDepth > 0) inFunction = true;
+      }
+      braceDepth += (line.match(/\{/g) || []).length;
+      braceDepth -= (line.match(/\}/g) || []).length;
+      if (braceDepth <= 0) { inFunction = false; braceDepth = 0; }
+
+      if (inFunction && /\$state\s*\(/.test(line)) {
+        fail(`svelte5-state-in-function-${short}:${i+1}`,
+          `$state() inside function body at line ${i+1}. Move to component top level.`);
+        staticOk = false;
+      }
+    }
+
+    // CHECK: on:click= instead of onclick= (Svelte 4 syntax)
+    if (/\bon:click\b/.test(src)) {
+      fail(`svelte5-legacy-event-${short}`, `Found 'on:click' — use 'onclick=' (Svelte 5 syntax).`);
+      staticOk = false;
+    }
+
+    // CHECK: export let (Svelte 4 props)
+    if (/export\s+let\s/.test(src)) {
+      fail(`svelte5-export-let-${short}`, `Found 'export let' — use '$props()' destructuring.`);
+      staticOk = false;
+    }
+
+    // CHECK: <style> block in component
+    if (/<style[\s>]/.test(src)) {
+      fail(`no-style-block-${short}`, `Found <style> block — all CSS must be in theme.css.`);
+      staticOk = false;
+    }
+
+    // CHECK: old --cv-card-* tokens in card fronts (should use --fs-* now)
+    if (short.includes('cards/fronts/') && /--cv-card-/.test(src)) {
+      warn(`stale-cv-token-${short}`, `Card front still uses --cv-card-* tokens — should use --fs-* fate-sheet tokens.`);
+    }
+
+    // CHECK: emoji HTML entities (should be FA icons)
+    const emojiRe = /&#(?:127|128|129)\d{3};/g;
+    if (emojiRe.test(src)) {
+      fail(`emoji-entity-${short}`, `Found emoji HTML entity — should use Font Awesome icon.`);
+      staticOk = false;
+    }
+  }
+
+  if (staticOk) pass('svelte5-static-analysis');
+}
+
+// ══════════════════════════════════════════════════════════════════════════
 // SUMMARY
 // ══════════════════════════════════════════════════════════════════════════
 console.log('\n' + '═'.repeat(60));

@@ -13,7 +13,7 @@
       <div class="callout-title"><i class="fa-solid fa-play" aria-hidden="true"></i> Start here — pick your path</div>
       <p><strong><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> New to Fate Condensed?</strong>&nbsp; <a href="/help/learn-fate">Learn Fate in 7 steps</a> — fiction first, aspects, dice, fate points, stress, stunts, and your first scene. 15 minutes.</p>
       <p><strong>&#9876; Coming from D&amp;D?</strong>&nbsp; <a href="/help/dnd-transition">D&amp;D Transition guide</a> — every D&amp;D habit that breaks Fate, and what to do instead.</p>
-      <p><strong>&#128640; Already know Fate, new to Ogma?</strong>&nbsp; <a href="/help/getting-started">Getting Started</a> — your first roll, pinning results, exporting, and offline use.</p>
+      <p><strong><i class="fa-solid fa-rocket" aria-hidden="true"></i> Already know Fate, new to Ogma?</strong>&nbsp; <a href="/help/getting-started">Getting Started</a> — your first roll, pinning results, exporting, and offline use.</p>
     </div>
 
     <div class="gen-grid">

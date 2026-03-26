@@ -102,9 +102,25 @@ src/routes/         26    route pages/layouts
 ## 6. QA gate — must pass before every zip delivery
 
 ```bash
-node scripts/qa-hard.mjs    # Content + engine checks
-node scripts/qa-export.mjs  # Export round-trip
+node scripts/qa-hard.mjs    # Content + engine + static analysis (188 checks)
+node scripts/qa-export.mjs  # Export round-trip (166 checks)
 npm run build               # Must print "✔ done"
+```
+
+### Static analysis checks (in qa-hard.mjs)
+- `$state()` timer variables read inside `$effect()` → infinite loop
+- `$state()` inside function bodies → invalid Svelte 5
+- `on:click` instead of `onclick` → Svelte 4 syntax
+- `export let` instead of `$props()` → Svelte 4 props
+- `<style>` blocks in components → CSS rule violation
+- Emoji HTML entities → should be FA icons
+- `--cv-card-*` tokens in card fronts → should use `--fs-*` (warning)
+
+### Browser smoke tests (optional — requires Playwright)
+```bash
+npx playwright install chromium   # One-time setup
+node scripts/qa-smoke.mjs         # Loads all 26 routes, generates on 8 worlds,
+                                   # tests nav + footer. Exit 0=pass, 2=skipped
 ```
 
 ---
@@ -122,7 +138,7 @@ npx vite build
 cd build && zip -rq ../ogma-offline-YYYY-MM-NNN.zip .
 ```
 
-Current version: `2026.03.582`
+Current version: `2026.03.606`
 
 ---
 

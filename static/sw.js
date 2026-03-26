@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ogma-2026.03.604';
+const CACHE_NAME = 'ogma-2026.03.616';
 
 // Font Awesome CDN resources to precache for offline
 const FA_CDN = [

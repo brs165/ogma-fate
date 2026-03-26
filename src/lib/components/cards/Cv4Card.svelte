@@ -1,5 +1,6 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
+  import { Dialog } from 'bits-ui';
   import BackPanel from './BackPanel.svelte';
 
   // ── Front component registry ────────────────────────────────────────────
@@ -69,7 +70,7 @@
   let { genId = 'npc_minor', campName = '', data = {}, onUpdate = null, savedCardState = null } = $props();
 
   // ── UI state ─────────────────────────────────────────────────────────────
-  let flipped = $state(false);
+  let guidanceOpen = $state(false);
   let hovered = $state(false);
   let visible = $state(true);
   let reduced = $state(false);
@@ -87,7 +88,7 @@
   });
 
   // ── Entry fade (triggers on genId/data change) ────────────────────────────
-  let fadeTimer = $state();
+  let fadeTimer;
   $effect(() => {
     if (!reduced) {
       void genId; void data;
@@ -125,98 +126,81 @@
     if (onUpdate) onUpdate(cardState);
   }
 
-  // ── Flip helpers ──────────────────────────────────────────────────────────
-  function toggleFlip(e) {
+  function openGuidance(e) {
     e.stopPropagation();
-    flipped = !flipped;
-  }
-  function onFlipKeydown(e) {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flipped = !flipped; }
+    guidanceOpen = true;
   }
 </script>
 
-<!-- ── Flip container ──────────────────────────────────────────────────── -->
+<!-- ── Card ─────────────────────────────────────────────────────────────── -->
 <div
-  class="cv4-flip-container"
   role="region"
   aria-label={ariaLabel}
   onmouseenter={() => hovered = true}
   onmouseleave={() => hovered = false}
-  style="perspective:{reduced ? 'none' : '1000px'}; animation:{reduced ? 'none' : 'fd-stamp-in 0.35s cubic-bezier(0.34,1.56,0.64,1) both'}; opacity:{visible ? 1 : 0}"
+  style="animation:{reduced ? 'none' : 'fd-stamp-in 0.35s cubic-bezier(0.34,1.56,0.64,1) both'}; opacity:{visible ? 1 : 0}"
 >
-  <!-- ── Flipper ──────────────────────────────────────────────────────── -->
   <div
-    class="cv4-flipper"
-    class:cv4-flipped={flipped}
-    style="position:relative; transform-style:{reduced ? 'flat' : 'preserve-3d'}; transition:{reduced ? 'none' : 'transform 0.5s cubic-bezier(0.4,0,0.2,1)'}; transform:{flipped ? (reduced ? 'none' : 'rotateY(180deg)') : 'none'}"
+    class="fs-card"
+    style="display:flex; flex-direction:column; transform:{hovered ? 'translateY(-2px)' : 'none'}; transition:transform 0.2s ease, box-shadow 0.2s ease; box-shadow:{hovered ? '0 6px 20px rgba(0,0,0,0.18)' : 'var(--fs-shadow)'}"
   >
-    <!-- ── FRONT ──────────────────────────────────────────────────────── -->
-    <div
-      class="cv4-face cv4-front fs-card"
-      style="backface-visibility:hidden; -webkit-backface-visibility:hidden; display:{reduced && flipped ? 'none' : 'flex'}; flex-direction:column; transform:{hovered && !flipped ? 'translateY(-2px)' : 'none'}; transition:transform 0.2s ease, box-shadow 0.2s ease; box-shadow:{hovered ? '0 6px 20px rgba(0,0,0,0.18)' : 'var(--fs-shadow)'}"
-    >
-      <!-- Header — campaign-tinted gradient -->
-      <div class="fs-header" style="background:{hdrBg}">
-        <div>
-          <div class="fs-world">
-            <i class={meta.icon} aria-hidden="true" style="margin-right:4px"></i>{genLabel}
-          </div>
-          {#if data.name}
-            <div class="fs-name">{data.name}</div>
-          {:else}
-            <div class="fs-name">{campName || genLabel}</div>
-          {/if}
+    <!-- Header — campaign-tinted gradient -->
+    <div class="fs-header" style="background:{hdrBg}">
+      <div>
+        <div class="fs-world">
+          <i class={meta.icon} aria-hidden="true" style="margin-right:4px"></i>{genLabel}
         </div>
-        {#if typeof data.refresh === 'number'}
-          <div class="fs-refresh" aria-label="Refresh {data.refresh}">{data.refresh}</div>
+        {#if data.name}
+          <div class="fs-name">{data.name}</div>
+        {:else}
+          <div class="fs-name">{campName || genLabel}</div>
         {/if}
       </div>
-      <!-- Front content -->
-      {#if FrontComponent}
-        <div class="fs-body">
-          <FrontComponent
-            {data}
-            {campName}
-            catColor={sectionColor}
-            {cardState}
-            onUpdate={updState}
-          />
-        </div>
+      {#if typeof data.refresh === 'number'}
+        <div class="fs-refresh" aria-label="Refresh {data.refresh}">{data.refresh}</div>
       {/if}
-      <!-- Flip button -->
-      <button
-        class="fs-flip-btn"
-        onclick={toggleFlip}
-        onkeydown={onFlipKeydown}
-        aria-label={flipped ? 'Show card front' : 'Show GM guidance'}
-      ><i class="fa-solid fa-rotate" aria-hidden="true" style="font-size:9px"></i> GM GUIDANCE</button>
     </div>
+    <!-- Front content -->
+    {#if FrontComponent}
+      <div class="fs-body">
+        <FrontComponent
+          {data}
+          {campName}
+          catColor={sectionColor}
+          {cardState}
+          onUpdate={updState}
+        />
+      </div>
+    {/if}
+    <!-- GM Guidance button -->
+    <button
+      class="fs-flip-btn"
+      onclick={openGuidance}
+      aria-label="Open GM guidance for {genLabel}"
+    ><i class="fa-solid fa-circle-info" aria-hidden="true" style="font-size:10px"></i> GM GUIDANCE</button>
+  </div>
+</div>
 
-    <!-- ── BACK ───────────────────────────────────────────────────────── -->
-    <div
-      class="cv4-face cv4-back fs-card"
-      style="backface-visibility:hidden; -webkit-backface-visibility:hidden; transform:{reduced ? 'none' : 'rotateY(180deg)'}; position:{flipped && !reduced ? 'relative' : reduced ? 'relative' : 'absolute'}; top:0; left:0; right:0; display:{reduced && !flipped ? 'none' : 'flex'}; flex-direction:column; box-shadow:var(--fs-shadow)"
-    >
-      <!-- Header -->
-      <div class="fs-header" style="background:{hdrBg}">
+<!-- ── GM Guidance Dialog ──────────────────────────────────────────────── -->
+<Dialog.Root bind:open={guidanceOpen}>
+  <Dialog.Portal>
+    <Dialog.Overlay class="fs-guidance-overlay" />
+    <Dialog.Content class="fs-guidance-dialog" aria-describedby={undefined}>
+      <div class="fs-header fs-guidance-hdr" style="background:{hdrBg}">
         <div>
           <div class="fs-world">
             <i class={meta.icon} aria-hidden="true" style="margin-right:4px"></i>{genLabel}
           </div>
           <div class="fs-name">GM Guidance</div>
         </div>
+        <Dialog.Close class="fs-guidance-close" aria-label="Close">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </Dialog.Close>
       </div>
-      <!-- Back panel content -->
-      <div class="fs-body" style="flex:1; overflow-y:visible; min-height:0">
+      <Dialog.Title class="sr-only">{genLabel} GM Guidance</Dialog.Title>
+      <div class="fs-body fs-guidance-body">
         <BackPanel {genId} catColor={sectionColor} />
       </div>
-      <!-- Flip button -->
-      <button
-        class="fs-flip-btn"
-        onclick={toggleFlip}
-        onkeydown={onFlipKeydown}
-        aria-label="Show card front"
-      ><i class="fa-solid fa-rotate" aria-hidden="true" style="font-size:9px"></i> CARD DETAILS</button>
-    </div>
-  </div>
-</div>
+    </Dialog.Content>
+  </Dialog.Portal>
+</Dialog.Root>

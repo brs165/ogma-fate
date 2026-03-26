@@ -1,10 +1,5 @@
 <script>
-  import CvLabel from './CvLabel.svelte';
-  let { genId = '', catColor = 'var(--accent)' } = $props();
-  const CV4_BODY = "system-ui,-apple-system,sans-serif";
-  const CV4_MONO = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
-  const accentBlue  = 'var(--c-blue,#60a5fa)';
-  const accentRed   = 'var(--c-red,#E06060)';
+  let { genId = '', catColor = 'var(--fs-section)' } = $props();
 
   const CV4_HELP = {
     npc_minor: {
@@ -156,61 +151,28 @@
   let help = $derived(CV4_HELP[genId] || { what: '', when: '', rule: '', invoke: '', compel: '' });
 </script>
 
-<div style:padding="12px 16px 14px"
-     style:display="flex"
-     style:flex-direction="column"
-     style:gap="10px">
+<div style="display:flex; flex-direction:column; gap:10px">
 
   <!-- What / When -->
-  <div style:display="flex" style:gap="12px">
-    <div style:flex="1">
-      <CvLabel label="WHAT IT GENERATES" color={catColor} />
-      <p style:margin="0"
-         style:font-size="11px"
-         style:color="var(--cv-card-text-dim)"
-         style:line-height="1.65"
-         style:font-family={CV4_BODY}>
-        {help.what}
-      </p>
+  <div style="display:flex; gap:12px">
+    <div style="flex:1">
+      <div class="fs-section-hdr">WHAT IT GENERATES</div>
+      <p style="margin:0; font-size:12px; color:var(--fs-text-dim); line-height:1.65">{help.what}</p>
     </div>
-    <div style:flex="1">
-      <CvLabel label="WHEN TO USE IT" color={catColor} />
-      <p style:margin="0"
-         style:font-size="11px"
-         style:color="var(--cv-card-text-dim)"
-         style:line-height="1.65"
-         style:font-family={CV4_BODY}>
-        {help.when}
-      </p>
+    <div style="flex:1">
+      <div class="fs-section-hdr">WHEN TO USE IT</div>
+      <p style="margin:0; font-size:12px; color:var(--fs-text-dim); line-height:1.65">{help.when}</p>
     </div>
   </div>
 
   <!-- Table rule -->
-  <div style:padding="8px 12px"
-       style:background="color-mix(in srgb,{catColor} 8%,var(--cv-card-dark,var(--panel)))"
-       style:border-left="3px solid {catColor}"
-       style:border-radius="0 2px 2px 0">
-    <CvLabel label="TABLE RULE" color={catColor} />
-    <p style:margin="0 0 4px"
-       style:font-size="11px"
-       style:color="var(--cv-card-text-dim)"
-       style:line-height="1.7"
-       style:font-family={CV4_BODY}>
-      {help.rule}
-    </p>
+  <div class="fs-stunt" style="border-left:3px solid var(--fs-section); border-radius:0 3px 3px 0; padding:8px 12px">
+    <div class="fs-stunt-name">TABLE RULE</div>
+    <p style="margin:0 0 4px; font-size:12px; color:var(--fs-text-dim); line-height:1.7">{help.rule}</p>
     {#if help.srd_url}
       <a href="https://fate-srd.com{help.srd_url}"
-         style:font-size="10px"
-         style:font-weight="700"
-         style:color={catColor}
-         style:opacity="0.8"
-         style:text-decoration="none"
-         style:letter-spacing="0.06em"
-         style:display="inline-flex"
-         style:align-items="center"
-         style:gap="3px"
-         target="_blank"
-         rel="noreferrer noopener"
+         style="font-size:10px; font-weight:700; color:var(--fs-section); opacity:0.8; text-decoration:none; letter-spacing:0.06em; display:inline-flex; align-items:center; gap:3px"
+         target="_blank" rel="noreferrer noopener"
          aria-label="Read on the Fate SRD (opens in new tab)"
       >SRD <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:10px"></i></a>
     {/if}
@@ -218,56 +180,24 @@
 
   <!-- Invoke + Compel examples -->
   {#if help.invoke || help.compel}
-    <div style:display="flex" style:gap="8px">
+    <div style="display:flex; gap:8px">
       {#if help.invoke}
-        <div style:flex="1"
-             style:padding="8px 10px"
-             style:background="color-mix(in srgb,{accentBlue} 8%,var(--cv-card-dark,var(--panel)))"
-             style:border-left="3px solid {accentBlue}"
-             style:border-radius="0 2px 2px 0">
-          <div style:display="flex" style:align-items="center" style:gap="5px" style:margin-bottom="4px">
-            <CvLabel label="INVOKE" color={accentBlue} />
-            <span style:font-size="9px"
-                  style:color={accentBlue}
-                  style:font-family={CV4_MONO}
-                  style:opacity="0.7"
-                  style:letter-spacing="0.1em">
-              EXAMPLE
-            </span>
+        <div class="fs-stunt" style="flex:1; border-left:3px solid #1565c0; border-radius:0 3px 3px 0">
+          <div style="display:flex; align-items:center; gap:5px; margin-bottom:4px">
+            <span class="fs-stunt-name" style="color:#1565c0; margin-bottom:0">INVOKE</span>
+            <span style="font-size:9px; color:#1565c0; opacity:0.7; letter-spacing:0.1em">EXAMPLE</span>
           </div>
-          <p style:margin="0"
-             style:font-size="11px"
-             style:color="var(--cv-card-text-dim)"
-             style:line-height="1.6"
-             style:font-family={CV4_BODY}>
-            {help.invoke}
-          </p>
+          <p style="margin:0; font-size:12px; color:var(--fs-text-dim); line-height:1.6">{help.invoke}</p>
         </div>
       {/if}
 
       {#if help.compel}
-        <div style:flex="1"
-             style:padding="8px 10px"
-             style:background="color-mix(in srgb,{accentRed} 8%,var(--cv-card-dark,var(--panel)))"
-             style:border-left="3px solid {accentRed}"
-             style:border-radius="0 2px 2px 0">
-          <div style:display="flex" style:align-items="center" style:gap="5px" style:margin-bottom="4px">
-            <CvLabel label="COMPEL" color={accentRed} />
-            <span style:font-size="9px"
-                  style:color={accentRed}
-                  style:font-family={CV4_MONO}
-                  style:opacity="0.7"
-                  style:letter-spacing="0.1em">
-              EXAMPLE
-            </span>
+        <div class="fs-stunt" style="flex:1; border-left:3px solid #c62828; border-radius:0 3px 3px 0">
+          <div style="display:flex; align-items:center; gap:5px; margin-bottom:4px">
+            <span class="fs-stunt-name" style="color:#c62828; margin-bottom:0">COMPEL</span>
+            <span style="font-size:9px; color:#c62828; opacity:0.7; letter-spacing:0.1em">EXAMPLE</span>
           </div>
-          <p style:margin="0"
-             style:font-size="11px"
-             style:color="var(--cv-card-text-dim)"
-             style:line-height="1.6"
-             style:font-family={CV4_BODY}>
-            {help.compel}
-          </p>
+          <p style="margin:0; font-size:12px; color:var(--fs-text-dim); line-height:1.6">{help.compel}</p>
         </div>
       {/if}
     </div>

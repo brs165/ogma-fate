@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   qa:
-    name: QA + Build
+    name: QA + Build + Smoke
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,7 +25,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: QA Hard (187 checks)
+      - name: QA Hard (188 checks)
         run: node scripts/qa-hard.mjs
 
       - name: QA Export (166 checks)
@@ -40,3 +40,27 @@ jobs:
           test -f build/sw.js || exit 1
           test -f build/manifest.json || exit 1
           echo "Build output verified"
+
+      # --- Playwright Setup (Chromium Only) ---
+      - name: Get Playwright version
+        id: playwright-version
+        run: echo "version=$(npm ls playwright --json | jq -r '.dependencies["playwright"].version')" >> $GITHUB_OUTPUT
+
+      - name: Cache Playwright Browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-chromium-${{ steps.playwright-version.outputs.version }}
+
+      - name: Install Playwright Chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install chromium --with-deps
+
+      - name: Install OS Dependencies (if cache hit)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      # --- Browser Smoke Tests ---
+      - name: QA Smoke (Playwright)
+        run: node scripts/qa-smoke.mjs

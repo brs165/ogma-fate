@@ -404,7 +404,7 @@
           </div>
 
           <div class="sz-card">
-            <div class="sz-card-title">&#127761; Impending Issue &mdash; Brewing on the Horizon</div>
+            <div class="sz-card-title"><i class="fa-solid fa-cloud-bolt" aria-hidden="true"></i> Impending Issue &mdash; Brewing on the Horizon</div>
             <div class="sz-issue-name">{wd.impending[iiIdx].name}</div>
             <div class="sz-issue-desc">{wd.impending[iiIdx].desc}</div>
           </div>
