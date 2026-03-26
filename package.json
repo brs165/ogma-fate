@@ -1,11 +1,11 @@
 {
 	"name": "ogma-fate",
 	"private": true,
-	"version": "2026.3.550",
+	"version": "2026.3.553",
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
-		"build": "bash scripts/bump-version.sh && vite build",
+		"build": "bash scripts/bump-version.sh && vite build && cp build/index.html build/404.html",
 		"qa": "node scripts/qa-hard.mjs",
 		"qa:export": "node scripts/qa-export.mjs",
 		"precheck": "node scripts/qa-hard.mjs && node scripts/qa-export.mjs && npm run build",
