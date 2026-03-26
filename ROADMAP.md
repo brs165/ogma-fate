@@ -4,7 +4,7 @@ See `docs/claude/PROJECT_MEMORY.md` for full project state and `docs/claude/CANV
 
 ---
 
-## Current version: 2026.03.600
+## Current version: 2026.03.644
 
 **Stack:** SvelteKit + Svelte 5 runes + SvelteFlow + Bits UI + Dexie 4 + FA 7.2 Free
 **QA gate:** 82 `.svelte` files | 6 stores | 187 hard checks | 166 export checks | `npm run build` passes

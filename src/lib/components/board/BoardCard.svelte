@@ -30,10 +30,17 @@
 
   // WC-04: minimise/expand — double-click card to collapse to title strip
   let minimised = $derived(card.minimised === true);
+  // WC-07: GM-only — hidden from player view when sync is active
+  let gmOnly = $derived(card.gmOnly === true);
 
   function toggleMinimise(e) {
     e.stopPropagation();
     if (onUpdate) onUpdate(card.id, { minimised: !minimised });
+  }
+
+  function toggleGmOnly(e) {
+    e.stopPropagation();
+    if (onUpdate) onUpdate(card.id, { gmOnly: !gmOnly });
   }
 
   function onKeyDown(e) {
@@ -67,6 +74,7 @@
 
 <div
   class="board-card"
+  class:bc-gm-only={gmOnly}
   tabindex="0"
   role="region"
   aria-label="{genEntry ? genEntry.label : card.genId}: {card.title || ''}"
@@ -93,6 +101,11 @@
       <button class="bc-btn" title="Move to Table" aria-label="Move to Table"
         onclick={(e) => { e.stopPropagation(); (() => { if (onSendToTable) onSendToTable(card); if (onDelete) onDelete(card.id); })(e); }}>→</button>
     {/if}
+    <button class="bc-btn bc-btn-gm-only" class:active={gmOnly}
+      title="{gmOnly ? 'Visible to GM only — click to show to players' : 'Visible to players — click to hide from players'}"
+      aria-label="{gmOnly ? 'GM only — hidden from players' : 'Visible to players'}"
+      aria-pressed={String(gmOnly)}
+      onclick={toggleGmOnly}><i class={gmOnly ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'} aria-hidden="true"></i></button>
     <button class="bc-btn bc-btn-minimise" title="{minimised ? 'Expand card' : 'Minimise card'}" aria-label="{minimised ? 'Expand' : 'Minimise'}"
       onclick={toggleMinimise}>{minimised ? '▼' : '▲'}</button>
     <button class="bc-btn" title="Delete" aria-label="Delete"

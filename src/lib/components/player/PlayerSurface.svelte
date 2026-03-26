@@ -3,7 +3,7 @@
   import Cv4Card from '../cards/Cv4Card.svelte';
   // ── Derived from sync state ────────────────────────────────────────────────
   let { syncState = null, playerName = '', roomCode = '', syncObj = null, syncStatus = 'offline', campId = '' } = $props();
-  let cards = $derived((syncState && syncState.cards) || []);
+  let cards = $derived(((syncState && syncState.cards) || []).filter(c => !c.gmOnly));
   let fp = $derived(syncState && syncState.fp);
   let players = $derived((syncState && syncState.players) || []);
   let roundInfo = $derived(syncState ? { round: syncState.round || 1, gmPool: syncState.gmPool || 0 } : { round: 1, gmPool: 0 });

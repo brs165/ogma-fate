@@ -3758,6 +3758,10 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 
 /* ══ WC-04: Card minimise/expand ══ */
 .bc-btn-minimise { font-size:9px; font-weight:900; letter-spacing:.05em; }
+.bc-btn-gm-only { font-size:11px; }
+.bc-btn-gm-only.active { color:var(--c-amber,#f4b942); }
+.bc-gm-only { opacity:0.55; outline:2px dashed var(--c-amber,#f4b942); outline-offset:2px; }
+.bc-gm-only .fs-card { filter:saturate(0.4); }
 .bc-mini-strip {
   display:flex; align-items:center; gap:7px;
   padding:8px 10px; cursor:pointer;

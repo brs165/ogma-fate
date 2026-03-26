@@ -1,7 +1,6 @@
 <script>
   import { onMount, onDestroy, setContext } from 'svelte';
   import { get, writable } from 'svelte/store';
-  import { Tooltip } from 'bits-ui';
   import { SvelteFlow, Background, BackgroundVariant, MiniMap, Controls } from '@xyflow/svelte';
   import '@xyflow/svelte/dist/style.css';
   import { nodeTypes } from './nodeTypes.js';
@@ -461,7 +460,6 @@
 
 <!-- ── Template ─────────────────────────────────────────────────────────────── -->
 
-<Tooltip.Provider>
 <div class="board-app" data-theme={theme} data-mode={mode} onclick={() => ctx = null}>
 
   <!-- ── Topbar ────────────────────────────────────────────────────────────── -->
@@ -912,4 +910,3 @@
     </div>
   {/if}
 </div>
-</Tooltip.Provider>

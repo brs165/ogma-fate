@@ -53,6 +53,7 @@
   }
 </script>
 
+<Tooltip.Provider>
 <div class="bt-bar">
 
   <!-- World picker — Bits UI Select -->
@@ -252,3 +253,4 @@
 
   </div>
 </div>
+</Tooltip.Provider>

@@ -78,6 +78,7 @@
       ]);
 </script>
 
+<Tooltip.Provider>
 <div
   class="rs-player{sel ? ' selected' : ''}"
   style="border-left-color:{player.color || 'var(--accent)'}; border-left-width:3px"
@@ -219,3 +220,4 @@
   </Collapsible.Content>
   </Collapsible.Root>
 </div>
+</Tooltip.Provider>

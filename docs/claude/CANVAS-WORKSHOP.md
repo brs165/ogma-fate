@@ -1,5 +1,5 @@
 # Canvas Workshop — SvelteFlow Prep & Play Surface
-# Date: March 2026 | Version: 2026.03.600
+# Date: March 2026 | Version: 2026.03.644
 
 Full team workshop on the SvelteFlow canvas integration.
 Six voices, two surfaces (Prep + Play).
