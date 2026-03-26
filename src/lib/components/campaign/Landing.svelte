@@ -148,6 +148,34 @@
       </div>
     </div>
 
+    <!-- Intro teaser — what Ogma generates -->
+    <section class="land-intro-section" aria-label="What Ogma generates">
+      <div class="land-worlds-inner">
+        <h2 class="land-section-heading">What Ogma generates</h2>
+        <p class="land-section-sub">Every result is rules-accurate, campaign-voiced, and ready to drop into your session. No prep required.</p>
+        <div class="land-intro-cards">
+          {#each [
+            { icon: '◆', label: 'Major NPC', desc: '5 aspects · skill pyramid · stunts · stress tracks · refresh', color: 'var(--c-blue)' },
+            { icon: '◉', label: 'Scene Setup', desc: 'Situation aspects · zones · framing questions · free invokes', color: 'var(--c-green)' },
+            { icon: '⊕', label: 'Adventure Seed', desc: '3-scene skeleton · opposition · stakes · twist · campaign hook', color: 'var(--accent)' },
+            { icon: '⚑', label: 'Faction', desc: 'Goal · method · weakness · named face NPC', color: 'var(--c-purple)' },
+            { icon: '⚡', label: 'Consequence', desc: 'Named aspect · compel hook · recovery path', color: 'var(--c-red)' },
+            { icon: '⏱', label: 'Countdown', desc: 'Track · trigger · outcome — visible urgency for any scene', color: 'var(--gold)' },
+          ] as item}
+            <div class="land-intro-card">
+              <div class="land-intro-card-icon" style="color:{item.color}">{item.icon}</div>
+              <div class="land-intro-card-label" style="color:{item.color}">{item.label}</div>
+              <div class="land-intro-card-desc">{item.desc}</div>
+            </div>
+          {/each}
+        </div>
+        <div class="land-intro-cta">
+          <a href="/campaigns/fantasy" class="land-cta-primary">&#127922; Try it now</a>
+          <a href="/help/generators" class="land-cta-secondary">All 17 generators &rarr;</a>
+        </div>
+      </div>
+    </section>
+
     <!-- Onboarding: New here? -->
     <div class="land-onboard-section">
       <div class="land-worlds-inner">
