@@ -5,25 +5,20 @@
     toBatchMarkdown, toBatchPlainText,
     toBatchMermaid, toBatchObsidianMD, toBatchTypst,
   } from '../../engine.js';
-
-  export let cards    = [];
-  export let campName = '';
-  export let onToast  = null;
-  export let onImport = null;
-
+  let { cards = [], campName = '', onToast = null, onImport = null } = $props();
   // Filter to exportable cards
-  $: exportable = cards.filter(c =>
+  let exportable = $derived(cards.filter(c =>
     c.genId && c.genId !== 'sticky' && c.genId !== 'boost' && c.genId !== 'label' && c.data
-  );
+  ));
 
   // Selection state — reset when exportable set changes
   let sel = {};
-  $: {
+  $effect(() => {
     void exportable.length;
     const s = {};
     exportable.forEach(c => { s[c.id] = true; });
     sel = s;
-  }
+  });
 
   let fmt  = 'md';
   let del_ = 'copy';
@@ -34,8 +29,8 @@
   function selAll()  { const s = {}; exportable.forEach(c => { s[c.id] = true;  }); sel = s; }
   function selNone() { sel = {}; }
 
-  $: selectedCards  = exportable.filter(c => sel[c.id]);
-  $: selectedCount  = selectedCards.length;
+  let selectedCards = $derived(exportable.filter(c => sel[c.id]));
+  let selectedCount = $derived(selectedCards.length);
 
   function cardTitle(c) {
     const d = c.data || {};
@@ -59,8 +54,8 @@
     {id:'prt', label:'Print',      icon:'⎙',   sub:'PDF popup',            action:'popup'},
   ];
 
-  $: activeFmt = FORMATS.find(f => f.id === fmt) || FORMATS[0];
-  $: isPopup = activeFmt.action === 'popup';
+  let activeFmt = $derived(FORMATS.find(f => f.id === fmt) || FORMATS[0]);
+  let isPopup = $derived(activeFmt.action === 'popup');
 
   function doExecute() {
     if (!selectedCards.length) return;
@@ -117,8 +112,8 @@
     <div class="bep-section-label" style="display:flex; align-items:center; justify-content:space-between">
       <span>Cards <span style="font-weight:400; color:var(--text-muted); font-size:10px">({selectedCount}/{exportable.length})</span></span>
       <span style="display:flex; gap:4px">
-        <button class="bep-sel-btn" on:click={selAll}>All</button>
-        <button class="bep-sel-btn" on:click={selNone}>None</button>
+        <button class="bep-sel-btn" onclick={selAll}>All</button>
+        <button class="bep-sel-btn" onclick={selNone}>None</button>
       </span>
     </div>
 
@@ -127,7 +122,7 @@
         {@const title = cardTitle(c)}
         {@const label = genLabel(c.genId)}
         <label class="bep-card-row">
-          <input type="checkbox" checked={!!sel[c.id]} on:change={() => toggleCard(c.id)} />
+          <input type="checkbox" checked={!!sel[c.id]} onchange={() => toggleCard(c.id)} />
           <span style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:11px">
             {title || label}
           </span>
@@ -142,7 +137,7 @@
       {#each FORMATS as f (f.id)}
         <button
           class="bep-fmt-btn{fmt === f.id ? ' is-active' : ''}"
-          on:click={() => (fmt = f.id)}
+          onclick={() => (fmt = f.id)}
           aria-pressed={String(fmt === f.id)}
           title="{f.label} — {f.sub}"
         >
@@ -159,14 +154,14 @@
     {#if !isPopup}
       <div class="bep-section-label">Delivery</div>
       <div class="bep-del-row">
-        <button class="bep-del-btn{del_ === 'copy' ? ' is-active' : ''}" on:click={() => (del_ = 'copy')}>⌘ Copy to clipboard</button>
-        <button class="bep-del-btn{del_ === 'download' ? ' is-active' : ''}" on:click={() => (del_ = 'download')}>↓ Download file</button>
+        <button class="bep-del-btn{del_ === 'copy' ? ' is-active' : ''}" onclick={() => (del_ = 'copy')}>⌘ Copy to clipboard</button>
+        <button class="bep-del-btn{del_ === 'download' ? ' is-active' : ''}" onclick={() => (del_ = 'download')}>↓ Download file</button>
       </div>
     {/if}
 
     <!-- Execute -->
     <div class="bep-exec-row">
-      <button class="bep-exec-btn" disabled={selectedCount === 0} on:click={doExecute}>
+      <button class="bep-exec-btn" disabled={selectedCount === 0} onclick={doExecute}>
         {#if isPopup}
           ▶ {activeFmt.label}
         {:else if del_ === 'copy'}
@@ -179,7 +174,7 @@
 
     <!-- Import link -->
     {#if onImport}
-      <button class="bep-import-link" on:click={onImport}>↑ Import from JSON</button>
+      <button class="bep-import-link" onclick={onImport}>↑ Import from JSON</button>
     {/if}
   {/if}
 </div>

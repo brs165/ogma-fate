@@ -1,7 +1,5 @@
 <script>
-  export let text = '';
-  export let color = 'var(--accent)';
-
+  let { text = '', color = 'var(--accent)' } = $props();
   const CV4_MONO = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
 </script>
 

@@ -1,22 +1,16 @@
 <script>
   import CvLabel from '../CvLabel.svelte';
   import StressRow from '../StressRow.svelte';
-
-  export let data = {};
-  export let campName = '';
-  export let catColor = 'var(--accent)';
-  export let cardState = {};
-  export let onUpdate = () => {};
-
+  let { data = {}, campName = '', catColor = 'var(--accent)', cardState = {}, onUpdate = () => {} } = $props();
   const CV4_MONO = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
   const CV4_SANS = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
 
-  $: asp    = data.aspects || {};
-  $: skills = Array.isArray(data.skills) ? data.skills : [];
-  $: stunts = Array.isArray(data.stunts) ? data.stunts : [];
-  $: others = Array.isArray(asp.others) ? asp.others : [];
-  $: phyHits = cardState?.phyHit ?? Array(data.physical_stress || 3).fill(false);
-  $: menHits = cardState?.menHit ?? Array(data.mental_stress  || 3).fill(false);
+  let asp = $derived(data.aspects || {});
+  let skills = $derived(Array.isArray(data.skills) ? data.skills : []);
+  let stunts = $derived(Array.isArray(data.stunts) ? data.stunts : []);
+  let others = $derived(Array.isArray(asp.others) ? asp.others : []);
+  let phyHits = $derived(cardState?.phyHit ?? Array(data.physical_stress || 3).fill(false));
+  let menHits = $derived(cardState?.menHit ?? Array(data.mental_stress  || 3).fill(false));
 
   function setPhy(a) { onUpdate({ phyHit: a }); }
   function setMen(a) { onUpdate({ menHit: a }); }

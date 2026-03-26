@@ -1,5 +1,3 @@
-<svelte:options runes={false} />
-
 <script>
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
@@ -7,7 +5,7 @@
 
   let theme = 'dark';
 
-  $: world = $page.params.world;
+  let world = $derived($page.params.world);
 
   const WORLD_NAMES = {
     thelongafter: 'The Long After',
@@ -19,7 +17,7 @@
     western: 'Dust and Iron',
     dVentiRealm: 'dVenti Realm',
   };
-  $: worldName = WORLD_NAMES[world] || 'Campaign Guide';
+  let worldName = $derived(WORLD_NAMES[world] || 'Campaign Guide');
 
   const GUIDES = {
     fantasy: `<h1 id="main-content">✦ Shattered Kingdoms</h1>
@@ -778,10 +776,10 @@
   <a href="/campaigns/dVentiRealm">⚔ Open dVenti Realm Generator</a>`
   };
 
-  $: guideHtml = GUIDES[world] || null;
-  $: if (typeof document !== 'undefined' && world) {
+  let guideHtml = $derived(GUIDES[world] || null);
+  $effect(() => { if (typeof document !== 'undefined' && world) {
     document.documentElement.setAttribute('data-campaign', world);
-  }
+  } });
 
   onMount(() => {
     try {
@@ -827,7 +825,7 @@
     <div class="topbar-status">
       <a href="/campaigns/{world}" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#9654; Generate</a>
       <a href="/help" class="btn btn-ghost topbar-nav-btn topbar-nav-hide-sm" style="font-size:13px;text-decoration:none">&#128218; Help</a>
-      <button class="btn btn-icon btn-ghost" on:click={toggleTheme}
+      <button class="btn btn-icon btn-ghost" onclick={toggleTheme}
         aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
         style="width:44px;height:44px">{theme === 'dark' ? '☀️' : '◑'}</button>
     </div>

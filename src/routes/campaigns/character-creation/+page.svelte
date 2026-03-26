@@ -1,5 +1,3 @@
-<svelte:options runes={false} />
-
 <script>
   import { onMount } from 'svelte';
   import { VERSION } from '$lib/version.js';
@@ -7,7 +5,7 @@
   let theme = 'dark';
   let step = 0;
 
-  $: STEPS = (() => {
+  let STEPS = $derived((() => {
     const base = [
       { id: 'campaign',    title: 'Choose Your Campaign' },
       { id: 'mode',        title: 'How Deep Do You Want to Go?' },
@@ -38,12 +36,12 @@
       { id: 'summary',   title: 'Summary & Export' },
     );
     return base;
-  })();
+  })());
 
-  $: totalSteps = STEPS.length;
-  $: stepId = STEPS[step] ? STEPS[step].id : 'campaign';
-  $: progress = ((step + 1) / totalSteps * 100);
-  $: if (step >= STEPS.length) step = 0;
+  let totalSteps = $derived(STEPS.length);
+  let stepId = $derived(STEPS[step] ? STEPS[step].id : 'campaign');
+  let progress = $derived(((step + 1) / totalSteps * 100));
+  $effect(() => { if (step >= STEPS.length) step = 0; });
 
   function next() { if (step < totalSteps - 1) step += 1; }
   function back() { if (step > 0) step -= 1; }
@@ -52,11 +50,11 @@
   let pcCount = 2;
   let pcIndex = 0;
   let pcDrafts = [];
-  $: {
+  $effect(() => {
     while (pcDrafts.length < pcCount) pcDrafts.push({ name: '', hc: '', trouble: '' });
     pcDrafts = pcDrafts.slice(0, pcCount);
-  }
-  $: currentPc = pcDrafts[pcIndex] || { name: '', hc: '', trouble: '' };
+  });
+  let currentPc = $derived(pcDrafts[pcIndex] || { name: '', hc: '', trouble: '' });
   let fromSessionZero = false;
   let sentToPrep = false;
 
@@ -116,7 +114,7 @@
     dVentiRealm:  { name: 'dVenti Realm',            icon: '⬟', genre: 'High Fantasy',    tagline: 'The Senate collapsed. The Vaults are still here. So is everything sealed inside them.' },
   };
 
-  $: camp = campId ? CAMPAIGNS[campId] : null;
+  let camp = $derived(campId ? CAMPAIGNS[campId] : null);
 
   const CAMP_ORDER = ['thelongafter','cyberpunk','fantasy','space','victorian','postapoc','western','dVentiRealm'];
 
@@ -279,9 +277,9 @@
     },
   };
 
-  $: wd = campId ? WORLD_DATA[campId] : null;
-  $: ciIdx = wd ? rerolls % wd.current.length : 0;
-  $: iiIdx = wd && wd.impending.length > 1 ? (rerolls + 1) % wd.impending.length : 0;
+  let wd = $derived(campId ? WORLD_DATA[campId] : null);
+  let ciIdx = $derived(wd ? rerolls % wd.current.length : 0);
+  let iiIdx = $derived(wd && wd.impending.length > 1 ? (rerolls + 1) % wd.impending.length : 0);
 
   function pickN(arr, n) {
     if (!arr || arr.length === 0) return [];
@@ -294,9 +292,9 @@
   }
 
   // Reactive picks that change on reroll
-  $: hcExamples = wd ? pickN(wd.hc, 4) : []; void rerolls;
-  $: trExamples = wd ? pickN(wd.troubles, 4) : []; void rerolls;
-  $: qExamples = wd ? pickN(wd.questions, 6) : []; void rerolls;
+  let hcExamples = $derived(wd ? pickN(wd.hc, 4) : []);
+  let trExamples = $derived(wd ? pickN(wd.troubles, 4) : []);
+  let qExamples = $derived(wd ? pickN(wd.questions, 6) : []);
 </script>
 
 <svelte:head>
@@ -313,7 +311,7 @@
     <div class="topbar-status">
       <a href="/help" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">&#128218; Help</a>
       <a href="/about" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">About</a>
-      <button class="btn btn-icon btn-ghost" on:click={toggleTheme}
+      <button class="btn btn-icon btn-ghost" onclick={toggleTheme}
         aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
         style="width:44px;height:44px">{theme === 'dark' ? '☀️' : '◑'}</button>
     </div>
@@ -359,7 +357,7 @@
       </div>
       <div class="sz-grid sz-grid-2">
         {#each CAMP_ORDER as id}
-          <button class="sz-option" class:selected={campId === id} on:click={() => selectCamp(id)} type="button">
+          <button class="sz-option" class:selected={campId === id} onclick={() => selectCamp(id)} type="button">
             <div class="sz-option-title">{CAMPAIGNS[id].name}</div>
             <div class="sz-option-sub">{CAMPAIGNS[id].tagline.split('.')[0]}.</div>
           </button>
@@ -372,7 +370,7 @@
       </div>
       <div class="sz-grid">
         {#each MODES as md}
-          <button class="sz-option" class:selected={mode === md.id} on:click={() => selectMode(md.id)} type="button" style="text-align:left">
+          <button class="sz-option" class:selected={mode === md.id} onclick={() => selectMode(md.id)} type="button" style="text-align:left">
             <div class="sz-option-tag">{md.tag}</div>
             <div class="sz-option-title">{md.label}</div>
             <div class="sz-option-sub">{md.sub}</div>
@@ -384,7 +382,7 @@
         <p>How many players are at the table today? The wizard will collect a name, High Concept, and Trouble for each one.</p>
         <div class="sz-pc-count-row">
           {#each [1,2,3,4,5,6] as n}
-            <button class="sz-option sz-pc-count-btn" class:selected={pcCount === n} on:click={() => { pcCount = n; pcIndex = 0; }} type="button" aria-pressed={String(pcCount === n)}>
+            <button class="sz-option sz-pc-count-btn" class:selected={pcCount === n} onclick={() => { pcCount = n; pcIndex = 0; }} type="button" aria-pressed={String(pcCount === n)}>
               <div class="sz-option-title">{n}</div>
               <div class="sz-option-sub">{n === 1 ? 'Solo' : n + ' players'}</div>
             </button>
@@ -410,7 +408,7 @@
             <div class="sz-issue-desc">{wd.impending[iiIdx].desc}</div>
           </div>
 
-          <button class="btn btn-ghost sz-reroll" on:click={reroll} type="button">&#127922; Different issues</button>
+          <button class="btn btn-ghost sz-reroll" onclick={reroll} type="button">&#127922; Different issues</button>
         {/if}
 
         <div class="sz-tip">Discuss for 5 minutes: What does this world feel like? Who has power? What's at stake? This shared understanding is the foundation everything else builds on.</div>
@@ -427,21 +425,21 @@
         {/if}
         <div class="sz-input-group">
           <label class="sz-input-label" for="pc-name">Character Name</label>
-          <input id="pc-name" type="text" class="sz-input" placeholder="Leave blank to fill in later" value={currentPc.name} on:input={e => updateCurrentPc('name', e.target.value)} autocomplete="off" />
+          <input id="pc-name" type="text" class="sz-input" placeholder="Leave blank to fill in later" value={currentPc.name} oninput={e => updateCurrentPc('name', e.target.value)} autocomplete="off" />
         </div>
         <p>Who is this character? One phrase that captures their role in the story.</p>
         <div class="sz-prompt-box">"If someone asked <em>what's your character about?</em> at a bar, what would you say?"</div>
         <div class="sz-input-group">
           <label class="sz-input-label" for="pc-hc">High Concept</label>
-          <input id="pc-hc" type="text" class="sz-input" placeholder="e.g. Burned Ex-Corporate Fixer" value={currentPc.hc} on:input={e => updateCurrentPc('hc', e.target.value)} autocomplete="off" />
+          <input id="pc-hc" type="text" class="sz-input" placeholder="e.g. Burned Ex-Corporate Fixer" value={currentPc.hc} oninput={e => updateCurrentPc('hc', e.target.value)} autocomplete="off" />
         </div>
         {#if hcExamples.length > 0}
           <div class="sz-card">
             <div class="sz-card-title">{camp ? camp.name : ''} Examples</div>
             <ul class="sz-aspect-list">
-              {#each hcExamples as ex}<li><button class="sz-example-pick" type="button" on:click={() => updateCurrentPc('hc', ex)}>{ex}</button></li>{/each}
+              {#each hcExamples as ex}<li><button class="sz-example-pick" type="button" onclick={() => updateCurrentPc('hc', ex)}>{ex}</button></li>{/each}
             </ul>
-            <button class="btn btn-ghost sz-reroll" on:click={reroll} type="button">&#127922; New examples</button>
+            <button class="btn btn-ghost sz-reroll" onclick={reroll} type="button">&#127922; New examples</button>
           </div>
         {/if}
         <div class="sz-dnd">In D&amp;D, your class + race IS your character concept. In Fate, High Concept is a narrative phrase that can be invoked and compelled.</div>
@@ -462,15 +460,15 @@
         <div class="sz-prompt-box">"When things go wrong for your character, <em>why</em> do they go wrong? What keeps pulling them back into trouble?"</div>
         <div class="sz-input-group">
           <label class="sz-input-label" for="pc-trouble">Trouble</label>
-          <input id="pc-trouble" type="text" class="sz-input" placeholder="e.g. The Handler Knows Everything" value={currentPc.trouble} on:input={e => updateCurrentPc('trouble', e.target.value)} autocomplete="off" />
+          <input id="pc-trouble" type="text" class="sz-input" placeholder="e.g. The Handler Knows Everything" value={currentPc.trouble} oninput={e => updateCurrentPc('trouble', e.target.value)} autocomplete="off" />
         </div>
         {#if trExamples.length > 0}
           <div class="sz-card">
             <div class="sz-card-title">Setting Examples</div>
             <ul class="sz-aspect-list">
-              {#each trExamples as ex}<li><button class="sz-example-pick" type="button" on:click={() => updateCurrentPc('trouble', ex)}>{ex}</button></li>{/each}
+              {#each trExamples as ex}<li><button class="sz-example-pick" type="button" onclick={() => updateCurrentPc('trouble', ex)}>{ex}</button></li>{/each}
             </ul>
-            <button class="btn btn-ghost sz-reroll" on:click={reroll} type="button">&#127922; New examples</button>
+            <button class="btn btn-ghost sz-reroll" onclick={reroll} type="button">&#127922; New examples</button>
           </div>
         {/if}
         <div class="sz-tip">A boring trouble earns you nothing. "Has Enemies" is flat. "The Warlord's Daughter Wants Me Dead" is a compel waiting to happen every single session.</div>
@@ -652,7 +650,7 @@
                 <li style="padding:3px 0">{q}</li>
               {/each}
             </ol>
-            <button class="btn btn-ghost sz-reroll" on:click={reroll} type="button">&#127922; Different questions</button>
+            <button class="btn btn-ghost sz-reroll" onclick={reroll} type="button">&#127922; Different questions</button>
           </div>
         {/if}
 
@@ -731,10 +729,10 @@
 
         <!-- Export bar -->
         <div class="sz-export-bar">
-          <button class="btn btn-primary" on:click={sendToPrep}><i class="fa-solid fa-cart-plus" aria-hidden="true"></i> Send to Table Prep</button>
-          <button class="btn btn-ghost" on:click={copyMarkdown}>&#128203; Markdown</button>
-          <button class="btn btn-ghost" on:click={copyJSON}>&#123; &#125; JSON</button>
-          <button class="btn btn-ghost" on:click={() => { if (typeof window !== 'undefined') window.print(); }}>&#128424; Print</button>
+          <button class="btn btn-primary" onclick={sendToPrep}><i class="fa-solid fa-cart-plus" aria-hidden="true"></i> Send to Table Prep</button>
+          <button class="btn btn-ghost" onclick={copyMarkdown}>&#128203; Markdown</button>
+          <button class="btn btn-ghost" onclick={copyJSON}>&#123; &#125; JSON</button>
+          <button class="btn btn-ghost" onclick={() => { if (typeof window !== 'undefined') window.print(); }}>&#128424; Print</button>
         </div>
         {#if copied}
           <div class="sz-copied">{copied}</div>
@@ -751,7 +749,7 @@
           <div class="sz-ready-desc">Start a local session on this device. The board opens in Prep mode with your world loaded.</div>
           <button
             class="btn btn-primary sz-ready-cta"
-            on:click={() => {
+            onclick={() => {
               if (typeof window === 'undefined') return;
               try {
                 localStorage.setItem('ogma_sz_seed', JSON.stringify({
@@ -775,12 +773,12 @@
     <!-- Navigation -->
     <div class="sz-nav">
       {#if step > 0}
-        <button class="btn btn-ghost" on:click={back}>&larr; Back</button>
+        <button class="btn btn-ghost" onclick={back}>&larr; Back</button>
       {:else}
         <div></div>
       {/if}
       {#if step < totalSteps - 1}
-        <button class="btn btn-primary" on:click={() => {
+        <button class="btn btn-primary" onclick={() => {
           if (stepId === 'trouble' && pcIndex < pcCount - 1) {
             pcIndex += 1;
             step = STEPS.findIndex(s => s.id === 'highconcept');

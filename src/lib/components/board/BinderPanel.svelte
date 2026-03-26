@@ -1,18 +1,7 @@
 <script>
   // ── BinderPanel — binder library + drafting tray ─────────────────────────────
   import { GENERATORS } from '../../engine.js';
-
-  export let campId            = '';
-  export let campName          = '';
-  export let binderCards       = [];
-  export let trayCards         = [];
-  export let onAddToTray       = null;
-  export let onRemoveFromTray  = null;
-  export let onSendTrayToCanvas = null;
-  export let onSendToCanvas    = null;
-  export let onExportCard      = null;
-  export let onUnpin           = null;
-
+  let { campId = '', campName = '', binderCards = [], trayCards = [], onAddToTray = null, onRemoveFromTray = null, onSendTrayToCanvas = null, onSendToCanvas = null, onExportCard = null, onUnpin = null } = $props();
   const BINDER_FILTER_GROUPS = {
     people:    ['npc_minor', 'npc_major', 'pc', 'backstory'],
     scene:     ['scene', 'encounter', 'complication', 'seed'],
@@ -30,10 +19,10 @@
 
   let filter = 'all';
 
-  $: visible = binderCards.filter(card => {
+  let visible = $derived(binderCards.filter(card => {
     if (filter === 'all') return true;
     return (BINDER_FILTER_GROUPS[filter] || []).includes(card.genId);
-  });
+  }));
 
   function cardTitle(card) {
     const d = card.data || {};
@@ -74,7 +63,7 @@
         {@const active = filter === f.id}
         <button
           class="bbp-filter-btn{active ? ' active' : ''}"
-          on:click={() => (filter = f.id)}
+          onclick={() => (filter = f.id)}
           aria-pressed={String(active)}
         >{f.label}</button>
       {/each}
@@ -102,23 +91,23 @@
         <div class="bbp-card-actions">
           <button
             class="bbp-action{tray ? ' in-tray' : ''}"
-            on:click={() => toggleTray(card)}
+            onclick={() => toggleTray(card)}
             title={tray ? 'Remove from Tray' : 'Add to Drafting Tray'}
             aria-pressed={String(tray)}
           >{tray ? '★' : '☆'}</button>
           <button
             class="bbp-action bbp-action-canvas"
-            on:click={() => onSendToCanvas && onSendToCanvas(card)}
+            onclick={() => onSendToCanvas && onSendToCanvas(card)}
             title="Place on canvas now"
           >→</button>
           <button
             class="bbp-action"
-            on:click={() => onExportCard && onExportCard(card)}
+            onclick={() => onExportCard && onExportCard(card)}
             title="Export as JSON"
           >↓</button>
           <button
             class="bbp-action bbp-action-remove"
-            on:click={() => onUnpin && onUnpin(card.id)}
+            onclick={() => onUnpin && onUnpin(card.id)}
             title="Remove from Binder"
           >✕</button>
         </div>
@@ -134,7 +123,7 @@
         <span class="bbp-tray-count">{trayCards.length}</span>
         <button
           class="bbp-tray-send"
-          on:click={() => onSendTrayToCanvas && onSendTrayToCanvas()}
+          onclick={() => onSendTrayToCanvas && onSendTrayToCanvas()}
           title="Place all Tray cards on canvas"
         >→ All to canvas</button>
       {/if}
@@ -151,7 +140,7 @@
             <span class="bbp-tray-name">{title}</span>
             <button
               class="bbp-tray-remove"
-              on:click={() => onRemoveFromTray && onRemoveFromTray(card.id)}
+              onclick={() => onRemoveFromTray && onRemoveFromTray(card.id)}
               aria-label="Remove from tray"
             >✕</button>
           </div>

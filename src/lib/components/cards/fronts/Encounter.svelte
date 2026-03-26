@@ -1,16 +1,12 @@
 <script>
   import CvLabel from '../CvLabel.svelte';
-
-  export let data = {};
-  export let campName = '';
-  export let catColor = 'var(--accent)';
-
+  let { data = {}, campName = '', catColor = 'var(--accent)' } = $props();
   const CV4_MONO = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
   const CV4_SANS = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
 
-  $: opp       = Array.isArray(data.opposition) ? data.opposition : [];
-  $: scAspects = Array.isArray(data.aspects)    ? data.aspects    : [];
-  $: zones     = Array.isArray(data.zones)      ? data.zones      : [];
+  let opp = $derived(Array.isArray(data.opposition) ? data.opposition : []);
+  let scAspects = $derived(Array.isArray(data.aspects)    ? data.aspects    : []);
+  let zones = $derived(Array.isArray(data.zones)      ? data.zones      : []);
 
   function spillColor(r) {
     return r >= 4 ? 'var(--c-red,#E06060)' : r >= 3 ? 'var(--gold,#C8A050)' : r >= 2 ? 'var(--c-blue,#5AC8FA)' : 'var(--text-muted)';

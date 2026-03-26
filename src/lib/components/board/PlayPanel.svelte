@@ -2,18 +2,7 @@
   // ── PlayPanel — left panel in Play mode; compact accordion in Prep mode ───────
   import PlayerRow from './PlayerRow.svelte';
 
-  export let players        = [];
-  export let selPlayer      = null;
-  export let onSel          = null;
-  export let onUpd          = null;
-  export let onAdd          = null;
-  export let gmPool         = 0;
-  export let updGmPool      = null;
-  export let onQuickNpc     = null;
-  export let onStarterScene = null;
-  export let onCompel       = null;
-  export let collapsed      = false;  // UNI-05: true in PREP mode
-
+  let { players = [], selPlayer = null, onSel = null, onUpd = null, onAdd = null, gmPool = 0, updGmPool = null, onQuickNpc = null, onStarterScene = null, onCompel = null, collapsed = false } = $props();
   let open = false;
 </script>
 
@@ -22,7 +11,7 @@
   <div class="blp-roster-acc">
     <button
       class="blp-roster-hdr"
-      on:click={() => (open = !open)}
+      onclick={() => (open = !open)}
       aria-expanded={String(open)}
     >
       <span>👥 Players</span>
@@ -49,7 +38,7 @@
             onUpd={patch => onUpd && onUpd(p.id, patch)}
           />
         {/each}
-        <button class="rs-add-player" aria-label="Add player" on:click={onAdd}>+ Add Player</button>
+        <button class="rs-add-player" aria-label="Add player" onclick={onAdd}>+ Add Player</button>
       </div>
     {/if}
   </div>
@@ -65,9 +54,9 @@
       {#if updGmPool}
         <div class="rs-gm-pool">
           <span class="rs-gm-pool-label">GM Pool</span>
-          <button class="rs-fp-btn" on:click={() => updGmPool(-1)} aria-label="Spend GM fate point">−</button>
+          <button class="rs-fp-btn" onclick={() => updGmPool(-1)} aria-label="Spend GM fate point">−</button>
           <span class="rs-gm-pool-val" style="color:{gmPool === 0 ? 'var(--c-red)' : 'var(--accent)'}">{gmPool}</span>
-          <button class="rs-fp-btn" on:click={() => updGmPool(1)} aria-label="Gain GM fate point">+</button>
+          <button class="rs-fp-btn" onclick={() => updGmPool(1)} aria-label="Gain GM fate point">+</button>
           <span class="rs-gm-pool-hint">NPC invokes</span>
         </div>
       {/if}
@@ -90,17 +79,17 @@
         />
       {/each}
 
-      <button class="rs-add-player" aria-label="Add player" on:click={onAdd}>+ Add Player</button>
+      <button class="rs-add-player" aria-label="Add player" onclick={onAdd}>+ Add Player</button>
 
       {#if onQuickNpc}
-        <button class="rs-add-player" aria-label="Generate quick NPC" on:click={onQuickNpc}
+        <button class="rs-add-player" aria-label="Generate quick NPC" onclick={onQuickNpc}
           style="margin-top:2px; border-color:var(--c-red); color:var(--c-red)">
           ⚡ Quick NPC
         </button>
       {/if}
 
       {#if onStarterScene}
-        <button class="rs-add-player" aria-label="Generate starter scene" on:click={onStarterScene}
+        <button class="rs-add-player" aria-label="Generate starter scene" onclick={onStarterScene}
           style="margin-top:2px; border-color:var(--c-blue); color:var(--c-blue)">
           🎬 Starter Scene
         </button>

@@ -1,11 +1,7 @@
 <script>
   import CvLabel from '../CvLabel.svelte';
   import CvTag from '../CvTag.svelte';
-
-  export let data = {};
-  export let campName = '';
-  export let catColor = 'var(--accent)';
-
+  let { data = {}, campName = '', catColor = 'var(--accent)' } = $props();
   const CV4_MONO = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
   const CV4_SANS = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
 
@@ -17,9 +13,9 @@
     usable:     'var(--c-purple,#a78bfa)',
   };
 
-  $: aspects = Array.isArray(data.aspects) ? data.aspects : [];
-  $: zones   = Array.isArray(data.zones)   ? data.zones   : [];
-  $: fqs     = Array.isArray(data.framing_questions) ? data.framing_questions : [];
+  let aspects = $derived(Array.isArray(data.aspects) ? data.aspects : []);
+  let zones = $derived(Array.isArray(data.zones)   ? data.zones   : []);
+  let fqs = $derived(Array.isArray(data.framing_questions) ? data.framing_questions : []);
 
   function aspectColor(a) {
     const cat = (typeof a === 'object' && a.category) ? a.category.toLowerCase() : 'tone';

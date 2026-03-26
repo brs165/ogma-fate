@@ -1,5 +1,3 @@
-<svelte:options runes={false} />
-
 <script>
   import { onMount } from 'svelte';
 
@@ -33,7 +31,7 @@
     <div class="topbar-status">
       <a href="/help" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">&#128218; Help</a>
       <a href="/about" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">About</a>
-      <button class="btn btn-icon btn-ghost" on:click={toggleTheme}
+      <button class="btn btn-icon btn-ghost" onclick={toggleTheme}
         aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
         title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
         style="width:44px;height:44px">{theme === 'dark' ? '☀️' : '◑'}</button>

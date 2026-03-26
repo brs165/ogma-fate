@@ -3,7 +3,7 @@
   import { UNIVERSAL } from '../../../data/universal.js';
   // Note: worldStunts prop is passed by the parent from CAMPAIGNS[campId].tables.stunts
 
-  export let worldStunts = [];  // Passed in by parent from CAMPAIGNS[campId].tables.stunts
+  let { worldStunts = [] } = $props();
 
   let filter  = '';
   let skill   = 'all';
@@ -11,24 +11,24 @@
   let copied  = null;
   let copyTimer = null;
 
-  $: uniStunts = (UNIVERSAL && UNIVERSAL.stunts) ? UNIVERSAL.stunts : [];
-  $: allStunts = worldStunts.concat(uniStunts);
+  let uniStunts = $derived((UNIVERSAL && UNIVERSAL.stunts) ? UNIVERSAL.stunts : []);
+  let allStunts = $derived(worldStunts.concat(uniStunts));
 
-  $: skills = ['all', ...allStunts
+  let skills = $derived(['all', ...allStunts
     .map(s => s.skill)
     .filter((v, i, a) => a.indexOf(v) === i && v && v !== 'varies')
     .sort()
-  ];
+  ]);
 
-  $: tags = ['all', ...allStunts
+  let tags = $derived(['all', ...allStunts
     .reduce((acc, s) => {
       (s.tags || []).forEach(t => { if (!acc.includes(t)) acc.push(t); });
       return acc;
     }, [])
     .sort()
-  ];
+  ]);
 
-  $: filtered = allStunts.filter(s => {
+  let filtered = $derived(allStunts.filter(s => {
     if (skill !== 'all' && s.skill !== skill) return false;
     if (tag !== 'all' && !(s.tags || []).includes(tag)) return false;
     if (filter) {
@@ -38,7 +38,7 @@
              (s.desc || '').toLowerCase().includes(q);
     }
     return true;
-  });
+  }));
 
   function copyStunt(s) {
     const text = s.name + ' (' + s.skill + '): ' + s.desc;
@@ -112,8 +112,8 @@
           role="button"
           tabindex="0"
           aria-label="Copy stunt: {s.name}"
-          on:click={() => copyStunt(s)}
-          on:keydown={e => onCardKeyDown(e, s)}
+          onclick={() => copyStunt(s)}
+          onkeydown={e => onCardKeyDown(e, s)}
         >
           <div class="bs-card-header">
             <span class="bs-name">{s.name}</span>

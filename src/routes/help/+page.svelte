@@ -1,5 +1,3 @@
-<svelte:options runes={false} />
-
 <svelte:head>
   <title>Help &amp; Wiki — Ogma Help</title>
   <meta name="description" content="Everything you need to master Ogma — the local-first, offline-ready generator suite for Fate Condensed." />

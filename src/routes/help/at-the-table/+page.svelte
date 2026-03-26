@@ -1,5 +1,3 @@
-<svelte:options runes={false} />
-
 <svelte:head>
   <title>At the Table — Ogma Help</title>
   <meta name="description" content="Using Ogma at the table during play" />

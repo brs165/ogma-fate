@@ -1,5 +1,3 @@
-<svelte:options runes={false} />
-
 <script>
   import HelpDiceRoller from '$lib/components/shared/HelpDiceRoller.svelte';
 </script>

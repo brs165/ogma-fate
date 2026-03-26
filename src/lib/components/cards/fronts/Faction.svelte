@@ -1,17 +1,13 @@
 <script>
   import CvLabel from '../CvLabel.svelte';
   import CvTag from '../CvTag.svelte';
-
-  export let data = {};
-  export let campName = '';
-  export let catColor = 'var(--accent)';
-
+  let { data = {}, campName = '', catColor = 'var(--accent)' } = $props();
   const CV4_MONO = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
   const CV4_SANS = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
 
-  $: face = data.face || {};
-  $: fn_ = typeof face === 'string' ? face : (face.name || '');
-  $: fr  = typeof face === 'string' ? '' : (face.role || '');
+  let face = $derived(data.face || {});
+  let fn_ = $derived(typeof face === 'string' ? face : (face.name || ''));
+  let fr = $derived(typeof face === 'string' ? '' : (face.role || ''));
 </script>
 
 <div style="flex:1; padding:12px 16px 14px; display:flex; gap:14px">

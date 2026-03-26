@@ -1,22 +1,18 @@
 <script>
   import CvLabel from '../CvLabel.svelte';
   import StressRow from '../StressRow.svelte';
-
-  export let data = {};
-  export let campName = '';
-  export let catColor = 'var(--accent)';
-
+  let { data = {}, campName = '', catColor = 'var(--accent)' } = $props();
   const CV4_MONO = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
   const CV4_SANS = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
   const LADDER = { 4: 'Great', 3: 'Good', 2: 'Fair', 1: 'Average', 0: 'Mediocre' };
 
-  $: asp    = data.aspects || {};
-  $: skills = Array.isArray(data.skills) ? data.skills : [];
-  $: stunts = Array.isArray(data.stunts) ? data.stunts : [];
-  $: otherAsps = [asp.other1, asp.other2, asp.other3].filter(Boolean);
-  $: consequences = data.consequences || [2, 4, 6];
+  let asp = $derived(data.aspects || {});
+  let skills = $derived(Array.isArray(data.skills) ? data.skills : []);
+  let stunts = $derived(Array.isArray(data.stunts) ? data.stunts : []);
+  let otherAsps = $derived([asp.other1, asp.other2, asp.other3].filter(Boolean));
+  let consequences = $derived(data.consequences || [2, 4, 6]);
 
-  $: byRating = (() => {
+  let byRating = $derived((() => {
     const m = {};
     skills.forEach(s => {
       const r = s.r || 0;
@@ -24,8 +20,8 @@
       m[r].push(s.name);
     });
     return m;
-  })();
-  $: pyramidRatings = [4,3,2,1].filter(r => byRating[r] && byRating[r].length);
+  })());
+  let pyramidRatings = $derived([4,3,2,1].filter(r => byRating[r] && byRating[r].length));
 
   const noop = () => {};
 </script>

@@ -1,5 +1,3 @@
-<svelte:options runes={false} />
-
 <svelte:head>
   <title>Hosting — Ogma Help</title>
   <meta name="description" content="How to host a live multiplayer Ogma session — deploy the sync server, share a room code, and play with remote players in real time." />

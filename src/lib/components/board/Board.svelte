@@ -1,5 +1,3 @@
-<svelte:options runes={false} />
-
 <script>
   import { onMount, onDestroy, setContext } from 'svelte';
   import { get } from 'svelte/store';
@@ -30,9 +28,7 @@
   import FatePointTracker from '../campaign/FatePointTracker.svelte';
 
   // ── Props ──────────────────────────────────────────────────────────────────
-  export let campId = 'fantasy';
-  export let initialMode = 'prep';
-  export let initialRoom = null;
+  let { campId = 'fantasy', initialMode = 'prep', initialRoom = null } = $props();
 
   // ── Constants ──────────────────────────────────────────────────────────────
   const BOARD_CANVAS_PREP_KEY = 'board_canvas_v1';
@@ -40,8 +36,8 @@
   const BOARD_FP_KEY = 'board_fp_v1';
 
   // ── Derived (early — needed before stores) ──────────────────────────────
-  $: campMeta = getWorldMeta(campId);
-  $: tables = getWorldTables(campId);
+  let campMeta = $derived(getWorldMeta(campId));
+  let tables = $derived(getWorldTables(campId));
 
   // ── Local state ────────────────────────────────────────────────────────────
   let mode = initialMode;
@@ -129,8 +125,8 @@
   }
 
   // ── Stores ─────────────────────────────────────────────────────────────────
-  $: canvasKey = mode === 'prep' ? BOARD_CANVAS_PREP_KEY : BOARD_CANVAS_PLAY_KEY;
-  $: campCanvasKey = canvasKey + '_' + campId;
+  let canvasKey = $derived(mode === 'prep' ? BOARD_CANVAS_PREP_KEY : BOARD_CANVAS_PLAY_KEY);
+  let campCanvasKey = $derived(canvasKey + '_' + campId);
 
   // These stores are created once on mount and recreated when campId changes
   let canvas;
@@ -287,15 +283,15 @@
   function goOffline() { isOnline = false; }
 
   // ── Mode change — left panel always open in prep ──────────────────────────
-  $: if (mode === 'prep') leftOpen = true;
+  $effect(() => { if (mode === 'prep') leftOpen = true; });
 
   // ── Play mode coach mark ──────────────────────────────────────────────────
-  $: if (mode === 'play') {
+  $effect(() => { if (mode === 'play') {
     try {
       const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}');
       if (!p.coach_play_dismissed) coachPlay = true;
     } catch (e) {}
-  }
+  } });
 
   // ── Theme toggle ──────────────────────────────────────────────────────────
   function toggleTheme() {
@@ -405,7 +401,7 @@
   }
 
   // ── Command palette actions ───────────────────────────────────────────────
-  $: cmdActions = [
+  let cmdActions = $derived([
     { id: 'gen-npc', icon: '\u{1F9D1}', label: 'Generate Minor NPC', shortcut: 'Space', fn: () => { if (canvas) canvas.generateCard('npc_minor'); } },
     { id: 'gen-major', icon: '\u{1F451}', label: 'Generate Major NPC', fn: () => { if (canvas) canvas.generateCard('npc_major'); } },
     { id: 'gen-scene', icon: '\u{1F525}', label: 'Generate Scene', fn: () => { if (canvas) canvas.generateCard('scene'); } },
@@ -420,10 +416,10 @@
     { id: 'undo', icon: '\u21B6', label: 'Undo', shortcut: '\u2318Z', fn: () => { if (canvas) canvas.undoLast(); } },
     { id: 'mode', icon: '\u25B6', label: mode === 'prep' ? 'Switch to Play' : 'Switch to Prep', fn: () => onModeChange(mode === 'prep' ? 'play' : 'prep') },
     { id: 'theme', icon: '\u263D', label: 'Toggle Dark/Light', fn: toggleTheme },
-  ];
+  ]);
 
   // ── NPC cards for turn bar ────────────────────────────────────────────────
-  $: npcCards = cards.filter(c => c.genId === 'npc_minor' || c.genId === 'npc_major');
+  let npcCards = $derived(cards.filter(c => c.genId === 'npc_minor' || c.genId === 'npc_major'));
 
   // ── Search dim ────────────────────────────────────────────────────────────
   function isSearchMatch(card) {
@@ -438,7 +434,7 @@
 
 <!-- ── Template ─────────────────────────────────────────────────────────────── -->
 
-<div class="board-app" data-theme={theme} data-mode={mode} on:click={() => ctx = null}>
+<div class="board-app" data-theme={theme} data-mode={mode} onclick={() => ctx = null}>
 
   <!-- ── Topbar ────────────────────────────────────────────────────────────── -->
   <Topbar
@@ -543,7 +539,7 @@
       {#if exportView}
         <div class="board-export-page">
           <div class="board-export-page-hdr">
-            <button class="bep-back-btn" on:click={() => { exportView = false; }} aria-label="Back to canvas">&larr; Back</button>
+            <button class="bep-back-btn" onclick={() => { exportView = false; }} aria-label="Back to canvas">&larr; Back</button>
             <h2 class="bep-page-title">Export Cards</h2>
           </div>
           <ExportPanel
@@ -611,7 +607,7 @@
         <!-- Combat tracker toggle + view -->
         {#if mode === 'play' && players.length > 0}
           <div class="ct-toggle-row">
-            <button class="ct-toggle-btn" on:click={() => { showTracker = !showTracker; }}
+            <button class="ct-toggle-btn" onclick={() => { showTracker = !showTracker; }}
               aria-pressed={String(showTracker)} aria-label="Toggle combat tracker">
               {showTracker ? '\u25BC Combat Tracker' : '\u25B6 Combat Tracker'}
             </button>
@@ -627,7 +623,7 @@
         {/if}
 
         <!-- Canvas area — Svelte Flow -->
-        <div class="board-sf-wrap" on:contextmenu={onCanvasContextMenu}>
+        <div class="board-sf-wrap" oncontextmenu={onCanvasContextMenu}>
           <SvelteFlow
             nodes={flowNodes}
             edges={flowEdges}
@@ -659,19 +655,19 @@
             <!-- svelte-ignore a11y-no-static-element-interactions -->
             <div class="board-ctx" role="menu" aria-label="Generate card"
               style="left:{ctx.screenX}px;top:{ctx.screenY}px;position:fixed;z-index:9999"
-              on:click|stopPropagation>
+              onclick={(e) => e.stopPropagation()}>
               <div class="board-ctx-section" role="none">Generate here</div>
               {#each CTX_ITEMS as g (g.id)}
                 <div class="board-ctx-item" role="menuitem" tabindex="0"
-                  on:click={() => ctxGenerate(g.id)}
-                  on:keydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ctxGenerate(g.id); } }}>
+                  onclick={() => ctxGenerate(g.id)}
+                  onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ctxGenerate(g.id); } }}>
                   <span class="board-ctx-icon" aria-hidden="true">{g.icon}</span>{g.label}
                 </div>
               {/each}
               <div class="board-ctx-sep" role="separator"></div>
               <div class="board-ctx-item" role="menuitem" tabindex="0"
-                on:click={() => { ctx = null; }}
-                on:keydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ctx = null; } }}>
+                onclick={() => { ctx = null; }}
+                onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ctx = null; } }}>
                 <span class="board-ctx-icon" aria-hidden="true">&times;</span> Cancel
               </div>
             </div>
@@ -706,10 +702,10 @@
 
   <!-- Dice floater -->
   {#if showDice}
-    <div class="board-floater board-dice-floater" on:click|stopPropagation>
+    <div class="board-floater board-dice-floater" onclick={(e) => e.stopPropagation()}>
       <div class="board-floater-hdr">
         <span class="board-floater-title">&#x1F3B2; Dice</span>
-        <button class="board-floater-close" on:click={() => { showDice = false; }} aria-label="Close dice roller">&times;</button>
+        <button class="board-floater-close" onclick={() => { showDice = false; }} aria-label="Close dice roller">&times;</button>
       </div>
       <DicePanel
         players={fpState ? (fpState.pcs || []).map(pc => ({ id: pc.id, name: pc.name, skills: pc.skills || [] })) : []}
@@ -732,10 +728,10 @@
 
   <!-- FP tracker floater -->
   {#if showFP}
-    <div class="board-floater board-fp-floater" on:click|stopPropagation>
+    <div class="board-floater board-fp-floater" onclick={(e) => e.stopPropagation()}>
       <div class="board-floater-hdr">
         <span class="board-floater-title">&#x25CE; Fate Points</span>
-        <button class="board-floater-close" on:click={() => { showFP = false; }} aria-label="Close Fate Point tracker">&times;</button>
+        <button class="board-floater-close" onclick={() => { showFP = false; }} aria-label="Close Fate Point tracker">&times;</button>
       </div>
       {#if fpState}
         <FatePointTracker
@@ -748,10 +744,10 @@
 
   <!-- Session notes floater -->
   {#if showNotes}
-    <div class="board-floater board-notes-floater" on:click|stopPropagation>
+    <div class="board-floater board-notes-floater" onclick={(e) => e.stopPropagation()}>
       <div class="board-floater-hdr">
         <span class="board-floater-title">&#x1F4DD; Session Notes</span>
-        <button class="board-floater-close" on:click={() => { showNotes = false; }} aria-label="Close session notes">&times;</button>
+        <button class="board-floater-close" onclick={() => { showNotes = false; }} aria-label="Close session notes">&times;</button>
       </div>
       <div style="padding:12px;color:var(--text-muted);font-size:13px">
         Session notes coming soon.
@@ -786,21 +782,21 @@
   <!-- Clear table modal -->
   {#if showClearModal}
     <!-- svelte-ignore a11y-no-static-element-interactions -->
-    <div class="modal-overlay" on:click={() => showClearModal = false} role="presentation">
+    <div class="modal-overlay" onclick={() => showClearModal = false} role="presentation">
       <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-      <div class="modal-box modal-box-narrow" on:click|stopPropagation role="dialog" aria-modal="true" aria-label="Clear table options">
+      <div class="modal-box modal-box-narrow" onclick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Clear table options">
         <div class="modal-header">
           <span class="modal-title">Clear Table</span>
-          <button class="btn btn-ghost btn-icon" on:click={() => showClearModal = false} aria-label="Close">&#10005;</button>
+          <button class="btn btn-ghost btn-icon" onclick={() => showClearModal = false} aria-label="Close">&#10005;</button>
         </div>
         <div class="modal-body">
           <p class="rhp-ready-sub">Choose what to clear. This cannot be undone.</p>
           <div class="sz-grid">
-            <button class="btn sz-option" on:click={() => { if (canvas) canvas.clearCanvas(); showClearModal = false; }}>
+            <button class="btn sz-option" onclick={() => { if (canvas) canvas.clearCanvas(); showClearModal = false; }}>
               <div class="sz-option-title">Clear current canvas</div>
               <div class="sz-option-sub">Removes all cards from the {mode} canvas</div>
             </button>
-            <button class="btn sz-option" on:click={() => { showClearModal = false; showToast('Use Prep mode to clear prep canvas'); }}>
+            <button class="btn sz-option" onclick={() => { showClearModal = false; showToast('Use Prep mode to clear prep canvas'); }}>
               <div class="sz-option-title">Clear other canvas</div>
               <div class="sz-option-sub">Switch to {mode === 'prep' ? 'play' : 'prep'} mode first to clear that canvas</div>
             </button>

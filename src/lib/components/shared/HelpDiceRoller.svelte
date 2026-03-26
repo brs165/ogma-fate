@@ -1,10 +1,5 @@
-<svelte:options runes={false} />
-
 <script>
-  export let mode = 'basic';
-  export let skill = 0;
-  export let label = '';
-
+  let { mode = 'basic', skill = 0, label = '' } = $props();
   const ADJECTIVES = [
     [-4, 'Abysmal',    '#FF3B30'],
     [-3, 'Terrible',   '#FF6B4A'],
@@ -92,8 +87,8 @@
     return face;
   }
 
-  $: skillText = (skill >= 0 ? '+' : '') + skill;
-  $: displayLabel = label || (mode === 'skill' ? '4DF — SKILL ROLL' : '4DF — RAW ROLL');
+  let skillText = $derived((skill >= 0 ? '+' : '') + skill);
+  let displayLabel = $derived(label || (mode === 'skill' ? '4DF — SKILL ROLL' : '4DF — RAW ROLL'));
 </script>
 
 <div class="dr-widget" role="region" aria-label={label || '4dF dice roller'}>
@@ -127,7 +122,7 @@
     {/if}
   </div>
 
-  <button class="dr-btn" type="button" aria-label="Roll 4 Fate dice" disabled={rolling} on:click={roll}>
+  <button class="dr-btn" type="button" aria-label="Roll 4 Fate dice" disabled={rolling} onclick={roll}>
     {btnLabel}
   </button>
 </div>

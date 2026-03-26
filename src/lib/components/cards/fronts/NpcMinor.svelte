@@ -1,21 +1,15 @@
 <script>
   import CvLabel from '../CvLabel.svelte';
   import StressRow from '../StressRow.svelte';
-
-  export let data = {};
-  export let campName = '';
-  export let catColor = 'var(--accent)';
-  export let cardState = {};
-  export let onUpdate = () => {};
-
+  let { data = {}, campName = '', catColor = 'var(--accent)', cardState = {}, onUpdate = () => {} } = $props();
   const CV4_MONO = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
   const CV4_SANS = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
 
-  $: aspects = Array.isArray(data.aspects) ? data.aspects : [];
-  $: skills  = Array.isArray(data.skills)  ? data.skills  : [];
-  $: stunt   = data.stunt || null;
-  $: stress  = data.stress || 1;
-  $: hits    = cardState?.phyHit ?? Array(stress).fill(false);
+  let aspects = $derived(Array.isArray(data.aspects) ? data.aspects : []);
+  let skills = $derived(Array.isArray(data.skills)  ? data.skills  : []);
+  let stunt = $derived(data.stunt || null);
+  let stress = $derived(data.stress || 1);
+  let hits = $derived(cardState?.phyHit ?? Array(stress).fill(false));
 
   function setHits(a) { onUpdate({ phyHit: a }); }
 

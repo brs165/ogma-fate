@@ -1,11 +1,6 @@
 <script>
   // ── BoardSticky — inline-editable aspect sticky note ─────────────────────────
-  export let card       = {};
-  export let onDelete   = null;
-  export let onUpdate   = null;
-  export let onDragStart = null;
-  export let onInvoke   = null;
-
+  let { card = {}, onDelete = null, onUpdate = null, onDragStart = null, onInvoke = null } = $props();
   const STICKY_COLORS = [
     {bg: '#fff9c4', text: '#5a4e00', label: '#8a7800'},
     {bg: '#d4f5e4', text: '#0d4d2a', label: '#0d6e3a'},
@@ -16,7 +11,7 @@
   let editing = false;
   let draft   = card.text || '';
 
-  $: sc = STICKY_COLORS[card.colorIdx || 0];
+  let sc = $derived(STICKY_COLORS[card.colorIdx || 0]);
 
   function commitEdit() {
     editing = false;
@@ -50,7 +45,7 @@
     if (e.key === 'Escape') { editing = false; }
   }
 
-  $: freeInvokes = card.freeInvokes || 0;
+  let freeInvokes = $derived(card.freeInvokes || 0);
 
   function pipClick(i) {
     const fi = card.freeInvokes || 0;
@@ -66,7 +61,7 @@
   }
 
   let textareaEl;
-  $: if (editing && textareaEl) setTimeout(() => textareaEl && textareaEl.focus(), 0);
+  $effect(() => { if (editing && textareaEl) setTimeout(() => textareaEl && textareaEl.focus(), 0); });
 </script>
 
 <div
@@ -77,17 +72,17 @@
   tabindex={editing ? -1 : 0}
   role="note"
   aria-label="Aspect sticky: {card.text || 'New Aspect'}{editing ? '' : '. Press Enter to edit.'}"
-  on:mousedown={onMouseDown}
-  on:dblclick|stopPropagation={startEdit}
-  on:keydown={onKeyDown}
+  onmousedown={onMouseDown}
+  ondblclick={(e) => { e.stopPropagation(); startEdit(e); }}
+  onkeydown={onKeyDown}
 >
   <div class="bc-actions">
     {#if card.rotation}
       <button class="bc-btn" title="Reset rotation" aria-label="Reset rotation"
-        on:click|stopPropagation={() => onUpdate && onUpdate(card.id, { rotation: 0 })}><i class="fa-solid fa-rotate-right" aria-hidden="true"></i></button>
+        onclick={(e) => { e.stopPropagation(); (() => onUpdate && onUpdate(card.id, { rotation: 0 }))(e); }}><i class="fa-solid fa-rotate-right" aria-hidden="true"></i></button>
     {/if}
     <button class="bc-btn" title="Delete" aria-label="Delete"
-      on:click|stopPropagation={() => onDelete && onDelete(card.id)}><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+      onclick={(e) => { e.stopPropagation(); (() => onDelete && onDelete(card.id))(e); }}><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
   </div>
 
   <div class="board-sticky-label" style="color:{sc.label}">Aspect</div>
@@ -103,9 +98,9 @@
       style="background:transparent; color:{sc.text}; border:none; border-bottom:2px solid {sc.label};
              outline:none; width:100%; resize:none; font-family:inherit; font-size:12px;
              padding:0; line-height:1.5"
-      on:blur={commitEdit}
-      on:keydown={onTextareaKeyDown}
-      on:click|stopPropagation
+      onblur={commitEdit}
+      onkeydown={onTextareaKeyDown}
+      onclick={(e) => e.stopPropagation()}
     ></textarea>
   {:else}
     <div class="board-sticky-text" title="Double-click to edit">{card.text || '"New Aspect"'}</div>
@@ -113,7 +108,7 @@
 
   <!-- Free invoke pips -->
   <!-- svelte-ignore a11y_no_static_element_interactions a11y_click_events_have_key_events -->
-  <div class="sticky-invokes" on:click|stopPropagation>
+  <div class="sticky-invokes" onclick={(e) => e.stopPropagation()}>
     <span class="sticky-inv-label" style="color:{sc.label}">Invokes</span>
     {#each [0,1,2,3] as i}
       {@const filled = i < freeInvokes}
@@ -122,7 +117,7 @@
         style="background:{filled ? sc.label : 'transparent'}; border-color:{sc.label}"
         title={filled ? 'Use free invoke' : 'Empty'}
         aria-label={filled ? 'Use free invoke ' + (i+1) : 'Empty invoke slot ' + (i+1)}
-        on:click={() => pipClick(i)}
+        onclick={() => pipClick(i)}
       ></button>
     {/each}
     <button
@@ -130,7 +125,7 @@
       style="color:{sc.label}; border-color:{sc.label}"
       title="Add free invoke"
       aria-label="Add free invoke"
-      on:click={addInvoke}
+      onclick={addInvoke}
     >+</button>
   </div>
 </div>

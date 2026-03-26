@@ -1,16 +1,11 @@
 <script>
   import CvLabel from './CvLabel.svelte';
-
-  export let boxes = 4;
-  export let filled = 0;
-  export let setFilled = () => {};
-  export let color = 'var(--accent)';
-
+  let { boxes = 4, filled = 0, setFilled = () => {}, color = 'var(--accent)' } = $props();
   const CV4_MONO = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
 
-  $: full = filled >= boxes;
-  $: labelColor = full ? 'var(--c-red,#E06060)' : color;
-  $: labelText = 'CLOCK \u2014 ' + boxes + ' BOXES' + (full ? ' \u2014 TRIGGERED!' : '');
+  let full = $derived(filled >= boxes);
+  let labelColor = $derived(full ? 'var(--c-red,#E06060)' : color);
+  let labelText = $derived('CLOCK \u2014 ' + boxes + ' BOXES' + (full ? ' \u2014 TRIGGERED!' : ''));
 
   function onClick(e, i, ticked) {
     e.stopPropagation();
@@ -38,8 +33,8 @@
         tabindex="0"
         aria-checked={String(ticked)}
         aria-label="Clock box {i + 1}{ticked ? ' (ticked)' : ' (empty)'}"
-        on:click={(e) => onClick(e, i, ticked)}
-        on:keydown={(e) => onKeyDown(e, i, ticked)}
+        onclick={(e) => onClick(e, i, ticked)}
+        onkeydown={(e) => onKeyDown(e, i, ticked)}
         style:width="28px"
         style:height="28px"
         style:border-radius="2px"

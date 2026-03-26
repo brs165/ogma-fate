@@ -1,5 +1,3 @@
-<svelte:options runes={false} />
-
 <script>
   import { onMount, onDestroy } from 'svelte';
   import { GENERATORS } from '../../engine.js';
@@ -10,11 +8,11 @@
   import Cv4Card from '../cards/Cv4Card.svelte';
   import Board from '../board/Board.svelte';
 
-  export let campId = 'fantasy';
+  let { campId = 'fantasy' } = $props();
 
   // ── Derived ────────────────────────────────────────────────────────────────
-  $: camp = CAMPAIGNS[campId] || { meta: { name: campId, icon: '\u25C8' }, tables: {}, colors: {} };
-  $: campName = camp.meta ? camp.meta.name : campId;
+  let camp = $derived(CAMPAIGNS[campId] || { meta: { name: campId, icon: '\u25C8' }, tables: {}, colors: {} });
+  let campName = $derived(camp.meta ? camp.meta.name : campId);
 
   // ── Local state ────────────────────────────────────────────────────────────
   let theme = 'dark';
@@ -61,8 +59,8 @@
     if (session.consequenceSev) unsubs.push(session.consequenceSev.subscribe(v => consequenceSev = v));
   }
 
-  $: gen = GENERATORS.find(g => g.id === activeGen) || GENERATORS[0];
-  $: helpEntry = HELP_CONTENT[activeGen] || null;
+  let gen = $derived(GENERATORS.find(g => g.id === activeGen) || GENERATORS[0]);
+  let helpEntry = $derived(HELP_CONTENT[activeGen] || null);
 
   // ── Generator groups for sidebar ──────────────────────────────────────────
   const GENERATOR_GROUPS = [
@@ -183,7 +181,7 @@
   <header class="sb-slim-bar">
     <button
       class="btn btn-icon btn-ghost sb-hamburger"
-      on:click={() => { showSidebar = !showSidebar; }}
+      onclick={() => { showSidebar = !showSidebar; }}
       aria-label={showSidebar ? 'Close menu' : 'Open menu'}
       aria-expanded={String(showSidebar)}
     >{showSidebar ? '\u2715' : '\u2630'}</button>
@@ -191,7 +189,7 @@
     <span class="sb-slim-gen" aria-hidden="true">{gen ? gen.label : ''}</span>
     <button
       class="btn btn-icon btn-ghost"
-      on:click={toggleTheme}
+      onclick={toggleTheme}
       aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
       style="width:44px;height:44px;margin-left:auto"
     >{theme === 'dark' ? '\u2600' : '\u25D1'}</button>
@@ -201,7 +199,7 @@
   <div class="app-body">
 
     {#if showSidebar}
-      <div class="sidebar-backdrop" on:click={() => { showSidebar = false; }} aria-hidden="true"></div>
+      <div class="sidebar-backdrop" onclick={() => { showSidebar = false; }} aria-hidden="true"></div>
     {/if}
 
     <!-- Sidebar -->
@@ -217,7 +215,7 @@
         <div class="sb-acc-sec">
           <button
             class="sb-acc-hdr" class:is-open={sbAcc === 'play'}
-            on:click={() => toggleAcc('play')}
+            onclick={() => toggleAcc('play')}
             aria-expanded={String(sbAcc === 'play')}
           >
             <span aria-hidden="true" class="sb-acc-sec-ico">&#x25B6;</span>
@@ -227,18 +225,18 @@
           </button>
           {#if sbAcc === 'play'}
             <div class="sb-acc-body" role="group" aria-label="Play tools">
-              <button class="sb-acc-item" class:active={canvasView} on:click={openCanvas} aria-pressed={String(canvasView)}>
+              <button class="sb-acc-item" class:active={canvasView} onclick={openCanvas} aria-pressed={String(canvasView)}>
                 <span aria-hidden="true" class="sidebar-item-icon">&#x25A6;</span>
                 <span class="sidebar-item-label">Prep & Play</span>
                 {#if pinnedCards.length > 0}
                   <span class="sb-count-badge" aria-hidden="true">{pinnedCards.length}</span>
                 {/if}
               </button>
-              <button class="sb-acc-item" on:click={() => { canvasView = true; showSidebar = false; }}>
+              <button class="sb-acc-item" onclick={() => { canvasView = true; showSidebar = false; }}>
                 <span aria-hidden="true" class="sidebar-item-icon">&#x2193;</span>
                 <span class="sidebar-item-label">Export Cards</span>
               </button>
-              <button class="sb-acc-item" on:click={() => { showSidebar = false; }}>
+              <button class="sb-acc-item" onclick={() => { showSidebar = false; }}>
                 <span aria-hidden="true" class="sidebar-item-icon">&#x1F4DD;</span>
                 <span class="sidebar-item-label">Session Notes</span>
               </button>
@@ -250,7 +248,7 @@
         <div class="sb-acc-sec">
           <button
             class="sb-acc-hdr" class:is-open={sbAcc === 'generate'}
-            on:click={() => toggleAcc('generate')}
+            onclick={() => toggleAcc('generate')}
             aria-expanded={String(sbAcc === 'generate')}
           >
             <span aria-hidden="true" class="sb-acc-sec-ico">&#x1F3B2;</span>
@@ -267,7 +265,7 @@
                   {#if g}
                     <button
                       class="sb-acc-item sb-acc-gen" class:active={activeGen === genId}
-                      on:click={() => selectGen(genId)}
+                      onclick={() => selectGen(genId)}
                       aria-label={g.label}
                     >
                       <span aria-hidden="true" class="sidebar-item-icon">{g.icon || ''}</span>
@@ -284,7 +282,7 @@
         <div class="sb-acc-sec sb-acc-sec-settings">
           <button
             class="sb-acc-hdr sb-acc-hdr-settings" class:is-open={sbAcc === 'settings'}
-            on:click={() => toggleAcc('settings')}
+            onclick={() => toggleAcc('settings')}
             aria-expanded={String(sbAcc === 'settings')}
           >
             <span aria-hidden="true" class="sb-acc-sec-ico sb-acc-sec-ico-sm">&#x2699;</span>
@@ -293,7 +291,7 @@
           </button>
           {#if sbAcc === 'settings'}
             <div class="sb-acc-body" role="group" aria-label="Settings">
-              <button class="sb-acc-item" on:click={toggleTheme}>
+              <button class="sb-acc-item" onclick={toggleTheme}>
                 <span aria-hidden="true" class="sidebar-item-icon">{theme === 'dark' ? '\u2600' : '\u25D1'}</span>
                 <span class="sidebar-item-label">{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
               </button>
@@ -354,7 +352,7 @@
                 <div class="action-bar">
                   <button
                     class="btn-roll action-bar-roll" class:rolling
-                    on:click={doGenerate}
+                    onclick={doGenerate}
                     disabled={rolling}
                     aria-live="polite"
                     style="position:relative"
@@ -373,7 +371,7 @@
                     {#if result}
                       <button
                         class="btn btn-ghost action-bar-icon" class:pin-bounce={pinBouncing}
-                        on:click={pinResult}
+                        onclick={pinResult}
                         title="Save to Table Prep [P]"
                         aria-label="Save to Table Prep{pinnedCards.length > 0 ? ' (' + pinnedCards.length + ' saved)' : ''}"
                         style="position:relative"
@@ -402,7 +400,7 @@
                         class="sev-btn"
                         class:sev-active={consequenceSev === sev.id}
                         style="--sev-color:{sev.color}"
-                        on:click={() => session.consequenceSev.set(sev.id)}
+                        onclick={() => session.consequenceSev.set(sev.id)}
                         aria-pressed={String(consequenceSev === sev.id)}
                       >{sev.label}</button>
                     {/each}
@@ -417,7 +415,7 @@
                         <span class="seed-pack-title">&#8853; Adventure Seed Pack</span>
                         <span class="seed-pack-count">{result.pack.length} cards</span>
                         <button class="btn btn-ghost seed-pack-pin-all"
-                          on:click={() => { result.pack.forEach(item => { session.pinResultDirect({ genId: item.genId, data: item.data }); }); }}
+                          onclick={() => { result.pack.forEach(item => { session.pinResultDirect({ genId: item.genId, data: item.data }); }); }}
                           title="Pin all cards to Table Prep"
                         >Pin All</button>
                       </div>

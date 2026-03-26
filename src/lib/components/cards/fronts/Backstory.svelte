@@ -1,14 +1,10 @@
 <script>
   import CvLabel from '../CvLabel.svelte';
-
-  export let data = {};
-  export let campName = '';
-  export let catColor = 'var(--accent)';
-
+  let { data = {}, campName = '', catColor = 'var(--accent)' } = $props();
   const CV4_MONO = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
   const CV4_SANS = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
 
-  $: qs = Array.isArray(data.questions) ? data.questions : [];
+  let qs = $derived(Array.isArray(data.questions) ? data.questions : []);
 </script>
 
 <div style="flex:1; padding:12px 16px 14px; display:flex; gap:14px">

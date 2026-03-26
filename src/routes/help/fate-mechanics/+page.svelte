@@ -1,5 +1,3 @@
-<svelte:options runes={false} />
-
 <svelte:head>
   <title>Fate Mechanics — Ogma Help</title>
   <meta name="description" content="Fate Condensed mechanics behind the generators" />
