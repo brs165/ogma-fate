@@ -1,31 +1,22 @@
-<svelte:options runes={false} />
-
 <script>
   import { onMount, onDestroy } from 'svelte';
   import Cv4Card from '../cards/Cv4Card.svelte';
-
-  export let syncState = null;
-  export let playerName = '';
-  export let roomCode = '';
-  export let syncObj = null;
-  export let syncStatus = 'offline';
-  export let campId = '';
-
   // ── Derived from sync state ────────────────────────────────────────────────
-  $: cards = (syncState && syncState.cards) || [];
-  $: fp = syncState && syncState.fp;
-  $: players = (syncState && syncState.players) || [];
-  $: roundInfo = syncState ? { round: syncState.round || 1, gmPool: syncState.gmPool || 0 } : { round: 1, gmPool: 0 };
-  $: rollHistory = (syncState && syncState.rollHistory) || [];
-  $: compelOffer = syncState && syncState.compelOffer;
+  let { syncState = null, playerName = '', roomCode = '', syncObj = null, syncStatus = 'offline', campId = '' } = $props();
+  let cards = $derived((syncState && syncState.cards) || []);
+  let fp = $derived(syncState && syncState.fp);
+  let players = $derived((syncState && syncState.players) || []);
+  let roundInfo = $derived(syncState ? { round: syncState.round || 1, gmPool: syncState.gmPool || 0 } : { round: 1, gmPool: 0 });
+  let rollHistory = $derived((syncState && syncState.rollHistory) || []);
+  let compelOffer = $derived(syncState && syncState.compelOffer);
 
   // ── Local state ────────────────────────────────────────────────────────────
   let tentMode = false;
   let showSheet = false;
 
   // Find this player in the roster
-  $: myPlayer = players.find(p => p.name && p.name.toLowerCase() === playerName.toLowerCase());
-  $: myFP = fp && myPlayer ? (fp.pcs || []).find(pc => pc.name && pc.name.toLowerCase() === playerName.toLowerCase()) : null;
+  let myPlayer = $derived(players.find(p => p.name && p.name.toLowerCase() === playerName.toLowerCase()));
+  let myFP = $derived(fp && myPlayer ? (fp.pcs || []).find(pc => pc.name && pc.name.toLowerCase() === playerName.toLowerCase()) : null);
 
   // ── Actions ────────────────────────────────────────────────────────────────
   function sendStressUpdate(patch) {
@@ -94,14 +85,14 @@
   <div class="ps-header">
     <span class="ps-player-name">{playerName}</span>
     <span class="ps-room-code">Room {roomCode}</span>
-    <button class="ps-tent-btn" on:click={() => { tentMode = !tentMode; }} aria-label={tentMode ? 'Exit tent mode' : 'Tent mode'} title="Tent mode — show your name to the table">
+    <button class="ps-tent-btn" onclick={() => { tentMode = !tentMode; }} aria-label={tentMode ? 'Exit tent mode' : 'Tent mode'} title="Tent mode — show your name to the table">
       {tentMode ? '\u{1F441}' : '\u{26FA}'}
     </button>
   </div>
 
   <!-- Tent mode: just show the name big -->
   {#if tentMode}
-    <div class="ps-tent" on:click={() => { tentMode = false; }}>
+    <div class="ps-tent" onclick={() => { tentMode = false; }}>
       <div class="ps-tent-name">{playerName}</div>
       {#if myPlayer && myPlayer.hc}
         <div class="ps-tent-hc">{myPlayer.hc}</div>
@@ -117,8 +108,8 @@
           <strong>Compel:</strong> {compelOffer.aspect}
         </div>
         <div class="ps-compel-actions">
-          <button class="ps-compel-btn ps-accept" on:click={() => respondCompel(true)}>Accept (+1 FP)</button>
-          <button class="ps-compel-btn ps-refuse" on:click={() => respondCompel(false)}>Refuse (-1 FP)</button>
+          <button class="ps-compel-btn ps-accept" onclick={() => respondCompel(true)}>Accept (+1 FP)</button>
+          <button class="ps-compel-btn ps-refuse" onclick={() => respondCompel(false)}>Refuse (-1 FP)</button>
         </div>
       </div>
     {/if}
@@ -138,13 +129,13 @@
 
     <!-- Quick actions -->
     <div class="ps-actions">
-      <button class="ps-action-btn" on:click={() => rollFateDice('Roll', 0)} disabled={diceRolling}>
+      <button class="ps-action-btn" onclick={() => rollFateDice('Roll', 0)} disabled={diceRolling}>
         &#x1F3B2; Roll Fate Dice
       </button>
-      <button class="ps-action-btn" on:click={createAspect}>
+      <button class="ps-action-btn" onclick={createAspect}>
         &#x2726; Create Aspect
       </button>
-      <button class="ps-action-btn" on:click={() => { showSheet = !showSheet; }}>
+      <button class="ps-action-btn" onclick={() => { showSheet = !showSheet; }}>
         &#x1F4CB; {showSheet ? 'Hide Sheet' : 'Character Sheet'}
       </button>
     </div>
