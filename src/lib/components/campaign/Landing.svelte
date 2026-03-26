@@ -267,6 +267,7 @@
                   href="/campaigns/{camp.id}/guide"
                   class="land-world-guide-link"
                   title="{camp.name} Campaign Guide"
+                  aria-label="View {camp.name} campaign guide"
                 >Campaign Guide &rarr;</a>
               </div>
             </div>
