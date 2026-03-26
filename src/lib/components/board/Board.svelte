@@ -1,6 +1,6 @@
 <script>
   import { onMount, onDestroy, setContext } from 'svelte';
-  import { get } from 'svelte/store';
+  import { get, writable } from 'svelte/store';
   import { SvelteFlow, Background, BackgroundVariant, MiniMap, Controls } from '@xyflow/svelte';
   import '@xyflow/svelte/dist/style.css';
   import { nodeTypes } from './nodeTypes.js';
@@ -52,8 +52,10 @@
   let cardSearch = $state('');
   let connectSourceId = $state(null);
   let connectorLines = $state([]);
-  let flowNodes = $state([]);
-  let flowEdges = $state([]);
+  // SvelteFlow requires Svelte store references, not $state arrays
+  // These are assigned from canvas.nodes / canvas.edges (writable/derived stores)
+  let flowNodes = writable([]);
+  let flowEdges = writable([]);
 
   function handleConnectClick(cardId) {
     if (!connectSourceId) {
@@ -167,8 +169,8 @@
     // Subscribe to store values
     unsubs.push(canvas.cards.subscribe(v => cards = v));
     unsubs.push(canvas.connectors.subscribe(v => connectorLines = v));
-    unsubs.push(canvas.nodes.subscribe(v => flowNodes = v));
-    unsubs.push(canvas.edges.subscribe(v => flowEdges = v));
+    unsubs.push(canvas.nodes.subscribe(v => flowNodes.set(v)));
+    unsubs.push(canvas.edges.subscribe(v => flowEdges.set(v)));
     let binderLoadedOnce = $state(false);
     unsubs.push(canvas.loaded.subscribe(v => {
       loaded = v;
