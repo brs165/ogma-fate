@@ -40,20 +40,20 @@
   let tables = $derived(getWorldTables(campId));
 
   // ── Local state ────────────────────────────────────────────────────────────
-  let mode = initialMode;
-  let activeGen = 'npc_minor';
-  let leftTab = 'gen';
-  let theme = 'dark';
-  let isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
+  let mode = $state(initialMode);
+  let activeGen = $state('npc_minor');
+  let leftTab = $state('gen');
+  let theme = $state('dark');
+  let isOnline = $state(typeof navigator !== 'undefined' ? navigator.onLine : true);
 
-  let toast = null;
-  let dossierCard = null;
-  let cmdPalette = false;
-  let cardSearch = '';
-  let connectSourceId = null;
-  let connectorLines = [];
-  let flowNodes = [];
-  let flowEdges = [];
+  let toast = $state(null);
+  let dossierCard = $state(null);
+  let cmdPalette = $state(false);
+  let cardSearch = $state('');
+  let connectSourceId = $state(null);
+  let connectorLines = $state([]);
+  let flowNodes = $state([]);
+  let flowEdges = $state([]);
 
   function handleConnectClick(cardId) {
     if (!connectSourceId) {
@@ -67,48 +67,48 @@
       showToast('Connected');
     }
   }
-  let showTracker = false;
-  let exportView = false;
+  let showTracker = $state(false);
+  let exportView = $state(false);
   // zoom/pan now handled by Svelte Flow
 
   // Coach marks
-  let coachCanvas = false;
-  let coachPlay = false;
+  let coachCanvas = $state(false);
+  let coachPlay = $state(false);
 
   // Panel visibility
-  let leftOpen = typeof window !== 'undefined' ? window.innerWidth > 520 : true;
-  let showDice = false;
-  let showClearModal = false;
-  let showFP = false;
-  let showNotes = false;
-  let mobileListView = false;
+  let leftOpen = $state(typeof window !== 'undefined' ? window.innerWidth > 520 : true);
+  let showDice = $state(false);
+  let showClearModal = $state(false);
+  let showFP = $state(false);
+  let showNotes = $state(false);
+  let mobileListView = $state(false);
 
   // Player join state
-  let playerJoinName = '';
-  let playerJoinSent = false;
-  let pcStep = 0;
+  let playerJoinName = $state('');
+  let playerJoinSent = $state(false);
+  let pcStep = $state(0);
   let pcDraft = { hc: '', trouble: '', aspect3: '', skills: {}, avatar: '' };
 
   // FP tracker state
-  let fpState = null;
+  let fpState = $state(null);
 
   // Sync state received from GM
-  let syncState = null;
+  let syncState = $state(null);
 
   // Compel + invoke
-  let compelOffer = null;
-  let pendingInvoke = null;
-  let rollHistory = [];
+  let compelOffer = $state(null);
+  let pendingInvoke = $state(null);
+  let rollHistory = $state([]);
 
   // Canvas refs
   // canvasRef/dragRef/panRef removed — Svelte Flow handles drag/pan
 
   // Context menu
-  let ctx = null;
+  let ctx = $state(null);
 
   // ── Toast queue ────────────────────────────────────────────────────────────
-  let toastTimer = null;
-  let toastQueue = [];
+  let toastTimer = $state(null);
+  let toastQueue = $state([]);
 
   function drainToast() {
     if (toastQueue.length === 0) { toast = null; return; }
@@ -129,10 +129,10 @@
   let campCanvasKey = $derived(canvasKey + '_' + campId);
 
   // These stores are created once on mount and recreated when campId changes
-  let canvas;
-  let play;
-  let binder;
-  let sync;
+  let canvas = $state();
+  let play = $state();
+  let binder = $state();
+  let sync = $state();
 
   // Svelte Flow context — must be called during init
   setContext('ogma_canvas', {
@@ -169,7 +169,7 @@
     unsubs.push(canvas.connectors.subscribe(v => connectorLines = v));
     unsubs.push(canvas.nodes.subscribe(v => flowNodes = v));
     unsubs.push(canvas.edges.subscribe(v => flowEdges = v));
-    let binderLoadedOnce = false;
+    let binderLoadedOnce = $state(false);
     unsubs.push(canvas.loaded.subscribe(v => {
       loaded = v;
       if (v && !binderLoadedOnce) {
@@ -198,23 +198,23 @@
   }
 
   // Reactive values from stores — manually subscribed in initStores
-  let cards = [];
-  let loaded = false;
-  let players = [];
-  let round = 1;
-  let order = [];
-  let selPlayer = null;
-  let roundFlash = false;
-  let gmPool = 0;
-  let binderCards = [];
-  let trayCards = [];
-  let binderOpenVal = false;
-  let playCardIds = new Set();
-  let syncObj = null;
-  let syncStatus = 'offline';
-  let roomCode = '';
+  let cards = $state([]);
+  let loaded = $state(false);
+  let players = $state([]);
+  let round = $state(1);
+  let order = $state([]);
+  let selPlayer = $state(null);
+  let roundFlash = $state(false);
+  let gmPool = $state(0);
+  let binderCards = $state([]);
+  let trayCards = $state([]);
+  let binderOpenVal = $state(false);
+  let playCardIds = $state(new Set());
+  let syncObj = $state(null);
+  let syncStatus = $state('offline');
+  let roomCode = $state('');
 
-  let unsubs = [];
+  let unsubs = $state([]);
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
   onMount(() => {
@@ -652,7 +652,7 @@
 
           <!-- Context menu overlay -->
           {#if ctx}
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div class="board-ctx" role="menu" aria-label="Generate card"
               style="left:{ctx.screenX}px;top:{ctx.screenY}px;position:fixed;z-index:9999"
               onclick={(e) => e.stopPropagation()}>
@@ -781,9 +781,9 @@
 
   <!-- Clear table modal -->
   {#if showClearModal}
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div class="modal-overlay" onclick={() => showClearModal = false} role="presentation">
-      <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+      <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
       <div class="modal-box modal-box-narrow" onclick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Clear table options">
         <div class="modal-header">
           <span class="modal-title">Clear Table</span>

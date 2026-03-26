@@ -3,7 +3,7 @@
   import { page } from '$app/stores';
   import { VERSION } from '$lib/version.js';
 
-  let theme = 'dark';
+  let theme = $state('dark');
 
   let world = $derived($page.params.world);
 
@@ -812,7 +812,7 @@
 <div class="land-shell">
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
-  <header class="land-topnav topbar" role="banner">
+  <header class="land-topnav topbar">
     <a href="/" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
     <nav class="topbar-crumb" aria-label="Breadcrumb">
       <a href="/" class="topbar-crumb-item">Home</a>

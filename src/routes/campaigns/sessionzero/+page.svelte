@@ -3,17 +3,17 @@
   import { generate, mergeUniversal, filteredTables } from '$lib/engine.js';
   import { CAMPAIGNS } from '$lib/../data/shared.js';
 
-  let theme = 'dark';
-  let step = 0;
-  let campId = null;
-  let playerCount = 3;
+  let theme = $state('dark');
+  let step = $state(0);
+  let campId = $state(null);
+  let playerCount = $state(3);
 
   // Generated content per step
-  let backstories = [];
-  let seedData = null;
-  let sceneData = null;
-  let npcData = null;
-  let extras = [];
+  let backstories = $state([]);
+  let seedData = $state(null);
+  let sceneData = $state(null);
+  let npcData = $state(null);
+  let extras = $state([]);
 
   const STEPS = [
     { id: 'world',   n: 1, label: 'World' },
@@ -135,7 +135,7 @@
 <div class="land-shell">
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
-  <header class="land-topnav topbar" role="banner">
+  <header class="land-topnav topbar">
     <a href="/" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
     <div class="topbar-spacer" style="flex:1"></div>
     <div class="topbar-status">

@@ -27,7 +27,7 @@
       {@const ticked = i < filled}
       {@const borderColor = full ? 'var(--c-red,#E06060)' : color}
       {@const bgBase = full ? 'var(--c-red,#E06060)' : color}
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
       <div
         role="checkbox"
         tabindex="0"

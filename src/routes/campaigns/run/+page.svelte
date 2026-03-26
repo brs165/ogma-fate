@@ -6,7 +6,7 @@
     const params = new URLSearchParams(window.location.search);
     const world = params.get('world') || 'fantasy';
     const room = params.get('room');
-    let dest = '/campaigns/' + encodeURIComponent(world) + '?canvas=1&mode=play';
+    let dest = $state('/campaigns/' + encodeURIComponent(world) + '?canvas=1&mode=play');
     if (room) dest += '&room=' + encodeURIComponent(room);
     goto(dest, { replaceState: true });
   });

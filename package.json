@@ -1,11 +1,11 @@
 {
 	"name": "ogma-fate",
 	"private": true,
-	"version": "2026.3.559",
+	"version": "2026.3.575",
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
-		"build": "bash scripts/bump-version.sh && vite build && cp build/index.html build/404.html",
+		"build": "bash scripts/bump-version.sh && npx vite build",
 		"qa": "node scripts/qa-hard.mjs",
 		"qa:export": "node scripts/qa-export.mjs",
 		"precheck": "node scripts/qa-hard.mjs && node scripts/qa-export.mjs && npm run build",
@@ -20,6 +20,7 @@
 		"vite": "^7.3.1"
 	},
 	"dependencies": {
+		"@sveltejs/adapter-cloudflare": "^7.2.8",
 		"@sveltejs/adapter-static": "^3.0.10",
 		"@xyflow/svelte": "^1.5.1",
 		"bits-ui": "^2.16.3",

@@ -40,11 +40,11 @@
     return 'Fail';
   }
 
-  let faces = [null, null, null, null];
-  let revealed = [false, false, false, false];
-  let rolling = false;
-  let result = null;
-  let btnLabel = 'Roll 4dF';
+  let faces = $state([null, null, null, null]);
+  let revealed = $state([false, false, false, false]);
+  let rolling = $state(false);
+  let result = $state(null);
+  let btnLabel = $state('Roll 4dF');
 
   function roll() {
     if (rolling) return;
@@ -57,7 +57,7 @@
     faces = newFaces;
 
     // Reveal dice one by one
-    let idx = 0;
+    let idx = $state(0);
     const interval = setInterval(() => {
       revealed[idx] = true;
       revealed = [...revealed];

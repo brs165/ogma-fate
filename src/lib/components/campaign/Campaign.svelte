@@ -15,30 +15,30 @@
   let campName = $derived(camp.meta ? camp.meta.name : campId);
 
   // ── Local state ────────────────────────────────────────────────────────────
-  let theme = 'dark';
-  let showSidebar = false;
-  let sbAcc = 'generate';
-  let canvasView = false;
+  let theme = $state('dark');
+  let showSidebar = $state(false);
+  let sbAcc = $state('generate');
+  let canvasView = $state(false);
   let prefs = { excluded: {}, locked: {}, custom: {} };
-  let universalMerge = true;
-  let gmMode = true;
+  let universalMerge = $state(true);
+  let gmMode = $state(true);
 
   // ── Stores ─────────────────────────────────────────────────────────────────
-  let chrome;
-  let session;
-  let unsubs = [];
+  let chrome = $state();
+  let session = $state();
+  let unsubs = $state([]);
 
   // Reactive values from stores
-  let toast = null;
-  let isOnline = true;
-  let activeGen = 'npc_minor';
-  let result = null;
-  let rolling = false;
-  let consequenceSev = '';
-  let pinnedCards = [];
-  let pinBouncing = false;
-  let sessionPack = null;
-  let resultAnim = false;
+  let toast = $state(null);
+  let isOnline = $state(true);
+  let activeGen = $state('npc_minor');
+  let result = $state(null);
+  let rolling = $state(false);
+  let consequenceSev = $state('');
+  let pinnedCards = $state([]);
+  let pinBouncing = $state(false);
+  let sessionPack = $state(null);
+  let resultAnim = $state(false);
 
   function initStores() {
     unsubs.forEach(u => u());

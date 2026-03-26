@@ -1,7 +1,7 @@
 <script>
   // ── PlayerRow — player FP, stress, consequences, concede, compel ─────────────
   let { player = {}, sel = false, onUpd = null, onSel = null, onCompel = null } = $props();
-  let expanded = false;
+  let expanded = $state(false);
 
   let fpCol = $derived(player.fp === 0 ? 'var(--c-red)' : player.fp < player.ref ? 'var(--c-amber,#f4b942)' : 'var(--c-green)');
   let conseq = $derived(player.conseq || ['', '', '']);

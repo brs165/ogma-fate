@@ -21,7 +21,7 @@
   <CvLabel {label} {color} />
   <div style:display="flex" style:gap="4px" style:flex-wrap="wrap">
     {#each hits as v, i (i)}
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
       <div
         role="checkbox"
         tabindex="0"

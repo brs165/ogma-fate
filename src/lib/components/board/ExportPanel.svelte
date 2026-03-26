@@ -20,8 +20,8 @@
     sel = s;
   });
 
-  let fmt  = 'md';
-  let del_ = 'copy';
+  let fmt = $state('md');
+  let del_ = $state('copy');
 
   function toggleCard(id) {
     sel = { ...sel, [id]: !sel[id] };

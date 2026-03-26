@@ -1,9 +1,10 @@
 <script>
-  import { onMount } from 'svelte';
+    let { children } = $props();
+import { onMount } from 'svelte';
   import { page } from '$app/stores';
 
-  let theme = 'dark';
-  let learnOpen = false;
+  let theme = $state('dark');
+  let learnOpen = $state(false);
 
   let currentPath = $derived($page.url.pathname);
 
@@ -36,7 +37,7 @@
 <div class="land-shell">
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
-  <header class="land-topnav topbar" role="banner">
+  <header class="land-topnav topbar">
     <a href="/" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
     <div class="topbar-spacer" style="flex:1"></div>
     <div class="topbar-status">
@@ -141,7 +142,7 @@
       </div>
     </aside>
 
-    <slot />
+    {@render children?.()}
   </div>
 
   <footer class="land-footer">

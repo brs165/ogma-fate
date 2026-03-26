@@ -7,7 +7,7 @@
     c.genId && c.genId !== 'sticky' && c.genId !== 'boost' && c.genId !== 'label'
   ).length > 0);
 
-  let open    = false;
+  let open = $state(false);
   let menuPos = { top: 0, right: 0 };
   let menuEl;
   let btnEl;

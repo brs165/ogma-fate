@@ -1,8 +1,8 @@
 <script>
   // ── TurnBar — draggable turn order strip for Play mode ────────────────────────
   let { players = [], order = [], setOrder = null, onToggleActed = null, round = 1, onNewRound = null, onPrevRound = null, roundFlash = false, onEndScene = null, onStartSession = null, onNewScene = null, onSessionSummary = null, onPrintScene = null, npcCards = [], onToggleNpcActed = null } = $props();
-  let dragId = null;
-  let overId = null;
+  let dragId = $state(null);
+  let overId = $state(null);
 
   let orderedPlayers = $derived((() => {
     const op = order.map(id => players.find(p => p.id === id)).filter(Boolean);

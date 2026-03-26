@@ -29,20 +29,20 @@
   }
 
   // ── State ─────────────────────────────────────────────────────────────────
-  let dice         = ['+', '0', '+', '−'];
-  let phase        = 'idle';   // idle | flicker | reveal | done
-  let revealCount  = 0;
-  let result       = null;
-  let activeSk     = null;
-  let boosted      = false;
-  let history      = [];
-  let diff         = 0;
-  let ladderOpen   = false;
-  let flickerFaces = ['+', '0', '−', '+'];
+  let dice = $state(['+', '0', '+', '−']);
+  let phase = $state('idle');   // idle | flicker | reveal | done
+  let revealCount = $state(0);
+  let result = $state(null);
+  let activeSk = $state(null);
+  let boosted = $state(false);
+  let history = $state([]);
+  let diff = $state(0);
+  let ladderOpen = $state(false);
+  let flickerFaces = $state(['+', '0', '−', '+']);
 
   // Timer refs
-  let flickerTimer = null;
-  let revealTimer  = null;
+  let flickerTimer = $state(null);
+  let revealTimer = $state(null);
 
   onDestroy(() => {
     if (flickerTimer) clearInterval(flickerTimer);
@@ -101,7 +101,7 @@
     const faces = [randomFace(), randomFace(), randomFace(), randomFace()];
 
     phase = 'flicker';
-    let flicks = 0;
+    let flicks = $state(0);
     if (flickerTimer) clearInterval(flickerTimer);
     flickerTimer = setInterval(() => {
       flickerFaces = [randomFace(), randomFace(), randomFace(), randomFace()];
@@ -111,7 +111,7 @@
         dice        = faces;
         phase       = 'reveal';
         revealCount = 0;
-        let idx = 0;
+        let idx = $state(0);
         if (revealTimer) clearInterval(revealTimer);
         revealTimer = setInterval(() => {
           idx++;
@@ -122,7 +122,7 @@
             result = raw;
             phase  = 'done';
             const skVal = sk.v != null ? sk.v : sk.r || 0;
-            let total   = raw + skVal;
+            let total = $state(raw + skVal);
             if (pendingInvoke) total += 2;
             const entry = {
               who:   player ? player.name : '?',

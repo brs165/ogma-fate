@@ -1,10 +1,10 @@
 <script>
   import { onMount } from 'svelte';
 
-  let theme = 'dark';
-  let demoNpcs = [];
-  let joinCode = '';
-  let joinErr = '';
+  let theme = $state('dark');
+  let demoNpcs = $state([]);
+  let joinCode = $state('');
+  let joinErr = $state('');
 
   const CAMPAIGN_INFO = {
     thelongafter: { name: 'The Long After', icon: '◈', genre: 'Sword & Planet', vibes: 'Nausicaä · Thundarr · Book of the New Sun', hook: 'Warlords and ruined gods in the wreckage of civilisation' },
@@ -91,7 +91,7 @@
   <a href="#main" class="skip-link">Skip to main content</a>
 
   <!-- Topbar -->
-  <header class="land-topnav topbar" role="banner">
+  <header class="land-topnav topbar">
     <a href="/" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
     <div class="topbar-spacer" style="flex:1"></div>
     <div class="topbar-status">

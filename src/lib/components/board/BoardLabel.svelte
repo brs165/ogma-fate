@@ -8,8 +8,8 @@
     { bg: 'color-mix(in srgb,var(--c-amber,#f4b942) 10%,var(--panel))', border: 'var(--c-amber,#f4b942)', text: 'var(--c-amber,#f4b942)' },
   ];
 
-  let editing = false;
-  let draft = card.text || 'Section';
+  let editing = $state(false);
+  let draft = $state(card.text || 'Section');
 
   let S = $derived(LABEL_STYLES[card.styleIdx || 0] || LABEL_STYLES[0]);
   let zoneMode = $derived(card.zoneMode || false);
@@ -64,7 +64,7 @@
   }
 </script>
 
-<!-- svelte-ignore a11y-no-noninteractive-element-interactions a11y-no-noninteractive-tabindex -->
+<!-- svelte-ignore a11y_no_noninteractive_element_interactions a11y_no_noninteractive_tabindex -->
 <div
   class="board-label"
   class:editing
@@ -104,7 +104,7 @@
        style:border-color={S.border}
        style:color={S.text}>
     {#if editing}
-      <!-- svelte-ignore a11y-autofocus -->
+      <!-- svelte-ignore a11y_autofocus -->
       <input
         type="text"
         class="board-label-input"

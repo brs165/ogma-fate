@@ -3,7 +3,7 @@
   import PlayerRow from './PlayerRow.svelte';
 
   let { players = [], selPlayer = null, onSel = null, onUpd = null, onAdd = null, gmPool = 0, updGmPool = null, onQuickNpc = null, onStarterScene = null, onCompel = null, collapsed = false } = $props();
-  let open = false;
+  let open = $state(false);
 </script>
 
 {#if collapsed}

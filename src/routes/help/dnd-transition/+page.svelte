@@ -100,7 +100,7 @@
   <li><strong>Conflict</strong> — the full combat structure, when someone wants to harm someone else and the other side resists.</li>
 </ul>
 
-<h2 id="quick-faq">Quick FAQ
+<h2 id="quick-faq">Quick FAQ</h2>
 <p><strong>Where's the damage? How much does a sword do?</strong> In Fate, weapons don't deal fixed damage — you roll your Fight skill, and shifts above the defender's effort become stress. A sword might grant +1 Weapon rating (add +1 to shifts on successful attacks), but there's no d6/d8/d10 damage die.</p>
 <p><strong>Can my character die?</strong> Yes, but only if you agree. The standard outcome of being Taken Out is narrative removal from the conflict — captured, fled, dramatically incapacitated. Permanent death is a table conversation, not a mechanical outcome.</p>
 <p><strong>There's no CR. How do I know if an encounter is appropriate?</strong> You don't balance by math — you balance by stakes. A fight where the GM doesn't know who will win is a fight worth having. Most encounters in Fate are significantly harder than "appropriate-by-CR," because consequences create lasting complications even from victories.</p>

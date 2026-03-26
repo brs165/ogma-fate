@@ -1,7 +1,7 @@
 <script>
   let { state = { pcs: [], pool: 0 }, onUpdate = () => {} } = $props();
-  let lastFPAnim = null;
-  let fpTab = 'fp';
+  let lastFPAnim = $state(null);
+  let fpTab = $state('fp');
 
   function adjustPC(id, delta) {
     const pc = state.pcs.find(p => p.id === id);

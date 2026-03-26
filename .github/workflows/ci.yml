@@ -37,7 +37,6 @@ jobs:
       - name: Verify build output
         run: |
           test -f build/index.html || exit 1
-          test -f build/404.html || exit 1
           test -f build/sw.js || exit 1
           test -f build/manifest.json || exit 1
           echo "Build output verified"

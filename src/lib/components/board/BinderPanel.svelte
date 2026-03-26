@@ -17,7 +17,7 @@
     {id:'mechanics',label:'Mech'},
   ];
 
-  let filter = 'all';
+  let filter = $state('all');
 
   let visible = $derived(binderCards.filter(card => {
     if (filter === 'all') return true;

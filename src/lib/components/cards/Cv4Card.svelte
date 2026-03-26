@@ -80,13 +80,13 @@
   let { genId = 'npc_minor', campName = '', data = {}, onUpdate = null, savedCardState = null } = $props();
 
   // ── UI state ─────────────────────────────────────────────────────────────
-  let flipped  = false;
-  let hovered  = false;
-  let visible  = true;
-  let reduced  = false;
+  let flipped = $state(false);
+  let hovered = $state(false);
+  let visible = $state(true);
+  let reduced = $state(false);
 
   // ── Reduced-motion listener ───────────────────────────────────────────────
-  let mq;
+  let mq = $state();
   onMount(() => {
     try {
       mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -98,7 +98,7 @@
   });
 
   // ── Entry fade (triggers on genId/data change) ────────────────────────────
-  let fadeTimer;
+  let fadeTimer = $state();
   $effect(() => {
     if (!reduced) {
       void genId; void data;
@@ -183,8 +183,7 @@
       <!-- Front content -->
       {#if FrontComponent}
         <div style="flex-shrink:0">
-          <svelte:component
-            this={FrontComponent}
+          <FrontComponent
             {data}
             {campName}
             {catColor}

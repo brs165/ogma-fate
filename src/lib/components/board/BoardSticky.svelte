@@ -8,8 +8,8 @@
     {bg: '#e8e4fc', text: '#2a2060', label: '#5a50b0'},
   ];
 
-  let editing = false;
-  let draft   = card.text || '';
+  let editing = $state(false);
+  let draft = $state(card.text || '');
 
   let sc = $derived(STICKY_COLORS[card.colorIdx || 0]);
 

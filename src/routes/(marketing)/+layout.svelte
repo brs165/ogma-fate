@@ -1,7 +1,8 @@
 <script>
-  import { onMount } from 'svelte';
+    let { children } = $props();
+import { onMount } from 'svelte';
 
-  let theme = 'dark';
+  let theme = $state('dark');
 
   onMount(() => {
     try {
@@ -25,7 +26,7 @@
 <div class="land-shell">
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
-  <header class="land-topnav topbar" role="banner">
+  <header class="land-topnav topbar">
     <a href="/" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
     <div class="topbar-spacer" style="flex:1"></div>
     <div class="topbar-status">
@@ -38,7 +39,7 @@
     </div>
   </header>
 
-  <slot />
+  {@render children?.()}
 
   <footer class="land-footer">
     <div class="land-footer-inner">

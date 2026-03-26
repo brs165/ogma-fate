@@ -5,11 +5,11 @@
 
   let { worldStunts = [] } = $props();
 
-  let filter  = '';
-  let skill   = 'all';
-  let tag     = 'all';
-  let copied  = null;
-  let copyTimer = null;
+  let filter = $state('');
+  let skill = $state('all');
+  let tag = $state('all');
+  let copied = $state(null);
+  let copyTimer = $state(null);
 
   let uniStunts = $derived((UNIVERSAL && UNIVERSAL.stunts) ? UNIVERSAL.stunts : []);
   let allStunts = $derived(worldStunts.concat(uniStunts));

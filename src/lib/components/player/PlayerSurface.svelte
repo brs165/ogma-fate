@@ -11,8 +11,8 @@
   let compelOffer = $derived(syncState && syncState.compelOffer);
 
   // ── Local state ────────────────────────────────────────────────────────────
-  let tentMode = false;
-  let showSheet = false;
+  let tentMode = $state(false);
+  let showSheet = $state(false);
 
   // Find this player in the roster
   let myPlayer = $derived(players.find(p => p.name && p.name.toLowerCase() === playerName.toLowerCase()));
@@ -62,8 +62,8 @@
   }
 
   // Simple dice roller
-  let diceResult = null;
-  let diceRolling = false;
+  let diceResult = $state(null);
+  let diceRolling = $state(false);
 
   function rollFateDice(skill, bonus) {
     diceRolling = true;

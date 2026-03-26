@@ -2,8 +2,8 @@
   import { onMount } from 'svelte';
   import { VERSION } from '$lib/version.js';
 
-  let theme = 'dark';
-  let step = 0;
+  let theme = $state('dark');
+  let step = $state(0);
 
   let STEPS = $derived((() => {
     const base = [
@@ -47,16 +47,16 @@
   function back() { if (step > 0) step -= 1; }
 
   // PC count and per-PC data collection
-  let pcCount = 2;
-  let pcIndex = 0;
-  let pcDrafts = [];
+  let pcCount = $state(2);
+  let pcIndex = $state(0);
+  let pcDrafts = $state([]);
   $effect(() => {
     while (pcDrafts.length < pcCount) pcDrafts.push({ name: '', hc: '', trouble: '' });
     pcDrafts = pcDrafts.slice(0, pcCount);
   });
   let currentPc = $derived(pcDrafts[pcIndex] || { name: '', hc: '', trouble: '' });
-  let fromSessionZero = false;
-  let sentToPrep = false;
+  let fromSessionZero = $state(false);
+  let sentToPrep = $state(false);
 
   function updateCurrentPc(field, value) {
     pcDrafts = pcDrafts.map((pc, i) => i === pcIndex ? { ...pc, [field]: value } : pc);
@@ -100,8 +100,8 @@
   }
 
   // ── Campaign data ──────────────────────────────────────────────────────
-  let campId = null;
-  let mode = 'standard';
+  let campId = $state(null);
+  let mode = $state('standard');
 
   const CAMPAIGNS = {
     thelongafter: { name: 'The Long After',          icon: '◈', genre: 'Sword & Planet',   tagline: 'Warlords and ruined gods in the wreckage of civilisation' },
@@ -124,8 +124,8 @@
     { id: 'flashback', label: 'Flashback Slots',    tag: 'Play-First',  sub: 'Start with High Concept + Trouble + top skill only. Discover the rest during play through flashback moments.' },
   ];
 
-  let rerolls = 0;
-  let copied = '';
+  let rerolls = $state(0);
+  let copied = $state('');
   function reroll() { rerolls += 1; }
 
   function copyMarkdown() {
@@ -305,7 +305,7 @@
 <div class="land-shell">
   <a href="#main" class="skip-link">Skip to main content</a>
 
-  <header class="land-topnav topbar" role="banner">
+  <header class="land-topnav topbar">
     <a href="/" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
     <div class="topbar-spacer" style="flex:1"></div>
     <div class="topbar-status">

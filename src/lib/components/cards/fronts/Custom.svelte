@@ -11,10 +11,10 @@
     { id: 'other',    label: 'Other',    color: 'var(--text-muted,#888)' },
   ];
 
-  let editTitle = false;
-  let editBody  = false;
-  let draftTitle = data.title || 'Untitled';
-  let draftBody  = data.body  || '';
+  let editTitle = $state(false);
+  let editBody = $state(false);
+  let draftTitle = $state(data.title || 'Untitled');
+  let draftBody = $state(data.body  || '');
 
   let typeId = $derived(data.type || 'aspect');
   let typeEntry = $derived(CV4_CUSTOM_TYPES.find(t => t.id === typeId) || CV4_CUSTOM_TYPES[0]);
@@ -65,7 +65,7 @@
 
   <!-- Title -->
   {#if editTitle}
-    <!-- svelte-ignore a11y-autofocus -->
+    <!-- svelte-ignore a11y_autofocus -->
     <input
       bind:this={titleEl}
       bind:value={draftTitle}
@@ -77,7 +77,7 @@
       style="font-size:14px; font-weight:700; color:var(--text); background:transparent; border:none; border-bottom:2px solid {typeColor}; outline:none; width:100%; font-family:{CV4_MONO}; padding:2px 0"
     />
   {:else}
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
       onclick={startEditTitle}
       onkeydown={e => { if (e.key === 'Enter' || e.key === ' ') startEditTitle(e); }}
@@ -90,7 +90,7 @@
 
   <!-- Body -->
   {#if editBody}
-    <!-- svelte-ignore a11y-autofocus -->
+    <!-- svelte-ignore a11y_autofocus -->
     <textarea
       bind:this={bodyEl}
       bind:value={draftBody}
@@ -104,7 +104,7 @@
       style="font-size:11px; color:var(--text); background:var(--inset,rgba(0,0,0,.08)); border:1px solid {typeColor}66; border-radius:4px; outline:none; width:100%; resize:vertical; font-family:{CV4_SANS}; padding:6px 8px; line-height:1.55"
     ></textarea>
   {:else}
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
       onclick={startEditBody}
       onkeydown={e => { if (e.key === 'Enter' || e.key === ' ') startEditBody(e); }}

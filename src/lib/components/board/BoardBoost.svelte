@@ -1,8 +1,8 @@
 <script>
   // ── BoardBoost — ephemeral boost card with 1 free invoke ─────────────────────
   let { card = {}, onDelete = null, onUpdate = null, onDragStart = null, onInvoke = null } = $props();
-  let editing = false;
-  let draft   = card.text || '';
+  let editing = $state(false);
+  let draft = $state(card.text || '');
 
   let expired = $derived(card.expired || false);
 
