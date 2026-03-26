@@ -73,8 +73,7 @@
   }
   let showTracker = false;
   let exportView = false;
-  let zoom = 0.6;
-  let pan = { x: 0, y: 0 };
+  // zoom/pan now handled by Svelte Flow
 
   // Coach marks
   let coachCanvas = false;
@@ -106,9 +105,7 @@
   let rollHistory = [];
 
   // Canvas refs
-  let canvasRef;
-  let dragRef = null;
-  let panRef = null;
+  // canvasRef/dragRef/panRef removed — Svelte Flow handles drag/pan
 
   // Context menu
   let ctx = null;
@@ -259,8 +256,7 @@
     document.addEventListener('keydown', onGlobalKey);
 
     // Mouse move/up for drag
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
+    // mousemove/mouseup removed — Svelte Flow handles drag
 
     // Session Zero auto-populate listener
     window.addEventListener('ogma:sz-pc', onSzPc);
@@ -279,8 +275,7 @@
     if (typeof window !== 'undefined') {
       window.removeEventListener('online', goOnline);
       window.removeEventListener('offline', goOffline);
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
+      // mousemove/mouseup removed — Svelte Flow handles drag
       document.removeEventListener('keydown', onGlobalKey);
       window.removeEventListener('ogma:sz-pc', onSzPc);
     }
@@ -347,137 +342,20 @@
   }
 
   // ── Drag system — direct DOM during drag, single store update on drop ────
-  function onDragStart(e, cardId) {
-    if (e.button !== 0) return;
-    const allCards = canvas ? get(canvas.cards) : [];
-    const card = allCards.find(c => c.id === cardId);
-    if (!card) return;
+  // Manual drag/zoom removed — Svelte Flow handles all canvas interaction
 
-    const el = e.target.closest('.board-card') || e.target.closest('.board-sticky') || e.target.closest('.board-boost') || e.target.closest('.board-label');
-    if (!el) return;
-
-    const topZ = Date.now();
-    el.style.zIndex = topZ;
-
-    dragRef = {
-      cardId, el,
-      startMouseX: e.clientX, startMouseY: e.clientY,
-      startCardX: card.x, startCardY: card.y,
-      topZ, moved: false, finalX: null, finalY: null,
-    };
-    e.preventDefault();
-  }
-
-  function onMouseMove(e) {
-    if (dragRef) {
-      const dx = e.clientX - dragRef.startMouseX;
-      const dy = e.clientY - dragRef.startMouseY;
-      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragRef.moved = true;
-      const newX = dragRef.startCardX + dx / zoom;
-      const newY = dragRef.startCardY + dy / zoom;
-      dragRef.el.style.left = newX + 'px';
-      dragRef.el.style.top = newY + 'px';
-      dragRef.finalX = newX;
-      dragRef.finalY = newY;
-      if (!dragRef.el.classList.contains('drag-active')) {
-        dragRef.el.classList.add('drag-active');
-      }
-    }
-    if (panRef) {
-      const pdx = e.clientX - panRef.startX;
-      const pdy = e.clientY - panRef.startY;
-      pan = { x: panRef.origX + pdx, y: panRef.origY + pdy };
-    }
-  }
-
-  function onMouseUp() {
-    if (dragRef) {
-      const d = dragRef;
-      dragRef = null;
-      if (d.el) d.el.classList.remove('drag-active');
-      if (d.moved && canvas) {
-        const fx = d.finalX != null ? d.finalX : d.startCardX;
-        const fy = d.finalY != null ? d.finalY : d.startCardY;
-        canvas.updateCard(d.cardId, { x: fx, y: fy, z: d.topZ });
-
-        // Zone assignment — check if card landed inside a zone label
-        const allCards = get(canvas.cards);
-        const zones = allCards.filter(c => c.genId === 'label' && c.zoneMode);
-        const droppedCard = allCards.find(c => c.id === d.cardId);
-        if (droppedCard && droppedCard.genId !== 'label') {
-          let assignedZone = null;
-          for (const zone of zones) {
-            const zW = zone.zoneW || 400;
-            const zH = zone.zoneH || 200;
-            if (fx >= zone.x && fx <= zone.x + zW && fy >= zone.y && fy <= zone.y + zH) {
-              assignedZone = zone.id;
-              break;
-            }
-          }
-          canvas.updateCard(d.cardId, { zoneId: assignedZone });
-        }
-      } else if (canvas) {
-        canvas.updateCard(d.cardId, { z: d.topZ });
-      }
-    }
-    panRef = null;
-  }
-
-  // ── Zoom ──────────────────────────────────────────────────────────────────
-  function changeZoom(delta) {
-    zoom = Math.min(2, Math.max(0.25, Math.round((zoom + delta) * 100) / 100));
-  }
-
+  // fitAll — Svelte Flow Controls has fitView button; this is a no-op for keyboard shortcut compat
   function fitAll() {
-    if (!cards || cards.length === 0 || !canvasRef) return;
-    const rect = canvasRef.getBoundingClientRect();
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-    cards.forEach(c => {
-      if (c.x != null && c.y != null) {
-        minX = Math.min(minX, c.x); minY = Math.min(minY, c.y);
-        maxX = Math.max(maxX, c.x + 320); maxY = Math.max(maxY, c.y + 400);
-      }
-    });
-    if (!isFinite(minX)) return;
-    const cw = maxX - minX + 60, ch = maxY - minY + 60;
-    zoom = Math.min(2, Math.max(0.25, Math.min(rect.width / cw, rect.height / ch) * 0.9));
-    pan = { x: -minX * zoom + (rect.width - cw * zoom) / 2 + 30, y: -minY * zoom + (rect.height - ch * zoom) / 2 + 30 };
-  }
-
-  // ── Canvas pan ────────────────────────────────────────────────────────────
-  function onCanvasMouseDown(e) {
-    if (leftOpen && typeof window !== 'undefined' && window.matchMedia('(max-width:640px)').matches) {
-      leftOpen = false;
-      return;
-    }
-    if (e.target.closest('.board-card') || e.target.closest('.board-sticky')) return;
-    if (e.target.closest('.board-ctx') || e.target.closest('.board-zoom')) return;
-    if (e.button !== 0 && e.button !== 1) return;
-    panRef = { startX: e.clientX, startY: e.clientY, origX: pan.x, origY: pan.y };
-    e.preventDefault();
-  }
-
-  function onCanvasWheel(e) {
-    e.preventDefault();
-    if (!canvasRef) return;
-    const r = canvasRef.getBoundingClientRect();
-    const mx = e.clientX - r.left;
-    const my = e.clientY - r.top;
-    const delta = e.deltaY < 0 ? 1.1 : 0.9;
-    const nz = Math.min(2, Math.max(0.25, Math.round(zoom * delta * 100) / 100));
-    pan = { x: mx - (mx - pan.x) * (nz / zoom), y: my - (my - pan.y) * (nz / zoom) };
-    zoom = nz;
+    // Svelte Flow fitView is handled by the Controls component
   }
 
   // ── Context menu (right-click) ────────────────────────────────────────────
   function onCanvasContextMenu(e) {
     if (e.target.closest('.board-card') || e.target.closest('.board-sticky')) return;
     e.preventDefault();
-    const r = canvasRef.getBoundingClientRect();
     ctx = {
-      screenX: e.clientX - r.left, screenY: e.clientY - r.top,
-      canvasX: (e.clientX - r.left - pan.x) / zoom,
-      canvasY: (e.clientY - r.top - pan.y) / zoom,
+      screenX: e.clientX, screenY: e.clientY,
+      canvasX: e.clientX, canvasY: e.clientY,
     };
   }
 
