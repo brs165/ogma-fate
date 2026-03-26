@@ -49,7 +49,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
   --text:#F5F0E8; --text-dim:rgba(245,240,232,0.68); --text-muted:rgba(245,240,232,0.45);
   --overlay:rgba(14,12,9,0.72); --inset:rgba(255,248,235,0.05);
   --cv-card-dark:#1A1610;--cv-card-dark2:#15120D;--cv-card-bdr:rgba(255,248,235,0.10);
-  --cv-card-text:#F5F0E8;--cv-card-text-dim:rgba(245,240,232,0.68);--cv-card-text-muted:rgba(245,240,232,0.38);
+  --cv-card-text:#F5F0E8;--cv-card-text-dim:rgba(245,240,232,0.68);--cv-card-text-muted:rgba(245,240,232,0.48);
   --glass-bg:rgba(255,248,235,0.07); --glass-border:rgba(255,248,235,0.12);
   --glass-shadow:0 4px 0 rgba(0,0,0,0.35), 3px 3px 0 rgba(0,0,0,0.2);
   --glass-inset:inset 0 1px 0 rgba(255,248,235,0.08), inset 0 -1px 0 rgba(0,0,0,0.18);
@@ -69,7 +69,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
   --text:#1C1410; --text-dim:rgba(28,20,16,0.68); --text-muted:rgba(28,20,16,0.50);
   --overlay:rgba(28,20,10,0.35); --inset:rgba(28,20,10,0.05);
   --cv-card-dark:#F5F0E8;--cv-card-dark2:#EDE8DF;--cv-card-bdr:rgba(28,20,10,0.10);
-  --cv-card-text:#1C1410;--cv-card-text-dim:rgba(28,20,16,0.68);--cv-card-text-muted:rgba(28,20,16,0.42);
+  --cv-card-text:#1C1410;--cv-card-text-dim:rgba(28,20,16,0.68);--cv-card-text-muted:rgba(28,20,16,0.48);
   --glass-bg:#F5F0E8; --glass-border:rgba(28,20,10,0.12);
   --glass-shadow:3px 3px 0 rgba(28,20,10,0.12);
   --glass-inset:inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -1px 0 rgba(28,20,10,0.06);
@@ -106,7 +106,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 :focus-visible{outline:2px solid var(--focus-ring,var(--accent));outline-offset:2px}
 [role="checkbox"]:focus-visible{outline:2px solid var(--focus-ring,var(--accent));outline-offset:3px;border-radius:2px}
 :focus:not(:focus-visible){outline:none}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important}body::before,body::after{display:none}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important;animation-iteration-count:1!important}body::before,body::after{display:none}}
 
 /* ══ ANIMATIONS ══ */
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
@@ -420,7 +420,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .bdr-tray-remove{
   background:none;border:none;cursor:pointer;color:var(--text-muted);
   font-size:12px;padding:0 2px;line-height:1;flex-shrink:0;
-  min-width:22px;min-height:22px;display:flex;align-items:center;justify-content:center;
+  min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;
 }
 .bdr-tray-remove:hover{color:var(--c-red);}
 .bdr-tray-remove:focus-visible{outline:2px solid var(--focus-ring);border-radius:2px;}
@@ -1170,6 +1170,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .land-section-sub{font-size:var(--text-sm);color:var(--text-muted);margin:4px 0 20px;max-width:480px}
 .land-join-form{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .land-join-input{flex:1;min-width:180px;max-width:220px;padding:10px 14px;border-radius:8px;border:1px solid var(--border-mid);background:var(--inset);color:var(--text);font-size:22px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;font-family:var(--font-mono,monospace);outline:none;transition:border-color .15s}
+.land-join-input:focus-visible{outline:2px solid var(--focus-ring,var(--accent));outline-offset:2px}
 .land-join-input:focus{border-color:var(--accent);border-width:2px;box-shadow:0 0 0 1px var(--accent)}
 .land-join-input::placeholder{font-weight:400;letter-spacing:.05em;font-size:14px;text-transform:none;opacity:.5}
 .land-join-btn{padding:10px 22px;font-size:15px;font-weight:700;background:var(--accent);color:#000;border:none;border-radius:8px;cursor:pointer;transition:opacity .15s}
@@ -2223,10 +2224,12 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .blp-stunts{padding:8px 0 0;display:flex;flex-direction:column;gap:0;height:100%;box-sizing:border-box}
 .bs-filters{padding:0 10px 8px;display:flex;flex-direction:column;gap:6px;flex-shrink:0}
 .bs-search{width:100%;padding:6px 10px;background:var(--inset);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;font-family:inherit;box-sizing:border-box;outline:none;transition:border .15s}
+.bs-search:focus-visible{outline:2px solid var(--focus-ring,var(--accent));outline-offset:2px}
 .bs-search:focus{border-color:var(--accent);border-width:2px}
 .bs-search::placeholder{color:var(--text-muted)}
 .bs-selects{display:flex;gap:6px}
 .bs-select{flex:1;padding:5px 6px;background:var(--inset);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;font-family:inherit;cursor:pointer;outline:none}
+.bs-select:focus-visible{outline:2px solid var(--focus-ring,var(--accent));outline-offset:2px}
 .bs-select:focus{border-color:var(--accent)}
 .bs-count{font-size:10px;color:var(--text-muted);letter-spacing:.04em;text-align:right;padding:0 2px}
 .bs-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:4px;padding:0 8px 8px}
@@ -2272,6 +2275,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .bwb-sub{font-size:12px;color:var(--text-muted);line-height:1.5;margin-bottom:14px}
 .bwb-row{display:flex;gap:8px;align-items:center}
 .bwb-input{width:100%;padding:9px 12px;background:var(--inset);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;font-family:inherit;outline:none;min-width:0;transition:border .15s;box-sizing:border-box}
+.bwb-input:focus-visible{outline:2px solid var(--focus-ring,var(--accent));outline-offset:2px}
 .bwb-input:focus{border-color:var(--accent)}
 .bwb-field{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
 .bwb-lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted)}
@@ -2455,6 +2459,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .cmd-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9999;display:flex;align-items:flex-start;justify-content:center;padding-top:15vh}
 .cmd-modal{width:420px;max-width:90vw;background:var(--panel);border:1px solid var(--border);border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.3);overflow:hidden}
 .cmd-input{width:100%;padding:12px 16px;border:none;border-bottom:1px solid var(--border);background:transparent;font-size:14px;color:var(--text);font-family:var(--font-ui);outline:none}
+.cmd-input:focus-visible{outline:2px solid var(--focus-ring,var(--accent));outline-offset:-2px}
 .cmd-list{max-height:320px;overflow-y:auto;padding:4px}
 .cmd-item{display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;border:none;background:transparent;cursor:pointer;font-size:12px;color:var(--text);font-family:var(--font-ui);border-radius:6px;text-align:left;transition:background .08s}
 .cmd-item:hover,.cmd-active{background:color-mix(in srgb,var(--accent) 12%,transparent)}
@@ -2508,7 +2513,8 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 /* Action buttons — hover reveal */
 .bc-actions{position:absolute;top:6px;right:6px;display:none;gap:3px;z-index:10}
 .board-card:hover .bc-actions{display:flex}
-.bc-btn{width:22px;height:22px;border-radius:4px;border:1px solid var(--border);background:var(--panel);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-muted);transition:background .1s}
+.bc-btn{width:44px;height:44px;border-radius:4px;border:1px solid var(--border);background:var(--panel);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-muted);transition:background .1s}
+@media(pointer:fine){.bc-btn{width:22px;height:22px}}
 .bc-btn:hover{background:var(--hover);color:var(--text)}
 .bc-btn-connect.connecting{color:var(--accent);background:color-mix(in srgb,var(--accent) 15%,transparent)}
 /* "→ Table" / "● On table" strip below cv4Card */
