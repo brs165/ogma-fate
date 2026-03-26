@@ -1,15 +1,9 @@
-<svelte:options runes={false} />
-
 <script>
-  export let cards = [];
-  export let campId = '';
-  export let onOpen = () => {};
-  export let onRemove = () => {};
-
-  $: genCards = cards.filter(c => c.genId && c.genId !== 'sticky' && c.genId !== 'boost' && c.genId !== 'label' && c.data);
-  $: stickyCards = cards.filter(c => c.genId === 'sticky');
-  $: boostCards = cards.filter(c => c.genId === 'boost');
-  $: labelCards = cards.filter(c => c.genId === 'label');
+  let { cards = [], campId = '', onOpen = () => {}, onRemove = () => {} } = $props();
+  let genCards = $derived(cards.filter(c => c.genId && c.genId !== 'sticky' && c.genId !== 'boost' && c.genId !== 'label' && c.data));
+  let stickyCards = $derived(cards.filter(c => c.genId === 'sticky'));
+  let boostCards = $derived(cards.filter(c => c.genId === 'boost'));
+  let labelCards = $derived(cards.filter(c => c.genId === 'label'));
 
   const TYPE_MAP = {
     npc_minor: 'Minor NPC', npc_major: 'Major NPC', scene: 'Scene', campaign: 'Campaign',
@@ -54,14 +48,14 @@
         role="button"
         tabindex="0"
         aria-label="{cardTypeLabel(card.genId)}: {cardTitle(card)}"
-        on:click={() => onOpen(card)}
-        on:keydown={(e) => handleKeyDown(e, card)}
+        onclick={() => onOpen(card)}
+        onkeydown={(e) => handleKeyDown(e, card)}
       >
         <div class="bml-card-type" style="color:{col}">{cardTypeLabel(card.genId)}</div>
         <div class="bml-card-title">{cardTitle(card)}</div>
         <button
           class="bml-remove"
-          on:click|stopPropagation={() => onRemove(card.id)}
+          onclick={(e) => { e.stopPropagation(); (() => onRemove(card.id))(e); }}
           aria-label="Remove {cardTitle(card)}"
         >&times;</button>
       </div>

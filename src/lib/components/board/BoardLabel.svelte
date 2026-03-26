@@ -1,12 +1,5 @@
-<svelte:options runes={false} />
-
 <script>
-  export let card = {};
-  export let onUpdate = () => {};
-  export let onDelete = () => {};
-  export let onDragStart = () => {};
-  export let childCards = [];
-
+  let { card = {}, onUpdate = () => {}, onDelete = () => {}, onDragStart = () => {}, childCards = [] } = $props();
   const LABEL_STYLES = [
     { bg: 'color-mix(in srgb,var(--accent) 10%,var(--panel))', border: 'var(--accent)', text: 'var(--accent)' },
     { bg: 'color-mix(in srgb,var(--c-green,#34c759) 10%,var(--panel))', border: 'var(--c-green,#34c759)', text: 'var(--c-green,#34c759)' },
@@ -18,14 +11,14 @@
   let editing = false;
   let draft = card.text || 'Section';
 
-  $: S = LABEL_STYLES[card.styleIdx || 0] || LABEL_STYLES[0];
-  $: zoneMode = card.zoneMode || false;
-  $: zoneW = zoneMode && childCards.length > 0
+  let S = $derived(LABEL_STYLES[card.styleIdx || 0] || LABEL_STYLES[0]);
+  let zoneMode = $derived(card.zoneMode || false);
+  let zoneW = $derived(zoneMode && childCards.length > 0
     ? Math.max(400, ...childCards.map(c => (c.x - card.x) + 360)) + 40
-    : (card.zoneW || 400);
-  $: zoneH = zoneMode && childCards.length > 0
+    : (card.zoneW || 400));
+  let zoneH = $derived(zoneMode && childCards.length > 0
     ? Math.max(200, ...childCards.map(c => (c.y - card.y) + 300)) + 40
-    : (card.zoneH || 200);
+    : (card.zoneH || 200));
 
   function commit() {
     editing = false;
@@ -85,16 +78,16 @@
   role="heading"
   aria-level="2"
   aria-label="Section: {card.text || 'Section'}"
-  on:mousedown={onMouseDown}
-  on:dblclick={onDoubleClick}
-  on:keydown={onWrapperKeyDown}
+  onmousedown={onMouseDown}
+  ondblclick={onDoubleClick}
+  onkeydown={onWrapperKeyDown}
 >
   <div class="bc-actions">
     <button class="bc-btn" title="Toggle Zone Container" aria-label="Toggle zone"
-      on:click|stopPropagation={() => onUpdate(card.id, { zoneMode: !zoneMode, zoneW: 400, zoneH: 200 })}
+      onclick={(e) => { e.stopPropagation(); (() => onUpdate(card.id, { zoneMode: !zoneMode, zoneW: 400, zoneH: 200 }))(e); }}
     ><i class={zoneMode ? 'fa-solid fa-object-ungroup' : 'fa-solid fa-object-group'} aria-hidden="true"></i></button>
-    <button class="bc-btn" title="Change colour" aria-label="Change colour" on:click={cycleStyle}><i class="fa-solid fa-palette" aria-hidden="true"></i></button>
-    <button class="bc-btn" title="Delete" aria-label="Delete" on:click={deleteLabel}><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+    <button class="bc-btn" title="Change colour" aria-label="Change colour" onclick={cycleStyle}><i class="fa-solid fa-palette" aria-hidden="true"></i></button>
+    <button class="bc-btn" title="Delete" aria-label="Delete" onclick={deleteLabel}><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
   </div>
 
   {#if zoneMode}
@@ -126,9 +119,9 @@
         style:font-size="inherit"
         style:font-weight="inherit"
         style:width="100%"
-        on:blur={commit}
-        on:keydown={onInputKeyDown}
-        on:click|stopPropagation
+        onblur={commit}
+        onkeydown={onInputKeyDown}
+        onclick={(e) => e.stopPropagation()}
       />
     {:else}
       <span title="Double-click to rename">{card.text || 'Section'}</span>

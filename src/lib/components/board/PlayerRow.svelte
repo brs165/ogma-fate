@@ -1,17 +1,10 @@
-<svelte:options runes={false} />
-
 <script>
   // ── PlayerRow — player FP, stress, consequences, concede, compel ─────────────
-  export let player   = {};
-  export let sel      = false;
-  export let onUpd    = null;
-  export let onSel    = null;
-  export let onCompel = null;
-
+  let { player = {}, sel = false, onUpd = null, onSel = null, onCompel = null } = $props();
   let expanded = false;
 
-  $: fpCol = player.fp === 0 ? 'var(--c-red)' : player.fp < player.ref ? 'var(--c-amber,#f4b942)' : 'var(--c-green)';
-  $: conseq = player.conseq || ['', '', ''];
+  let fpCol = $derived(player.fp === 0 ? 'var(--c-red)' : player.fp < player.ref ? 'var(--c-amber,#f4b942)' : 'var(--c-green)');
+  let conseq = $derived(player.conseq || ['', '', '']);
 
   function setConseq(i, val) {
     const n = conseq.slice();
@@ -55,9 +48,9 @@
     if (onUpd) onUpd({ fp: (player.fp || 0) + conseqCount, acted: true });
   }
 
-  $: conseqFilled = (player.conseq || []).filter(c => c).length;
+  let conseqFilled = $derived((player.conseq || []).filter(c => c).length);
 
-  $: labels = conseq.length >= 4
+  let labels = $derived(conseq.length >= 4
     ? [
         {name:'Mild', rec:'end of next scene'},
         {name:'Moderate', rec:'end of session'},
@@ -68,7 +61,7 @@
         {name:'Mild', rec:'end of next scene'},
         {name:'Moderate', rec:'end of session'},
         {name:'Severe', rec:'end of scenario'},
-      ];
+      ]);
 </script>
 
 <div
@@ -83,20 +76,20 @@
     tabindex="0"
     aria-expanded={String(!!sel)}
     aria-label="{sel ? 'Collapse ' : 'Expand '}{player.name}"
-    on:click={toggleSel}
-    on:keydown={onRowKeyDown}
+    onclick={toggleSel}
+    onkeydown={onRowKeyDown}
   >
     <div class="rs-player-dot" style="background:{player.color || 'var(--accent)'}"></div>
     <div class="rs-player-name">{player.name}</div>
     {#if sel}
       <button
         style="background:none; border:none; cursor:pointer; font-size:10px; color:var(--text-muted); padding:0 2px; flex-shrink:0"
-        on:click|stopPropagation={() => (expanded = !expanded)}
+        onclick={(e) => { e.stopPropagation(); (() => (expanded = !expanded))(e); }}
       >{expanded ? '▲' : '▼'}</button>
     {/if}
     <button
       style="background:none; border:none; cursor:pointer; font-size:12px; color:{player.acted ? 'var(--c-green)' : 'var(--border-mid)'}; padding:0 2px; flex-shrink:0; line-height:1"
-      on:click={toggleActed}
+      onclick={toggleActed}
       aria-label={player.acted ? 'Mark unacted' : 'Mark acted'}
     >{player.acted ? '●' : '○'}</button>
   </div>
@@ -110,11 +103,11 @@
   <div class="rs-fp-row">
     <span class="rs-fp-label">FP</span>
     <button class="rs-fp-btn"
-      on:click={() => onUpd && onUpd({ fp: Math.max(0, player.fp - 1) })}
+      onclick={() => onUpd && onUpd({ fp: Math.max(0, player.fp - 1) })}
       aria-label="Spend FP">−</button>
     <span class="rs-fp-num" style="color:{fpCol}">{player.fp}</span>
     <button class="rs-fp-btn"
-      on:click={() => onUpd && onUpd({ fp: player.fp + 1 })}
+      onclick={() => onUpd && onUpd({ fp: player.fp + 1 })}
       aria-label="Gain FP">+</button>
   </div>
 
@@ -129,8 +122,8 @@
           aria-checked={String(!!v)}
           aria-label="Physical stress {i + 1}"
           tabindex="0"
-          on:click={() => togglePhy(i)}
-          on:keydown={e => onStressKeyDown(togglePhy, i, e)}
+          onclick={() => togglePhy(i)}
+          onkeydown={e => onStressKeyDown(togglePhy, i, e)}
         ></div>
       {/each}
     </div>
@@ -144,8 +137,8 @@
           aria-checked={String(!!v)}
           aria-label="Mental stress {i + 1}"
           tabindex="0"
-          on:click={() => toggleMen(i)}
-          on:keydown={e => onStressKeyDown(toggleMen, i, e)}
+          onclick={() => toggleMen(i)}
+          onkeydown={e => onStressKeyDown(toggleMen, i, e)}
         ></div>
       {/each}
     </div>
@@ -165,7 +158,7 @@
               value={conseq[i] || ''}
               placeholder="empty"
               aria-label="{slot.name} consequence"
-              on:input={e => setConseq(i, e.currentTarget.value)}
+              oninput={e => setConseq(i, e.currentTarget.value)}
               style="flex:1; background:var(--inset);
                      border:1px solid {conseq[i] ? 'var(--c-amber,#f4b942)' : 'var(--border)'};
                      border-radius:4px; padding:2px 5px; font-size:10px; color:var(--text);
@@ -182,7 +175,7 @@
 
       <button
         class="rs-concede-btn"
-        on:click={doConcedeClick}
+        onclick={doConcedeClick}
         disabled={!player.conseq || !player.conseq.some(c => c)}
         aria-label="Concede conflict"
         title="FCon p.35: exit conflict, earn 1 FP per consequence taken"
@@ -191,7 +184,7 @@
       {#if onCompel}
         <button
           class="rs-concede-btn"
-          on:click={() => onCompel(player)}
+          onclick={() => onCompel(player)}
           aria-label="Offer compel to {player.name}"
           title="FCon p.20: offer FP through aspect"
           style="border-color:var(--c-purple); color:var(--c-purple)"
