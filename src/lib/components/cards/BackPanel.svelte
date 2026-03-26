@@ -1,9 +1,6 @@
 <script>
   import CvLabel from './CvLabel.svelte';
-
-  export let genId = '';
-  export let catColor = 'var(--accent)';
-
+  let { genId = '', catColor = 'var(--accent)' } = $props();
   const CV4_BODY = "system-ui,-apple-system,sans-serif";
   const CV4_MONO = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
   const accentBlue  = 'var(--c-blue,#60a5fa)';
@@ -156,7 +153,7 @@
     },
   };
 
-  $: help = CV4_HELP[genId] || { what: '', when: '', rule: '', invoke: '', compel: '' };
+  let help = $derived(CV4_HELP[genId] || { what: '', when: '', rule: '', invoke: '', compel: '' });
 </script>
 
 <div style:padding="12px 16px 14px"

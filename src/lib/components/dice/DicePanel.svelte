@@ -1,3 +1,5 @@
+<svelte:options runes={false} />
+
 <script>
   import { onDestroy } from 'svelte';
 

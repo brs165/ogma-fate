@@ -1,3 +1,5 @@
+<svelte:options runes={false} />
+
 <script>
   // ── StuntPanel — stunt library with search + filter ───────────────────────────
   import { UNIVERSAL } from '../../../data/universal.js';

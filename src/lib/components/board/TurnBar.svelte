@@ -1,3 +1,5 @@
+<svelte:options runes={false} />
+
 <script>
   // ── TurnBar — draggable turn order strip for Play mode ────────────────────────
   export let players         = [];

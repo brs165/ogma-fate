@@ -1,3 +1,5 @@
+<svelte:options runes={false} />
+
 <script>
   import { Handle, Position } from '@xyflow/svelte';
   import BoardCard from '../BoardCard.svelte';

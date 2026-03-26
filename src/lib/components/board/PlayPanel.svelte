@@ -1,3 +1,5 @@
+<svelte:options runes={false} />
+
 <script>
   // ── PlayPanel — left panel in Play mode; compact accordion in Prep mode ───────
   import PlayerRow from './PlayerRow.svelte';

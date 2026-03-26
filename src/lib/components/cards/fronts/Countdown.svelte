@@ -1,18 +1,12 @@
 <script>
   import CvLabel from '../CvLabel.svelte';
   import ClockTrack from '../ClockTrack.svelte';
-
-  export let data = {};
-  export let campName = '';
-  export let catColor = 'var(--accent)';
-  export let cardState = {};
-  export let onUpdate = () => {};
-
+  let { data = {}, campName = '', catColor = 'var(--accent)', cardState = {}, onUpdate = () => {} } = $props();
   const CV4_MONO = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
   const CV4_SANS = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
 
-  $: boxes  = data.boxes || 4;
-  $: filled = cardState?.cdFilled ?? 0;
+  let boxes = $derived(data.boxes || 4);
+  let filled = $derived(cardState?.cdFilled ?? 0);
 
   function setFilled(n) { onUpdate({ cdFilled: n }); }
 </script>

@@ -1,7 +1,5 @@
 <script>
-  export let label = '';
-  export let color = 'var(--text-muted)';
-
+  let { label = '', color = 'var(--text-muted)' } = $props();
   const CV4_MONO = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
 </script>
 

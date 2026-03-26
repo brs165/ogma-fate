@@ -1,3 +1,5 @@
+<svelte:options runes={false} />
+
 <script>
   import BoardLabel from '../BoardLabel.svelte';
   import { getContext } from 'svelte';

@@ -1,15 +1,11 @@
 <script>
   import CvLabel from '../CvLabel.svelte';
-
-  export let data = {};
-  export let campName = '';
-  export let catColor = 'var(--accent)';
-
+  let { data = {}, campName = '', catColor = 'var(--accent)' } = $props();
   const CV4_MONO = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
   const CV4_SANS = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
 
-  $: scenes = Array.isArray(data.scenes) ? data.scenes : [];
-  $: opp    = Array.isArray(data.opposition) ? data.opposition : [];
+  let scenes = $derived(Array.isArray(data.scenes) ? data.scenes : []);
+  let opp = $derived(Array.isArray(data.opposition) ? data.opposition : []);
 
   const cols = ['', 'var(--gold,#fbbf24)', 'var(--c-red,#f87171)'];
 

@@ -1,19 +1,15 @@
 <script>
   import CvLabel from '../CvLabel.svelte';
-
-  export let data = {};
-  export let campName = '';
-  export let catColor = 'var(--accent)';
-
+  let { data = {}, campName = '', catColor = 'var(--accent)' } = $props();
   const CV4_MONO = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
   const CV4_SANS = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
 
-  $: cur      = data.current || {};
-  $: imp      = data.impending || {};
-  $: curFaces = Array.isArray(cur.faces) ? cur.faces : [];
-  $: impFaces = Array.isArray(imp.faces) ? imp.faces : [];
-  $: setting  = Array.isArray(data.setting) ? data.setting : [];
-  $: curPlaces = Array.isArray(cur.places) ? cur.places : [];
+  let cur = $derived(data.current || {});
+  let imp = $derived(data.impending || {});
+  let curFaces = $derived(Array.isArray(cur.faces) ? cur.faces : []);
+  let impFaces = $derived(Array.isArray(imp.faces) ? imp.faces : []);
+  let setting = $derived(Array.isArray(data.setting) ? data.setting : []);
+  let curPlaces = $derived(Array.isArray(cur.places) ? cur.places : []);
 </script>
 
 <div style="flex:1; padding:12px 16px 14px; display:flex; gap:14px">

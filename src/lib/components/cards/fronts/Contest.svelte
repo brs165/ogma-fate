@@ -1,23 +1,17 @@
 <script>
   import CvLabel from '../CvLabel.svelte';
-
-  export let data = {};
-  export let campName = '';
-  export let catColor = 'var(--accent)';
-  export let cardState = {};
-  export let onUpdate = () => {};
-
+  let { data = {}, campName = '', catColor = 'var(--accent)', cardState = {}, onUpdate = () => {} } = $props();
   const CV4_MONO = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
   const CV4_SANS = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
 
-  $: victories = data.victories_needed || 3;
-  $: twists    = Array.isArray(data.twists) ? data.twists : [];
-  $: sideA = { label: data.side_a || 'Side A', skills: data.skills_a || '' };
-  $: sideB = { label: data.side_b || 'Side B', skills: data.skills_b || '' };
-  $: sA = cardState?.scoreA ?? 0;
-  $: sB = cardState?.scoreB ?? 0;
-  $: winA = sA >= victories;
-  $: winB = sB >= victories;
+  let victories = $derived(data.victories_needed || 3);
+  let twists = $derived(Array.isArray(data.twists) ? data.twists : []);
+  let sideA = $derived({ label: data.side_a || 'Side A', skills: data.skills_a || '' });
+  let sideB = $derived({ label: data.side_b || 'Side B', skills: data.skills_b || '' });
+  let sA = $derived(cardState?.scoreA ?? 0);
+  let sB = $derived(cardState?.scoreB ?? 0);
+  let winA = $derived(sA >= victories);
+  let winB = $derived(sB >= victories);
 
   const colA = () => catColor;
   const colB = 'var(--c-red,#f87171)';
@@ -51,7 +45,7 @@
           <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:3px">
             <div style="font-size:11px; font-weight:700; color:{row.col}; font-family:{CV4_SANS}">{row.side.label}</div>
             <button
-              on:click|stopPropagation={() => tick(row.key)}
+              onclick={(e) => { e.stopPropagation(); (() => tick(row.key))(e); }}
               disabled={row.won}
               aria-label="Add victory for {row.side.label}"
               style="padding:2px 8px; background:{row.col}; border:none; border-radius:3px; color:var(--bg,#0d1117); font-size:11px; font-weight:700; cursor:{row.won ? 'default' : 'pointer'}; opacity:{row.won ? 0.4 : 1}; font-family:{CV4_SANS}"
@@ -68,7 +62,7 @@
     </div>
 
     <div style="display:flex; justify-content:flex-end">
-      <button on:click={reset} aria-label="Reset contest scores" style="padding:2px 8px; background:transparent; border:1px solid var(--border); border-radius:3px; font-size:11px; color:var(--text-muted); cursor:pointer; font-family:{CV4_SANS}">Reset</button>
+      <button onclick={reset} aria-label="Reset contest scores" style="padding:2px 8px; background:transparent; border:1px solid var(--border); border-radius:3px; font-size:11px; color:var(--text-muted); cursor:pointer; font-family:{CV4_SANS}">Reset</button>
     </div>
   </div>
 

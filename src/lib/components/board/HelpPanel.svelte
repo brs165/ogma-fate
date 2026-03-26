@@ -1,3 +1,5 @@
+<svelte:options runes={false} />
+
 <script>
   // ── HelpPanel — accordion rules reference with inspiration prompts ────────────
   let openSection  = null;

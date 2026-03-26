@@ -1,3 +1,5 @@
+<svelte:options runes={false} />
+
 <script>
   // ── BinderPanel — binder library + drafting tray ─────────────────────────────
   import { GENERATORS } from '../../engine.js';

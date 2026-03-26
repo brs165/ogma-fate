@@ -1,11 +1,6 @@
 <script>
   import CvLabel from './CvLabel.svelte';
-
-  export let label = '';
-  export let hits = [];
-  export let setHits = () => {};
-  export let color = 'var(--accent)';
-
+  let { label = '', hits = [], setHits = () => {}, color = 'var(--accent)' } = $props();
   const CV4_MONO = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
 
   function toggle(i) {
@@ -32,8 +27,8 @@
         tabindex="0"
         aria-checked={String(!!v)}
         aria-label="{label} stress box {i + 1}{v ? ' (marked)' : ' (clear)'}"
-        on:click|stopPropagation={() => toggle(i)}
-        on:keydown={(e) => onKeyDown(e, i)}
+        onclick={(e) => { e.stopPropagation(); (() => toggle(i))(e); }}
+        onkeydown={(e) => onKeyDown(e, i)}
         style:width="18px"
         style:height="18px"
         style:border-radius="2px"

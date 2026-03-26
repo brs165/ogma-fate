@@ -1,3 +1,5 @@
+<svelte:options runes={false} />
+
 <script>
   // ── ExportMenu — topbar export/import dropdown ────────────────────────────────
   import { onMount, onDestroy } from 'svelte';

@@ -1,3 +1,5 @@
+<svelte:options runes={false} />
+
 <script>
   import { onMount, onDestroy } from 'svelte';
   import BackPanel from './BackPanel.svelte';

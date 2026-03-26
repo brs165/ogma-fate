@@ -1,3 +1,5 @@
+<svelte:options runes={false} />
+
 <script>
   // ── BoardCard — generated card on the board canvas ───────────────────────────
   import Cv4Card from '../cards/Cv4Card.svelte';

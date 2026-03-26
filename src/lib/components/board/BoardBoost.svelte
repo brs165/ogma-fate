@@ -1,3 +1,5 @@
+<svelte:options runes={false} />
+
 <script>
   // ── BoardBoost — ephemeral boost card with 1 free invoke ─────────────────────
   export let card        = {};

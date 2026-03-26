@@ -1,3 +1,5 @@
+<svelte:options runes={false} />
+
 <script>
   // ── ExportPanel — full export page in left panel ──────────────────────────────
   import { DB } from '../../db.js';

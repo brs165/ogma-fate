@@ -1,12 +1,6 @@
 <script>
   import CvLabel from '../CvLabel.svelte';
-
-  export let data = {};
-  export let campName = '';
-  export let catColor = 'var(--accent)';
-  export let cardState = {};
-  export let onUpdate = () => {};
-
+  let { data = {}, campName = '', catColor = 'var(--accent)', cardState = {}, onUpdate = () => {} } = $props();
   const CV4_MONO = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
   const CV4_SANS = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
 
@@ -17,9 +11,9 @@
     { label: 'Severe',   s: 6, c: 'var(--c-red,#f87171)'   },
   ];
 
-  $: sev     = (data.severity || 'mild').toLowerCase();
-  $: col     = SC[sev] || 'var(--c-purple,#a78bfa)';
-  $: treated = !!(cardState?.treated);
+  let sev = $derived((data.severity || 'mild').toLowerCase());
+  let col = $derived(SC[sev] || 'var(--c-purple,#a78bfa)');
+  let treated = $derived(!!(cardState?.treated));
 
   function toggleTreated(e) {
     e.stopPropagation();
@@ -42,7 +36,7 @@
     </div>
 
     <button
-      on:click={toggleTreated}
+      onclick={toggleTreated}
       role="checkbox"
       aria-checked={String(treated)}
       aria-label={treated ? 'Consequence treated — timer started' : 'Mark consequence as treated'}

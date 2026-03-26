@@ -1,3 +1,5 @@
+<svelte:options runes={false} />
+
 <script>
   // ── BoardSticky — inline-editable aspect sticky note ─────────────────────────
   export let card       = {};

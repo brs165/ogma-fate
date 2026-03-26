@@ -1,3 +1,5 @@
+<svelte:options runes={false} />
+
 <script>
   // ── DossierModal — GM Guidance modal with focus trap ─────────────────────────
   import { onMount, onDestroy } from 'svelte';

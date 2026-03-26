@@ -1,3 +1,5 @@
+<svelte:options runes={false} />
+
 <script>
   // ── PlayerRow — player FP, stress, consequences, concede, compel ─────────────
   export let player   = {};
