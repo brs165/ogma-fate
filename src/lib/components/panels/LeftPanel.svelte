@@ -75,6 +75,10 @@
           <button
             class="blp-item" class:active={activeGen === gen.id}
             onclick={() => onSelectGen(gen.id)}
+            onkeydown={(e) => {
+              if (e.key === 'ArrowDown') { e.preventDefault(); e.currentTarget.nextElementSibling?.focus(); }
+              if (e.key === 'ArrowUp') { e.preventDefault(); e.currentTarget.previousElementSibling?.focus(); }
+            }}
             title="{gen.label}{gen.sub ? ' \u2014 ' + gen.sub : ''}"
           >
             <span class="blp-icon">{gen.icon}</span>
