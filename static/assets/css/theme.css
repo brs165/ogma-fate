@@ -3127,3 +3127,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 
 /* ══ BOARD SVELTE FLOW WRAP ══ */
 .board-sf-wrap{flex:1;position:relative;overflow:hidden;height:100%;--xy-background-color:var(--bg);--xy-node-border-radius:0;--xy-node-border:none;--xy-node-background-color:transparent;--xy-node-boxshadow-hover:none;--xy-node-boxshadow-selected:none;--xy-minimap-background-color:var(--panel);--xy-controls-button-background-color:var(--glass-bg);--xy-controls-button-border-color:var(--border);--xy-controls-button-color:var(--text-dim);--xy-controls-button-color-hover:var(--text);--xy-controls-background-color:var(--glass-bg);--xy-controls-border:1px solid var(--border)}
+
+/* ══ BITS UI DIALOG ══ */
+.modal-overlay{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,0.6);backdrop-filter:blur(2px)}
+.modal-content{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:401;width:min(640px,calc(100vw - 32px));max-height:min(80vh,800px);overflow-y:auto;background:var(--panel);border:1px solid var(--border);border-radius:var(--glass-radius);box-shadow:0 20px 60px rgba(0,0,0,.4);padding:0}
