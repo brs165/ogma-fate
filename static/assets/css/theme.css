@@ -199,7 +199,8 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .fp-controls{display:flex;align-items:center;gap:5px;flex:1}
 .fp-dots{display:flex;gap:4px;flex:1;justify-content:center;perspective:120px}
 .fp-dot{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--text-muted);cursor:pointer;transition:background 0.1s,border-color 0.1s;flex-shrink:0;transform-style:preserve-3d}
-.fp-btn{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--border-mid);background:transparent;color:var(--text-dim);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;transition:all 0.12s;flex-shrink:0;padding:0}
+.fp-btn{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--border-mid);background:transparent;color:var(--text-dim);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;transition:all 0.12s;flex-shrink:0;padding:0}
+@media(pointer:fine){.fp-btn{width:24px;height:24px}}
 .fp-btn:hover:not(:disabled){background:var(--glass-border);color:var(--text)}
 .fp-btn:disabled{opacity:0.3;cursor:default}
 .fp-count{font-size:14px;font-weight:700;color:var(--accent);width:18px;text-align:right;flex-shrink:0}
