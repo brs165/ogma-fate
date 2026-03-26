@@ -3140,3 +3140,15 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .cmd-item-icon{font-size:16px;width:20px;flex-shrink:0}
 .cmd-item-label{flex:1}
 .cmd-shortcut{font-size:var(--text-label);color:var(--text-muted);font-family:var(--font-mono)}
+
+/* ══ BITS UI ACCORDION ══ */
+.hp-accordion{width:100%}
+.hp-item{border-bottom:1px solid var(--border)}
+.bh-head-text{flex:1}
+.bh-head-chevron{transition:transform 0.2s;font-size:18px;line-height:1}
+[data-state="open"] .bh-head-chevron{transform:rotate(90deg)}
+.bh-body[data-state="open"]{animation:accordion-down 0.2s ease}
+.bh-body[data-state="closed"]{animation:accordion-up 0.2s ease}
+@keyframes accordion-down{from{height:0;opacity:0}to{height:var(--bits-accordion-content-height);opacity:1}}
+@keyframes accordion-up{from{height:var(--bits-accordion-content-height);opacity:1}to{height:0;opacity:0}}
+@media(prefers-reduced-motion:reduce){.bh-body[data-state="open"],.bh-body[data-state="closed"]{animation:none}}
