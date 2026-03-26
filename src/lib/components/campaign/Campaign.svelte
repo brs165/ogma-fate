@@ -467,10 +467,16 @@
 
                         {#if helpEntry.rules && helpEntry.rules.length}
                           <div class="rhp-block">
-                            <div class="rhp-block-label">Key rules</div>
+                            <div class="rhp-block-label">Rules Reference &middot; Fate Condensed</div>
                             <ul class="rhp-rules-list">
-                              {#each helpEntry.rules.slice(0, 3) as rule}
-                                <li>{rule}</li>
+                              {#each helpEntry.rules.slice(0, 3) as rule, i}
+                                {@const srdPath = helpEntry.rule_urls?.[i] || null}
+                                <li class="rhp-rule-row">
+                                  <span class="rhp-rule-text">{rule}</span>
+                                  {#if srdPath}
+                                    <a href="https://fate-srd.com{srdPath}" class="rhp-srd-link" target="_blank" rel="noreferrer noopener" aria-label="Read on the Fate SRD (opens in new tab)">SRD &#8599;</a>
+                                  {/if}
+                                </li>
                               {/each}
                             </ul>
                           </div>
