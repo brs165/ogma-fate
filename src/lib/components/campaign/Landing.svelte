@@ -1,5 +1,3 @@
-<svelte:options runes={false} />
-
 <script>
   import { onMount } from 'svelte';
 
@@ -51,7 +49,7 @@
     return arr.slice(0, 3);
   }
 
-  $: camps = (function() {
+  let camps = $derived((function() {
     const arr = Object.keys(CAMPAIGN_INFO).map(id => ({
       id, ...CAMPAIGN_INFO[id]
     }));
@@ -60,7 +58,7 @@
       [arr[i], arr[j]] = [arr[j], arr[i]];
     }
     return arr;
-  })();
+  })());
 
   onMount(() => {
     demoNpcs = pickThree();
@@ -102,7 +100,7 @@
       <a href="/about" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">About</a>
       <button
         class="btn btn-icon btn-ghost"
-        on:click={toggleTheme}
+        onclick={toggleTheme}
         aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
         title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
         style="width:44px;height:44px"
@@ -223,10 +221,10 @@
             maxlength="6"
             aria-label="Room code"
             spellcheck="false"
-            on:input={() => { if (joinErr) joinErr = ''; }}
-            on:keydown={(e) => { if (e.key === 'Enter') handleJoin(); }}
+            oninput={() => { if (joinErr) joinErr = ''; }}
+            onkeydown={(e) => { if (e.key === 'Enter') handleJoin(); }}
           />
-          <button class="btn land-join-btn" on:click={handleJoin} disabled={joinCode.trim().length === 0} aria-label="Join table">
+          <button class="btn land-join-btn" onclick={handleJoin} disabled={joinCode.trim().length === 0} aria-label="Join table">
             Join &rarr;
           </button>
         </div>
@@ -284,7 +282,7 @@
             <h2 class="land-section-heading" style="margin-bottom:4px">Every NPC is ready to run.</h2>
             <p class="land-npc-demo-sub">High concept, trouble, top skill, and a stunt &mdash; rules-accurate, fiction-first.</p>
           </div>
-          <button class="btn btn-ghost land-npc-shuffle-btn" on:click={() => { demoNpcs = pickThree(); }} aria-label="Show three different NPCs">
+          <button class="btn btn-ghost land-npc-shuffle-btn" onclick={() => { demoNpcs = pickThree(); }} aria-label="Show three different NPCs">
             &#x1F3B2; Shuffle
           </button>
         </div>
