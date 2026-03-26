@@ -1,8 +1,11 @@
 <svelte:options runes={false} />
 
 <script>
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount, onDestroy, setContext } from 'svelte';
   import { get } from 'svelte/store';
+  import { SvelteFlow, Background, BackgroundVariant, MiniMap, Controls } from '@xyflow/svelte';
+  import '@xyflow/svelte/dist/style.css';
+  import { nodeTypes } from './nodeTypes.js';
   import { getWorldTables, getWorldMeta } from '../../helpers.js';
   import { createCanvasStore } from '../../stores/canvasStore.js';
   import { createPlayStore } from '../../stores/playStore.js';
@@ -137,6 +140,19 @@
   let play;
   let binder;
   let sync;
+
+  // Svelte Flow context — must be called during init
+  setContext('ogma_canvas', {
+    get mode() { return mode; },
+    get campId() { return campId; },
+    get playCardIds() { return playCardIds; },
+    onDelete: (id) => canvas && canvas.deleteCard(id),
+    onReroll: (id) => canvas && canvas.rerollCard(id),
+    onUpdate: (id, patch) => canvas && canvas.updateCard(id, patch),
+    onSendToTable: (card) => binder && binder.sendToTable(card),
+    onOpen: (card) => { dossierCard = card; },
+    onInvoke: (opts) => { pendingInvoke = opts; showDice = true; showToast('\u2726 Invoke queued \u2014 +2 on next roll'); },
+  });
 
   function initStores() {
     // Clean up previous subscriptions
@@ -732,174 +748,56 @@
           />
         {/if}
 
-        <!-- Canvas area -->
-        <div
-          id="board-canvas"
-          class="board-canvas-wrap"
-          bind:this={canvasRef}
-          on:contextmenu={onCanvasContextMenu}
-          on:mousedown={onCanvasMouseDown}
-          on:wheel|preventDefault={onCanvasWheel}
-        >
-          <!-- Dot grid background -->
-          <div class="board-dot-grid"></div>
-
-          <!-- Zoomable canvas layer -->
-          <div
-            class="board-canvas-layer"
-            style="transform:translate({pan.x}px,{pan.y}px) scale({zoom});transform-origin:0 0"
+        <!-- Canvas area — Svelte Flow -->
+        <div class="board-sf-wrap" on:contextmenu={onCanvasContextMenu}>
+          <SvelteFlow
+            nodes={flowNodes}
+            edges={flowEdges}
+            {nodeTypes}
+            fitView={false}
+            minZoom={0.2}
+            maxZoom={2}
+            defaultViewport={{ x: 0, y: 0, zoom: 0.7 }}
+            deleteKey="Delete"
+            panOnScroll={true}
+            panOnDrag={[1, 2]}
+            on:nodedragstop={(e) => {
+              if (canvas && e.detail && e.detail.nodes) canvas.syncNodePositions(e.detail.nodes);
+            }}
+            on:connect={(e) => {
+              if (canvas && e.detail) canvas.addConnector(e.detail.source, e.detail.target);
+            }}
+            on:edgedelete={(e) => {
+              if (canvas && e.detail && e.detail.edges) e.detail.edges.forEach(edge => canvas.removeConnector(edge.id));
+            }}
           >
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
-            <svg class="board-connector-svg" aria-hidden="true"
-              style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:500">
-              {#each connectorLines as conn (conn.id)}
-                {@const fromCard = cards.find(c => c.id === conn.fromId)}
-                {@const toCard = cards.find(c => c.id === conn.toId)}
-                {#if fromCard && toCard}
-                  <line
-                    x1={fromCard.x + 170} y1={fromCard.y + 60}
-                    x2={toCard.x + 170} y2={toCard.y + 60}
-                    stroke="var(--accent)" stroke-width="2"
-                    stroke-dasharray="6 3" opacity="0.6"
-                  />
-                  <line
-                    x1={fromCard.x + 170} y1={fromCard.y + 60}
-                    x2={toCard.x + 170} y2={toCard.y + 60}
-                    stroke="transparent" stroke-width="12"
-                    style="pointer-events:stroke;cursor:pointer"
-                    on:click={() => canvas.removeConnector(conn.id)}
-                    role="button" tabindex="0"
-                    aria-label="Remove connection"
-                    on:keydown={e => e.key === 'Enter' && canvas.removeConnector(conn.id)}
-                  />
-                {/if}
-              {/each}
-            </svg>
+            <Background variant={BackgroundVariant.Dots} gap={24} size={1} />
+            <Controls />
+            <MiniMap />
+          </SvelteFlow>
 
-            {#each cards as card (card.id)}
-              {#if card.genId === 'label'}
-                <BoardLabel
-                  {card}
-                  childCards={cards.filter(c => c.zoneId === card.id)}
-                  onDelete={canvas ? canvas.deleteCard : () => {}}
-                  onUpdate={canvas ? canvas.updateCard : () => {}}
-                  {onDragStart}
-                />
-              {:else}
-                <div style={cardSearch && !isSearchMatch(card) ? 'opacity:0.2;pointer-events:none' : ''}>
-                  <BoardCard
-                    {card}
-                    onDelete={canvas ? canvas.deleteCard : null}
-                    onReroll={canvas ? canvas.rerollCard : null}
-                    onSendToTable={binder ? binder.sendToTable : null}
-                    onRemoveFromTable={binder ? binder.removeFromTable : null}
-                    onOpen={(c) => { dossierCard = c; }}
-                    {onDragStart}
-                    onUpdate={canvas ? canvas.updateCard : null}
-                    {mode}
-                    {campId}
-                    isOnTable={playCardIds.has(card.id)}
-                    onInvoke={(inv) => { pendingInvoke = inv; showDice = true; showToast('\u2726 Invoke queued \u2014 +2 on next roll'); }}
-                    onConnect={handleConnectClick}
-                    isConnectSource={connectSourceId === card.id}
-                  />
-                </div>
-              {/if}
-            {/each}
-          </div>
-
-          <!-- Empty state -->
-          {#if cards.length === 0 && loaded}
-            <div class="board-empty">
-              <div class="board-empty-icon">&#x1F3B2;</div>
-              <div class="board-empty-title">Canvas is empty</div>
-              <div class="board-empty-desc">
-                Click any generator in the left panel to place a card.<br/>
-                Right-click anywhere to generate in place.
-              </div>
-            </div>
-          {/if}
-
-          <!-- Coach marks -->
-          {#if coachCanvas && cards.length === 0 && loaded && mode === 'prep'}
-            <div class="board-coach board-coach-canvas" role="dialog" aria-label="Getting started tip">
-              <div class="bc-coach-body">
-                <div class="bc-coach-icon">&#x1F3B2;</div>
-                <div class="bc-coach-text">
-                  <strong>This is your GM canvas</strong>
-                  <span> &mdash; generate cards from the left panel, arrange them here. Switch to <strong>Play</strong> and click <strong>Host</strong> when your players are ready.</span>
-                </div>
-                <button class="bc-coach-dismiss" on:click={dismissCoachCanvas} aria-label="Dismiss tip">&times;</button>
-              </div>
-            </div>
-          {/if}
-
-          {#if coachPlay && mode === 'play'}
-            <div class="board-coach board-coach-play" role="dialog" aria-label="Play mode tip">
-              <div class="bc-coach-body">
-                <div class="bc-coach-icon">&#x25CF;</div>
-                <div class="bc-coach-text">
-                  <strong>Prep cards are private.</strong>
-                  <span> Use <strong>&#x25CF; Send to Table</strong> on any Prep card to share it with connected players.</span>
-                </div>
-                <button class="bc-coach-dismiss" on:click={dismissCoachPlay} aria-label="Dismiss tip">&times;</button>
-              </div>
-            </div>
-          {/if}
-
-          <!-- Context menu -->
+          <!-- Context menu overlay -->
           {#if ctx}
-            <div
-              class="board-ctx"
-              role="menu"
-              aria-label="Generate card"
-              style="left:{ctx.screenX}px;top:{ctx.screenY}px"
-              on:click|stopPropagation
-            >
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <div class="board-ctx" role="menu" aria-label="Generate card"
+              style="left:{ctx.screenX}px;top:{ctx.screenY}px;position:fixed;z-index:9999"
+              on:click|stopPropagation>
               <div class="board-ctx-section" role="none">Generate here</div>
               {#each CTX_ITEMS as g (g.id)}
-                <div
-                  class="board-ctx-item" role="menuitem" tabindex="0"
+                <div class="board-ctx-item" role="menuitem" tabindex="0"
                   on:click={() => ctxGenerate(g.id)}
-                  on:keydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ctxGenerate(g.id); } }}
-                >
-                  <span class="board-ctx-icon" aria-hidden="true">{g.icon}</span>
-                  {g.label}
+                  on:keydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ctxGenerate(g.id); } }}>
+                  <span class="board-ctx-icon" aria-hidden="true">{g.icon}</span>{g.label}
                 </div>
               {/each}
               <div class="board-ctx-sep" role="separator"></div>
-              <div
-                class="board-ctx-item" role="menuitem" tabindex="0"
+              <div class="board-ctx-item" role="menuitem" tabindex="0"
                 on:click={() => { ctx = null; }}
-                on:keydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ctx = null; } }}
-              >
+                on:keydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ctx = null; } }}>
                 <span class="board-ctx-icon" aria-hidden="true">&times;</span> Cancel
               </div>
             </div>
           {/if}
-
-          <!-- Card search -->
-          <div class="board-search">
-            <input
-              type="text" value={cardSearch}
-              placeholder="&#x1F50D; Search cards&hellip;"
-              on:input={(e) => { cardSearch = e.target.value; }}
-              on:keydown={(e) => { if (e.key === 'Escape') cardSearch = ''; }}
-              aria-label="Search cards on canvas"
-              style="width:{cardSearch ? 140 : 100}px;transition:width .15s"
-            />
-            {#if cardSearch}
-              <button class="board-search-clear" on:click={() => { cardSearch = ''; }} aria-label="Clear search">&times;</button>
-            {/if}
-          </div>
-
-          <!-- Zoom controls -->
-          <div class="board-zoom">
-            <button class="board-zoom-btn" on:click={() => changeZoom(-0.1)} aria-label="Zoom out">&minus;</button>
-            <div class="board-zoom-pct">{Math.round(zoom * 100)}%</div>
-            <button class="board-zoom-btn" on:click={() => changeZoom(0.1)} aria-label="Zoom in">+</button>
-            <button class="board-zoom-btn" on:click={fitAll} aria-label="Fit all cards" title="Zoom to fit all cards">&#x2922;</button>
-          </div>
 
           <!-- Toast -->
           {#if toast}
