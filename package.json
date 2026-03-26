@@ -1,7 +1,7 @@
 {
 	"name": "ogma-fate",
 	"private": true,
-	"version": "2026.3.466",
+	"version": "2026.3.467",
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
@@ -21,6 +21,7 @@
 	},
 	"dependencies": {
 		"@sveltejs/adapter-static": "^3.0.10",
+		"@xyflow/svelte": "^1.5.1",
 		"dexie": "^4.3.0"
 	}
 }

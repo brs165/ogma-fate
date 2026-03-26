@@ -1,6 +1,6 @@
 // canvasStore.js — from useBoardCards (react-source/core/ui-board.js L2387-2593)
 // Factory: createCanvasStore(campCanvasKey, tables, showToast, onCardsChange)
-import { writable, get } from 'svelte/store';
+import { writable, get, derived } from 'svelte/store';
 import { generate, mergeUniversal, filteredTables, GENERATORS } from '../engine.js';
 import DB from '../db.js';
 import { boardUid, extractCardTitle, extractCardSummary, extractCardTags, STICKY_COLORS } from '../helpers.js';
@@ -323,13 +323,50 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
     if (showToast) showToast(placed.length + ' binder cards loaded to canvas');
   }
 
+  // ── Svelte Flow derived stores ─────────────────────────────────────────
+  const nodes = derived(cards, $cards =>
+    $cards.map(card => ({
+      id: card.id,
+      type: card.genId || 'npc_minor',
+      position: { x: card.x || 0, y: card.y || 0 },
+      zIndex: card.z || 1,
+      draggable: true,
+      selectable: true,
+      data: card,
+    }))
+  );
+
+  const edges = derived(connectors, $conns =>
+    $conns.map(conn => ({
+      id: conn.id,
+      source: conn.fromId,
+      target: conn.toId,
+      type: 'smoothstep',
+      animated: false,
+      deletable: true,
+      data: conn,
+    }))
+  );
+
+  function syncNodePositions(changedNodes) {
+    if (!changedNodes || !changedNodes.length) return;
+    const posMap = {};
+    changedNodes.forEach(n => {
+      if (n.position) {
+        posMap[n.id] = { x: Math.round(n.position.x), y: Math.round(n.position.y), z: n.zIndex || Date.now() };
+      }
+    });
+    mutate(prev => prev.map(c => posMap[c.id] ? Object.assign({}, c, posMap[c.id]) : c));
+  }
+
   return {
-    cards, loaded, connectors,
+    cards, nodes, edges, loaded, connectors,
     getCards: () => get(cards),
     persistCanvas,
     generateCard, generateCardWithData, loadBinderToCanvas,
     updateCard, deleteCard, rerollCard,
     addConnector, removeConnector, removeCardConnectors, clearCanvas,
+    syncNodePositions,
     undoLast, exportCanvas, importCanvas,
   };
 }

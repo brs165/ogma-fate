@@ -53,6 +53,8 @@
   let cardSearch = '';
   let connectSourceId = null;
   let connectorLines = [];
+  let flowNodes = [];
+  let flowEdges = [];
 
   function handleConnectClick(cardId) {
     if (!connectSourceId) {
@@ -156,6 +158,8 @@
     // Subscribe to store values
     unsubs.push(canvas.cards.subscribe(v => cards = v));
     unsubs.push(canvas.connectors.subscribe(v => connectorLines = v));
+    unsubs.push(canvas.nodes.subscribe(v => flowNodes = v));
+    unsubs.push(canvas.edges.subscribe(v => flowEdges = v));
     let binderLoadedOnce = false;
     unsubs.push(canvas.loaded.subscribe(v => {
       loaded = v;
