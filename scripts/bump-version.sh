@@ -9,7 +9,7 @@ NEW="${YEAR}.${MONTH}.${NEXT}"
 # Update version.js
 sed -i "s/export const VERSION = .*/export const VERSION = '${NEW}';/" src/lib/version.js
 # Update sw.js cache name
-sed -i "s/const CACHE_NAME = .*/const CACHE_NAME = 'ogma-${NEW}';/" static/sw.js
+sed -i "s/const CACHE_NAME = .*/const CACHE_NAME = 'ogma-${NEW}';/" src/service-worker.js
 # Update package.json
 npm version "${YEAR}.${MONTH}.${NEXT}" --no-git-tag-version --allow-same-version
 echo "Bumped: ${CURRENT} → ${NEW}"
