@@ -1,6 +1,6 @@
 <script>
   import { onMount, onDestroy, setContext } from 'svelte';
-  import { get, writable } from 'svelte/store';
+  import { get } from 'svelte/store';
   import { SvelteFlow, Background, BackgroundVariant, MiniMap, Controls } from '@xyflow/svelte';
   import '@xyflow/svelte/dist/style.css';
   import { nodeTypes } from './nodeTypes.js';
@@ -55,10 +55,9 @@
   let cardSearch = $state('');
   let connectSourceId = $state(null);
   let connectorLines = $state([]);
-  // SvelteFlow requires Svelte store references, not $state arrays
-  // These are assigned from canvas.nodes / canvas.edges (writable/derived stores)
-  let flowNodes = writable([]);
-  let flowEdges = writable([]);
+  // SvelteFlow v1.5+ expects plain arrays, not Svelte stores
+  let flowNodes = $state([]);
+  let flowEdges = $state([]);
 
   function handleConnectClick(cardId) {
     if (!connectSourceId) {
@@ -180,8 +179,8 @@
     // Subscribe to store values
     unsubs.push(canvas.cards.subscribe(v => cards = v));
     unsubs.push(canvas.connectors.subscribe(v => connectorLines = v));
-    unsubs.push(canvas.nodes.subscribe(v => flowNodes.set(v)));
-    unsubs.push(canvas.edges.subscribe(v => flowEdges.set(v)));
+    unsubs.push(canvas.nodes.subscribe(v => flowNodes = v));
+    unsubs.push(canvas.edges.subscribe(v => flowEdges = v));
     let binderLoadedOnce = false;
     unsubs.push(canvas.loaded.subscribe(v => {
       loaded = v;
@@ -417,7 +416,7 @@
     } else if ((e.ctrlKey || e.metaKey) && (e.key === 'a' || e.key === 'A')) {
       e.preventDefault();
       // Ctrl+A = select all nodes; Ctrl+Shift+A = deselect all
-      flowNodes.update(nodes => nodes.map(n => ({ ...n, selected: !e.shiftKey })));
+      flowNodes = flowNodes.map(n => ({ ...n, selected: !e.shiftKey }));
     } else if (e.key === 'r' || e.key === 'R') {
       showDice = !showDice;
     } else if (e.key === 'f' || e.key === 'F') {
@@ -439,7 +438,7 @@
     { id: 'fit', icon: '\u2922', label: 'Fit All Cards', shortcut: 'F', fn: fitAll },
     { id: 'clear', icon: '\u{1F5D1}', label: 'Clear Table', fn: () => { showClearModal = true; } },
     { id: 'undo', icon: '\u21B6', label: 'Undo', shortcut: '\u2318Z', fn: () => { if (canvas) canvas.undoLast(); } },
-    { id: 'selectAll', icon: '\u2610', label: 'Select All Nodes', shortcut: '\u2318A', fn: () => { flowNodes.update(ns => ns.map(n => ({ ...n, selected: true }))); } },
+    { id: 'selectAll', icon: '\u2610', label: 'Select All Nodes', shortcut: '\u2318A', fn: () => { flowNodes = flowNodes.map(n => ({ ...n, selected: true })); } },
     { id: 'mode', icon: '\u25B6', label: mode === 'prep' ? 'Switch to Play' : 'Switch to Prep', fn: () => onModeChange(mode === 'prep' ? 'play' : 'prep') },
     { id: 'theme', icon: '\u263D', label: 'Toggle Dark/Light', fn: toggleTheme },
   ]);
@@ -677,8 +676,8 @@
         <!-- Canvas area — Svelte Flow -->
         <div class="board-sf-wrap{connectSourceId ? ' connect-mode' : ''}{modeTransitioning ? ' mode-transitioning' : ''}" oncontextmenu={onCanvasContextMenu} bind:this={sfWrap}>
           <SvelteFlow
-            nodes={flowNodes}
-            edges={flowEdges}
+            bind:nodes={flowNodes}
+            bind:edges={flowEdges}
             {nodeTypes}
             fitView={fitViewOnLoad}
             minZoom={0.2}
@@ -688,27 +687,26 @@
             panOnScroll={true}
             panOnDrag={[1, 2]}
             selectionOnDrag={false}
-            multiSelectionKeyCode="Shift"
-            on:nodedragstop={(e) => {
-              if (canvas && e.detail && e.detail.nodes) canvas.syncNodePositions(e.detail.nodes);
+            multiSelectionKey="Shift"
+            onnodedragstop={({ nodes }) => {
+              if (canvas && nodes) canvas.syncNodePositions(nodes);
             }}
-            on:nodeclick={(e) => {
-              if (canvas && e.detail?.node)
-                canvas.updateCard(e.detail.node.id, { z: Date.now() });
+            onnodeclick={({ node }) => {
+              if (canvas && node)
+                canvas.updateCard(node.id, { z: Date.now() });
             }}
-            on:connect={(e) => {
-              if (canvas && e.detail) canvas.addConnector(e.detail.source, e.detail.target);
+            onconnect={(connection) => {
+              if (canvas && connection) canvas.addConnector(connection.source, connection.target);
             }}
-            on:edgedelete={(e) => {
-              if (canvas && e.detail && e.detail.edges) e.detail.edges.forEach(edge => canvas.removeConnector(edge.id));
+            ondelete={({ edges }) => {
+              if (canvas && edges) edges.forEach(edge => canvas.removeConnector(edge.id));
             }}
-            on:edgeclick={(e) => {
-              if (!canvas || !e.detail?.edge) return;
+            onedgeclick={({ edge }) => {
+              if (!canvas || !edge) return;
               if (!coachEdge) {
                 coachEdge = true;
                 showToast('\u21D4 Click edge to cycle relationship label');
               }
-              const edge = e.detail.edge;
               const LABELS = ['', 'Knows', 'Opposes', 'Ally', 'Fears', 'Owes', 'Loves', 'Rival', 'Commands', 'Seeks'];
               const current = edge.data?.label || '';
               const next = LABELS[(LABELS.indexOf(current) + 1) % LABELS.length];

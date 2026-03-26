@@ -42,8 +42,8 @@
     <!-- Tutorial steps — progressive disclosure -->
     <div class="step-block">
       <div class="step-num"><i class="fa-solid fa-play" aria-hidden="true"></i></div>
-      <div class="step-title">The scene opens</div>
       <div class="step-body">
+        <div class="step-title">The scene opens</div>
         <p>The GM says: <em>"You're in the ruins of the old rail station. There's a package behind the ticket counter — the one you were hired to retrieve. But the floor is covered in broken glass, and through the shattered windows you can see two scavengers approaching from the east platform. What do you do?"</em></p>
 
         <div class="callout callout-tip" role="note">
@@ -71,8 +71,8 @@
 
     <div class="step-block">
       <div class="step-num"><i class="fa-solid fa-bolt" aria-hidden="true"></i></div>
-      <div class="step-title">Using an aspect — the invoke</div>
       <div class="step-body">
+        <div class="step-title">Using an aspect — the invoke</div>
         <p>Let's say you rolled a total of +1 — one short. You failed. But wait.</p>
         <p>Your High Concept is <em>"Last Courier Who Knows the Old Routes."</em> You know this station. You know there's a maintenance hatch behind the bench — a route the scavengers wouldn't know about.</p>
 
@@ -88,8 +88,8 @@
 
     <div class="step-block">
       <div class="step-num"><i class="fa-solid fa-hand-point-right" aria-hidden="true"></i></div>
-      <div class="step-title">Getting compelled — earning fate points</div>
       <div class="step-body">
+        <div class="step-title">Getting compelled — earning fate points</div>
         <p>You have the package. Time to leave. But the GM slides a fate point toward you.</p>
         <p><em>"Your Trouble is 'Trusts the Map More Than Her Eyes.' You check the map for the exit route — but the map shows the east corridor as clear. It's not. The scavengers are right there. You walk straight into them because you were looking at the map instead of the corridor."</em></p>
 
@@ -105,8 +105,8 @@
 
     <div class="step-block">
       <div class="step-num"><i class="fa-solid fa-star" aria-hidden="true"></i></div>
-      <div class="step-title">Create Advantage — the move that changes everything</div>
       <div class="step-body">
+        <div class="step-title">Create Advantage — the move that changes everything</div>
         <p>The scavengers block the exit. Kira could attack — but her Fight is only +1. Instead:</p>
         <p><strong>You say:</strong> <em>"I kick the fire extinguisher off the wall — it ruptures and fills the corridor with white fog."</em></p>
         <p>The GM says: <em>"That's Create Advantage using Athletics. Roll against Fair (+2)."</em></p>
