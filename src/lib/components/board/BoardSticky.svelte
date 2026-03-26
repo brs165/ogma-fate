@@ -25,11 +25,6 @@
     editing = true;
   }
 
-  function onMouseDown(e) {
-    if (editing) return;
-    if (e.target.closest('.bc-actions')) return;
-    if (onDragStart) onDragStart(e, card.id);
-  }
 
   function onKeyDown(e) {
     if (!editing && (e.key === 'Enter' || e.key === 'F2')) {
@@ -66,17 +61,16 @@
 
 <div
   class="board-sticky{editing ? ' editing' : ''}"
-  style="left:{card.x}px; top:{card.y}px; background:{sc.bg}; color:{sc.text};
+  style="background:{sc.bg}; color:{sc.text};
          transform:{editing ? 'rotate(0deg)' : 'rotate(' + (card.rotation || 0) + 'deg)'};
          z-index:{card.z || 1}"
   tabindex={editing ? -1 : 0}
   role="note"
   aria-label="Aspect sticky: {card.text || 'New Aspect'}{editing ? '' : '. Press Enter to edit.'}"
-  onmousedown={onMouseDown}
   ondblclick={(e) => { e.stopPropagation(); startEdit(e); }}
   onkeydown={onKeyDown}
 >
-  <div class="bc-actions">
+  <div class="bc-actions nodrag nopan">
     {#if card.rotation}
       <button class="bc-btn" title="Reset rotation" aria-label="Reset rotation"
         onclick={(e) => { e.stopPropagation(); (() => onUpdate && onUpdate(card.id, { rotation: 0 }))(e); }}><i class="fa-solid fa-rotate-right" aria-hidden="true"></i></button>

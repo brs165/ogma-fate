@@ -1,6 +1,7 @@
 <script>
   // ── BinderPanel — binder library + drafting tray ─────────────────────────────
   import { GENERATORS } from '../../engine.js';
+  import { ToggleGroup } from 'bits-ui';
   let { campId = '', campName = '', binderCards = [], trayCards = [], onAddToTray = null, onRemoveFromTray = null, onSendTrayToCanvas = null, onSendToCanvas = null, onExportCard = null, onUnpin = null } = $props();
   const BINDER_FILTER_GROUPS = {
     people:    ['npc_minor', 'npc_major', 'pc', 'backstory'],
@@ -58,16 +59,19 @@
 
   <!-- Filter strip -->
   {#if binderCards.length > 0}
-    <div class="bbp-filters" role="group" aria-label="Filter by type">
+    <ToggleGroup.Root
+      type="single"
+      value={filter}
+      onValueChange={(v) => { if (v) filter = v; }}
+      class="bbp-filters"
+      aria-label="Filter by type"
+    >
       {#each filters as f (f.id)}
-        {@const active = filter === f.id}
-        <button
-          class="bbp-filter-btn{active ? ' active' : ''}"
-          onclick={() => (filter = f.id)}
-          aria-pressed={String(active)}
-        >{f.label}</button>
+        <ToggleGroup.Item value={f.id} class="bbp-filter-btn" aria-label="Filter: {f.label}">
+          {f.label}
+        </ToggleGroup.Item>
       {/each}
-    </div>
+    </ToggleGroup.Root>
   {/if}
 
   <!-- Card list -->

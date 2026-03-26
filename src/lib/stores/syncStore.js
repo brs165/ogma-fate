@@ -1,4 +1,4 @@
-// syncStore.js — from useBoardSync + createTableSync (react-source/core/ui.js L1035-1113, ui-board.js L2253-2300)
+// syncStore.js — WebSocket sync: connect/disconnect, room code, role, PartySocket
 // Factory: createSyncStore(showToast)
 import { writable, get } from 'svelte/store';
 import { generateBoardRoomCode } from '../helpers.js';

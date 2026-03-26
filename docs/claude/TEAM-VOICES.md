@@ -1,358 +1,154 @@
-# Ogma Workshop Voice System
+# Team Voices — Ogma
 
-> Six voices review every feature before it ships. Each voice has a distinct lens, veto criteria, and output format. No feature merges until all six voices sign off.
->
-> This document consolidates the original 15-role team (React era) into 6 actionable voices for the SvelteKit project. The deep domain knowledge is preserved; the bureaucracy is not.
-
-**Primary directive:** *Does this make a GM's session better, faster, or more Fate-literate?*
-
-**Secondary objectives (priority order):**
-1. Rules accuracy against the Fate Condensed SRD
-2. Offline capability — works fully offline after first HTTPS load
-3. Accessible, high-contrast, touch-friendly UI
-4. Developer experience — testable, readable, maintainable Svelte components
+Six workshop voices for every design and engineering decision.
+Invoke all six when reviewing features. Invoke relevant subsets for targeted work.
 
 ---
 
-## 1. Engineering
+## Voice 1 — Engineering (Svelte 5 + SvelteFlow)
 
-**Lens:** Technical correctness, build-chain integrity, and architecture rules.
+*"Does this compile, stay reactive, and not fight the framework?"*
 
-**Checks:**
-- Valid Svelte 5 runes / Svelte 4 `export let` syntax (per CLAUDE.md)
-- ES module imports resolve — no circular deps, no bare specifiers
-- Vite build passes (`npm run build` exits 0)
-- Stores before components: `engine.js` and `db.js` import no Svelte
-- Components import stores, never the reverse
-- No runtime `document`/`window` access during SSR-compatible paths
-- adapter-static constraints respected (no server endpoints)
-- Drag system uses direct DOM during drag, single store update on drop
-- Card flip uses CSS 3D transforms, `prefers-reduced-motion` fallback
+Responsible for: build health, runes correctness, SvelteFlow integration integrity,
+store architecture, CSS-only styling, component structure.
 
-**CSS rules (from Design Engineer domain):**
-- All tokens live in `static/assets/css/theme.css` — don't duplicate into `<style>` blocks
-- Campaign theming via `[data-campaign="X"]` selectors
-- Dark mode is primary; light mode must be equally functional
-- Glass tokens: `--glass-blur`, `--glass-bg`, `--glass-border`, `--glass-inset`, `--glass-shadow`
-- NEVER hardcode hex/rgb for text — always CSS variables
-- Campaign accent colours: decorative only (borders, icons), never text backgrounds
-- Font minimums: 11px labels, 12px body text
-- Print stylesheet must be maintained — GMs print at conventions
+**Hard vetoes:**
+- Build fails
+- `$state()` used inside a function body (invalid in Svelte 5)
+- `flowNodes`/`flowEdges` changed from `writable()` to `$state()` (breaks SvelteFlow)
+- Card components given `left/top` style or `onmousedown` drag (fights SvelteFlow)
+- `nodeTypes` defined inside a component or reactive block (causes infinite re-renders)
+- `<style>` blocks added to components (violates CSS rule)
+- Import cycle introduced between stores and components
 
-**Veto if:** Build fails, import cycle introduced, architecture rule from CLAUDE.md violated, or drag uses reactive state during movement.
-
-**Output format:**
-```
-[Engineering] PASS | VETO
-- Files touched: <list>
-- Build: pass/fail
-- Import graph: clean / cycle at <path>
-- Notes: <detail>
-```
+**Must ensure:**
+- Every mutable `let` uses `$state()`
+- Props use `$props()` destructuring
+- Events use `onclick=` not `on:click=`
+- Store subscriptions use `.set(v)` for writable targets, not reassignment
+- `useSvelteFlow()` called at component init level, not inside functions
 
 ---
 
-## 2. Rules / Content
+## Voice 2 — Rules/Content (Fate Condensed)
 
-**Lens:** Fate Condensed SRD accuracy, cross-system conversion safety, campaign world voice, and content quality.
+*"Does this accurately represent Fate Condensed rules?"*
 
-**Default operating mode: Fate Condensed.** All output, UI labels, GM tips, and generated content must conform to Fate Condensed rules unless the owner explicitly requests a different system's conventions.
+Responsible for: stress track sizing, fate point economy, consequence labels,
+invoke/compel accuracy, skill ladder correctness, action type labelling.
 
-### SRD Mastery
+**Hard vetoes:**
+- Stress boxes exceeding FCon maximums (3 base, 4 at skill 1–2, 6 at skill 3+)
+- Refresh displayed incorrectly (default 3, minimum 1)
+- GM fate pool seeded incorrectly (1 FP per PC per new scene, FCon p.20)
+- Contest framed as "race to 3" without noting ties count as success with style for winner
 
-*Primary authority:*
-- **Fate Condensed SRD** (Evil Hat, 2020) — the governing ruleset
+**Must ensure:**
+- Consequence slots: Mild/Moderate/Severe (+ extra Mild at Physique/Will 5+)
+- End scene: clears stress, preserves consequences and FP
+- Session start: FP resets to max(refresh, current FP)
+- Skill pyramid: 1×Great(+4), 2×Good(+3), 3×Fair(+2), 4×Average(+1)
 
-*Full fluency (available for enrichment):*
-- **Fate Core System SRD** (2013) — deeper examples, Phase Trio, extras, Long Game
-- **Fate Accelerated Edition SRD** (2013) — approach-based variant, quick-start patterns
+---
 
-*Supplementary:*
-- **Fate Adversary Toolkit** — threats, hitters, bosses, obstacles, constraints
-- **Fate System Toolkit** — magic, gadgets, vehicles, conditions, weapon/armor, scale
-- **Fate Horror Toolkit** — dread, corruption, isolation
-- **Book of Hanz** — philosophy (fiction first, collaborative setting, the Fractal). Philosophy, not rules — never overrides the SRD on mechanical questions
-- **Fate Space** — ship construction, crew roles, sector generation
+## Voice 3 — QA
 
-### Critical Conversion Map — Fate Core → Condensed
+*"Does every path work? What breaks under edge cases?"*
 
-| Mechanic | Core | Condensed | Action |
-|---|---|---|---|
-| Stress boxes | Escalating value [1][2][3][4] | All 1-point, mark multiple per hit | Replace value boxes with 1-pt count (FCon p.12) |
-| Stress track default | 2 boxes | 3 boxes | Use FCon table: +0→3, +1/+2→4, +3/+4→6 |
-| Milestones | Minor / Significant / Major | Milestone (session) / Breakthrough (arc) | **NEVER** use "significant milestone" — eliminated in Condensed |
-| Initiative | Skill-based | Balsera Style (popcorn) | Replace skill-based initiative |
-| Active opposition | Separate from Defend | Folded into Defend | Remove as distinct concept |
-| Extreme consequences | Clears at "next major milestone" | Clears at "next breakthrough" | Use FCon terminology |
-| Skill list | 18 skills | 19 skills (Lore included) | Verify against FCon p.7–9 |
-| Full defense | Standard rule | Optional (FCon p.48) | Label as optional |
+Responsible for: QA script health, regression identification, edge case coverage,
+data integrity across IDB persist/load cycles.
 
-### Critical Conversion Map — FAE → Condensed
+**Hard vetoes:**
+- `qa-hard.mjs` exits non-zero
+- `qa-export.mjs` exits non-zero
+- IDB round-trip broken (save then reload loses data)
+- Cards generated with undefined title/summary/tags
 
-| Mechanic | FAE | Condensed | Action |
-|---|---|---|---|
-| Skills vs Approaches | 6 Approaches, cap +3 | 19 Skills in pyramid, cap +4 | Rewrite approach stunts to skill format |
-| Stress | Single unified track, escalating [1][2][3] | Dual tracks, all 1-point | Split into two tracks |
-| Aspects | 3 total | 5 total (HC, Trouble, Relationship, 2 others) | Expand to 5 |
-| Stunts | Start with 1 | Start with 3 free slots | Adjust expectations |
-| Consequence recovery | Timing only | Treatment overcome roll required FIRST, then timing | Add treatment step |
-
-### Content Quality (World-Building Savant standards)
-
-**Domain:** All `src/data/[campaign].js` table arrays and `src/data/universal.js`.
-
-**Non-negotiable quality standards:**
-- **Genre-specific vernacular** — no generic filler. Every entry feels native to its world
-- **Proper noun test** — "Would a character in this world say this?"
-- **Trouble quality bar** — dramatic tension, not mere inconvenience. "Owes a debt" = weak. "The thing I buried is walking again" = strong
-- **Aspect word count** — 3–8 words, both invocable AND compellable
-- **Narrative interconnectivity** — factions hire NPCs, seeds escalate to issues, locations suggest who operates there
-- **10 entries that sing beat 30 that fill space**
-- **Cross-world contamination check** — "Could this appear in a different campaign unchanged?" If yes, not specific enough
-
-### Genre Enforcement (ComicBookGuy standards)
-
-- Every content review cites the specific world voice and at least one genre touchstone
-- When flagging a cliché, always propose the subversion
-- Genre authenticity ≠ genre gatekeeping — a fantasy world can have guns if the fiction earns it
-- Deep cuts > obvious picks. Every GM knows Blade Runner. Value is knowing Texhnolyze
-- Name quality is non-negotiable. "Sir Aldric" in cyberpunk breaks immersion instantly
-
-**Veto if:** SRD rule misrepresented, forbidden term used ("significant milestone"), generated content breaks campaign voice, or aspect fails the invoke+compel test.
-
-**Output format:**
-```
-[Rules/Content] PASS | VETO
-- SRD compliance: pass / violation at <location>
-- World voice: consistent / drift in <file>
-- Conversion safety: no cross-system bleed / bleed at <location>
-- Terms audited: <list>
-- Notes: <detail>
+**Must run before every delivery:**
+```bash
+node scripts/qa-hard.mjs
+node scripts/qa-export.mjs
+npm run build
 ```
 
 ---
 
-## 3. QA
+## Voice 4 — UX (GM-first, at-table)
 
-**Lens:** Test gates, regression prevention, and verification rigor.
+*"Would a GM running their first Fate session understand this immediately?"*
 
-**Checks:**
-- `npm run dev` starts with zero errors
-- `npm run build` succeeds
-- Component count: `find src -name "*.svelte" | wc -l` matches expected (currently 51)
-- Store count: `ls src/lib/stores/*.js | wc -l` matches expected (currently 6)
-- Engine exports verify: `node -e "import('./src/lib/engine.js').then(m => console.log(Object.keys(m)))"`
-- No stubs: `grep -rn "TODO\|FIXME\|STUB" src/` returns zero hits
-- Every fixed bug gets a **named assertion**
+Responsible for: discoverability, interaction clarity, mobile usability,
+44px touch targets, focus management, empty states.
 
-**Named assertion format:**
-```
-ASSERT [bug-slug]: <one-line description of what must remain true>
-VERIFY: <exact command or manual step to confirm>
-```
+**Key UX principles:**
+- Target user: GM running Fate for first-time players, possibly mid-session
+- Primary interaction: one click generates, one click places on canvas
+- Canvas should feel like a physical table, not a software canvas
+- Play mode is time-pressured — every action needs to be 2 taps or fewer
+- Empty canvas needs a clear call to action, not a blank void
 
-**Smoke test:** All 8 worlds × 16 generators = 128 combinations must produce valid output.
-
-**Veto if:** Any gate fails, or a bug fix ships without a named assertion.
-
-**Output format:**
-```
-[QA] PASS | VETO
-- dev server: pass/fail
-- build: pass/fail
-- component count: <n>/51
-- store count: <n>/6
-- stubs found: <n>
-- assertions added: <list>
-- Notes: <detail>
-```
+**Segments to design for:**
+1. New GM / D&D convert — needs guardrails and Fate rule reminders
+2. Experienced Fate GM — needs speed and keyboard shortcuts
+3. At-table (mid-session) — needs large touch targets, no reading required
+4. Solo player — needs self-explanatory card content
 
 ---
 
-## 4. UX
+## Voice 5 — Product Strategist
 
-**Lens:** Touch usability, discoverability, accessibility, and user-segment fit.
+*"Is this the right thing to build now? Does it compound value?"*
 
-### User Segments
+Responsible for: backlog prioritisation, effort vs impact, feature coherence,
+avoiding premature complexity.
 
-| Segment | Persona | Primary need |
-|---------|---------|-------------|
-| D&D Convert | Marcus | Stress/HP translation, D&D contrast notes |
-| Solo GM | Sarah | Speed, export, minimal friction, offline-first |
-| Narrative Veteran | Elena | Table customisation, rules accuracy, keyboard shortcuts |
-| Mobile Player | Kenji | At-table use, 44px touch targets, fast state, no network |
-| New GM | — | First-time session runner, needs guidance at every step |
+**Prioritisation framework:**
+1. Broken things that hurt current users → fix now
+2. Missing things that block core workflow → build next
+3. Improvements to existing features → build when stable
+4. New features → validate need before building
 
-### Accessibility Checklist (WCAG 2.1 AA + Apple HIG)
-
-**Contrast:**
-- Body/label text ≥ 4.5:1 against background
-- Large text (≥18px or ≥14px bold) ≥ 3:1
-- UI component boundaries ≥ 3:1
-- Glass interfaces need explicit contrast audit in both dark and light modes
-
-**Touch targets:**
-- All interactive elements ≥ **44×44px** (HIG)
-- `@media(pointer:fine)` may reduce to 28px on compact controls
-- Drag interactions must have non-drag alternatives
-
-**Keyboard:**
-- No `<div on:click>` without `role`, `tabindex`, `aria-*`, and `on:keydown` (Space + Enter)
-- Escape dismisses all overlays
-- Focus returns to trigger on panel close
-- Focus moves into panel on open (first interactive element)
-
-**ARIA:**
-- Modal: descriptive `aria-label` (not generic "Dialog")
-- Live regions: `aria-live="polite"` for results/state changes
-- Icons in buttons: `aria-hidden="true"` on icon, name on button
-- Checkboxes: follow StressRow pattern for interactive div checkboxes
-
-**System:**
-- `prefers-color-scheme` respected on first load
-- `env(safe-area-inset-bottom)` on fixed bottom elements
-- `prefers-reduced-motion` — animations replaced with instant transitions
-- Colour alone never conveys meaning — pair with text, shape, or icon
-
-**Veto if:** Touch target below 44px, discoverability < 50% with no mitigation, accessibility attribute removed, or contrast below 4.5:1 on text.
-
-**Output format:**
-```
-[UX] PASS | VETO
-- Touch targets: pass / violation at <component>
-- Discoverability: <score>% for <segment>
-- Segments impacted: <list>
-- A11y: pass / regression at <location>
-- Notes: <detail>
-```
+**Current priority order:**
+1. SF canvas correctness (cards appearing, positioning, drag)
+2. Play mode completeness (stress, FP, round tracking working)
+3. Session Zero → Prep Canvas flow
+4. Content quality (aspect word counts, Victorian pass)
+5. Bits UI adoption for accessibility
+6. Advanced SF features (edge labels, snap, resize)
 
 ---
 
-## 5. Product Strategist
+## Voice 6 — Mechanical Auditor (Fate rules compliance)
 
-**Lens:** Prioritisation through segment impact, effort, and strategic alignment.
+*"Does the generated content hold up at the table?"*
 
-### Scoring Framework: Segment × Impact × Effort
+Responsible for: generated content scoring, aspect quality,
+skill assignment validity, stress/consequence coherence in generated NPCs.
 
-| Factor | Scale | Definition |
-|--------|-------|------------|
-| Segments reached | 1–5 | How many user segments benefit |
-| Impact per segment | 1–5 | How much their experience improves |
-| Effort | 1–5 | Implementation cost (1 = trivial, 5 = multi-week) |
-| Priority score | calc | `(segments × impact) / effort` |
+**Content scoring rubric (each 1–10):**
+- Voice: Does it sound like the world?
+- Narrative: Is it immediately usable at the table?
+- Mechanical: Are skills/stress/aspects internally consistent?
+- Polish: No raw `undefined`, no truncated strings, no duplicate aspects?
+- Pacing: Does it give the GM something to act on immediately?
 
-### Four Big Risks (every proposed feature)
-
-| Risk | Question |
-|------|----------|
-| **Value** | Will GMs actually use this? |
-| **Usability** | Can they figure it out without help? |
-| **Feasibility** | Can we build it with current constraints? |
-| **Viability** | Does it fit the project's scope and sustainability? |
-
-**Checks:**
-- Feature has a clear segment target — "everyone" is not a segment
-- Priority score computed and compared to backlog
-- Scope creep flagged
-- Reversibility assessed
-
-**Veto if:** Priority score below threshold with no strategic justification, or scope creep without acknowledgment.
-
-**Output format:**
-```
-[Product Strategist] PASS | VETO
-- Target segments: <list>
-- Segments reached: <n>/5
-- Impact: <n>/5
-- Effort: <n>/5
-- Priority score: <calculated>
-- Scope: clean / creep at <description>
-- Notes: <detail>
-```
+**Hard vetoes:**
+- Any generated content with `undefined` in visible fields
+- Skills not in the FCon skill list (e.g. `Ride` for non-western worlds)
+- Major NPC refresh value != 3 (hardcoded bug to watch for)
+- Aspects over 15 words (unusable at table)
 
 ---
 
-## 6. Mechanical Auditor
+## Workshop format
 
-**Lens:** Scored qualitative audit of generated content across five dimensions.
+When invoked as a team:
 
-### Scoring Dimensions (each 1–10)
+1. **Engineering** reads the code and identifies structural issues
+2. **Rules/Content** checks Fate accuracy of any game mechanic changes
+3. **QA** lists what could break and what tests are needed
+4. **UX** describes the GM experience impact
+5. **Product** rates priority and sequencing
+6. **Mechanical Auditor** scores content quality if content changed
 
-| Dimension | What it measures |
-|-----------|-----------------|
-| **Voice & Vernacular** | Does the text feel native to this world? Genre terms correct? Would a character say these words? |
-| **Narrative Interconnectivity** | Do NPCs connect to factions? Seeds escalate to issues? Locations suggest who operates there? |
-| **Mechanical Integrity** | Correct FCon stress (1-pt boxes), stunt format (+2 when [condition] OR once-per-scene), skills from FCon list, consequence slots, opposition per Adversary Toolkit |
-| **Editorial Polish** | No filler, no semicolon chains, no aspects over 15 words, no entries that work as descriptions but fail as aspects |
-| **Structural Pacing** | Scene aspects provide momentum? Countdowns feel urgent? Complications escalate rather than pile up? |
-
-**Composite score:** Average of all five. Minimum **6.0** to ship. Any single dimension below **5** is a blocker.
-
-**Audit sample:** 3 NPCs (1 minor, 1 major, 1 antagonist), 3 scenes, 2 seeds, 2 factions, 1 of every other generator type.
-
-**Veto if:** Composite below 6.0, or any dimension below 5.
-
-**Output format:**
-```
-[Mechanical Auditor] PASS | VETO
-- Samples reviewed: <n>
-- Voice:      <score>/10  [justification]
-- Narrative:  <score>/10  [justification]
-- Mechanical: <score>/10  [justification]
-- Polish:     <score>/10  [justification]
-- Pacing:     <score>/10  [justification]
-- Composite:  <score>/10
-- Lore gaps: <specific examples>
-- Priority rewrites: <ranked list>
-```
-
----
-
-## Campaign Voice Reference
-
-| World | ID | Voice |
-|---|---|---|
-| The Long After | `thelongafter` | Elegiac, mythic, world-weary. Things have names from before the collapse. The nostalgia is the danger. |
-| Neon Abyss | `cyberpunk` | Transhumanist anxiety. The chrome is a leash. Precision over action-movie energy. |
-| Shattered Kingdoms | `fantasy` | Wound-lore fantasy. Magic is scar tissue. Everything has a cost that compounds. |
-| Void Runners | `space` | Blue-collar solidarity. The ship payment is always due. Competence under pressure, not heroism. |
-| The Gaslight Chronicles | `victorian` | The Enlightenment was a mistake. Cosmic horror with manners. The horror is in the implication. |
-| The Long Road | `postapoc` | Lyrical, not grimdark. The question is what you build. Loss as texture, not wallpaper. |
-| Dust and Iron | `western` | Frontier justice. The land doesn't care. Violence has weight and aftermath. Silence before speech. |
-| dVenti Realm | `dVentiRealm` | Whimsical tabletop-in-a-tabletop. Self-aware, playful, fourth-wall-adjacent. |
-
----
-
-## Review Protocol
-
-1. Feature author presents the change with a one-line summary
-2. All six voices review in parallel
-3. Any single VETO blocks the merge
-4. Vetoing voice states the specific fix required
-5. After fixes, only the vetoing voice(s) re-review
-6. When all six show PASS, the feature ships
-
-### Commit Tag
-
-```
-feat: add complication generator
-[workshop: 6/6 pass]
-```
-
-With caveats:
-```
-feat: add complication generator
-[workshop: 6/6 pass, UX caveat: discoverability 55% for new-gm]
-```
-
----
-
-## What the Team Does Not Do
-
-- Ship features without a user need
-- Let the parking lot drift — items have review dates
-- Accept fabricated usability data as evidence
-- Confuse Fate Core and Fate Condensed rules
-- Ship without passing QA
-- Use "significant milestone" (eliminated in Fate Condensed)
-- Chase vanity metrics over real user outcomes
+For targeted reviews, invoke only the relevant voices.

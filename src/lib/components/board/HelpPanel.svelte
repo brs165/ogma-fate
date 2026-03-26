@@ -1,5 +1,5 @@
 <script>
-  import { Accordion } from 'bits-ui';
+  import { Accordion, Popover } from 'bits-ui';
 
   let inspoPrompt = $state(null);
 
@@ -97,10 +97,18 @@
   </Accordion.Root>
 
   <div class="bh-inspo">
-    <button class="bh-inspo-btn" onclick={rollInspo}>🎲 What would happen?</button>
-    {#if inspoPrompt}
-      <div class="bh-inspo-result">{inspoPrompt}</div>
-    {/if}
+    <Popover.Root open={inspoPrompt !== null} onOpenChange={(o) => { if (!o) inspoPrompt = null; }}>
+      <Popover.Trigger class="bh-inspo-btn" onclick={rollInspo}>
+        🎲 What would happen?
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Content class="bh-inspo-popover" sideOffset={8} align="start">
+          <Popover.Arrow class="bh-inspo-arrow" />
+          <div class="bh-inspo-roll-result">{inspoPrompt}</div>
+          <button class="bh-inspo-reroll" onclick={rollInspo}>🎲 Reroll</button>
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
   </div>
 
   <div class="bh-tip">

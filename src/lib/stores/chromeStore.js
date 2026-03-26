@@ -1,4 +1,4 @@
-// chromeStore.js — from useChromeHooks (react-source/core/ui.js L1550-1642)
+// chromeStore.js — Chrome: toast queue, theme toggle, SW update, PWA lifecycle
 // Factory: createChromeStore(campId)
 import { writable } from 'svelte/store';
 

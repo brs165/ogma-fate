@@ -57,7 +57,7 @@
     faces = newFaces;
 
     // Reveal dice one by one
-    let idx = $state(0);
+    let idx = 0;
     const interval = setInterval(() => {
       revealed[idx] = true;
       revealed = [...revealed];

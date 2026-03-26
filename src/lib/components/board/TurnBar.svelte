@@ -1,5 +1,7 @@
 <script>
   // ── TurnBar — draggable turn order strip for Play mode ────────────────────────
+  import { AlertDialog, Tooltip } from 'bits-ui';
+
   let { players = [], order = [], setOrder = null, onToggleActed = null, round = 1, onNewRound = null, onPrevRound = null, roundFlash = false, onEndScene = null, onStartSession = null, onNewScene = null, onSessionSummary = null, onPrintScene = null, npcCards = [], onToggleNpcActed = null } = $props();
   let dragId = $state(null);
   let overId = $state(null);
@@ -50,19 +52,33 @@
     overId = null;
   }
 
+  let confirmPending = $state(null); // { action, label, detail, fn }
+
+  function requestConfirm(action, label, detail, fn) {
+    confirmPending = { action, label, detail, fn };
+  }
+
+  function doConfirm() {
+    if (confirmPending) confirmPending.fn();
+    confirmPending = null;
+  }
+
   function endScene() {
-    if (!confirm('End scene?\nAll stress boxes cleared. Consequences and FP preserved.')) return;
-    if (onEndScene) onEndScene();
+    requestConfirm('end-scene', 'End Scene?',
+      'Stress cleared. Consequences and FP preserved.',
+      () => { if (onEndScene) onEndScene(); });
   }
 
   function startSession() {
-    if (!confirm('Start new session?\nAll FP reset to refresh value (or current if higher). Round resets to 1.')) return;
-    if (onStartSession) onStartSession();
+    requestConfirm('start-session', 'Start New Session?',
+      'FP reset to refresh value. Round resets to 1.',
+      () => { if (onStartSession) onStartSession(); });
   }
 
   function newScene() {
-    if (!confirm('New scene?\nPlay table cleared. Stress cleared. GM pool reset. Round 1.')) return;
-    if (onNewScene) onNewScene();
+    requestConfirm('new-scene', 'New Scene?',
+      'Play table cleared. Stress cleared. GM pool reset.',
+      () => { if (onNewScene) onNewScene(); });
   }
 
   function onNpcKeyDown(e, npc) {
@@ -77,10 +93,26 @@
   <!-- Round pill -->
   <div class="rs-round-pill{roundFlash ? ' rs-round-flash' : ''}" style="flex-shrink:0">
     <button class="rs-round-btn" onclick={onPrevRound} aria-label="Prev round">−</button>
-    <span style="font-size:11px; color:var(--text-muted); margin-right:2px">Rnd</span>
+    <span style="font-size:10px; color:var(--text-muted); margin-right:2px; letter-spacing:.03em">XCHG</span>
     <span class="rs-round-num" aria-live="polite" aria-atomic="true" aria-label="Round {round}">{round}</span>
     <button class="rs-round-btn" onclick={onNewRound} aria-label="New round">+</button>
   </div>
+
+<AlertDialog.Root open={confirmPending !== null} onOpenChange={(o) => { if (!o) confirmPending = null; }}>
+  <AlertDialog.Portal>
+    <AlertDialog.Overlay class="tb-confirm-overlay" />
+    <AlertDialog.Content class="tb-confirm-box">
+      {#if confirmPending}
+        <AlertDialog.Title class="tb-confirm-title">{confirmPending.label}</AlertDialog.Title>
+        <AlertDialog.Description class="tb-confirm-detail">{confirmPending.detail}</AlertDialog.Description>
+        <div class="tb-confirm-actions">
+          <AlertDialog.Cancel class="tb-confirm-cancel">Cancel</AlertDialog.Cancel>
+          <AlertDialog.Action class="tb-confirm-ok" onclick={doConfirm}>Confirm</AlertDialog.Action>
+        </div>
+      {/if}
+    </AlertDialog.Content>
+  </AlertDialog.Portal>
+</AlertDialog.Root>
 
   <span class="rs-turn-label" style="flex-shrink:0">Turn:</span>
 

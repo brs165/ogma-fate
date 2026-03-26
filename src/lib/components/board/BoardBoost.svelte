@@ -18,11 +18,6 @@
     editing = true;
   }
 
-  function onMouseDown(e) {
-    if (editing) return;
-    if (e.target.closest('.bc-actions')) return;
-    if (onDragStart) onDragStart(e, card.id);
-  }
 
   function onKeyDown(e) {
     if (!editing && (e.key === 'Enter' || e.key === 'F2')) {
@@ -51,17 +46,14 @@
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <div
   class="board-boost{expired ? ' boost-expired' : ''}{editing ? ' editing' : ''}"
-  style="left:{card.x}px; top:{card.y}px;
-         transform:{editing ? 'rotate(0deg)' : 'rotate(' + (card.rotation || 0) + 'deg)'};
-         z-index:{card.z || 1}"
+  style="transform:{editing ? 'rotate(0deg)' : 'rotate(' + (card.rotation || 0) + 'deg)'};"
   tabindex={editing ? -1 : 0}
   role="note"
   aria-label="Boost: {card.text || 'New Boost'}{expired ? ' (expired)' : ''}"
-  onmousedown={onMouseDown}
   ondblclick={(e) => { e.stopPropagation(); startEdit(e); }}
   onkeydown={onKeyDown}
 >
-  <div class="bc-actions">
+  <div class="bc-actions nodrag nopan">
     <button class="bc-btn" title="Delete"
       onclick={(e) => { e.stopPropagation(); (() => onDelete && onDelete(card.id))(e); }}>✕</button>
   </div>
@@ -91,7 +83,7 @@
   {/if}
 
   <!-- svelte-ignore a11y_click_events_have_key_events -->
-  <div class="boost-invoke-row" onclick={(e) => e.stopPropagation()}>
+  <div class="boost-invoke-row nodrag nopan" onclick={(e) => e.stopPropagation()}>
     {#if expired}
       <span class="boost-expired-label">Expired — used</span>
     {:else}

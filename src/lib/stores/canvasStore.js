@@ -1,4 +1,4 @@
-// canvasStore.js — from useBoardCards (react-source/core/ui-board.js L2387-2593)
+// canvasStore.js — Canvas state: card CRUD, generate, connectors, undo, IDB persist, SvelteFlow derived stores
 // Factory: createCanvasStore(campCanvasKey, tables, showToast, onCardsChange)
 import { writable, get, derived } from 'svelte/store';
 import { generate, mergeUniversal, filteredTables, GENERATORS } from '../engine.js';

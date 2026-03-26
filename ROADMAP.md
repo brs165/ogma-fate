@@ -1,45 +1,54 @@
-# Roadmap
+# Roadmap — Ogma
 
-**Current version:** 2.0.0 (SvelteKit)
-**QA gate:** 51 `.svelte` components | 6 stores | `npm run build` passes | 0 TODO/FIXME/STUB
-
----
-
-## Completed
-
-### Svelte Migration (March 2026)
-Full rewrite from React 18 CDN UMD to SvelteKit + Vite + adapter-static.
-See `CHANGELOG.md` for details and `MIGRATION.md` for the historical spec.
-
-- 51 components across cards, board, campaign, panels, dice, player
-- 6 Svelte stores replacing custom React hooks
-- File-based routing with `[world]` dynamic parameter
-- Production build via adapter-static
-- Zero compilation errors, zero stubs
+See `docs/claude/CANVAS-WORKSHOP.md` for the detailed canvas backlog with sprint assignments.
 
 ---
 
-## Open — Feature Parking Lot
+## Current version: 2026.03.579
 
-Items identified during or before the migration. Not prioritized.
-
-| Feature | Notes |
-|---------|-------|
-| Session state URL | Encode board state in URL for shareable session links |
-| Campaign arc tracker | Multi-session arc progression, milestone tracking |
-| Relationship map | Visual graph of NPC/faction relationships on the board |
-| Sound / ambience | Background audio per world theme, triggered by scene cards |
-| Fari import/export | Import characters and campaigns from Fari.app JSON format |
-| Session replay | Record and playback a session's card generation sequence |
-| 9th world | New campaign data module (genre TBD) |
+**Stack:** SvelteKit + Svelte 5 runes + SvelteFlow + Bits UI + Dexie 4
+**QA gate:** 81 `.svelte` files | 6 stores | `npm run build` passes | `qa-hard.mjs` passes
 
 ---
 
-## Open — Infrastructure
+## Recently completed (2026.03.x series)
 
-| Item | Status | Notes |
-|------|--------|-------|
-| Playwright E2E tests | Not started | Cover core flows: landing → world select → generate → board → export |
-| Preact evaluation | Parked | Originally considered as lighter alternative; SvelteKit chosen instead |
-| CSS Phase 2–4 refactor | Parked | Carried over from React era. `theme.css` works but is 2,744 lines. Reassess whether to split into component-scoped styles or CSS modules |
-| TypeScript / JSDoc props | Optional | Props use `export let` without type annotations. Add incrementally if desired |
+- Full Svelte 5 runes migration (`$state`, `$derived`, `$props` throughout)
+- SvelteFlow canvas integration (pan/zoom/connect/minimap/node types)
+- Bits UI adoption: Dialog, Accordion, DropdownMenu, ToggleGroup, Tooltip,
+  AlertDialog, Collapsible, Select, Popover
+- Play mode: Players/Generate tabs, exchange tracker, stress colour coding,
+  compel modal, GM pool urgency
+- Canvas: card entrance animation, empty state hint, connect mode visual,
+  fitView on load, NPC acted state, clock trigger ring
+- Repo cleanup: react-source removed, stale docs deleted, adapters pruned
+
+---
+
+## Active backlog
+
+### Tier 1 — Fix broken things
+See `docs/claude/CANVAS-WORKSHOP.md` Sprint 1 remaining items.
+
+### Tier 2 — Missing core features
+- **BL-01** localStorage schema — structured prefs object
+- **BL-02** Stunt data (spec done at `docs/stunt-data-spec.md`)
+- **BL-03** Victorian adjective pass — content quality
+- **BL-04** QA Playwright smoke tests
+
+### Tier 3 — Improvements
+- **WC-02** Node groups (scene grouping on canvas)
+- **WC-03** Edge labels (relationship types)
+- **WC-04** Card minimise/expand
+- **WC-05** Canvas templates
+- **WC-07** Player-facing gmOnly card toggle
+- **WC-08** Consequence stickies auto-placed
+- **BL-06** Shareable links
+- **BL-07** GM Tips depth
+- **BL-08** Western world expansion
+
+### Parked
+- Session Zero Tool (design agreed, not built)
+- Ogma rebrand (needs GitHub username confirmation first)
+- PWA install nudge (needs BL-01 first)
+- Milestone tracker panel tab (needs BL-01 first)

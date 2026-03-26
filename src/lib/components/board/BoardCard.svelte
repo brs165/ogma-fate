@@ -28,11 +28,6 @@
 
   let genEntry = $derived((GENERATORS || []).find(g => g.id === card.genId));
 
-  function onMouseDown(e) {
-    if (e.target.closest('.bc-actions') || e.target.closest('.bc-cv4-wrap')) return;
-    if (onDragStart) onDragStart(e, card.id);
-  }
-
   function onKeyDown(e) {
     if (e.key === 'Delete' || e.key === 'Backspace') {
       e.preventDefault();
@@ -64,15 +59,13 @@
 
 <div
   class="board-card"
-  style="left:{card.x}px; top:{card.y}px; z-index:{card.z || 1}"
   tabindex="0"
   role="region"
   aria-label="{genEntry ? genEntry.label : card.genId}: {card.title || ''}"
-  onmousedown={onMouseDown}
   onkeydown={onKeyDown}
 >
   <!-- Action buttons -->
-  <div class="bc-actions">
+  <div class="bc-actions nodrag nopan">
     {#if card.genId !== 'custom'}
       <button class="bc-btn" title="Reroll" aria-label="Reroll"
         onclick={(e) => { e.stopPropagation(); (() => onReroll && onReroll(card.id))(e); }}><i class="fa-solid fa-rotate-right" aria-hidden="true"></i></button>
@@ -97,18 +90,9 @@
   </div>
 
   <!-- Drag handle -->
-  <div
-    class="bc-drag-handle"
-    role="button"
-    tabindex="-1"
-    aria-label="Drag handle"
-    onmousedown={e => onDragStart && onDragStart(e, card.id)}
-    onkeydown={() => {}}
-    title="Drag to move"
-  >≡</div>
 
   <!-- Card content -->
-  <div class="bc-cv4-wrap">
+  <div class="bc-cv4-wrap nodrag nopan">
     {#if card.data}
       <div class="bc-cv4-scaler">
         <Cv4Card

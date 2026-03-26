@@ -1,4 +1,4 @@
-// sessionStore.js — from useGeneratorSession (react-source/core/ui.js L1649-1862)
+// sessionStore.js — Session: active generator, result history, chain rolls, prefs
 // Factory: createSessionStore(campId, campMeta, tables, prefs, showToast)
 import { writable, get } from 'svelte/store';
 import { generate, generateSeedPack, mergeUniversal, filteredTables, GENERATORS } from '../engine.js';

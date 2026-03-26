@@ -6,7 +6,7 @@
   const ctx = getContext('ogma_canvas') || {};
 </script>
 
-<div class="ogma-node-wrap">
+<div class="ogma-node-wrap{ctx.connectSourceId === id ? ' sf-connect-source' : ''}{ctx.mode === 'play' && data.acted ? ' npc-acted' : ''}{data.genId === 'countdown' && data.cardState?.clockFull ? ' clock-triggered' : ''}">
   <Handle type="source" position={Position.Right} id="src" />
   <Handle type="target" position={Position.Left} id="tgt" />
   <BoardCard

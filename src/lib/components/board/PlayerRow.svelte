@@ -1,7 +1,19 @@
 <script>
+  import { Collapsible, Tooltip } from 'bits-ui';
   // ── PlayerRow — player FP, stress, consequences, concede, compel ─────────────
   let { player = {}, sel = false, onUpd = null, onSel = null, onCompel = null } = $props();
   let expanded = $state(false);
+  let fpAnimKey = $state(0);
+  let fpAnimDir = $state('');
+  let stressShake = $state(false);
+
+  function shakeIfFull(hits) {
+    const marked = hits.filter(Boolean).length;
+    if (marked === hits.length) {
+      stressShake = true;
+      setTimeout(() => { stressShake = false; }, 400);
+    }
+  }
 
   let fpCol = $derived(player.fp === 0 ? 'var(--c-red)' : player.fp < player.ref ? 'var(--c-amber,#f4b942)' : 'var(--c-green)');
   let conseq = $derived(player.conseq || ['', '', '']);
@@ -29,12 +41,14 @@
     const a = (player.phy || []).slice();
     a[i] = !a[i];
     if (onUpd) onUpd({ phy: a });
+    shakeIfFull(a);
   }
 
   function toggleMen(i) {
     const a = (player.men || []).slice();
     a[i] = !a[i];
     if (onUpd) onUpd({ men: a });
+    shakeIfFull(a);
   }
 
   function onStressKeyDown(fn, i, e) {
@@ -103,49 +117,63 @@
   <div class="rs-fp-row">
     <span class="rs-fp-label">FP</span>
     <button class="rs-fp-btn"
-      onclick={() => onUpd && onUpd({ fp: Math.max(0, player.fp - 1) })}
+      onclick={() => { fpAnimDir='spend'; fpAnimKey++; onUpd && onUpd({ fp: Math.max(0, player.fp - 1) }); }}
       aria-label="Spend FP">−</button>
-    <span class="rs-fp-num" style="color:{fpCol}">{player.fp}</span>
+    {#key fpAnimKey}<span class="rs-fp-num fp-anim-{fpAnimDir}" style="color:{fpCol}">{player.fp}</span>{/key}
     <button class="rs-fp-btn"
-      onclick={() => onUpd && onUpd({ fp: player.fp + 1 })}
+      onclick={() => { fpAnimDir='gain'; fpAnimKey++; onUpd && onUpd({ fp: player.fp + 1 }); }}
       aria-label="Gain FP">+</button>
   </div>
 
   <!-- Stress row -->
-  <div class="rs-stress-row">
-    <span class="rs-fp-label">PHY</span>
+  <div class="rs-stress-row{stressShake ? ' rs-stress-shake' : '' }">
+    <span class="rs-fp-label rs-stress-label-phy">PHY</span>
     <div style="display:flex; gap:2px">
       {#each (player.phy || []) as v, i}
-        <div
-          class="rs-stress-box{v ? ' filled' : ''}"
-          role="checkbox"
-          aria-checked={String(!!v)}
-          aria-label="Physical stress {i + 1}"
-          tabindex="0"
-          onclick={() => togglePhy(i)}
-          onkeydown={e => onStressKeyDown(togglePhy, i, e)}
-        ></div>
+        <Tooltip.Root openDelay={600}>
+          <Tooltip.Trigger
+            class="rs-stress-box rs-stress-phy{v ? ' filled' : ''}"
+            role="checkbox"
+            aria-checked={String(!!v)}
+            aria-label="Physical stress {i + 1}"
+            tabindex="0"
+            onclick={() => { togglePhy(i); }}
+            onkeydown={e => onStressKeyDown(togglePhy, i, e)}
+          ></Tooltip.Trigger>
+          <Tooltip.Portal>
+            <Tooltip.Content class="bt-tooltip">
+              {v ? 'Clear' : 'Mark'} Physical {i + 1}
+            </Tooltip.Content>
+          </Tooltip.Portal>
+        </Tooltip.Root>
       {/each}
     </div>
-    <span class="rs-fp-label" style="margin-left:4px">MEN</span>
+    <span class="rs-fp-label rs-stress-label-men" style="margin-left:4px">MEN</span>
     <div style="display:flex; gap:2px">
       {#each (player.men || []) as v, i}
-        <div
-          class="rs-stress-box{v ? ' filled' : ''}"
-          style="border-color:var(--c-purple)"
-          role="checkbox"
-          aria-checked={String(!!v)}
-          aria-label="Mental stress {i + 1}"
-          tabindex="0"
-          onclick={() => toggleMen(i)}
-          onkeydown={e => onStressKeyDown(toggleMen, i, e)}
-        ></div>
+        <Tooltip.Root openDelay={600}>
+          <Tooltip.Trigger
+            class="rs-stress-box rs-stress-men{v ? ' filled' : ''}"
+            role="checkbox"
+            aria-checked={String(!!v)}
+            aria-label="Mental stress {i + 1}"
+            tabindex="0"
+            onclick={() => { toggleMen(i); }}
+            onkeydown={e => onStressKeyDown(toggleMen, i, e)}
+          ></Tooltip.Trigger>
+          <Tooltip.Portal>
+            <Tooltip.Content class="bt-tooltip">
+              {v ? 'Clear' : 'Mark'} Mental {i + 1}
+            </Tooltip.Content>
+          </Tooltip.Portal>
+        </Tooltip.Root>
       {/each}
     </div>
   </div>
 
-  <!-- Expanded: consequences + buttons -->
-  {#if expanded}
+  <!-- Expanded: consequences + buttons — Bits UI Collapsible for animated height -->
+  <Collapsible.Root open={expanded}>
+    <Collapsible.Content class="rs-player-collapsible">
     <div style="padding:0 8px 7px">
       <div style="font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
                   color:var(--text-muted); margin-bottom:3px">Consequences</div>
@@ -191,5 +219,6 @@
         >↩ Compel</button>
       {/if}
     </div>
-  {/if}
+  </Collapsible.Content>
+  </Collapsible.Root>
 </div>

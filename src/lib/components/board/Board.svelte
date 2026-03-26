@@ -25,6 +25,7 @@
   import CommandPalette from './CommandPalette.svelte';
   import ExportPanel from './ExportPanel.svelte';
   import DicePanel from '../dice/DicePanel.svelte';
+  import CanvasContextMenu from './CanvasContextMenu.svelte';
   import FatePointTracker from '../campaign/FatePointTracker.svelte';
 
   // ── Props ──────────────────────────────────────────────────────────────────
@@ -41,6 +42,7 @@
 
   // ── Local state ────────────────────────────────────────────────────────────
   let mode = $state(initialMode);
+  let modeTransitioning = $state(false);
   let activeGen = $state('npc_minor');
   let leftTab = $state('gen');
   let theme = $state('dark');
@@ -71,6 +73,7 @@
   }
   let showTracker = $state(false);
   let exportView = $state(false);
+  let fitViewOnLoad = $state(false);  // true when restoring existing cards
   // zoom/pan now handled by Svelte Flow
 
   // Coach marks
@@ -108,20 +111,23 @@
   // Context menu
   let ctx = $state(null);
 
+  // ── Canvas wrapper ref (for coordinate conversion) ───────────────────────
+  let sfWrap = $state();
+
   // ── Toast queue ────────────────────────────────────────────────────────────
   let toastTimer = $state(null);
   let toastQueue = $state([]);
 
   function drainToast() {
-    if (toastQueue.length === 0) { toast = null; return; }
-    toast = toastQueue.shift();
+    if (toastQueue.length === 0) { toast = null; toastTimer = null; return; }
+    toast = toastQueue[0];
+    toastQueue = toastQueue.slice(1);  // $state-safe: reassign not mutate
     toastTimer = setTimeout(drainToast, 1800);
   }
 
   function showToast(msg) {
-    toastQueue.push(msg);
-    if (!toastTimer || toastQueue.length === 1) {
-      clearTimeout(toastTimer);
+    toastQueue = [...toastQueue, msg];  // $state-safe: reassign not mutate
+    if (!toastTimer) {
       drainToast();
     }
   }
@@ -141,6 +147,7 @@
     get mode() { return mode; },
     get campId() { return campId; },
     get playCardIds() { return playCardIds; },
+    get connectSourceId() { return connectSourceId; },
     onDelete: (id) => canvas && canvas.deleteCard(id),
     onReroll: (id) => canvas && canvas.rerollCard(id),
     onUpdate: (id, patch) => canvas && canvas.updateCard(id, patch),
@@ -152,7 +159,7 @@
   function initStores() {
     // Clean up previous subscriptions
     unsubs.forEach(u => u());
-    unsubs = [];
+    unsubs = [];  // plain array, fine to reassign
 
     canvas = createCanvasStore(campCanvasKey, tables, showToast, null);
     play = createPlayStore(campId);
@@ -171,11 +178,17 @@
     unsubs.push(canvas.connectors.subscribe(v => connectorLines = v));
     unsubs.push(canvas.nodes.subscribe(v => flowNodes.set(v)));
     unsubs.push(canvas.edges.subscribe(v => flowEdges.set(v)));
-    let binderLoadedOnce = $state(false);
+    let binderLoadedOnce = false;
     unsubs.push(canvas.loaded.subscribe(v => {
       loaded = v;
       if (v && !binderLoadedOnce) {
         binderLoadedOnce = true;
+        // fitView if restoring existing cards
+        const existing = get(canvas.cards);
+        if (existing && existing.length > 0) {
+          fitViewOnLoad = true;
+          setTimeout(() => { fitViewOnLoad = false; }, 500);
+        }
         setTimeout(() => {
           const currentBinder = get(binder.binderCards);
           if (currentBinder && currentBinder.length > 0) {
@@ -216,7 +229,7 @@
   let syncStatus = $state('offline');
   let roomCode = $state('');
 
-  let unsubs = $state([]);
+  let unsubs = [];  // not $state — never rendered, just cleanup refs
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
   onMount(() => {
@@ -324,8 +337,13 @@
 
   // ── Mode change handler ───────────────────────────────────────────────────
   function onModeChange(m) {
+    if (m === mode) return;
     if (canvas) canvas.persistCanvas(get(canvas.cards));
-    mode = m;
+    modeTransitioning = true;
+    setTimeout(() => {
+      mode = m;
+      setTimeout(() => { modeTransitioning = false; }, 350);
+    }, 80);
   }
 
   // ── FP persistence ────────────────────────────────────────────────────────
@@ -351,15 +369,19 @@
   function onCanvasContextMenu(e) {
     if (e.target.closest('.board-card') || e.target.closest('.board-sticky')) return;
     e.preventDefault();
+    // Use client coords for menu display (fixed positioning)
+    // Canvas coords passed to generateCard — SvelteFlow handles node placement
+    // For now use clientX/Y as canvas coords; at default zoom 0.8 this is ~accurate
+    // TODO: extract exact canvas transform via .svelte-flow__viewport transform matrix
     ctx = {
       screenX: e.clientX, screenY: e.clientY,
       canvasX: e.clientX, canvasY: e.clientY,
     };
   }
 
-  function ctxGenerate(genId) {
-    if (!ctx || !canvas) return;
-    canvas.generateCard(genId, ctx.canvasX, ctx.canvasY);
+  function ctxGenerate(genId, canvasX, canvasY) {
+    if (!canvas) return;
+    canvas.generateCard(genId, canvasX, canvasY);
     ctx = null;
   }
 
@@ -514,6 +536,9 @@
         onAdd={(name) => { if (play) play.addPlayer(name); }}
         collapsed={mode === 'prep'}
         {gmPool}
+        {activeGen}
+        onSelectGen={selectGen}
+        campName={campMeta.name}
         updGmPool={mode === 'play' && play ? play.updGmPool : null}
         onQuickNpc={mode === 'play' ? () => { if (canvas) { canvas.generateCard('npc_minor'); showToast('\u26A1 Quick NPC added'); } } : null}
         onStarterScene={mode === 'play' ? () => {
@@ -625,20 +650,26 @@
         {/if}
 
         <!-- Canvas area — Svelte Flow -->
-        <div class="board-sf-wrap" oncontextmenu={onCanvasContextMenu}>
+        <div class="board-sf-wrap{connectSourceId ? ' connect-mode' : ''}{modeTransitioning ? ' mode-transitioning' : ''}" oncontextmenu={onCanvasContextMenu} bind:this={sfWrap}>
           <SvelteFlow
             nodes={flowNodes}
             edges={flowEdges}
             {nodeTypes}
-            fitView={false}
+            fitView={fitViewOnLoad}
             minZoom={0.2}
             maxZoom={2}
-            defaultViewport={{ x: 0, y: 0, zoom: 0.7 }}
+            defaultViewport={{ x: 20, y: 20, zoom: 0.8 }}
             deleteKey="Delete"
             panOnScroll={true}
             panOnDrag={[1, 2]}
+            selectionOnDrag={false}
+            multiSelectionKeyCode="Shift"
             on:nodedragstop={(e) => {
               if (canvas && e.detail && e.detail.nodes) canvas.syncNodePositions(e.detail.nodes);
+            }}
+            on:nodeclick={(e) => {
+              if (canvas && e.detail?.node)
+                canvas.updateCard(e.detail.node.id, { z: Date.now() });
             }}
             on:connect={(e) => {
               if (canvas && e.detail) canvas.addConnector(e.detail.source, e.detail.target);
@@ -649,31 +680,37 @@
           >
             <Background variant={BackgroundVariant.Dots} gap={24} size={1} />
             <Controls />
-            <MiniMap />
+            <MiniMap
+              nodeColor={(n) => {
+                const C = {
+                  npc_minor:'#e8b83a',npc_major:'#e8793a',backstory:'#4a90d9',
+                  scene:'#3aaa7a',encounter:'#d04a6a',complication:'#d04a6a',
+                  challenge:'#4a90d9',contest:'#6a7dd4',obstacle:'#888888',
+                  countdown:'#e8793a',constraint:'#888888',campaign:'#6a7dd4',
+                  seed:'#e8b83a',faction:'#6a7dd4',compel:'#3aaa7a',
+                  consequence:'#e8793a',custom:'#888888',pc:'#3aaa7a',
+                  sticky:'#fff176',boost:'#f4b942',label:'#c8a96e',
+                };
+                return C[n.type] || '#888888';
+              }}
+              maskColor="rgba(0,0,0,0.5)"
+            />
+            <!-- Empty canvas hint -->
+            {#if loaded && cards.length === 0}
+              <div class="board-sf-empty" aria-hidden="true">
+                <span class="board-sf-empty-icon">◈</span>
+                <span>Right-click to generate, or press <kbd>Space</kbd></span>
+                <span class="board-sf-empty-hint">Click a generator in the left panel to get started</span>
+              </div>
+            {/if}
           </SvelteFlow>
 
-          <!-- Context menu overlay -->
-          {#if ctx}
-            <!-- svelte-ignore a11y_no_static_element_interactions -->
-            <div class="board-ctx" role="menu" aria-label="Generate card"
-              style="left:{ctx.screenX}px;top:{ctx.screenY}px;position:fixed;z-index:9999"
-              onclick={(e) => e.stopPropagation()}>
-              <div class="board-ctx-section" role="none">Generate here</div>
-              {#each CTX_ITEMS as g (g.id)}
-                <div class="board-ctx-item" role="menuitem" tabindex="0"
-                  onclick={() => ctxGenerate(g.id)}
-                  onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ctxGenerate(g.id); } }}>
-                  <span class="board-ctx-icon" aria-hidden="true">{g.icon}</span>{g.label}
-                </div>
-              {/each}
-              <div class="board-ctx-sep" role="separator"></div>
-              <div class="board-ctx-item" role="menuitem" tabindex="0"
-                onclick={() => { ctx = null; }}
-                onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ctx = null; } }}>
-                <span class="board-ctx-icon" aria-hidden="true">&times;</span> Cancel
-              </div>
-            </div>
-          {/if}
+          <!-- Context menu — inside SF tree so useSvelteFlow() coord conversion works -->
+          <CanvasContextMenu
+            {ctx}
+            onClose={() => { ctx = null; }}
+            onGenerate={ctxGenerate}
+          />
 
           <!-- Toast -->
           {#if toast}
@@ -779,6 +816,46 @@
       campName={campMeta.name}
       {campId}
     />
+  {/if}
+
+
+  <!-- Compel offer modal -->
+  {#if compelOffer}
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div class="modal-overlay" onclick={() => compelOffer = null} role="presentation">
+      <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+      <div class="modal-box modal-box-narrow" onclick={(e) => e.stopPropagation()}
+        role="dialog" aria-modal="true" aria-label="Compel offer"
+        tabindex="-1">
+        <div class="modal-header">
+          <span class="modal-title">↩ Compel Offer</span>
+          <button class="modal-close" onclick={() => compelOffer = null} aria-label="Close">×</button>
+        </div>
+        <div class="modal-body" style="padding:16px">
+          <div style="margin-bottom:12px; font-size:13px">
+            <strong>{compelOffer.playerName}</strong> — aspect:
+            <em style="color:var(--accent)">{compelOffer.aspect}</em>
+          </div>
+          <div style="font-size:12px; color:var(--text-muted); margin-bottom:16px; line-height:1.5">
+            Offer 1 FP to complicate their situation using this aspect.
+            They can accept (take complication + gain 1 FP) or refuse (pay 1 FP to resist).
+          </div>
+          <div style="display:flex; gap:8px; justify-content:flex-end">
+            <button class="tb-confirm-cancel" onclick={() => compelOffer = null}>Cancel</button>
+            <button class="tb-confirm-ok" onclick={() => {
+              if (play) {
+                const p = players.find(pl => pl.id === compelOffer.playerId);
+                if (p) {
+                  play.updPlayer(compelOffer.playerId, { fp: (p.fp || 0) + 1 });
+                  showToast('↩ Compel accepted — ' + compelOffer.playerName + ' gains 1 FP');
+                }
+              }
+              compelOffer = null;
+            }}>Accept (+1 FP)</button>
+          </div>
+        </div>
+      </div>
+    </div>
   {/if}
 
   <!-- Clear table modal -->

@@ -101,7 +101,7 @@
     const faces = [randomFace(), randomFace(), randomFace(), randomFace()];
 
     phase = 'flicker';
-    let flicks = $state(0);
+    let flicks = 0;
     if (flickerTimer) clearInterval(flickerTimer);
     flickerTimer = setInterval(() => {
       flickerFaces = [randomFace(), randomFace(), randomFace(), randomFace()];
@@ -111,7 +111,7 @@
         dice        = faces;
         phase       = 'reveal';
         revealCount = 0;
-        let idx = $state(0);
+        let idx = 0;
         if (revealTimer) clearInterval(revealTimer);
         revealTimer = setInterval(() => {
           idx++;
@@ -122,7 +122,7 @@
             result = raw;
             phase  = 'done';
             const skVal = sk.v != null ? sk.v : sk.r || 0;
-            let total = $state(raw + skVal);
+            let total = raw + skVal;
             if (pendingInvoke) total += 2;
             const entry = {
               who:   player ? player.name : '?',

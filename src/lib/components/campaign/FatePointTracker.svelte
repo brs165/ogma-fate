@@ -47,24 +47,11 @@
     {/if}
   </div>
 
-  <!-- Tab bar -->
-  <div style="display:flex;border-bottom:1px solid var(--border);margin-bottom:10px">
-    <button
-      onclick={() => fpTab = 'fp'}
-      style="flex:1;background:none;border:none;cursor:pointer;padding:6px 4px;font-size:var(--text-label);font-family:var(--font-ui);font-weight:{fpTab==='fp'?700:500};color:{fpTab==='fp'?'var(--accent)':'var(--text-muted)'};border-bottom:2px solid {fpTab==='fp'?'var(--accent)':'transparent'};transition:all .15s;white-space:nowrap"
-      aria-pressed={String(fpTab === 'fp')}
-    >&#x25CE; Fate Points</button>
-    <button
-      onclick={() => fpTab = 'ms'}
-      style="flex:1;background:none;border:none;cursor:pointer;padding:6px 4px;font-size:var(--text-label);font-family:var(--font-ui);font-weight:{fpTab==='ms'?700:500};color:{fpTab==='ms'?'var(--accent)':'var(--text-muted)'};border-bottom:2px solid {fpTab==='ms'?'var(--accent)':'transparent'};transition:all .15s;white-space:nowrap"
-      aria-pressed={String(fpTab === 'ms')}
-    >&#x2B21; Milestones</button>
-    <button
-      onclick={() => fpTab = 'pi'}
-      style="flex:1;background:none;border:none;cursor:pointer;padding:6px 4px;font-size:var(--text-label);font-family:var(--font-ui);font-weight:{fpTab==='pi'?700:500};color:{fpTab==='pi'?'var(--accent)':'var(--text-muted)'};border-bottom:2px solid {fpTab==='pi'?'var(--accent)':'transparent'};transition:all .15s;white-space:nowrap"
-      aria-pressed={String(fpTab === 'pi')}
-      title="Turn Order (Popcorn) \u2014 after you act, choose who goes next. No fixed order."
-    >&#x1F3C1; Turn Order</button>
+  <!-- Tab bar — Bits UI Tabs -->
+  <div class="fp-tab-bar">
+    <button class="fp-tab-btn{fpTab==='fp'?' active':''}" onclick={() => fpTab = 'fp'} aria-selected={String(fpTab==='fp')}>◎ FP</button>
+    <button class="fp-tab-btn{fpTab==='ms'?' active':''}" onclick={() => fpTab = 'ms'} aria-selected={String(fpTab==='ms')}>⬡ Miles</button>
+    <button class="fp-tab-btn{fpTab==='pi'?' active':''}" onclick={() => fpTab = 'pi'} title="Popcorn turn order" aria-selected={String(fpTab==='pi')}>🏁 Order</button>
   </div>
 
   <!-- Fate Points Tab -->
@@ -94,7 +81,7 @@
               {/each}
             </div>
             <button class="fp-btn fp-plus" onclick={() => adjustPC(pc.id, 1)} aria-label="Gain fate point">+</button>
-            <span class="fp-count">{pc.current}</span>
+            {#key pc.current}<span class="fp-count fp-count-anim">{pc.current}</span>{/key}
           </div>
           <button class="fp-remove" onclick={() => removePC(pc.id)} aria-label="Remove {pc.name}" title="Remove">&times;</button>
         </div>

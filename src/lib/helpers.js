@@ -1,4 +1,4 @@
-// helpers.js — Board utility functions (from react-source/core/ui-board.js L97-206)
+// helpers.js — Board utility functions: world tables, world meta, card title/summary/tags extraction
 // Pure functions: no Svelte imports, no DOM dependencies.
 
 export function generateBoardRoomCode() {
