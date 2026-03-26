@@ -15,7 +15,7 @@
     <p class="wiki-page-desc">A guided walkthrough of the Fate Condensed rules — everything a player needs, plus the extras a GM needs on top.</p>
 
     <div class="step-block" id="step-1">
-      <div class="step-num">Step 1</div>
+      <div class="step-num">1</div>
       <div class="step-title">Fiction first</div>
       <div class="step-body">
         <p>In Fate, you describe what your character does in the story, <strong>then</strong> choose the skill and action that fits. The fiction drives the rules, not the other way around. You don't say "I roll Athletics." You say "I leap over the counter and slide behind the bar" — and the GM says "that sounds like Athletics to overcome the obstacle."</p>
@@ -30,7 +30,7 @@
     </div>
 
     <div class="step-block" id="step-2">
-      <div class="step-num">Step 2</div>
+      <div class="step-num">2</div>
       <div class="step-title">Aspects — the core of everything</div>
       <div class="step-body">
         <p>An <strong>aspect</strong> is a short phrase that is true about a character, scene, or situation. "Burned-Out Corp Fixer," "Slippery Deck in the Storm," "The Crown Owes Me a Favour." Aspects do two things: you can <strong>invoke</strong> them (spend a fate point for +2 on a roll when they're relevant) or they can be <strong>compelled</strong> (the GM offers you a fate point to accept a complication).</p>
@@ -49,7 +49,7 @@
     </div>
 
     <div class="step-block" id="step-3">
-      <div class="step-num">Step 3</div>
+      <div class="step-num">3</div>
       <div class="step-title">Skills and dice</div>
       <div class="step-body">
         <p>Your character has 19 skills rated from +0 (Mediocre) to +4 (Great). When you act, you roll 4 Fate dice (each shows +1, 0, or −1), add the relevant skill, and compare to a target number. Results: <strong>Fail</strong> (below target), <strong>Tie</strong> (equal), <strong>Success</strong> (+1 or +2 over), <strong>Success with Style</strong> (+3 or more).</p>
@@ -65,7 +65,7 @@
     </div>
 
     <div class="step-block" id="step-4">
-      <div class="step-num">Step 4</div>
+      <div class="step-num">4</div>
       <div class="step-title">Fate points — the economy</div>
       <div class="step-body">
         <p>You start each session with at least 3 <strong>fate points</strong>. Spend one to <strong>invoke</strong> an aspect for +2 on a roll (or a reroll). Earn one when you accept a <strong>compel</strong> — the GM offers a fate point and a complication based on one of your aspects. You can refuse a compel by spending a fate point instead.</p>
@@ -81,7 +81,7 @@
     </div>
 
     <div class="step-block" id="step-5">
-      <div class="step-num">Step 5</div>
+      <div class="step-num">5</div>
       <div class="step-title">Stress and consequences</div>
       <div class="step-body">
         <p>When you take a hit, you absorb it with <strong>stress boxes</strong> (1 shift each, 3 per track by default — you can mark <em>as many as you need</em> per hit) or <strong>consequences</strong> (named aspects: Mild absorbs 2 shifts, Moderate absorbs 4, Severe absorbs 6). Stress clears at end of every scene. If you can't absorb all the shifts, you're <strong>taken out</strong> — the attacker narrates what happens. You can also <strong>concede</strong> before a roll to leave the scene on your terms and earn fate points.</p>
@@ -100,7 +100,7 @@
     </div>
 
     <div class="step-block" id="step-6">
-      <div class="step-num">Step 6</div>
+      <div class="step-num">6</div>
       <div class="step-title">Stunts and advancement</div>
       <div class="step-body">
         <p><strong>Stunts</strong> give your character a special edge: +2 to a specific skill in a specific situation, or a once-per-scene special ability. You start with 3 free; each extra costs 1 Refresh (minimum Refresh 1).</p>
@@ -133,7 +133,7 @@
     </div>
 
     <div class="step-block" id="step-7">
-      <div class="step-num">Step 7 — For the GM</div>
+      <div class="step-num">7 — For the GM</div>
       <div class="step-title">Running the game</div>
       <div class="step-body">
         <p>As a GM, your main tools are: <strong>compels</strong> (offer fate points to create complications), <strong>scene aspects</strong> (set the stage with invokable/compellable truths), <strong>NPCs</strong> (minor = 1-2 aspects, no consequences; major = full character sheet), and the <strong>GM fate point pool</strong> (1 per PC, shared across all NPCs).</p>
