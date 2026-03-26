@@ -11,6 +11,7 @@
 
   const CV4_HELP = {
     npc_minor: {
+      srd_url: '/fate-condensed/being-game-master#npcs',
       what: 'A supporting character with one aspect, one peak skill, and one stress box.',
       when: 'Shopkeepers, witnesses, bystanders \u2014 anyone who has one scene and a name.',
       rule: 'No consequences \u2014 one solid hit takes them out. Use the aspect as a compel hook immediately. Never give a minor NPC a second stress box by mistake; that turns them into a major NPC.',
@@ -18,6 +19,7 @@
       compel: 'The informant\u2019s weakness is \u201cDesperate for Coin\u201d. Compel it: someone offers them money mid-scene and they hesitate just long enough to blow the party\u2019s cover.',
     },
     npc_major: {
+      srd_url: '/fate-condensed/being-game-master#npcs',
       what: 'A full character: skill pyramid, stunts, dual stress tracks, and a complete aspect suite.',
       when: 'Recurring antagonists, key allies, anyone who survives a conflict and returns.',
       rule: 'Refresh = free invokes they can spend against the party. High Concept and Trouble are the most compellable aspects. Consequence recovery requires a treatment roll before timing starts.',
@@ -25,6 +27,7 @@
       compel: 'The same warlord\u2019s Trouble is \u201cI Never Forgive a Debt\u201d. Compel it when a PC who once helped them asks a favour \u2014 the warlord has to honour it, even when it costs them.',
     },
     faction: {
+      srd_url: '/fate-system-toolkit/factions',
       what: 'An organisation with a goal, method, structural weakness, and a human face.',
       when: 'Between sessions or when players ask who is behind something.',
       rule: 'Goal + Method = two sides of one faction aspect. The Face is the person the PCs deal with. The Weakness is how the faction can be disrupted without direct confrontation.',
@@ -32,6 +35,7 @@
       compel: 'The same faction aspect means a local chapter is starved of supplies. Compel it: a faction lieutenant asks the PCs to help, because they can\u2019t ask headquarters without losing face.',
     },
     scene: {
+      srd_url: '/fate-condensed/aspects-and-fate-points#situation-aspects',
       what: 'Situation aspects and zones that make a location mechanically and dramatically alive.',
       when: 'Before any scene where action is likely. Use framing questions to decide if the scene is worth playing.',
       rule: 'Scene aspects last until the fiction changes them. Free invokes reset each scene. Zones control movement.',
@@ -39,6 +43,7 @@
       compel: 'The same aspect: compel it mid-fight to cut off a PC\u2019s escape route. The storm arrived early and the exit zone is now impassable \u2014 here\u2019s a Fate point.',
     },
     campaign: {
+      srd_url: '/fate-condensed/getting-started#define-your-setting',
       what: 'A current issue, an impending threat, and setting aspects defining what kind of world this is.',
       when: 'Session zero, between arcs, or when the table needs a shared frame to pull against.',
       rule: 'Current issue = what is already on fire. Impending = what happens if they do not act. Both are aspects. Use them every session or they disappear.',
@@ -46,6 +51,7 @@
       compel: 'The impending issue is \u201cThe Rail Company Arrives in Sixty Days\u201d. Compel it: the company\u2019s advance scouts are already in town, asking questions, and they\u2019ve noticed the PCs.',
     },
     encounter: {
+      srd_url: '/fate-condensed/challenges-conflicts-and-contests#conflicts',
       what: 'A full conflict setup: opposition, zones, stakes, twist, and starting GM fate points.',
       when: 'Any scene with direct opposition. The twist fires mid-conflict, not in the first exchange.',
       rule: 'GM starts with 1 FP per PC. Always state victory and defeat conditions before the first roll. The twist is optional.',
@@ -53,6 +59,7 @@
       compel: 'A PC\u2019s trouble is relevant: they\u2019re \u201cKnown in Every Town\u201d. Compel it \u2014 a guard recognises them the moment they walk in and sounds the alarm.',
     },
     seed: {
+      srd_url: '/fate-condensed/getting-started',
       what: 'A 3-scene skeleton: opening, complication, climax. Drop-in ready for one session.',
       when: 'Session prep, unexpected cancellations, or when you need something playable in minutes.',
       rule: 'Do not add more scenes. The constraint is the design.',
@@ -60,6 +67,7 @@
       compel: 'The same aspect in the climax: compel a PC whose trouble relates to owing favours. They can\u2019t refuse the call for help, even though they know it\u2019s a trap.',
     },
     compel: {
+      srd_url: '/fate-condensed/aspects-and-fate-points#compels',
       what: 'A situation where an aspect makes things worse in exchange for a Fate point.',
       when: 'When a player aspect is relevant and making life harder would be more interesting.',
       rule: 'Event compels happen to the character. Decision compels require a hard choice. Player refuses by spending 1 FP.',
@@ -67,6 +75,7 @@
       compel: 'A PC\u2019s trouble is \u201cI Always Finish What I Start\u201d. Event compel: the building is on fire and the target escaped, but the evidence is still inside. Here\u2019s a Fate point \u2014 do you go in?',
     },
     challenge: {
+      srd_url: '/fate-condensed/challenges-conflicts-and-contests#challenges',
       what: 'A series of overcome rolls where each result matters and changes the fiction.',
       when: 'Extended tasks where failure at multiple stages has independent consequences.',
       rule: 'Each roll succeeds, fails, or ties independently. Declare all stakes before the first roll.',
@@ -74,6 +83,7 @@
       compel: 'Mid-challenge, a PC\u2019s High Concept \u201cSelf-Taught Mechanic\u201d gets compelled: the procedure requires training they don\u2019t have. They can solve it \u2014 but it will take an extra roll and a cost.',
     },
     contest: {
+      srd_url: '/fate-condensed/challenges-conflicts-and-contests#contests',
       what: 'Two sides competing for a goal, not fighting, but racing, arguing, or outmanoeuvring.',
       when: 'Chases, debates, political manoeuvring, escape sequences.',
       rule: 'Both sides roll every exchange. Three victories wins (default). Ties add a twist. The loser earns a Fate point.',
@@ -81,6 +91,7 @@
       compel: 'The PC is ahead in a footchase but their trouble is \u201cI Never Leave Anyone Behind\u201d. Compel it: an ally just tripped. Do they keep running or stop? Here\u2019s a Fate point.',
     },
     consequence: {
+      srd_url: '/fate-condensed/challenges-conflicts-and-contests#taking-harm',
       what: 'An aspect a character takes to absorb a hit instead of being taken out.',
       when: 'When stress will not cover the overflow and the player wants to stay in the scene.',
       rule: 'Mild = 2 shifts. Moderate = 4. Severe = 6. Recovery needs a treatment overcome roll first.',
@@ -88,6 +99,7 @@
       compel: 'Same consequence: compel it when the PC tries to climb a wall. \u201cYou\u2019re knocked around \u2014 the GM offers a Fate point. You can make the climb but you\u2019ll worsen the injury.\u201d',
     },
     complication: {
+      srd_url: '/fate-condensed/aspects-and-fate-points#situation-aspects',
       what: 'A new aspect that enters the scene and makes everything harder.',
       when: 'End of a scene that resolved cleanly, or when a scene needs a second wind.',
       rule: 'Complications arrive with at least one free invoke. Remove them only when the fiction justifies it.',
@@ -95,6 +107,7 @@
       compel: 'The complication is \u201cThe Safe House Is Compromised\u201d. Compel it when a PC tries to retreat there: they arrive and walk straight into an ambush. Fate point offered.',
     },
     pc: {
+      srd_url: '/fate-condensed/getting-started#create-your-characters',
       what: 'A complete Fate Condensed player character: 5 aspects, full skill pyramid, 3 stunts, stress tracks, and session zero questions.',
       when: 'Session zero, one-shots, or when a player needs an instant character. Generate 3\u20134, let players pick and customise.',
       rule: 'Skill pyramid: 1\u00d7+4, 2\u00d7+3, 3\u00d7+2, 4\u00d7+1. Refresh 3 with 3 free stunts. Physique/Will determine stress track length. All 3 consequence slots always open at creation.',
@@ -102,6 +115,7 @@
       compel: 'The same PC\u2019s Trouble is \u201cThe Map In My Head Has Never Been Wrong Before\u201d. Compel it when the map is wrong: they trusted it too long and now they\u2019re deep in hostile territory.',
     },
     backstory: {
+      srd_url: '/fate-condensed/getting-started#create-your-characters',
       what: 'Targeted questions that build a character history and create hooks into the campaign.',
       when: 'Session zero, or when a new player joins and needs weaving into the party.',
       rule: 'Every answer should name another PC or NPC and leave something unresolved. Hooks are invitations, never mandates.',
@@ -109,6 +123,7 @@
       compel: 'The same aspect: compel it when the settlement asks for something dangerous. \u201cYou owe them. Here\u2019s a Fate point if you agree even though it\u2019s a terrible idea.\u201d',
     },
     obstacle: {
+      srd_url: '/fate-condensed/optional-rules#obstacles',
       what: 'A passive threat that opposes the party without taking an action each exchange.',
       when: 'Environmental dangers, barriers, conditions. Anything that resists without acting in the conflict.',
       rule: 'Obstacles do not act in a conflict. Passive opposition = their rating. Disable by overcoming at rating + 2.',
@@ -116,6 +131,7 @@
       compel: 'The same obstacle: compel a PC whose trouble is \u201cI Can\u2019t Leave Anyone Behind\u201d. The water is rising and someone\u2019s stuck. Do they go back? Fate point on the table.',
     },
     countdown: {
+      srd_url: '/fate-condensed/optional-rules#countdowns',
       what: 'A ticking clock that creates urgency without requiring direct opposition.',
       when: 'Whenever players risk losing momentum, or a threat has a natural deadline.',
       rule: 'Fill one box per trigger. The last box fires the outcome, no roll, no negotiation. Show the track openly.',
@@ -123,6 +139,7 @@
       compel: 'Two boxes left. Compel a PC\u2019s trouble to fill one now: their impulsive action triggered the next stage early. Fate point, and the clock ticks forward.',
     },
     constraint: {
+      srd_url: '/fate-adversary-toolkit/constraints',
       what: 'A limitation that forces the party to change their approach rather than roll higher.',
       when: 'When the obvious solution is too easy, or a scene needs tactical texture without more enemies.',
       rule: 'Constraints do not deal stress, they change the rules. Bypass requires specific fiction, not a high roll.',
@@ -130,6 +147,7 @@
       compel: 'Same constraint. A PC goes for their weapon anyway \u2014 compel their impulsive trouble. Guards move. The room goes hostile. Fate point, and the negotiation just became a conflict.',
     },
     custom: {
+      srd_url: null,
       what: 'A blank card you fill in yourself \u2014 title, type, and notes all editable in place.',
       when: 'Any time the generators produce something close but not quite right, or you need to capture an improvised NPC, location, aspect, or clue right now.',
       rule: 'Click the title or notes to edit. Tap the type pill to cycle: Aspect \u2192 NPC \u2192 Location \u2192 Clue \u2192 Other. The type tints the card accent colour for quick visual scanning.',
@@ -176,13 +194,29 @@
        style:border-left="3px solid {catColor}"
        style:border-radius="0 2px 2px 0">
     <CvLabel label="TABLE RULE" color={catColor} />
-    <p style:margin="0"
+    <p style:margin="0 0 4px"
        style:font-size="11px"
        style:color="var(--cv-card-text-dim)"
        style:line-height="1.7"
        style:font-family={CV4_BODY}>
       {help.rule}
     </p>
+    {#if help.srd_url}
+      <a href="https://fate-srd.com{help.srd_url}"
+         style:font-size="10px"
+         style:font-weight="700"
+         style:color={catColor}
+         style:opacity="0.8"
+         style:text-decoration="none"
+         style:letter-spacing="0.06em"
+         style:display="inline-flex"
+         style:align-items="center"
+         style:gap="3px"
+         target="_blank"
+         rel="noreferrer noopener"
+         aria-label="Read on the Fate SRD (opens in new tab)"
+      >SRD &#8599;</a>
+    {/if}
   </div>
 
   <!-- Invoke + Compel examples -->
