@@ -163,6 +163,7 @@
           setTimeout(() => fitAll(), 120);
         }
         setTimeout(() => {
+          if (mode !== 'prep') return;
           const currentBinder = get(binder.binderCards);
           if (currentBinder && currentBinder.length > 0) {
             canvas.loadBinderToCanvas(currentBinder);
@@ -460,6 +461,7 @@
     onExportCanvas={canvas ? canvas.exportCanvas : () => {}}
     onImportCanvas={canvas ? canvas.importCanvas : () => {}}
     onPrint={() => showToast('Print not yet available')}
+    onBack={() => { leftOpen = true; leftTab = 'gen'; }}
   />
 
   <!-- ── Body: left panel + canvas column ──────────────────────────────────── -->

@@ -2282,7 +2282,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .board-turn-bar::-webkit-scrollbar{display:none}
 
 .board-app~*{display:none}
-.board-app{display:flex;flex-direction:column;height:100vh;overflow:hidden;background:var(--bg);font-family:var(--font-ui,'Segoe UI',system-ui,sans-serif)}
+.board-app{display:flex;flex-direction:column;position:fixed;inset:0;z-index:200;overflow:hidden;background:var(--bg);font-family:var(--font-ui,'Segoe UI',system-ui,sans-serif)}
 
 /* Topbar */
 .bt-bar{height:46px;background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:10px;flex-shrink:0;z-index:50}
@@ -3852,6 +3852,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 /* ── Per-card positioner ─────────────────────────────────────────────────── */
 .cv-card-pos {
   position:absolute; pointer-events:all;
+  width:646px;
   cursor:grab; touch-action:none;
   transition:opacity 0.15s;
 }

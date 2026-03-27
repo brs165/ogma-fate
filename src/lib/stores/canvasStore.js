@@ -9,7 +9,7 @@ import { boardUid, extractCardTitle, extractCardSummary, extractCardTags, STICKY
 export function generateSzPack(pcDrafts, campId, campName, campData, mode) {
   const tables = filteredTables(mergeUniversal(campData.tables || {}), {});
   const allCards = [];
-  const CARD_W = 360, CARD_GAP = 24, COLS = 3;
+  const CARD_W = 646, CARD_GAP = 24, COLS = 2;
 
   // Campaign Frame card
   try {
@@ -135,8 +135,8 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
         y: y !== undefined ? y : lastPlaced.y,
         z: Date.now(), ts: Date.now(), gmOnly: false,
       };
-      lastPlaced.col = (lastPlaced.col + 1) % 3;
-      if (lastPlaced.col === 0) { lastPlaced.x = 60; lastPlaced.y += 420; } else { lastPlaced.x += 340; }
+      lastPlaced.col = (lastPlaced.col + 1) % 2;
+      if (lastPlaced.col === 0) { lastPlaced.x = 60; lastPlaced.y += 700; } else { lastPlaced.x += 670; }
       mutate(prev => prev.concat([customCard]));
       showToast('✎ Custom Card added — click title or notes to edit');
       return;
@@ -152,8 +152,8 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
       cardX = x; cardY = y;
     } else {
       cardX = lastPlaced.x; cardY = lastPlaced.y;
-      lastPlaced.col = (lastPlaced.col + 1) % 3;
-      if (lastPlaced.col === 0) { lastPlaced.x = 60; lastPlaced.y += 420; } else { lastPlaced.x += 340; }
+      lastPlaced.col = (lastPlaced.col + 1) % 2;
+      if (lastPlaced.col === 0) { lastPlaced.x = 60; lastPlaced.y += 700; } else { lastPlaced.x += 670; }
     }
     const card = {
       id: boardUid(), genId,
@@ -302,9 +302,10 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
     const existing = get(cards);
     if (existing.length > 0) return;
 
-    const CARD_W = 360;
+    const CARD_W = 646;
     const CARD_GAP = 24;
-    const COLS = 3;
+    const COLS = 2;
+    const ROW_H = 700;
     const START_X = 24;
     const START_Y = 24;
 
@@ -319,7 +320,7 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
         tags: bc.tags || extractCardTags(bc.genId, bc.data || {}),
         data: bc.data,
         x: START_X + col * (CARD_W + CARD_GAP),
-        y: START_Y + row * (CARD_W + CARD_GAP),
+        y: START_Y + row * ROW_H,
         z: Date.now() + i,
         ts: Date.now(),
         gmOnly: false,

@@ -2,7 +2,7 @@
   import ExportMenu from './ExportMenu.svelte';
   import { ToggleGroup, Select, DropdownMenu } from 'bits-ui';
 
-  let { campMeta = {}, mode = 'prep', onModeChange = () => {}, campId = '', onCampChange = () => {}, isOnline = true, sync = {}, panels = {}, counts = {}, exportActions = {}, cards = [], campName = '', onExportCanvas = () => {}, onImportCanvas = () => {}, onPrint = () => {}, onToggleMobileList = null, mobileListView = false, onExportView = null } = $props();
+  let { campMeta = {}, mode = 'prep', onModeChange = () => {}, campId = '', onCampChange = () => {}, isOnline = true, sync = {}, panels = {}, counts = {}, exportActions = {}, cards = [], campName = '', onExportCanvas = () => {}, onImportCanvas = () => {}, onPrint = () => {}, onToggleMobileList = null, mobileListView = false, onExportView = null, onBack = null } = $props();
 
   let syncStatus = $derived(sync.status || 'offline');
   let roomCode   = $derived(sync.roomCode || '');
@@ -57,7 +57,11 @@
 
   <!-- World picker — Bits UI Select -->
   <div class="bt-world">
-    <a href="/campaigns/{campId}" class="bt-back" title="Back to generator">&larr;</a>
+    {#if onBack}
+      <button class="bt-back" onclick={onBack} title="Back to generator">&larr;</button>
+    {:else}
+      <a href="/campaigns/{campId}" class="bt-back" title="Back to generator">&larr;</a>
+    {/if}
     <Select.Root
       type="single"
       value={campId}
