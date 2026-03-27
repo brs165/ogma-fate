@@ -10,8 +10,7 @@ Generate world-specific content, run sessions, track players — all in one tab.
 ## Features
 
 - 17 generators × 8 campaign worlds (136 generator/world combinations)
-- Freeform canvas (SvelteFlow) — generate cards, arrange, connect, annotate
-- Play mode — turn order, fate points, stress, consequences, GM pool
+- Freeform canvas — generate cards, arrange, connect, annotate (native pan/zoom)
 - Session Zero — guided world/character setup → export to prep canvas
 - Offline-first PWA — works without internet after first load
 - Multiplayer — players join via room code, see GM canvas in real time
@@ -22,7 +21,7 @@ Generate world-specific content, run sessions, track players — all in one tab.
 ## Stack
 
 - **SvelteKit** + **Svelte 5** (runes: `$state`, `$derived`, `$props`)
-- **@xyflow/svelte** — canvas pan/zoom/connect
+- **Native canvas** — pointer/wheel pan-zoom (OgmaCanvas.svelte, SvelteFlow removed v662)
 - **bits-ui** — accessible headless UI components
 - **Font Awesome 7.2 Free** — icons (cached by SW for offline)
 - **Dexie 4** — IndexedDB persistence
@@ -66,8 +65,7 @@ See `docs/claude/` for session bootstrap, project memory, team voices, and world
 1. All styling in `static/assets/css/theme.css` — no `<style>` blocks
 2. `engine.js` and `db.js` are pure JS — no Svelte imports
 3. Svelte 5 runes everywhere — `$state()`, `$derived()`, `$props()`
-4. SvelteFlow `nodes`/`edges` must be `writable()` stores, not `$state([])`
-5. Card components must not have `left/top` style or `onmousedown` drag — SvelteFlow owns that
+4. Canvas cards must not have `left/top` on the component — only the `.cv-card-positioner` wrapper
 
 ---
 
@@ -92,4 +90,5 @@ See `LICENSING.md` for full attribution.
 ## History
 
 Built March 2026. Original React 18 CDN UMD codebase migrated to SvelteKit + Svelte 5.
+SvelteFlow canvas replaced with native pointer/wheel canvas in v662.
 The `react-source/` directory contains the original codebase (read-only reference).

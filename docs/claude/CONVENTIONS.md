@@ -27,42 +27,24 @@ $effect(() => {
 let { children } = $props();
 {@render children?.()}
 
+<!-- $state.raw — for objects always replaced wholesale, no deep proxy needed -->
+let cardState = $state.raw({ phyHit: [], menHit: [] });
+function update(patch) { cardState = Object.assign({}, cardState, patch); }
+
+<!-- Intra-component snippet — eliminates copy-pasted markup blocks -->
+{#snippet conRow(label, cls)}
+  <div class="fs-con-row">
+    <span class="fs-con-label {cls}">{label}</span>
+    <div class="fs-con-line"></div>
+  </div>
+{/snippet}
+{@render conRow('Mild (2)', 'fs-con-label-mild')}
+{@render conRow('Moderate (4)', 'fs-con-label-mod')}
+
 <!-- NO $state() inside functions -->
 function doThing() {
   let local = 0;  // plain let is fine for function-local vars
 }
-```
-
-## SvelteFlow 1.5.1 rules
-
-```js
-// flowNodes and flowEdges MUST be plain $state arrays
-let flowNodes = $state([]);
-let flowEdges = $state([]);
-
-// Subscribe and assign — NOT .set()
-canvas.nodes.subscribe(v => flowNodes = v);
-canvas.edges.subscribe(v => flowEdges = v);
-
-// Update via reassignment — NOT .update()
-flowNodes = flowNodes.map(n => ({ ...n, selected: true }));
-
-// Use bind:nodes / bind:edges on <SvelteFlow>
-<SvelteFlow bind:nodes={flowNodes} bind:edges={flowEdges}>
-
-// Callback props — NOT on: dispatchers
-onnodedragstop={({ nodes }) => { ... }}    // NOT on:nodedragstop
-onnodeclick={({ node }) => { ... }}        // NOT on:nodeclick
-onconnect={(connection) => { ... }}        // NOT on:connect
-ondelete={({ edges }) => { ... }}          // NOT on:edgedelete
-onedgeclick={({ edge }) => { ... }}        // NOT on:edgeclick
-
-// Prop names
-multiSelectionKey="Shift"                  // NOT multiSelectionKeyCode
-
-// nodeTypes MUST be at module level
-import { nodeTypes } from './nodeTypes.js';
-// Never: $derived({ ... }) or inside initStores()
 ```
 
 ## CSS rules
@@ -70,7 +52,7 @@ import { nodeTypes } from './nodeTypes.js';
 - All styling in `static/assets/css/theme.css`
 - No `<style>` blocks in components
 - Use CSS custom properties (`var(--accent)`, `var(--bg)`) not hardcoded colours
-- SvelteFlow nodes: no `position:absolute`, no `left/top` on card components
+- Canvas cards: no `position:absolute`, no `left/top` on card components — `.cv-card-positioner` wrapper owns that
 
 ## File naming
 

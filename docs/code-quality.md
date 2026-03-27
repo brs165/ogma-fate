@@ -54,45 +54,15 @@ function doThing() {
 }
 ```
 
----
-
-## SvelteFlow patterns
-
-### flowNodes and flowEdges MUST be plain $state arrays
+### `$state.raw` — wholesale-replaced objects
 ```js
-// ✅ CORRECT — SvelteFlow 1.5.1 expects plain arrays
-let flowNodes = $state([]);
-canvas.nodes.subscribe(v => flowNodes = v);
+// ✅ CORRECT — always replaced via Object.assign, no deep proxy needed
+let cardState = $state.raw({ phyHit: [], menHit: [] });
+function updState(patch) { cardState = Object.assign({}, cardState, patch); }
 
-// ❌ WRONG — writable() stores crash SvelteFlow ("t is not iterable")
-let flowNodes = writable([]);
-canvas.nodes.subscribe(v => flowNodes.set(v));
+// ❌ UNNECESSARY — deep proxy overhead for an object never mutated in-place
+let cardState = $state({ phyHit: [], menHit: [] });
 ```
-
-### SvelteFlow events use callback props, not on: dispatchers
-```js
-// ✅ CORRECT — SvelteFlow 1.5.1 callback props
-onnodedragstop={({ nodes }) => { ... }}
-onconnect={(connection) => { ... }}
-ondelete={({ edges }) => { ... }}
-
-// ❌ WRONG — old Svelte 4 dispatch syntax
-on:nodedragstop={(e) => { e.detail.nodes ... }}
-on:connect={(e) => { e.detail ... }}
-```
-
-### nodeTypes MUST be at module level
-```js
-// ✅ CORRECT — in nodeTypes.js, imported at top of Board.svelte
-export const nodeTypes = { ... };
-
-// ❌ WRONG — inside component or reactive block
-let nodeTypes = $derived({ ... });
-```
-
-### Card components must not position themselves
-SvelteFlow positions node containers via CSS transform.
-Card components must not set `left`, `top`, `position:absolute`, or handle `mousedown` drag.
 
 ---
 
@@ -133,7 +103,7 @@ border: 1px solid var(--border);
 | `theme.css` | no limit | Single file by design — global styles |
 
 **Exception:** `Board.svelte` is intentionally large (~800 lines) because it is
-the main app shell coordinating all stores, panels, and the SvelteFlow canvas.
+the main app shell coordinating all stores, panels, and the native canvas.
 It should not be split unless a clear sub-component boundary emerges.
 
 ---
@@ -163,15 +133,11 @@ export function createCanvasStore(key, tables, showToast) {
 `static/assets/css/theme.css` is hand-authored, not compiled from Sass/Tailwind.
 This keeps the deploy pipeline simple and the CSS legible.
 
-**2. SvelteFlow for canvas, not custom drag**
-The previous custom drag/pan/zoom system (direct DOM `mousemove`) was replaced by
-SvelteFlow in March 2026. SvelteFlow owns all canvas interaction. Card components
-must not reintroduce drag logic.
-
-**3. Context for canvas callbacks**
-`Board.svelte` sets Svelte context (`ogma_canvas`) with getter functions so node
-components can call canvas operations without prop drilling through SvelteFlow.
-Context getters must be live references — avoid capturing stale closures.
+**2. Native canvas, not a canvas library**
+The original custom drag system and the SvelteFlow replacement were both superseded
+by `OgmaCanvas.svelte` in v662 — a ~250-line native pointer/wheel pan-zoom canvas.
+SvelteFlow (`@xyflow/svelte`) is NOT installed. Card components must not introduce
+drag logic; `.cv-card-positioner` wrappers own all position.
 
 **4. IDB for everything persistent**
 All canvas state, play state, player state, binder cards — persisted to IndexedDB

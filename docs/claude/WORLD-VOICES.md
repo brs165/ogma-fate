@@ -37,10 +37,10 @@ Each world has a distinct register that table content must honour.
 
 | Constraint | Notes |
 |---|---|
-| No build step | Source files = deployed files. No compilation. |
-| React 18 CDN UMD | `h()` alias, no JSX |
+| SvelteKit + Vite 7 | `npm run build` → `build/`. No CDN UMD. |
 | Offline-first | All content must work without network after first load |
-| No backend | All generator logic is client-side in `core/engine.js` |
+| No backend | All generator logic is client-side in `src/lib/engine.js` |
+| Native canvas | `OgmaCanvas.svelte` — no `@xyflow/svelte` |
 
 ---
 
