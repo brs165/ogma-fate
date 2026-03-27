@@ -3941,7 +3941,7 @@ g:hover .cv-edge-label-bg { fill:color-mix(in srgb,var(--accent) 12%,var(--panel
 
 /* ── Zoom controls ──────────────────────────────────────────────────────── */
 .cv-controls {
-  position:absolute; bottom:16px; right:16px; z-index:10;
+  position:absolute; bottom:16px; right:16px; z-index:12;
   display:flex; flex-direction:column; gap:3px;
 }
 .cv-ctrl-btn {
@@ -3959,7 +3959,7 @@ g:hover .cv-edge-label-bg { fill:color-mix(in srgb,var(--accent) 12%,var(--panel
 
 /* ── Minimap ────────────────────────────────────────────────────────────── */
 .cv-minimap {
-  position:absolute; bottom:108px; right:16px; z-index:10;
+  position:absolute; bottom:16px; left:16px; z-index:10;
   width:140px; height:90px;
   background:var(--glass-bg); border:1px solid var(--border-mid);
   border-radius:var(--fd-stamp-radius,3px); overflow:hidden;
