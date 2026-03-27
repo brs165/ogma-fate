@@ -98,6 +98,7 @@
   // ── Pan (drag on empty canvas) ────────────────────────────────────────────
   function onWrapPointerDown(e) {
     if (e.target.closest('.cv-card-pos')) return;
+    if (e.target.closest('.cv-controls')) return;
     if (e.button !== 0) return;
     panDrag = { startX: e.clientX, startY: e.clientY, startPanX: panX, startPanY: panY };
     if (cvWrap) cvWrap.setPointerCapture(e.pointerId);

@@ -269,7 +269,6 @@
           <Collapsible.Trigger class="sb-acc-hdr{sbAcc === 'table' ? ' is-open' : ''}">
             <span aria-hidden="true" class="sb-acc-sec-ico"><i class="fa-solid fa-table-cells"></i></span>
             <span class="sb-acc-sec-name">Table</span>
-            <span aria-hidden="true" class="sb-acc-chev"><i class="fa-solid fa-chevron-right"></i></span>
           </Collapsible.Trigger>
           <Collapsible.Content class="sb-acc-body">
             <button class="sb-acc-item" onclick={toggleTableFull} aria-pressed={String(tableFull)}>
@@ -289,7 +288,6 @@
             <span aria-hidden="true" class="sb-acc-sec-ico"><i class="fa-solid fa-dice-d20"></i></span>
             <span class="sb-acc-sec-name">Generate</span>
             <span aria-hidden="true" class="sb-acc-meta">{gen ? gen.label.split(' ').slice(0, 2).join(' ') : ''}</span>
-            <span aria-hidden="true" class="sb-acc-chev"><i class="fa-solid fa-chevron-right"></i></span>
           </Collapsible.Trigger>
           <Collapsible.Content class="sb-acc-body sb-acc-generate-body">
             {#each GENERATOR_GROUPS as group (group.id)}
@@ -316,7 +314,6 @@
           <Collapsible.Trigger class="sb-acc-hdr sb-acc-hdr-settings{sbAcc === 'settings' ? ' is-open' : ''}">
             <span aria-hidden="true" class="sb-acc-sec-ico sb-acc-sec-ico-sm"><i class="fa-solid fa-gear"></i></span>
             <span class="sb-acc-sec-name sb-acc-sec-name-muted">Settings</span>
-            <span aria-hidden="true" class="sb-acc-chev"><i class="fa-solid fa-chevron-right"></i></span>
           </Collapsible.Trigger>
           <Collapsible.Content class="sb-acc-body">
             <button class="sb-acc-item" onclick={toggleTheme}>
