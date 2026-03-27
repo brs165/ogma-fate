@@ -12,7 +12,8 @@
       {@render children?.()}
     </Tooltip.Trigger>
     <Tooltip.Portal>
-      <Tooltip.Content sideOffset={6}>
+      <Tooltip.Content sideOffset={8}>
+        <Tooltip.Arrow />
         {tip}
       </Tooltip.Content>
     </Tooltip.Portal>

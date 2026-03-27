@@ -250,12 +250,16 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
       summary: extractCardSummary(genId, data),
       tags: extractCardTags(genId, data),
       data,
-      x: x !== undefined ? x : 80,
-      y: y !== undefined ? y : 80,
+      x: x !== undefined ? x : lastPlaced.x,
+      y: y !== undefined ? y : lastPlaced.y,
       z: Date.now(),
       ts: Date.now(),
       gmOnly: false,
     };
+    if (x === undefined) {
+      lastPlaced.col = (lastPlaced.col + 1) % 3;
+      if (lastPlaced.col === 0) { lastPlaced.x = 60; lastPlaced.y += 420; } else { lastPlaced.x += 340; }
+    }
     mutate(prev => prev.concat([card]));
     if (showToast) showToast('Session Zero PC added to canvas');
   }
@@ -353,6 +357,25 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
     mutate(prev => prev.concat([sticky]));
   }
 
+  function autoArrange() {
+    var current = get(cards);
+    if (!current.length) return;
+    var sorted = current.slice().sort(function(a, b) { return (a.ts || 0) - (b.ts || 0); });
+    var COLS = 3, CW = 680, CH = 440, PX = 60, PY = 60;
+    var next = current.map(function(c) {
+      var idx = sorted.indexOf(c);
+      return Object.assign({}, c, {
+        x: PX + (idx % COLS) * CW,
+        y: PY + Math.floor(idx / COLS) * CH,
+      });
+    });
+    cards.set(next);
+    persistCanvas(next);
+    lastPlaced.col = sorted.length % COLS;
+    lastPlaced.x = PX + lastPlaced.col * (lastPlaced.col > 0 ? 340 : 0);
+    lastPlaced.y = PY + Math.floor(sorted.length / COLS) * 420;
+  }
+
   return {
     cards, loaded, connectors, groups,
     getCards: () => get(cards),
@@ -363,6 +386,6 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
     addGroup, updateGroup, deleteGroup,
     clearCanvas,
     addStickyWithText,
-    undoLast, exportCanvas, importCanvas, importCards,
+    undoLast, exportCanvas, importCanvas, importCards, autoArrange,
   };
 }

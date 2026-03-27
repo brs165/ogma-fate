@@ -68,7 +68,7 @@
   // Reactive values from stores
   let toast = $state(null);
   let isOnline = $state(true);
-  let activeGen = $state('npc_minor');
+  let activeGen = $state('seed');
   let result = $state(null);
   let rolling = $state(false);
   let consequenceSev = $state('');

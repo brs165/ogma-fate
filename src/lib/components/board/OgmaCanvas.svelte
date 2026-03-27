@@ -39,6 +39,9 @@
     onCtxTemplate   = null,
     ctxTemplates    = [],
     onEdgeCoach     = null,
+    onClearTable    = null,
+    onAutoArrange   = null,
+    onExportModal   = null,
     toast           = null,
     showToast       = null,
   } = $props();
@@ -408,10 +411,16 @@
   {/if}
 
   <!-- Zoom controls -->
-  <div class="cv-controls" aria-label="Canvas zoom controls">
-    <button class="cv-ctrl-btn" onclick={() => adjustZoom(0.15)}  aria-label="Zoom in"      >+</button>
-    <button class="cv-ctrl-btn" onclick={() => adjustZoom(-0.15)} aria-label="Zoom out"     >−</button>
+  <div class="cv-controls" aria-label="Canvas controls">
+    <button class="cv-ctrl-btn" onclick={() => adjustZoom(0.15)}  aria-label="Zoom in">+</button>
+    <button class="cv-ctrl-btn" onclick={() => adjustZoom(-0.15)} aria-label="Zoom out">−</button>
     <button class="cv-ctrl-btn" onclick={fitAll}                  aria-label="Fit all cards">⊡</button>
+    {#if cards.length > 0}
+      <div class="cv-ctrl-sep" aria-hidden="true"></div>
+      <button class="cv-ctrl-btn" onclick={onAutoArrange} aria-label="Auto-arrange cards">⊞</button>
+      <button class="cv-ctrl-btn" onclick={onExportModal} aria-label="Export / Import">↓</button>
+      <button class="cv-ctrl-btn cv-ctrl-danger" onclick={onClearTable} aria-label="Clear table">✕</button>
+    {/if}
   </div>
 
   <!-- Minimap -->
