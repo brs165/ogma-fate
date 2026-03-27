@@ -39,7 +39,7 @@
   let tables   = $derived(getWorldTables(campId));
 
   // ── UI state ───────────────────────────────────────────────────────────────
-  let activeGen    = $state('npc_minor');
+  let activeGen    = $state('seed');
   let leftTab      = $state('gen');
   let theme        = $state('dark');
   let isOnline     = $state(typeof navigator !== 'undefined' ? navigator.onLine : true);
@@ -224,6 +224,7 @@
     if (dossierCard) { if (e.key === 'Escape') dossierCard = null; return; }
     if (e.key === 'Escape') return;
     if (e.code === 'Space' && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+      if (embedded) return;  // split-view Space handled by Campaign.svelte
       e.preventDefault();
       if (canvas) canvas.generateCard(activeGen);
     } else if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
@@ -388,6 +389,9 @@
           onCtxTemplate={(tplId) => dropTemplate(tplId, ctx?.canvasX ?? 60, ctx?.canvasY ?? 60)}
           ctxTemplates={CANVAS_TEMPLATES}
           onEdgeCoach={() => { if (!coachEdge) { coachEdge = true; showToast('\u21D4 Click line to cycle label'); } }}
+          onClearTable={() => { showClearModal = true; }}
+          onAutoArrange={() => { if (canvas) canvas.autoArrange(); setTimeout(() => fitAll(), 150); }}
+          onExportModal={() => { showExportModal = true; }}
           showToast={showToast}
         />
       {/if}
