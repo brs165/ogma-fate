@@ -54,7 +54,7 @@
   onkeydown={onKeyDown}
 >
   <div class="bc-actions nodrag nopan">
-    <button class="bc-btn" title="Delete"
+    <button class="bc-btn" aria-label="Delete boost"
       onclick={(e) => { e.stopPropagation(); (() => onDelete && onDelete(card.id))(e); }}>✕</button>
   </div>
 
@@ -89,8 +89,7 @@
     {:else}
       <button
         class="boost-use-btn"
-        title="Use free invoke — boost expires after use"
-        aria-label="Use boost free invoke"
+        aria-label="Use free invoke — boost expires after use"
         onclick={useInvoke}
       >● Use Invoke</button>
     {/if}

@@ -7,6 +7,7 @@
   import DB, { LS } from '../../db.js';
   import Cv4Card from '../cards/Cv4Card.svelte';
   import Board from '../board/Board.svelte';
+  import { Collapsible } from 'bits-ui';
 
   let { campId = 'fantasy' } = $props();
 
@@ -18,10 +19,46 @@
   let theme = $state('dark');
   let showSidebar = $state(false);
   let sbAcc = $state('generate');
-  let canvasView = $state(false);
   let prefs = { excluded: {}, locked: {}, custom: {} };
   let universalMerge = $state(true);
   let gmMode = $state(true);
+
+  // ── Split layout state ─────────────────────────────────────────────────────
+  // tableFull: generator hidden, table takes all content area
+  // tableOpen: on mobile, whether the bottom-sheet table is visible
+  let tableFull  = $state(false);
+  let tableOpen  = $state(false); // mobile only
+  let boardRef   = $state();      // bind:this on Board for sendToTable etc
+
+  // Split ratio: fraction of content-panel width for generator column (0.3–0.7)
+  const RATIO_KEY = 'ogma_split_ratio_' + campId;
+  let splitRatio = $state(() => {
+    try { const v = parseFloat(localStorage.getItem(RATIO_KEY)); return (v >= 0.2 && v <= 0.8) ? v : 0.5; } catch { return 0.5; }
+  });
+  let draggingDivider = $state(false);
+  let splitRoot = $state(); // bind:this on .cp-split-root
+
+  function onDividerPointerDown(e) {
+    if (tableFull) return;
+    e.preventDefault();
+    draggingDivider = true;
+    e.currentTarget.setPointerCapture(e.pointerId);
+  }
+  function onDividerPointerMove(e) {
+    if (!draggingDivider || !splitRoot) return;
+    const rect = splitRoot.getBoundingClientRect();
+    let ratio = (e.clientX - rect.left) / rect.width;
+    // Snap to thirds
+    const SNAPS = [0.3, 0.5, 0.7];
+    const snapped = SNAPS.find(s => Math.abs(ratio - s) < 0.04);
+    ratio = snapped ?? Math.max(0.2, Math.min(0.8, ratio));
+    splitRatio = ratio;
+  }
+  function onDividerPointerUp() {
+    if (!draggingDivider) return;
+    draggingDivider = false;
+    try { localStorage.setItem(RATIO_KEY, String(splitRatio)); } catch {}
+  }
 
   // ── Stores ─────────────────────────────────────────────────────────────────
   let chrome = $state();
@@ -94,10 +131,10 @@
     // Check canvas param
     try {
       const params = new URLSearchParams(window.location.search);
-      if (params.get('canvas') === '1') canvasView = true;
+      if (params.get('table') === '1') tableFull = true;
     } catch (e) {}
 
-    // Session Zero auto-populate
+    // Session Zero auto-populate (legacy path)
     try {
       const szRaw = localStorage.getItem('ogma_sz_seed');
       const szParams = new URLSearchParams(window.location.search);
@@ -106,7 +143,6 @@
         localStorage.removeItem('ogma_sz_seed');
         if (seed.campId === campId && seed._sz_auto_pc) {
           setTimeout(() => {
-            canvasView = true;
             import('../../engine.js').then(({ generate: gen, mergeUniversal: mu, filteredTables: ft }) => {
               const campData = CAMPAIGNS[campId];
               if (!campData || !campData.tables) return;
@@ -119,6 +155,30 @@
       }
     } catch(e) {
       console.warn('[Ogma] sz seed read failed:', e);
+    }
+
+    // Session Zero handoff — Send All to Table path
+    try {
+      const szParams = new URLSearchParams(window.location.search);
+      if (szParams.get('sz') === '1') {
+        const handoffRaw = sessionStorage.getItem('ogma_sz_handoff');
+        if (handoffRaw) {
+          sessionStorage.removeItem('ogma_sz_handoff');
+          const handoff = JSON.parse(handoffRaw);
+          if (handoff.campId === campId && Array.isArray(handoff.cards) && handoff.cards.length) {
+            // Dispatch after board has mounted and canvasStore is ready
+            setTimeout(() => {
+              handoff.cards.forEach((c, i) => {
+                setTimeout(() => {
+                  if (boardRef) boardRef.sendToTable(c.genId, c.data);
+                }, i * 80); // stagger so cards land in a readable grid
+              });
+            }, 500);
+          }
+        }
+      }
+    } catch(e) {
+      console.warn('[Ogma] sz handoff failed:', e);
     }
   });
 
@@ -150,8 +210,10 @@
 
   function toggleAcc(s) { sbAcc = sbAcc === s ? null : s; }
 
-  function openCanvas() { canvasView = true; showSidebar = false; }
-  function closeCanvas() { canvasView = false; }
+  function toggleTableFull() { tableFull = !tableFull; }
+  function sendToTable() {
+    if (result && boardRef) boardRef.sendToTable(result.genId, result.data);
+  }
 
   // ── Keyboard ───────────────────────────────────────────────────────────────
   function onKey(e) {
@@ -206,57 +268,38 @@
 
       <div class="sb-acc" role="navigation" aria-label="Campaign navigation">
 
-        <!-- PLAY section -->
-        <div class="sb-acc-sec">
-          <button
-            class="sb-acc-hdr" class:is-open={sbAcc === 'play'}
-            onclick={() => toggleAcc('play')}
-            aria-expanded={String(sbAcc === 'play')}
-          >
-            <span aria-hidden="true" class="sb-acc-sec-ico"><i class="fa-solid fa-play"></i></span>
-            <span class="sb-acc-sec-name">Play</span>
-            <span aria-hidden="true" class="sb-acc-meta">{isOnline ? 'online' : 'offline'}</span>
+        <!-- TABLE section -->
+        <Collapsible.Root open={sbAcc === 'table'} onOpenChange={(o) => { sbAcc = o ? 'table' : null; }} class="sb-acc-sec">
+          <Collapsible.Trigger class="sb-acc-hdr{sbAcc === 'table' ? ' is-open' : ''}">
+            <span aria-hidden="true" class="sb-acc-sec-ico"><i class="fa-solid fa-table-cells"></i></span>
+            <span class="sb-acc-sec-name">Table</span>
             <span aria-hidden="true" class="sb-acc-chev"><i class="fa-solid fa-chevron-right"></i></span>
-          </button>
-          {#if sbAcc === 'play'}
-            <div class="sb-acc-body" role="group" aria-label="Play tools">
-              <button class="sb-acc-item" class:active={canvasView} onclick={openCanvas} aria-pressed={String(canvasView)}>
-                <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-solid fa-table-cells"></i></span>
-                <span class="sidebar-item-label">Prep & Play</span>
-                {#if pinnedCards.length > 0}
-                  <span class="sb-count-badge" aria-hidden="true">{pinnedCards.length}</span>
-                {/if}
-              </button>
-              <button class="sb-acc-item" onclick={() => { canvasView = true; showSidebar = false; }}>
-                <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-solid fa-arrow-down"></i></span>
-                <span class="sidebar-item-label">Export Cards</span>
-              </button>
-              <button class="sb-acc-item" onclick={() => { showSidebar = false; }}>
-                <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-solid fa-pen-to-square"></i></span>
-                <span class="sidebar-item-label">Session Notes</span>
-              </button>
-            </div>
-          {/if}
-        </div>
+          </Collapsible.Trigger>
+          <Collapsible.Content class="sb-acc-body">
+            <button class="sb-acc-item" onclick={toggleTableFull} aria-pressed={String(tableFull)}>
+              <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-solid {tableFull ? 'fa-compress' : 'fa-expand'}"></i></span>
+              <span class="sidebar-item-label">{tableFull ? 'Split view' : 'Full Table'}</span>
+            </button>
+            <button class="sb-acc-item" onclick={() => { tableOpen = !tableOpen; showSidebar = false; }}>
+              <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-solid fa-mobile-screen"></i></span>
+              <span class="sidebar-item-label">Table on mobile</span>
+            </button>
+          </Collapsible.Content>
+        </Collapsible.Root>
 
         <!-- GENERATE section -->
-        <div class="sb-acc-sec">
-          <button
-            class="sb-acc-hdr" class:is-open={sbAcc === 'generate'}
-            onclick={() => toggleAcc('generate')}
-            aria-expanded={String(sbAcc === 'generate')}
-          >
+        <Collapsible.Root open={sbAcc === 'generate'} onOpenChange={(o) => { sbAcc = o ? 'generate' : null; }} class="sb-acc-sec">
+          <Collapsible.Trigger class="sb-acc-hdr{sbAcc === 'generate' ? ' is-open' : ''}">
             <span aria-hidden="true" class="sb-acc-sec-ico"><i class="fa-solid fa-dice-d20"></i></span>
             <span class="sb-acc-sec-name">Generate</span>
             <span aria-hidden="true" class="sb-acc-meta">{gen ? gen.label.split(' ').slice(0, 2).join(' ') : ''}</span>
             <span aria-hidden="true" class="sb-acc-chev"><i class="fa-solid fa-chevron-right"></i></span>
-          </button>
-          {#if sbAcc === 'generate'}
-            <div class="sb-acc-body sb-acc-generate-body" role="group" aria-label="Generators">
-              {#each GENERATOR_GROUPS as group (group.id)}
-                <div class="sb-acc-group-lbl">{group.label}</div>
-                {#each group.gens as genId (genId)}
-                  {@const g = GENERATORS.find(x => x.id === genId)}
+          </Collapsible.Trigger>
+          <Collapsible.Content class="sb-acc-body sb-acc-generate-body">
+            {#each GENERATOR_GROUPS as group (group.id)}
+              <div class="sb-acc-group-lbl">{group.label}</div>
+              {#each group.gens as genId (genId)}
+                {@const g = GENERATORS.find(x => x.id === genId)}
                   {#if g}
                     <button
                       class="sb-acc-item sb-acc-gen" class:active={activeGen === genId}
@@ -269,42 +312,35 @@
                   {/if}
                 {/each}
               {/each}
-            </div>
-          {/if}
-        </div>
+          </Collapsible.Content>
+        </Collapsible.Root>
 
         <!-- SETTINGS section -->
-        <div class="sb-acc-sec sb-acc-sec-settings">
-          <button
-            class="sb-acc-hdr sb-acc-hdr-settings" class:is-open={sbAcc === 'settings'}
-            onclick={() => toggleAcc('settings')}
-            aria-expanded={String(sbAcc === 'settings')}
-          >
+        <Collapsible.Root open={sbAcc === 'settings'} onOpenChange={(o) => { sbAcc = o ? 'settings' : null; }} class="sb-acc-sec sb-acc-sec-settings">
+          <Collapsible.Trigger class="sb-acc-hdr sb-acc-hdr-settings{sbAcc === 'settings' ? ' is-open' : ''}">
             <span aria-hidden="true" class="sb-acc-sec-ico sb-acc-sec-ico-sm"><i class="fa-solid fa-gear"></i></span>
             <span class="sb-acc-sec-name sb-acc-sec-name-muted">Settings</span>
             <span aria-hidden="true" class="sb-acc-chev"><i class="fa-solid fa-chevron-right"></i></span>
-          </button>
-          {#if sbAcc === 'settings'}
-            <div class="sb-acc-body" role="group" aria-label="Settings">
-              <button class="sb-acc-item" onclick={toggleTheme}>
-                <span aria-hidden="true" class="sidebar-item-icon">{theme === 'dark' ? '\u2600' : '\u25D1'}</span>
-                <span class="sidebar-item-label">{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
-              </button>
-              <a href="/help" class="sb-acc-item" style="text-decoration:none">
-                <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-solid fa-book-open"></i></span>
-                <span class="sidebar-item-label">Help &amp; Wiki</span>
-              </a>
-              <a href="/about" class="sb-acc-item" style="text-decoration:none">
-                <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-solid fa-circle-info"></i></span>
-                <span class="sidebar-item-label">About</span>
-              </a>
-              <a href="/license" class="sb-acc-item" style="text-decoration:none">
-                <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-regular fa-copyright"></i></span>
-                <span class="sidebar-item-label">License</span>
-              </a>
-            </div>
-          {/if}
-        </div>
+          </Collapsible.Trigger>
+          <Collapsible.Content class="sb-acc-body">
+            <button class="sb-acc-item" onclick={toggleTheme}>
+              <span aria-hidden="true" class="sidebar-item-icon">{theme === 'dark' ? '\u2600' : '\u25D1'}</span>
+              <span class="sidebar-item-label">{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
+            </button>
+            <a href="/help" class="sb-acc-item" style="text-decoration:none">
+              <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-solid fa-book-open"></i></span>
+              <span class="sidebar-item-label">Help &amp; Wiki</span>
+            </a>
+            <a href="/about" class="sb-acc-item" style="text-decoration:none">
+              <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-solid fa-circle-info"></i></span>
+              <span class="sidebar-item-label">About</span>
+            </a>
+            <a href="/license" class="sb-acc-item" style="text-decoration:none">
+              <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-regular fa-copyright"></i></span>
+              <span class="sidebar-item-label">License</span>
+            </a>
+          </Collapsible.Content>
+        </Collapsible.Root>
       </div>
 
       <div style="height:8px;flex-shrink:0"></div>
@@ -314,6 +350,10 @@
         <a href="/help/learn-fate" class="sb-dock-btn" aria-label="Learn Fate">
           <span aria-hidden="true" class="sb-dock-ico"><i class="fa-solid fa-book-open"></i></span>
           <span class="sb-dock-lbl">Learn</span>
+        </a>
+        <a href="/help/reference" class="sb-dock-btn" target="_blank" rel="noopener" aria-label="Print reference card">
+          <span aria-hidden="true" class="sb-dock-ico"><i class="fa-solid fa-print"></i></span>
+          <span class="sb-dock-lbl">Ref</span>
         </a>
         <a href="/" class="sb-dock-btn" aria-label="All Worlds">
           <span aria-hidden="true" class="sb-dock-ico"><i class="fa-solid fa-earth-americas"></i></span>
@@ -326,18 +366,28 @@
       </div>
     </nav>
 
-    <!-- Main content panel -->
-    <div class="content-panel">
+    <!-- Main content panel — split: generator | table -->
+    <div
+      class="content-panel cp-split-root"
+      class:cp-table-full={tableFull}
+      class:cp-divider-dragging={draggingDivider}
+      bind:this={splitRoot}
+      style={!tableFull ? `--cp-gen-width:${(splitRatio * 100).toFixed(1)}%` : ''}
+    >
 
-      <!-- Canvas view: Board component -->
-      {#if canvasView}
-        <Board {campId} initialMode="prep" onClose={closeCanvas} />
-      {/if}
+      <!-- Generator column -->
+      <div class="cp-gen-col">
+        <!-- Strip header: generator label + full-table toggle -->
+        <div class="cp-gen-hdr">
+          <span class="cp-gen-hdr-label">{gen ? gen.label : 'Generate'}</span>
+          <button class="cp-full-btn btn btn-ghost btn-icon" onclick={toggleTableFull}
+            title={tableFull ? 'Split view' : 'Full Table'}
+            aria-label={tableFull ? 'Split view' : 'Expand Table'}
+          ><i class="fa-solid fa-{tableFull ? 'compress' : 'expand'}" aria-hidden="true"></i></button>
+        </div>
 
-      <!-- Normal generate view -->
-      {#if !canvasView}
-        <main id="main">
-          <div class="main-layout">
+        <main id="main" class="cp-gen-scroll">
+          <div class="main-layout cp-gen-layout">
 
             <!-- Result panel -->
             <div id="result-panel" role="region" aria-label={result ? 'Generated ' + gen.label + ' result' : 'Ready to generate'} aria-live="polite" aria-atomic="true">
@@ -361,14 +411,22 @@
                     </span>
                   </button>
 
-                  <!-- Pin -->
+                  <!-- Secondary actions -->
                   <div class="action-bar-secondary">
                     {#if result}
+                      <!-- → Table -->
+                      <button
+                        class="btn btn-ghost action-bar-icon cp-to-table-btn"
+                        onclick={sendToTable}
+                        title="Send to Table"
+                        aria-label="Send to Table"
+                      ><i class="fa-solid fa-arrow-right" aria-hidden="true"></i> Table</button>
+                      <!-- Pin to history -->
                       <button
                         class="btn btn-ghost action-bar-icon" class:pin-bounce={pinBouncing}
                         onclick={pinResult}
-                        title="Save to Table Prep [P]"
-                        aria-label="Save to Table Prep{pinnedCards.length > 0 ? ' (' + pinnedCards.length + ' saved)' : ''}"
+                        title="Save to history [P]"
+                        aria-label="Save to history"
                         style="position:relative"
                       >
                         <i class="fa-solid fa-thumbtack" aria-hidden="true"></i>
@@ -410,9 +468,9 @@
                         <span class="seed-pack-title"><i class="fa-solid fa-square-plus" aria-hidden="true"></i> Adventure Seed Pack</span>
                         <span class="seed-pack-count">{result.pack.length} cards</span>
                         <button class="btn btn-ghost seed-pack-pin-all"
-                          onclick={() => { result.pack.forEach(item => { session.pinResultDirect({ genId: item.genId, data: item.data }); }); }}
-                          title="Pin all cards to Table Prep"
-                        >Pin All</button>
+                          onclick={() => { result.pack.forEach(item => { if (boardRef) boardRef.sendToTable(item.genId, item.data); }); }}
+                          title="Send all to Table"
+                        >→ Table All</button>
                       </div>
                       <div class="seed-pack-grid">
                         {#each result.pack as item, i (i)}
@@ -491,9 +549,49 @@
 
           </div>
         </main>
+      </div>
+
+      <!-- Drag divider -->
+      <div
+        class="cp-divider"
+        aria-hidden="true"
+        onpointerdown={onDividerPointerDown}
+        onpointermove={onDividerPointerMove}
+        onpointerup={onDividerPointerUp}
+        onpointercancel={onDividerPointerUp}
+      ></div>
+
+      <!-- Table column — Board embedded -->
+      <div class="cp-table-col">
+        <Board
+          bind:this={boardRef}
+          {campId}
+          embedded={true}
+        />
+      </div>
+
+      <!-- Mobile Table bottom-sheet -->
+      {#if tableOpen}
+        <div class="cp-mobile-sheet-backdrop" onclick={() => { tableOpen = false; }} aria-hidden="true"></div>
+        <div class="cp-mobile-sheet" role="dialog" aria-label="Table">
+          <div class="cp-mobile-sheet-hdr">
+            <span class="cp-mobile-sheet-title"><i class="fa-solid fa-table-cells" aria-hidden="true"></i> Table</span>
+            <button class="cp-mobile-sheet-close" onclick={() => { tableOpen = false; }} aria-label="Close Table">&times;</button>
+          </div>
+          <div class="cp-mobile-sheet-body">
+            <!-- Board also mounts here on mobile — shares same IDB key so same cards -->
+            <Board {campId} embedded={true} />
+          </div>
+        </div>
       {/if}
+
     </div>
   </div>
+
+  <!-- Mobile Table FAB -->
+  <button class="cp-table-fab" onclick={() => { tableOpen = !tableOpen; }} aria-label="Open Table" title="Open Table">
+    <i class="fa-solid fa-table-cells" aria-hidden="true"></i>
+  </button>
 
   <!-- Toast -->
   {#if toast}

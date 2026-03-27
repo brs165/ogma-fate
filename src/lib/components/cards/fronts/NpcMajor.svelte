@@ -1,8 +1,34 @@
 <script>
   import StressRow from '../StressRow.svelte';
+  import OgmaTooltip from '../../shared/OgmaTooltip.svelte';
   let { data = {}, campName = '', catColor = 'var(--fs-section)', cardState = {}, onUpdate = () => {} } = $props();
 
   const LADDER = {8:"Legendary",7:"Epic",6:"Fantastic",5:"Superb",4:"Great",3:"Good",2:"Fair",1:"Average",0:"Mediocre"};
+  const SKILL_TIPS = {
+    'Shoot': 'Ranged attacks. Difficulty = target defense.',
+    'Fight': 'Melee attacks and physical contests.',
+    'Provoke': 'Intimidation, manipulation, emotional attacks.',
+    'Deceive': 'Lies, misdirection, disguise.',
+    'Rapport': 'Charm, diplomacy, persuasion.',
+    'Empathy': 'Reading people, sensing intent.',
+    'Notice': 'Perception, awareness, spotting hidden things.',
+    'Investigate': 'Research, deduction, finding clues.',
+    'Stealth': 'Hiding, moving unseen.',
+    'Burglary': 'Breaking in, picking locks, sleight of hand.',
+    'Athletics': 'Running, jumping, dodging.',
+    'Physique': 'Strength, endurance. Determines physical stress track.',
+    'Will': 'Mental fortitude. Determines mental stress track.',
+    'Crafts': 'Making and repairing things.',
+    'Lore': 'Arcane or specialized knowledge.',
+    'Resources': 'Wealth and material assets.',
+    'Contacts': 'Social network, knowing people.',
+    'Drive': 'Vehicles and chase scenes.',
+  };
+  function skillTip(name, r) {
+    const base = SKILL_TIPS[name] || name;
+    const label = LADDER[r] || ('+' + r);
+    return `${name} — ${label} (+${r}). ${base}`;
+  }
 
   let asp = $derived(data.aspects || {});
   let skills = $derived(Array.isArray(data.skills) ? data.skills : []);
@@ -35,12 +61,14 @@
 <!-- Skills -->
 <div class="fs-section-gap">
   <div class="fs-section-hdr">SKILLS</div>
-  {#each skills as s}
-    <div class="fs-skill-row">
-      <span class="fs-skill-badge">+{s.r}</span>
-      <span class="fs-skill-name">{s.name}</span>
-      <span class="fs-skill-ladder">({LADDER[s.r] || ''})</span>
-    </div>
+  {#each skills as s, i}
+    <OgmaTooltip tip={skillTip(s.name, s.r)}>
+      <div class="fs-skill-row" style="--skill-pct:{Math.min(1, (s.r || 0) / 7)}; --skill-delay:{i * 40}ms">
+        <span class="fs-skill-badge">+{s.r}</span>
+        <span class="fs-skill-name">{s.name}</span>
+        <span class="fs-skill-ladder">({LADDER[s.r] || ''})</span>
+      </div>
+    </OgmaTooltip>
   {/each}
 </div>
 

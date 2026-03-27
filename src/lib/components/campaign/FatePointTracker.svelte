@@ -1,7 +1,29 @@
 <script>
+  import { Tabs } from 'bits-ui';
   let { state = { pcs: [], pool: 0 }, onUpdate = () => {} } = $props();
   let lastFPAnim = $state(null);
   let fpTab = $state('fp');
+  let collapsed = $state(false);
+
+  // ── Drag ─────────────────────────────────────────────────────────────────
+  let posX = $state(null);
+  let posY = $state(null);
+  let dragOffset = $state(null);
+  let panel = $state();
+
+  function onHdrPointerDown(e) {
+    if (e.button !== 0) return;
+    if (e.target.closest('button')) return;
+    const rect = panel.getBoundingClientRect();
+    dragOffset = { dx: e.clientX - rect.left, dy: e.clientY - rect.top };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  }
+  function onHdrPointerMove(e) {
+    if (!dragOffset) return;
+    posX = e.clientX - dragOffset.dx;
+    posY = e.clientY - dragOffset.dy;
+  }
+  function onHdrPointerUp() { dragOffset = null; }
 
   function adjustPC(id, delta) {
     const pc = state.pcs.find(p => p.id === id);
@@ -10,10 +32,7 @@
     const animDot = delta < 0 ? pc.current - 1 : pc.current;
     lastFPAnim = { id, dot: animDot, dir: delta > 0 ? 'gain' : 'spend' };
     setTimeout(() => { lastFPAnim = null; }, 380);
-    onUpdate({
-      ...state,
-      pcs: state.pcs.map(p => p.id !== id ? p : { ...p, current: newVal })
-    });
+    onUpdate({ ...state, pcs: state.pcs.map(p => p.id !== id ? p : { ...p, current: newVal }) });
   }
 
   function setName(id, name) {
@@ -39,77 +58,99 @@
   }
 </script>
 
-<div class="fp-tracker">
-  <div class="fp-header">
-    <span class="fp-title"><i class="fa-solid fa-coins" aria-hidden="true"></i> Fate Tools</span>
-    {#if fpTab === 'fp'}
-      <button class="btn btn-ghost" onclick={resetAll} title="Reset all to refresh" style="font-size:12px;padding:2px 8px;min-height:0"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> Reset</button>
+<!-- ── Card shell ─────────────────────────────────────────────────────────── -->
+<div
+  class="fpt-panel fd-card"
+  bind:this={panel}
+  style={posX !== null ? `position:fixed;left:${posX}px;top:${posY}px;` : ''}
+  onclick={(e) => e.stopPropagation()}
+>
+  <!-- Draggable header stripe -->
+  <div
+    class="fpt-hdr"
+    onpointerdown={onHdrPointerDown}
+    onpointermove={onHdrPointerMove}
+    onpointerup={onHdrPointerUp}
+    onpointercancel={onHdrPointerUp}
+    role="toolbar"
+    aria-label="Fate Point Tracker"
+  >
+    <span class="fpt-hdr-icon" aria-hidden="true"><i class="fa-solid fa-coins"></i></span>
+    <span class="fpt-hdr-title">Fate Points</span>
+    {#if !collapsed && fpTab === 'fp'}
+      <button class="fpt-reset-btn btn btn-ghost" onclick={resetAll} title="Reset all to refresh" aria-label="Reset all fate points">
+        <i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>
+      </button>
     {/if}
+    <button class="fpt-collapse-btn" onclick={() => { collapsed = !collapsed; }}
+      aria-label={collapsed ? 'Expand' : 'Collapse'}>
+      <i class="fa-solid fa-chevron-{collapsed ? 'down' : 'up'}" aria-hidden="true"></i>
+    </button>
   </div>
 
-  <!-- Tab bar — Bits UI Tabs -->
-  <div class="fp-tab-bar">
-    <button class="fp-tab-btn{fpTab==='fp'?' active':''}" onclick={() => fpTab = 'fp'} aria-selected={String(fpTab==='fp')}>◎ FP</button>
-    <button class="fp-tab-btn{fpTab==='ms'?' active':''}" onclick={() => fpTab = 'ms'} aria-selected={String(fpTab==='ms')}>⬡ Miles</button>
-    <button class="fp-tab-btn{fpTab==='pi'?' active':''}" onclick={() => fpTab = 'pi'} title="Popcorn turn order" aria-selected={String(fpTab==='pi')}>🏁 Order</button>
-  </div>
+  {#if !collapsed}
+  <!-- Tab bar — Bits Tabs -->
+  <Tabs.Root bind:value={fpTab}>
+    <Tabs.List aria-label="Fate tools sections">
+      <Tabs.Trigger value="fp">FP</Tabs.Trigger>
+      <Tabs.Trigger value="ms">Miles.</Tabs.Trigger>
+      <Tabs.Trigger value="pi">Init.</Tabs.Trigger>
+    </Tabs.List>
 
-  <!-- Fate Points Tab -->
-  {#if fpTab === 'fp'}
+    <!-- Fate Points tab -->
+    <Tabs.Content value="fp">
     <div class="fp-pcs">
       {#each state.pcs as pc (pc.id)}
         <div class="fp-pc-row">
-          <input
-            class="fp-pc-name"
-            value={pc.name}
-            onchange={(e) => setName(pc.id, e.target.value)}
-            aria-label="Player character name"
-          />
+          <input class="fp-pc-name" value={pc.name}
+            onchange={(e) => setName(pc.id, e.target.value)} aria-label="PC name" />
           <div class="fp-controls">
-            <button class="fp-btn fp-minus" onclick={() => adjustPC(pc.id, -1)} aria-label="Spend fate point" disabled={pc.current === 0}>&minus;</button>
-            <div class="fp-dots">
+            <button class="fp-btn fp-minus" onclick={() => adjustPC(pc.id, -1)} disabled={pc.current === 0} aria-label="Spend">&minus;</button>
+            <div class="fp-dots" role="group" aria-label="Fate points for {pc.name}">
               {#each [0,1,2,3,4,5] as i}
                 {@const filled = i < pc.current}
                 {@const isAnim = lastFPAnim && lastFPAnim.id === pc.id && lastFPAnim.dot === i}
-                <div
-                  class="fp-dot"
-                  class:fp-dot-filled={filled}
+                <button
+                  class="fp-dot" class:fp-dot-filled={filled}
                   class:fp-gaining={isAnim && lastFPAnim.dir === 'gain'}
                   class:fp-spending={isAnim && lastFPAnim.dir === 'spend'}
                   onclick={() => adjustPC(pc.id, i < pc.current ? -1 : 1)}
-                ></div>
+                  aria-label="{filled ? 'Spend' : 'Gain'} fate point (dot {i + 1})"
+                  aria-pressed={String(filled)}
+                ></button>
               {/each}
             </div>
-            <button class="fp-btn fp-plus" onclick={() => adjustPC(pc.id, 1)} aria-label="Gain fate point">+</button>
+            <button class="fp-btn fp-plus" onclick={() => adjustPC(pc.id, 1)} aria-label="Gain">+</button>
             {#key pc.current}<span class="fp-count fp-count-anim">{pc.current}</span>{/key}
           </div>
-          <button class="fp-remove" onclick={() => removePC(pc.id)} aria-label="Remove {pc.name}" title="Remove">&times;</button>
+          <button class="fp-remove" onclick={() => removePC(pc.id)} aria-label="Remove {pc.name}">&times;</button>
         </div>
       {/each}
     </div>
     <div class="fp-pool-row">
       <span class="fp-pool-label">GM Pool</span>
-      <button class="fp-btn fp-minus" onclick={() => adjustPool(-1)} disabled={(state.pool || 0) === 0} aria-label="Decrease GM fate point pool">&minus;</button>
-      <span class="fp-pool-count" aria-live="polite" aria-label="GM Pool: {state.pool || 0} fate points">{state.pool || 0}</span>
-      <button class="fp-btn fp-plus" onclick={() => adjustPool(1)} aria-label="Increase GM fate point pool">+</button>
+      <button class="fp-btn fp-minus" onclick={() => adjustPool(-1)} disabled={(state.pool||0)===0} aria-label="Decrease pool">&minus;</button>
+      <span class="fp-pool-count" aria-live="polite">{state.pool || 0}</span>
+      <button class="fp-btn fp-plus" onclick={() => adjustPool(1)} aria-label="Increase pool">+</button>
     </div>
     <button class="fp-add-pc" onclick={addPC}>+ Add PC</button>
-  {/if}
+    </Tabs.Content>
 
-  <!-- Milestones Tab -->
-  {#if fpTab === 'ms'}
-    <div style="padding:8px;color:var(--text-muted);font-size:13px">
-      <p><strong>Minor Milestone</strong> (end of session): Switch skill ratings, change a stunt, rename a mild consequence, change an aspect.</p>
-      <p style="margin-top:8px"><strong>Significant Milestone</strong> (end of arc): +1 skill point OR +1 stunt slot, plus all Minor benefits.</p>
-      <p style="margin-top:8px"><strong>Major Milestone</strong> (campaign shake-up): +1 refresh, rename high concept, clear severe consequence, plus all Significant benefits.</p>
-    </div>
-  {/if}
+    <!-- Milestones tab -->
+    <Tabs.Content value="ms">
+      <div class="fpt-rules-body">
+        <p><strong>Minor</strong> (end of session): Switch skills, rename stunt, rename mild consequence, change aspect.</p>
+        <p><strong>Significant</strong> (end of arc): +1 skill or +1 stunt slot, plus Minor.</p>
+        <p><strong>Major</strong> (campaign shake-up): +1 refresh, rename high concept, clear severe consequence, plus Significant.</p>
+      </div>
+    </Tabs.Content>
 
-  <!-- Turn Order Tab -->
-  {#if fpTab === 'pi'}
-    <div style="padding:8px;color:var(--text-muted);font-size:13px">
-      <p><strong>Popcorn Initiative</strong>: After you act, you choose who goes next. NPCs and PCs alternate unless someone uses a stunt or spends a fate point to interrupt.</p>
-      <p style="margin-top:8px">Use the Turn Bar at the top of the canvas to track who has acted this round.</p>
-    </div>
+    <!-- Initiative tab -->
+    <Tabs.Content value="pi">
+      <div class="fpt-rules-body">
+        <p><strong>Popcorn Initiative</strong>: After you act, you choose who goes next. NPCs and PCs alternate unless someone spends a fate point to interrupt.</p>
+      </div>
+    </Tabs.Content>
+  </Tabs.Root>
   {/if}
 </div>

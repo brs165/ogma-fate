@@ -1,4 +1,5 @@
 <script>
+  import OgmaTooltip from '../../shared/OgmaTooltip.svelte';
   let { data = {}, campName = '', catColor = 'var(--fs-section)' } = $props();
 
   let cur = $derived(data.current || {});
@@ -7,11 +8,17 @@
   let impFaces = $derived(Array.isArray(imp.faces) ? imp.faces : []);
   let setting = $derived(Array.isArray(data.setting) ? data.setting : []);
   let curPlaces = $derived(Array.isArray(cur.places) ? cur.places : []);
+
+  const CURRENT_TIP = 'Current issue — already on fire. Invoke it every session. Compel it against PCs. If it never comes up, replace it.';
+  const IMPENDING_TIP = 'Impending issue — what happens if the PCs do nothing. Should feel urgent every 2–3 sessions. When it fires, it becomes the new current issue.';
+  const SETTING_TIP = 'Setting aspects — always-true facts about the world. Any PC or NPC can invoke them when relevant. They define what kind of story this is.';
 </script>
 
 <!-- Current Issue -->
 <div class="fs-section-gap">
-  <div class="fs-section-hdr">CURRENT ISSUE</div>
+  <OgmaTooltip tip={CURRENT_TIP}>
+    <div class="fs-section-hdr" tabindex="0">CURRENT ISSUE</div>
+  </OgmaTooltip>
   <div style="font-size:13px; font-weight:700; color:var(--fs-text); line-height:1.3; margin-bottom:3px">{cur.name || ''}</div>
   {#if cur.desc}<div style="font-size:12px; color:var(--fs-text-dim); line-height:1.5">{cur.desc}</div>{/if}
   {#if curFaces.length > 0}
@@ -29,7 +36,9 @@
 <!-- Impending Issue -->
 <div class="fs-section-gap">
   <div class="fs-stunt" style="border-left:3px solid #c62828; border-radius:0 3px 3px 0">
-    <div style="font-size:10px; font-weight:800; letter-spacing:0.12em; color:#c62828; margin-bottom:2px">IMPENDING</div>
+    <OgmaTooltip tip={IMPENDING_TIP}>
+      <div style="font-size:10px; font-weight:800; letter-spacing:0.12em; color:#c62828; margin-bottom:2px" tabindex="0">IMPENDING</div>
+    </OgmaTooltip>
     <div style="font-size:13px; font-weight:700; color:#c62828; line-height:1.3">{imp.name || ''}</div>
     {#if imp.desc}<div class="fs-stunt-desc" style="font-style:italic">{imp.desc}</div>{/if}
   </div>
@@ -47,7 +56,9 @@
 
 <!-- Setting Aspects -->
 <div class="fs-section-gap">
-  <div class="fs-section-hdr">SETTING ASPECTS</div>
+  <OgmaTooltip tip={SETTING_TIP}>
+    <div class="fs-section-hdr" tabindex="0">SETTING ASPECTS</div>
+  </OgmaTooltip>
   {#each setting as s}
     <div class="fs-aspect-val">"{s}"</div>
   {/each}

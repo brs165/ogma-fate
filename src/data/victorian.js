@@ -77,7 +77,7 @@ export const CAMPAIGNS = { victorian: {
             ],
             VmajRole: ["consulting detective", "alienist", "society matriarch", "disgraced surgeon", "intelligence operative", "occultist", "colonial administrator", "investigative journalist", "hereditary peer", "blackmailer", "forensic scientist", "professional medium", "private alienist to Lodge members", "colonial governor returned changed", "experimental psychicist at the Academy", "hereditary keeper of the Third Compact", "unofficial Vatican emissary for the anomalous", "former Lodge Grandmaster now regretting the tenure", "mesmerist to the Queen's household"
             ],
-            VmajDrive: ["controls three society factions through accumulated knowledge", "found evidence that cannot be published without destroying innocents", "works both the official inquiry and the lodge simultaneously", "knows which families own the precinct and charges accordingly", "is three cases from complete professional ruin", "holds a secret that ends a dynasty if it surfaces", "built a reputation on cases that never officially existed", "has read the Ashmore Papers and is the only one who has and survived with full cognition", "maintains the Lodge's only accurate record of what was bound and when the binding expires", "serves the entity sincerely and is not wrong that the entity offers things it actually delivers", "has spent eleven years establishing that one death was not self-inflicted and is one document away from proof"
+            VmajDrive: ["controls three society factions through accumulated knowledge", "found evidence that cannot be published without destroying innocents", "works both the official inquiry and the lodge simultaneously", "knows which families own the precinct and charges accordingly", "is three cases from complete professional ruin", "holds a secret that ends a dynasty if it surfaces", "built a reputation on cases that never officially existed", "has read the Ashmore Papers and is the only one who has and survived with full cognition", "maintains the Lodge record of what was bound and when it expires", "serves the entity sincerely and is not wrong that the entity offers things it actually delivers", "has spent eleven years establishing that one death was not self-inflicted and is one document away from proof"
             ],
             VmajAlt: ["government consultant", "private investigator", "blackmailer", "society liability", "reluctant witness", "the problem"],
             VmajSphere: ["the society", "the lodge network", "the city", "the profession", "three counties", "official circles"],
@@ -936,5 +936,37 @@ t.scene_tone.v.VtAdj = t.scene_tone.v.VtAdj.concat([
     }
   }
 });
+
+})();
+
+// ═══════════════════════════════════════════════════════════════════════
+// BL-03 — Victorian adjective pass (Sprint 8)
+// Replaces generic descriptors with period-specific alternatives.
+// Adds unwholesome, peculiar, atmospheric register to NPC adjectives.
+// ═══════════════════════════════════════════════════════════════════════
+(function(){var t = CAMPAIGNS.victorian.tables;
+
+// Minor NPC adjective enhancement — Victorian register
+t.minor_concepts.v.VmAdj = t.minor_concepts.v.VmAdj.concat([
+  "unwholesome","peculiar","atmospheric","mesmeric","insalubrious",
+  "vaporous","spectral-adjacent","lurid","grotesque","morally-irregular",
+  "opium-hazed","inquisition-familiar","gas-lamp-pale","laudanum-steadied",
+  "fog-habituated","cellar-dwelling","dissection-adjacent","séance-regular",
+  "Lodge-compromised","colonial-shaped","reform-era nervous","penny-dreadful adjacent"
+]);
+
+// Minor NPC role expansion with Victorian specificity
+t.minor_concepts.v.VmRole = t.minor_concepts.v.VmRole.concat([
+  "resurrection man","spirit photographer","alienist's orderly","occult pamphleteer",
+  "mudlark","pawnbroker's runner","crossing sweeper of unusual routes","opium purveyor",
+  "private inquiry agent","anatomical specimen procurer","mesmerist's subject"
+]);
+
+// Scene tone VtAdj additional atmospheric entries  
+t.scene_tone.v.VtAdj = t.scene_tone.v.VtAdj.concat([
+  "unwholesomely preserved","peculiarly attended","mesmeric-still",
+  "lurid in the gaslight","insalubrious","vapour-heavy","spectrally lit",
+  "grotesquely maintained","reformatory-adjacent","penny-dreadful toned"
+]);
 
 })();

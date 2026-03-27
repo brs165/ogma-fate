@@ -83,11 +83,11 @@
   onkeydown={onWrapperKeyDown}
 >
   <div class="bc-actions">
-    <button class="bc-btn" title="Toggle Zone Container" aria-label="Toggle zone"
+    <button class="bc-btn" aria-label="Toggle zone"
       onclick={(e) => { e.stopPropagation(); (() => onUpdate(card.id, { zoneMode: !zoneMode, zoneW: 400, zoneH: 200 }))(e); }}
     >{zoneMode ? "⊞" : "⊟"}</button>
-    <button class="bc-btn" title="Change colour" aria-label="Change colour" onclick={cycleStyle}>◐</button>
-    <button class="bc-btn" title="Delete" aria-label="Delete" onclick={deleteLabel}>✕</button>
+    <button class="bc-btn" aria-label="Change colour" onclick={cycleStyle}>◐</button>
+    <button class="bc-btn" aria-label="Delete" onclick={deleteLabel}>✕</button>
   </div>
 
   {#if zoneMode}
@@ -124,7 +124,7 @@
         onclick={(e) => e.stopPropagation()}
       />
     {:else}
-      <span title="Double-click to rename">{card.text || 'Section'}</span>
+      <span >{card.text || 'Section'}</span>
     {/if}
   </div>
 </div>

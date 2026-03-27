@@ -1,6 +1,7 @@
 <script>
   // ── ExportPanel — full export page in left panel ──────────────────────────────
   import { DB } from '../../db.js';
+  import { RadioGroup } from 'bits-ui';
   import {
     toBatchMarkdown, toBatchPlainText,
     toBatchMermaid, toBatchObsidianMD, toBatchTypst,
@@ -131,32 +132,31 @@
       {/each}
     </div>
 
-    <!-- Format grid -->
+    <!-- Format grid — Bits RadioGroup for keyboard navigation -->
     <div class="bep-section-label">Format</div>
-    <div class="bep-fmt-grid">
+    <RadioGroup.Root bind:value={fmt} aria-label="Export format" class="bep-fmt-grid">
       {#each FORMATS as f (f.id)}
-        <button
+        <RadioGroup.Item
+          value={f.id}
           class="bep-fmt-btn{fmt === f.id ? ' is-active' : ''}"
-          onclick={() => (fmt = f.id)}
-          aria-pressed={String(fmt === f.id)}
-          title="{f.label} — {f.sub}"
+          aria-label="{f.label} — {f.sub}"
         >
           <span class="bep-fmt-icon">{f.icon}</span>
           <span class="bep-fmt-info">
             <span class="bep-fmt-name">{f.label}</span>
             <span class="bep-fmt-sub">{f.sub}</span>
           </span>
-        </button>
+        </RadioGroup.Item>
       {/each}
-    </div>
+    </RadioGroup.Root>
 
-    <!-- Delivery -->
+    <!-- Delivery — Bits RadioGroup -->
     {#if !isPopup}
       <div class="bep-section-label">Delivery</div>
-      <div class="bep-del-row">
-        <button class="bep-del-btn{del_ === 'copy' ? ' is-active' : ''}" onclick={() => (del_ = 'copy')}>⌘ Copy to clipboard</button>
-        <button class="bep-del-btn{del_ === 'download' ? ' is-active' : ''}" onclick={() => (del_ = 'download')}>↓ Download file</button>
-      </div>
+      <RadioGroup.Root bind:value={del_} aria-label="Delivery method" class="bep-del-row">
+        <RadioGroup.Item value="copy" class="bep-del-btn{del_ === 'copy' ? ' is-active' : ''}">⌘ Copy to clipboard</RadioGroup.Item>
+        <RadioGroup.Item value="download" class="bep-del-btn{del_ === 'download' ? ' is-active' : ''}">↓ Download file</RadioGroup.Item>
+      </RadioGroup.Root>
     {/if}
 
     <!-- Execute -->

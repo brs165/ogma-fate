@@ -8,12 +8,14 @@
   import BoardSticky from './BoardSticky.svelte';
   import BoardBoost  from './BoardBoost.svelte';
   import BoardLabel  from './BoardLabel.svelte';
+  import BoardGroup  from './BoardGroup.svelte';
   import CanvasContextMenu from './CanvasContextMenu.svelte';
 
   // ── Props ────────────────────────────────────────────────────────────────
   let {
     cards           = [],
     connectors      = [],
+    groups          = [],
     loaded          = false,
     mode            = 'prep',
     campId          = '',
@@ -29,11 +31,16 @@
     onInvoke        = null,
     onConnect       = null,
     onUpdateConnector = null,
-    onContextMenu   = null,    // (screenX, screenY, canvasX, canvasY) → sets ctx in Board
+    onUpdateGroup   = null,
+    onDeleteGroup   = null,
+    onContextMenu   = null,
     onCtxClose      = null,
     onCtxGenerate   = null,
-    onEdgeCoach     = null,    // () → show "click line to cycle label" toast once
-    toast           = null,    // toast message string, rendered inside canvas bounds
+    onCtxTemplate   = null,
+    ctxTemplates    = [],
+    onEdgeCoach     = null,
+    toast           = null,
+    showToast       = null,
   } = $props();
 
   // ── Canvas state (fully owned here) ──────────────────────────────────────
@@ -133,9 +140,36 @@
     if (panDrag) { panDrag = null; return; }
     if (dragState) {
       if (dragState.moved && onUpdateCard) {
-        onUpdateCard(dragState.cardId, {
-          x: dragState.currentX, y: dragState.currentY, z: Date.now(),
-        });
+        // ── Stack detection (WC-07) ─────────────────────────────────────────
+        // If dropped within 80px of another card's centre, form a stack
+        const SNAP = 80;
+        const droppedCard = cards.find(c => c.id === dragState.cardId);
+        const target = droppedCard ? cards.find(c => {
+          if (c.id === dragState.cardId || c.genId === 'sticky' || c.genId === 'label') return false;
+          const cx = c.x + 323, cy = c.y + 160; // card centre
+          const dx = cx - (dragState.currentX + 323);
+          const dy = cy - (dragState.currentY + 160);
+          return Math.sqrt(dx*dx + dy*dy) < SNAP;
+        }) : null;
+
+        if (target) {
+          // Stack: move dragged card onto target, mark stackId
+          const stackId = target.stackId || target.id;
+          onUpdateCard(dragState.cardId, {
+            x: target.x + 12, y: target.y + 12,
+            z: (target.z || 1) + 1,
+            stackId,
+          });
+          // Ensure target also has stackId
+          if (!target.stackId) onUpdateCard(target.id, { stackId: target.id });
+          if (showToast) showToast('\u29C5 Cards stacked — click to expand');
+        } else {
+          // Normal move — clear stackId if it had one
+          onUpdateCard(dragState.cardId, {
+            x: dragState.currentX, y: dragState.currentY, z: Date.now(),
+            stackId: null,
+          });
+        }
       }
       dragState = null;
     }
@@ -182,6 +216,21 @@
   function cardColor(genId) { return CARD_COLORS[genId] || '#888'; }
 
   const MM_W = 140, MM_H = 90;
+  let showMinimap = $state(true);
+
+  // ── Minimap click-to-pan ──────────────────────────────────────────────────
+  function onMinimapClick(e) {
+    const bounds = minimapBounds();
+    if (!bounds || !cvWrap) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const mmX = e.clientX - rect.left - 8;
+    const mmY = e.clientY - rect.top  - 8;
+    const canvasX = mmX / bounds.scale + bounds.minX;
+    const canvasY = mmY / bounds.scale + bounds.minY;
+    const wrapRect = cvWrap.getBoundingClientRect();
+    panX = -(canvasX * zoom) + wrapRect.width  / 2;
+    panY = -(canvasY * zoom) + wrapRect.height / 2;
+  }
   function minimapBounds() {
     if (!cards.length) return null;
     const xs = cards.map(c => c.x), ys = cards.map(c => c.y);
@@ -253,6 +302,18 @@
     class="cv-viewport"
     style="transform: translate({panX}px,{panY}px) scale({zoom}); transform-origin: 0 0;"
   >
+    <!-- Groups render beneath cards (lower z-index) -->
+    {#each groups as group (group.id)}
+      <BoardGroup
+        {group}
+        {zoom}
+        {panX}
+        {panY}
+        onUpdate={onUpdateGroup}
+        onDelete={onDeleteGroup}
+      />
+    {/each}
+
     {#each [...cards].sort((a, b) => (a.z || 0) - (b.z || 0)) as card (card.id)}
       {@const isDragged = dragState?.cardId === card.id}
       {@const cx = isDragged ? dragState.currentX : card.x}
@@ -270,12 +331,48 @@
         {:else if card.genId === 'label'}
           <BoardLabel  {card} onDelete={onDeleteCard} onUpdate={onUpdateCard} />
         {:else}
+          {@const stackCount = card.stackId ? cards.filter(c => c.stackId === card.stackId || c.id === card.stackId).length : 1}
           <BoardCard
             {card} {mode} {campId}
             isOnTable={false}
+            {stackCount}
             onDelete={onDeleteCard}
             onReroll={onRerollCard}
-            onUpdate={onUpdateCard}
+            onUpdate={(id, patch) => {
+              if (patch._fanStack) {
+                // Fan out all cards in this stack — smart placement avoids existing cards
+                const stackId = card.stackId || card.id;
+                const stackCards = cards.filter(c => c.stackId === stackId || c.id === stackId);
+                const otherCards = cards.filter(c => c.stackId !== stackId && c.id !== stackId);
+                const COLS = 3, CW = 680, CH = 500;
+
+                // Find a clear origin: start at card position, shift right if occupied
+                let originX = card.x;
+                let originY = card.y;
+                const isOccupied = (x, y) => otherCards.some(oc =>
+                  Math.abs(oc.x - x) < CW * 0.6 && Math.abs(oc.y - y) < CH * 0.6
+                );
+                // Try a few origin offsets to find clear space
+                const offsets = [[0,0],[0,-520],[0,520],[CW*COLS+40,0],[-CW-40,0]];
+                for (const [ox, oy] of offsets) {
+                  if (!isOccupied(originX + ox, originY + oy)) {
+                    originX += ox; originY += oy; break;
+                  }
+                }
+
+                stackCards.forEach((sc, i) => {
+                  if (onUpdateCard) onUpdateCard(sc.id, {
+                    x: originX + (i % COLS) * CW,
+                    y: originY + Math.floor(i / COLS) * CH,
+                    z: Date.now() + i,
+                    stackId: null,
+                  });
+                });
+                if (showToast) showToast('\u29C4 Stack fanned — ' + stackCards.length + ' cards');
+                return;
+              }
+              if (onUpdateCard) onUpdateCard(id, patch);
+            }}
             onSendToTable={null}
             onOpen={onOpenCard}
             onInvoke={onInvoke}
@@ -287,28 +384,48 @@
     {/each}
   </div>
 
-  <!-- Empty canvas hint -->
+  <!-- Empty canvas CTA -->
   {#if loaded && cards.length === 0}
     <div class="cv-empty-hint" aria-hidden="true">
-      <span class="cv-empty-icon">◈</span>
-      <span>Right-click to generate, or press <kbd>Space</kbd></span>
-      <span class="cv-empty-sub">Click a generator in the left panel to get started</span>
+      <div class="cv-empty-icon">◈</div>
+      <div class="cv-empty-title">Table is ready</div>
+      <div class="cv-empty-steps">
+        <div class="cv-empty-step">
+          <span class="cv-empty-step-num">1</span>
+          <span>Pick a generator on the left</span>
+        </div>
+        <div class="cv-empty-step">
+          <span class="cv-empty-step-num">2</span>
+          <span>Hit <kbd>Space</kbd> or <strong>Roll</strong></span>
+        </div>
+        <div class="cv-empty-step">
+          <span class="cv-empty-step-num">3</span>
+          <span>Click <strong>→ Table</strong> to place it here</span>
+        </div>
+      </div>
+      <div class="cv-empty-sub">Right-click anywhere to generate directly · <kbd>Ctrl+K</kbd> for commands</div>
     </div>
   {/if}
 
   <!-- Zoom controls -->
   <div class="cv-controls" aria-label="Canvas zoom controls">
-    <button class="cv-ctrl-btn" onclick={() => adjustZoom(0.15)}  aria-label="Zoom in"       title="Zoom in">+</button>
-    <button class="cv-ctrl-btn" onclick={() => adjustZoom(-0.15)} aria-label="Zoom out"      title="Zoom out">−</button>
-    <button class="cv-ctrl-btn" onclick={fitAll}                  aria-label="Fit all cards" title="Fit all">⊡</button>
+    <button class="cv-ctrl-btn" onclick={() => adjustZoom(0.15)}  aria-label="Zoom in"      >+</button>
+    <button class="cv-ctrl-btn" onclick={() => adjustZoom(-0.15)} aria-label="Zoom out"     >−</button>
+    <button class="cv-ctrl-btn" onclick={fitAll}                  aria-label="Fit all cards">⊡</button>
   </div>
 
   <!-- Minimap -->
   {#if cards.length > 0}
     {@const bounds = minimapBounds()}
     {@const vp = bounds ? minimapViewport(bounds) : null}
-    <div class="cv-minimap" aria-hidden="true">
-      {#if bounds}
+    <div class="cv-minimap{showMinimap ? '' : ' cv-minimap-hidden'}"
+      role="button"
+      tabindex="0"
+      aria-label="Canvas minimap — click to pan"
+      onclick={onMinimapClick}
+      onkeydown={(e) => { if (e.key === 'Enter') onMinimapClick(e); }}
+    >
+      {#if showMinimap && bounds}
         {#each cards as c (c.id)}
           <div class="cv-mm-card" style="
             left:{(c.x - bounds.minX) * bounds.scale + 8}px;
@@ -325,6 +442,13 @@
           "></div>
         {/if}
       {/if}
+      <!-- Toggle button -->
+      <button
+        class="cv-mm-toggle"
+        onclick={(e) => { e.stopPropagation(); showMinimap = !showMinimap; }}
+        aria-label={showMinimap ? 'Hide minimap' : 'Show minimap'}
+        aria-pressed={String(showMinimap)}
+      >{showMinimap ? '▼' : '▲'}</button>
     </div>
   {/if}
 
@@ -333,6 +457,8 @@
     {ctx}
     onClose={onCtxClose}
     onGenerate={onCtxGenerate}
+    onTemplate={onCtxTemplate}
+    templates={ctxTemplates}
   />
 
   <!-- Toast -->

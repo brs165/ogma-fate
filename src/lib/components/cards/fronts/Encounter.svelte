@@ -1,5 +1,5 @@
 <script>
-  let { data = {}, campName = '', catColor = 'var(--fs-section)' } = $props();
+  let { data = {}, campName = '', catColor = 'var(--fs-section)', cardState = {}, onUpdate = () => {} } = $props();
 
   const LADDER = {8:"Legendary",7:"Epic",6:"Fantastic",5:"Superb",4:"Great",3:"Good",2:"Fair",1:"Average",0:"Mediocre"};
 
@@ -10,6 +10,15 @@
   function aspName(a) { return typeof a === 'string' ? a : (a.name || ''); }
   function zoneName(z) { return typeof z === 'string' ? z : (z.name || ''); }
   function zoneAsp(z) { return typeof z === 'object' ? (z.aspect || '') : ''; }
+
+  // Per-opponent stress tracking
+  let oppStress = $derived(cardState?.oppStress || {});
+  function toggleHit(oppName, i) {
+    const key = oppName + '_' + i;
+    const updated = { ...oppStress, [key]: !oppStress[key] };
+    onUpdate({ oppStress: updated });
+  }
+  function isHit(oppName, i) { return !!(oppStress[(oppName + '_' + i)]); }
 </script>
 
 <!-- Scene Aspects -->
@@ -28,13 +37,14 @@
   {#each opp as o}
     {@const isMajor = (o.type || '').toLowerCase() === 'major'}
     {@const oAspects = Array.isArray(o.aspects) ? o.aspects : []}
+    {@const stressCount = o.stress || 2}
     <div class="fs-stunt" style="border-left:3px solid {isMajor ? 'var(--fs-con-sev)' : 'var(--fs-border-mid)'}; border-radius:0 3px 3px 0; padding:8px 10px">
       <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px">
-        <span style="font-size:9px; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; color:{isMajor ? 'var(--fs-con-sev)' : 'var(--fs-text-muted)'}; background:{isMajor ? 'rgba(192,57,43,0.1)' : 'transparent'}; padding:1px 6px; border-radius:2px">{(o.type || '').toUpperCase()} ×{o.qty || 1}</span>
+        <span style="font-size:9px; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; color:{isMajor ? 'var(--fs-con-sev)' : 'var(--fs-text-muted)'}; padding:1px 6px; border-radius:2px">{(o.type||'').toUpperCase()} ×{o.qty||1}</span>
         <span style="font-size:12px; font-weight:700; color:var(--fs-text)">{o.name || ''}</span>
       </div>
       <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:4px">
-        {#each (o.skills || []).slice(0,3) as s}
+        {#each (o.skills||[]).slice(0,3) as s}
           <div class="fs-skill-row" style="margin-bottom:0">
             <span class="fs-skill-badge">+{s.r}</span>
             <span class="fs-skill-name" style="font-size:11px">{s.name}</span>
@@ -47,9 +57,18 @@
         {/each}
       {/if}
       {#if o.stunt}<div style="font-size:11px; color:var(--fs-section); margin-top:2px"><i class="fa-solid fa-star" aria-hidden="true" style="font-size:8px"></i> {o.stunt}</div>{/if}
-      <div style="display:flex; gap:3px; margin-top:4px">
-        {#each Array.from({length: o.stress || 2}) as _}
-          <div style="width:12px; height:12px; border:1.5px solid var(--fs-stress-phy); border-radius:2px"></div>
+      <!-- Interactive stress boxes -->
+      <div style="display:flex; gap:4px; margin-top:6px" role="group" aria-label="{o.name} stress track">
+        {#each Array.from({length: stressCount}) as _, i}
+          {@const hit = isHit(o.name, i)}
+          <button
+            onclick={(e) => { e.stopPropagation(); toggleHit(o.name, i); }}
+            aria-label="Stress box {i+1}{hit ? ' (hit)' : ' (clear)'}"
+            aria-pressed={String(hit)}
+            style="width:16px; height:16px; border:1.5px solid var(--fs-stress-phy); border-radius:2px; background:{hit ? 'var(--fs-stress-phy)' : 'transparent'}; cursor:pointer; padding:0; display:flex; align-items:center; justify-content:center; transition:all 0.1s; flex-shrink:0"
+          >
+            {#if hit}<i class="fa-solid fa-xmark" aria-hidden="true" style="font-size:8px; color:#fff"></i>{/if}
+          </button>
         {/each}
       </div>
     </div>

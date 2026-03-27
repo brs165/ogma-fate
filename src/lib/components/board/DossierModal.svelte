@@ -96,8 +96,8 @@
         </div>
 
         <div class="bd-footer">
-          <button class="bd-chain" onclick={() => { if (onReroll) onReroll(card.id); handleClose(); }} title="Generate a new card of this type">↻ Chain</button>
-          <button class="bd-delete" onclick={() => { if (onDelete) onDelete(card.id); handleClose(); }} title="Remove card from canvas">✕</button>
+          <button class="bd-chain" onclick={() => { if (onReroll) onReroll(card.id); handleClose(); }} aria-label="Chain — generate a new card of this type">↻ Chain</button>
+          <button class="bd-delete" onclick={() => { if (onDelete) onDelete(card.id); handleClose(); }} aria-label="Remove card from canvas">✕</button>
         </div>
       {/if}
     </Dialog.Content>

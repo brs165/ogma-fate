@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import { Progress } from 'bits-ui';
   import { generate, mergeUniversal, filteredTables } from '$lib/engine.js';
   import { CAMPAIGNS } from '$lib/../data/shared.js';
   import { LS } from '$lib/db.js';
@@ -85,6 +86,21 @@
     window.location.href = '/campaigns/' + (campId || 'fantasy');
   }
 
+  function sendAllToTable() {
+    // Pack all generated cards into sessionStorage, navigate to campaign
+    // Campaign.svelte reads ogma_sz_handoff on mount and fires ogma:sz-card events
+    const cards = [];
+    if (seedData)   cards.push({ genId: 'seed',      data: seedData });
+    if (sceneData)  cards.push({ genId: 'scene',     data: sceneData });
+    if (npcData)    cards.push({ genId: 'npc_major', data: npcData });
+    backstories.forEach(b => { if (b) cards.push({ genId: 'backstory', data: b }); });
+    if (!cards.length) { goToBoard(); return; }
+    try {
+      sessionStorage.setItem('ogma_sz_handoff', JSON.stringify({ campId, cards, ts: Date.now() }));
+    } catch(e) {}
+    window.location.href = '/campaigns/' + (campId || 'fantasy') + '?sz=1';
+  }
+
   function exportSession() {
     const items = [];
     if (seedData) items.push({ generator: 'seed', label: seedData.location || 'Seed', data: seedData, ts: Date.now() });
@@ -148,7 +164,7 @@
     <div style="width:100%;max-width:600px">
 
       <!-- Progress tracker -->
-      <div class="pw-track" aria-label="Wizard progress" role="progressbar">
+      <div class="pw-track" aria-label="Wizard progress">
         {#each STEPS as s, i}
           <div class="pw-track-step" class:done={i < step} class:active={i === step}>
             <div class="pw-track-dot">{i < step ? '✓' : s.n}</div>
@@ -156,9 +172,18 @@
           </div>
         {/each}
       </div>
+      <Progress.Root
+        value={step}
+        max={STEPS.length - 1}
+        aria-label="Session Zero progress"
+        style="margin-bottom:20px"
+      >
+        <Progress.Indicator style="width:{(step / (STEPS.length - 1)) * 100}%" />
+      </Progress.Root>
 
       <!-- ── STEP 1: Choose World ──────────────────────────────────── -->
       {#if step === 0}
+        <div class="pw-step-content">
         <div style="font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:6px">STEP 1 OF 6</div>
         <h1 style="font-size:26px;font-weight:800;letter-spacing:-.025em;color:var(--text);margin-bottom:8px;line-height:1.2">Which world are you running?</h1>
         <p style="font-size:13px;color:var(--text-dim);line-height:1.65;margin-bottom:24px">Pick a campaign setting. Everything after this is tailored to your world.</p>
@@ -176,6 +201,8 @@
             </button>
           {/each}
         </div>
+
+        </div><!-- /pw-step-content -->
 
       <!-- ── STEP 2: Player Count ──────────────────────────────────── -->
       {:else if step === 1}
@@ -352,9 +379,13 @@
 
         <div class="pw-action-row">
           <button
-            style="display:inline-flex;align-items:center;gap:8px;background:var(--glass-bg);border:2px solid var(--accent);border-radius:8px;padding:13px 28px;font-size:14px;font-weight:800;color:var(--text);cursor:pointer;box-shadow:0 0 10px color-mix(in srgb,var(--accent) 25%,transparent)"
+            style="display:inline-flex;align-items:center;gap:8px;background:var(--accent);border:2px solid var(--accent);border-radius:8px;padding:13px 28px;font-size:14px;font-weight:800;color:#fff;cursor:pointer;box-shadow:0 0 16px color-mix(in srgb,var(--accent) 35%,transparent)"
+            onclick={sendAllToTable}
+          ><i class="fa-solid fa-table-cells" aria-hidden="true"></i> Send All to Table</button>
+          <button
+            style="display:inline-flex;align-items:center;gap:8px;background:var(--glass-bg);border:2px solid var(--border-mid);border-radius:8px;padding:13px 28px;font-size:14px;font-weight:800;color:var(--text);cursor:pointer"
             onclick={goToBoard}
-          ><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> Open {campName} Generator</button>
+          ><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> Open Generator</button>
           <button
             style="background:none;border:1px solid var(--border);border-radius:8px;padding:12px 20px;font-size:13px;font-weight:600;color:var(--text-dim);cursor:pointer"
             onclick={exportSession}

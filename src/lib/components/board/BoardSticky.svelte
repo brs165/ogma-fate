@@ -72,10 +72,10 @@
 >
   <div class="bc-actions nodrag nopan">
     {#if card.rotation}
-      <button class="bc-btn" title="Reset rotation" aria-label="Reset rotation"
+      <button class="bc-btn" aria-label="Reset rotation"
         onclick={(e) => { e.stopPropagation(); (() => onUpdate && onUpdate(card.id, { rotation: 0 }))(e); }}>↻</button>
     {/if}
-    <button class="bc-btn" title="Delete" aria-label="Delete"
+    <button class="bc-btn" aria-label="Delete"
       onclick={(e) => { e.stopPropagation(); (() => onDelete && onDelete(card.id))(e); }}>✕</button>
   </div>
 
@@ -97,7 +97,7 @@
       onclick={(e) => e.stopPropagation()}
     ></textarea>
   {:else}
-    <div class="board-sticky-text" title="Double-click to edit">{card.text || '"New Aspect"'}</div>
+    <div class="board-sticky-text" >{card.text || '"New Aspect"'}</div>
   {/if}
 
   <!-- Free invoke pips -->
@@ -109,7 +109,6 @@
       <button
         class="sticky-inv-pip{filled ? ' filled' : ''}"
         style="background:{filled ? sc.label : 'transparent'}; border-color:{sc.label}"
-        title={filled ? 'Use free invoke' : 'Empty'}
         aria-label={filled ? 'Use free invoke ' + (i+1) : 'Empty invoke slot ' + (i+1)}
         onclick={() => pipClick(i)}
       ></button>
@@ -117,7 +116,6 @@
     <button
       class="sticky-inv-add"
       style="color:{sc.label}; border-color:{sc.label}"
-      title="Add free invoke"
       aria-label="Add free invoke"
       onclick={addInvoke}
     >+</button>

@@ -47,6 +47,7 @@ export function generateSzPack(pcDrafts, campId, campName, campData, mode) {
 export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChange) {
   const cards  = writable([]);
   const connectors = writable([]);
+  const groups     = writable([]);
   const loaded = writable(false);
 
   let undoStack   = [];
@@ -62,6 +63,9 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
     }).catch(() => loaded.set(true));
     DB.loadSession(campCanvasKey + '_connectors').then(saved => {
       if (saved && Array.isArray(saved.connectors)) connectors.set(saved.connectors);
+    }).catch(() => {});
+    DB.loadSession(campCanvasKey + '_groups').then(saved => {
+      if (saved && Array.isArray(saved.groups)) groups.set(saved.groups);
     }).catch(() => {});
   } else {
     loaded.set(true);
@@ -284,9 +288,33 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
     persistConnectors();
   }
 
+  function persistGroups() {
+    if (!DB) return;
+    DB.saveSession(campCanvasKey + '_groups', { groups: get(groups), ts: Date.now() }).catch(() => {});
+  }
+
+  function addGroup(x, y) {
+    const g = { id: boardUid(), label: 'Scene', x: x || 60, y: y || 60, w: 640, h: 440, colorIdx: 0 };
+    groups.update(gs => gs.concat([g]));
+    persistGroups();
+    if (showToast) showToast('\u{1F5C2} Group added — double-click label to rename');
+  }
+
+  function updateGroup(id, patch) {
+    groups.update(gs => gs.map(g => g.id === id ? Object.assign({}, g, patch) : g));
+    persistGroups();
+  }
+
+  function deleteGroup(id) {
+    groups.update(gs => gs.filter(g => g.id !== id));
+    persistGroups();
+  }
+
   function clearCanvas() {
     connectors.set([]);
     persistConnectors();
+    groups.set([]);
+    persistGroups();
     mutate(() => []);
     if (showToast) showToast('Canvas cleared');
   }
@@ -305,12 +333,14 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
   }
 
   return {
-    cards, loaded, connectors,
+    cards, loaded, connectors, groups,
     getCards: () => get(cards),
     persistCanvas,
     generateCard, generateCardWithData,
     updateCard, deleteCard, rerollCard,
-    addConnector, removeConnector, updateConnector, removeCardConnectors, clearCanvas,
+    addConnector, removeConnector, updateConnector, removeCardConnectors,
+    addGroup, updateGroup, deleteGroup,
+    clearCanvas,
     addStickyWithText,
     undoLast, exportCanvas, importCanvas,
   };

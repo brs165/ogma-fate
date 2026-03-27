@@ -3,7 +3,7 @@
   import Cv4Card from '../cards/Cv4Card.svelte';
   import { GENERATORS } from '../../engine.js';
 
-  let { card = {}, onDelete = null, onReroll = null, onSendToTable = null, onRemoveFromTable = null, onOpen = null, onDragStart = null, onUpdate = null, isOnTable = false, mode = 'prep', campId = '', onInvoke = null, onConnect = null, isConnectSource = false } = $props();
+  let { card = {}, onDelete = null, onReroll = null, onSendToTable = null, onRemoveFromTable = null, onOpen = null, onDragStart = null, onUpdate = null, isOnTable = false, mode = 'prep', campId = '', onInvoke = null, onConnect = null, isConnectSource = false, stackCount = 0 } = $props();
   const BOARD_TYPE_COLOR = {
     npc_minor:    {stripe:'#e8b83a', tc:'#b8860b', bg:'#fffbee'},
     npc_major:    {stripe:'#e8793a', tc:'#c4581a', bg:'#fff3ee'},
@@ -32,6 +32,7 @@
   let minimised = $derived(card.minimised === true);
   // WC-07: GM-only — hidden from player view when sync is active
   let gmOnly = $derived(card.gmOnly === true);
+  // WC-07: stack indicator — show count badge if card is part of a stack
 
   function toggleMinimise(e) {
     e.stopPropagation();
@@ -82,33 +83,38 @@
 >
   <!-- Action buttons -->
   <div class="bc-actions nodrag nopan">
+    {#if stackCount > 1}
+      <button class="bc-btn bc-stack-badge" aria-label="Stack of {stackCount} cards — click to fan out"
+        onclick={(e) => { e.stopPropagation(); if (onUpdate) onUpdate(card.id, { _fanStack: true }); }}>
+        ⊞{stackCount}
+      </button>
+    {/if}
     {#if card.genId !== 'custom'}
-      <button class="bc-btn" title="Reroll" aria-label="Reroll"
+      <button class="bc-btn" aria-label="Reroll"
         onclick={(e) => { e.stopPropagation(); (() => onReroll && onReroll(card.id))(e); }}>↻</button>
     {/if}
     {#if onInvoke && card.genId !== 'sticky' && card.genId !== 'boost' && card.genId !== 'label'}
-      <button class="bc-btn" title="Invoke aspect from this card (+2 next roll)" aria-label="Invoke aspect"
+      <button class="bc-btn" aria-label="Invoke aspect"
         onclick={(e) => { e.stopPropagation(); onInvoke({ source: 'paid', label: card.title || card.genId }); }}
         style="color:var(--accent); font-weight:800">⦿</button>
     {/if}
     <button class="bc-btn bc-btn-connect" class:connecting={isConnectSource}
-      title="Draw connection line to another card"
-      onclick={(e) => { e.stopPropagation(); if (onConnect) onConnect && onConnect(card.id); }}
-      aria-label="Connect this card to another">⤢</button>
-    <button class="bc-btn" title="Pin to Table" aria-label="Pin to Table"
+      aria-label="Draw connection line to another card"
+      onclick={(e) => { e.stopPropagation(); if (onConnect) onConnect && onConnect(card.id); }}>⤢</button>
+    <button class="bc-btn" aria-label="Pin to Table"
       onclick={(e) => { e.stopPropagation(); (() => onSendToTable && onSendToTable(card))(e); }}>⊞</button>
     {#if mode === 'prep'}
-      <button class="bc-btn" title="Move to Table" aria-label="Move to Table"
+      <button class="bc-btn" aria-label="Move to Table"
         onclick={(e) => { e.stopPropagation(); (() => { if (onSendToTable) onSendToTable(card); if (onDelete) onDelete(card.id); })(e); }}>→</button>
     {/if}
     <button class="bc-btn bc-btn-gm-only" class:active={gmOnly}
-      title="{gmOnly ? 'Visible to GM only — click to show to players' : 'Visible to players — click to hide from players'}"
+      
       aria-label="{gmOnly ? 'GM only — hidden from players' : 'Visible to players'}"
       aria-pressed={String(gmOnly)}
       onclick={toggleGmOnly}><i class={gmOnly ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'} aria-hidden="true"></i></button>
-    <button class="bc-btn bc-btn-minimise" title="{minimised ? 'Expand card' : 'Minimise card'}" aria-label="{minimised ? 'Expand' : 'Minimise'}"
+    <button class="bc-btn bc-btn-minimise" aria-label="{minimised ? 'Expand' : 'Minimise'}"
       onclick={toggleMinimise}>{minimised ? '▼' : '▲'}</button>
-    <button class="bc-btn" title="Delete" aria-label="Delete"
+    <button class="bc-btn" aria-label="Delete"
       onclick={(e) => { e.stopPropagation(); (() => onDelete && onDelete(card.id))(e); }}>✕</button>
   </div>
 
@@ -116,13 +122,13 @@
 
   <!-- Minimised title strip (collapsed state) -->
   {#if minimised}
-    <div class="bc-mini-strip" ondblclick={toggleMinimise} title="Double-click to expand">
+    <div class="bc-mini-strip" ondblclick={toggleMinimise} aria-label="Minimised card — double-click to expand">
       <span class="bc-mini-icon" aria-hidden="true">{genEntry ? genEntry.icon : '◈'}</span>
       <span class="bc-mini-title">{card.title || (genEntry ? genEntry.label : card.genId)}</span>
     </div>
   {:else}
   <!-- Card content — double-click to minimise -->
-  <div class="bc-cv4-wrap nodrag nopan" ondblclick={toggleMinimise} title="Double-click to minimise">
+  <div class="bc-cv4-wrap nodrag nopan" ondblclick={toggleMinimise} >
     {#if card.data}
       <div class="bc-cv4-scaler">
         <Cv4Card
@@ -153,7 +159,6 @@
             class="bc-remove-table"
             onclick={(e) => { e.stopPropagation(); onRemoveFromTable(card.id); }}
             aria-label="Remove {card.title || 'card'} from table"
-            title="Remove from table"
           >✕</button>
         {/if}
       {:else}

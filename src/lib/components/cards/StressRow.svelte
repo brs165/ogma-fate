@@ -1,38 +1,37 @@
 <script>
+  import { Checkbox } from 'bits-ui';
+  import OgmaTooltip from '../shared/OgmaTooltip.svelte';
   let { label = '', hits = [], setHits = () => {}, color = 'var(--fs-stress-phy)' } = $props();
+
+  const TIPS = {
+    'Physical': 'Physical stress — taken when hurt bodily. Clears at end of scene. 3 boxes base; 4 at Physique 1–2, 6 at Physique 3+.',
+    'Mental': 'Mental stress — taken from fear, manipulation, or social harm. Clears at end of scene. 3 boxes base; 4 at Will 1–2, 6 at Will 3+.',
+  };
+  let tip = $derived(TIPS[label] || 'Stress clears at end of scene. Check a box to absorb a hit.');
 
   function toggle(i) {
     const a = hits.slice();
     a[i] = !a[i];
     setHits(a);
   }
-
-  function onKeyDown(e, i) {
-    if (e.key === ' ' || e.key === 'Enter') {
-      e.preventDefault();
-      toggle(i);
-    }
-  }
 </script>
 
 <div class="fs-stress-track">
-  <span class="fs-stress-label">{label}</span>
+  <OgmaTooltip {tip}>
+    <span class="fs-stress-label" tabindex="0">{label}</span>
+  </OgmaTooltip>
   <div class="fs-stress-boxes">
     {#each hits as v, i (i)}
-      <div
-        class="fs-stress-box"
-        role="checkbox"
-        tabindex="0"
-        aria-checked={String(!!v)}
+      <Checkbox.Root
+        checked={!!v}
+        onCheckedChange={() => toggle(i)}
         aria-label="{label} stress box {i + 1}{v ? ' (marked)' : ' (clear)'}"
-        onclick={(e) => { e.stopPropagation(); toggle(i); }}
-        onkeydown={(e) => onKeyDown(e, i)}
-        style="border-color:{color}; background:{v ? color : 'transparent'}; color:{v ? '#fff' : color}; animation:{v ? 'fd-box-stamp 0.2s cubic-bezier(0.34,1.56,0.64,1)' : 'none'}"
+        style="border-color:{color}; background:{v ? color : 'transparent'}; color:{v ? '#fff' : color};"
       >
-        {#if v}
-          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-        {/if}
-      </div>
+        <Checkbox.Indicator>
+          {#if v}<i class="fa-solid fa-xmark" aria-hidden="true"></i>{/if}
+        </Checkbox.Indicator>
+      </Checkbox.Root>
     {/each}
   </div>
 </div>

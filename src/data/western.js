@@ -879,3 +879,100 @@ export const CAMPAIGNS = { western: {
     ],
   }, // end tables
 }}; // end CAMPAIGNS["western"]
+
+// ═══════════════════════════════════════════════════════════════════════
+// BL-08 — Dust and Iron depth pass (Sprint 8)
+// Expands thin adjective/role/drive tables to Victorian depth.
+// ═══════════════════════════════════════════════════════════════════════
+(function(){var t = CAMPAIGNS.western.tables;
+
+// ── Minor NPC adj + role expansion ────────────────────────────────────
+t.minor_concepts.v.DmAdj = t.minor_concepts.v.DmAdj.concat([
+  "trail-worn","tight-lipped","sun-baked","bone-tired","double-dealing",
+  "soft-spoken","quick-tempered","road-weary","company-owned","war-hollowed",
+  "lawless-adjacent","drought-mean","claim-jumped","debt-ridden","church-going"
+]);
+t.minor_concepts.v.DmRole = t.minor_concepts.v.DmRole.concat([
+  "night-herder","land agent","army deserter","claim jumper","barkeep",
+  "undertaker","midwife","horse thief","dry-goods clerk","circuit judge",
+  "Mexican vaquero","Pinkerton man","freedman homesteader","Chinese cook","cattle detective"
+]);
+t.minor_concepts.v.DmOrigin = (t.minor_concepts.v.DmOrigin || []).concat([
+  "the reservation","the mine camps","the Confederate side","the Union side",
+  "south of the border","the territories that don't have names yet"
+]);
+t.minor_concepts.v.DmFlaw = (t.minor_concepts.v.DmFlaw || []).concat([
+  "name on a wanted poster","war they can't leave behind","loyalty to the wrong outfit",
+  "bottle that owns them","land they can't legally prove they own"
+]);
+t.minor_concepts.v.DmAct = (t.minor_concepts.v.DmAct || []).concat([
+  "has been watching the ranch road","works for two bosses who don't know about each other",
+  "carries a letter they haven't delivered","knows where the body is buried — literally",
+  "is three days from leaving and something keeps stopping them"
+]);
+
+// ── Major NPC expansion ────────────────────────────────────────────────
+t.major_concepts.v.CmajAdj = t.major_concepts.v.CmajAdj.concat([
+  "war-scarred","company-bought","land-hungry","reputation-ruined","hard-eyed",
+  "once-honest","drought-hardened","politically-connected","cattle-rich","blood-guilty",
+  "federally-wanted","railroad-backed","silver-flush","border-seasoned","quietly-deadly"
+]);
+t.major_concepts.v.CmajTitle = t.major_concepts.v.CmajTitle.concat([
+  "The Land Agent","The Mine Owner","The Apache Tracker","The Cavalry Captain",
+  "The Freedman Sheriff","The Company Doctor","The Territorial Judge",
+  "The Hired Gun","The Water Rights Holder","The Newspaper Editor"
+]);
+t.major_concepts.v.CmajRole = t.major_concepts.v.CmajRole.concat([
+  "Pinkerton detective","land speculator","reservation agent","cattle queen",
+  "territorial newspaper man","silver mine owner","Mexican hacendado",
+  "army surgeon gone civilian","freedman marshal","railroad land commissioner"
+]);
+t.major_concepts.v.CmajDrive = t.major_concepts.v.CmajDrive.concat([
+  "owns the water rights and will use them","made a railroad deal this town doesn't know about",
+  "came here after the war and never went back","holds paper on half the deeds in the county",
+  "is buying up everything before the railroad route is announced",
+  "has been protecting this town's secret for twenty years",
+  "knows who ordered the massacre and has been waiting"
+]);
+t.major_concepts.v.CmajSecret = t.major_concepts.v.CmajSecret.concat([
+  "the land grant they're sitting on is older than the territorial survey",
+  "the name in the deed box isn't theirs","three men dead from their last job nobody talked about",
+  "the photograph in their coat of someone they swore to forget",
+  "a prior life back East that better people are protecting them from"
+]);
+
+// ── Scene tone expansion ───────────────────────────────────────────────
+t.scene_tone.v.WtAdj = t.scene_tone.v.WtAdj.concat([
+  "dust-hazed","iron-flat","sun-hammered","wind-scoured","drought-cracked",
+  "claim-salted","blood-quiet","gun-heavy","territory-wide","road-weary",
+  "bone-dry","smoke-stained","mesa-tall","canyon-deep","brand-fresh"
+]);
+t.scene_tone.v.WtAdj2 = t.scene_tone.v.WtAdj2.concat([
+  "carrying more history than the people in it","about two words from violence",
+  "watching the road and not saying why","full of men with reasons to be somewhere else",
+  "too quiet for this hour of the day","wrong in the way towns go wrong when the money leaves",
+  "holding the last thing that happened very carefully","remembering what was here before the railroad",
+  "carrying the specific patience of people who have learned to wait for the right moment",
+  "managed by someone not in the room"
+]);
+t.scene_tone.v.WtNoun = t.scene_tone.v.WtNoun.concat([
+  "rope","land","claim","drought","salt","rifle","church","warrant","debt","wire"
+]);
+t.scene_tone.v.WtQual = t.scene_tone.v.WtQual.concat([
+  "like a town that knows something is coming","like the silence after a shot",
+  "like water that's almost gone","like a deal that's already been made",
+  "like the last honest man rode out this morning","like everything is still legal — barely",
+  "like a fire that just went out"
+]);
+t.scene_tone.v.WtSmell = t.scene_tone.v.WtSmell.concat([
+  "hot iron and horse leather","dry grass and distant rain","gun oil and sawdust",
+  "creek mud and pine smoke","cattle and old money","alkali and disappointment",
+  "the specific smell of a town that burned once and remembers it"
+]);
+t.scene_tone.v.WtLight = t.scene_tone.v.WtLight.concat([
+  "cutting low between the false fronts","bright and merciless overhead",
+  "failing fast the way it does in the territories","diffused through afternoon dust",
+  "through the livery slats, striped and hot","coming up off the flats with nowhere to hide"
+]);
+
+})();

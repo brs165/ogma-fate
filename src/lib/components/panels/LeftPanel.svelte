@@ -1,6 +1,7 @@
 <script>
   import HelpPanel from '../board/HelpPanel.svelte';
   import StuntPanel from '../board/StuntPanel.svelte';
+  import { Tabs, ScrollArea } from 'bits-ui';
   // Derive world stunts from CAMPAIGNS global
   let { activeGen = 'npc_minor', onSelectGen = () => {}, campId = '', activeTab = 'gen', onTabChange = () => {}, campName = '' } = $props();
   let worldStunts = $derived((typeof globalThis.CAMPAIGNS !== 'undefined' && globalThis.CAMPAIGNS[campId] &&
@@ -57,48 +58,57 @@
 </script>
 
 <div class="blp">
-  <div class="blp-tabs">
-    <button class="blp-tab" class:active={activeTab === 'gen'} onclick={() => onTabChange('gen')}>Generate</button>
-    <button class="blp-tab" class:active={activeTab === 'stunts'} onclick={() => onTabChange('stunts')}>Stunts</button>
-    <button class="blp-tab" class:active={activeTab === 'help'} onclick={() => onTabChange('help')}>Help</button>
-  </div>
+  <Tabs.Root value={activeTab} onValueChange={(v) => onTabChange(v)}>
+    <Tabs.List aria-label="Panel sections">
+      <Tabs.Trigger value="gen">Generate</Tabs.Trigger>
+      <Tabs.Trigger value="stunts">Stunts</Tabs.Trigger>
+      <Tabs.Trigger value="help">Help</Tabs.Trigger>
+    </Tabs.List>
 
-  {#if activeTab === 'gen'}
-    <div class="blp-body">
-      {#each BOARD_GEN_GROUPS as group (group.id)}
-        {#if group.separator}
-          <div class="blp-separator">{group.label}</div>
-        {:else}
-          <div class="blp-group">{group.label}</div>
-        {/if}
-        {#each group.gens as gen (gen.id)}
-          <button
-            class="blp-item" class:active={activeGen === gen.id}
-            onclick={() => onSelectGen(gen.id)}
-            onkeydown={(e) => {
-              if (e.key === 'ArrowDown') { e.preventDefault(); e.currentTarget.nextElementSibling?.focus(); }
-              if (e.key === 'ArrowUp') { e.preventDefault(); e.currentTarget.previousElementSibling?.focus(); }
-            }}
-            title="{gen.label}{gen.sub ? ' \u2014 ' + gen.sub : ''}"
-          >
-            <span class="blp-icon">{gen.icon}</span>
-            <div class="blp-label-wrap">
-              <span class="blp-label">{gen.label}</span>
-              {#if gen.sub}
-                <span class="blp-sub">{gen.sub}</span>
+    <Tabs.Content value="gen">
+      <ScrollArea.Root>
+        <ScrollArea.Viewport>
+          <div class="blp-body">
+            {#each BOARD_GEN_GROUPS as group (group.id)}
+              {#if group.separator}
+                <div class="blp-separator">{group.label}</div>
+              {:else}
+                <div class="blp-group">{group.label}</div>
               {/if}
-            </div>
-          </button>
-        {/each}
-      {/each}
-    </div>
-  {/if}
+              {#each group.gens as gen (gen.id)}
+                <button
+                  class="blp-item" class:active={activeGen === gen.id}
+                  onclick={() => onSelectGen(gen.id)}
+                  onkeydown={(e) => {
+                    if (e.key === 'ArrowDown') { e.preventDefault(); e.currentTarget.nextElementSibling?.focus(); }
+                    if (e.key === 'ArrowUp') { e.preventDefault(); e.currentTarget.previousElementSibling?.focus(); }
+                  }}
+                  aria-label="{gen.label}{gen.sub ? ' \u2014 ' + gen.sub : ''}"
+                >
+                  <span class="blp-icon">{gen.icon}</span>
+                  <div class="blp-label-wrap">
+                    <span class="blp-label">{gen.label}</span>
+                    {#if gen.sub}
+                      <span class="blp-sub">{gen.sub}</span>
+                    {/if}
+                  </div>
+                </button>
+              {/each}
+            {/each}
+          </div>
+        </ScrollArea.Viewport>
+        <ScrollArea.Scrollbar orientation="vertical">
+          <ScrollArea.Thumb />
+        </ScrollArea.Scrollbar>
+      </ScrollArea.Root>
+    </Tabs.Content>
 
-  {#if activeTab === 'stunts'}
-    <StuntPanel worldStunts={worldStunts} />
-  {/if}
+    <Tabs.Content value="stunts">
+      <StuntPanel worldStunts={worldStunts} />
+    </Tabs.Content>
 
-  {#if activeTab === 'help'}
-    <HelpPanel />
-  {/if}
+    <Tabs.Content value="help">
+      <HelpPanel />
+    </Tabs.Content>
+  </Tabs.Root>
 </div>

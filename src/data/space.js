@@ -77,7 +77,7 @@ export const CAMPAIGNS = { space: {
             SmajAlt: ["authority asset", "independent contractor", "fugitive", "civilian", "the problem", "reluctant ally"],
             SmajRep: ["most wanted", "most useful", "most expensive", "most dangerous", "most unreachable", "last surviving"],
             SmajSpace: ["the belt", "the outer systems", "charted space", "this sector", "the station network", "the dead zones"],
-            SmajSecret: ["a jump point on no official chart", "an authority file with their real history", "a contact inside the target corp", "a ship registered under a dead person's name", "a debt settleable in only one currency", "a first-contact record never filed", "a first contact record that changes the legal status of three systems", "a route map that bypasses every authority checkpoint in the belt", "the location of the corp's classified xenotech site", "a ship registered under a destroyed settlement's colonial charter - still legally valid"
+            SmajSecret: ["a jump point on no official chart", "an authority file with their real history", "a contact inside the target corp", "a ship registered under a dead person's name", "a debt settleable in only one currency", "a first-contact record never filed", "a first contact record that changes the legal status of three systems", "a route map past every authority checkpoint in the belt", "the location of the corp's classified xenotech site", "a ship registered under a destroyed settlement's colonial charter - still legally valid"
             ],
           }
         },

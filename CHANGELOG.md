@@ -2,7 +2,34 @@
 
 ---
 
-## [2026.03.665] — March 2026 — Canvas UX Fixes
+## [2026.03.675] — March 2026 — Sprint 6: Bits UI + Delight Pass
+
+### Bits UI upgrades
+- StressRow, ClockTrack → Bits Checkbox (a11y focus ring, keyboard, ARIA)
+- LeftPanel → Bits Tabs + ScrollArea (arrow-key nav, styled scrollbar)
+- FatePointTracker → Bits Tabs, FP dots → button elements (keyboard reachable)
+- Board.svelte → Bits AlertDialog for Clear Table (focus trap, Escape, ARIA)
+- ExportPanel → Bits RadioGroup for format + delivery pickers
+- DicePanel → Bits RadioGroup for skill ladder
+- Campaign sidebar → Bits Collapsible accordion (animated slide open/close)
+- Session Zero → Bits Progress bar + pw-step-content entrance animation
+- Backstory → Bits Collapsible write-in answers per question
+- OgmaTooltip.svelte component created (Bits Tooltip wrapper)
+- 51 title= attributes converted to aria-label across board components
+
+### Delight animations
+- Canvas card hover: lift shadow + translateY + rotate
+- Seed pack stagger entrance (55ms per card)
+- Skill bars: sev-bar-slam with stagger in NpcMajor + NpcMinor
+- Contest victory box: spring-pop on score
+- Scene free-invoke: spend toggle with strike-reveal animation
+- Encounter: interactive stress boxes with cardState persistence
+- Dice result: fp-num-pop on total, sev-label-out on outcome, dr-pop on history
+- Session Zero step: pw-step-in slide transition
+- CommandPalette active item: translateX(3px) + accent left border
+- Mobile haptic vibration on dice roll (navigator.vibrate(40))
+
+## [2026.03.666] — March 2026 — Canvas UX Fixes
 
 - Canvas cards: 646px width, auto height (was 320px)
 - Binder auto-load to canvas gated to Prep mode only — Play canvas starts empty until GM sends cards
@@ -11,7 +38,7 @@
 - Campaign.svelte: passes onClose={() => canvasView = false} to Board
 - Topbar: onClose prop — renders as button (callback) when provided, falls back to href link when not
 
-## [2026.03.665] — March 2026 — OgmaCanvas.svelte extraction
+## [2026.03.666] — March 2026 — OgmaCanvas.svelte extraction
 
 ### Canvas refactor: Board.svelte → OgmaCanvas.svelte
 - Created `OgmaCanvas.svelte` (344 lines) — self-contained canvas component
@@ -57,7 +84,7 @@
 - BOOTSTRAP.md: build script rule clarified (npx vite build for tests, bump-version.sh once for zip)
 - PROJECT_MEMORY.md: stack table updated, SvelteFlow architecture section replaced with native canvas section
 - CANVAS-WORKSHOP.md: archived SvelteFlow sprint history, updated feature status table
-- All version references updated to 2026.03.665/662
+- All version references updated to 2026.03.666/662
 
 ---
 

@@ -247,7 +247,12 @@ export const HELP_CONTENT = {
       "Offer the fate point first, then state the complication. This order makes acceptance feel like agency rather than punishment.",
       "Two to three compels per session is the right cadence. If an hour passes without one, offer one now.",
       "Two refusals means you're finding the right aspects. The refusal still costs them a fate point — that's fine.",
-      "Compel the situation, not the character. 'Your aspect means this happens' is stronger than 'your aspect means you fail.'"
+      "Compel the situation, not the character. 'Your aspect means this happens' is stronger than 'your aspect means you fail.'",
+    
+      "Self-compels are the gold standard. When a player says 'my trouble means I should...' and creates a problem for themselves, reward the instinct immediately.",
+      "Don't compel consequences as gotchas. A consequence aspect can be invoked and compelled, but only in scenes where it's already affecting the fiction.",
+      "The best compels arrive naturally. Scan your aspect notes before each scene — one of them should be itching to fire.",
+      "Compel chains work. If you compel one PC's aspect and another PC's trouble makes them unable to let it go, offer the second compel immediately. FP floods the table.",
     ],
     invoke_example: "A PC has the aspect 'Loyalty to the Crew Above All.' They're trying to talk a neutral contact into helping. Invoke the aspect for +2 on Rapport - their genuine commitment to protecting people reads as trustworthy, not just desperate.",
     compel_example: "The same PC has gathered intel the crew needs urgently. But the situation aspect 'Every Exit Has Eyes' is in play. The GM offers a fate point: their loyalty compel fires - they can't leave a teammate who's still inside, even though it means walking through the surveillance zone.",
@@ -260,6 +265,8 @@ export const HELP_CONTENT = {
         ["Refuse", "Spend a fate point to avoid the complication. You stay in control, but you're poorer."],
       ],
     },
+  
+    dnd_notes: "D&D character flaws are optional flavor. In Fate, aspects are live mechanics. The GM offers a fate point and the player accepts the complication (gains FP) or refuses (spends FP). It is an economy, not a penalty.",
   },
   challenge: {
     title: "Challenge",
@@ -279,7 +286,12 @@ export const HELP_CONTENT = {
       "Declare the primary skill and difficulty before any dice touch the table. Players need the playing field first.",
       "Let players Create Advantage before the decisive roll — reward preparation with free invokes when it matters.",
       "Keep it to 3-5 rolls. Past five, the tension deflates. End it decisively.",
-      "Failure changes the situation — it never ends the scene. Ask what failure looks like before the roll."
+      "Failure changes the situation — it never ends the scene. Ask what failure looks like before the roll.",
+    
+      "The best challenges are ones where different PCs contribute different skills to different problems simultaneously. A challenge where everyone rolls the same skill isn't a challenge — it's a montage.",
+      "Declare failure conditions before anyone rolls. Players trust challenges when they know failure is a thing that changes the story, not ends it.",
+      "Mix success and failure — it's better than all-success. 3/5 successes is a richer fiction than 5/5.",
+      "The decisive roll should always be the last one. Build tension in sequence — the earlier rolls narrow options for the final roll.",
     ],
     invoke_example: "The challenge is breaking into a locked archive. A PC used Create Advantage earlier to place 'Guard Rotation on a Predictable Loop.' Now they invoke that free invoke for +2 on Burglary — the window is exactly where they predicted.",
     compel_example: "Halfway through the same challenge, a PC has the aspect 'My Tools Are Always Jury-Rigged.' The GM offers a fate point mid-challenge: a critical piece of equipment fails at the worst moment, raising the difficulty of the next roll. They take the fate point. The tension spikes.",
@@ -292,6 +304,8 @@ export const HELP_CONTENT = {
         ["Create Advantage", "Set up a helpful aspect before the big roll. Successful setup gives a free +2 boost."],
       ],
     },
+  
+    dnd_notes: "D&D skill challenge uses rigid pass/fail math. Fate challenge: failure changes the situation rather than blocking the scene. Success at a Cost is always available. There is no 'the party failed the skill challenge.'",
   },
   contest: {
     title: "Contest",
@@ -547,7 +561,12 @@ export const HELP_CONTENT = {
       "State limitations before players commit to an action — after the roll is a gotcha. Before the roll is a puzzle.",
       "Resistances require a bypass. The players need to know a bypass exists, even if they don't know what it is yet.",
       "One constraint: interesting. Two: a puzzle. Three: a slog. Stop at two per encounter.",
-      "Players figure out bypasses through Investigate, Lore, or the right NPC conversation. Reward the research."
+      "Players figure out bypasses through Investigate, Lore, or the right NPC conversation. Reward the research.",
+    
+      "Introduce the bypass before the party needs it. Seed it two scenes back. When they need it, they'll feel clever for having found it.",
+      "Name the bypass out loud at session prep. 'The entity can only be harmed by iron smelted before 1200 AD' is your session premise. The party's job is finding that iron.",
+      "Limitations are best when they create interesting trades. 'You can attack but it alerts the entity' forces choice every exchange — that's drama.",
+      "Review constraints between sessions. If the party hasn't engaged with the bypass in two sessions, compress the timeline. Escalate. Make it urgent.",
     ],
     invoke_example: "The constraint is a resistance: 'Armoured Hide — Blades Can't Pierce It.' A PC has found the bypass (a gap at the throat). They invoke the aspect 'One Weak Spot' that they placed via Create Advantage — for +2 on Fight to strike the gap under pressure.",
     compel_example: "Same creature. A PC's high concept is 'I Solve Every Problem with Force.' The GM offers a fate point: their usual approach is useless against the hide. They're off balance, frustrated, swinging at something that shrugs off every blow. The limitation becomes character texture.",
@@ -560,6 +579,8 @@ export const HELP_CONTENT = {
         ["Cost", "What happens if you try the restricted action anyway. Not 'you can't' — 'you can, but here's the price.'"],
       ],
     },
+  
+    dnd_notes: "D&D has immunities (fire immune = no damage). Fate constraints redirect rather than block — the bypass is always there, it just requires fiction: find the sword, learn the word, negotiate the exception. The party is never simply stopped.",
   },
 
 };

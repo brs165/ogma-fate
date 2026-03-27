@@ -1,80 +1,129 @@
 # Roadmap — Ogma
 
-See `docs/claude/PROJECT_MEMORY.md` for full project state.
+See `docs/claude/PROJECT_MEMORY.md` for full project state and `docs/claude/TEAM-VOICES.md` for workshop voices.
 
 ---
 
-## Current version: 2026.03.665
+## Current version: v2026.03.675
 
-**Stack:** SvelteKit + Svelte 5.55 runes + native canvas (OgmaCanvas.svelte) + Bits UI + Dexie 4 + FA 7.2 Free
-**QA gate:** 78 `.svelte` files | 3 stores (canvas, session, chrome) | 189 hard checks | 166 export checks
-
----
-
-## Strategic direction (March 2026)
-
-Ogma is **Learn + Generate + Table** — not a VTT. Online play is a solved problem (Foundry, Roll20, Owlbear). What nobody does well is Fate-native generation and spatial prep. That is the moat.
-
-**Removed:** PartyKit/CloudFlare sync, Play mode, Binder, TurnBar, CombatTracker, PlayPanel, PlayerRow, PlayerSurface
-**Focused on:** generators, the Table canvas, the dice roller, and learning content
+**Stack:** SvelteKit + Svelte 5.55 runes + native canvas (OgmaCanvas.svelte) + Bits UI 2.16.3 + Dexie 4 + FA 7.2 Free
+**QA gate:** 72 `.svelte` files (45 components + 27 routes) | 3 stores | 189 hard checks | 166 export checks
 
 ---
 
-## Active sprint backlog (committed)
+## Strategic direction
 
-### Sprint 1 ✅ DONE — Deletions + Table rename
-- Deleted: syncStore, playStore, binderStore, 9 components
-- Board.svelte: 824 → 381 lines, play/binder/sync removed
-- Topbar: mode toggle, sync controls, binder button removed. "Table" label added.
-- canvasStore: loadBinderToCanvas + play canvas guard removed
-- DossierModal, OgmaCanvas, ExportMenu: dead props stripped
+Ogma is **Learn + Generate + Table** — not a VTT. The moat is Fate-native generation and spatial prep that no other tool does well. Online play is solved elsewhere.
 
-### Sprint 2 — 50/50 split layout (Generator | Table)
-- Campaign page: left = generator result, right = Table canvas, draggable divider with snap points (30/70, 50/50, 70/30, 0/100)
-- Split ratio persisted per world in localStorage
-- Full-table button collapses generator panel, table fills content area
-- Mobile: generator fills screen, Table accessible via "◈ Table" bottom-sheet (80vh, swipe to dismiss)
-- Campaign.svelte + Board.svelte merge into unified WorldPage layout — no canvasView boolean toggle
-
-### Sprint 3 — Direct generation → Table
-- Every generator result card gets "→ Table" button
-- Direct send to canvas at smart grid position (no binder staging)
-- Session Zero: cards send directly to Table
-- Roll history panel: every past result has "→ Table" action
-
-### Sprint 4 — Dice roller rebuild (card UI + draggable + modifiers)
-- DicePanel.svelte rewritten with fd-card visual treatment
-- Draggable by header strip (pointer-capture, same pattern as canvas cards)
-- Modifier strip: tap +2 buttons (invoke = +2), stacks, running total shown
-- Skill ladder: tap-to-select (Mediocre +0 through Epic +7), world-labelled
-- Result: 4 Fate die faces (SVG +-0), shift number, ladder label, outcome tag
-- Collapse button: folds to header strip only
-- Roll history strip: last 5 rolls, dismissable
-
-### Sprint 5 — FatePointTracker card treatment
-- FatePointTracker.svelte gets fd-card shell (same visual as canvas cards)
-- Draggable floater by header
-- Simplified: single GM pool counter + per-PC optional tracking
-- No player roster required — pool sets at session start manually
+**Pillars:**
+- **Learn** — interactive tutorials, D&D-to-Fate transition, at-table reference
+- **Generate** — 17 generators across 8 worlds, world-flavoured content
+- **Table** — spatial canvas for GM prep, draggable cards, connectors
 
 ---
 
-## Remaining content backlog
+## Sprint 7 — In progress (v668)
 
-- **BL-03** Victorian adjective pass [S]
-- **BL-08** Western world content depth [M]
-- **WC-02** Node groups — scene spatial grouping [M]
-- **WC-05** Canvas templates — starter scene layouts [M]
-- **PDF-04–08** Shattered Kingdoms, Neon Abyss, Void Runners, dVenti Realm, Dust and Iron
+### 7a — Doc + Divider + Tooltip + SZ flow
+- [x] TEAM-VOICES.md rewritten for current stack
+- [x] ROADMAP.md updated with full sprint plan
+- [ ] Split layout drag-to-resize (pointer events on `.cp-divider`, localStorage persist)
+- [ ] OgmaTooltip wired to 8 key educational touchpoints
+- [ ] Session Zero Done step → "→ Send All to Table" button
 
 ---
 
-## Recently completed
+## Sprint 8 — Content quality (v669)
 
-- **v662–664** Native canvas migration — SvelteFlow removed, OgmaCanvas.svelte, 646px cards, full-screen fixed layout, back button callback
-- **v660** SvelteFlow API fix — flowNodes/flowEdges plain $state arrays
-- **v652–655** Deep dive learning content, Teacher voice
-- **v633–648** Canvas polish — gmOnly toggle, undo moves, consequence stickies, Ctrl+A
-- **v600** FateX card restyling — all 18 fronts with fs-* tokens
-- **v593** Font Awesome 7.2 Free — ~200 emoji replacements
-- **v586** Legal compliance — attribution corrected
+**Goal:** Every world feels hand-crafted, not procedurally flat.
+
+- **BL-03** Victorian adjective pass — `data/victorian.js`
+  Replace generic adjectives with: unwholesome, peculiar, atmospheric, uncanny,
+  lurid, grotesque, mesmeric, vaporous, spectral, insalubrious
+- **BL-08** Western world depth — `data/western.js`
+  Expand NPC tables, add frontier-specific stunts, deepen location descriptions
+- **Consequence card** — recovery timing display
+  Add severity → timing lookup: Mild=end scene, Moderate=end session, Severe=end arc
+- **Empty Table canvas** — ghost call-to-action state when 0 cards
+  Faded example card + "Roll something and send it here →" instruction label
+
+---
+
+## Sprint 9 ✅ DONE — Canvas features (v670)
+
+**Goal:** The Table becomes a proper spatial workspace.
+
+- **WC-05** Canvas templates — starter scene layouts
+  One-click drops a pre-formed layout: Opening Scene (scene + 2 NPCs + countdown),
+  Investigation (scene + faction + complication + obstacle),
+  Climax (encounter + contest + boost × 2)
+  Accessible via context menu + command palette
+- **WC-02** Node groups — scene container
+  Drag a resize handle to create a labelled region that visually groups cards
+  Cards inside inherit a tinted background from the region colour
+  Double-click region label to rename
+
+---
+
+## Sprint 10 — PDF world books (v671–v675)
+
+**Goal:** Every world has a print-ready digest.
+
+Pattern: `reportlab --break-system-packages`, 6×9 digest, world palette accent colour,
+Evil Hat Worlds of Adventure layout. Scripts rebuilt each session from pattern.
+
+Shipped: The Long Road (35pp, v648), The Long After (40pp, v651), The Gaslight Chronicles (49pp, v654)
+
+- **PDF-04** Shattered Kingdoms (dark fantasy)
+- **PDF-05** Neon Abyss (cyberpunk)
+- **PDF-06** Void Runners (space western)
+- **PDF-07** dVenti Realm (high fantasy)
+- **PDF-08** Dust and Iron (frontier western)
+
+---
+
+## Sprint 11 ✅ DONE — Polish pass (v671)
+
+**Goal:** Everything feels finished.
+
+- **BL-07b** GM Tips depth — second pass on 3 weakest generators
+- **WC-06** Canvas minimap — toggle show/hide, click to pan
+- **WC-07** Card stacking — drag card onto another to form a stack, click to fan
+- Help wiki — at-the-table quick reference card (single printable page)
+- WCAG 2.1 AA audit — verify all Bits upgrades pass with assistive technology
+
+---
+
+## Completed
+
+### v2026.03.665–667 — Strategic pivot + Bits UI + delight pass
+- Play/binder/sync removed (syncStore, playStore, binderStore, 9 components)
+- 50/50 split layout: generator | Table, always both visible
+- Board `embedded` prop, `sendToTable()` exported
+- Direct → Table button on every generator result
+- DicePanel rebuilt: card UI, draggable, modifier strip, Fate die faces, haptic
+- FatePointTracker: fd-card shell, draggable, Bits Tabs
+- Bits Checkbox → StressRow, ClockTrack
+- Bits Tabs → LeftPanel + ScrollArea, FatePointTracker
+- Bits AlertDialog → Board Clear Table
+- Bits RadioGroup → ExportPanel, DicePanel
+- Bits Collapsible → Campaign sidebar accordion, Backstory write-ins
+- Bits Progress → Session Zero wizard
+- OgmaTooltip.svelte component created
+- 51 `title=` → `aria-label` conversion across board components
+- FP dots → `<button aria-pressed>`
+- Canvas card hover lift shadow, seed pack stagger, skill bars, contest victory pop,
+  scene free-invoke spend toggle, encounter interactive stress, dice result animations,
+  mobile haptic vibration
+
+### v2026.03.662–664 — Native canvas migration
+- SvelteFlow removed; OgmaCanvas.svelte (~250 lines) with pointer pan/zoom
+- Card width 646px, auto height; CSS transform on cv-viewport
+- connectors as SVG overlay; minimap as scaled CSS rects
+
+### v2026.03.600–660 — Foundation
+- FateX card restyling (all 18 fronts, fs-* tokens)
+- Font Awesome 7.2 Free (~200 emoji replacements)
+- Legal compliance (Fate Condensed attribution)
+- Deep dive learning content, Teacher voice
+- Canvas polish: gmOnly, undo, consequence stickies, Ctrl+A

@@ -2,7 +2,7 @@
   // CanvasContextMenu — right-click menu for canvas card generation
   // No SvelteFlow dependency — coords computed by Board.svelte screenToCanvas()
 
-  let { ctx = null, onClose = null, onGenerate = null } = $props();
+  let { ctx = null, onClose = null, onGenerate = null, onTemplate = null, templates = [] } = $props();
 
   const CTX_ITEMS = [
     { id: 'npc_minor',   icon: '\u{1F9D1}', label: 'Minor NPC' },
@@ -14,6 +14,7 @@
     { id: 'sticky',      icon: '\u{1F4DD}', label: 'Aspect Sticky' },
     { id: 'boost',       icon: '\u26A1',    label: 'Boost' },
     { id: 'label',       icon: '\u{1F516}', label: 'Section Label' },
+    { id: '__group__',   icon: '\u{1F5C2}', label: 'Scene Group' },
   ];
 
   function generate(genId) {
@@ -48,6 +49,23 @@
       </div>
     {/each}
     <div class="board-ctx-sep" role="separator"></div>
+    {#if templates.length > 0}
+      <div class="board-ctx-section" role="none">Drop template</div>
+      {#each templates as t (t.id)}
+        <div
+          class="board-ctx-item"
+          role="menuitem"
+          tabindex="0"
+          onclick={() => { onTemplate?.(t.id); onClose?.(); }}
+          onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onTemplate?.(t.id); onClose?.(); } }}
+        >
+          <span class="board-ctx-icon" aria-hidden="true">{t.icon}</span>
+          <span>{t.label}</span>
+          <span class="board-ctx-sub">{t.desc}</span>
+        </div>
+      {/each}
+      <div class="board-ctx-sep" role="separator"></div>
+    {/if}
     <div
       class="board-ctx-item"
       role="menuitem"

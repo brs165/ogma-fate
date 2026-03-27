@@ -16,9 +16,18 @@
   import OgmaCanvas    from './OgmaCanvas.svelte';
   import GenerateFAB   from './GenerateFAB.svelte';
   import FatePointTracker from '../campaign/FatePointTracker.svelte';
+  import { AlertDialog } from 'bits-ui';
 
   // ── Props ──────────────────────────────────────────────────────────────────
-  let { campId = 'fantasy', onClose = null } = $props();
+  let { campId = 'fantasy', onClose = null, embedded = false } = $props();
+
+  // ── Exposed for embedded parent ────────────────────────────────────────────
+  export function sendToTable(genId, data) {
+    if (!canvas) return;
+    canvas.generateCardWithData(genId, data);
+  }
+  export function toggleDice() { showDice = !showDice; }
+  export function toggleFP()   { showFP   = !showFP;   }
 
   // ── Constants ──────────────────────────────────────────────────────────────
   const BOARD_CANVAS_KEY = 'board_canvas_v1';
@@ -63,6 +72,7 @@
   let canvas = $state();
   let cards  = $state([]);
   let loaded = $state(false);
+  let groups = $state([]);
   let unsubs = [];
 
   let campCanvasKey = $derived(BOARD_CANVAS_KEY + '_' + campId);
@@ -73,6 +83,7 @@
     canvas = createCanvasStore(campCanvasKey, tables, showToast, null);
     unsubs.push(canvas.cards.subscribe(v => cards = v));
     unsubs.push(canvas.connectors.subscribe(v => connectorLines = v));
+    unsubs.push(canvas.groups.subscribe(v => groups = v));
     unsubs.push(canvas.loaded.subscribe(v => {
       loaded = v;
       if (v && cards.length > 0) setTimeout(() => fitAll(), 120);
@@ -108,12 +119,81 @@
   // ── fitAll via OgmaCanvas ref ──────────────────────────────────────────────
   function fitAll() { if (canvasRef) canvasRef.fitAll(); }
 
+  // ── Canvas templates (WC-05) ───────────────────────────────────────────────
+  const CANVAS_TEMPLATES = [
+    {
+      id: 'tpl_opening',
+      icon: '\u{1F3AC}',
+      label: 'Opening Scene',
+      desc: 'Scene + 2 NPCs + Countdown',
+      cards: [
+        { genId: 'scene',      dx: 0,   dy: 0   },
+        { genId: 'npc_minor',  dx: 680, dy: 0   },
+        { genId: 'npc_minor',  dx: 680, dy: 480 },
+        { genId: 'countdown',  dx: 0,   dy: 520 },
+      ],
+    },
+    {
+      id: 'tpl_investigation',
+      icon: '\u{1F50D}',
+      label: 'Investigation',
+      desc: 'Scene + Faction + Complication + Obstacle',
+      cards: [
+        { genId: 'scene',        dx: 0,   dy: 0   },
+        { genId: 'faction',      dx: 680, dy: 0   },
+        { genId: 'complication', dx: 0,   dy: 520 },
+        { genId: 'obstacle',     dx: 680, dy: 520 },
+      ],
+    },
+    {
+      id: 'tpl_climax',
+      icon: '\u{1F525}',
+      label: 'Climax',
+      desc: 'Encounter + Contest + 2 Boosts',
+      cards: [
+        { genId: 'encounter', dx: 0,    dy: 0   },
+        { genId: 'contest',   dx: 680,  dy: 0   },
+        { genId: 'boost',     dx: 0,    dy: 520 },
+        { genId: 'boost',     dx: 340,  dy: 520 },
+      ],
+    },
+    {
+      id: 'tpl_session_zero',
+      icon: '\u{1F9D1}',
+      label: 'Session Zero',
+      desc: 'Campaign frame + PC × 3 + Backstory × 3',
+      cards: [
+        { genId: 'campaign',  dx: 0,    dy: 0   },
+        { genId: 'pc',        dx: 700,  dy: 0   },
+        { genId: 'backstory', dx: 700,  dy: 480 },
+        { genId: 'pc',        dx: 1060, dy: 0   },
+        { genId: 'backstory', dx: 1060, dy: 480 },
+        { genId: 'pc',        dx: 1420, dy: 0   },
+        { genId: 'backstory', dx: 1420, dy: 480 },
+      ],
+    },
+  ];
+
+  function dropTemplate(tplId, originX = 60, originY = 60) {
+    if (!canvas) return;
+    const tpl = CANVAS_TEMPLATES.find(t => t.id === tplId);
+    if (!tpl) return;
+    tpl.cards.forEach((slot, i) => {
+      setTimeout(() => {
+        canvas.generateCard(slot.genId, originX + slot.dx, originY + slot.dy);
+      }, i * 80);
+    });
+    showToast('\u{1F3AC} ' + tpl.label + ' template dropped');
+    ctx = null;
+  }
+
   // ── Context menu ───────────────────────────────────────────────────────────
   function onCanvasContextMenu(screenX, screenY, canvasX, canvasY) {
     ctx = { screenX, screenY, canvasX, canvasY };
   }
   function ctxGenerate(genId, canvasX, canvasY) {
     if (!canvas) return;
+    if (genId === '__group__') { canvas.addGroup(canvasX, canvasY); ctx = null; return; }
     canvas.generateCard(genId, canvasX, canvasY);
     ctx = null;
   }
@@ -159,6 +239,10 @@
     { id: 'gen-scene',   icon: '\u{1F525}', label: 'Generate Scene',                  fn: () => { if (canvas) canvas.generateCard('scene'); } },
     { id: 'gen-encounter',icon: '\u2694',   label: 'Generate Encounter',              fn: () => { if (canvas) canvas.generateCard('encounter'); } },
     { id: 'gen-sticky',  icon: '\u{1F4DD}', label: 'Add Aspect Sticky',               fn: () => { if (canvas) canvas.generateCard('sticky'); } },
+    ...CANVAS_TEMPLATES.map(t => ({
+      id: t.id, icon: t.icon, label: 'Template: ' + t.label, sub: t.desc,
+      fn: () => dropTemplate(t.id),
+    })),
     { id: 'dice',        icon: '\u{1F3B2}', label: 'Toggle Dice Roller', shortcut: 'R', fn: () => { showDice = !showDice; } },
     { id: 'fp',          icon: '\u25CE',    label: 'Toggle Fate Points',              fn: () => { showFP = !showFP; } },
     { id: 'export',      icon: '\u2193',    label: 'Export Cards',                    fn: () => { exportView = true; } },
@@ -197,8 +281,9 @@
 </script>
 
 <!-- ── Template ──────────────────────────────────────────────────────────── -->
-<div class="board-app" data-theme={theme} onclick={() => ctx = null}>
+<div class="board-app{embedded ? ' board-embedded' : ''}" data-theme={embedded ? undefined : theme} onclick={() => ctx = null}>
 
+  {#if !embedded}
   <!-- Topbar -->
   <Topbar
     campMeta={campMeta}
@@ -228,10 +313,12 @@
     onImportCanvas={canvas ? canvas.importCanvas : () => {}}
     onCampChange={(newId) => { if (canvas) canvas.persistCanvas(get(canvas.cards)); window.location.href = '/campaigns/' + newId; }}
   />
+  {/if}
 
   <!-- Body -->
   <div class="board-body">
 
+    {#if !embedded}
     <!-- Mobile backdrop -->
     {#if leftOpen}
       <div class="blp-backdrop" onclick={() => { leftOpen = false; }} aria-hidden="true"></div>
@@ -248,6 +335,7 @@
         campName={campMeta.name}
       />
     </div>
+    {/if}
 
     <!-- Canvas column -->
     <div class="board-canvas-col">
@@ -271,6 +359,7 @@
           bind:this={canvasRef}
           {cards}
           connectors={connectorLines}
+          {groups}
           {loaded}
           mode="prep"
           {campId}
@@ -288,20 +377,27 @@
           onInvoke={null}
           onConnect={handleConnectClick}
           onUpdateConnector={canvas ? canvas.updateConnector : null}
+          onUpdateGroup={canvas ? canvas.updateGroup : null}
+          onDeleteGroup={canvas ? canvas.deleteGroup : null}
           onContextMenu={onCanvasContextMenu}
           onCtxClose={() => { ctx = null; }}
           onCtxGenerate={ctxGenerate}
+          onCtxTemplate={(tplId) => dropTemplate(tplId, ctx?.canvasX ?? 60, ctx?.canvasY ?? 60)}
+          ctxTemplates={CANVAS_TEMPLATES}
           onEdgeCoach={() => { if (!coachEdge) { coachEdge = true; showToast('\u21D4 Click line to cycle label'); } }}
+          showToast={showToast}
         />
       {/if}
     </div>
   </div>
 
+  {#if !embedded}
   <!-- Mobile generate FAB -->
   <GenerateFAB
     {activeGen}
     onGenerate={(genId) => { if (canvas) canvas.generateCard(genId); }}
   />
+  {/if}
 
   <!-- Dice floater -->
   {#if showDice}
@@ -354,28 +450,25 @@
     />
   {/if}
 
-  <!-- Clear table modal -->
-  {#if showClearModal}
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="modal-overlay" onclick={() => showClearModal = false} role="presentation">
-      <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-      <div class="modal-box modal-box-narrow" onclick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Clear table">
-        <div class="modal-header">
-          <span class="modal-title">Clear Table</span>
-          <button class="btn btn-ghost btn-icon" onclick={() => showClearModal = false} aria-label="Close"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+  <!-- Clear table — Bits AlertDialog (focus trap, Escape, ARIA) -->
+  <AlertDialog.Root bind:open={showClearModal}>
+    <AlertDialog.Portal>
+      <AlertDialog.Overlay />
+      <AlertDialog.Content aria-describedby="clear-table-desc">
+        <AlertDialog.Title>Clear Table</AlertDialog.Title>
+        <AlertDialog.Description id="clear-table-desc">
+          Remove all cards from the Table. This cannot be undone.
+        </AlertDialog.Description>
+        <div style="display:flex;gap:8px;justify-content:flex-end;padding:0 18px 16px">
+          <AlertDialog.Cancel class="btn btn-ghost">Cancel</AlertDialog.Cancel>
+          <AlertDialog.Action
+            class="btn"
+            style="background:var(--c-red);border-color:var(--c-red);color:#fff"
+            onclick={() => { if (canvas) canvas.clearCanvas(); showToast('Table cleared'); }}
+          >Clear Table</AlertDialog.Action>
         </div>
-        <div class="modal-body">
-          <p style="margin-bottom:16px;font-size:var(--text-sm);color:var(--text-dim)">Remove all cards from the Table. This cannot be undone.</p>
-          <div style="display:flex;gap:8px;justify-content:flex-end">
-            <button class="btn btn-ghost" onclick={() => showClearModal = false}>Cancel</button>
-            <button class="btn" style="background:var(--c-red);border-color:var(--c-red);color:#fff"
-              onclick={() => { if (canvas) canvas.clearCanvas(); showClearModal = false; showToast('Table cleared'); }}>
-              Clear Table
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  {/if}
+      </AlertDialog.Content>
+    </AlertDialog.Portal>
+  </AlertDialog.Root>
 
 </div>

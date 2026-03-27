@@ -35,7 +35,7 @@
   <!-- World / back -->
   <div class="bt-world">
     {#if onClose}
-      <button class="bt-back" onclick={onClose} title="Back to generator" aria-label="Back to generator">&larr;</button>
+      <button class="bt-back" onclick={onClose} aria-label="Back to generator">&larr;</button>
     {:else}
       <a href="/campaigns/{campId}" class="bt-back" title="Back to generator">&larr;</a>
     {/if}
@@ -83,27 +83,25 @@
       onclick={onToggleLeft}
       aria-label={leftOpen ? 'Hide panel' : 'Show panel'}
       aria-expanded={String(!!leftOpen)}
-      title={leftOpen ? 'Hide panel' : 'Show panel'}
+      
     ><i class="fa-solid fa-sidebar" aria-hidden="true"></i></button>
 
     <!-- Dice -->
     <button class="bt-icon-btn{showDice ? ' active' : ''}"
       onclick={onToggleDice}
-      aria-label={showDice ? 'Close dice roller' : 'Open dice roller'}
+      aria-label={showDice ? 'Close dice roller (shortcut: R)' : 'Open dice roller (shortcut: R)'}
       aria-pressed={String(showDice)}
-      title="Dice Roller (R)"
     ><i class="fa-solid fa-dice-d20" aria-hidden="true"></i></button>
 
     <!-- FP tracker -->
     <button class="bt-icon-btn{showFP ? ' active' : ''}"
       onclick={onToggleFP}
-      aria-label={showFP ? 'Close Fate Points' : 'Open Fate Points'}
+      aria-label={showFP ? 'Close Fate Point Tracker' : 'Open Fate Point Tracker'}
       aria-pressed={String(showFP)}
-      title="Fate Point Tracker"
     ><i class="fa-solid fa-bullseye" aria-hidden="true"></i></button>
 
     <!-- Export menu -->
-    <ExportMenu {cards} {campName} {onExportCanvas} {onImportCanvas} onPrint={() => {}} />
+    <ExportMenu {cards} {campName} {onExportCanvas} {onImportCanvas} onPrint={() => window.open('/help/reference?print=1', '_blank')} />
 
     <!-- Overflow -->
     <DropdownMenu.Root>

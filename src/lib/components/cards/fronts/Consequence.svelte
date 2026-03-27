@@ -1,4 +1,5 @@
 <script>
+  import OgmaTooltip from '../../shared/OgmaTooltip.svelte';
   let { data = {}, campName = '', catColor = 'var(--fs-section)', cardState = {}, onUpdate = () => {} } = $props();
 
   const SC = { mild: 'var(--fs-con-mild)', moderate: 'var(--fs-con-mod)', severe: 'var(--fs-con-sev)' };
@@ -12,8 +13,14 @@
   let col = $derived(SC[sev] || 'var(--fs-con-mild)');
   let treated = $derived(!!(cardState?.treated));
 
+  let recoveryTip = $derived(
+    sev === 'mild' ? 'Mild: clears at end of the scene it was treated in.' :
+    sev === 'moderate' ? 'Moderate: clears at end of the session it was treated in.' :
+    'Severe: clears at end of the arc it was treated in.'
+  );
+  let untreatedTip = 'Treatment must be narrated (medicine, rest, magic). Once treated, recovery timing begins.';
+
   function toggleTreated(e) {
-    e.stopPropagation();
     onUpdate({ treated: !treated });
   }
 </script>
@@ -48,11 +55,13 @@
 </div>
 
 <!-- Treated toggle -->
-<button
-  onclick={toggleTreated}
-  role="checkbox"
-  aria-checked={String(treated)}
-  aria-label={treated ? 'Consequence treated — timer started' : 'Mark consequence as treated'}
-  class="fs-stunt"
-  style="width:100%; cursor:pointer; text-align:center; font-size:12px; font-weight:700; letter-spacing:0.08em; color:{treated ? '#2e7d32' : 'var(--fs-text-muted)'}; border-color:{treated ? '#2e7d32' : 'var(--fs-border)'}; background:{treated ? 'rgba(46,125,50,0.08)' : 'var(--fs-stunt-bg)'}; transition:all 0.15s"
->{#if treated}<i class="fa-solid fa-check" aria-hidden="true"></i> TREATED — TIMER STARTED{:else}MARK AS TREATED{/if}</button>
+<OgmaTooltip tip={treated ? recoveryTip : untreatedTip}>
+  <button
+    onclick={toggleTreated}
+    role="checkbox"
+    aria-checked={String(treated)}
+    aria-label={treated ? 'Consequence treated — timer started' : 'Mark consequence as treated'}
+    class="fs-stunt"
+    style="width:100%; cursor:pointer; text-align:center; font-size:12px; font-weight:700; letter-spacing:0.08em; color:{treated ? '#2e7d32' : 'var(--fs-text-muted)'}; border-color:{treated ? '#2e7d32' : 'var(--fs-border)'}; background:{treated ? 'rgba(46,125,50,0.08)' : 'var(--fs-stunt-bg)'}; transition:all 0.15s"
+  >{#if treated}<i class="fa-solid fa-check" aria-hidden="true"></i> TREATED — {recoveryTip}{:else}MARK AS TREATED{/if}</button>
+</OgmaTooltip>
