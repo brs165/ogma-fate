@@ -72,7 +72,6 @@
   let result = $state(null);
   let rolling = $state(false);
   let consequenceSev = $state('');
-  let pinnedCards = $state([]);
   let pinBouncing = $state(false);
   let sessionPack = $state(null);
   let resultAnim = $state(false);
@@ -89,7 +88,6 @@
     unsubs.push(session.activeGen.subscribe(v => activeGen = v));
     unsubs.push(session.result.subscribe(v => result = v));
     unsubs.push(session.rolling.subscribe(v => rolling = v));
-    unsubs.push(session.pinnedCards.subscribe(v => pinnedCards = v));
     unsubs.push(session.pinBouncing.subscribe(v => pinBouncing = v));
     unsubs.push(session.sessionPack.subscribe(v => sessionPack = v));
     unsubs.push(session.resultAnim.subscribe(v => resultAnim = v));
@@ -201,7 +199,6 @@
   // ── Actions ────────────────────────────────────────────────────────────────
   function doGenerate() { if (session && !rolling) session.doGenerate(); }
   function doInspire() { if (session && !rolling) session.doInspire(); }
-  function pinResult() { if (session) session.pinResult(); }
 
   function selectGen(genId) {
     if (session) session.selectGen(genId);
@@ -224,7 +221,6 @@
       e.preventDefault();
       doGenerate();
     } else if (e.key === 'p' || e.key === 'P') {
-      if (result) pinResult();
     } else if (e.key === 'i' || e.key === 'I') {
       doInspire();
     }
@@ -280,7 +276,7 @@
               <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-solid {tableFull ? 'fa-compress' : 'fa-expand'}"></i></span>
               <span class="sidebar-item-label">{tableFull ? 'Split view' : 'Full Table'}</span>
             </button>
-            <button class="sb-acc-item" onclick={() => { tableOpen = !tableOpen; showSidebar = false; }}>
+            <button class="sb-acc-item sb-mobile-only" onclick={() => { tableOpen = !tableOpen; showSidebar = false; }}>
               <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-solid fa-mobile-screen"></i></span>
               <span class="sidebar-item-label">Table on mobile</span>
             </button>
@@ -421,21 +417,7 @@
                         title="Send to Table"
                         aria-label="Send to Table"
                       ><i class="fa-solid fa-arrow-right" aria-hidden="true"></i> Table</button>
-                      <!-- Pin to history -->
-                      <button
-                        class="btn btn-ghost action-bar-icon" class:pin-bounce={pinBouncing}
-                        onclick={pinResult}
-                        title="Save to history [P]"
-                        aria-label="Save to history"
-                        style="position:relative"
-                      >
-                        <i class="fa-solid fa-thumbtack" aria-hidden="true"></i>
-                        {#if pinnedCards.length > 0}
-                          <span aria-hidden="true" style="position:absolute;top:1px;right:1px;width:14px;height:14px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">
-                            {pinnedCards.length > 9 ? '9+' : pinnedCards.length}
-                          </span>
-                        {/if}
-                      </button>
+
                     {/if}
                   </div>
                 </div>

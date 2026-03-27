@@ -1,5 +1,6 @@
 <script>
   import StressRow from '../StressRow.svelte';
+  import OgmaTooltip from '../../shared/OgmaTooltip.svelte';
   let { data = {}, campName = '', catColor = 'var(--fs-section)' } = $props();
 
   const LADDER = {8:"Legendary",7:"Epic",6:"Fantastic",5:"Superb",4:"Great",3:"Good",2:"Fair",1:"Average",0:"Mediocre"};
@@ -12,6 +13,13 @@
   const CON_LABELS = ['Mild','Moderate','Severe'];
   const CON_CLASSES = ['fs-con-label-mild','fs-con-label-mod','fs-con-label-sev'];
   const noop = () => {};
+
+  // FCon p.12: Superb (5)+ Physique/Will grants a second Mild consequence slot
+  let physRating = $derived((skills.find(s => s.name === 'Physique') || {}).r || 0);
+  let willRating = $derived((skills.find(s => s.name === 'Will') || {}).r || 0);
+  let hasExtraMild = $derived(physRating >= 5 || willRating >= 5);
+  let extraMildType = $derived(physRating >= 5 && willRating >= 5 ? 'Physical or Mental'
+    : physRating >= 5 ? 'Physical' : 'Mental');
 </script>
 
 <!-- Aspects -->
@@ -61,6 +69,14 @@
       <div class="fs-con-line"></div>
     </div>
   {/each}
+  {#if hasExtraMild}
+    <OgmaTooltip tip="Second Mild consequence slot — granted by {extraMildType} Superb (+5) or higher (FCon p.12). Absorbs 2 shifts specifically for {extraMildType.toLowerCase()} hits.">
+      <div class="fs-con-row" style="opacity:0.75">
+        <span class="fs-con-label fs-con-label-mild" tabindex="0">Mild ({extraMildType}) (2) ★</span>
+        <div class="fs-con-line"></div>
+      </div>
+    </OgmaTooltip>
+  {/if}
 </div>
 
 <!-- Stunts -->

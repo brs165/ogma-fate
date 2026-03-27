@@ -110,7 +110,7 @@
       <div class="callout-title"><i class="fa-solid fa-gamepad" aria-hidden="true"></i> Exchange 3 — resolution</div>
       <p><strong>Enforcer attacks:</strong> Fight +3 + 2 (invoke) = +5. PC defends: Fight +2 + spend FP on their own aspect = +4. 1 shift through.</p>
       <p><strong>PC options:</strong> Tick a stress box (absorbs 1 shift), take a Mild consequence ("Bruised Ribs" — written as an aspect on the sheet; GM can invoke it against relevant rolls or compel it for a fate point), or concede.</p>
-      <p><strong>PC concedes:</strong> "I don't want to take the consequence. I concede — my character bolts for the loading dock, dignity wounded." Earns 1 FP. Player narrates: they escape, but the enforcer saw their face.</p>
+      <p><strong>PC concedes</strong> (must declare <em>before</em> the opponent rolls — FCon p.36): "I concede — my character bolts for the loading dock." Earns 1 FP plus 1 per consequence already taken this conflict. Player narrates: they escape, but the enforcer saw their face.</p>
       <p><strong>Result:</strong> PC is out of the scene on their terms, story has moved (enforcer knows who they are), and a future complication is seeded. No one "lost" — the story got richer.</p>
     </div>
     <div class="callout callout-info">

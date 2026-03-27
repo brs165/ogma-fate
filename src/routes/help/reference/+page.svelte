@@ -76,12 +76,12 @@
       <div class="ogma-ref-row"><span class="ogma-ref-label">Base tracks</span><span class="ogma-ref-val">3 boxes physical + 3 mental</span></div>
       <div class="ogma-ref-row"><span class="ogma-ref-label">Physique/Will 1–2</span><span class="ogma-ref-val">+1 box to that track</span></div>
       <div class="ogma-ref-row"><span class="ogma-ref-label">Physique/Will 3+</span><span class="ogma-ref-val">+3 boxes to that track</span></div>
-      <div class="ogma-ref-note">Stress clears end of scene. Check highest single box that covers the shift.</div>
+      <div class="ogma-ref-note">Stress clears end of scene. Mark as many 1-point boxes as needed to absorb shifts (FCon p.35). Multiple boxes per hit is correct.</div>
 
       <div class="ogma-ref-h2">Consequences</div>
-      <div class="ogma-ref-row"><span class="ogma-ref-label">Mild (−2)</span><span class="ogma-ref-val">Absorb 2 shifts — clears end of scene treated</span></div>
-      <div class="ogma-ref-row"><span class="ogma-ref-label">Moderate (−4)</span><span class="ogma-ref-val">Absorb 4 — clears end of session treated</span></div>
-      <div class="ogma-ref-row"><span class="ogma-ref-label">Severe (−6)</span><span class="ogma-ref-val">Absorb 6 — clears end of arc treated</span></div>
+      <div class="ogma-ref-row"><span class="ogma-ref-label">Mild (−2)</span><span class="ogma-ref-val">Absorb 2 shifts — clears end of next scene after treatment</span></div>
+      <div class="ogma-ref-row"><span class="ogma-ref-label">Moderate (−4)</span><span class="ogma-ref-val">Absorb 4 — clears end of session after treatment</span></div>
+      <div class="ogma-ref-row"><span class="ogma-ref-label">Severe (−6)</span><span class="ogma-ref-val">Absorb 6 — clears end of arc after treatment</span></div>
 
       <div class="ogma-ref-h2">Skill Ladder</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 4mm">

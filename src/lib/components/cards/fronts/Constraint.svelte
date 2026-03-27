@@ -1,29 +1,37 @@
 <script>
   let { data = {}, campName = '', catColor = 'var(--fs-section)' } = $props();
+  // constraint_type: 'limitation' | 'resistance'
+  let isLimitation = $derived((data.constraint_type || '') === 'limitation');
+  let actionLabel  = $derived(isLimitation ? 'RESTRICTED ACTION' : 'WHAT IT RESISTS');
+  let actionText   = $derived(data.what_resists || data.restricted_action || data.what || '');
 </script>
 
 <div style="display:flex; gap:14px">
   <div style="flex:1; min-width:0">
     <div class="fs-section-gap">
       <div class="fs-stunt" style="border-left:3px solid var(--fs-section); border-radius:0 3px 3px 0; padding:8px 10px">
-        <div style="font-size:10px; font-weight:800; letter-spacing:0.12em; color:var(--fs-section); margin-bottom:3px">RESTRICTED ACTION</div>
-        <div style="font-size:13px; font-weight:600; color:var(--fs-text); line-height:1.35">{data.restricted_action || data.what_resists || data.what || ''}</div>
+        <div style="font-size:10px; font-weight:800; letter-spacing:0.12em; color:var(--fs-section); margin-bottom:3px">{actionLabel}</div>
+        <div style="font-size:13px; font-weight:600; color:var(--fs-text); line-height:1.35">{actionText}</div>
       </div>
     </div>
 
-    <div class="fs-section-gap">
-      <div class="fs-stunt" style="border-left:3px solid #c62828; border-radius:0 3px 3px 0">
-        <div class="fs-stunt-name" style="color:#c62828">IF VIOLATED</div>
-        <div class="fs-stunt-desc">{data.consequence || ''}</div>
+    {#if isLimitation && data.consequence}
+      <div class="fs-section-gap">
+        <div class="fs-stunt" style="border-left:3px solid #c62828; border-radius:0 3px 3px 0">
+          <div class="fs-stunt-name" style="color:#c62828">IF VIOLATED</div>
+          <div class="fs-stunt-desc">{data.consequence}</div>
+        </div>
       </div>
-    </div>
+    {/if}
 
-    <div class="fs-section-gap">
-      <div class="fs-stunt" style="border-left:3px solid #2e7d32; border-radius:0 3px 3px 0">
-        <div class="fs-stunt-name" style="color:#2e7d32">HOW TO BYPASS</div>
-        <div class="fs-stunt-desc">{data.bypass || ''}</div>
+    {#if data.bypass}
+      <div class="fs-section-gap">
+        <div class="fs-stunt" style="border-left:3px solid #2e7d32; border-radius:0 3px 3px 0">
+          <div class="fs-stunt-name" style="color:#2e7d32">HOW TO BYPASS</div>
+          <div class="fs-stunt-desc">{data.bypass}</div>
+        </div>
       </div>
-    </div>
+    {/if}
   </div>
 
   <div style="width:100px; flex-shrink:0; text-align:center">

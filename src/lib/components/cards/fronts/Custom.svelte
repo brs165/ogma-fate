@@ -11,8 +11,14 @@
 
   let editTitle = $state(false);
   let editBody = $state(false);
-  let draftTitle = $state(data.title || 'Untitled');
-  let draftBody = $state(data.body || '');
+  let draftTitle = $state('Untitled');
+  let draftBody = $state('');
+
+  // Sync draft values when data prop changes (avoids state_referenced_locally warning)
+  $effect(() => {
+    if (!editTitle) draftTitle = data.title || 'Untitled';
+    if (!editBody)  draftBody  = data.body  || '';
+  });
 
   let typeId = $derived(data.type || 'aspect');
   let typeEntry = $derived(CV4_CUSTOM_TYPES.find(t => t.id === typeId) || CV4_CUSTOM_TYPES[0]);

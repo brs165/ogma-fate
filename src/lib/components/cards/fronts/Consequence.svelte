@@ -14,9 +14,9 @@
   let treated = $derived(!!(cardState?.treated));
 
   let recoveryTip = $derived(
-    sev === 'mild' ? 'Mild: clears at end of the scene it was treated in.' :
-    sev === 'moderate' ? 'Moderate: clears at end of the session it was treated in.' :
-    'Severe: clears at end of the arc it was treated in.'
+    sev === 'mild' ? 'Mild: clears at end of the next scene after treatment (FCon p.37).' :
+    sev === 'moderate' ? 'Moderate: clears at end of the session it was treated in (FCon p.37).' :
+    'Severe: clears at end of the arc it was treated in (FCon p.37).'
   );
   let untreatedTip = 'Treatment must be narrated (medicine, rest, magic). Once treated, recovery timing begins.';
 

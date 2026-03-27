@@ -136,7 +136,7 @@ npx vite build
 cd build && zip -rq ../ogma-offline-YYYY-MM-NNN.zip .
 ```
 
-Current version: `2026.03.675`
+Current version: `2026.03.677`
 
 ---
 
@@ -150,3 +150,8 @@ Current version: `2026.03.675`
 6. Preserve all a11y: `role`, `aria-label`, `aria-pressed`, `aria-expanded`
 7. Canvas cards must NOT have `left/top` absolute positioning — viewport transform handles position
 8. `@xyflow/svelte` is removed — do not import from it
+
+
+## Next sprint
+
+Sprint 16 — FCon rules correctness. See ROADMAP.md.

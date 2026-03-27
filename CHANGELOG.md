@@ -2,7 +2,7 @@
 
 ---
 
-## [2026.03.675] — March 2026 — Sprint 6: Bits UI + Delight Pass
+## [2026.03.677] — March 2026 — Sprint 6: Bits UI + Delight Pass
 
 ### Bits UI upgrades
 - StressRow, ClockTrack → Bits Checkbox (a11y focus ring, keyboard, ARIA)

@@ -1,5 +1,6 @@
 <script>
   // ── BoardBoost — ephemeral boost card with 1 free invoke ─────────────────────
+  import OgmaTooltip from '../shared/OgmaTooltip.svelte';
   let { card = {}, onDelete = null, onUpdate = null, onDragStart = null, onInvoke = null } = $props();
   let editing = $state(false);
   let draft = $state(card.text || '');
@@ -60,7 +61,9 @@
 
   <div class="boost-header">
     <span class="boost-icon">⚡</span>
-    <span class="boost-label">Boost</span>
+    <OgmaTooltip tip="Boost — one free invoke, then gone. Cannot be compelled. Does not persist beyond the scene (FCon p.23).">
+      <span class="boost-label" tabindex="0">Boost</span>
+    </OgmaTooltip>
   </div>
 
   {#if editing}

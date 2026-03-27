@@ -107,6 +107,8 @@ export const HELP_CONTENT = {
       "🎲 Free invoke shown on an aspect = it's pre-placed for players to find. Hand them an index card. In play, free invokes come from Create Advantage.",
       "Zones limit movement. Moving past opposition into another zone costs an action if contested.",
       "Zone aspects are always true - they define what's possible in the zone. Invoke them for +2 with a fate point, as with any aspect.",
+    
+      "Create Advantage tie (FCon p.19): the aspect is created but you get NO free invoke. Still worth it — the aspect is real. Spend a fate point to invoke it immediately, or bank it for anyone to invoke later.",
     ],
     rule_urls: ['/fate-condensed/aspects-and-fate-points#situation-aspects', '/fate-condensed/aspects-and-fate-points#situation-aspects', '/fate-condensed/aspects-and-fate-points#situation-aspects', '/fate-condensed/challenges-conflicts-and-contests#zones', '/fate-condensed/challenges-conflicts-and-contests#zones'],
     gm_tips: [
@@ -170,6 +172,8 @@ export const HELP_CONTENT = {
       "Conceding (p.37): before being taken out, anyone can concede. They narrate their exit, earn 1 FP per consequence taken. Let villains concede - they come back.",
       "Full Defense (p.48): skip your action, get +2 to all defends this round. Use when holding ground or covering someone.",
       "Teamwork (p.32): one rolls, each helper with Average (+1)+ in a relevant skill adds +1. No cap on helpers, just that +1 each.",
+    
+      "Create Advantage tie (FCon p.19): the aspect is created but you get NO free invoke. Still worth it — the aspect is real. Spend a fate point to invoke it immediately, or bank it for anyone to invoke later.",
     ],
     rule_urls: ['/fate-condensed/being-game-master#the-gms-fate-points', '/fate-condensed/being-game-master#the-gms-fate-points', null, '/fate-condensed/challenges-conflicts-and-contests#turn-order', null, null, '/fate-condensed/conflicts#conceding', '/fate-condensed/optional-rules#full-defense', '/fate-condensed/challenges-conflicts-and-contests#teamwork'],
     gm_tips: [
@@ -279,6 +283,8 @@ export const HELP_CONTENT = {
       "Use Create Advantage to let players set up for the decisive roll. Reward preparation.",
       "Failure changes the situation and costs something. It's not a dead end.",
       "Place a free invoke on a scene aspect before the challenge starts. It's a gift the players will remember.",
+    
+      "Create Advantage tie (FCon p.19): the aspect is created but you get NO free invoke. Still worth it — the aspect is real. Spend a fate point to invoke it immediately, or bank it for anyone to invoke later.",
     ],
     rule_urls: ['/fate-condensed/challenges-conflicts-and-contests#challenges', null, '/fate-condensed/challenges-conflicts-and-contests#challenges', '/fate-condensed/challenges-conflicts-and-contests#challenges', '/fate-condensed/challenges-conflicts-and-contests#challenges', '/fate-condensed/challenges-conflicts-and-contests#challenges'],
     gm_tips: [
@@ -583,6 +589,40 @@ export const HELP_CONTENT = {
     dnd_notes: "D&D has immunities (fire immune = no damage). Fate constraints redirect rather than block — the bypass is always there, it just requires fiction: find the sword, learn the word, negotiate the exception. The party is never simply stopped.",
   },
 
+
+  boost: {
+    title: "Boost",
+    what: "A boost is a fleeting, unnamed advantage — a momentary edge. It has one free invoke and vanishes as soon as that invoke is used (or the scene ends).",
+    output: "A short aspect phrase representing a temporary advantage.",
+    rules: [
+      "A boost can NEVER be compelled. It is not a persistent aspect — it has no dramatic weight, only mechanical weight (FCon p.23).",
+      "A boost cannot be refused. It has no fate point economy attached.",
+      "You get ONE free invoke. After that it is gone — it cannot be held or passed between scenes.",
+      "You can pass a boost to an ally if there is narrative justification (FCon p.23).",
+      "You can hold off naming a boost until you invoke it — useful when the fiction hasn\'t fully resolved.",
+      "Boosts never persist beyond the end of a scene.",
+    ],
+    rule_urls: ['/fate-condensed/aspects-and-fate-points#boosts', '/fate-condensed/aspects-and-fate-points#boosts', '/fate-condensed/aspects-and-fate-points#boosts', '/fate-condensed/aspects-and-fate-points#boosts', null, null],
+    gm_tips: [
+      "Boosts from Success with Style are gifts to players. Name them quickly and evocatively — \"Off Balance\", \"In My Sights\", \"Caught Flat-Footed\".",
+      "Remind players boosts disappear. A player who forgets to use a boost before the scene ends has lost it — no rollover.",
+      "Boosts are not consequences, not situation aspects, not free invokes on persistent aspects. They are their own lightweight category.",
+      "Use boosts to reward stylish play. A player who describes their action cinematically and rolls well deserves the boost. Make it feel good to earn one.",
+      "Never let a boost become the subject of a compel. If you\'re tempted to compel a boost, you\'re thinking of a situation aspect instead — place that instead.",
+    ],
+    dnd_notes: "D&D advantage (roll twice, take higher) is a binary flip. A Fate boost is a named narrative fact with one free +2. The name matters — it ties the mechanical bonus to what actually happened in the fiction.",
+    invoke_example: "PC rolls Fight with Style and earns a boost: \"Guard Is Overextended\". Next exchange they invoke it on their attack roll for +2 — the guard\'s poor positioning pays off immediately.",
+    compel_example: "N/A — boosts cannot be compelled. If you want to create a complication from a fast-moving tactical situation, place a situation aspect instead and compel that.",
+    beginner: {
+      what: "A boost is a temporary +2 that lasts exactly one use. When you succeed really well at an action (Success with Style), you often get a boost — a short phrase that gives you or an ally a +2 bonus on one specific upcoming roll. Use it or lose it.",
+      terms: [
+        ["Boost", "A one-use +2 bonus attached to a short phrase. Cannot be compelled. Disappears after use or end of scene."],
+        ["Free invoke", "Use a boost by declaring you\'re invoking it — you get +2 on your roll. Then it\'s gone."],
+        ["Success with Style", "Rolling +3 or more shifts above difficulty. Often awards a boost on top of the main success."],
+      ],
+    },
+  },
+
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -708,7 +748,7 @@ export const HELP_CONTENT = {
       gm_checklist: ["Announce limitations BEFORE players commit to actions","Resistances: confirm a bypass exists even if players don't know it yet","One constraint per encounter - two is a puzzle, three is a slog","Players should be able to figure out bypasses through Investigate or Lore"],
       gm_running: "State limitations before players commit to an action - not after they've rolled. A known limitation is a puzzle. A surprise limitation is a gotcha. Resistances need a bypass and the players need to know a bypass exists, even if they don't know what it is yet.",
       dnd_notes: "D&D damage immunity is often a wall with no workaround. Fate resistance always has a bypass the players can discover. Finding the bypass is a session goal. An immunity without a bypass is not a constraint - it is a dead end.",
-    },
+    }
   };
   Object.keys(gm).forEach(function(k) {
     if (HELP_CONTENT[k]) {

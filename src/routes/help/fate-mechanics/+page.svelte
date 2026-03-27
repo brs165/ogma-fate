@@ -128,6 +128,17 @@
     <h2 id="create-advantage">Create an Advantage — the most important action</h2>
     <p><strong>Create an Advantage</strong> is the action new players skip and experienced players build entire sessions around. It places a new aspect on a scene, character, or situation — or discovers an existing hidden aspect — and gives you one or two free invokes on it.</p>
     <p>Why it matters: a free invoke stacks on top of a paid invoke (+2 each). Stack two free invokes before your Attack and you're rolling at effectively +4 over your skill — without spending a single Fate Point.</p>
+
+    <div class="callout callout-warning">
+      <div class="callout-title"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> The four outcomes of Create Advantage (FCon p.19)</div>
+      <ul>
+        <li><strong>Fail:</strong> You don't create the aspect, or — if it already existed — your opponent gets a free invoke on it instead.</li>
+        <li><strong>Tie:</strong> You <em>do</em> create the aspect, but you get <strong>no free invoke</strong>. The aspect exists and anyone can invoke it by spending a fate point.</li>
+        <li><strong>Succeed:</strong> You create the aspect and gain <strong>one free invoke</strong>.</li>
+        <li><strong>Succeed with Style (+3):</strong> You create the aspect and gain <strong>two free invokes</strong>.</li>
+      </ul>
+      <p>The tie result catches many GMs off guard. A tie is not a failure — the aspect is real — but you don't get the free invoke that makes Create Advantage so powerful. In practice this means a tie is a soft win: the narrative fact is established, but you'll need a fate point to invoke it immediately.</p>
+    </div>
     <div class="callout callout-scenario">
       <div class="callout-title"><i class="fa-solid fa-gamepad" aria-hidden="true"></i> Worked example — fighting a skilled swordsman</div>
       <p>Your Fight is Good (+3). The enemy's Fight is Great (+4) — you're at a mechanical disadvantage every exchange if you just attack.</p>

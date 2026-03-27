@@ -11,7 +11,7 @@
   }
 </script>
 
-<div>
+<div class="fs-clock-track">
   <div class="fs-section-hdr" style="color:{labelColor}; border-color:{labelColor}">{labelText}</div>
   <div style="display:flex; gap:5px; flex-wrap:wrap; margin-bottom:4px" role="group" aria-label="Countdown clock boxes">
     {#each Array.from({ length: boxes }) as _, i (i)}

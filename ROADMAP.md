@@ -4,7 +4,7 @@ See `docs/claude/PROJECT_MEMORY.md` for full project state and `docs/claude/TEAM
 
 ---
 
-## Current version: v2026.03.675
+## Current version: v2026.03.677
 
 **Stack:** SvelteKit + Svelte 5.55 runes + native canvas (OgmaCanvas.svelte) + Bits UI 2.16.3 + Dexie 4 + FA 7.2 Free
 **QA gate:** 72 `.svelte` files (45 components + 27 routes) | 3 stores | 189 hard checks | 166 export checks
@@ -127,3 +127,74 @@ Shipped: The Long Road (35pp, v648), The Long After (40pp, v651), The Gaslight C
 - Legal compliance (Fate Condensed attribution)
 - Deep dive learning content, Teacher voice
 - Canvas polish: gmOnly, undo, consequence stickies, Ctrl+A
+
+---
+
+## Sprint 16 — Rules Correctness (v676) ← NEXT
+
+**6 targeted fixes, zero new features. FCon compliance.**
+
+1. Reference card (`/help/reference`): fix stress rule — "mark as many 1-point boxes as needed to absorb shifts" (FCon p.35), not "highest single box" (that's Fate Core)
+2. Consequence tooltip + reference card: Mild clears at end of *next* scene after treatment, not same scene (FCon p.37)
+3. `learn-fate` + `at-the-table`: add concede timing — must be *before* opponent rolls (FCon p.36)
+4. `fate-mechanics` + HELP_CONTENT: Create Advantage tie result — aspect created but *no* free invoke (FCon p.19)
+5. HELP_CONTENT.boost + BoardBoost: "cannot be compelled, cannot be refused, one free invoke then gone" (FCon p.23)
+6. PC generator consequence display: second Mild slot at Superb+ Physique/Will (FCon p.12)
+
+---
+
+## Sprint 17 — Just-in-Time Help System (v677)
+
+**Embedded, zero-friction help at point-of-use. No new routes.**
+
+1. Persistent help strip: `rhp-*` reference panel stays visible after rolling (collapsible, not disappearing)
+2. "?" button on canvas cards → opens BackPanel as floating aside, not modal
+3. OgmaTooltip pass on remaining card elements:
+   - Compel card template type badges (event/decision)
+   - Challenge card skill+difficulty display
+   - Countdown trigger label
+   - Contest victory track label
+4. BoardBoost: "Cannot be compelled" tooltip on aspect text
+
+---
+
+## Sprint 18 — Comprehensive Learning Surface (v678–679)
+
+**New `/help/workshop` route — 8 interactive scenario exercises.**
+
+Each scenario: 150-word setup + 3 labeled choices + accordion reveal with FCon citation.
+
+| # | Topic |
+|---|-------|
+| 1 | Fiction first — "I roll Athletics" |
+| 2 | Create Advantage vs Attack — enemy in cover |
+| 3 | Compel timing — when to offer the FP |
+| 4 | Concede vs taken out — the difference |
+| 5 | Aspects are true — can they do it? |
+| 6 | FP economy — GM pool is empty |
+| 7 | Consequence recovery — is it gone next session? |
+| 8 | Challenge vs Conflict — burning building escape |
+
+**New `/help/mistakes` route — 20 most common Fate errors.**
+
+Each: what people do → why it feels right (D&D) → what FCon actually says (with page) → mid-session fix.
+
+---
+
+## Sprint 19 — Content Quality + Navigation (v680)
+
+1. Expand `how-to-use-ogma` from 50 lines to full workflow walkthrough
+2. Cross-links: every generator help panel gets "Try this generator →" button
+3. Client-side search across all help content
+4. `learn-fate` deep-link audit: steps link to relevant mechanics pages
+5. `/help` index: "Start here" onboarding banner for first-time visitors
+
+---
+
+## PDF Backlog (parked ~2 months)
+
+- **PDF-04** Shattered Kingdoms
+- **PDF-05** Neon Abyss
+- **PDF-06** Void Runners
+- **PDF-07** dVenti Realm
+- **PDF-08** Dust and Iron
