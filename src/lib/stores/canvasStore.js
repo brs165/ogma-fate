@@ -260,6 +260,27 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
     if (showToast) showToast('Session Zero PC added to canvas');
   }
 
+  function importCards(results) {
+    if (!results || !results.length) return 0;
+    var newCards = results.map(function(r, i) {
+      return {
+        id: boardUid(),
+        genId: r.generator || '',
+        title: extractCardTitle(r.generator || '', r.data || {}),
+        summary: extractCardSummary(r.generator || '', r.data || {}),
+        tags: extractCardTags(r.generator || '', r.data || {}),
+        data: r.data || {},
+        x: 80 + (i % 5) * 320,
+        y: 80 + Math.floor(i / 5) * 240,
+        z: Date.now() + i,
+        ts: r.ts || Date.now(),
+        gmOnly: false,
+      };
+    });
+    mutate(function(prev) { return prev.concat(newCards); });
+    return newCards.length;
+  }
+
   function persistConnectors() {
     if (!DB) return;
     DB.saveSession(campCanvasKey + '_connectors', { connectors: get(connectors), ts: Date.now() }).catch(() => {});
@@ -342,6 +363,6 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
     addGroup, updateGroup, deleteGroup,
     clearCanvas,
     addStickyWithText,
-    undoLast, exportCanvas, importCanvas,
+    undoLast, exportCanvas, importCanvas, importCards,
   };
 }

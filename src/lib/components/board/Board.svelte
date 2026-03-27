@@ -12,6 +12,7 @@
   import DossierModal  from './DossierModal.svelte';
   import CommandPalette from './CommandPalette.svelte';
   import ExportPanel   from './ExportPanel.svelte';
+  import ExportModal   from './ExportModal.svelte';
   import DicePanel     from '../dice/DicePanel.svelte';
   import OgmaCanvas    from './OgmaCanvas.svelte';
   import GenerateFAB   from './GenerateFAB.svelte';
@@ -57,6 +58,7 @@
   let showDice     = $state(false);
   let showFP       = $state(false);
   let showClearModal = $state(false);
+  let showExportModal = $state(false);
   let coachEdge    = $state(false);
   let ctx          = $state(null);
   let canvasRef    = $state();
@@ -307,6 +309,7 @@
       onImportCanvas: canvas ? canvas.importCanvas : () => {},
     }}
     onExportView={() => { exportView = true; }}
+    onExportModal={() => { showExportModal = true; }}
     cards={cards}
     campName={campMeta.name}
     onExportCanvas={canvas ? canvas.exportCanvas : () => {}}
@@ -449,6 +452,24 @@
       {campId}
     />
   {/if}
+
+  <!-- Export/Import Modal -->
+  <ExportModal
+    open={showExportModal}
+    onOpenChange={(o) => { showExportModal = o; }}
+    {cards}
+    campName={campMeta.name}
+    onToast={showToast}
+    onImportCards={canvas ? canvas.importCards : null}
+    onImportCanvas={(data) => {
+      if (!canvas || !data || !data.state || !Array.isArray(data.state.cards)) {
+        showToast('Invalid board file');
+        return;
+      }
+      canvas.cards.set(data.state.cards);
+      canvas.persistCanvas(data.state.cards);
+    }}
+  />
 
   <!-- Clear table — Bits AlertDialog (focus trap, Escape, ARIA) -->
   <AlertDialog.Root bind:open={showClearModal}>

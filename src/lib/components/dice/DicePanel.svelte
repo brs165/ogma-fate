@@ -16,8 +16,14 @@
     { r: 6, label: 'Fantastic' },
     { r: 7, label: 'Epic'      },
   ];
-  const OUTCOME_LABEL = ['Fail', 'Fail', 'Fail', 'Tie', 'Succeed', 'Succeed with Style', 'Succeed with Style'];
-  const OUTCOME_COLOR = ['var(--c-red)', 'var(--c-red)', 'var(--c-red)', 'var(--gold)', 'var(--c-green)', 'var(--accent)', 'var(--accent)'];
+  // Fate Condensed outcomes based on shifts (your result − opposition):
+  //   <0 = Fail, 0 = Tie, 1-2 = Succeed, 3+ = Succeed with Style
+  function outcomeFromShifts(s) {
+    if (s >= 3) return { label: 'Succeed with Style', color: 'var(--accent)' };
+    if (s >= 1) return { label: 'Succeed', color: 'var(--c-green)' };
+    if (s === 0) return { label: 'Tie', color: 'var(--gold)' };
+    return { label: 'Fail', color: 'var(--c-red)' };
+  }
 
   function ladderLabel(n) {
     if (n < 0) return LADDER[0].label;
@@ -25,12 +31,13 @@
     return 'Legendary +' + n;
   }
 
-  let skill     = $state(2);
-  let modifier  = $state(0);
-  let dice      = $state([]);
-  let total     = $state(null);
-  let collapsed = $state(false);
-  let history   = $state([]);
+  let skill       = $state(2);
+  let opposition  = $state(0);
+  let modifier    = $state(0);
+  let dice        = $state([]);
+  let total       = $state(null);
+  let collapsed   = $state(false);
+  let history     = $state([]);
 
   let posX = $state(null);
   let posY = $state(null);
@@ -69,7 +76,9 @@
   function faceSym(v) { return v === 1 ? '+' : v === -1 ? '\u2212' : '0'; }
   function faceClass(v) { return v === 1 ? 'dp-die-plus' : v === -1 ? 'dp-die-minus' : 'dp-die-zero'; }
 
-  let outcomeIdx = $derived(total === null ? -1 : Math.min(6, Math.max(0, total + 2)));
+  let hasOpposition = $derived(opposition > 0);
+  let shifts = $derived(total === null ? null : total - opposition);
+  let outcome = $derived(shifts === null ? null : outcomeFromShifts(shifts));
 </script>
 
 <!-- ── Panel ─────────────────────────────────────────────────────────────── -->
@@ -120,6 +129,31 @@
     </OgmaTooltip>
   </div>
 
+  <!-- Opposition row -->
+  <div class="dp-section">
+    <div class="dp-section-label">Opposition / Difficulty</div>
+    <RadioGroup.Root
+      value={String(opposition)}
+      onValueChange={(v) => { if (v) opposition = Number(v); }}
+      aria-label="Opposition rating"
+      class="dp-skill-row"
+    >
+      <RadioGroup.Item
+        value="0"
+        class="dp-skill-btn dp-opp-none{opposition === 0 ? ' dp-opp-active' : ''}"
+        aria-label="No target set"
+      >—</RadioGroup.Item>
+      {#each LADDER as l (l.r)}
+        <RadioGroup.Item
+          value={String(l.r)}
+          class="dp-skill-btn dp-opp-btn{opposition === l.r ? ' dp-opp-active' : ''}"
+          aria-label="{l.label} +{l.r}"
+        >+{l.r}</RadioGroup.Item>
+      {/each}
+    </RadioGroup.Root>
+    <div class="dp-skill-name">{opposition === 0 ? 'No target — raw total shown' : ladderLabel(opposition) + ' +' + opposition}</div>
+  </div>
+
   <!-- Modifier strip -->
   <div class="dp-section">
     <div class="dp-section-label">Modifiers{modifier !== 0 ? ' (' + (modifier > 0 ? '+' : '') + modifier + ')' : ''}</div>
@@ -165,15 +199,23 @@
       </div>
       <!-- Total -->
       <div class="dp-total-row">
-        <span class="dp-total-num" style="color:{OUTCOME_COLOR[outcomeIdx] ?? 'var(--text)'}">
+        <span class="dp-total-num" style="color:{hasOpposition && outcome ? outcome.color : 'var(--text)'}">
           {total >= 0 ? '+' : ''}{total}
         </span>
         <span class="dp-total-label">{ladderLabel(total)}</span>
       </div>
-      <!-- Outcome tag -->
-      <div class="dp-outcome" style="background:color-mix(in srgb,{OUTCOME_COLOR[outcomeIdx] ?? 'var(--accent)'} 15%,transparent);color:{OUTCOME_COLOR[outcomeIdx] ?? 'var(--accent)'}">
-        {OUTCOME_LABEL[outcomeIdx] ?? (total >= 3 ? 'Succeed with Style' : 'Result')}
-      </div>
+      <!-- Shifts & Outcome (only when opposition is set) -->
+      {#if hasOpposition && outcome}
+        <div class="dp-shifts-row">
+          {shifts >= 0 ? '+' : ''}{shifts} shift{Math.abs(shifts) !== 1 ? 's' : ''} vs {ladderLabel(opposition)} +{opposition}
+        </div>
+        <div class="dp-outcome" style="background:color-mix(in srgb,{outcome.color} 15%,transparent);color:{outcome.color}">
+          {outcome.label}
+        </div>
+        {#if shifts === 0}
+          <div class="dp-tie-hint">Succeed at minor cost, or gain a boost</div>
+        {/if}
+      {/if}
     </div>
   {/if}
 
