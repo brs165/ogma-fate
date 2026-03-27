@@ -1,6 +1,6 @@
 <script>
   import ExportMenu from './ExportMenu.svelte';
-  import { ToggleGroup, Select, DropdownMenu } from 'bits-ui';
+  import { ToggleGroup, Select, DropdownMenu, Tooltip } from 'bits-ui';
 
   let { campMeta = {}, mode = 'prep', onModeChange = () => {}, campId = '', onCampChange = () => {}, isOnline = true, sync = {}, panels = {}, counts = {}, exportActions = {}, cards = [], campName = '', onExportCanvas = () => {}, onImportCanvas = () => {}, onPrint = () => {}, onToggleMobileList = null, mobileListView = false, onExportView = null, onBack = null } = $props();
 
@@ -144,37 +144,70 @@
 
     <!-- Binder (Prep) -->
     {#if mode === 'prep'}
-      <button class="bt-icon-btn{binderOpen ? ' active' : ''}"
-        onclick={onToggleBinder}
-        aria-label={binderOpen ? 'Hide Binder' : 'Open Binder'}
-        aria-pressed={String(binderOpen)}
-        title="Binder{binderCount > 0 ? ` (${binderCount})` : ''}"
-        style="position:relative"
-      >
-        <i class="fa-solid fa-clipboard" aria-hidden="true"></i>
-        {#if binderCount > 0 || trayCount > 0}
-          <span class="bt-count" style="position:absolute;top:-4px;right:-4px">
-            {trayCount > 0 ? trayCount : binderCount}
-          </span>
-        {/if}
-      </button>
+      <Tooltip.Root openDelay={400}>
+        <Tooltip.Trigger asChild>
+          {#snippet child({ props })}
+            <button {...props} class="bt-icon-btn{binderOpen ? ' active' : ''}"
+              onclick={onToggleBinder}
+              aria-label={binderOpen ? 'Hide Binder' : 'Open Binder'}
+              aria-pressed={String(binderOpen)}
+              style="position:relative"
+            >
+              <i class="fa-solid fa-clipboard" aria-hidden="true"></i>
+              {#if binderCount > 0 || trayCount > 0}
+                <span class="bt-count" style="position:absolute;top:-4px;right:-4px">
+                  {trayCount > 0 ? trayCount : binderCount}
+                </span>
+              {/if}
+            </button>
+          {/snippet}
+        </Tooltip.Trigger>
+        <Tooltip.Portal>
+          <Tooltip.Content class="bt-tooltip" sideOffset={6}>
+            Binder{binderCount > 0 ? ` (${binderCount})` : ''}
+            <Tooltip.Arrow class="bt-tooltip-arrow" />
+          </Tooltip.Content>
+        </Tooltip.Portal>
+      </Tooltip.Root>
     {/if}
 
     <!-- Dice -->
-    <button class="bt-icon-btn{showDice ? ' active' : ''}"
-      onclick={onToggleDice}
-      aria-label={showDice ? 'Close dice roller' : 'Open dice roller'}
-      aria-pressed={String(showDice)}
-      title="Dice Roller (R)"
-    ><i class="fa-solid fa-dice-d20" aria-hidden="true"></i></button>
+    <Tooltip.Root openDelay={400}>
+      <Tooltip.Trigger asChild>
+        {#snippet child({ props })}
+          <button {...props} class="bt-icon-btn{showDice ? ' active' : ''}"
+            onclick={onToggleDice}
+            aria-label={showDice ? 'Close dice roller' : 'Open dice roller'}
+            aria-pressed={String(showDice)}
+          ><i class="fa-solid fa-dice-d20" aria-hidden="true"></i></button>
+        {/snippet}
+      </Tooltip.Trigger>
+      <Tooltip.Portal>
+        <Tooltip.Content class="bt-tooltip" sideOffset={6}>
+          Dice Roller <kbd class="bt-tooltip-kbd">R</kbd>
+          <Tooltip.Arrow class="bt-tooltip-arrow" />
+        </Tooltip.Content>
+      </Tooltip.Portal>
+    </Tooltip.Root>
 
     <!-- FP tracker -->
-    <button class="bt-icon-btn{showFP ? ' active' : ''}"
-      onclick={onToggleFP}
-      aria-label={showFP ? 'Close Fate Point tracker' : 'Open Fate Point tracker'}
-      aria-pressed={String(showFP)}
-      title="Fate Point Tracker"
-    ><i class="fa-solid fa-bullseye" aria-hidden="true"></i></button>
+    <Tooltip.Root openDelay={400}>
+      <Tooltip.Trigger asChild>
+        {#snippet child({ props })}
+          <button {...props} class="bt-icon-btn{showFP ? ' active' : ''}"
+            onclick={onToggleFP}
+            aria-label={showFP ? 'Close Fate Point tracker' : 'Open Fate Point tracker'}
+            aria-pressed={String(showFP)}
+          ><i class="fa-solid fa-bullseye" aria-hidden="true"></i></button>
+        {/snippet}
+      </Tooltip.Trigger>
+      <Tooltip.Portal>
+        <Tooltip.Content class="bt-tooltip" sideOffset={6}>
+          Fate Points
+          <Tooltip.Arrow class="bt-tooltip-arrow" />
+        </Tooltip.Content>
+      </Tooltip.Portal>
+    </Tooltip.Root>
 
     <!-- Host / room code -->
     {#if mode === 'play' && syncStatus === 'offline'}
@@ -196,12 +229,23 @@
 
     <!-- Mobile list/canvas — visible on mobile only -->
     {#if onToggleMobileList}
-      <button class="bt-icon-btn bt-mob-view-toggle"
-        onclick={onToggleMobileList}
-        aria-label={mobileListView ? 'Canvas view' : 'List view'}
-        aria-pressed={String(!!mobileListView)}
-        title={mobileListView ? 'Canvas view' : 'List view'}
-      >{mobileListView ? '\u25A6' : '\u2261'}</button>
+      <Tooltip.Root openDelay={400}>
+        <Tooltip.Trigger asChild>
+          {#snippet child({ props })}
+            <button {...props} class="bt-icon-btn bt-mob-view-toggle"
+              onclick={onToggleMobileList}
+              aria-label={mobileListView ? 'Canvas view' : 'List view'}
+              aria-pressed={String(!!mobileListView)}
+            >{mobileListView ? '\u25A6' : '\u2261'}</button>
+          {/snippet}
+        </Tooltip.Trigger>
+        <Tooltip.Portal>
+          <Tooltip.Content class="bt-tooltip" sideOffset={6}>
+            {mobileListView ? 'Canvas view' : 'List view'}
+            <Tooltip.Arrow class="bt-tooltip-arrow" />
+          </Tooltip.Content>
+        </Tooltip.Portal>
+      </Tooltip.Root>
     {/if}
 
     <!-- Overflow menu — groups low-priority actions, shown on all sizes but essential on mobile -->

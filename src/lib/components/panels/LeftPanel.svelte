@@ -1,4 +1,5 @@
 <script>
+  import { Tabs } from 'bits-ui';
   import HelpPanel from '../board/HelpPanel.svelte';
   import StuntPanel from '../board/StuntPanel.svelte';
   // Derive world stunts from CAMPAIGNS global
@@ -56,49 +57,51 @@
   ];
 </script>
 
-<div class="blp">
-  <div class="blp-tabs">
-    <button class="blp-tab" class:active={activeTab === 'gen'} onclick={() => onTabChange('gen')}>Generate</button>
-    <button class="blp-tab" class:active={activeTab === 'stunts'} onclick={() => onTabChange('stunts')}>Stunts</button>
-    <button class="blp-tab" class:active={activeTab === 'help'} onclick={() => onTabChange('help')}>Help</button>
-  </div>
+<Tabs.Root
+  value={activeTab}
+  onValueChange={(v) => { if (v) onTabChange(v); }}
+  class="blp"
+>
+  <Tabs.List class="blp-tabs" aria-label="Left panel tabs">
+    <Tabs.Trigger value="gen" class="blp-tab">Generate</Tabs.Trigger>
+    <Tabs.Trigger value="stunts" class="blp-tab">Stunts</Tabs.Trigger>
+    <Tabs.Trigger value="help" class="blp-tab">Help</Tabs.Trigger>
+  </Tabs.List>
 
-  {#if activeTab === 'gen'}
-    <div class="blp-body">
-      {#each BOARD_GEN_GROUPS as group (group.id)}
-        {#if group.separator}
-          <div class="blp-separator">{group.label}</div>
-        {:else}
-          <div class="blp-group">{group.label}</div>
-        {/if}
-        {#each group.gens as gen (gen.id)}
-          <button
-            class="blp-item" class:active={activeGen === gen.id}
-            onclick={() => onSelectGen(gen.id)}
-            onkeydown={(e) => {
-              if (e.key === 'ArrowDown') { e.preventDefault(); e.currentTarget.nextElementSibling?.focus(); }
-              if (e.key === 'ArrowUp') { e.preventDefault(); e.currentTarget.previousElementSibling?.focus(); }
-            }}
-            title="{gen.label}{gen.sub ? ' \u2014 ' + gen.sub : ''}"
-          >
-            <span class="blp-icon">{gen.icon}</span>
-            <div class="blp-label-wrap">
-              <span class="blp-label">{gen.label}</span>
-              {#if gen.sub}
-                <span class="blp-sub">{gen.sub}</span>
-              {/if}
-            </div>
-          </button>
-        {/each}
+  <Tabs.Content value="gen" class="blp-body blp-tab-content">
+    {#each BOARD_GEN_GROUPS as group (group.id)}
+      {#if group.separator}
+        <div class="blp-separator">{group.label}</div>
+      {:else}
+        <div class="blp-group">{group.label}</div>
+      {/if}
+      {#each group.gens as gen (gen.id)}
+        <button
+          class="blp-item" class:active={activeGen === gen.id}
+          onclick={() => onSelectGen(gen.id)}
+          onkeydown={(e) => {
+            if (e.key === 'ArrowDown') { e.preventDefault(); e.currentTarget.nextElementSibling?.focus(); }
+            if (e.key === 'ArrowUp') { e.preventDefault(); e.currentTarget.previousElementSibling?.focus(); }
+          }}
+          title="{gen.label}{gen.sub ? ' \u2014 ' + gen.sub : ''}"
+        >
+          <span class="blp-icon">{gen.icon}</span>
+          <div class="blp-label-wrap">
+            <span class="blp-label">{gen.label}</span>
+            {#if gen.sub}
+              <span class="blp-sub">{gen.sub}</span>
+            {/if}
+          </div>
+        </button>
       {/each}
-    </div>
-  {/if}
+    {/each}
+  </Tabs.Content>
 
-  {#if activeTab === 'stunts'}
+  <Tabs.Content value="stunts" class="blp-tab-content">
     <StuntPanel worldStunts={worldStunts} />
-  {/if}
+  </Tabs.Content>
 
-  {#if activeTab === 'help'}
+  <Tabs.Content value="help" class="blp-tab-content">
     <HelpPanel />
-  {/if}
-</div>
+  </Tabs.Content>
+</Tabs.Root>
