@@ -141,7 +141,8 @@ function generateMinorNPC(t) {
   var aspects = weak ? [aspect1, weak] : [aspect1];
   var numSkills = rand(1, 2);
   var chosenSkills = pickN(ALL_SKILLS, numSkills);
-  var rating = rand(2, 3);
+  // FCon SRD: nameless NPCs cap at Fair (+2); Average (+1) to Fair (+2)
+  var rating = rand(1, 2);
   var skills = chosenSkills.map(function(s, i) { return {name: s, r: Math.max(1, rating - i)}; });
   var hasStunt = _rng() > 0.5;
   var bonusStunts = (t.stunts || []).filter(function(s) { return s.type === 'bonus'; });
@@ -206,11 +207,14 @@ function generateMajorNPC(t) {
     if (s.name === 'Physique') physR = s.r;
     if (s.name === 'Will') willR = s.r;
   });
+  // FCon: Major NPCs get standard consequence slots (Mild −2, Moderate −4, Severe −6)
+  var consequences = [2, 4, 6];
   return {
     name: name,
     aspects: {high_concept: high_concept, trouble: trouble, others: others},
     skills: skills, stunts: stunts,
     physical_stress: stressFromRating(physR), mental_stress: stressFromRating(willR),
+    consequences: consequences,
     // FCon p.10: 3 free stunt slots. Each stunt beyond 3 costs 1 Refresh. Minimum 1.
     refresh: Math.max(1, 3 - Math.max(0, stunts.length - 3)),
   };
@@ -951,6 +955,11 @@ function mdStunt(s) {
   return '### ' + s.name + '\n**Skill:** ' + s.skill + ' \u00b7 `' +
     (s.type === 'special' ? 'ONCE/SCENE' : '+2 BONUS') + '`  \n' + s.desc;
 }
+var CON_NAMES = ['Mild', 'Moderate', 'Severe'];
+function mdConsequences(arr) {
+  var slots = arr || [2, 4, 6];
+  return slots.map(function(v, i) { return '| ' + (CON_NAMES[i] || 'Extra Mild') + ' | −' + v + ' |'; });
+}
 
 // ── Seed Pack: generate a full adventure as multiple typed cards ──────────
 export function generateSeedPack(t, partySize) {
@@ -1036,9 +1045,8 @@ export function toMarkdown(genId, data, campName) {
         '**Mental:** ' + mdBoxes(d.mental_stress) + '\n',
         '| Consequence | Shift Value |',
         '|-------------|-------------|',
-        '| Mild        | −2          |',
-        '| Moderate    | −4          |',
-        '| Severe      | −6          |\n',
+      ]).concat(mdConsequences(d.consequences)).concat([
+        '',
         '**Refresh:** ' + d.refresh,
         MD_FOOTER,
       ]).join('\n');
@@ -1281,7 +1289,7 @@ export function toMarkdown(genId, data, campName) {
         '**Physical:** ' + physBoxes + '  ',
         '**Mental:** ' + mentBoxes + '\n',
         '**Refresh:** ' + (d.refresh||3) + '  ',
-        '**Consequences:** Mild (−2) · Moderate (−4) · Severe (−6)',
+        '**Consequences:** ' + (d.consequences||[2,4,6]).map(function(v,i){ return (CON_NAMES[i]||'Extra Mild') + ' (−' + v + ')'; }).join(' · '),
         '\n## Session Zero Questions',
         (d.questions||[]).map(function(q,i){ return (i+1) + '. ' + q; }).join('\n'),
         MD_FOOTER,
@@ -1813,7 +1821,7 @@ function toObsidianMD(genId, data, campName) {
       lines.push('**Physical** ' + '\u25a1 '.repeat(data.physical_stress||3).trim() +
         '   **Mental** ' + '\u25a1 '.repeat(data.mental_stress||3).trim() +
         '   **Refresh** ' + (data.refresh||3));
-      lines.push('*Consequences: Mild \u22122 / Moderate \u22124 / Severe \u22126*');
+      lines.push('*Consequences: ' + (data.consequences||[2,4,6]).map(function(v,i){ return (CON_NAMES[i]||'Extra Mild') + ' \u2212' + v; }).join(' / ') + '*');
       if (isPC && data.questions && data.questions.length) {
         lines.push('', '## Session Zero', '');
         data.questions.forEach(function(q, i){ lines.push((i+1) + '. *' + q + '*'); });
@@ -1915,7 +1923,7 @@ function toTypst(genId, data, campName) {
       var phBoxes = Array(data.physical_stress||3).fill('#sb').join(' ');
       var mnBoxes = Array(data.mental_stress||3).fill('#sb').join(' ');
       body += '#grid(columns: (auto, auto, auto, auto, auto), gutter: 6pt, [*PHYSICAL*], [' + phBoxes + '], [*MENTAL*], [' + mnBoxes + '], [*REFRESH ' + (data.refresh||3) + '*])\n';
-      body += '#text(fill: muted, size: 8pt)[Consequences: Mild \u22122 / Moderate \u22124 / Severe \u22126]\n';
+      body += '#text(fill: muted, size: 8pt)[Consequences: ' + (data.consequences||[2,4,6]).map(function(v,i){ return (CON_NAMES[i]||'Extra Mild') + ' \u2212' + v; }).join(' / ') + ']\n';
       if (isPC && data.questions && data.questions.length) {
         body += '\n*SESSION ZERO*\n#v(3pt)\n';
         data.questions.forEach(function(q, i){ body += '#block(stroke: (left: 2pt + rgb("#dddddd")), inset: (left: 8pt, y: 4pt), below: 4pt)[' + (i+1) + '. #text(style: "italic")[' + esc(q) + ']]\n'; });
@@ -2007,7 +2015,7 @@ export function toPlainText(genId, data, campName) {
       }
       out += '\u251c' + hr('\u2500') + '\u2524\n';
       out += row('PHYSICAL  '+stressBoxes(data.physical_stress||3)+'   MENTAL  '+stressBoxes(data.mental_stress||3));
-      out += row('REFRESH '+(data.refresh||3)+'   Mild \u22122 / Moderate \u22124 / Severe \u22126');
+      out += row('REFRESH '+(data.refresh||3)+'   '+(data.consequences||[2,4,6]).map(function(v,i){ return (CON_NAMES[i]||'Extra Mild')+' \u2212'+v; }).join(' / '));
       if (isPC && data.questions && data.questions.length) {
         out += '\u251c' + hr('\u2500') + '\u2524\n'; out += row('SESSION ZERO');
         data.questions.forEach(function(q,i){ wrap((i+1)+'. '+q,'   ',W-2).split('\n').forEach(function(l,li){ out+=row(li===0?(i+1)+'. '+l.slice(3):l); }); });

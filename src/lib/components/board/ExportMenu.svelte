@@ -3,7 +3,7 @@
   import { DropdownMenu } from 'bits-ui';
   import { DB } from '../../db.js';
 
-  let { cards = [], campName = '', onExportCanvas = null, onImportCanvas = null, onPrint = null } = $props();
+  let { cards = [], campName = '', onExportCanvas = null, onImportCanvas = null, onExportModal = null, onPrint = null } = $props();
 
   let hasCards = $derived(cards.filter(c =>
     c.genId && c.genId !== 'sticky' && c.genId !== 'boost' && c.genId !== 'label'
@@ -64,6 +64,17 @@
           <span class="export-dd-sub">Restore from .json file</span>
         </span>
       </DropdownMenu.Item>
+
+      {#if onExportModal}
+        <DropdownMenu.Separator class="export-dd-sep" />
+        <DropdownMenu.Item class="export-dd-item" onSelect={() => onExportModal()}>
+          <span class="export-dd-icon">&ctdot;</span>
+          <span class="export-dd-body">
+            <span class="export-dd-name">More formats...</span>
+            <span class="export-dd-sub">Markdown, Mermaid, Obsidian, etc.</span>
+          </span>
+        </DropdownMenu.Item>
+      {/if}
     </DropdownMenu.Content>
   </DropdownMenu.Portal>
 </DropdownMenu.Root>

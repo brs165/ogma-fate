@@ -2,7 +2,7 @@
   import ExportMenu from './ExportMenu.svelte';
   import { Select, DropdownMenu } from 'bits-ui';
 
-  let { campMeta = {}, campId = '', onCampChange = () => {}, isOnline = true, panels = {}, exportActions = {}, cards = [], campName = '', onExportCanvas = () => {}, onImportCanvas = () => {}, onExportView = null, onClose = null } = $props();
+  let { campMeta = {}, campId = '', onCampChange = () => {}, isOnline = true, panels = {}, exportActions = {}, cards = [], campName = '', onExportCanvas = () => {}, onImportCanvas = () => {}, onExportView = null, onExportModal = null, onClose = null } = $props();
 
   let leftOpen      = $derived(panels.leftOpen);
   let onToggleLeft  = $derived(panels.onToggleLeft || (() => {}));
@@ -101,7 +101,7 @@
     ><i class="fa-solid fa-bullseye" aria-hidden="true"></i></button>
 
     <!-- Export menu -->
-    <ExportMenu {cards} {campName} {onExportCanvas} {onImportCanvas} onPrint={() => window.open('/help/reference?print=1', '_blank')} />
+    <ExportMenu {cards} {campName} {onExportCanvas} {onImportCanvas} {onExportModal} onPrint={() => window.open('/help/reference?print=1', '_blank')} />
 
     <!-- Overflow -->
     <DropdownMenu.Root>
