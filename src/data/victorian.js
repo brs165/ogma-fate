@@ -6,7 +6,7 @@ export const CAMPAIGNS = { victorian: {
     meta: {
       id: "victorian", name: "The Gaslight Chronicles",
       tagline: "Gothic Cosmic Horror. The arrogance of the Enlightenment meets ancient, incomprehensible dread - in the gaslit streets where industrial progress ends, the veil is very thin.",
-      icon: "⊕", font: "'Inter', sans-serif",
+      icon: "fa-magnifying-glass", font: "'Inter', sans-serif",
     },
     colors: {
       bg:"#08090a", panel:"#0f1012", border:"#1e2015",

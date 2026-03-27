@@ -302,7 +302,7 @@
                       onclick={() => selectGen(genId)}
                       aria-label={g.label}
                     >
-                      <span aria-hidden="true" class="sidebar-item-icon">{g.icon || ''}</span>
+                      <span aria-hidden="true" class="sidebar-item-icon">{#if g.icon}<i class="fa-solid {g.icon}"></i>{/if}</span>
                       <span class="sidebar-item-label">{g.label}</span>
                     </button>
                   {/if}
@@ -320,7 +320,7 @@
           </Collapsible.Trigger>
           <Collapsible.Content class="sb-acc-body">
             <button class="sb-acc-item" onclick={toggleTheme}>
-              <span aria-hidden="true" class="sidebar-item-icon">{theme === 'dark' ? '\u2600' : '\u25D1'}</span>
+              <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-solid {theme === 'dark' ? 'fa-sun' : 'fa-circle-half-stroke'}"></i></span>
               <span class="sidebar-item-label">{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
             </button>
             <a href="/help" class="sb-acc-item" style="text-decoration:none">

@@ -6,7 +6,7 @@ export const CAMPAIGNS = { space: {
     meta: {
       id: "space", name: "Void Runners",
       tagline: "The Used Future. Blue-collar space western - ships held together by prayers and stolen parts, survival meeting lawlessness at the edge of everything.",
-      icon: "◯", font: "'Exo 2', 'Futura', sans-serif",
+      icon: "fa-shuttle-space", font: "'Exo 2', 'Futura', sans-serif",
     },
     colors: {
       bg:"#030508", panel:"#060a10", border:"#0a1828",

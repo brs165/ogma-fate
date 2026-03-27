@@ -10,7 +10,7 @@ export const CAMPAIGNS = { dVentiRealm: {
     id: "dVentiRealm", name: "dVenti Realm",
     tagline: "The Senate fell thirty years ago. The last dragon fell eighteen months ago. The world is still learning what dragons were actually for.",
     tagline2: "The vaults are still here. So is everything the dragons were keeping out.",
-    icon: "⚔", font: "'Inter', sans-serif",
+    icon: "fa-dice-d20", font: "'Inter', sans-serif",
   },
   colors: {
     bg:"#120806", panel:"#1a0c08", border:"#2e1208",

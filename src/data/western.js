@@ -11,7 +11,7 @@ export const CAMPAIGNS = { western: {
     id:      "western",
     name:    "Dust and Iron",
     tagline: "Frontier justice. Railroad money and the weight of the old war.",
-    icon:    "★",
+    icon:    "fa-hat-cowboy",
     font:    "'Georgia', serif",
   },
   colors: {

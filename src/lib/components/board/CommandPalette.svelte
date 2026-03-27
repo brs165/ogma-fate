@@ -58,7 +58,7 @@
             onclick={() => exec(a)}
             onmouseenter={() => (sel = i)}
           >
-            <span class="cmd-item-icon">{a.icon || ''}</span>
+            <span class="cmd-item-icon">{#if a.icon}<i class="fa-solid {a.icon}" aria-hidden="true"></i>{/if}</span>
             <span class="cmd-item-label">{a.label}</span>
             {#if a.shortcut}
               <span class="cmd-shortcut">{a.shortcut}</span>

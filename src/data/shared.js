@@ -8,30 +8,30 @@
 export { CAMPAIGNS } from './index.js';
 
 export const GENERATORS = [
-  {id:"npc_minor",  label:"Minor NPC",       icon:"◈", sub:"1–2 aspects · skills · stress"},
-  {id:"npc_major",  label:"Major NPC",        icon:"◆", sub:"5 aspects · skill pyramid · stunts"},
-  {id:"scene",      label:"Scene Setup",      icon:"◉", sub:"Situation aspects · zones"},
-  {id:"campaign",   label:"Campaign Frame",  icon:"◇", sub:"Current + impending + setting"},
-  {id:"encounter",  label:"Encounter",        icon:"⚔", sub:"Opposition · stakes · twist"},
-  {id:"seed",       label:"Adventure Seed",   icon:"◎", sub:"3-scene skeleton · opposition · stakes · twist"},
-  {id:"compel",     label:"Compel",     icon:"⊗", sub:"Aspect situation · consequence · GM tip"},
-  {id:"challenge",  label:"Challenge",        icon:"⬡", sub:"Series of overcome rolls · stakes · success/failure"},
-  {id:"contest",    label:"Contest",          icon:"🏁", sub:"Opposed exchanges · victory track · twist on tie"},
-  {id:"consequence", label:"Consequence",     icon:"⚡", sub:"Mild · moderate · severe · compel hook"},
-  {id:"faction",     label:"Faction",         icon:"⚑", sub:"Name · goal · method · weakness · face"},
-  {id:"complication",label:"Complication", icon:"⚠", sub:"New aspect · arrival · environment shift"},
-  {id:"pc",          label:"Player Character", icon:"☆",      sub:"5 aspects · skill pyramid · stunts · refresh 3"},
-  {id:"backstory",   label:"PC Backstory",    icon:"📖", sub:"Session Zero questions · relationship web · hook"},
-  {id:"obstacle",    label:"Obstacle",        icon:"🛡", sub:"Hazard · block · distraction - not an enemy"},
-  {id:"countdown",   label:"Countdown",       icon:"⏱", sub:"Track · trigger · outcome - pacing pressure"},
-  {id:"constraint",  label:"Constraint",      icon:"🔒", sub:"Limitation or resistance - forces Plan B"},
+  {id:"npc_minor",  label:"Minor NPC",       icon:"fa-user", sub:"1–2 aspects · skills · stress"},
+  {id:"npc_major",  label:"Major NPC",        icon:"fa-crown", sub:"5 aspects · skill pyramid · stunts"},
+  {id:"scene",      label:"Scene Setup",      icon:"fa-fire", sub:"Situation aspects · zones"},
+  {id:"campaign",   label:"Campaign Frame",  icon:"fa-globe", sub:"Current + impending + setting"},
+  {id:"encounter",  label:"Encounter",        icon:"fa-burst", sub:"Opposition · stakes · twist"},
+  {id:"seed",       label:"Adventure Seed",   icon:"fa-seedling", sub:"3-scene skeleton · opposition · stakes · twist"},
+  {id:"compel",     label:"Compel",     icon:"fa-rotate-left", sub:"Aspect situation · consequence · GM tip"},
+  {id:"challenge",  label:"Challenge",        icon:"fa-bullseye", sub:"Series of overcome rolls · stakes · success/failure"},
+  {id:"contest",    label:"Contest",          icon:"fa-trophy", sub:"Opposed exchanges · victory track · twist on tie"},
+  {id:"consequence", label:"Consequence",     icon:"fa-bolt", sub:"Mild · moderate · severe · compel hook"},
+  {id:"faction",     label:"Faction",         icon:"fa-flag", sub:"Name · goal · method · weakness · face"},
+  {id:"complication",label:"Complication", icon:"fa-triangle-exclamation", sub:"New aspect · arrival · environment shift"},
+  {id:"pc",          label:"Player Character", icon:"fa-star",      sub:"5 aspects · skill pyramid · stunts · refresh 3"},
+  {id:"backstory",   label:"PC Backstory",    icon:"fa-masks-theater", sub:"Session Zero questions · relationship web · hook"},
+  {id:"obstacle",    label:"Obstacle",        icon:"fa-shield-halved", sub:"Hazard · block · distraction - not an enemy"},
+  {id:"countdown",   label:"Countdown",       icon:"fa-clock", sub:"Track · trigger · outcome - pacing pressure"},
+  {id:"constraint",  label:"Constraint",      icon:"fa-lock", sub:"Limitation or resistance - forces Plan B"},
 ];
 
 export const GENERATOR_GROUPS = [
-  {id:"people",    label:"People",    icon:"👤", gens:["npc_minor","npc_major","pc","backstory"]},
-  {id:"scene",     label:"Scene",     icon:"🎬", gens:["scene","encounter","complication"]},
-  {id:"story",     label:"Story",     icon:"🌍", gens:["seed","campaign","faction"]},
-  {id:"mechanics", label:"Mechanics", icon:"⚙",  gens:["compel","consequence","challenge","contest","obstacle","countdown","constraint"]},
+  {id:"people",    label:"People",    icon:"fa-users", gens:["npc_minor","npc_major","pc","backstory"]},
+  {id:"scene",     label:"Scene",     icon:"fa-clapperboard", gens:["scene","encounter","complication"]},
+  {id:"story",     label:"Story",     icon:"fa-earth-americas", gens:["seed","campaign","faction"]},
+  {id:"mechanics", label:"Mechanics", icon:"fa-gears",  gens:["compel","consequence","challenge","contest","obstacle","countdown","constraint"]},
 ];
 
 
@@ -764,7 +764,7 @@ export const HELP_CONTENT = {
 
 export const HELP_ENTRIES = [
   {
-    id:"npc_minor", icon:"◎", label:"Minor NPC",
+    id:"npc_minor", icon:"fa-user", label:"Minor NPC",
     what:"A named minor NPC (mook): concept, one weakness, and 1–2 stress boxes.",
     how:"Instant extras for any scene — read the name and concept aloud, use the weakness as a compel hook.",
     tip:"Don't name every mook - only the ones who might interact with the party. Optionally, treat a mob as sharing a single stress track.",
@@ -772,7 +772,7 @@ export const HELP_ENTRIES = [
     srd_url:"https://fate-srd.com/fate-condensed/being-game-master#npcs",
   },
   {
-    id:"npc_major", icon:"◉", label:"Major NPC",
+    id:"npc_major", icon:"fa-crown", label:"Major NPC",
     what:"A full antagonist or ally: high concept, trouble, 3 other aspects, a skill pyramid, 2–3 stunts, stress and consequences.",
     how:"Your session's central antagonist or ally in one roll — read concept + trouble to set the personality, reveal other aspects through play.",
     tip:"Major NPCs should feel like PCs. Give them a want, a fear, and a reason the party might sympathise with them.",
@@ -780,7 +780,7 @@ export const HELP_ENTRIES = [
     srd_url:"https://fate-srd.com/fate-condensed/being-game-master#npcs",
   },
   {
-    id:"scene", icon:"◈", label:"Scene Setup",
+    id:"scene", icon:"fa-fire", label:"Scene Setup",
     what:"Scene aspects (tone, movement, cover, danger, usable), 2–4 zones with their own aspects, and zone descriptions.",
     how:"Sets the stage before players arrive — read zone names aloud, reveal visible aspects, keep hidden ones for discovery.",
     tip:"Scene aspects can be invoked by anyone. Put at least one 'usable' aspect in reach - players love having options.",
@@ -788,7 +788,7 @@ export const HELP_ENTRIES = [
     srd_url:"https://fate-srd.com/fate-condensed/aspects-and-fate-points#situation-aspects",
   },
   {
-    id:"campaign", icon:"◇", label:"Campaign Frame",
+    id:"campaign", icon:"fa-globe", label:"Campaign Frame",
     what:"One current issue (already causing problems), one impending issue (coming crisis), setting aspects, key faces, and important places.",
     how:"Defines what your world is fighting about — hand players the current issue and let the impending issue build pressure between sessions.",
     tip:"Current issues give the party something to react to. Impending issues create urgency. Setting aspects are always true - spend a fate point to invoke them like any other aspect.",
@@ -796,7 +796,7 @@ export const HELP_ENTRIES = [
     srd_url:"https://fate-srd.com/fate-condensed/getting-started#define-your-setting",
   },
   {
-    id:"encounter", icon:"⚔", label:"Encounter",
+    id:"encounter", icon:"fa-burst", label:"Encounter",
     what:"A named opposition force, 2 possible twists, a victory condition, a defeat condition, and the GM's starting fate points.",
     how:"A complete action scene, ready to run — announce the victory condition first, hold the twist for when things feel settled.",
     tip:"The defeat condition is just as important as victory - it gives consequences weight. GM fate points = number of PCs.",
@@ -804,7 +804,7 @@ export const HELP_ENTRIES = [
     srd_url:"https://fate-srd.com/fate-condensed/conflicts",
   },
   {
-    id:"seed", icon:"◎", label:"Adventure Seed",
+    id:"seed", icon:"fa-seedling", label:"Adventure Seed",
     what:"A full one-page scenario skeleton: location, objective, complication, three-scene structure, opposition, victory/defeat conditions, and a mid-scene twist.",
     how:"An entire session from a standing start — read the opening hook as your first words, prep Scene 1 only, let the rest emerge.",
     tip:"A complete seed is one session of prep. Everything after Scene 1 is a reaction to the players, not a plan. The complication should force a choice, not just an obstacle.",
@@ -812,7 +812,7 @@ export const HELP_ENTRIES = [
     srd_url:"https://fate-srd.com/fate-condensed/getting-started",
   },
   {
-    id:"compel", icon:"⊗", label:"Compel",
+    id:"compel", icon:"fa-rotate-left", label:"Compel",
     what:"A concrete situation invoking a specific aspect, a consequence if accepted, and the fate point offer framing.",
     how:"The fastest way to create drama and move fate points — offer the point first, name the aspect, state the consequence.",
     tip:"A good compel creates dramatic interest, not punishment. If accepting feels narratively satisfying, it is a good compel. Players can refuse by spending 1 fate point — that's not failure, it's the economy working.",
@@ -822,7 +822,7 @@ export const HELP_ENTRIES = [
     srd_url:"https://fate-srd.com/fate-condensed/aspects-and-fate-points#compels",
   },
   {
-    id:"challenge", icon:"⬡", label:"Challenge",
+    id:"challenge", icon:"fa-bullseye", label:"Challenge",
     what:"A series of overcome rolls against fixed difficulties, resolved collectively. Not a Contest (opposed exchange-by-exchange competition).",
     how:"Turns a complex problem into 3-5 meaningful rolls — announce the stakes up front, let players Create Advantage before the big moment.",
     tip:"Keep challenges to 3–5 rolls. Longer drags the tension. Use Create Advantage first to set up the decisive action.",
@@ -830,7 +830,7 @@ export const HELP_ENTRIES = [
     srd_url:"https://fate-srd.com/fate-condensed/challenges-conflicts-and-contests#challenges",
   },
   {
-    id:"contest", icon:"🏁", label:"Contest",
+    id:"contest", icon:"fa-trophy", label:"Contest",
     what:"Two sides in direct opposition, exchange by exchange. First to 3 victories wins. Ties introduce twists.",
     how:"Tracks a race or rivalry exchange by exchange — visible victory track, ties introduce twists, succeed with style for double victories.",
     tip:"Announce the victory track visibly. Ties are the best part - they introduce new aspects that change the contest. Use them aggressively.",
@@ -838,7 +838,7 @@ export const HELP_ENTRIES = [
     srd_url:"https://fate-srd.com/fate-condensed/challenges-conflicts-and-contests#contests",
   },
   {
-    id:"consequence", icon:"⚡", label:"Consequence",
+    id:"consequence", icon:"fa-bolt", label:"Consequence",
     what:"A lasting aspect taken to absorb a hit - mild (2), moderate (4), or severe (6). Must be treated before it clears.",
     how:"Lasting damage that drives story — write it as an evocative aspect, compel it at least once before it heals.",
     tip:"Compel the consequence at least once before it clears. Name it specifically: 'Badly Burned Hands' not 'Injured.'",
@@ -846,7 +846,7 @@ export const HELP_ENTRIES = [
     srd_url:"https://fate-srd.com/fate-condensed/challenges-conflicts-and-contests#taking-harm",
   },
   {
-    id:"faction", icon:"⚑", label:"Faction",
+    id:"faction", icon:"fa-flag", label:"Faction",
     what:"A group with a goal, method, weakness, and a named face NPC who represents it in play.",
     how:"Organisations that move the world between sessions — the named face is your session anchor, advance the goal off-screen.",
     tip:"Two factions with conflicting goals = engine. Three with overlapping methods = the ideal mess.",
@@ -854,7 +854,7 @@ export const HELP_ENTRIES = [
     srd_url:"https://fate-srd.com/fate-system-toolkit/factions",
   },
   {
-    id:"complication", icon:"⚠", label:"Complication",
+    id:"complication", icon:"fa-triangle-exclamation", label:"Complication",
     what:"A mid-scene interruption: new aspect, arriving NPC, or environment shift. Drop when the scene has settled.",
     how:"Restores energy when a scene feels settled — introduce one element at a time and let players react before the next.",
     tip:"The best complications force a choice - solve the new problem or continue with the original goal.",
@@ -862,7 +862,7 @@ export const HELP_ENTRIES = [
     srd_url:"https://fate-srd.com/fate-condensed/aspects-and-fate-points#situation-aspects",
   },
   {
-    id:"backstory", icon:"📖", label:"PC Backstory",
+    id:"backstory", icon:"fa-masks-theater", label:"PC Backstory",
     what:"Session Zero questions that draw out character history, a relationship web exercise, and an opening hook.",
     how:"Session Zero character creation that produces playable aspects — ask questions at the table together, write aspects as they talk.",
     tip:"Relationship web questions are more important than individual questions. Cross-PC history is fuel.",
@@ -870,7 +870,7 @@ export const HELP_ENTRIES = [
     srd_url:"https://fate-srd.com/fate-condensed/getting-started#create-your-characters",
   },
   {
-    id:"obstacle", icon:"🛡", label:"Obstacle",
+    id:"obstacle", icon:"fa-shield-halved", label:"Obstacle",
     what:"A hazard, block, or distraction - an obstacle that cannot be attacked and taken out like an enemy.",
     how:"Splits player attention and rewards creative thinking — one per scene, announce the type, give non-combat PCs a way to shine.",
     tip:"One obstacle per combat scene is ideal. Give non-combat PCs a way to disable it while fighters handle enemies.",
@@ -878,7 +878,7 @@ export const HELP_ENTRIES = [
     srd_url:"https://fate-srd.com/fate-condensed/optional-rules#obstacles",
   },
   {
-    id:"countdown", icon:"⏱", label:"Countdown",
+    id:"countdown", icon:"fa-clock", label:"Countdown",
     what:"A pacing clock: boxes that fill on triggers, with an outcome when the last box is checked.",
     how:"Visible urgency that paces the entire scene — place the track where everyone sees it, check boxes honestly, never fudge.",
     tip:"Put the track where players can see it. Physically marking boxes is one of the best tension tools in the game.",
@@ -886,7 +886,7 @@ export const HELP_ENTRIES = [
     srd_url:"https://fate-srd.com/fate-condensed/optional-rules#countdowns",
   },
   {
-    id:"constraint", icon:"🔒", label:"Constraint",
+    id:"constraint", icon:"fa-lock", label:"Constraint",
     what:"A limitation (restricts an action with consequences) or a resistance (makes a target immune until bypassed).",
     how:"Forces Plan B and rewards investigation — announce limitations up front, let players discover bypasses through play.",
     tip:"One constraint per encounter. Two makes a puzzle. Three makes a slog. Always include a bypass for resistances.",

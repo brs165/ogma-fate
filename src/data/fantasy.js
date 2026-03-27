@@ -6,7 +6,7 @@ export const CAMPAIGNS = { fantasy: {
     meta: {
       id: "fantasy", name: "Shattered Kingdoms",
       tagline: "The Weight of History. Magic is an ecological wound left by wars that broke the world - and the old oaths still bind.",
-      icon: "✦", font: "'Inter', sans-serif",
+      icon: "fa-dragon", font: "'Inter', sans-serif",
     },
     colors: {
       bg:"#080b06", panel:"#0e130b", border:"#1a2a12",

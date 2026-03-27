@@ -125,7 +125,7 @@
   const CANVAS_TEMPLATES = [
     {
       id: 'tpl_opening',
-      icon: '\u{1F3AC}',
+      icon: 'fa-clapperboard',
       label: 'Opening Scene',
       desc: 'Scene + 2 NPCs + Countdown',
       cards: [
@@ -137,7 +137,7 @@
     },
     {
       id: 'tpl_investigation',
-      icon: '\u{1F50D}',
+      icon: 'fa-magnifying-glass',
       label: 'Investigation',
       desc: 'Scene + Faction + Complication + Obstacle',
       cards: [
@@ -149,7 +149,7 @@
     },
     {
       id: 'tpl_climax',
-      icon: '\u{1F525}',
+      icon: 'fa-fire',
       label: 'Climax',
       desc: 'Encounter + Contest + 2 Boosts',
       cards: [
@@ -161,7 +161,7 @@
     },
     {
       id: 'tpl_session_zero',
-      icon: '\u{1F9D1}',
+      icon: 'fa-users',
       label: 'Session Zero',
       desc: 'Campaign frame + PC × 3 + Backstory × 3',
       cards: [
@@ -237,22 +237,22 @@
   }
 
   let cmdActions = $derived([
-    { id: 'gen-npc',     icon: '\u{1F9D1}', label: 'Generate Minor NPC',  shortcut: 'Space', fn: () => { if (canvas) canvas.generateCard('npc_minor'); } },
-    { id: 'gen-major',   icon: '\u{1F451}', label: 'Generate Major NPC',              fn: () => { if (canvas) canvas.generateCard('npc_major'); } },
-    { id: 'gen-scene',   icon: '\u{1F525}', label: 'Generate Scene',                  fn: () => { if (canvas) canvas.generateCard('scene'); } },
-    { id: 'gen-encounter',icon: '\u2694',   label: 'Generate Encounter',              fn: () => { if (canvas) canvas.generateCard('encounter'); } },
-    { id: 'gen-sticky',  icon: '\u{1F4DD}', label: 'Add Aspect Sticky',               fn: () => { if (canvas) canvas.generateCard('sticky'); } },
+    { id: 'gen-npc',     icon: 'fa-user', label: 'Generate Minor NPC',  shortcut: 'Space', fn: () => { if (canvas) canvas.generateCard('npc_minor'); } },
+    { id: 'gen-major',   icon: 'fa-crown', label: 'Generate Major NPC',              fn: () => { if (canvas) canvas.generateCard('npc_major'); } },
+    { id: 'gen-scene',   icon: 'fa-fire', label: 'Generate Scene',                  fn: () => { if (canvas) canvas.generateCard('scene'); } },
+    { id: 'gen-encounter',icon: 'fa-burst',   label: 'Generate Encounter',              fn: () => { if (canvas) canvas.generateCard('encounter'); } },
+    { id: 'gen-sticky',  icon: 'fa-note-sticky', label: 'Add Aspect Sticky',               fn: () => { if (canvas) canvas.generateCard('sticky'); } },
     ...CANVAS_TEMPLATES.map(t => ({
       id: t.id, icon: t.icon, label: 'Template: ' + t.label, sub: t.desc,
       fn: () => dropTemplate(t.id),
     })),
-    { id: 'dice',        icon: '\u{1F3B2}', label: 'Toggle Dice Roller', shortcut: 'R', fn: () => { showDice = !showDice; } },
-    { id: 'fp',          icon: '\u25CE',    label: 'Toggle Fate Points',              fn: () => { showFP = !showFP; } },
-    { id: 'export',      icon: '\u2193',    label: 'Export Cards',                    fn: () => { exportView = true; } },
-    { id: 'fit',         icon: '\u2922',    label: 'Fit All Cards',      shortcut: 'F', fn: fitAll },
-    { id: 'clear',       icon: '\u{1F5D1}', label: 'Clear Table',                     fn: () => { showClearModal = true; } },
-    { id: 'undo',        icon: '\u21B6',    label: 'Undo',               shortcut: '\u2318Z', fn: () => { if (canvas) canvas.undoLast(); } },
-    { id: 'theme',       icon: '\u263D',    label: 'Toggle Theme',                    fn: toggleTheme },
+    { id: 'dice',        icon: 'fa-dice-d20', label: 'Toggle Dice Roller', shortcut: 'R', fn: () => { showDice = !showDice; } },
+    { id: 'fp',          icon: 'fa-coins',    label: 'Toggle Fate Points',              fn: () => { showFP = !showFP; } },
+    { id: 'export',      icon: 'fa-file-export',    label: 'Export Cards',                    fn: () => { exportView = true; } },
+    { id: 'fit',         icon: 'fa-expand',    label: 'Fit All Cards',      shortcut: 'F', fn: fitAll },
+    { id: 'clear',       icon: 'fa-trash-can', label: 'Clear Table',                     fn: () => { showClearModal = true; } },
+    { id: 'undo',        icon: 'fa-rotate-left',    label: 'Undo',               shortcut: '\u2318Z', fn: () => { if (canvas) canvas.undoLast(); } },
+    { id: 'theme',       icon: 'fa-circle-half-stroke',    label: 'Toggle Theme',                    fn: toggleTheme },
   ]);
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────

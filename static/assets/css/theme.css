@@ -4886,6 +4886,15 @@ g:hover .cv-edge-label-bg { fill:color-mix(in srgb,var(--accent) 12%,var(--panel
   stroke-width: 1px;
 }
 
+/* ── FA content icons — white in dark theme, black in light ────────────── */
+.blp-icon i, .cmd-item-icon i, .sidebar-item-icon i,
+.land-world-icon i, .land-npc-world i, .board-ctx-icon i { color: #fff; }
+[data-theme="light"] .blp-icon i, [data-theme="light"] .cmd-item-icon i,
+[data-theme="light"] .sidebar-item-icon i,
+[data-theme="light"] .land-world-icon i,
+[data-theme="light"] .land-npc-world i,
+[data-theme="light"] .board-ctx-icon i { color: #000; }
+
 /* ── Bits ScrollArea ────────────────────────────────────────────────────── */
 [data-bits-scroll-area-root] { overflow: hidden; position: relative; flex: 1; }
 [data-bits-scroll-area-viewport] { overflow: auto; height: 100%; width: 100%; }
