@@ -19,7 +19,7 @@ import { onMount } from 'svelte';
 
   // Close nav on route change
   $effect(() => {
-    void currentPath;
+    currentPath;
     navOpen = false;
   });
 

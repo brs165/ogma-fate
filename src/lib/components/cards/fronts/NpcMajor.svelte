@@ -80,20 +80,17 @@
 </div>
 
 <!-- Consequences -->
+{#snippet conRow(label, cls)}
+  <div class="fs-con-row">
+    <span class="fs-con-label {cls}">{label}</span>
+    <div class="fs-con-line"></div>
+  </div>
+{/snippet}
 <div class="fs-section-gap">
   <div class="fs-section-hdr">CONSEQUENCES</div>
-  <div class="fs-con-row">
-    <span class="fs-con-label fs-con-label-mild">Mild (2)</span>
-    <div class="fs-con-line"></div>
-  </div>
-  <div class="fs-con-row">
-    <span class="fs-con-label fs-con-label-mod">Moderate (4)</span>
-    <div class="fs-con-line"></div>
-  </div>
-  <div class="fs-con-row">
-    <span class="fs-con-label fs-con-label-sev">Severe (6)</span>
-    <div class="fs-con-line"></div>
-  </div>
+  {@render conRow('Mild (2)',     'fs-con-label-mild')}
+  {@render conRow('Moderate (4)', 'fs-con-label-mod')}
+  {@render conRow('Severe (6)',   'fs-con-label-sev')}
 </div>
 
 <!-- Stunts -->

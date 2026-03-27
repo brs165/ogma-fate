@@ -109,7 +109,8 @@
   let sectionColor = $derived('var(--fs-section)');
 
   // ── Interactive card state ────────────────────────────────────────────────
-  let cardState = (() => {
+  // $state.raw: always replaced wholesale via updState — no deep proxy needed
+  let cardState = $state.raw((() => {
     const pMax = typeof data.physical_stress === 'number' ? data.physical_stress
                : typeof data.stress          === 'number' ? data.stress : 0;
     const mMax = typeof data.mental_stress   === 'number' ? data.mental_stress : 0;
@@ -119,7 +120,7 @@
       cdFilled: 0, scoreA: 0, scoreB: 0, treated: false,
     };
     return savedCardState ? Object.assign({}, defaults, savedCardState) : defaults;
-  })();
+  })());
 
   function updState(patch) {
     cardState = Object.assign({}, cardState, patch);

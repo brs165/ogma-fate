@@ -1,5 +1,6 @@
 <script>
   import OgmaTooltip from '../../shared/OgmaTooltip.svelte';
+  let { data = {}, campName = '', catColor = 'var(--fs-section)', cardState = {}, onUpdate = () => {} } = $props();
 
   const CC = {
     danger: '#c62828', cover: '#1565c0', tone: '#b8860b', movement: '#2e7d32', usable: '#7b1fa2',
