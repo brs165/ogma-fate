@@ -1,7 +1,7 @@
 {
 	"name": "ogma-fate",
 	"private": true,
-	"version": "2026.3.679",
+	"version": "2026.3.680",
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",

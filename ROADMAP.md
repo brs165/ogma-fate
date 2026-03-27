@@ -4,10 +4,10 @@ See `docs/claude/PROJECT_MEMORY.md` for full project state and `docs/claude/TEAM
 
 ---
 
-## Current version: v2026.03.677
+## Current version: v2026.03.680
 
 **Stack:** SvelteKit + Svelte 5.55 runes + native canvas (OgmaCanvas.svelte) + Bits UI 2.16.3 + Dexie 4 + FA 7.2 Free
-**QA gate:** 72 `.svelte` files (45 components + 27 routes) | 3 stores | 189 hard checks | 166 export checks
+**QA gate:** 75 `.svelte` files (48 components + 27 routes) | 3 stores | 189 hard checks | 166 export checks
 
 ---
 

@@ -1,6 +1,6 @@
 # Project Memory — Ogma
 _Persistent context for model-switching and session handoffs._
-_Last updated: 2026.03.677 — native canvas migration (v662 in progress)_
+_Last updated: 2026.03.680 — Svelte 5 runes compliance audit_
 
 ---
 
@@ -49,16 +49,17 @@ docs/claude/CANVAS-WORKSHOP.md       Canvas sprint status and backlog
 
 ---
 
-## Svelte 5 runes rules (CRITICAL — applies to all 76 components)
+## Svelte 5 runes rules (CRITICAL — applies to all 75 components)
 
-- `let x = $state(value)` — ALL mutable local state. Never plain `let` for reassigned vars.
+- `let x = $state(value)` — mutable local state. Use `$state.raw(value)` for objects always replaced wholesale (avoids deep proxy).
 - `let x = $derived(expr)` — computed values. Expression only, never a wrapping function.
 - `let { prop = default } = $props()` — component props. Never `export let`.
-- `$effect(() => { ... })` — side effects. Replaces `$: { ... }`.
+- `$effect(() => { ... })` — DOM side effects only. Not for state derivation (use `$derived`). Never write to state inside `$effect` based on another state value.
 - `onclick={}` not `on:click={}` — Svelte 5 event syntax throughout.
 - `{@render children?.()}` not `<slot />` — snippet rendering.
 - **`$state()` only at component top level** — never inside function bodies.
 - **Zero `runes={false}` files** — all components are on runes mode.
+- **Dependency hacks banned** — `void expr` inside `$effect` was an anti-pattern; use bare `expr;` for silent dependencies.
 
 ---
 
@@ -116,7 +117,7 @@ screenY = cardY * zoom + panY
 
 ---
 
-## Component inventory (78 .svelte files)
+## Component inventory (75 .svelte files)
 
 ```
 src/lib/components/
@@ -125,22 +126,23 @@ src/lib/components/
 │                         Compel, Challenge, Contest, Consequence, Faction,
 │                         Complication, Backstory, Obstacle, Countdown,
 │                         Constraint, Custom, Pc
-├── board/          20    Board, BoardCard, BoardLabel, BoardSticky, BoardBoost,
-│                         TurnBar, PlayerRow, CombatTracker, PlayPanel, BinderPanel,
-│                         DossierModal, Topbar, ExportMenu, ExportPanel, HelpPanel,
-│                         StuntPanel, MobileList, CommandPalette,
-│                         CanvasContextMenu, GenerateFAB
+├── board/          17    Board, OgmaCanvas, BoardCard, BoardLabel, BoardSticky,
+│                         BoardBoost, BoardGroup, Topbar, DossierModal, ExportMenu,
+│                         ExportPanel, HelpPanel, StuntPanel, MobileList,
+│                         CommandPalette, CanvasContextMenu, GenerateFAB
 ├── campaign/        3    Campaign, FatePointTracker, Landing
 ├── panels/          1    LeftPanel
 ├── dice/            1    DicePanel
-├── player/          1    PlayerSurface
-└── shared/          2    HelpDiceRoller, Footer
+└── shared/          3    HelpDiceRoller, Footer, OgmaTooltip
 
 src/routes/                27 route page/layout files
 ```
 
 **Deleted in v662:** `nodes/CardNode.svelte`, `nodes/StickyNode.svelte`,
 `nodes/BoostNode.svelte`, `nodes/LabelNode.svelte`, `nodeTypes.js`
+
+**Deleted in v665:** `TurnBar.svelte`, `PlayerRow.svelte`, `CombatTracker.svelte`,
+`PlayPanel.svelte`, `BinderPanel.svelte`, `PlayerSurface.svelte` (play mode removed)
 
 ---
 
@@ -165,7 +167,13 @@ src/routes/                27 route page/layout files
 Cards render directly via `{#each}` loop in a transformed viewport div. Connectors as SVG
 overlay. Minimap as scaled position rectangles. No `@xyflow/svelte` dependency.
 
-**Svelte 5 migration** — all 76 components on runes, zero legacy files.
+**Svelte 5 migration** — all 75 components on runes, zero legacy files.
+
+**Svelte 5 runes compliance audit (v680)** — systematic pass across all 75 components:
+`void`-dependency hacks removed, sync `$effect` anti-patterns replaced with `$derived` or
+init-on-edit patterns, `$state.raw` adopted for wholesale-replaced objects (`cardState`),
+`tick()` replaces `setTimeout(..., 0)` for post-render focus, `Scene.svelte` missing
+`$props()` declaration fixed (critical), `{#snippet}` adopted in `NpcMajor.svelte`.
 
 **FateX-style card restyling (v600)** — all 18 card fronts + Cv4Card shell rewritten
 with `--fs-*` fate-sheet design tokens.
@@ -208,6 +216,7 @@ undo covers card moves + reroll + delete, Ctrl+A select all.
 - **PDF-08** Dust and Iron
 
 ### Recently completed
+- ~~**Svelte 5 runes compliance audit**~~ `void` hacks, sync effects, `$state.raw`, snippets — v680
 - ~~**Canvas migration**~~ SvelteFlow → native pointer/wheel canvas — v662
 - ~~**BL-01**~~ localStorage schema — v624
 - ~~**BL-02**~~ Stunt data — v627
@@ -224,7 +233,7 @@ undo covers card moves + reroll + delete, Ctrl+A select all.
 - **Zip naming:** source = `YYYY-MM-NNN.zip`, offline = `ogma-offline-YYYY-MM-NNN.zip`
 - **`npx vite build`** — use for all test/intermediate builds. No version bump.
 - **`bash scripts/bump-version.sh`** — run ONCE, immediately before the final zip delivery only.
-- Current version: `2026.03.677`
+- Current version: `2026.03.680`
 
 ---
 

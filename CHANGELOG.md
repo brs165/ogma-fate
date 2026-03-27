@@ -2,6 +2,33 @@
 
 ---
 
+## [2026.03.680] — March 2026 — Svelte 5 Runes Compliance Audit
+
+### Critical fixes
+- `Scene.svelte`: added missing `$props()` declaration — `data`, `cardState`, and `onUpdate` were used but never declared, causing runtime errors on free-invoke toggle and card render
+- `Campaign.svelte`: `unsubs = $state([])` → `let unsubs = []` — cleanup array proxied unnecessarily (matches existing `Board.svelte` pattern)
+
+### Reactive state hygiene
+- `ExportPanel.svelte`: promoted `sel` from plain `let` to `$state({})` for explicit reactive intent; removed `void exportable.length` dependency-tracking hack
+- `CommandPalette.svelte`: replaced `void filtered` hack with `filtered.length` reference
+- `Cv4Card.svelte`: replaced `void genId; void data` hacks with direct bare references; promoted `cardState` from plain `let` to `$state.raw({})` — always replaced wholesale, no deep proxy needed; demoted `mq` from `$state()` to plain `let` (DOM object, set once in `onMount`)
+- `character-creation/+page.svelte`: replaced `pcDrafts.push()` mutation inside `$effect` with immutable `Array.from` rebuild to avoid stale proxy reads
+
+### Effect hygiene
+- `Custom.svelte`: removed sync `$effect` that wrote `draftTitle`/`draftBody` from props; replaced with explicit draft initialization in `startEditTitle`/`startEditBody`; display branches now read `data.title`/`data.body` directly
+- `help/+layout.svelte`: replaced `void currentPath` hack with bare `currentPath` reference
+
+### Performance
+- `BoardBoost.svelte`, `BoardSticky.svelte`: replaced `setTimeout(..., 0)` focus with `tick().then()` for guaranteed post-render DOM timing
+
+### Snippet adoption
+- `NpcMajor.svelte`: extracted `{#snippet conRow(label, cls)}` to replace 3 hardcoded identical consequence rows — first `{#snippet}` usage in the card layer
+
+### Docs
+- All docs updated: component inventory corrected (75 total, 47 components), SvelteFlow references purged, `$state.raw` guidance added, outdated architecture tables fixed
+
+---
+
 ## [2026.03.677] — March 2026 — Sprint 6: Bits UI + Delight Pass
 
 ### Bits UI upgrades

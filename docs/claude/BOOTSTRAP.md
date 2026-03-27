@@ -47,8 +47,8 @@ Add others per task (e.g. `src/lib/stores/canvasStore.js`, `src/lib/components/b
 
 ## 4. Stack facts (critical)
 
-**Svelte 5 runes — 76 files, zero legacy:**
-- `$state()` on every mutable `let` — never plain `let` for reassigned vars
+**Svelte 5 runes — 75 files, zero legacy:**
+- `$state()` for mutable state; `$state.raw()` for objects always replaced wholesale (no deep proxy)
 - `$props()` for all component props — never `export let`
 - `onclick=` not `on:click=` — Svelte 5 event syntax
 - `$derived(expr)` — expression only, never a wrapping `() => {}`
@@ -82,7 +82,7 @@ canvasY = (screenY - panY) / zoom
 
 ---
 
-## 5. Component inventory (78 .svelte files)
+## 5. Component inventory (75 .svelte files)
 
 ```
 src/lib/components/
@@ -91,21 +91,19 @@ src/lib/components/
 │                         Complication, Backstory, Obstacle, Countdown,
 │                         Constraint, Custom, Pc
 ├── cards/           4    StressRow, ClockTrack, Cv4Card, BackPanel
-├── board/          20    Board, BoardCard, BoardSticky, BoardBoost, BoardLabel,
-│                         TurnBar, PlayerRow, CombatTracker, PlayPanel, BinderPanel,
-│                         DossierModal, Topbar, ExportMenu, ExportPanel, HelpPanel,
-│                         StuntPanel, MobileList, CommandPalette,
-│                         CanvasContextMenu, GenerateFAB
+├── board/          17    Board, OgmaCanvas, BoardCard, BoardSticky, BoardBoost,
+│                         BoardLabel, BoardGroup, Topbar, DossierModal, ExportMenu,
+│                         ExportPanel, HelpPanel, StuntPanel, MobileList,
+│                         CommandPalette, CanvasContextMenu, GenerateFAB
 ├── campaign/        3    Campaign, FatePointTracker, Landing
 ├── dice/            1    DicePanel
 ├── panels/          1    LeftPanel
-├── player/          1    PlayerSurface
-└── shared/          2    HelpDiceRoller, Footer
+└── shared/          3    HelpDiceRoller, Footer, OgmaTooltip
 
 src/routes/         27    route pages/layouts
 ```
 
-> NOTE: `src/lib/components/board/nodes/` and `nodeTypes.js` deleted in v662. `OgmaCanvas.svelte` added in v663.
+> Deleted in v662: `board/nodes/` (4 files) + `nodeTypes.js`. Deleted in v665: TurnBar, PlayerRow, CombatTracker, PlayPanel, BinderPanel, PlayerSurface (play mode removed).
 
 ---
 
@@ -136,7 +134,7 @@ npx vite build
 cd build && zip -rq ../ogma-offline-YYYY-MM-NNN.zip .
 ```
 
-Current version: `2026.03.677`
+Current version: `2026.03.680`
 
 ---
 
