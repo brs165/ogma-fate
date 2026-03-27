@@ -82,7 +82,7 @@ canvasY = (screenY - panY) / zoom
 
 ---
 
-## 5. Component inventory (77 .svelte files)
+## 5. Component inventory (78 .svelte files)
 
 ```
 src/lib/components/
@@ -105,7 +105,7 @@ src/lib/components/
 src/routes/         27    route pages/layouts
 ```
 
-> NOTE: `src/lib/components/board/nodes/` and `nodeTypes.js` were deleted in v662 (native canvas migration).
+> NOTE: `src/lib/components/board/nodes/` and `nodeTypes.js` deleted in v662. `OgmaCanvas.svelte` added in v663.
 
 ---
 
@@ -136,7 +136,7 @@ npx vite build
 cd build && zip -rq ../ogma-offline-YYYY-MM-NNN.zip .
 ```
 
-Current version: `2026.03.663`
+Current version: `2026.03.665`
 
 ---
 

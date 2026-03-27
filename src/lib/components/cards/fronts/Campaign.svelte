@@ -1,73 +1,64 @@
 <script>
-  import CvLabel from '../CvLabel.svelte';
+  let { data = {}, campName = '', catColor = 'var(--fs-section)' } = $props();
 
-  export let data = {};
-  export let campName = '';
-  export let catColor = 'var(--accent)';
-
-  const CV4_MONO = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
-  const CV4_SANS = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
-
-  $: cur      = data.current || {};
-  $: imp      = data.impending || {};
-  $: curFaces = Array.isArray(cur.faces) ? cur.faces : [];
-  $: impFaces = Array.isArray(imp.faces) ? imp.faces : [];
-  $: setting  = Array.isArray(data.setting) ? data.setting : [];
-  $: curPlaces = Array.isArray(cur.places) ? cur.places : [];
+  let cur = $derived(data.current || {});
+  let imp = $derived(data.impending || {});
+  let curFaces = $derived(Array.isArray(cur.faces) ? cur.faces : []);
+  let impFaces = $derived(Array.isArray(imp.faces) ? imp.faces : []);
+  let setting = $derived(Array.isArray(data.setting) ? data.setting : []);
+  let curPlaces = $derived(Array.isArray(cur.places) ? cur.places : []);
 </script>
 
-<div style="flex:1; padding:12px 16px 14px; display:flex; gap:14px">
-  <!-- Left column -->
-  <div style="flex:1; display:flex; flex-direction:column; gap:8px; min-width:0">
-    <div>
-      <CvLabel label="CURRENT ISSUE" color={catColor} />
-      <div style="font-size:12px; font-weight:700; color:var(--text); font-family:{CV4_SANS}; line-height:1.3; margin-bottom:3px">{cur.name || ''}</div>
-      <p style="margin:0; font-size:11px; color:var(--text-dim); font-family:{CV4_SANS}; line-height:1.5">{cur.desc || ''}</p>
+<!-- Current Issue -->
+<div class="fs-section-gap">
+  <div class="fs-section-hdr">CURRENT ISSUE</div>
+  <div style="font-size:13px; font-weight:700; color:var(--fs-text); line-height:1.3; margin-bottom:3px">{cur.name || ''}</div>
+  {#if cur.desc}<div style="font-size:12px; color:var(--fs-text-dim); line-height:1.5">{cur.desc}</div>{/if}
+  {#if curFaces.length > 0}
+    <div style="display:flex; flex-direction:column; gap:3px; margin-top:6px">
+      {#each curFaces as f}
+        <div class="fs-stunt">
+          <span class="fs-stunt-name">{f.name}: </span>
+          <span class="fs-stunt-desc" style="display:inline; font-style:italic">{f.role}</span>
+        </div>
+      {/each}
     </div>
-
-    {#if curFaces.length > 0}
-      <div style="display:flex; flex-direction:column; gap:3px">
-        {#each curFaces as f}
-          <div style="padding:3px 8px; background:var(--inset); border:1px solid var(--border); border-radius:4px">
-            <span style="font-size:11px; font-weight:700; color:{catColor}; font-family:{CV4_SANS}">{f.name}: </span>
-            <span style="font-size:11px; color:var(--text-dim); font-family:{CV4_SANS}; font-style:italic">{f.role}</span>
-          </div>
-        {/each}
-      </div>
-    {/if}
-
-    <div style="padding:7px 10px; background:color-mix(in srgb,var(--c-red,#f87171) 8%,var(--cv-card-dark,var(--panel))); border:1px solid var(--c-red,#f87171)33; border-left:3px solid var(--c-red,#f87171); border-radius:0 2px 2px 0">
-      <CvLabel label="IMPENDING" color="var(--c-red,#f87171)" />
-      <div style="font-size:12px; font-weight:700; color:var(--c-red,#f87171); font-family:{CV4_SANS}; line-height:1.3; margin-bottom:{imp.desc ? 3 : 0}px">{imp.name || ''}</div>
-      {#if imp.desc}<p style="margin:0; font-size:11px; font-style:italic; color:var(--text-dim); font-family:{CV4_SANS}; line-height:1.35">{imp.desc}</p>{/if}
-    </div>
-
-    {#if impFaces.length > 0}
-      <div style="display:flex; flex-direction:column; gap:3px">
-        {#each impFaces as f}
-          <div style="padding:3px 8px; background:var(--inset); border:1px solid rgba(248,113,113,0.25); border-radius:4px">
-            <span style="font-size:11px; font-weight:700; color:var(--c-red,#f87171); font-family:{CV4_SANS}">{f.name}: </span>
-            <span style="font-size:11px; color:var(--text-dim); font-family:{CV4_SANS}; font-style:italic">{f.role}</span>
-          </div>
-        {/each}
-      </div>
-    {/if}
-  </div>
-
-  <!-- Right column -->
-  <div style="width:172px; flex-shrink:0; display:flex; flex-direction:column; gap:8px">
-    <CvLabel label="SETTING ASPECTS" color={catColor} />
-    {#each setting as s}
-      <p style="margin:0 0 6px; font-size:11px; font-style:italic; color:var(--text-dim); font-family:{CV4_SANS}; line-height:1.4; padding-left:8px; border-left:1px solid var(--border)">"{s}"</p>
-    {/each}
-
-    {#if curPlaces.length > 0}
-      <div>
-        <CvLabel label="PLACES" color={catColor} />
-        {#each curPlaces as p}
-          <div style="font-size:11px; color:var(--text-dim); font-family:{CV4_SANS}; padding:1px 0">· {p}</div>
-        {/each}
-      </div>
-    {/if}
-  </div>
+  {/if}
 </div>
+
+<!-- Impending Issue -->
+<div class="fs-section-gap">
+  <div class="fs-stunt" style="border-left:3px solid #c62828; border-radius:0 3px 3px 0">
+    <div style="font-size:10px; font-weight:800; letter-spacing:0.12em; color:#c62828; margin-bottom:2px">IMPENDING</div>
+    <div style="font-size:13px; font-weight:700; color:#c62828; line-height:1.3">{imp.name || ''}</div>
+    {#if imp.desc}<div class="fs-stunt-desc" style="font-style:italic">{imp.desc}</div>{/if}
+  </div>
+  {#if impFaces.length > 0}
+    <div style="display:flex; flex-direction:column; gap:3px; margin-top:4px">
+      {#each impFaces as f}
+        <div class="fs-stunt">
+          <span style="font-size:12px; font-weight:700; color:#c62828">{f.name}: </span>
+          <span class="fs-stunt-desc" style="display:inline; font-style:italic">{f.role}</span>
+        </div>
+      {/each}
+    </div>
+  {/if}
+</div>
+
+<!-- Setting Aspects -->
+<div class="fs-section-gap">
+  <div class="fs-section-hdr">SETTING ASPECTS</div>
+  {#each setting as s}
+    <div class="fs-aspect-val">"{s}"</div>
+  {/each}
+</div>
+
+<!-- Places -->
+{#if curPlaces.length > 0}
+  <div class="fs-section-gap">
+    <div class="fs-section-hdr">PLACES</div>
+    {#each curPlaces as p}
+      <div style="font-size:12px; color:var(--fs-text-dim); padding:1px 0"><i class="fa-solid fa-circle" aria-hidden="true" style="font-size:4px; vertical-align:middle; margin-right:6px; color:var(--fs-section)"></i>{p}</div>
+    {/each}
+  </div>
+{/if}

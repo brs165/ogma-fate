@@ -1,15 +1,9 @@
-<svelte:options runes={false} />
-
 <script>
-  export let cards = [];
-  export let campId = '';
-  export let onOpen = () => {};
-  export let onRemove = () => {};
-
-  $: genCards = cards.filter(c => c.genId && c.genId !== 'sticky' && c.genId !== 'boost' && c.genId !== 'label' && c.data);
-  $: stickyCards = cards.filter(c => c.genId === 'sticky');
-  $: boostCards = cards.filter(c => c.genId === 'boost');
-  $: labelCards = cards.filter(c => c.genId === 'label');
+  let { cards = [], campId = '', onOpen = () => {}, onRemove = () => {} } = $props();
+  let genCards = $derived(cards.filter(c => c.genId && c.genId !== 'sticky' && c.genId !== 'boost' && c.genId !== 'label' && c.data));
+  let stickyCards = $derived(cards.filter(c => c.genId === 'sticky'));
+  let boostCards = $derived(cards.filter(c => c.genId === 'boost'));
+  let labelCards = $derived(cards.filter(c => c.genId === 'label'));
 
   const TYPE_MAP = {
     npc_minor: 'Minor NPC', npc_major: 'Major NPC', scene: 'Scene', campaign: 'Campaign',
@@ -40,7 +34,7 @@
 
 {#if cards.length === 0}
   <div class="bml-empty">
-    <div style="font-size:32px;margin-bottom:10px">&#x1F3B2;</div>
+    <div style="font-size:32px;margin-bottom:10px"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i></div>
     <div style="font-size:14px;font-weight:700;color:var(--text)">Canvas is empty</div>
     <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Use Generate tab to add cards.</div>
   </div>
@@ -54,26 +48,26 @@
         role="button"
         tabindex="0"
         aria-label="{cardTypeLabel(card.genId)}: {cardTitle(card)}"
-        on:click={() => onOpen(card)}
-        on:keydown={(e) => handleKeyDown(e, card)}
+        onclick={() => onOpen(card)}
+        onkeydown={(e) => handleKeyDown(e, card)}
       >
         <div class="bml-card-type" style="color:{col}">{cardTypeLabel(card.genId)}</div>
         <div class="bml-card-title">{cardTitle(card)}</div>
         <button
           class="bml-remove"
-          on:click|stopPropagation={() => onRemove(card.id)}
+          onclick={(e) => { e.stopPropagation(); (() => onRemove(card.id))(e); }}
           aria-label="Remove {cardTitle(card)}"
         >&times;</button>
       </div>
     {/each}
     {#if stickyCards.length > 0}
-      <div class="bml-section">&#x1F4CC; Sticky notes ({stickyCards.length})</div>
+      <div class="bml-section"><i class="fa-solid fa-thumbtack" aria-hidden="true"></i> Sticky notes ({stickyCards.length})</div>
     {/if}
     {#if boostCards.length > 0}
-      <div class="bml-section">&#x26A1; Boosts ({boostCards.length})</div>
+      <div class="bml-section"><i class="fa-solid fa-bolt" aria-hidden="true"></i> Boosts ({boostCards.length})</div>
     {/if}
     {#if labelCards.length > 0}
-      <div class="bml-section">&#x1F3F7; Labels ({labelCards.length})</div>
+      <div class="bml-section"><i class="fa-solid fa-tag" aria-hidden="true"></i> Labels ({labelCards.length})</div>
     {/if}
   </div>
 {/if}

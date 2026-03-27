@@ -3,6 +3,7 @@
   import Cv4Card from '../cards/Cv4Card.svelte';
   import { GENERATORS } from '../../engine.js';
 
+  let { card = {}, onDelete = null, onReroll = null, onSendToTable = null, onRemoveFromTable = null, onOpen = null, onDragStart = null, onUpdate = null, isOnTable = false, mode = 'prep', campId = '', onInvoke = null, onConnect = null, isConnectSource = false } = $props();
   const BOARD_TYPE_COLOR = {
     npc_minor:    {stripe:'#e8b83a', tc:'#b8860b', bg:'#fffbee'},
     npc_major:    {stripe:'#e8793a', tc:'#c4581a', bg:'#fff3ee'},
@@ -23,27 +24,23 @@
     custom:       {stripe:'#888',    tc:'#555',    bg:'#f5f4f1'},
     boost:        {stripe:'#f4b942', tc:'#b8860b', bg:'#fffbee'},
   };
+  let C = $derived(BOARD_TYPE_COLOR[card.genId] || { stripe: '#888', tc: '#555', bg: '#f5f4f1' });
 
-  export let card              = {};
-  export let onDelete          = null;
-  export let onReroll          = null;
-  export let onSendToTable     = null;
-  export let onRemoveFromTable = null;
-  export let onOpen            = null;
-  export let onDragStart       = null;
-  export let onUpdate          = null;
-  export let isOnTable         = false;
-  export let mode              = 'prep';
-  export let campId            = '';
-  export let onInvoke          = null;
+  let genEntry = $derived((GENERATORS || []).find(g => g.id === card.genId));
 
-  $: C = BOARD_TYPE_COLOR[card.genId] || { stripe: '#888', tc: '#555', bg: '#f5f4f1' };
+  // WC-04: minimise/expand — double-click card to collapse to title strip
+  let minimised = $derived(card.minimised === true);
+  // WC-07: GM-only — hidden from player view when sync is active
+  let gmOnly = $derived(card.gmOnly === true);
 
-  $: genEntry = (GENERATORS || []).find(g => g.id === card.genId);
+  function toggleMinimise(e) {
+    e.stopPropagation();
+    if (onUpdate) onUpdate(card.id, { minimised: !minimised });
+  }
 
-  function onMouseDown(e) {
-    if (e.target.closest('.bc-actions') || e.target.closest('.bc-cv4-wrap')) return;
-    if (onDragStart) onDragStart(e, card.id);
+  function toggleGmOnly(e) {
+    e.stopPropagation();
+    if (onUpdate) onUpdate(card.id, { gmOnly: !gmOnly });
   }
 
   function onKeyDown(e) {
@@ -77,47 +74,55 @@
 
 <div
   class="board-card"
-  style="left:{card.x}px; top:{card.y}px; z-index:{card.z || 1}"
+  class:bc-gm-only={gmOnly}
   tabindex="0"
   role="region"
   aria-label="{genEntry ? genEntry.label : card.genId}: {card.title || ''}"
-  on:mousedown={onMouseDown}
-  on:keydown={onKeyDown}
+  onkeydown={onKeyDown}
 >
   <!-- Action buttons -->
-  <div class="bc-actions">
+  <div class="bc-actions nodrag nopan">
     {#if card.genId !== 'custom'}
-      <button class="bc-btn" title="Reroll"
-        on:click|stopPropagation={() => onReroll && onReroll(card.id)}>↻</button>
+      <button class="bc-btn" title="Reroll" aria-label="Reroll"
+        onclick={(e) => { e.stopPropagation(); (() => onReroll && onReroll(card.id))(e); }}>↻</button>
     {/if}
     {#if onInvoke && card.genId !== 'sticky' && card.genId !== 'boost' && card.genId !== 'label'}
-      <button class="bc-btn" title="Invoke aspect from this card (+2 next roll)"
-        on:click|stopPropagation={() => onInvoke({ source: 'paid', label: card.title || card.genId })}
+      <button class="bc-btn" title="Invoke aspect from this card (+2 next roll)" aria-label="Invoke aspect"
+        onclick={(e) => { e.stopPropagation(); onInvoke({ source: 'paid', label: card.title || card.genId }); }}
         style="color:var(--accent); font-weight:800">⦿</button>
     {/if}
-    <button class="bc-btn" title="Pin to Table (copy)"
-      on:click|stopPropagation={() => onSendToTable && onSendToTable(card)}>📌</button>
+    <button class="bc-btn bc-btn-connect" class:connecting={isConnectSource}
+      title="Draw connection line to another card"
+      onclick={(e) => { e.stopPropagation(); if (onConnect) onConnect && onConnect(card.id); }}
+      aria-label="Connect this card to another">⤢</button>
+    <button class="bc-btn" title="Pin to Table" aria-label="Pin to Table"
+      onclick={(e) => { e.stopPropagation(); (() => onSendToTable && onSendToTable(card))(e); }}>⊞</button>
     {#if mode === 'prep'}
-      <button class="bc-btn" title="Move to Table (removes from prep)"
-        on:click|stopPropagation={() => { if (onSendToTable) onSendToTable(card); if (onDelete) onDelete(card.id); }}>→</button>
+      <button class="bc-btn" title="Move to Table" aria-label="Move to Table"
+        onclick={(e) => { e.stopPropagation(); (() => { if (onSendToTable) onSendToTable(card); if (onDelete) onDelete(card.id); })(e); }}>→</button>
     {/if}
-    <button class="bc-btn" title="Delete"
-      on:click|stopPropagation={() => onDelete && onDelete(card.id)}>✕</button>
+    <button class="bc-btn bc-btn-gm-only" class:active={gmOnly}
+      title="{gmOnly ? 'Visible to GM only — click to show to players' : 'Visible to players — click to hide from players'}"
+      aria-label="{gmOnly ? 'GM only — hidden from players' : 'Visible to players'}"
+      aria-pressed={String(gmOnly)}
+      onclick={toggleGmOnly}><i class={gmOnly ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'} aria-hidden="true"></i></button>
+    <button class="bc-btn bc-btn-minimise" title="{minimised ? 'Expand card' : 'Minimise card'}" aria-label="{minimised ? 'Expand' : 'Minimise'}"
+      onclick={toggleMinimise}>{minimised ? '▼' : '▲'}</button>
+    <button class="bc-btn" title="Delete" aria-label="Delete"
+      onclick={(e) => { e.stopPropagation(); (() => onDelete && onDelete(card.id))(e); }}>✕</button>
   </div>
 
   <!-- Drag handle -->
-  <div
-    class="bc-drag-handle"
-    role="button"
-    tabindex="-1"
-    aria-label="Drag handle"
-    on:mousedown={e => onDragStart && onDragStart(e, card.id)}
-    on:keydown={() => {}}
-    title="Drag to move"
-  >≡</div>
 
-  <!-- Card content -->
-  <div class="bc-cv4-wrap">
+  <!-- Minimised title strip (collapsed state) -->
+  {#if minimised}
+    <div class="bc-mini-strip" ondblclick={toggleMinimise} title="Double-click to expand">
+      <span class="bc-mini-icon" aria-hidden="true">{genEntry ? genEntry.icon : '◈'}</span>
+      <span class="bc-mini-title">{card.title || (genEntry ? genEntry.label : card.genId)}</span>
+    </div>
+  {:else}
+  <!-- Card content — double-click to minimise -->
+  <div class="bc-cv4-wrap nodrag nopan" ondblclick={toggleMinimise} title="Double-click to minimise">
     {#if card.data}
       <div class="bc-cv4-scaler">
         <Cv4Card
@@ -146,7 +151,7 @@
         {#if onRemoveFromTable}
           <button
             class="bc-remove-table"
-            on:click|stopPropagation={() => onRemoveFromTable(card.id)}
+            onclick={(e) => { e.stopPropagation(); onRemoveFromTable(card.id); }}
             aria-label="Remove {card.title || 'card'} from table"
             title="Remove from table"
           >✕</button>
@@ -154,10 +159,15 @@
       {:else}
         <button
           class="bc-send-table"
-          on:click|stopPropagation={() => onSendToTable && onSendToTable(card)}
+          onclick={(e) => { e.stopPropagation(); if (onSendToTable) onSendToTable && onSendToTable(card); }}
           aria-label="Put {card.title || 'card'} on table"
         >→ Table</button>
       {/if}
     </div>
+  {/if}
+
+  {#if card.sourceCanvas === 'prep' && mode === 'prep'}
+    <div class="bc-source-badge">PREP</div>
+  {/if}
   {/if}
 </div>

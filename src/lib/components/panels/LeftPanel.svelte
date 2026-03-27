@@ -1,20 +1,11 @@
-<svelte:options runes={false} />
-
 <script>
   import HelpPanel from '../board/HelpPanel.svelte';
   import StuntPanel from '../board/StuntPanel.svelte';
-
-  export let activeGen = 'npc_minor';
-  export let onSelectGen = () => {};
-  export let campId = '';
-  export let activeTab = 'gen';
-  export let onTabChange = () => {};
-  export let campName = '';
-
   // Derive world stunts from CAMPAIGNS global
-  $: worldStunts = (typeof globalThis.CAMPAIGNS !== 'undefined' && globalThis.CAMPAIGNS[campId] &&
+  let { activeGen = 'npc_minor', onSelectGen = () => {}, campId = '', activeTab = 'gen', onTabChange = () => {}, campName = '' } = $props();
+  let worldStunts = $derived((typeof globalThis.CAMPAIGNS !== 'undefined' && globalThis.CAMPAIGNS[campId] &&
     globalThis.CAMPAIGNS[campId].tables && globalThis.CAMPAIGNS[campId].tables.stunts)
-    ? globalThis.CAMPAIGNS[campId].tables.stunts : [];
+    ? globalThis.CAMPAIGNS[campId].tables.stunts : []);
 
   const BOARD_GEN_GROUPS = [
     {
@@ -67,9 +58,9 @@
 
 <div class="blp">
   <div class="blp-tabs">
-    <button class="blp-tab" class:active={activeTab === 'gen'} on:click={() => onTabChange('gen')}>Generate</button>
-    <button class="blp-tab" class:active={activeTab === 'stunts'} on:click={() => onTabChange('stunts')}>Stunts</button>
-    <button class="blp-tab" class:active={activeTab === 'help'} on:click={() => onTabChange('help')}>Help</button>
+    <button class="blp-tab" class:active={activeTab === 'gen'} onclick={() => onTabChange('gen')}>Generate</button>
+    <button class="blp-tab" class:active={activeTab === 'stunts'} onclick={() => onTabChange('stunts')}>Stunts</button>
+    <button class="blp-tab" class:active={activeTab === 'help'} onclick={() => onTabChange('help')}>Help</button>
   </div>
 
   {#if activeTab === 'gen'}
@@ -83,7 +74,11 @@
         {#each group.gens as gen (gen.id)}
           <button
             class="blp-item" class:active={activeGen === gen.id}
-            on:click={() => onSelectGen(gen.id)}
+            onclick={() => onSelectGen(gen.id)}
+            onkeydown={(e) => {
+              if (e.key === 'ArrowDown') { e.preventDefault(); e.currentTarget.nextElementSibling?.focus(); }
+              if (e.key === 'ArrowUp') { e.preventDefault(); e.currentTarget.previousElementSibling?.focus(); }
+            }}
             title="{gen.label}{gen.sub ? ' \u2014 ' + gen.sub : ''}"
           >
             <span class="blp-icon">{gen.icon}</span>

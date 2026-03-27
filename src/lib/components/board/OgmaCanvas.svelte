@@ -20,13 +20,11 @@
     cardSearch      = '',
     connectSourceId = null,
     modeTransitioning = false,
-    playCardIds     = new Set(),
     ctx             = null,
     // Callbacks
     onUpdateCard    = null,
     onDeleteCard    = null,
     onRerollCard    = null,
-    onSendToTable   = null,
     onOpenCard      = null,
     onInvoke        = null,
     onConnect       = null,
@@ -60,7 +58,7 @@
 
   export function fitAll() {
     if (!cards.length || !cvWrap) return;
-    const CARD_W = 646, CARD_H = 400, PAD = 60;
+    const CARD_W = 646, CARD_H = 320, PAD = 60;
     const minX = Math.min(...cards.map(c => c.x)) - PAD;
     const minY = Math.min(...cards.map(c => c.y)) - PAD;
     const maxX = Math.max(...cards.map(c => c.x + CARD_W)) + PAD;
@@ -158,8 +156,8 @@
     if (!card) return null;
     const cx = isDragged ? dragState.currentX : card.x;
     const cy = isDragged ? dragState.currentY : card.y;
-    const W = card.genId === 'label' ? 160 : (card.genId === 'sticky' || card.genId === 'boost') ? 140 : 646;
-    const H = card.genId === 'label' ? 36  : (card.genId === 'sticky' || card.genId === 'boost') ? 120 : 400;
+    const W = card.genId === 'label' ? 200 : (card.genId === 'sticky' || card.genId === 'boost') ? 160 : 646;
+    const H = card.genId === 'label' ? 36  : (card.genId === 'sticky' || card.genId === 'boost') ? 140 : 300;
     return { x: (cx + W / 2) * zoom + panX, y: (cy + H / 2) * zoom + panY };
   }
 
@@ -188,7 +186,7 @@
     if (!cards.length) return null;
     const xs = cards.map(c => c.x), ys = cards.map(c => c.y);
     const minX = Math.min(...xs), minY = Math.min(...ys);
-    const maxX = Math.max(...cards.map(c => c.x + 646)), maxY = Math.max(...cards.map(c => c.y + 400));
+    const maxX = Math.max(...cards.map(c => c.x + 646)), maxY = Math.max(...cards.map(c => c.y + 300));
     const w = maxX - minX || 1, h = maxY - minY || 1;
     return { minX, minY, scale: Math.min((MM_W - 16) / w, (MM_H - 16) / h) };
   }
@@ -274,11 +272,11 @@
         {:else}
           <BoardCard
             {card} {mode} {campId}
-            isOnTable={playCardIds.has(card.id)}
+            isOnTable={false}
             onDelete={onDeleteCard}
             onReroll={onRerollCard}
             onUpdate={onUpdateCard}
-            onSendToTable={onSendToTable}
+            onSendToTable={null}
             onOpen={onOpenCard}
             onInvoke={onInvoke}
             onConnect={onConnect}

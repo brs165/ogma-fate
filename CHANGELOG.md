@@ -2,7 +2,30 @@
 
 ---
 
-## [2026.03.663] — March 2026 — Native Canvas Migration (SvelteFlow Removed)
+## [2026.03.665] — March 2026 — Canvas UX Fixes
+
+- Canvas cards: 646px width, auto height (was 320px)
+- Binder auto-load to canvas gated to Prep mode only — Play canvas starts empty until GM sends cards
+- Back arrow in Topbar now calls onClose callback (closes canvas, returns to generator) — no full page navigation
+- board-app: position:fixed inset:0 z-index:300 — canvas covers full browser window including left nav
+- Campaign.svelte: passes onClose={() => canvasView = false} to Board
+- Topbar: onClose prop — renders as button (callback) when provided, falls back to href link when not
+
+## [2026.03.665] — March 2026 — OgmaCanvas.svelte extraction
+
+### Canvas refactor: Board.svelte → OgmaCanvas.svelte
+- Created `OgmaCanvas.svelte` (344 lines) — self-contained canvas component
+- Owns all canvas state: panX, panY, zoom, dragState, panDrag
+- Owns all canvas logic: wheel zoom, pointer pan, pointer-capture card drag,
+  SVG connector overlay, minimap, dot background, zoom controls, empty hint
+- Exposes `fitAll()` as bound method for Board to call via `bind:this={canvasRef}`
+- Board.svelte is now a pure coordinator — passes data + callbacks, owns no canvas state
+- Canvas coordinate math, card rendering, context menu all live in OgmaCanvas
+- 78 .svelte files (50 components + 27 routes + OgmaCanvas)
+
+---
+
+## [2026.03.662] — March 2026 — Native Canvas Migration (SvelteFlow Removed)
 
 ### Canvas architecture replaced
 - **SvelteFlow removed:** `@xyflow/svelte` dependency deleted from `package.json`
@@ -34,7 +57,7 @@
 - BOOTSTRAP.md: build script rule clarified (npx vite build for tests, bump-version.sh once for zip)
 - PROJECT_MEMORY.md: stack table updated, SvelteFlow architecture section replaced with native canvas section
 - CANVAS-WORKSHOP.md: archived SvelteFlow sprint history, updated feature status table
-- All version references updated to 2026.03.663/662
+- All version references updated to 2026.03.665/662
 
 ---
 

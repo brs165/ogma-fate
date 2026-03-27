@@ -1,6 +1,6 @@
 # Project Memory — Ogma
 _Persistent context for model-switching and session handoffs._
-_Last updated: 2026.03.663 — native canvas migration (v662 in progress)_
+_Last updated: 2026.03.665 — native canvas migration (v662 in progress)_
 
 ---
 
@@ -116,7 +116,7 @@ screenY = cardY * zoom + panY
 
 ---
 
-## Component inventory (77 .svelte files)
+## Component inventory (78 .svelte files)
 
 ```
 src/lib/components/
@@ -220,11 +220,11 @@ undo covers card moves + reroll + delete, Ctrl+A select all.
 
 ## Build / version rules
 
-- **Version format:** `YYYY.MM.NNN` (e.g. `2026.03.663`)
+- **Version format:** `YYYY.MM.NNN` (e.g. `2026.03.665`)
 - **Zip naming:** source = `YYYY-MM-NNN.zip`, offline = `ogma-offline-YYYY-MM-NNN.zip`
 - **`npx vite build`** — use for all test/intermediate builds. No version bump.
 - **`bash scripts/bump-version.sh`** — run ONCE, immediately before the final zip delivery only.
-- Current version: `2026.03.663`
+- Current version: `2026.03.665`
 
 ---
 

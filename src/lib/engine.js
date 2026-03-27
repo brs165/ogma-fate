@@ -61,6 +61,40 @@ function pickN(arr, n) {
 function rand(a, b) { return Math.floor(_rng() * (b - a + 1)) + a; }
 
 /**
+ * Pick stunts that match the character's skills. Prefers skill-matching stunts
+ * but falls back to random if not enough matches exist.
+ * @param {Array} pool - All available stunts.
+ * @param {number} n - How many to pick.
+ * @param {Array} skills - Character's skills [{name,r},...].
+ * @returns {Array} Selected stunts, no duplicates.
+ */
+function pickStuntsForSkills(pool, n, skills) {
+  if (!pool || !pool.length) return [];
+  var skillNames = {};
+  (skills || []).forEach(function(s) { skillNames[s.name] = true; });
+  // Partition: matching (stunt.skill in character's skills) vs rest
+  var matching = [];
+  var rest = [];
+  pool.forEach(function(st) {
+    if (st.skill && skillNames[st.skill]) matching.push(st);
+    else if (st.skill === 'varies') matching.push(st); // "varies" stunts always match
+    else rest.push(st);
+  });
+  // Shuffle both pools
+  matching = pickN(matching, matching.length);
+  rest = pickN(rest, rest.length);
+  // Take from matching first, then fill from rest
+  var out = [];
+  var seen = {};
+  var combined = matching.concat(rest);
+  for (var i = 0; i < combined.length && out.length < n; i++) {
+    var key = combined[i].name;
+    if (!seen[key]) { seen[key] = true; out.push(combined[i]); }
+  }
+  return out;
+}
+
+/**
  * Variety Matrix engine — picks a random template and substitutes {Token} placeholders.
  *
  * @param {object|Array|null} tblObj
@@ -111,7 +145,7 @@ function generateMinorNPC(t) {
   var skills = chosenSkills.map(function(s, i) { return {name: s, r: Math.max(1, rating - i)}; });
   var hasStunt = _rng() > 0.5;
   var bonusStunts = (t.stunts || []).filter(function(s) { return s.type === 'bonus'; });
-  var stunt = hasStunt && bonusStunts.length > 0 ? pick(bonusStunts) : null;
+  var stunt = hasStunt && bonusStunts.length > 0 ? pickStuntsForSkills(bonusStunts, 1, skills)[0] || null : null;
   // FCon: minor NPCs have 1–2 stress boxes (not 3 — that is the default for full characters)
   var stress = rand(1, 2);
   return {name: name, aspects: aspects, skills: skills, stunt: stunt, stress: stress};
@@ -165,7 +199,7 @@ function generateMajorNPC(t) {
     {name: chosen[1], r: peak - 1}, {name: chosen[2], r: peak - 1},
     {name: chosen[3], r: peak - 2}, {name: chosen[4], r: peak - 2}, {name: chosen[5], r: peak - 2},
   ].filter(function(s) { return s.r > 0; });
-  var stunts = pickN(t.stunts || [], 2);
+  var stunts = pickStuntsForSkills(t.stunts || [], 2, skills);
   // Calculate stress from assigned Physique/Will ratings (default +0 if not assigned)
   var physR = 0, willR = 0;
   skills.forEach(function(s) {
@@ -625,7 +659,7 @@ export function generatePC(t) {
 
   // 3 stunts at creation (each costs 1 Refresh; 3 stunts = refresh 3 - 0 net spend if taken free)
   // FCon p.10: players start with 3 free stunt slots. Refresh starts at 3.
-  var stunts = pickN(t.stunts || [], 3);
+  var stunts = pickStuntsForSkills(t.stunts || [], 3, skills);
 
   // Stress derived from Physique / Will per FCon p.12
   var physR = 0, willR = 0;
@@ -916,6 +950,57 @@ function mdStunt(s) {
   if (!s) return '';
   return '### ' + s.name + '\n**Skill:** ' + s.skill + ' \u00b7 `' +
     (s.type === 'special' ? 'ONCE/SCENE' : '+2 BONUS') + '`  \n' + s.desc;
+}
+
+// ── Seed Pack: generate a full adventure as multiple typed cards ──────────
+export function generateSeedPack(t, partySize) {
+  var ps = partySize || 4;
+  var seed = generate('seed', t, ps, {});
+  var pack = [];
+  pack.push({ genId: 'seed', data: seed, label: 'Adventure Summary' });
+
+  var s1 = generate('scene', t, ps, {});
+  s1._seedLabel = 'Scene 1: ' + (seed.scenes && seed.scenes[0] ? seed.scenes[0].type : 'OPENING');
+  s1._seedNote = seed.scenes && seed.scenes[0] ? seed.scenes[0].brief : '';
+  pack.push({ genId: 'scene', data: s1, label: 'Scene 1 — Opening' });
+
+  var s2 = generate('scene', t, ps, {});
+  s2._seedLabel = 'Scene 2: COMPLICATIONS';
+  s2._seedNote = seed.scenes && seed.scenes[1] ? seed.scenes[1].brief : '';
+  pack.push({ genId: 'scene', data: s2, label: 'Scene 2 — Complications' });
+
+  var enc = generate('encounter', t, ps, {});
+  enc._seedNote = seed.scenes && seed.scenes[2] ? seed.scenes[2].brief : '';
+  pack.push({ genId: 'encounter', data: enc, label: 'Scene 3 — Climax' });
+
+  if (seed.opposition && seed.opposition.length > 0) {
+    seed.opposition.forEach(function(opp) {
+      var npcType = opp.type === 'major' ? 'npc_major' : 'npc_minor';
+      pack.push({
+        genId: npcType,
+        data: {
+          name: opp.name || 'Unknown',
+          aspects: npcType === 'npc_major'
+            ? { high_concept: (opp.aspects || [])[0] || '', trouble: (opp.aspects || [])[1] || '', others: (opp.aspects || []).slice(2) }
+            : opp.aspects || [],
+          skills: opp.skills || [],
+          stunts: opp.stunt ? [opp.stunt] : [],
+          stress: opp.stress || 2,
+          physical_stress: opp.stress || 2,
+          mental_stress: 2,
+          refresh: 3,
+        },
+        label: 'Opposition: ' + (opp.name || 'NPC'),
+      });
+    });
+  }
+
+  var compel = generate('compel', t, ps, {});
+  compel._seedTwist = seed.twist;
+  compel.situation = seed.twist || compel.situation;
+  pack.push({ genId: 'compel', data: compel, label: 'Twist' });
+
+  return pack;
 }
 
 export function toMarkdown(genId, data, campName) {
@@ -1316,8 +1401,9 @@ export function toMarkdown(genId, data, campName) {
 // Import:  parseOgmaJSON(str) → {type:'single'|'batch', ...} or null
 // ════════════════════════════════════════════════════════════════════════
 
+import { VERSION } from './version.js';
 const OGMA_FORMAT  = 'ogma';
-const OGMA_VERSION = '1';
+const OGMA_VERSION = VERSION;
 
 /**
  * Serialise a single generator result to a Mermaid diagram string.
@@ -2021,8 +2107,29 @@ export function parseOgmaJSON(str) {
   if (!str) return null;
   try {
     var obj = JSON.parse(str);
+    if (!obj || typeof obj !== 'object') return null;
+
+    // Normalise old schema (ogma:true / cards:[]) to current format
+    if (obj.ogma === true && Array.isArray(obj.cards)) {
+      obj = {
+        format: OGMA_FORMAT,
+        version: String(obj.version || '1.0.0'),
+        campaign: obj.campName || obj.campaign || '',
+        campId: obj.campaign || '',
+        ts: obj.ts || Date.now(),
+        results: obj.cards.map(function(c) {
+          return {
+            generator: c.genId || c.generator || '',
+            label: c.title || c.genId || '',
+            data: c.data || {},
+            ts: c.ts || Date.now(),
+          };
+        }),
+      };
+    }
+
     // Validate envelope
-    if (!obj || obj.format !== OGMA_FORMAT) return null;
+    if (obj.format !== OGMA_FORMAT) return null;
     // Single result
     if (obj.generator && obj.data && typeof obj.data === 'object') {
       return { type: 'single', generator: obj.generator, data: obj.data,

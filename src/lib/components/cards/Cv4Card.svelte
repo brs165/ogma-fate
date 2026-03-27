@@ -1,5 +1,6 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
+  import { Dialog } from 'bits-ui';
   import BackPanel from './BackPanel.svelte';
 
   // ── Front component registry ────────────────────────────────────────────
@@ -23,74 +24,59 @@
   import Custom      from './fronts/Custom.svelte';
 
   const FRONTS = {
-    npc_minor:    NpcMinor,
-    npc_major:    NpcMajor,
-    faction:      Faction,
-    scene:        Scene,
-    campaign:     Campaign,
-    encounter:    Encounter,
-    seed:         Seed,
-    compel:       Compel,
-    challenge:    Challenge,
-    contest:      Contest,
-    consequence:  Consequence,
-    complication: Complication,
-    pc:           Pc,
-    backstory:    Backstory,
-    obstacle:     Obstacle,
-    countdown:    Countdown,
-    constraint:   Constraint,
-    custom:       Custom,
+    npc_minor: NpcMinor, npc_major: NpcMajor, faction: Faction,
+    scene: Scene, campaign: Campaign, encounter: Encounter,
+    seed: Seed, compel: Compel, challenge: Challenge,
+    contest: Contest, consequence: Consequence, complication: Complication,
+    pc: Pc, backstory: Backstory, obstacle: Obstacle,
+    countdown: Countdown, constraint: Constraint, custom: Custom,
   };
 
-  // ── Category / meta maps ─────────────────────────────────────────────────
-  const CV4_CAT = {
-    character: { color: 'var(--c-blue,#60a5fa)'   },
-    world:     { color: 'var(--gold,#fbbf24)'      },
-    mechanics: { color: 'var(--c-red,#f87171)'     },
-    tool:      { color: 'var(--c-purple,#a78bfa)'  },
-    pressure:  { color: 'var(--c-green,#34d399)'   },
-    custom:    { color: 'var(--text-muted,#888)'   },
-  };
-
+  // ── Generator meta ──────────────────────────────────────────────────────
   const CV4_META = {
-    npc_minor:    { cat: 'character', icon: '◈' },
-    npc_major:    { cat: 'character', icon: '◆' },
-    faction:      { cat: 'character', icon: '⚑' },
-    scene:        { cat: 'world',     icon: '◉' },
-    campaign:     { cat: 'world',     icon: '✶' },
-    encounter:    { cat: 'world',     icon: '⚔' },
-    seed:         { cat: 'world',     icon: '⊕' },
-    compel:       { cat: 'mechanics', icon: '↩' },
-    challenge:    { cat: 'mechanics', icon: '⊙' },
-    contest:      { cat: 'mechanics', icon: '⇌' },
-    consequence:  { cat: 'mechanics', icon: '⬡' },
-    complication: { cat: 'tool',      icon: '⚡' },
-    pc:           { cat: 'character', icon: '☆' },
-    backstory:    { cat: 'tool',      icon: '◑' },
-    obstacle:     { cat: 'pressure',  icon: '▲' },
-    countdown:    { cat: 'pressure',  icon: '⏳' },
-    constraint:   { cat: 'pressure',  icon: '⊘' },
-    custom:       { cat: 'custom',    icon: '✎' },
+    npc_minor:    { icon: 'fa-solid fa-user',              label: 'Minor NPC' },
+    npc_major:    { icon: 'fa-solid fa-user-tie',          label: 'Major NPC' },
+    faction:      { icon: 'fa-solid fa-chess-rook',        label: 'Faction' },
+    scene:        { icon: 'fa-solid fa-map',               label: 'Scene Setup' },
+    campaign:     { icon: 'fa-solid fa-scroll',            label: 'Campaign Frame' },
+    encounter:    { icon: 'fa-solid fa-burst',             label: 'Encounter' },
+    seed:         { icon: 'fa-solid fa-seedling',          label: 'Adventure Seed' },
+    compel:       { icon: 'fa-solid fa-hand-point-right',  label: 'Compel' },
+    challenge:    { icon: 'fa-solid fa-mountain',          label: 'Challenge' },
+    contest:      { icon: 'fa-solid fa-flag-checkered',    label: 'Contest' },
+    consequence:  { icon: 'fa-solid fa-bolt',              label: 'Consequence' },
+    complication: { icon: 'fa-solid fa-triangle-exclamation', label: 'Complication' },
+    pc:           { icon: 'fa-solid fa-star',              label: 'Player Character' },
+    backstory:    { icon: 'fa-solid fa-book-open',         label: 'PC Backstory' },
+    obstacle:     { icon: 'fa-solid fa-shield-halved',     label: 'Obstacle' },
+    countdown:    { icon: 'fa-solid fa-hourglass-half',    label: 'Countdown' },
+    constraint:   { icon: 'fa-solid fa-lock',              label: 'Constraint' },
+    custom:       { icon: 'fa-solid fa-pen-to-square',     label: 'Custom' },
   };
 
-  const CV4_MONO = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
+  // ── Campaign header gradient map ────────────────────────────────────────
+  const CAMP_HDR = {
+    thelongafter: 'var(--fs-hdr-thelongafter)',
+    cyberpunk:    'var(--fs-hdr-cyberpunk)',
+    fantasy:      'var(--fs-hdr-fantasy)',
+    space:        'var(--fs-hdr-space)',
+    victorian:    'var(--fs-hdr-victorian)',
+    postapoc:     'var(--fs-hdr-postapoc)',
+    western:      'var(--fs-hdr-western)',
+    dVentiRealm:  'var(--fs-hdr-dVentiRealm)',
+  };
 
   // ── Props ────────────────────────────────────────────────────────────────
-  export let genId          = 'npc_minor';
-  export let campName       = '';
-  export let data           = {};
-  export let onUpdate       = null;
-  export let savedCardState = null;
+  let { genId = 'npc_minor', campName = '', data = {}, onUpdate = null, savedCardState = null } = $props();
 
   // ── UI state ─────────────────────────────────────────────────────────────
-  let flipped  = false;
-  let hovered  = false;
-  let visible  = true;
-  let reduced  = false;
+  let guidanceOpen = $state(false);
+  let hovered = $state(false);
+  let visible = $state(true);
+  let reduced = $state(false);
 
   // ── Reduced-motion listener ───────────────────────────────────────────────
-  let mq;
+  let mq = $state();
   onMount(() => {
     try {
       mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -103,30 +89,26 @@
 
   // ── Entry fade (triggers on genId/data change) ────────────────────────────
   let fadeTimer;
-  $: if (!reduced) {
-    // Reference both deps so Svelte tracks them
-    void genId; void data;
-    visible = false;
-    clearTimeout(fadeTimer);
-    fadeTimer = setTimeout(() => { visible = true; }, 30);
-  }
+  $effect(() => {
+    if (!reduced) {
+      void genId; void data;
+      visible = false;
+      clearTimeout(fadeTimer);
+      fadeTimer = setTimeout(() => { visible = true; }, 30);
+    }
+  });
 
   onDestroy(() => clearTimeout(fadeTimer));
 
   // ── Derived ───────────────────────────────────────────────────────────────
-  $: meta      = CV4_META[genId] || { cat: 'mechanics', icon: '◈' };
-  $: cat       = CV4_CAT[meta.cat] || CV4_CAT.mechanics;
-  $: catColor  = cat.color;
-  $: genLabel  = genId.replace(/_/g, ' ').toUpperCase();
-  $: ariaLabel = genLabel + ' card' + (campName ? ' from ' + campName : '');
-  $: FrontComponent = FRONTS[genId] || null;
+  let meta      = $derived(CV4_META[genId] || { icon: 'fa-solid fa-dice-d20', label: genId });
+  let genLabel  = $derived(meta.label);
+  let ariaLabel = $derived(genLabel + ' card' + (campName ? ' from ' + campName : ''));
+  let FrontComponent = $derived(FRONTS[genId] || null);
+  let hdrBg    = $derived(CAMP_HDR[campName] || 'var(--fs-hdr-default)');
+  let sectionColor = $derived('var(--fs-section)');
 
   // ── Interactive card state ────────────────────────────────────────────────
-  $: phyMax = typeof data.physical_stress === 'number' ? data.physical_stress
-            : typeof data.stress           === 'number' ? data.stress : 0;
-  $: menMax = typeof data.mental_stress   === 'number' ? data.mental_stress : 0;
-
-  // Initialize once (like React useState initializer)
   let cardState = (() => {
     const pMax = typeof data.physical_stress === 'number' ? data.physical_stress
                : typeof data.stress          === 'number' ? data.stress : 0;
@@ -144,92 +126,81 @@
     if (onUpdate) onUpdate(cardState);
   }
 
-  // ── Flip helpers ──────────────────────────────────────────────────────────
-  function toggleFlip(e) {
+  function openGuidance(e) {
     e.stopPropagation();
-    flipped = !flipped;
-  }
-  function onFlipKeydown(e) {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flipped = !flipped; }
+    guidanceOpen = true;
   }
 </script>
 
-<!-- ── Flip container ──────────────────────────────────────────────────── -->
+<!-- ── Card ─────────────────────────────────────────────────────────────── -->
 <div
-  class="cv4-flip-container"
   role="region"
   aria-label={ariaLabel}
-  on:mouseenter={() => hovered = true}
-  on:mouseleave={() => hovered = false}
-  style="perspective:{reduced ? 'none' : '1000px'}; animation:{reduced ? 'none' : 'fd-stamp-in 0.35s cubic-bezier(0.34,1.56,0.64,1) both'}; opacity:{visible ? 1 : 0}"
+  onmouseenter={() => hovered = true}
+  onmouseleave={() => hovered = false}
+  style="animation:{reduced ? 'none' : 'fd-stamp-in 0.35s cubic-bezier(0.34,1.56,0.64,1) both'}; opacity:{visible ? 1 : 0}"
 >
-  <!-- ── Flipper ──────────────────────────────────────────────────────── -->
   <div
-    class="cv4-flipper"
-    class:cv4-flipped={flipped}
-    style="position:relative; transform-style:{reduced ? 'flat' : 'preserve-3d'}; transition:{reduced ? 'none' : 'transform 0.5s cubic-bezier(0.4,0,0.2,1)'}; transform:{flipped ? (reduced ? 'none' : 'rotateY(180deg)') : 'none'}"
+    class="fs-card"
+    style="display:flex; flex-direction:column; transform:{hovered ? 'translateY(-2px)' : 'none'}; transition:transform 0.2s ease, box-shadow 0.2s ease; box-shadow:{hovered ? '0 6px 20px rgba(0,0,0,0.18)' : 'var(--fs-shadow)'}"
   >
-    <!-- ── FRONT ──────────────────────────────────────────────────────── -->
-    <div
-      class="cv4-face cv4-front fd-card"
-      style="backface-visibility:hidden; -webkit-backface-visibility:hidden; background:var(--cv-card-dark,var(--panel)); border:1px solid {hovered ? catColor + 'AA' : 'var(--cv-card-bdr,var(--border))'}; border-radius:3px; overflow:hidden; display:{reduced && flipped ? 'none' : 'flex'}; flex-direction:column; box-shadow:{hovered ? '5px 7px 0 rgba(0,0,0,0.18), 0 0 0 1px ' + catColor + '44' : '3px 3px 0 rgba(0,0,0,0.18)'}; transform:{hovered && !flipped ? 'translateY(-3px) rotate(0.25deg)' : 'none'}; transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s ease, border-color 0.15s"
-    >
-      <!-- Stamp band -->
-      <div style="height:5px; background:{catColor}; flex-shrink:0"></div>
-      <!-- Header -->
-      <div style="height:34px; flex-shrink:0; border-bottom:1px solid {catColor}33; display:flex; align-items:center; padding:0 14px; gap:8px; background:color-mix(in srgb,{catColor} 6%,var(--cv-card-dark,var(--panel)))">
-        <span style="font-size:14px; color:{catColor}; line-height:1; flex-shrink:0">{meta.icon}</span>
-        <span style="font-size:10px; font-weight:800; letter-spacing:0.22em; color:{catColor}; font-family:{CV4_MONO}; text-transform:uppercase">{genLabel}</span>
-        <div style="flex:1"></div>
-        {#if campName}<span style="font-size:10px; color:var(--cv-card-text-muted); font-family:{CV4_MONO}; letter-spacing:0.08em; font-style:italic">{campName}</span>{/if}
-      </div>
-      <!-- Front content -->
-      {#if FrontComponent}
-        <div style="flex-shrink:0">
-          <svelte:component
-            this={FrontComponent}
-            {data}
-            {campName}
-            {catColor}
-            {cardState}
-            onUpdate={updState}
-          />
+    <!-- Header — campaign-tinted gradient -->
+    <div class="fs-header" style="background:{hdrBg}">
+      <div>
+        <div class="fs-world">
+          <i class={meta.icon} aria-hidden="true" style="margin-right:4px"></i>{genLabel}
         </div>
+        {#if data.name}
+          <div class="fs-name">{data.name}</div>
+        {:else}
+          <div class="fs-name">{campName || genLabel}</div>
+        {/if}
+      </div>
+      {#if typeof data.refresh === 'number'}
+        <div class="fs-refresh" aria-label="Refresh {data.refresh}">{data.refresh}</div>
       {/if}
-      <!-- Flip button -->
-      <button
-        on:click={toggleFlip}
-        on:keydown={onFlipKeydown}
-        aria-label={flipped ? 'Show card front' : 'Show GM guidance'}
-        style="width:100%; height:28px; background:transparent; border:none; border-top:1px solid {catColor}22; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; font-family:{CV4_MONO}; font-size:10px; font-weight:700; letter-spacing:0.18em; color:{catColor}; text-transform:uppercase"
-      ><span style="font-size:10px; line-height:1">▶</span> TAP FOR GM GUIDANCE</button>
     </div>
-
-    <!-- ── BACK ───────────────────────────────────────────────────────── -->
-    <div
-      class="cv4-face cv4-back"
-      style="backface-visibility:hidden; -webkit-backface-visibility:hidden; transform:{reduced ? 'none' : 'rotateY(180deg)'}; position:{reduced ? 'relative' : 'absolute'}; top:0; left:0; right:0; min-height:100%; background:var(--cv-card-dark,var(--panel)); border:1px solid {hovered ? catColor + 'AA' : 'var(--cv-card-bdr,var(--border))'}; border-radius:3px; overflow:hidden; display:{reduced && !flipped ? 'none' : 'flex'}; flex-direction:column; box-shadow:{hovered ? '5px 7px 0 rgba(0,0,0,0.18), 0 0 0 1px ' + catColor + '44' : '3px 3px 0 rgba(0,0,0,0.18)'}"
-    >
-      <!-- Stamp band -->
-      <div style="height:5px; background:{catColor}; flex-shrink:0"></div>
-      <!-- Header -->
-      <div style="height:34px; flex-shrink:0; border-bottom:1px solid {catColor}33; display:flex; align-items:center; padding:0 14px; gap:8px; background:color-mix(in srgb,{catColor} 6%,var(--cv-card-dark,var(--panel)))">
-        <span style="font-size:14px; color:{catColor}; line-height:1; flex-shrink:0">{meta.icon}</span>
-        <span style="font-size:10px; font-weight:800; letter-spacing:0.22em; color:{catColor}; font-family:{CV4_MONO}; text-transform:uppercase">GM GUIDANCE</span>
-        <div style="flex:1"></div>
-        {#if campName}<span style="font-size:10px; color:var(--cv-card-text-muted); font-family:{CV4_MONO}; letter-spacing:0.08em; font-style:italic">{campName}</span>{/if}
+    <!-- Front content -->
+    {#if FrontComponent}
+      <div class="fs-body">
+        <FrontComponent
+          {data}
+          {campName}
+          catColor={sectionColor}
+          {cardState}
+          onUpdate={updState}
+        />
       </div>
-      <!-- Back panel content -->
-      <div style="flex:1; overflow-y:auto; max-height:400px">
-        <BackPanel {genId} {catColor} />
-      </div>
-      <!-- Flip button -->
-      <button
-        on:click={toggleFlip}
-        on:keydown={onFlipKeydown}
-        aria-label="Show card front"
-        style="width:100%; height:28px; background:transparent; border:none; border-top:1px solid {catColor}22; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; font-family:{CV4_MONO}; font-size:10px; font-weight:700; letter-spacing:0.18em; color:{catColor}; text-transform:uppercase"
-      ><span style="font-size:10px; line-height:1">◀</span> TAP FOR CARD DETAILS</button>
-    </div>
+    {/if}
+    <!-- GM Guidance button -->
+    <button
+      class="fs-flip-btn"
+      onclick={openGuidance}
+      aria-label="Open GM guidance for {genLabel}"
+    ><i class="fa-solid fa-circle-info" aria-hidden="true" style="font-size:10px"></i> GM GUIDANCE</button>
   </div>
 </div>
+
+<!-- ── GM Guidance Dialog ──────────────────────────────────────────────── -->
+<Dialog.Root bind:open={guidanceOpen}>
+  <Dialog.Portal>
+    <Dialog.Overlay class="fs-guidance-overlay" />
+    <Dialog.Content class="fs-guidance-dialog" aria-describedby={undefined}>
+      <div class="fs-header fs-guidance-hdr" style="background:{hdrBg}">
+        <div>
+          <div class="fs-world">
+            <i class={meta.icon} aria-hidden="true" style="margin-right:4px"></i>{genLabel}
+          </div>
+          <div class="fs-name">GM Guidance</div>
+        </div>
+        <Dialog.Close class="fs-guidance-close" aria-label="Close">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </Dialog.Close>
+      </div>
+      <Dialog.Title class="sr-only">{genLabel} GM Guidance</Dialog.Title>
+      <div class="fs-body fs-guidance-body">
+        <BackPanel {genId} catColor={sectionColor} />
+      </div>
+    </Dialog.Content>
+  </Dialog.Portal>
+</Dialog.Root>

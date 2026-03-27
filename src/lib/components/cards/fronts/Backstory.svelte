@@ -1,38 +1,29 @@
 <script>
-  import CvLabel from '../CvLabel.svelte';
+  let { data = {}, campName = '', catColor = 'var(--fs-section)' } = $props();
 
-  export let data = {};
-  export let campName = '';
-  export let catColor = 'var(--accent)';
-
-  const CV4_MONO = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
-  const CV4_SANS = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
-
-  $: qs = Array.isArray(data.questions) ? data.questions : [];
+  let qs = $derived(Array.isArray(data.questions) ? data.questions : []);
 </script>
 
-<div style="flex:1; padding:12px 16px 14px; display:flex; gap:14px">
-  <!-- Left column -->
-  <div style="flex:1; display:flex; flex-direction:column; gap:8px; min-width:0">
-    <CvLabel label="SESSION ZERO QUESTIONS" color={catColor} />
-    {#each qs as q, i}
-      <div style="display:flex; gap:8px; align-items:flex-start">
-        <div style="width:18px; height:18px; border-radius:50%; flex-shrink:0; background:color-mix(in srgb,{catColor} 16%,var(--inset)); border:1px solid {catColor}55; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:{catColor}; font-family:{CV4_MONO}">{i+1}</div>
-        <p style="margin:0; font-size:11px; color:var(--text); font-family:{CV4_SANS}; line-height:1.45">{q}</p>
-      </div>
-    {/each}
-  </div>
-
-  <!-- Right column -->
-  <div style="width:160px; flex-shrink:0; display:flex; flex-direction:column; gap:8px">
-    <div style="padding:7px 10px; background:color-mix(in srgb,{catColor} 8%,var(--cv-card-dark,var(--panel))); border:1px solid {catColor}33; border-left:3px solid {catColor}; border-radius:0 2px 2px 0">
-      <CvLabel label="HOOK" color={catColor} />
-      <p style="margin:0; font-size:11px; color:var(--text-dim); font-family:{CV4_SANS}; line-height:1.45; font-style:italic">{data.hook || ''}</p>
+<div class="fs-section-gap">
+  <div class="fs-section-hdr">SESSION ZERO QUESTIONS</div>
+  {#each qs as q, i}
+    <div style="display:flex; gap:8px; align-items:flex-start; margin-bottom:6px">
+      <span class="fs-skill-badge" style="min-width:22px; height:22px; border-radius:50%; font-size:11px">{i+1}</span>
+      <div style="font-size:12px; color:var(--fs-text); line-height:1.45">{q}</div>
     </div>
+  {/each}
+</div>
 
-    <div style="padding:7px 10px; background:var(--inset); border:1px solid var(--cv-card-bdr,var(--border)); border-radius:2px">
-      <CvLabel label="RELATIONSHIP WEB" color={catColor} />
-      <p style="margin:0; font-size:11px; color:var(--text-muted); font-family:{CV4_SANS}; line-height:1.5">{data.relationship || 'Each player names two PCs. What do you share? What secret?'}</p>
+{#if data.hook}
+  <div class="fs-section-gap">
+    <div class="fs-stunt" style="border-left:3px solid var(--fs-section); border-radius:0 3px 3px 0">
+      <div class="fs-stunt-name">ADVENTURE HOOK</div>
+      <div class="fs-stunt-desc" style="font-style:italic">{data.hook}</div>
     </div>
   </div>
+{/if}
+
+<div class="fs-stunt">
+  <div class="fs-stunt-name">RELATIONSHIP WEB</div>
+  <div class="fs-stunt-desc">{data.relationship || 'Each player names two PCs. What do you share? What secret?'}</div>
 </div>

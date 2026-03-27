@@ -1,34 +1,45 @@
-<svelte:options runes={false} />
-
 <script>
   import { onMount } from 'svelte';
+  import { LS } from '$lib/db.js';
+  import Footer from '$lib/components/shared/Footer.svelte';
 
-  let theme = 'dark';
-  let demoNpcs = [];
-  let joinCode = '';
-  let joinErr = '';
+  let theme = $state('dark');
+  let demoNpcs = $state([]);
+  let joinCode = $state('');
+  let joinErr = $state('');
 
   const CAMPAIGN_INFO = {
-    thelongafter: { name: 'The Long After', icon: '\u25C8', genre: 'Sword & Planet', vibes: 'Nausica\u00e4 \u00b7 Thundarr \u00b7 Book of the New Sun', hook: 'Warlords and ruined gods in the wreckage of civilisation' },
-    cyberpunk:    { name: 'Neon Abyss', icon: '\u2B21', genre: 'Cyberpunk', vibes: 'Neuromancer \u00b7 Blade Runner \u00b7 Edgerunners', hook: 'Chrome, corp-blood, and the city that eats its own' },
-    fantasy:      { name: 'Shattered Kingdoms', icon: '\u2726', genre: 'Dark Fantasy', vibes: 'Malazan \u00b7 Black Company \u00b7 Witcher', hook: 'Grim blades, older magic, and the weight of history' },
-    space:        { name: 'Void Runners', icon: '\u25EF', genre: 'Space Western', vibes: 'Firefly \u00b7 The Expanse \u00b7 Cowboy Bebop', hook: 'Hard vacuum, hard choices, and no one coming to help' },
-    victorian:    { name: 'The Gaslight Chronicles', icon: '\u2295', genre: 'Gothic Horror', vibes: 'Penny Dreadful \u00b7 From Hell \u00b7 The Prestige', hook: 'Gaslight and secrets and things that should not exist' },
-    postapoc:     { name: 'The Long Road', icon: '\u25FB', genre: 'Post-Apocalypse', vibes: 'Mad Max \u00b7 Last of Us \u00b7 Station Eleven', hook: 'The world already ended. Survive what comes next' },
-    western:      { name: 'Dust and Iron', icon: '\u25C8', genre: 'Frontier Western', vibes: 'Blood Meridian \u00b7 Deadwood \u00b7 True Grit', hook: 'Frontier justice. Railroad money and the weight of the old war' },
-    dVentiRealm:  { name: 'dVenti Realm', icon: '\u2B1F', genre: 'High Fantasy', vibes: 'D&D 5e \u00b7 Pathfinder \u00b7 Dragon Age', hook: 'The Senate collapsed. The Vaults are still here. So is everything sealed inside them.' },
+    thelongafter: { name: 'The Long After', icon: '◈', genre: 'Sword & Planet', vibes: 'Nausicaä · Thundarr · Book of the New Sun', hook: 'Warlords and ruined gods in the wreckage of civilisation' },
+    cyberpunk:    { name: 'Neon Abyss', icon: '⬡', genre: 'Cyberpunk', vibes: 'Neuromancer · Blade Runner · Edgerunners', hook: 'Chrome, corp-blood, and the city that eats its own' },
+    fantasy:      { name: 'Shattered Kingdoms', icon: '✦', genre: 'Dark Fantasy', vibes: 'Malazan · Black Company · Witcher', hook: 'Grim blades, older magic, and the weight of history' },
+    space:        { name: 'Void Runners', icon: '◯', genre: 'Space Western', vibes: 'Firefly · The Expanse · Cowboy Bebop', hook: 'Hard vacuum, hard choices, and no one coming to help' },
+    victorian:    { name: 'The Gaslight Chronicles', icon: '⊕', genre: 'Gothic Horror', vibes: 'Penny Dreadful · From Hell · The Prestige', hook: 'Gaslight and secrets and things that should not exist' },
+    postapoc:     { name: 'The Long Road', icon: '◻', genre: 'Post-Apocalypse', vibes: 'Mad Max · Last of Us · Station Eleven', hook: 'The world already ended. Survive what comes next' },
+    western:      { name: 'Dust and Iron', icon: '◈', genre: 'Frontier Western', vibes: 'Blood Meridian · Deadwood · True Grit', hook: 'Frontier justice. Railroad money and the weight of the old war' },
+    dVentiRealm:  { name: 'dVenti Realm', icon: '⬟', genre: 'High Fantasy', vibes: 'D&D 5e · Pathfinder · Dragon Age', hook: 'The Senate collapsed. The Vaults are still here. So is everything sealed inside them.' },
   };
 
   const NPC_POOL = [
-    { world: 'The Long After', icon: '\u{1F305}', concept: 'Last Cartographer of the Before-Times', trouble: "The Map Shows a City That Shouldn't Exist", skill: 'Lore +3', stunt: 'Living Archive: +2 to Lore when recalling pre-Collapse geography.' },
-    { world: 'Neon Abyss', icon: '\u{1F306}', concept: 'Debt-Bonded Neural Translator', trouble: 'My Employer Owns My Language Centers', skill: 'Empathy +4', stunt: 'Ghost Signal: once per session, intercept a private corporate data packet without triggering alerts.' },
-    { world: 'Shattered Kingdoms', icon: '\u2694\uFE0F', concept: 'Battle-Surgeon Who Stitches with Scar-Thread', trouble: 'The Thread Remembers What It Healed', skill: 'Crafts +3', stunt: 'Scar Lore: +2 to Empathy when reading the history of wounds on a willing subject.' },
-    { world: 'Void Runners', icon: '\u{1F680}', concept: 'Jump Drive Mechanic Three Payments Behind', trouble: "The Drive Works. The Paperwork Doesn't.", skill: 'Engineering +4', stunt: 'Hot Start: once per session, push a failing drive past its rated capacity.' },
-    { world: 'The Gaslight Chronicles', icon: '\u{1F3A9}', concept: 'Alienist Who Studies What Studies Him Back', trouble: 'My Notes Are Starting to Write Themselves', skill: 'Lore +4', stunt: 'Clinical Distance: +2 to Will when resisting mental consequence aspects.' },
-    { world: 'The Long Road', icon: '\u{1F6E3}\uFE0F', concept: "Convoy Medic Who Buries What She Can't Fix", trouble: 'The Graves Are Catching Up', skill: 'Medicine +3', stunt: 'Keep Moving: +2 to Will when treating consequences during active travel.' },
-    { world: 'Dust and Iron', icon: '\u{1F920}', concept: 'Land Surveyor Working Both Sides of the Deed', trouble: 'Three Towns Believe the Same Acre Is Theirs', skill: 'Lore +2', stunt: 'I Know This Land: +2 to Notice when reading terrain for cover or escape routes.' },
-    { world: 'dVenti Realm', icon: '\u2B1F', concept: 'Vault Warden Who Lost the Key Decades Ago', trouble: 'What Comes Out Cannot Be Put Back', skill: 'Will +3', stunt: 'Seal Knowledge: +2 to Lore when identifying magical containment wards.' },
-    { world: 'Neon Abyss', icon: '\u{1F306}', concept: 'Protest Archivist Who Films Everything', trouble: 'The Footage Has Made Me a Target', skill: 'Notice +3', stunt: "You're on Camera: once per scene, reveal a hidden aspect through documented evidence." },
+    { world: 'The Long After', icon: '🌅', concept: 'Last Cartographer of the Before-Times', trouble: "The Map Shows a City That Shouldn't Exist", skill: 'Lore +3', stunt: 'Living Archive: +2 to Lore when recalling pre-Collapse geography.' },
+    { world: 'The Long After', icon: '🌅', concept: 'Scavenger-Priest of the Rusted Saints', trouble: 'Faith Built on Parts That No Longer Fit', skill: 'Will +3', stunt: 'Lay on Hands (Mechanical): once per scene, repair one stress on a willing target with salvage tools.' },
+    { world: 'The Long After', icon: '🌅', concept: "Road Tax Collector with a Legitimate Monopoly", trouble: "The Route That Pays My Salary Doesn't Exist Anymore", skill: 'Provoke +2', stunt: "I Know What This Is Worth: +2 to Rapport when negotiating salvage value." },
+    { world: 'Neon Abyss', icon: '🌆', concept: 'Debt-Bonded Neural Translator', trouble: 'My Employer Owns My Language Centers', skill: 'Empathy +4', stunt: 'Ghost Signal: once per session, intercept a private corporate data packet without triggering alerts.' },
+    { world: 'Neon Abyss', icon: '🌆', concept: 'Ex-Corpo Medic Running an Unlicensed Clinic', trouble: 'Every Patient Is Evidence', skill: 'Medicine +3', stunt: 'Field Triage: +2 to overcome when treating consequences in the field with improvised tools.' },
+    { world: 'Neon Abyss', icon: '🌆', concept: 'Protest Archivist Who Films Everything', trouble: 'The Footage Has Made Me a Target', skill: 'Notice +3', stunt: "You're on Camera: once per scene, reveal you recorded a key moment — create a \"Documented Evidence\" aspect with one free invoke." },
+    { world: 'Shattered Kingdoms', icon: '⚔️', concept: 'Battle-Surgeon Who Stitches with Scar-Thread', trouble: 'The Thread Remembers What It Healed', skill: 'Crafts +3', stunt: 'Scar Lore: +2 to Empathy when reading the history of wounds on a willing subject.' },
+    { world: 'Shattered Kingdoms', icon: '⚔️', concept: 'Exiled Prince Hiding as a Traveling Merchant', trouble: "The Crown's Spies Recognize My Hands", skill: 'Deceive +3', stunt: "Merchant's Price: +2 to Rapport when using trade goods as social leverage." },
+    { world: 'Shattered Kingdoms', icon: '⚔️', concept: 'Hedge Witch Paid in Secrets', trouble: 'I Know Too Much to Be Safe Anywhere', skill: 'Lore +4', stunt: "Cost of Knowledge: once per session, name a secret someone present holds — they must confirm or deny it." },
+    { world: 'Void Runners', icon: '🚀', concept: 'Jump Drive Mechanic Three Payments Behind', trouble: "The Drive Works. The Paperwork Doesn't.", skill: 'Engineering +4', stunt: "Hot Start: once per session, push a failing drive past its rated capacity — it works, but takes a consequence." },
+    { world: 'Void Runners', icon: '🚀', concept: 'Retired Fleet Medic Running Cargo', trouble: "The Fleet Wants Me Back and Won't Take No", skill: 'Medicine +3', stunt: 'Combat Triage: +2 to overcome stress consequences in zero-g or vacuum conditions.' },
+    { world: 'Void Runners', icon: '🚀', concept: 'Salvage Auctioneer with a Questionable Ledger', trouble: 'Half My Inventory Has Prior Owners', skill: 'Contacts +3', stunt: "Finder's Cut: +2 to Contacts when locating hard-to-source ship components through informal channels." },
+    { world: 'The Gaslight Chronicles', icon: '🎩', concept: 'Alienist Who Studies What Studies Him Back', trouble: 'My Notes Are Starting to Write Themselves', skill: 'Lore +4', stunt: 'Clinical Distance: +2 to Will when resisting mental consequence aspects caused by eldritch phenomena.' },
+    { world: 'The Gaslight Chronicles', icon: '🎩', concept: 'Society Photographer with a Darkroom Secret', trouble: "Some Subjects Appear in the Negative That Weren't in the Room", skill: 'Notice +3', stunt: 'The Camera Sees True: once per session, reveal a hidden aspect of a location or person through developed photographs.' },
+    { world: 'The Gaslight Chronicles', icon: '🎩', concept: 'Clockwork Surgeon Wanted by the College', trouble: 'My Methods Work. My Methods Are Illegal.', skill: 'Crafts +3', stunt: 'Surgical Precision: once per scene, treat a Moderate consequence as Mild for the purpose of scene-end recovery.' },
+    { world: 'The Long Road', icon: '🛣️', concept: "Convoy Medic Who Buries What She Can't Fix", trouble: 'The Graves Are Catching Up', skill: 'Medicine +3', stunt: 'Keep Moving: +2 to Will when treating consequences during active travel under pressure.' },
+    { world: 'The Long Road', icon: '🛣️', concept: "Water-Finder Who Charges What the Water's Worth", trouble: 'Everyone Needs Me. Nobody Trusts Me.', skill: 'Investigate +3', stunt: 'Dowsing the Ruin: +2 to Investigate when searching pre-collapse structures for viable water sources.' },
+    { world: 'Dust and Iron', icon: '🤠', concept: 'Land Surveyor Working Both Sides of the Deed', trouble: 'Three Towns Believe the Same Acre Is Theirs', skill: 'Lore +2', stunt: 'I Know This Land: +2 to Notice when reading terrain for cover, ambush points, or escape routes.' },
+    { world: 'Dust and Iron', icon: '🤠', concept: 'Circuit Rider Preacher with a Warrant', trouble: "The Lord's Work and the Law's Work Crossed Once", skill: 'Provoke +3', stunt: "Fire and Brimstone: once per scene, compel a hostile NPC's conscience aspect without spending a fate point." },
+    { world: 'Dust and Iron', icon: '🤠', concept: 'Assay Office Clerk Who Knows Every Vein', trouble: 'The Company Pays My Salary and Owns My Silence', skill: 'Contacts +2', stunt: 'Supply Chain: +2 to Contacts when locating equipment or personnel through mining company networks.' },
   ];
 
   function pickThree() {
@@ -40,8 +51,7 @@
     return arr.slice(0, 3);
   }
 
-  // Shuffle worlds for display
-  $: camps = (function() {
+  let camps = $derived((function() {
     const arr = Object.keys(CAMPAIGN_INFO).map(id => ({
       id, ...CAMPAIGN_INFO[id]
     }));
@@ -50,13 +60,12 @@
       [arr[i], arr[j]] = [arr[j], arr[i]];
     }
     return arr;
-  })();
+  })());
 
   onMount(() => {
     demoNpcs = pickThree();
     try {
-      const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}');
-      theme = p.theme || 'dark';
+      theme = LS.get('theme') || 'dark';
       document.documentElement.setAttribute('data-theme', theme);
     } catch (e) {}
   });
@@ -64,11 +73,7 @@
   function toggleTheme() {
     theme = theme === 'dark' ? 'light' : 'dark';
     if (typeof document !== 'undefined') document.documentElement.setAttribute('data-theme', theme);
-    try {
-      const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}');
-      p.theme = theme;
-      localStorage.setItem('fate_prefs_v1', JSON.stringify(p));
-    } catch (e) {}
+    LS.set('theme', theme);
   }
 
   function handleJoin() {
@@ -87,13 +92,16 @@
     <a href="/" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
     <div class="topbar-spacer" style="flex:1"></div>
     <div class="topbar-status">
+      <a href="/campaigns/sessionzero" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> Prep Wizard</a>
+      <a href="/help" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Help</a>
+      <a href="/about" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">About</a>
       <button
         class="btn btn-icon btn-ghost"
-        on:click={toggleTheme}
+        onclick={toggleTheme}
         aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
         title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
         style="width:44px;height:44px"
-      >{theme === 'dark' ? '\u2600\uFE0F' : '\u25D1'}</button>
+      >{theme === 'dark' ? '☀️' : '◑'}</button>
     </div>
   </header>
 
@@ -108,25 +116,89 @@
           <span style="white-space:nowrap"><strong class="ogma-letter" style="--i:3">A</strong>dventures</span>
         </p>
         <h1 class="land-hero-title">
-          Your session is in two hours.
+          Learn Fate. Build worlds.
           <br/>
-          <span class="land-hero-sub">Pick a world. Roll. Play.</span>
+          <span class="land-hero-sub">Solo prep or group play &mdash; one click away.</span>
         </h1>
         <p class="land-hero-desc">
           Rules-accurate NPCs, scenes, and encounters &mdash; generated in one click, ready for the table.
         </p>
         <p class="land-hero-desc" style="font-size:var(--text-sm);color:var(--text-muted);margin-top:4px">
-          Every GM should be able to run a great Fate Condensed session, regardless of how much time they had to prep.
+          Learn the rules, generate your world, and prep your session &mdash; whether you have two hours or two minutes.
         </p>
         <div class="land-hero-pills">
-          <span class="land-hero-pill">&#x1F4F4; Fully offline</span>
-          <span class="land-hero-pill">&#x1F513; Free forever</span>
-          <span class="land-hero-pill">&#x1F5A8; Print-ready</span>
-          <span class="land-hero-pill">&#x26A1; One click</span>
+          <span class="land-hero-pill"><i class="fa-solid fa-tower-broadcast" aria-hidden="true"></i> Fully offline</span>
+          <span class="land-hero-pill"><i class="fa-solid fa-lock-open" aria-hidden="true"></i> Free forever</span>
+          <span class="land-hero-pill"><i class="fa-solid fa-print" aria-hidden="true"></i> Print-ready</span>
+          <span class="land-hero-pill"><i class="fa-solid fa-bolt" aria-hidden="true"></i> One click</span>
         </div>
         <div class="land-hero-ctas">
-          <a href="/campaigns/fantasy" class="land-cta-primary" aria-label="Start with a world">
+          <a href="/campaigns/fantasy" class="land-cta-primary" aria-label="Open the generator">
             &#x1F3B2; Pick a World &amp; Generate
+          </a>
+          <a href="#worlds" class="land-cta-secondary">
+            Pick a world &rarr;
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Intro teaser — what Ogma generates -->
+    <section class="land-intro-section" aria-label="What Ogma generates">
+      <div class="land-worlds-inner">
+        <h2 class="land-section-heading">What Ogma generates</h2>
+        <p class="land-section-sub">Every result is rules-accurate, campaign-voiced, and ready to drop into your session. No prep required.</p>
+        <div class="land-intro-cards">
+          {#each [
+            { icon: '◆', label: 'Major NPC', desc: '5 aspects · skill pyramid · stunts · stress tracks · refresh', color: 'var(--c-blue)' },
+            { icon: '◉', label: 'Scene Setup', desc: 'Situation aspects · zones · framing questions · free invokes', color: 'var(--c-green)' },
+            { icon: '⊕', label: 'Adventure Seed', desc: '3-scene skeleton · opposition · stakes · twist · campaign hook', color: 'var(--accent)' },
+            { icon: '⚑', label: 'Faction', desc: 'Goal · method · weakness · named face NPC', color: 'var(--c-purple)' },
+            { icon: '⚡', label: 'Consequence', desc: 'Named aspect · compel hook · recovery path', color: 'var(--c-red)' },
+            { icon: '⏱', label: 'Countdown', desc: 'Track · trigger · outcome — visible urgency for any scene', color: 'var(--gold)' },
+          ] as item}
+            <div class="land-intro-card">
+              <div class="land-intro-card-icon" style="color:{item.color}">{item.icon}</div>
+              <div class="land-intro-card-label" style="color:{item.color}">{item.label}</div>
+              <div class="land-intro-card-desc">{item.desc}</div>
+            </div>
+          {/each}
+        </div>
+        <div class="land-intro-cta">
+          <a href="/campaigns/fantasy" class="land-cta-primary"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> Try it now</a>
+          <a href="/help/generators" class="land-cta-secondary">All 17 generators &rarr;</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Onboarding: New here? -->
+    <div class="land-onboard-section">
+      <div class="land-worlds-inner">
+        <h2 class="land-section-heading">New here?</h2>
+        <div class="land-onboard-grid">
+          <a href="/help/learn-fate" class="land-onboard-card">
+            <div class="land-onboard-icon"><i class="fa-solid fa-dice-d20"></i></div>
+            <div class="land-onboard-text">
+              <div class="land-onboard-label">Learn Fate</div>
+              <div class="land-onboard-desc">Step-by-step guide to the rules &mdash; as a player or a GM. Coming from D&amp;D? We cover that too.</div>
+            </div>
+            <span class="land-onboard-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+          </a>
+          <a href="/campaigns/sessionzero" class="land-onboard-card">
+            <div class="land-onboard-icon"><i class="fa-solid fa-bolt"></i></div>
+            <div class="land-onboard-text">
+              <div class="land-onboard-label">Prep a Session</div>
+              <div class="land-onboard-desc">The Prep Wizard walks you through world, players, seed, scene, and opening NPC in 10 minutes. Done screen sends cards straight to the Table.</div>
+            </div>
+            <span class="land-onboard-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+          </a>
+          <a href="/help/export-share" class="land-onboard-card">
+            <div class="land-onboard-icon"><i class="fa-solid fa-link"></i></div>
+            <div class="land-onboard-text">
+              <div class="land-onboard-label">Export &amp; Play</div>
+              <div class="land-onboard-desc">Ogma JSON export, Markdown, print-ready cards, and shareable links. Take your prep to any table.</div>
+            </div>
+            <span class="land-onboard-arrow"><i class="fa-solid fa-chevron-right"></i></span>
           </a>
         </div>
       </div>
@@ -141,15 +213,15 @@
           <input
             class="land-join-input"
             type="text"
-            placeholder="Room code \u2014 e.g. A3KX"
+            placeholder="Room code — e.g. A3KX"
             bind:value={joinCode}
             maxlength="6"
             aria-label="Room code"
             spellcheck="false"
-            on:input={() => { if (joinErr) joinErr = ''; }}
-            on:keydown={(e) => { if (e.key === 'Enter') handleJoin(); }}
+            oninput={() => { if (joinErr) joinErr = ''; }}
+            onkeydown={(e) => { if (e.key === 'Enter') handleJoin(); }}
           />
-          <button class="btn land-join-btn" on:click={handleJoin} disabled={joinCode.trim().length === 0} aria-label="Join table">
+          <button class="btn land-join-btn" onclick={handleJoin} disabled={joinCode.trim().length === 0} aria-label="Join table">
             Join &rarr;
           </button>
         </div>
@@ -165,26 +237,35 @@
         <h2 class="land-section-heading">Choose your world</h2>
         <div class="land-worlds-grid">
           {#each camps as camp, idx (camp.id)}
-            <a
-              href="/campaigns/{camp.id}"
+            <div
               class="land-world-card"
               data-campaign={camp.id}
               style="animation-delay:{idx * 0.05}s;position:relative;overflow:hidden"
+              role="group"
+              aria-label={camp.name}
             >
-              <div class="land-world-card-accent"></div>
-              <div class="land-world-card-body">
-                <div class="land-world-icon">{camp.icon}</div>
-                <div class="land-world-info">
-                  <div class="land-world-name">{camp.name}</div>
-                  <div class="land-world-genre">{camp.genre}</div>
-                  <div class="land-world-hook">{camp.hook}</div>
+              <a href="/campaigns/{camp.id}" class="land-world-card-link" aria-label="Open {camp.name} generator">
+                <div class="land-world-card-accent"></div>
+                <div class="land-world-card-body">
+                  <div class="land-world-icon">{camp.icon}</div>
+                  <div class="land-world-info">
+                    <div class="land-world-name">{camp.name}</div>
+                    <div class="land-world-genre">{camp.genre}</div>
+                    <div class="land-world-hook">{camp.hook}</div>
+                  </div>
+                  <div class="land-world-arrow"><i class="fa-solid fa-chevron-right"></i></div>
                 </div>
-                <div class="land-world-arrow">&#x203A;</div>
-              </div>
+              </a>
               <div class="land-world-footer">
                 <span class="land-world-vibes">{camp.vibes}</span>
+                <a
+                  href="/campaigns/{camp.id}/guide"
+                  class="land-world-guide-link"
+                  title="{camp.name} Campaign Guide"
+                  aria-label="View {camp.name} campaign guide"
+                >Campaign Guide &rarr;</a>
               </div>
-            </a>
+            </div>
           {/each}
         </div>
       </div>
@@ -198,8 +279,8 @@
             <h2 class="land-section-heading" style="margin-bottom:4px">Every NPC is ready to run.</h2>
             <p class="land-npc-demo-sub">High concept, trouble, top skill, and a stunt &mdash; rules-accurate, fiction-first.</p>
           </div>
-          <button class="btn btn-ghost land-npc-shuffle-btn" on:click={() => { demoNpcs = pickThree(); }} aria-label="Show three different NPCs">
-            &#x1F3B2; Shuffle
+          <button class="btn btn-ghost land-npc-shuffle-btn" onclick={() => { demoNpcs = pickThree(); }} aria-label="Show three different NPCs">
+            <i class="fa-solid fa-dice-d20" aria-hidden="true"></i> Shuffle
           </button>
         </div>
         <div class="land-npc-demo-grid">
@@ -231,14 +312,5 @@
   </main>
 
   <!-- Footer -->
-  <footer class="land-footer">
-    <div class="land-footer-inner">
-      <div style="font-style:italic;color:var(--text-muted);margin-bottom:4px">
-        <strong>O</strong>n-demand <strong>G</strong>enerator for <strong>M</strong>asterful <strong>A</strong>dventures
-      </div>
-      <div style="margin-bottom:4px">
-        Fate&trade; is a trademark of Evil Hat Productions, LLC. Released under CC BY 3.0.
-      </div>
-    </div>
-  </footer>
+  <Footer />
 </div>
