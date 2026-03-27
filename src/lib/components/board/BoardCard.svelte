@@ -123,7 +123,7 @@
   <!-- Minimised title strip (collapsed state) -->
   {#if minimised}
     <div class="bc-mini-strip" ondblclick={toggleMinimise} aria-label="Minimised card — double-click to expand">
-      <span class="bc-mini-icon" aria-hidden="true">{genEntry ? genEntry.icon : '◈'}</span>
+      <span class="bc-mini-icon" aria-hidden="true"><i class="fa-solid {genEntry ? genEntry.icon : 'fa-dice-d20'}"></i></span>
       <span class="bc-mini-title">{card.title || (genEntry ? genEntry.label : card.genId)}</span>
     </div>
   {:else}
@@ -142,7 +142,7 @@
     {:else}
       <div class="bc-inner">
         <div class="bc-type" style="color:{C.tc}">
-          {genEntry ? genEntry.icon + ' ' + genEntry.label : card.genId}
+          {#if genEntry}<i class="fa-solid {genEntry.icon}" aria-hidden="true"></i> {genEntry.label}{:else}{card.genId}{/if}
         </div>
         <div class="bc-title">{card.title || ''}</div>
       </div>

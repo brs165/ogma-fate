@@ -185,7 +185,7 @@
         canvas.generateCard(slot.genId, originX + slot.dx, originY + slot.dy);
       }, i * 80);
     });
-    showToast('\u{1F3AC} ' + tpl.label + ' template dropped');
+    showToast(tpl.label + ' template dropped');
     ctx = null;
   }
 

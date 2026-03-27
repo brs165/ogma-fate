@@ -4888,12 +4888,17 @@ g:hover .cv-edge-label-bg { fill:color-mix(in srgb,var(--accent) 12%,var(--panel
 
 /* ── FA content icons — white in dark theme, black in light ────────────── */
 .blp-icon i, .cmd-item-icon i, .sidebar-item-icon i,
-.land-world-icon i, .land-npc-world i, .board-ctx-icon i { color: #fff; }
+.land-world-icon i, .land-npc-world i, .board-ctx-icon i,
+.gen-fab-icon i, .bc-mini-icon i, .bc-type i,
+.bt-world-icon i, .bt-world-item-icon i, .bd-badge i { color: #fff; }
 [data-theme="light"] .blp-icon i, [data-theme="light"] .cmd-item-icon i,
 [data-theme="light"] .sidebar-item-icon i,
 [data-theme="light"] .land-world-icon i,
 [data-theme="light"] .land-npc-world i,
-[data-theme="light"] .board-ctx-icon i { color: #000; }
+[data-theme="light"] .board-ctx-icon i,
+[data-theme="light"] .gen-fab-icon i, [data-theme="light"] .bc-mini-icon i,
+[data-theme="light"] .bc-type i, [data-theme="light"] .bt-world-icon i,
+[data-theme="light"] .bt-world-item-icon i, [data-theme="light"] .bd-badge i { color: #000; }
 
 /* ── Bits ScrollArea ────────────────────────────────────────────────────── */
 [data-bits-scroll-area-root] { overflow: hidden; position: relative; flex: 1; }

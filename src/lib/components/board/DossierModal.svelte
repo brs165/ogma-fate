@@ -42,7 +42,7 @@
         <Dialog.Title class="bd-title">{card?.title || ''}</Dialog.Title>
         {#if card}
           <div class="bd-badge" style="color:{C.tc}; border-color:{C.tc}; background:{C.bg}">
-            {genMeta.icon || ''}&nbsp;{genMeta.label || card.genId}
+            {#if genMeta.icon}<i class="fa-solid {genMeta.icon}" aria-hidden="true"></i>&nbsp;{/if}{genMeta.label || card.genId}
           </div>
         {/if}
         <Dialog.Close class="bd-close" aria-label="Close">✕</Dialog.Close>

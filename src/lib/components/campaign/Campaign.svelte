@@ -12,7 +12,7 @@
   let { campId = 'fantasy' } = $props();
 
   // ── Derived ────────────────────────────────────────────────────────────────
-  let camp = $derived(CAMPAIGNS[campId] || { meta: { name: campId, icon: '\u25C8' }, tables: {}, colors: {} });
+  let camp = $derived(CAMPAIGNS[campId] || { meta: { name: campId, icon: 'fa-dice-d20' }, tables: {}, colors: {} });
   let campName = $derived(camp.meta ? camp.meta.name : campId);
 
   // ── Local state ────────────────────────────────────────────────────────────
