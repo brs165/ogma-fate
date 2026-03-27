@@ -6,7 +6,7 @@ export const CAMPAIGNS = { cyberpunk: {
     meta: {
       id: "cyberpunk", name: "Neon Abyss",
       tagline: "High Tech, Low Life. Corporate feudalism and transhumanist anxiety - your hardware is your only résumé and the city is a concrete trap.",
-      icon: "⬡", font: "'Inter', sans-serif",
+      icon: "fa-microchip", font: "'Inter', sans-serif",
     },
     colors: {
       bg:"#050810", panel:"#080d18", border:"#0a2040",
