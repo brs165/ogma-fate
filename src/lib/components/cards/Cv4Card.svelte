@@ -76,7 +76,7 @@
   let reduced = $state(false);
 
   // ── Reduced-motion listener ───────────────────────────────────────────────
-  let mq = $state();
+  let mq;
   onMount(() => {
     try {
       mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -91,7 +91,7 @@
   let fadeTimer;
   $effect(() => {
     if (!reduced) {
-      void genId; void data;
+      genId; data;
       visible = false;
       clearTimeout(fadeTimer);
       fadeTimer = setTimeout(() => { visible = true; }, 30);

@@ -43,6 +43,7 @@
   let totalSteps = $derived(STEPS.length);
   let stepId = $derived(STEPS[step] ? STEPS[step].id : 'campaign');
   let progress = $derived(((step + 1) / totalSteps * 100));
+  // Guard: if mode changes and shrinks STEPS, reset step to avoid OOB index
   $effect(() => { if (step >= STEPS.length) step = 0; });
 
   function next() { if (step < totalSteps - 1) step += 1; }
@@ -53,8 +54,9 @@
   let pcIndex = $state(0);
   let pcDrafts = $state([]);
   $effect(() => {
-    while (pcDrafts.length < pcCount) pcDrafts.push({ name: '', hc: '', trouble: '' });
-    pcDrafts = pcDrafts.slice(0, pcCount);
+    pcDrafts = Array.from({ length: pcCount }, (_, i) =>
+      pcDrafts[i] ?? { name: '', hc: '', trouble: '' }
+    );
   });
   let currentPc = $derived(pcDrafts[pcIndex] || { name: '', hc: '', trouble: '' });
   let fromSessionZero = $state(false);
