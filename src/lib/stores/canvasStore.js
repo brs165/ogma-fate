@@ -1,6 +1,6 @@
 // canvasStore.js — Canvas state: card CRUD, generate, connectors, undo, IDB persist, SvelteFlow derived stores
 // Factory: createCanvasStore(campCanvasKey, tables, showToast, onCardsChange)
-import { writable, get, derived } from 'svelte/store';
+import { writable, get } from 'svelte/store';
 import { generate, mergeUniversal, filteredTables, GENERATORS } from '../engine.js';
 import DB from '../db.js';
 import { boardUid, extractCardTitle, extractCardSummary, extractCardTags, STICKY_COLORS } from '../helpers.js';
@@ -331,61 +331,6 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
     if (showToast) showToast(placed.length + ' binder cards loaded to canvas');
   }
 
-  // ── Svelte Flow derived stores ─────────────────────────────────────────
-  const nodes = derived(cards, $cards =>
-    $cards.map(card => ({
-      id: card.id,
-      type: card.genId || 'npc_minor',
-      position: { x: card.x || 0, y: card.y || 0 },
-      zIndex: card.z || 1,
-      draggable: true,
-      selectable: true,
-      data: card,
-    }))
-  );
-
-  const edges = derived(connectors, $conns =>
-    $conns.map(conn => ({
-      id: conn.id,
-      source: conn.fromId,
-      target: conn.toId,
-      type: 'smoothstep',
-      animated: false,
-      deletable: true,
-      label: conn.label || '',
-      labelStyle: { fontSize: '10px', fontWeight: 600, fill: 'var(--text)', fontFamily: 'inherit' },
-      labelBgStyle: { fill: 'var(--panel)', fillOpacity: 0.85 },
-      data: conn,
-    }))
-  );
-
-  function syncNodePositions(changedNodes) {
-    if (!changedNodes || !changedNodes.length) return;
-    // Capture old positions for undo
-    const currentCards = get(cards);
-    const oldPositions = {};
-    changedNodes.forEach(n => {
-      const card = currentCards.find(c => c.id === n.id);
-      if (card) oldPositions[n.id] = { x: card.x, y: card.y, z: card.z };
-    });
-    const posMap = {};
-    changedNodes.forEach(n => {
-      if (n.position) {
-        posMap[n.id] = { x: Math.round(n.position.x), y: Math.round(n.position.y), z: n.zIndex || Date.now() };
-      }
-    });
-    // Only push undo if positions actually changed
-    const moved = Object.keys(posMap).some(id => {
-      const old = oldPositions[id];
-      const nw = posMap[id];
-      return old && nw && (Math.abs(old.x - nw.x) > 2 || Math.abs(old.y - nw.y) > 2);
-    });
-    if (moved) {
-      undoStack = [{ type: 'move', positions: oldPositions }, ...undoStack].slice(0, 10);
-    }
-    mutate(prev => prev.map(c => posMap[c.id] ? Object.assign({}, c, posMap[c.id]) : c));
-  }
-
   // WC-08: Create a sticky with pre-filled text (used by consequence auto-placement)
   function addStickyWithText(text, colorIdx, rotation) {
     const sticky = {
@@ -400,13 +345,13 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
   }
 
   return {
-    cards, nodes, edges, loaded, connectors,
+    cards, loaded, connectors,
     getCards: () => get(cards),
     persistCanvas,
     generateCard, generateCardWithData, loadBinderToCanvas,
     updateCard, deleteCard, rerollCard,
     addConnector, removeConnector, updateConnector, removeCardConnectors, clearCanvas,
-    syncNodePositions, addStickyWithText,
+    addStickyWithText,
     undoLast, exportCanvas, importCanvas,
   };
 }

@@ -15,7 +15,8 @@ store architecture, CSS-only styling, component structure.
 **Hard vetoes:**
 - Build fails
 - `$state()` used inside a function body (invalid in Svelte 5)
-- `flowNodes`/`flowEdges` changed from `writable()` to `$state()` (breaks SvelteFlow)
+- `flowNodes`/`flowEdges` changed from `$state([])` to `writable()` (crashes SvelteFlow 1.5.1 — "t is not iterable")
+- Old event syntax `on:nodeclick` instead of callback `onnodeclick` (SvelteFlow 1.5.1 uses callback props)
 - Card components given `left/top` style or `onmousedown` drag (fights SvelteFlow)
 - `nodeTypes` defined inside a component or reactive block (causes infinite re-renders)
 - `<style>` blocks added to components (violates CSS rule)
@@ -25,7 +26,8 @@ store architecture, CSS-only styling, component structure.
 - Every mutable `let` uses `$state()`
 - Props use `$props()` destructuring
 - Events use `onclick=` not `on:click=`
-- Store subscriptions use `.set(v)` for writable targets, not reassignment
+- SvelteFlow nodes/edges are plain arrays with `bind:nodes={flowNodes}`
+- Store subscriptions use `flowNodes = v` (reassignment), not `.set(v)`
 - `useSvelteFlow()` called at component init level, not inside functions
 
 ---

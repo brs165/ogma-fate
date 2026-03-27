@@ -1,5 +1,5 @@
 # Stunt Data Specification — Ogma
-> BL-02 · COMPLETE as of v2026.03.659 · last updated: 2026.03.659
+> BL-02 · COMPLETE as of v2026.03.660 · last updated: 2026.03.660
 
 ## Canonical stunt object shape
 

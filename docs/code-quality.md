@@ -58,14 +58,27 @@ function doThing() {
 
 ## SvelteFlow patterns
 
-### flowNodes and flowEdges MUST be writable stores
+### flowNodes and flowEdges MUST be plain $state arrays
 ```js
-// ✅ CORRECT
+// ✅ CORRECT — SvelteFlow 1.5.1 expects plain arrays
+let flowNodes = $state([]);
+canvas.nodes.subscribe(v => flowNodes = v);
+
+// ❌ WRONG — writable() stores crash SvelteFlow ("t is not iterable")
 let flowNodes = writable([]);
 canvas.nodes.subscribe(v => flowNodes.set(v));
+```
 
-// ❌ WRONG — $state doesn't work with SvelteFlow
-let flowNodes = $state([]);
+### SvelteFlow events use callback props, not on: dispatchers
+```js
+// ✅ CORRECT — SvelteFlow 1.5.1 callback props
+onnodedragstop={({ nodes }) => { ... }}
+onconnect={(connection) => { ... }}
+ondelete={({ edges }) => { ... }}
+
+// ❌ WRONG — old Svelte 4 dispatch syntax
+on:nodedragstop={(e) => { e.detail.nodes ... }}
+on:connect={(e) => { e.detail ... }}
 ```
 
 ### nodeTypes MUST be at module level

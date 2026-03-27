@@ -33,16 +33,32 @@ function doThing() {
 }
 ```
 
-## SvelteFlow rules
+## SvelteFlow 1.5.1 rules
 
 ```js
-// flowNodes and flowEdges MUST be writable stores
-let flowNodes = writable([]);
-let flowEdges = writable([]);
+// flowNodes and flowEdges MUST be plain $state arrays
+let flowNodes = $state([]);
+let flowEdges = $state([]);
 
-// Subscribe and .set() — NOT reassign
-canvas.nodes.subscribe(v => flowNodes.set(v));
-canvas.edges.subscribe(v => flowEdges.set(v));
+// Subscribe and assign — NOT .set()
+canvas.nodes.subscribe(v => flowNodes = v);
+canvas.edges.subscribe(v => flowEdges = v);
+
+// Update via reassignment — NOT .update()
+flowNodes = flowNodes.map(n => ({ ...n, selected: true }));
+
+// Use bind:nodes / bind:edges on <SvelteFlow>
+<SvelteFlow bind:nodes={flowNodes} bind:edges={flowEdges}>
+
+// Callback props — NOT on: dispatchers
+onnodedragstop={({ nodes }) => { ... }}    // NOT on:nodedragstop
+onnodeclick={({ node }) => { ... }}        // NOT on:nodeclick
+onconnect={(connection) => { ... }}        // NOT on:connect
+ondelete={({ edges }) => { ... }}          // NOT on:edgedelete
+onedgeclick={({ edge }) => { ... }}        // NOT on:edgeclick
+
+// Prop names
+multiSelectionKey="Shift"                  // NOT multiSelectionKeyCode
 
 // nodeTypes MUST be at module level
 import { nodeTypes } from './nodeTypes.js';
@@ -64,5 +80,5 @@ import { nodeTypes } from './nodeTypes.js';
 
 ## Version format
 
-`YYYY.MM.NNN` — e.g. `2026.03.576`
-Zip delivery: `YYYY.MM.NNN.zip`
+`YYYY.MM.NNN` — e.g. `2026.03.660`
+Zip delivery: `YYYY-MM-NNN.zip` (hyphens, not dots)

@@ -2,6 +2,134 @@
 
 ---
 
+## [2026.03.663] — March 2026 — Native Canvas Migration (SvelteFlow Removed)
+
+### Canvas architecture replaced
+- **SvelteFlow removed:** `@xyflow/svelte` dependency deleted from `package.json`
+- **Native canvas:** `<SvelteFlow>` block replaced with pointer/wheel pan-zoom viewport div
+- Card rendering: direct `{#each cards}` loop in a CSS-transformed `<div class="cv-viewport">`
+- Connectors: `<svg class="cv-svg-overlay">` with `<line>` elements, pure math positioning
+- Minimap: CSS scaled card rectangles + viewport indicator box
+- Zoom controls: 3 plain buttons (in/out/fit) replacing `<Controls />`
+- Background: CSS `radial-gradient` dot pattern replacing `<Background />`
+- Context menu coords: pure `screenToCanvas()` math function (no `useSvelteFlow()` required)
+
+### Files deleted
+- `src/lib/components/board/nodes/CardNode.svelte`
+- `src/lib/components/board/nodes/StickyNode.svelte`
+- `src/lib/components/board/nodes/BoostNode.svelte`
+- `src/lib/components/board/nodes/LabelNode.svelte`
+- `src/lib/components/board/nodeTypes.js`
+
+### canvasStore.js simplified
+- Removed `nodes` derived store (SvelteFlow node format)
+- Removed `edges` derived store (SvelteFlow edge format)
+- Removed `syncNodePositions()` (replaced by direct card position updates in drag handler)
+
+### CanvasContextMenu.svelte
+- Removed `useSvelteFlow()` / `screenToFlowPosition` import
+- Now accepts `screenToCanvas` function as prop
+
+### Docs & memory aligned
+- BOOTSTRAP.md: build script rule clarified (npx vite build for tests, bump-version.sh once for zip)
+- PROJECT_MEMORY.md: stack table updated, SvelteFlow architecture section replaced with native canvas section
+- CANVAS-WORKSHOP.md: archived SvelteFlow sprint history, updated feature status table
+- All version references updated to 2026.03.663/662
+
+---
+
+## [2026.03.660] — March 2026 — SvelteFlow API Fix + Doc Sweep
+
+### Canvas crash fix — "t is not iterable"
+- **Root cause:** `flowNodes`/`flowEdges` were `writable()` stores; SvelteFlow 1.5.1 expects plain `$state([])` arrays
+- Changed all store `.set(v)` calls to assignment (`flowNodes = v`)
+- Changed all `.update(fn)` calls to reassignment (`flowNodes = fn(flowNodes)`)
+- Replaced all `on:event` dispatchers with callback props (`onnodeclick`, `onnodedragstop`, etc.)
+- `on:edgedelete` → `ondelete` (SvelteFlow 1.5.1 API)
+- `multiSelectionKeyCode` → `multiSelectionKey`
+- Comprehensive doc sweep: corrected SvelteFlow rules in BOOTSTRAP.md, CONVENTIONS.md, TEAM-VOICES.md, PROJECT_MEMORY.md, code-quality.md (all previously had the reversed/wrong pattern documented)
+
+---
+
+## [2026.03.655] — March 2026 — Deep Dive Layout Fix
+
+- Fixed `step-block` 3-column flex layout on `/help/learn-fate-deep` — nested `step-title` inside `step-body` so icon sits left, title+content stack right
+
+---
+
+## [2026.03.652] — March 2026 — Teacher Voice + Deep Dive Learning
+
+### Voice 7 — The Teacher
+- Added to `docs/claude/TEAM-VOICES.md`: fiction-first, learner perspective, D&D transition, interactive examples
+- Deep dive page at `/help/learn-fate-deep` with 4 sections:
+  1. Interactive tutorial — guided scene with Kira Vasquez, dice rollers, Teacher callouts
+  2. Play-by-post walkthrough — Dr. Helena Blackwood Victorian scene, beat-by-beat
+  3. Strategy guide — Create Advantage math, FP economy, conceding, self-compels
+  4. First session checklist — 30-min prep, what to skip, 3-hour template, D&D habits to unlearn
+- Hero text: "Learn Fate. Build worlds. Solo prep or group play — one click away."
+- CSS: callout variants (info/tip/dnd/scenario), step-body, play-by-post exchange styling
+
+---
+
+## [2026.03.648] — March 2026 — Canvas Polish Sprint
+
+- bits-ui Tooltip completely removed from all canvas components (Topbar, PlayerRow, TurnBar) — replaced with HTML `title` attrs. Fixed persistent "t is not iterable" crash from Tooltip/SvelteFlow conflict
+- PREP-06: Undo covers card moves (captures old positions, 2px drag threshold)
+- WC-08: Consequence stickies — `addStickyWithText()` in canvasStore, auto-creates color-coded stickies when GM types consequences
+
+---
+
+## [2026.03.636] — March 2026 — gmOnly Toggle + Docs
+
+- WC-07: gmOnly card toggle — eye icon in BoardCard, 55% opacity + amber dashed border visual, PlayerSurface filters gmOnly cards
+- Docs version stamp sweep across all claude/ docs
+
+---
+
+## [2026.03.633] — March 2026 — Select All + Command Palette
+
+- PREP-08: Ctrl+A select all nodes + Ctrl+Shift+A deselect
+- Command palette "Select All Nodes" entry
+
+---
+
+## [2026.03.630] — March 2026 — GM Tips Depth
+
+- BL-07: GM Tips depth — 1,950→3,293 words (+69%)
+- "Common Mistakes" (red) and "Pairs Well With" (green) sections added to all 18 generators
+
+---
+
+## [2026.03.627] — March 2026 — Stunt Data
+
+- BL-02: 27 universal stunts tagged (18 canonical tags)
+- `pickStuntsForSkills()` added to engine.js
+- Major/Minor NPC/PC generators updated — 100% stunt-skill match rate
+
+---
+
+## [2026.03.624] — March 2026 — localStorage Schema
+
+- BL-01: 14 keys in DEFAULTS, `LS.get()`/`LS.set()` accessor, 9 files migrated from raw localStorage
+
+---
+
+## [2026.03.621] — March 2026 — Mobile Nav
+
+- BL-15: Help wiki sidebar → hamburger drawer on mobile (≤640px)
+- Marketing pages get hamburger drawer with 8 world links
+
+---
+
+## [2026.03.612] — March 2026 — QA + BackPanel Rewrite
+
+- BackPanel/ClockTrack rewritten with fs-* tokens
+- CvLabel + CvTag deleted (82→80 components)
+- QA static analysis (6 checks) + Playwright smoke tests (43 checks)
+- CI pipeline updated
+
+---
+
 ## [2026.03.600] — March 2026 — FateX Card Restyling (Option A)
 
 ### Card design overhaul — all 18 types

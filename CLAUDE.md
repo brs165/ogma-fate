@@ -3,13 +3,13 @@
 ## What this project is
 
 Ogma is a browser-based offline-first PWA that generates Fate Condensed tabletop RPG content
-for GMs. Built with SvelteKit + Svelte 5 + SvelteFlow. Deployed at ogma.net via Cloudflare Pages.
+for GMs. Built with SvelteKit + Svelte 5. Deployed at ogma.net via Cloudflare Pages. Deployed at ogma.net via Cloudflare Pages.
 
 ## Stack
 
 - **Framework:** SvelteKit + Svelte 5.51.0 — full runes mode (`$state`, `$derived`, `$props`)
 - **Build:** Vite 7, `@sveltejs/adapter-static`, `npx vite build`
-- **Canvas:** `@xyflow/svelte` — SvelteFlow for the Prep & Play board
+- **Canvas:** Native pointer/wheel pan-zoom (SvelteFlow removed v662)
 - **UI:** `bits-ui@2.16.3` — headless accessible primitives
 - **Icons:** Font Awesome 7.2 Free via jsDelivr CDN (cached by SW for offline)
 - **State:** Svelte stores (`writable`, `derived`) in plain JS + `$state` in components
@@ -29,8 +29,6 @@ for GMs. Built with SvelteKit + Svelte 5 + SvelteFlow. Deployed at ogma.net via 
 | `src/lib/helpers.js` | Shared utility functions |
 | `src/lib/stores/` | 6 stores: canvas, play, binder, sync, session, chrome |
 | `src/lib/components/board/Board.svelte` | Main app shell |
-| `src/lib/components/board/nodes/` | SvelteFlow node components (4 files) |
-| `src/lib/components/board/nodeTypes.js` | SvelteFlow node registry (module-level) |
 | `src/data/` | 11 campaign data modules |
 | `src/routes/+layout.js` | `ssr=false, prerender=false` |
 | `static/assets/css/theme.css` | Global stylesheet |
@@ -40,11 +38,11 @@ for GMs. Built with SvelteKit + Svelte 5 + SvelteFlow. Deployed at ogma.net via 
 | `docs/claude/BOOTSTRAP.md` | Session startup checklist |
 | `docs/claude/PROJECT_MEMORY.md` | Full project state, known issues, backlog |
 
-## Component inventory (82 .svelte files)
+## Component inventory (76 .svelte files)
 
 | Directory | Count | Contents |
 |-----------|-------|---------|
-| `cards/` | 6 | CvLabel, CvTag, StressRow, ClockTrack, Cv4Card, BackPanel |
+| `cards/` | 4 | StressRow, ClockTrack, Cv4Card, BackPanel |
 | `cards/fronts/` | 18 | 18 generator card fronts (all use `fs-*` fate-sheet tokens) |
 | `board/` | 20 | Board, BoardCard, BoardSticky, BoardBoost, BoardLabel, Topbar, TurnBar, PlayerRow, CombatTracker, PlayPanel, BinderPanel, DossierModal, ExportMenu, ExportPanel, HelpPanel, StuntPanel, MobileList, CommandPalette, CanvasContextMenu, GenerateFAB |
 | `board/nodes/` | 4 | CardNode, StickyNode, BoostNode, LabelNode |
@@ -53,7 +51,7 @@ for GMs. Built with SvelteKit + Svelte 5 + SvelteFlow. Deployed at ogma.net via 
 | `dice/` | 1 | DicePanel |
 | `player/` | 1 | PlayerSurface |
 | `shared/` | 2 | HelpDiceRoller, Footer |
-| `routes/` | 26 | Layouts + pages (marketing, help, campaigns) |
+| `routes/` | 27 | Layouts + pages (marketing, help, campaigns) |
 
 ## Architecture rules
 
@@ -61,10 +59,8 @@ for GMs. Built with SvelteKit + Svelte 5 + SvelteFlow. Deployed at ogma.net via 
 2. **CSS in theme.css only** — no `<style>` blocks in any component
 3. **engine.js and db.js are pure JS** — no Svelte imports, ever
 4. **Stores are plain `.js`** — no Svelte syntax in store files
-5. **SvelteFlow nodes/edges MUST be `writable()` stores** — not `$state([])`
-6. **Card components have no positioning or drag logic** — SvelteFlow owns that
-7. **`nodeTypes.js` at module level** — never inside reactive block or function
-8. **Preserve all a11y** — role, aria-label, aria-pressed, aria-expanded
+5. **Canvas cards** must NOT have left/top on the component — only the .cv-card-positioner wrapper
+9. **Preserve all a11y** — role, aria-label, aria-pressed, aria-expanded
 
 ## Commands
 

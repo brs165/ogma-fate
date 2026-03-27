@@ -3812,3 +3812,139 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .svelte-flow__edge:hover .svelte-flow__edge-text {
   fill:var(--accent) !important;
 }
+
+/* ══ NATIVE CANVAS (v662) — replaces SvelteFlow ══════════════════════════
+   cv-wrap: full-bleed container, clips overflow, receives pointer events
+   cv-viewport: CSS-transformed plane holding all card positioners
+   cv-card-pos: absolute positioned wrapper per card (handles drag visual)
+   cv-svg-overlay: SVG layer for connector lines (pointer-events:none)
+   cv-controls: zoom +/−/fit buttons (bottom-right)
+   cv-minimap: scaled overview (bottom-right, above controls)
+   cv-dot-bg: repeating dot pattern background
+═══════════════════════════════════════════════════════════════════════════*/
+
+/* ── Container ──────────────────────────────────────────────────────────── */
+.cv-wrap {
+  flex:1; position:relative; overflow:hidden; height:100%;
+  cursor:grab; user-select:none; -webkit-user-select:none;
+}
+.cv-wrap:active { cursor:grabbing; }
+.cv-wrap.connect-mode { cursor:crosshair !important; }
+.cv-wrap.mode-transitioning { filter:saturate(0.15); transition:filter 0.08s ease; }
+.cv-wrap:not(.mode-transitioning) { filter:saturate(1); transition:filter 0.35s ease; }
+
+/* ── Dot background ─────────────────────────────────────────────────────── */
+.cv-dot-bg {
+  position:absolute; inset:0; pointer-events:none; z-index:0;
+  background-image: radial-gradient(circle, var(--border-bright) 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity:0.45;
+}
+[data-theme="light"] .cv-dot-bg { opacity:0.3; }
+
+/* ── Viewport — the transformed card plane ──────────────────────────────── */
+.cv-viewport {
+  position:absolute; top:0; left:0;
+  width:1px; height:1px; /* zero footprint — cards overflow this */
+  will-change:transform; pointer-events:none; z-index:1;
+}
+
+/* ── Per-card positioner ─────────────────────────────────────────────────── */
+.cv-card-pos {
+  position:absolute; pointer-events:all;
+  cursor:grab; touch-action:none;
+  transition:opacity 0.15s;
+}
+.cv-card-pos:active,
+.cv-card-pos.cv-dragging { cursor:grabbing; z-index:9999 !important; }
+.cv-card-pos.cv-dimmed { opacity:0.22; pointer-events:none; }
+.cv-card-pos.cv-connect-source .board-card {
+  outline:2px dashed var(--accent); outline-offset:3px;
+  box-shadow:0 0 12px color-mix(in srgb,var(--accent) 30%,transparent);
+}
+
+/* ── SVG connector overlay ──────────────────────────────────────────────── */
+.cv-svg-overlay {
+  position:absolute; inset:0; width:100%; height:100%;
+  pointer-events:none; z-index:2; overflow:visible;
+}
+.cv-connector-line {
+  stroke:var(--border-bright); stroke-width:1.5;
+  stroke-dasharray:5 4; fill:none;
+  transition:stroke 0.15s;
+}
+.cv-connector-hit {
+  stroke:transparent; stroke-width:18; fill:none;
+  pointer-events:stroke; cursor:pointer;
+}
+.cv-connector-hit:hover + .cv-connector-line,
+g:hover .cv-connector-line { stroke:var(--accent); stroke-width:2; stroke-dasharray:none; }
+.cv-edge-label-bg { fill:var(--panel); fill-opacity:0.92; }
+.cv-edge-label {
+  fill:var(--text-dim); font-size:9px; font-weight:700;
+  text-anchor:middle; font-family:var(--font-mono); letter-spacing:0.06em;
+  text-transform:uppercase; pointer-events:none;
+}
+g:hover .cv-edge-label { fill:var(--accent); }
+g:hover .cv-edge-label-bg { fill:color-mix(in srgb,var(--accent) 12%,var(--panel)); }
+
+/* ── Zoom controls ──────────────────────────────────────────────────────── */
+.cv-controls {
+  position:absolute; bottom:16px; right:16px; z-index:10;
+  display:flex; flex-direction:column; gap:3px;
+}
+.cv-ctrl-btn {
+  width:28px; height:28px; display:flex; align-items:center; justify-content:center;
+  background:var(--glass-bg); border:1px solid var(--border-mid);
+  border-radius:var(--fd-stamp-radius,3px); color:var(--text-dim);
+  font-size:14px; font-weight:700; cursor:pointer; line-height:1;
+  backdrop-filter:var(--glass-blur-sm); -webkit-backdrop-filter:var(--glass-blur-sm);
+  box-shadow:var(--fd-stamp-shadow); transition:all 0.1s;
+}
+.cv-ctrl-btn:hover { background:var(--glass-border); color:var(--text); }
+.cv-ctrl-btn:active { transform:scale(0.92); }
+
+/* ── Minimap ────────────────────────────────────────────────────────────── */
+.cv-minimap {
+  position:absolute; bottom:108px; right:16px; z-index:10;
+  width:140px; height:90px;
+  background:var(--glass-bg); border:1px solid var(--border-mid);
+  border-radius:var(--fd-stamp-radius,3px); overflow:hidden;
+  backdrop-filter:var(--glass-blur-sm); -webkit-backdrop-filter:var(--glass-blur-sm);
+  box-shadow:var(--fd-stamp-shadow);
+}
+.cv-mm-card {
+  position:absolute; border-radius:1px; opacity:0.75;
+  min-width:3px; min-height:2px;
+}
+.cv-mm-vp {
+  position:absolute; border:1.5px solid var(--accent);
+  border-radius:2px; pointer-events:none;
+  background:color-mix(in srgb,var(--accent) 8%,transparent);
+}
+
+/* ── Empty hint ─────────────────────────────────────────────────────────── */
+.cv-empty-hint {
+  position:absolute; inset:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:10px;
+  color:var(--text-muted); pointer-events:none; z-index:1;
+  font-size:var(--text-sm);
+}
+.cv-empty-icon { font-size:32px; animation:board-empty-pulse 2.4s ease-in-out infinite; }
+.cv-empty-sub { font-size:12px; color:var(--text-muted); font-style:italic; }
+.cv-empty-hint kbd {
+  background:var(--inset); border:1px solid var(--border-mid);
+  border-radius:3px; padding:1px 6px; font-size:11px;
+}
+
+/* ── Toast (canvas-local) ────────────────────────────────────────────────── */
+.cv-toast {
+  position:absolute; bottom:52px; left:50%; transform:translateX(-50%);
+  background:var(--panel-raised); border:1px solid var(--border);
+  color:var(--text); font-size:11px; padding:5px 14px;
+  border-radius:16px; white-space:nowrap; z-index:999;
+  pointer-events:none; box-shadow:0 2px 10px rgba(0,0,0,.15);
+}
+
+/* ── Mobile: hide minimap on small screens ───────────────────────────────── */
+@media(max-width:640px){ .cv-minimap { display:none; } }

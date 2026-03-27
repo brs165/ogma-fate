@@ -1,9 +1,6 @@
 <script>
-  import { onMount, onDestroy, setContext } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import { get } from 'svelte/store';
-  import { SvelteFlow, Background, BackgroundVariant, MiniMap, Controls } from '@xyflow/svelte';
-  import '@xyflow/svelte/dist/style.css';
-  import { nodeTypes } from './nodeTypes.js';
   import { getWorldTables, getWorldMeta } from '../../helpers.js';
   import { createCanvasStore } from '../../stores/canvasStore.js';
   import { createPlayStore } from '../../stores/playStore.js';
@@ -15,8 +12,6 @@
   import Topbar from './Topbar.svelte';
   import LeftPanel from '../panels/LeftPanel.svelte';
   import PlayPanel from './PlayPanel.svelte';
-  import BoardCard from './BoardCard.svelte';
-  import BoardLabel from './BoardLabel.svelte';
   import MobileList from './MobileList.svelte';
   import TurnBar from './TurnBar.svelte';
   import CombatTracker from './CombatTracker.svelte';
@@ -25,7 +20,7 @@
   import CommandPalette from './CommandPalette.svelte';
   import ExportPanel from './ExportPanel.svelte';
   import DicePanel from '../dice/DicePanel.svelte';
-  import CanvasContextMenu from './CanvasContextMenu.svelte';
+  import OgmaCanvas from './OgmaCanvas.svelte';
   import GenerateFAB from './GenerateFAB.svelte';
   import FatePointTracker from '../campaign/FatePointTracker.svelte';
 
@@ -55,9 +50,8 @@
   let cardSearch = $state('');
   let connectSourceId = $state(null);
   let connectorLines = $state([]);
-  // SvelteFlow v1.5+ expects plain arrays, not Svelte stores
-  let flowNodes = $state([]);
-  let flowEdges = $state([]);
+
+  let canvasRef = $state(); // bind to OgmaCanvas for fitAll()
 
   function handleConnectClick(cardId) {
     if (!connectSourceId) {
@@ -73,8 +67,6 @@
   }
   let showTracker = $state(false);
   let exportView = $state(false);
-  let fitViewOnLoad = $state(false);  // true when restoring existing cards
-  // zoom/pan now handled by Svelte Flow
 
   // Coach marks
   let coachCanvas = $state(false);
@@ -106,14 +98,11 @@
   let pendingInvoke = $state(null);
   let rollHistory = $state([]);
 
-  // Canvas refs
-  // canvasRef/dragRef/panRef removed — Svelte Flow handles drag/pan
+  // Canvas ref — bound to OgmaCanvas for fitAll()
+  // canvasRef is set via bind:this={canvasRef} on <OgmaCanvas>
 
   // Context menu
   let ctx = $state(null);
-
-  // ── Canvas wrapper ref (for coordinate conversion) ───────────────────────
-  let sfWrap = $state();
 
   // ── Toast queue ────────────────────────────────────────────────────────────
   let toastTimer = $state(null);
@@ -144,21 +133,6 @@
   let sync = $state();
 
   // Svelte Flow context — must be called during init
-  setContext('ogma_canvas', {
-    get mode() { return mode; },
-    get campId() { return campId; },
-    get playCardIds() { return playCardIds; },
-    get connectSourceId() { return connectSourceId; },
-    get cardSearch() { return cardSearch; },
-    onDelete: (id) => canvas && canvas.deleteCard(id),
-    onReroll: (id) => canvas && canvas.rerollCard(id),
-    onUpdate: (id, patch) => canvas && canvas.updateCard(id, patch),
-    onSendToTable: (card) => binder && binder.sendToTable(card),
-    onOpen: (card) => { dossierCard = card; },
-    onInvoke: (opts) => { pendingInvoke = opts; showDice = true; showToast('\u2726 Invoke queued \u2014 +2 on next roll'); },
-    onUpdateConnector: (id, patch) => canvas && canvas.updateConnector && canvas.updateConnector(id, patch),
-  });
-
   function initStores() {
     // Clean up previous subscriptions
     unsubs.forEach(u => u());
@@ -179,18 +153,14 @@
     // Subscribe to store values
     unsubs.push(canvas.cards.subscribe(v => cards = v));
     unsubs.push(canvas.connectors.subscribe(v => connectorLines = v));
-    unsubs.push(canvas.nodes.subscribe(v => flowNodes = v));
-    unsubs.push(canvas.edges.subscribe(v => flowEdges = v));
     let binderLoadedOnce = false;
     unsubs.push(canvas.loaded.subscribe(v => {
       loaded = v;
       if (v && !binderLoadedOnce) {
         binderLoadedOnce = true;
-        // fitView if restoring existing cards
         const existing = get(canvas.cards);
         if (existing && existing.length > 0) {
-          fitViewOnLoad = true;
-          setTimeout(() => { fitViewOnLoad = false; }, 500);
+          setTimeout(() => fitAll(), 120);
         }
         setTimeout(() => {
           const currentBinder = get(binder.binderCards);
@@ -353,26 +323,12 @@
     rollHistory = [entry, ...rollHistory].slice(0, 12);
   }
 
-  // ── Drag system — direct DOM during drag, single store update on drop ────
-  // Manual drag/zoom removed — Svelte Flow handles all canvas interaction
-
-  // fitAll — Svelte Flow Controls has fitView button; this is a no-op for keyboard shortcut compat
-  function fitAll() {
-    // Svelte Flow fitView is handled by the Controls component
-  }
+  // fitAll — delegated to OgmaCanvas via bind:this
+  function fitAll() { if (canvasRef) canvasRef.fitAll(); }
 
   // ── Context menu (right-click) ────────────────────────────────────────────
-  function onCanvasContextMenu(e) {
-    if (e.target.closest('.board-card') || e.target.closest('.board-sticky')) return;
-    e.preventDefault();
-    // Use client coords for menu display (fixed positioning)
-    // Canvas coords passed to generateCard — SvelteFlow handles node placement
-    // For now use clientX/Y as canvas coords; at default zoom 0.8 this is ~accurate
-    // TODO: extract exact canvas transform via .svelte-flow__viewport transform matrix
-    ctx = {
-      screenX: e.clientX, screenY: e.clientY,
-      canvasX: e.clientX, canvasY: e.clientY,
-    };
+  function onCanvasContextMenu(screenX, screenY, canvasX, canvasY) {
+    ctx = { screenX, screenY, canvasX, canvasY };
   }
 
   function ctxGenerate(genId, canvasX, canvasY) {
@@ -415,8 +371,7 @@
       if (canvas) canvas.undoLast();
     } else if ((e.ctrlKey || e.metaKey) && (e.key === 'a' || e.key === 'A')) {
       e.preventDefault();
-      // Ctrl+A = select all nodes; Ctrl+Shift+A = deselect all
-      flowNodes = flowNodes.map(n => ({ ...n, selected: !e.shiftKey }));
+      showToast(cards.length + ' cards on canvas');
     } else if (e.key === 'r' || e.key === 'R') {
       showDice = !showDice;
     } else if (e.key === 'f' || e.key === 'F') {
@@ -438,7 +393,7 @@
     { id: 'fit', icon: '\u2922', label: 'Fit All Cards', shortcut: 'F', fn: fitAll },
     { id: 'clear', icon: '\u{1F5D1}', label: 'Clear Table', fn: () => { showClearModal = true; } },
     { id: 'undo', icon: '\u21B6', label: 'Undo', shortcut: '\u2318Z', fn: () => { if (canvas) canvas.undoLast(); } },
-    { id: 'selectAll', icon: '\u2610', label: 'Select All Nodes', shortcut: '\u2318A', fn: () => { flowNodes = flowNodes.map(n => ({ ...n, selected: true })); } },
+    { id: 'selectAll', icon: '\u2610', label: 'Count Cards', shortcut: '\u2318A', fn: () => { showToast(cards.length + ' cards on canvas'); } },
     { id: 'mode', icon: '\u25B6', label: mode === 'prep' ? 'Switch to Play' : 'Switch to Prep', fn: () => onModeChange(mode === 'prep' ? 'play' : 'prep') },
     { id: 'theme', icon: '\u263D', label: 'Toggle Dark/Light', fn: toggleTheme },
   ]);
@@ -446,15 +401,6 @@
   // ── NPC cards for turn bar ────────────────────────────────────────────────
   let npcCards = $derived(cards.filter(c => c.genId === 'npc_minor' || c.genId === 'npc_major'));
 
-  // ── Search dim ────────────────────────────────────────────────────────────
-  function isSearchMatch(card) {
-    if (!cardSearch) return true;
-    const q = cardSearch.toLowerCase();
-    return (card.title || '').toLowerCase().includes(q) ||
-      (card.summary || '').toLowerCase().includes(q) ||
-      (card.text || '').toLowerCase().includes(q) ||
-      (card.genId || '').toLowerCase().includes(q);
-  }
 </script>
 
 <!-- ── Template ─────────────────────────────────────────────────────────────── -->
@@ -673,85 +619,33 @@
           />
         {/if}
 
-        <!-- Canvas area — Svelte Flow -->
-        <div class="board-sf-wrap{connectSourceId ? ' connect-mode' : ''}{modeTransitioning ? ' mode-transitioning' : ''}" oncontextmenu={onCanvasContextMenu} bind:this={sfWrap}>
-          <SvelteFlow
-            bind:nodes={flowNodes}
-            bind:edges={flowEdges}
-            {nodeTypes}
-            fitView={fitViewOnLoad}
-            minZoom={0.2}
-            maxZoom={2}
-            defaultViewport={{ x: 20, y: 20, zoom: 0.8 }}
-            deleteKey="Delete"
-            panOnScroll={true}
-            panOnDrag={[1, 2]}
-            selectionOnDrag={false}
-            multiSelectionKey="Shift"
-            onnodedragstop={({ nodes }) => {
-              if (canvas && nodes) canvas.syncNodePositions(nodes);
-            }}
-            onnodeclick={({ node }) => {
-              if (canvas && node)
-                canvas.updateCard(node.id, { z: Date.now() });
-            }}
-            onconnect={(connection) => {
-              if (canvas && connection) canvas.addConnector(connection.source, connection.target);
-            }}
-            ondelete={({ edges }) => {
-              if (canvas && edges) edges.forEach(edge => canvas.removeConnector(edge.id));
-            }}
-            onedgeclick={({ edge }) => {
-              if (!canvas || !edge) return;
-              if (!coachEdge) {
-                coachEdge = true;
-                showToast('\u21D4 Click edge to cycle relationship label');
-              }
-              const LABELS = ['', 'Knows', 'Opposes', 'Ally', 'Fears', 'Owes', 'Loves', 'Rival', 'Commands', 'Seeks'];
-              const current = edge.data?.label || '';
-              const next = LABELS[(LABELS.indexOf(current) + 1) % LABELS.length];
-              canvas.updateConnector(edge.id, { label: next });
-            }}
-          >
-            <Background variant={BackgroundVariant.Dots} gap={24} size={1} />
-            <Controls />
-            <MiniMap
-              nodeColor={(n) => {
-                const C = {
-                  npc_minor:'#e8b83a',npc_major:'#e8793a',backstory:'#4a90d9',
-                  scene:'#3aaa7a',encounter:'#d04a6a',complication:'#d04a6a',
-                  challenge:'#4a90d9',contest:'#6a7dd4',obstacle:'#888888',
-                  countdown:'#e8793a',constraint:'#888888',campaign:'#6a7dd4',
-                  seed:'#e8b83a',faction:'#6a7dd4',compel:'#3aaa7a',
-                  consequence:'#e8793a',custom:'#888888',pc:'#3aaa7a',
-                  sticky:'#fff176',boost:'#f4b942',label:'#c8a96e',
-                };
-                return C[n.type] || '#888888';
-              }}
-              maskColor="rgba(0,0,0,0.5)"
-            />
-            <!-- Empty canvas hint -->
-            {#if loaded && cards.length === 0}
-              <div class="board-sf-empty" aria-hidden="true">
-                <span class="board-sf-empty-icon">◈</span>
-                <span>Right-click to generate, or press <kbd>Space</kbd></span>
-                <span class="board-sf-empty-hint">Click a generator in the left panel to get started</span>
-              </div>
-            {/if}
-          </SvelteFlow>
-
-          <!-- Context menu — inside SF tree so useSvelteFlow() coord conversion works -->
-          <CanvasContextMenu
-            {ctx}
-            onClose={() => { ctx = null; }}
-            onGenerate={ctxGenerate}
-          />
-
-          <!-- Toast -->
-          {#if toast}
-            <div class="board-toast">{toast}</div>
-          {/if}
-        </div>
+        <!-- Canvas area — OgmaCanvas -->
+        <OgmaCanvas
+          bind:this={canvasRef}
+          {cards}
+          connectors={connectorLines}
+          {loaded}
+          {mode}
+          {campId}
+          {cardSearch}
+          {connectSourceId}
+          {modeTransitioning}
+          {playCardIds}
+          {ctx}
+          {toast}
+          onUpdateCard={canvas ? canvas.updateCard : null}
+          onDeleteCard={canvas ? canvas.deleteCard : null}
+          onRerollCard={canvas ? canvas.rerollCard : null}
+          onSendToTable={binder ? binder.sendToTable : null}
+          onOpenCard={(card) => { dossierCard = card; }}
+          onInvoke={(opts) => { pendingInvoke = opts; showDice = true; showToast('\u2726 Invoke queued \u2014 +2 on next roll'); }}
+          onConnect={handleConnectClick}
+          onUpdateConnector={canvas ? canvas.updateConnector : null}
+          onContextMenu={onCanvasContextMenu}
+          onCtxClose={() => { ctx = null; }}
+          onCtxGenerate={ctxGenerate}
+          onEdgeCoach={() => { if (!coachEdge) { coachEdge = true; showToast('\u21D4 Click line to cycle label'); } }}
+        />
       {/if}
     </div>
   </div>

@@ -1,29 +1,25 @@
 <script>
-  // CanvasContextMenu — lives inside <SvelteFlow> tree so useSvelteFlow() works
-  import { useSvelteFlow, Panel } from '@xyflow/svelte';
-  import { getContext } from 'svelte';
+  // CanvasContextMenu — right-click menu for canvas card generation
+  // No SvelteFlow dependency — coords computed by Board.svelte screenToCanvas()
 
   let { ctx = null, onClose = null, onGenerate = null } = $props();
 
-  const { screenToFlowPosition } = useSvelteFlow();
-
   const CTX_ITEMS = [
-    { id: 'npc_minor',   icon: '🧑', label: 'Minor NPC' },
-    { id: 'npc_major',   icon: '👑', label: 'Major NPC' },
-    { id: 'scene',       icon: '🔥', label: 'Scene Setup' },
-    { id: 'encounter',   icon: '⚔',  label: 'Encounter' },
-    { id: 'compel',      icon: '↩',  label: 'Compel' },
-    { id: 'custom',      icon: '✎',  label: 'Custom Card' },
-    { id: 'sticky',      icon: '📝', label: 'Aspect Sticky' },
-    { id: 'boost',       icon: '⚡', label: 'Boost' },
-    { id: 'label',       icon: '🔖', label: 'Section Label' },
+    { id: 'npc_minor',   icon: '\u{1F9D1}', label: 'Minor NPC' },
+    { id: 'npc_major',   icon: '\u{1F451}', label: 'Major NPC' },
+    { id: 'scene',       icon: '\u{1F525}', label: 'Scene Setup' },
+    { id: 'encounter',   icon: '\u2694',    label: 'Encounter' },
+    { id: 'compel',      icon: '\u21A9',    label: 'Compel' },
+    { id: 'custom',      icon: '\u270E',    label: 'Custom Card' },
+    { id: 'sticky',      icon: '\u{1F4DD}', label: 'Aspect Sticky' },
+    { id: 'boost',       icon: '\u26A1',    label: 'Boost' },
+    { id: 'label',       icon: '\u{1F516}', label: 'Section Label' },
   ];
 
   function generate(genId) {
     if (!ctx || !onGenerate) return;
-    // Convert screen coords → canvas coords using SvelteFlow API
-    const canvasPos = screenToFlowPosition({ x: ctx.screenX, y: ctx.screenY });
-    onGenerate(genId, canvasPos.x, canvasPos.y);
+    // ctx.canvasX/canvasY already converted by Board.svelte screenToCanvas()
+    onGenerate(genId, ctx.canvasX, ctx.canvasY);
     if (onClose) onClose();
   }
 </script>
