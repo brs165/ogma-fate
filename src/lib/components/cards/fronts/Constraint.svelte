@@ -1,41 +1,53 @@
 <script>
-  let { data = {}, campName = '', catColor = 'var(--fs-section)' } = $props();
+  import CvLabel from '../CvLabel.svelte';
+
+  export let data = {};
+  export let campName = '';
+  export let catColor = 'var(--accent)';
+
+  const CV4_MONO = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
+  const CV4_SANS = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
 </script>
 
-<div style="display:flex; gap:14px">
-  <div style="flex:1; min-width:0">
-    <div class="fs-section-gap">
-      <div class="fs-stunt" style="border-left:3px solid var(--fs-section); border-radius:0 3px 3px 0; padding:8px 10px">
-        <div style="font-size:10px; font-weight:800; letter-spacing:0.12em; color:var(--fs-section); margin-bottom:3px">RESTRICTED ACTION</div>
-        <div style="font-size:13px; font-weight:600; color:var(--fs-text); line-height:1.35">{data.restricted_action || data.what_resists || data.what || ''}</div>
-      </div>
+<div style="flex:1; padding:12px 16px 14px; display:flex; gap:14px">
+  <!-- Left column -->
+  <div style="flex:1; display:flex; flex-direction:column; gap:8px; min-width:0">
+    <div style="font-size:15px; font-weight:800; color:var(--text); font-family:{CV4_MONO}; line-height:1.1">{data.name || ''}</div>
+
+    <div style="padding:8px 10px; background:color-mix(in srgb,{catColor} 8%,var(--cv-card-dark,var(--panel))); border:1px solid {catColor}33; border-left:3px solid {catColor}; border-radius:0 2px 2px 0">
+      <CvLabel label="RESTRICTED ACTION" color={catColor} />
+      <p style="margin:0; font-size:12px; font-weight:600; color:var(--text); font-family:{CV4_SANS}; line-height:1.35">{data.restricted_action || data.what_resists || data.what || ''}</p>
     </div>
 
-    <div class="fs-section-gap">
-      <div class="fs-stunt" style="border-left:3px solid #c62828; border-radius:0 3px 3px 0">
-        <div class="fs-stunt-name" style="color:#c62828">IF VIOLATED</div>
-        <div class="fs-stunt-desc">{data.consequence || ''}</div>
-      </div>
+    <div style="padding:7px 10px; background:color-mix(in srgb,var(--c-red,#f87171) 8%,var(--cv-card-dark,var(--panel))); border:1px solid var(--c-red,#f87171)33; border-left:3px solid var(--c-red,#f87171); border-radius:0 2px 2px 0">
+      <CvLabel label="IF VIOLATED" color="var(--c-red,#f87171)" />
+      <p style="margin:0; font-size:11px; color:var(--c-red,#f87171); font-family:{CV4_SANS}; line-height:1.4">{data.consequence || ''}</p>
     </div>
 
-    <div class="fs-section-gap">
-      <div class="fs-stunt" style="border-left:3px solid #2e7d32; border-radius:0 3px 3px 0">
-        <div class="fs-stunt-name" style="color:#2e7d32">HOW TO BYPASS</div>
-        <div class="fs-stunt-desc">{data.bypass || ''}</div>
-      </div>
+    <div style="padding:7px 10px; background:var(--inset); border:1px solid var(--cv-card-bdr,var(--border)); border-radius:2px">
+      <CvLabel label="HOW TO BYPASS" color="var(--c-green,#34d399)" />
+      <p style="margin:0; font-size:11px; color:var(--c-green,#34d399); font-family:{CV4_SANS}; line-height:1.4">{data.bypass || ''}</p>
     </div>
   </div>
 
-  <div style="width:100px; flex-shrink:0; text-align:center">
-    <div style="font-size:10px; font-weight:800; letter-spacing:0.12em; color:var(--fs-section); margin-bottom:6px">TYPE</div>
-    <span class="fs-skill-badge" style="font-size:12px; padding:4px 12px; text-transform:capitalize">{data.constraint_type || ''}</span>
+  <!-- Right column -->
+  <div style="width:128px; flex-shrink:0; display:flex; flex-direction:column; gap:8px">
+    <div style="text-align:center">
+      <CvLabel label="TYPE" color={catColor} />
+      <div style="padding:7px 12px; background:color-mix(in srgb,{catColor} 16%,var(--inset)); border:2px solid {catColor}; border-radius:6px; display:inline-block">
+        <div style="font-size:13px; font-weight:800; color:{catColor}; font-family:{CV4_MONO}; text-transform:capitalize">{data.constraint_type || ''}</div>
+      </div>
+    </div>
+
     {#if data.gm_note}
-      <div class="fs-stunt" style="margin-top:10px; text-align:left">
-        <div class="fs-stunt-name">GM NOTE</div>
-        <div class="fs-stunt-desc">{data.gm_note}</div>
+      <div style="padding:7px 10px; background:var(--inset); border:1px solid var(--cv-card-bdr,var(--border)); border-radius:2px">
+        <CvLabel label="GM NOTE" color={catColor} />
+        <p style="margin:0; font-size:11px; color:var(--text-muted); font-family:{CV4_SANS}; line-height:1.5">{data.gm_note}</p>
       </div>
     {:else}
-      <div style="font-size:11px; color:var(--fs-text-muted); margin-top:10px; line-height:1.4">Forces a new approach — not higher rolls</div>
+      <div style="padding:7px 10px; background:var(--inset); border:1px solid var(--cv-card-bdr,var(--border)); border-radius:2px">
+        <p style="margin:0; font-size:11px; color:var(--text-muted); font-family:{CV4_SANS}; line-height:1.5">Forces a new approach — not higher rolls</p>
+      </div>
     {/if}
   </div>
 </div>

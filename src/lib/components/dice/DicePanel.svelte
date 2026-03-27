@@ -2,8 +2,14 @@
   import { onDestroy } from 'svelte';
 
   // ── Props ────────────────────────────────────────────────────────────────
+  export let players       = [];
+  export let selId         = null;
+  export let spendFP       = null;
+  export let onRoll        = null;
+  export let pendingInvoke = null;
+  export let onClearInvoke = null;
+
   // ── Ladder data ───────────────────────────────────────────────────────────
-  let { players = [], selId = null, spendFP = null, onRoll = null, pendingInvoke = null, onClearInvoke = null } = $props();
   const TP_LADDER = [
     {v:8,l:'Legendary'},{v:7,l:'Epic'},{v:6,l:'Fantastic'},{v:5,l:'Superb'},
     {v:4,l:'Great'},{v:3,l:'Good'},{v:2,l:'Fair'},{v:1,l:'Average'},
@@ -29,20 +35,20 @@
   }
 
   // ── State ─────────────────────────────────────────────────────────────────
-  let dice = $state(['+', '0', '+', '−']);
-  let phase = $state('idle');   // idle | flicker | reveal | done
-  let revealCount = $state(0);
-  let result = $state(null);
-  let activeSk = $state(null);
-  let boosted = $state(false);
-  let history = $state([]);
-  let diff = $state(0);
-  let ladderOpen = $state(false);
-  let flickerFaces = $state(['+', '0', '−', '+']);
+  let dice         = ['+', '0', '+', '−'];
+  let phase        = 'idle';   // idle | flicker | reveal | done
+  let revealCount  = 0;
+  let result       = null;
+  let activeSk     = null;
+  let boosted      = false;
+  let history      = [];
+  let diff         = 0;
+  let ladderOpen   = false;
+  let flickerFaces = ['+', '0', '−', '+'];
 
   // Timer refs
-  let flickerTimer = $state(null);
-  let revealTimer = $state(null);
+  let flickerTimer = null;
+  let revealTimer  = null;
 
   onDestroy(() => {
     if (flickerTimer) clearInterval(flickerTimer);
@@ -50,14 +56,14 @@
   });
 
   // ── Derived ───────────────────────────────────────────────────────────────
-  let player = $derived(players.find(p => p.id === selId) || null);
-  let mod = $derived(activeSk ? (activeSk.v != null ? activeSk.v : activeSk.r || 0) : 0);
-  let invokeBonus = $derived(pendingInvoke ? 2 : 0);
-  let final = $derived(result != null ? result + mod + (boosted ? 2 : 0) + invokeBonus : null);
-  let rolling = $derived(phase === 'flicker' || phase === 'reveal');
+  $: player      = players.find(p => p.id === selId) || null;
+  $: mod         = activeSk ? (activeSk.v != null ? activeSk.v : activeSk.r || 0) : 0;
+  $: invokeBonus = pendingInvoke ? 2 : 0;
+  $: final       = result != null ? result + mod + (boosted ? 2 : 0) + invokeBonus : null;
+  $: rolling     = phase === 'flicker' || phase === 'reveal';
 
   // Outcome calculation
-  let outcomeData = $derived((() => {
+  $: outcomeData = (() => {
     if (phase !== 'done' || final == null) return null;
     const margin  = final - diff;
     const outcome = margin >= 3 ? 'Succeed w/ Style'
@@ -75,7 +81,7 @@
       'Fail':             "You don't get what you want, and it may get worse",
     };
     return { outcome, outCol, hint: hints[outcome], margin };
-  })());
+  })();
 
   // ── Die class helper ──────────────────────────────────────────────────────
   function dieClass(f, isFlicker, isHidden, isPop) {
@@ -122,7 +128,7 @@
             result = raw;
             phase  = 'done';
             const skVal = sk.v != null ? sk.v : sk.r || 0;
-            let total = raw + skVal;
+            let total   = raw + skVal;
             if (pendingInvoke) total += 2;
             const entry = {
               who:   player ? player.name : '?',
@@ -144,7 +150,7 @@
   }
 
   // Stats derived from history
-  let stats = $derived((() => {
+  $: stats = (() => {
     if (history.length < 3) return null;
     const totals = history.map(r => r.total);
     const avg    = totals.reduce((a,b) => a+b, 0) / totals.length;
@@ -156,7 +162,7 @@
       byPlayer[r.who].push(r.total);
     });
     return { avg, hi, lo, byPlayer };
-  })());
+  })();
 </script>
 
 <div class="tp-dice-v2" role="region" aria-label="Dice roller">
@@ -226,7 +232,7 @@
       <span style="font-size:10px; color:var(--text-muted); font-style:italic">
          — {pendingInvoke.label || 'aspect'}
       </span>
-      <button class="tp-dice-invoke-clear" onclick={onClearInvoke} aria-label="Cancel invoke">✕</button>
+      <button class="tp-dice-invoke-clear" on:click={onClearInvoke} aria-label="Cancel invoke">✕</button>
     </div>
   {/if}
 
@@ -255,7 +261,7 @@
     <button
       class="dr-btn"
       disabled={rolling}
-      onclick={() => doRoll({ l: '4dF', v: 0 })}
+      on:click={() => doRoll({ l: '4dF', v: 0 })}
       aria-label="Roll 4 Fate dice"
     >{rolling ? '…' : '🎲 Roll 4dF'}</button>
 
@@ -264,7 +270,7 @@
         class="dr-btn"
         class:tp-dice-boosted={boosted}
         disabled={!player || (player.fp || 0) <= 0 || boosted}
-        onclick={() => { if (!player || boosted || result == null) return; if (spendFP) spendFP(selId); boosted = true; }}
+        on:click={() => { if (!player || boosted || result == null) return; if (spendFP) spendFP(selId); boosted = true; }}
         title="Spend 1 FP for +2"
         style="min-width:0; padding:6px 16px"
       >{boosted ? '✅ +2' : '⦿ FP +2'}</button>
@@ -276,7 +282,7 @@
       <div class="tp-ladder-wrap">
         <button
           class="tp-ladder-sel"
-          onclick={() => ladderOpen = !ladderOpen}
+          on:click={() => ladderOpen = !ladderOpen}
           aria-expanded={String(ladderOpen)}
           aria-haspopup="listbox"
           title="Select opposition difficulty"
@@ -295,7 +301,7 @@
                 class:selected={sel}
                 role="option"
                 aria-selected={String(sel)}
-                onclick={() => { diff = row.v; ladderOpen = false; }}
+                on:click={() => { diff = row.v; ladderOpen = false; }}
               >
                 <span class="tp-ladder-opt-val" style="color:{tpLcolHex(row.v)}">{row.v >= 0 ? '+' : ''}{row.v}</span>
                 <span class="tp-ladder-opt-name">{row.l}</span>
@@ -316,7 +322,7 @@
         <button
           class="tp-dice-skill-pill"
           class:active={isSel}
-          onclick={() => doRoll(sk)}
+          on:click={() => doRoll(sk)}
         >
           <span class="tp-dice-skill-name">{sk.l || sk.name}</span>
           <span class="tp-dice-skill-val" style="color:{tpLcolHex(v)}">{v >= 0 ? '+' : ''}{v}</span>

@@ -1,52 +1,12 @@
-// canvasStore.js — Canvas state: card CRUD, generate, connectors, undo, IDB persist, SvelteFlow derived stores
+// canvasStore.js — from useBoardCards (react-source/core/ui-board.js L2387-2593)
 // Factory: createCanvasStore(campCanvasKey, tables, showToast, onCardsChange)
 import { writable, get } from 'svelte/store';
-import { generate, mergeUniversal, filteredTables, GENERATORS } from '../engine.js';
+import { generate, mergeUniversal, GENERATORS } from '../engine.js';
 import DB from '../db.js';
 import { boardUid, extractCardTitle, extractCardSummary, extractCardTags, STICKY_COLORS } from '../helpers.js';
 
-// ── Session Zero pack generator (standalone, no store dependency) ─────────
-export function generateSzPack(pcDrafts, campId, campName, campData, mode) {
-  const tables = filteredTables(mergeUniversal(campData.tables || {}), {});
-  const allCards = [];
-  const CARD_W = 646, CARD_GAP = 24, COLS = 2;
-
-  // Campaign Frame card
-  try {
-    const frameData = generate('campaign', tables, 4, {});
-    allCards.push({ id: boardUid(), genId: 'campaign', sourceCanvas: 'prep', title: campName + ' — Campaign Frame', summary: '', tags: [], data: frameData, x: 24, y: 24, z: Date.now(), ts: Date.now(), gmOnly: false });
-  } catch(e) {}
-
-  // Per-PC cards
-  pcDrafts.forEach((pc, idx) => {
-    const col = (idx + 1) % COLS;
-    const row = Math.floor((idx + 1) / COLS);
-    const baseX = 24 + col * (CARD_W + CARD_GAP);
-    const baseY = 24 + row * 600;
-
-    let pcData = {};
-    try { pcData = generate('pc', tables, 4, {}); } catch(e) {}
-    if (pc.name) pcData.name = pc.name;
-    if (pc.hc) pcData.aspects = { ...pcData.aspects, high_concept: pc.hc };
-    if (pc.trouble) pcData.aspects = { ...pcData.aspects, trouble: pc.trouble };
-
-    allCards.push({ id: boardUid(), genId: 'pc', sourceCanvas: 'prep', title: pc.name || ('Player ' + (idx + 1)), summary: pc.hc || '', tags: [], data: pcData, x: baseX, y: baseY, z: Date.now() + idx, ts: Date.now(), gmOnly: false });
-
-    if (pc.hc) allCards.push({ id: boardUid(), genId: 'sticky', sourceCanvas: 'prep', text: pc.hc, colorIdx: idx % 4, rotation: Math.random() * 4 - 2, x: baseX, y: baseY + 520, z: Date.now() + idx + 0.1, ts: Date.now() });
-    if (pc.trouble) allCards.push({ id: boardUid(), genId: 'sticky', sourceCanvas: 'prep', text: pc.trouble, colorIdx: (idx + 2) % 4, rotation: Math.random() * 4 - 2, x: baseX + CARD_W / 2, y: baseY + 520, z: Date.now() + idx + 0.2, ts: Date.now() });
-
-    try {
-      const bsData = generate('backstory', tables, 4, {});
-      allCards.push({ id: boardUid(), genId: 'backstory', sourceCanvas: 'prep', title: (pc.name || 'Player ' + (idx + 1)) + ' — Backstory', summary: '', tags: [], data: bsData, x: baseX, y: baseY + 660, z: Date.now() + idx + 0.3, ts: Date.now(), gmOnly: false });
-    } catch(e) {}
-  });
-
-  return allCards;
-}
-
 export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChange) {
   const cards  = writable([]);
-  const connectors = writable([]);
   const loaded = writable(false);
 
   let undoStack   = [];
@@ -55,20 +15,9 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
   // Load canvas from IDB when key changes
   if (DB) {
     DB.loadSession(campCanvasKey).then(saved => {
-      if (saved && Array.isArray(saved.cards)) {
-        let loadedCards = saved.cards;
-        // Play canvas guard: strip any prep-sourced cards
-        const isPlayCanvas = campCanvasKey.includes('board_play');
-        if (isPlayCanvas) {
-          loadedCards = loadedCards.filter(c => c.sourceCanvas !== 'prep');
-        }
-        cards.set(loadedCards);
-      }
+      if (saved && Array.isArray(saved.cards)) cards.set(saved.cards);
       loaded.set(true);
     }).catch(() => loaded.set(true));
-    DB.loadSession(campCanvasKey + '_connectors').then(saved => {
-      if (saved && Array.isArray(saved.connectors)) connectors.set(saved.connectors);
-    }).catch(() => {});
   } else {
     loaded.set(true);
   }
@@ -135,8 +84,8 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
         y: y !== undefined ? y : lastPlaced.y,
         z: Date.now(), ts: Date.now(), gmOnly: false,
       };
-      lastPlaced.col = (lastPlaced.col + 1) % 2;
-      if (lastPlaced.col === 0) { lastPlaced.x = 60; lastPlaced.y += 700; } else { lastPlaced.x += 670; }
+      lastPlaced.col = (lastPlaced.col + 1) % 3;
+      if (lastPlaced.col === 0) { lastPlaced.x = 60; lastPlaced.y += 420; } else { lastPlaced.x += 340; }
       mutate(prev => prev.concat([customCard]));
       showToast('✎ Custom Card added — click title or notes to edit');
       return;
@@ -152,8 +101,8 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
       cardX = x; cardY = y;
     } else {
       cardX = lastPlaced.x; cardY = lastPlaced.y;
-      lastPlaced.col = (lastPlaced.col + 1) % 2;
-      if (lastPlaced.col === 0) { lastPlaced.x = 60; lastPlaced.y += 700; } else { lastPlaced.x += 670; }
+      lastPlaced.col = (lastPlaced.col + 1) % 3;
+      if (lastPlaced.col === 0) { lastPlaced.x = 60; lastPlaced.y += 420; } else { lastPlaced.x += 340; }
     }
     const card = {
       id: boardUid(), genId,
@@ -172,7 +121,6 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
   }
 
   function deleteCard(id) {
-    removeCardConnectors(id);
     cards.update(prev => {
       const removing = prev.find(c => c.id === id);
       if (removing) {
@@ -216,9 +164,6 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
     } else if (entry.type === 'reroll') {
       mutate(prev => prev.map(c => c.id === entry.id ? entry.prev : c));
       showToast('Reroll undone (' + undoStack.length + ' left)');
-    } else if (entry.type === 'move') {
-      mutate(prev => prev.map(c => entry.positions[c.id] ? Object.assign({}, c, entry.positions[c.id]) : c));
-      showToast('Move undone (' + undoStack.length + ' left)');
     }
   }
 
@@ -243,116 +188,11 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
     });
   }
 
-  function generateCardWithData(genId, data, x, y) {
-    if (!data) return;
-    const card = {
-      id: boardUid(),
-      genId,
-      title: extractCardTitle(genId, data),
-      summary: extractCardSummary(genId, data),
-      tags: extractCardTags(genId, data),
-      data,
-      x: x !== undefined ? x : 80,
-      y: y !== undefined ? y : 80,
-      z: Date.now(),
-      ts: Date.now(),
-      gmOnly: false,
-    };
-    mutate(prev => prev.concat([card]));
-    if (showToast) showToast('Session Zero PC added to canvas');
-  }
-
-  function persistConnectors() {
-    if (!DB) return;
-    DB.saveSession(campCanvasKey + '_connectors', { connectors: get(connectors), ts: Date.now() }).catch(() => {});
-  }
-
-  function addConnector(fromId, toId) {
-    if (fromId === toId) return;
-    const existing = get(connectors);
-    if (existing.find(c => (c.fromId === fromId && c.toId === toId) || (c.fromId === toId && c.toId === fromId))) return;
-    connectors.update(cs => cs.concat([{ id: boardUid(), fromId, toId }]));
-    persistConnectors();
-  }
-
-  function removeConnector(connId) {
-    connectors.update(cs => cs.filter(c => c.id !== connId));
-    persistConnectors();
-  }
-
-  function updateConnector(connId, patch) {
-    connectors.update(cs => cs.map(c => c.id === connId ? Object.assign({}, c, patch) : c));
-    persistConnectors();
-  }
-
-  function removeCardConnectors(cardId) {
-    connectors.update(cs => cs.filter(c => c.fromId !== cardId && c.toId !== cardId));
-    persistConnectors();
-  }
-
-  function clearCanvas() {
-    connectors.set([]);
-    persistConnectors();
-    mutate(() => []);
-    if (showToast) showToast('Canvas cleared');
-  }
-
-  function loadBinderToCanvas(binderCards) {
-    if (!binderCards || binderCards.length === 0) return;
-    const existing = get(cards);
-    if (existing.length > 0) return;
-
-    const CARD_W = 646;
-    const CARD_GAP = 24;
-    const COLS = 2;
-    const ROW_H = 700;
-    const START_X = 24;
-    const START_Y = 24;
-
-    const placed = binderCards.map((bc, i) => {
-      const col = i % COLS;
-      const row = Math.floor(i / COLS);
-      return {
-        id: boardUid(),
-        genId: bc.genId,
-        title: bc.title || extractCardTitle(bc.genId, bc.data || {}),
-        summary: bc.summary || extractCardSummary(bc.genId, bc.data || {}),
-        tags: bc.tags || extractCardTags(bc.genId, bc.data || {}),
-        data: bc.data,
-        x: START_X + col * (CARD_W + CARD_GAP),
-        y: START_Y + row * ROW_H,
-        z: Date.now() + i,
-        ts: Date.now(),
-        gmOnly: false,
-        _fromBinder: true,
-      };
-    });
-
-    mutate(() => placed);
-    if (showToast) showToast(placed.length + ' binder cards loaded to canvas');
-  }
-
-  // WC-08: Create a sticky with pre-filled text (used by consequence auto-placement)
-  function addStickyWithText(text, colorIdx, rotation) {
-    const sticky = {
-      id: boardUid(), genId: 'sticky', text: text || '"Aspect"',
-      colorIdx: colorIdx != null ? colorIdx : Math.floor(Math.random() * STICKY_COLORS.length),
-      rotation: rotation != null ? rotation : (Math.random() * 6 - 3),
-      x: 80 + Math.random() * 400,
-      y: 80 + Math.random() * 300,
-      z: Date.now(), ts: Date.now(),
-    };
-    mutate(prev => prev.concat([sticky]));
-  }
-
   return {
-    cards, loaded, connectors,
+    cards, loaded,
     getCards: () => get(cards),
     persistCanvas,
-    generateCard, generateCardWithData, loadBinderToCanvas,
-    updateCard, deleteCard, rerollCard,
-    addConnector, removeConnector, updateConnector, removeCardConnectors, clearCanvas,
-    addStickyWithText,
+    generateCard, updateCard, deleteCard, rerollCard,
     undoLast, exportCanvas, importCanvas,
   };
 }

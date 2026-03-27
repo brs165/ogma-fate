@@ -1,22 +1,15 @@
 <script>
-  import { Collapsible } from 'bits-ui';
   // ── PlayerRow — player FP, stress, consequences, concede, compel ─────────────
-  let { player = {}, sel = false, onUpd = null, onSel = null, onCompel = null } = $props();
-  let expanded = $state(false);
-  let fpAnimKey = $state(0);
-  let fpAnimDir = $state('');
-  let stressShake = $state(false);
+  export let player   = {};
+  export let sel      = false;
+  export let onUpd    = null;
+  export let onSel    = null;
+  export let onCompel = null;
 
-  function shakeIfFull(hits) {
-    const marked = hits.filter(Boolean).length;
-    if (marked === hits.length) {
-      stressShake = true;
-      setTimeout(() => { stressShake = false; }, 400);
-    }
-  }
+  let expanded = false;
 
-  let fpCol = $derived(player.fp === 0 ? 'var(--c-red)' : player.fp < player.ref ? 'var(--c-amber,#f4b942)' : 'var(--c-green)');
-  let conseq = $derived(player.conseq || ['', '', '']);
+  $: fpCol = player.fp === 0 ? 'var(--c-red)' : player.fp < player.ref ? 'var(--c-amber,#f4b942)' : 'var(--c-green)';
+  $: conseq = player.conseq || ['', '', ''];
 
   function setConseq(i, val) {
     const n = conseq.slice();
@@ -41,14 +34,12 @@
     const a = (player.phy || []).slice();
     a[i] = !a[i];
     if (onUpd) onUpd({ phy: a });
-    shakeIfFull(a);
   }
 
   function toggleMen(i) {
     const a = (player.men || []).slice();
     a[i] = !a[i];
     if (onUpd) onUpd({ men: a });
-    shakeIfFull(a);
   }
 
   function onStressKeyDown(fn, i, e) {
@@ -62,9 +53,9 @@
     if (onUpd) onUpd({ fp: (player.fp || 0) + conseqCount, acted: true });
   }
 
-  let conseqFilled = $derived((player.conseq || []).filter(c => c).length);
+  $: conseqFilled = (player.conseq || []).filter(c => c).length;
 
-  let labels = $derived(conseq.length >= 4
+  $: labels = conseq.length >= 4
     ? [
         {name:'Mild', rec:'end of next scene'},
         {name:'Moderate', rec:'end of session'},
@@ -75,7 +66,7 @@
         {name:'Mild', rec:'end of next scene'},
         {name:'Moderate', rec:'end of session'},
         {name:'Severe', rec:'end of scenario'},
-      ]);
+      ];
 </script>
 
 <div
@@ -90,20 +81,20 @@
     tabindex="0"
     aria-expanded={String(!!sel)}
     aria-label="{sel ? 'Collapse ' : 'Expand '}{player.name}"
-    onclick={toggleSel}
-    onkeydown={onRowKeyDown}
+    on:click={toggleSel}
+    on:keydown={onRowKeyDown}
   >
     <div class="rs-player-dot" style="background:{player.color || 'var(--accent)'}"></div>
     <div class="rs-player-name">{player.name}</div>
     {#if sel}
       <button
         style="background:none; border:none; cursor:pointer; font-size:10px; color:var(--text-muted); padding:0 2px; flex-shrink:0"
-        onclick={(e) => { e.stopPropagation(); (() => (expanded = !expanded))(e); }}
+        on:click|stopPropagation={() => (expanded = !expanded)}
       >{expanded ? '▲' : '▼'}</button>
     {/if}
     <button
       style="background:none; border:none; cursor:pointer; font-size:12px; color:{player.acted ? 'var(--c-green)' : 'var(--border-mid)'}; padding:0 2px; flex-shrink:0; line-height:1"
-      onclick={toggleActed}
+      on:click={toggleActed}
       aria-label={player.acted ? 'Mark unacted' : 'Mark acted'}
     >{player.acted ? '●' : '○'}</button>
   </div>
@@ -117,51 +108,49 @@
   <div class="rs-fp-row">
     <span class="rs-fp-label">FP</span>
     <button class="rs-fp-btn"
-      onclick={() => { fpAnimDir='spend'; fpAnimKey++; onUpd && onUpd({ fp: Math.max(0, player.fp - 1) }); }}
+      on:click={() => onUpd && onUpd({ fp: Math.max(0, player.fp - 1) })}
       aria-label="Spend FP">−</button>
-    {#key fpAnimKey}<span class="rs-fp-num fp-anim-{fpAnimDir}" style="color:{fpCol}">{player.fp}</span>{/key}
+    <span class="rs-fp-num" style="color:{fpCol}">{player.fp}</span>
     <button class="rs-fp-btn"
-      onclick={() => { fpAnimDir='gain'; fpAnimKey++; onUpd && onUpd({ fp: player.fp + 1 }); }}
+      on:click={() => onUpd && onUpd({ fp: player.fp + 1 })}
       aria-label="Gain FP">+</button>
   </div>
 
   <!-- Stress row -->
-  <div class="rs-stress-row{stressShake ? ' rs-stress-shake' : '' }">
-    <span class="rs-fp-label rs-stress-label-phy">PHY</span>
+  <div class="rs-stress-row">
+    <span class="rs-fp-label">PHY</span>
     <div style="display:flex; gap:2px">
       {#each (player.phy || []) as v, i}
         <div
-          class="rs-stress-box rs-stress-phy{v ? ' filled' : ''}"
+          class="rs-stress-box{v ? ' filled' : ''}"
           role="checkbox"
           aria-checked={String(!!v)}
           aria-label="Physical stress {i + 1}"
-          title="{v ? 'Clear' : 'Mark'} Physical {i + 1}"
           tabindex="0"
-          onclick={() => { togglePhy(i); }}
-          onkeydown={e => onStressKeyDown(togglePhy, i, e)}
+          on:click={() => togglePhy(i)}
+          on:keydown={e => onStressKeyDown(togglePhy, i, e)}
         ></div>
       {/each}
     </div>
-    <span class="rs-fp-label rs-stress-label-men" style="margin-left:4px">MEN</span>
+    <span class="rs-fp-label" style="margin-left:4px">MEN</span>
     <div style="display:flex; gap:2px">
       {#each (player.men || []) as v, i}
         <div
-          class="rs-stress-box rs-stress-men{v ? ' filled' : ''}"
+          class="rs-stress-box{v ? ' filled' : ''}"
+          style="border-color:var(--c-purple)"
           role="checkbox"
           aria-checked={String(!!v)}
           aria-label="Mental stress {i + 1}"
-          title="{v ? 'Clear' : 'Mark'} Mental {i + 1}"
           tabindex="0"
-          onclick={() => { toggleMen(i); }}
-          onkeydown={e => onStressKeyDown(toggleMen, i, e)}
+          on:click={() => toggleMen(i)}
+          on:keydown={e => onStressKeyDown(toggleMen, i, e)}
         ></div>
       {/each}
     </div>
   </div>
 
-  <!-- Expanded: consequences + buttons — Bits UI Collapsible for animated height -->
-  <Collapsible.Root open={expanded}>
-    <Collapsible.Content class="rs-player-collapsible">
+  <!-- Expanded: consequences + buttons -->
+  {#if expanded}
     <div style="padding:0 8px 7px">
       <div style="font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
                   color:var(--text-muted); margin-bottom:3px">Consequences</div>
@@ -174,8 +163,11 @@
               value={conseq[i] || ''}
               placeholder="empty"
               aria-label="{slot.name} consequence"
-              oninput={e => setConseq(i, e.currentTarget.value)}
-              class="rs-conseq-input{conseq[i] ? ' filled' : ''}"
+              on:input={e => setConseq(i, e.currentTarget.value)}
+              style="flex:1; background:var(--inset);
+                     border:1px solid {conseq[i] ? 'var(--c-amber,#f4b942)' : 'var(--border)'};
+                     border-radius:4px; padding:2px 5px; font-size:10px; color:var(--text);
+                     font-family:var(--font-ui); outline:none"
             />
           </div>
           {#if conseq[i]}
@@ -188,7 +180,7 @@
 
       <button
         class="rs-concede-btn"
-        onclick={doConcedeClick}
+        on:click={doConcedeClick}
         disabled={!player.conseq || !player.conseq.some(c => c)}
         aria-label="Concede conflict"
         title="FCon p.35: exit conflict, earn 1 FP per consequence taken"
@@ -197,13 +189,12 @@
       {#if onCompel}
         <button
           class="rs-concede-btn"
-          onclick={() => onCompel(player)}
+          on:click={() => onCompel(player)}
           aria-label="Offer compel to {player.name}"
           title="FCon p.20: offer FP through aspect"
           style="border-color:var(--c-purple); color:var(--c-purple)"
         >↩ Compel</button>
       {/if}
     </div>
-  </Collapsible.Content>
-  </Collapsible.Root>
+  {/if}
 </div>

@@ -1,7 +1,6 @@
-// chromeStore.js — Chrome: toast queue, theme toggle, SW update, PWA lifecycle
+// chromeStore.js — from useChromeHooks (react-source/core/ui.js L1550-1642)
 // Factory: createChromeStore(campId)
 import { writable } from 'svelte/store';
-import { LS } from '../db.js';
 
 const TOAST_MS = 2500;
 
@@ -24,7 +23,7 @@ export function createChromeStore(campId) {
 
   function dismissPwaNudge() {
     showPwaNudge.set(false);
-    LS.set('pwa_nudge_dismissed', true);
+    try { localStorage.setItem('pwa_nudge_dismissed', 'true'); } catch (e) {}
   }
 
   function installPwa() {
@@ -39,8 +38,14 @@ export function createChromeStore(campId) {
   // PWA install nudge
   function initPwaNudge() {
     if (typeof window === 'undefined') return () => {};
-    if (LS.get('pwa_nudge_dismissed')) return () => {};
-    let visits = LS.incrementVisitCount(campId);
+    let dismissed = false;
+    try { dismissed = !!localStorage.getItem('pwa_nudge_dismissed'); } catch (e) {}
+    if (dismissed) return () => {};
+    let visits = 0;
+    try {
+      visits = (parseInt(localStorage.getItem('visit_count_' + campId) || '0', 10) || 0) + 1;
+      localStorage.setItem('visit_count_' + campId, String(visits));
+    } catch (e) {}
     function onBeforeInstall(e) {
       e.preventDefault();
       deferredInstallPrompt = e;
@@ -65,10 +70,14 @@ export function createChromeStore(campId) {
     const isSafari = /^((?!chrome|android|crios|fxios).)*safari/i.test(ua);
     const isStandalone = ('standalone' in navigator) && navigator.standalone;
     if ((isIOS || isSafari) && !isStandalone) {
-      if (!LS.get('safari_warn_dismissed')) showSafariWarn.set(true);
+      let warnDismissed = false;
+      try { warnDismissed = !!localStorage.getItem('safari_warn_dismissed'); } catch (e) {}
+      if (!warnDismissed) showSafariWarn.set(true);
     }
     if (isIOS && isSafari && !isStandalone) {
-      if (!LS.get('ios_install_dismissed')) showIosInstall.set(true);
+      let iosDismissed = false;
+      try { iosDismissed = !!localStorage.getItem('ios_install_dismissed'); } catch (e) {}
+      if (!iosDismissed) showIosInstall.set(true);
     }
   }
 

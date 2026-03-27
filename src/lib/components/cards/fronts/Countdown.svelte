@@ -1,38 +1,45 @@
 <script>
+  import CvLabel from '../CvLabel.svelte';
   import ClockTrack from '../ClockTrack.svelte';
-  let { data = {}, campName = '', catColor = 'var(--fs-section)', cardState = {}, onUpdate = () => {} } = $props();
 
-  let boxes = $derived(data.boxes || 4);
-  let filled = $derived(cardState?.cdFilled ?? 0);
+  export let data = {};
+  export let campName = '';
+  export let catColor = 'var(--accent)';
+  export let cardState = {};
+  export let onUpdate = () => {};
+
+  const CV4_MONO = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
+  const CV4_SANS = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
+
+  $: boxes  = data.boxes || 4;
+  $: filled = cardState?.cdFilled ?? 0;
 
   function setFilled(n) { onUpdate({ cdFilled: n }); }
 </script>
 
-<div style="display:flex; gap:14px">
-  <div style="flex:1; min-width:0">
-    <div class="fs-section-gap">
-      <div class="fs-section-hdr">TRIGGER</div>
-      <div style="font-size:12px; color:var(--fs-text-dim); line-height:1.4">{data.trigger || ''}</div>
+<div style="flex:1; padding:12px 16px 14px; display:flex; gap:14px">
+  <!-- Left column -->
+  <div style="flex:1; display:flex; flex-direction:column; gap:8px; min-width:0">
+    <div style="font-size:15px; font-weight:800; color:var(--text); font-family:{CV4_MONO}; line-height:1.1">{data.name || ''}</div>
+
+    <div>
+      <CvLabel label="TRIGGER" color={catColor} />
+      <p style="margin:0; font-size:11px; color:var(--text-dim); font-family:{CV4_SANS}; line-height:1.4">{data.trigger || ''}</p>
     </div>
 
-    <div class="fs-section-gap">
-      <div class="fs-stunt" style="border-left:3px solid #c62828; border-radius:0 3px 3px 0">
-        <div class="fs-stunt-name" style="color:#c62828">OUTCOME WHEN FULL</div>
-        <div class="fs-stunt-desc" style="color:#c62828; font-weight:600">{data.outcome || ''}</div>
-      </div>
+    <div style="padding:7px 10px; background:color-mix(in srgb,var(--c-red,#f87171) 8%,var(--cv-card-dark,var(--panel))); border:1px solid var(--c-red,#f87171)33; border-left:3px solid var(--c-red,#f87171); border-radius:0 2px 2px 0">
+      <CvLabel label="OUTCOME WHEN FULL" color="var(--c-red,#f87171)" />
+      <p style="margin:0; font-size:11px; font-weight:600; color:var(--c-red,#f87171); font-family:{CV4_SANS}; line-height:1.35">{data.outcome || ''}</p>
     </div>
-
-    {#if data.unit}
-      <div class="fs-section-gap">
-        <div class="fs-stunt">
-          <div class="fs-stunt-name">UNIT</div>
-          <div style="font-size:13px; font-weight:700; color:var(--fs-text); text-transform:capitalize">{data.unit}</div>
-        </div>
-      </div>
-    {/if}
   </div>
 
-  <div style="width:140px; flex-shrink:0">
-    <ClockTrack {boxes} {filled} {setFilled} color="var(--fs-badge-bg, var(--fs-section))" />
+  <!-- Right column -->
+  <div style="width:160px; flex-shrink:0; display:flex; flex-direction:column; gap:8px">
+    <ClockTrack {boxes} {filled} {setFilled} color={catColor} />
+
+    <div style="padding:7px 10px; background:var(--inset); border:1px solid var(--cv-card-bdr,var(--border)); border-radius:2px">
+      <CvLabel label="UNIT" color={catColor} />
+      <div style="font-size:13px; font-weight:700; color:var(--text); text-transform:capitalize; font-family:{CV4_MONO}">{data.unit || ''}</div>
+    </div>
   </div>
 </div>

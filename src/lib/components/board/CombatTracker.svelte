@@ -1,5 +1,9 @@
 <script>
-  let { players = [], npcCards = [], onToggleActed = () => {}, onToggleNpcActed = () => {} } = $props();</script>
+  export let players = [];
+  export let npcCards = [];
+  export let onToggleActed = () => {};
+  export let onToggleNpcActed = () => {};
+</script>
 
 <div class="ct-wrap">
   <table class="ct-table" role="grid">
@@ -11,7 +15,7 @@
         <th>PHY</th>
         <th>MEN</th>
         <th>Conseq</th>
-        <th><i class="fa-solid fa-check"></i></th>
+        <th>&#x2713;</th>
       </tr>
     </thead>
     <tbody>
@@ -32,7 +36,7 @@
             <button
               class="ct-act-btn"
               class:acted={p.acted}
-              onclick={() => onToggleActed(p.id)}
+              on:click={() => onToggleActed(p.id)}
               aria-label="{p.acted ? 'Mark unacted' : 'Mark acted'} {p.name}"
             >
               {p.acted ? '✓' : '○'}
@@ -53,7 +57,7 @@
             <button
               class="ct-act-btn"
               class:acted={npc.acted}
-              onclick={() => onToggleNpcActed && onToggleNpcActed(npc.id)}
+              on:click={() => onToggleNpcActed && onToggleNpcActed(npc.id)}
             >
               {npc.acted ? '✓' : '○'}
             </button>

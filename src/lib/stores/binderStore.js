@@ -1,4 +1,4 @@
-// binderStore.js — Binder: saved cards, tray, pin/unpin, send to canvas
+// binderStore.js — from useBoardBinder (react-source/core/ui-board.js L2595-2735)
 // Factory: createBinderStore(campId, campMetaName, playCanvasKey, showToast, getCanvasCards, persistCanvas, onTableChange)
 import { writable, get } from 'svelte/store';
 import DB from '../db.js';

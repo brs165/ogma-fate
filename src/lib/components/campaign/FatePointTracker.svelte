@@ -1,7 +1,11 @@
+<svelte:options runes={false} />
+
 <script>
-  let { state = { pcs: [], pool: 0 }, onUpdate = () => {} } = $props();
-  let lastFPAnim = $state(null);
-  let fpTab = $state('fp');
+  export let state = { pcs: [], pool: 0 };
+  export let onUpdate = () => {};
+
+  let lastFPAnim = null;
+  let fpTab = 'fp';
 
   function adjustPC(id, delta) {
     const pc = state.pcs.find(p => p.id === id);
@@ -41,17 +45,30 @@
 
 <div class="fp-tracker">
   <div class="fp-header">
-    <span class="fp-title"><i class="fa-solid fa-coins" aria-hidden="true"></i> Fate Tools</span>
+    <span class="fp-title">&#x25CE; Fate Tools</span>
     {#if fpTab === 'fp'}
-      <button class="btn btn-ghost" onclick={resetAll} title="Reset all to refresh" style="font-size:12px;padding:2px 8px;min-height:0"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> Reset</button>
+      <button class="btn btn-ghost" on:click={resetAll} title="Reset all to refresh" style="font-size:12px;padding:2px 8px;min-height:0">&#x21BA; Reset</button>
     {/if}
   </div>
 
-  <!-- Tab bar — Bits UI Tabs -->
-  <div class="fp-tab-bar">
-    <button class="fp-tab-btn{fpTab==='fp'?' active':''}" onclick={() => fpTab = 'fp'} aria-selected={String(fpTab==='fp')}>◎ FP</button>
-    <button class="fp-tab-btn{fpTab==='ms'?' active':''}" onclick={() => fpTab = 'ms'} aria-selected={String(fpTab==='ms')}>⬡ Miles</button>
-    <button class="fp-tab-btn{fpTab==='pi'?' active':''}" onclick={() => fpTab = 'pi'} title="Popcorn turn order" aria-selected={String(fpTab==='pi')}>🏁 Order</button>
+  <!-- Tab bar -->
+  <div style="display:flex;border-bottom:1px solid var(--border);margin-bottom:10px">
+    <button
+      on:click={() => fpTab = 'fp'}
+      style="flex:1;background:none;border:none;cursor:pointer;padding:6px 4px;font-size:var(--text-label);font-family:var(--font-ui);font-weight:{fpTab==='fp'?700:500};color:{fpTab==='fp'?'var(--accent)':'var(--text-muted)'};border-bottom:2px solid {fpTab==='fp'?'var(--accent)':'transparent'};transition:all .15s;white-space:nowrap"
+      aria-pressed={String(fpTab === 'fp')}
+    >&#x25CE; Fate Points</button>
+    <button
+      on:click={() => fpTab = 'ms'}
+      style="flex:1;background:none;border:none;cursor:pointer;padding:6px 4px;font-size:var(--text-label);font-family:var(--font-ui);font-weight:{fpTab==='ms'?700:500};color:{fpTab==='ms'?'var(--accent)':'var(--text-muted)'};border-bottom:2px solid {fpTab==='ms'?'var(--accent)':'transparent'};transition:all .15s;white-space:nowrap"
+      aria-pressed={String(fpTab === 'ms')}
+    >&#x2B21; Milestones</button>
+    <button
+      on:click={() => fpTab = 'pi'}
+      style="flex:1;background:none;border:none;cursor:pointer;padding:6px 4px;font-size:var(--text-label);font-family:var(--font-ui);font-weight:{fpTab==='pi'?700:500};color:{fpTab==='pi'?'var(--accent)':'var(--text-muted)'};border-bottom:2px solid {fpTab==='pi'?'var(--accent)':'transparent'};transition:all .15s;white-space:nowrap"
+      aria-pressed={String(fpTab === 'pi')}
+      title="Turn Order (Popcorn) \u2014 after you act, choose who goes next. No fixed order."
+    >&#x1F3C1; Turn Order</button>
   </div>
 
   <!-- Fate Points Tab -->
@@ -62,11 +79,11 @@
           <input
             class="fp-pc-name"
             value={pc.name}
-            onchange={(e) => setName(pc.id, e.target.value)}
+            on:change={(e) => setName(pc.id, e.target.value)}
             aria-label="Player character name"
           />
           <div class="fp-controls">
-            <button class="fp-btn fp-minus" onclick={() => adjustPC(pc.id, -1)} aria-label="Spend fate point" disabled={pc.current === 0}>&minus;</button>
+            <button class="fp-btn fp-minus" on:click={() => adjustPC(pc.id, -1)} aria-label="Spend fate point" disabled={pc.current === 0}>&minus;</button>
             <div class="fp-dots">
               {#each [0,1,2,3,4,5] as i}
                 {@const filled = i < pc.current}
@@ -76,24 +93,24 @@
                   class:fp-dot-filled={filled}
                   class:fp-gaining={isAnim && lastFPAnim.dir === 'gain'}
                   class:fp-spending={isAnim && lastFPAnim.dir === 'spend'}
-                  onclick={() => adjustPC(pc.id, i < pc.current ? -1 : 1)}
+                  on:click={() => adjustPC(pc.id, i < pc.current ? -1 : 1)}
                 ></div>
               {/each}
             </div>
-            <button class="fp-btn fp-plus" onclick={() => adjustPC(pc.id, 1)} aria-label="Gain fate point">+</button>
-            {#key pc.current}<span class="fp-count fp-count-anim">{pc.current}</span>{/key}
+            <button class="fp-btn fp-plus" on:click={() => adjustPC(pc.id, 1)} aria-label="Gain fate point">+</button>
+            <span class="fp-count">{pc.current}</span>
           </div>
-          <button class="fp-remove" onclick={() => removePC(pc.id)} aria-label="Remove {pc.name}" title="Remove">&times;</button>
+          <button class="fp-remove" on:click={() => removePC(pc.id)} aria-label="Remove {pc.name}" title="Remove">&times;</button>
         </div>
       {/each}
     </div>
     <div class="fp-pool-row">
       <span class="fp-pool-label">GM Pool</span>
-      <button class="fp-btn fp-minus" onclick={() => adjustPool(-1)} disabled={(state.pool || 0) === 0} aria-label="Decrease GM fate point pool">&minus;</button>
+      <button class="fp-btn fp-minus" on:click={() => adjustPool(-1)} disabled={(state.pool || 0) === 0} aria-label="Decrease GM fate point pool">&minus;</button>
       <span class="fp-pool-count" aria-live="polite" aria-label="GM Pool: {state.pool || 0} fate points">{state.pool || 0}</span>
-      <button class="fp-btn fp-plus" onclick={() => adjustPool(1)} aria-label="Increase GM fate point pool">+</button>
+      <button class="fp-btn fp-plus" on:click={() => adjustPool(1)} aria-label="Increase GM fate point pool">+</button>
     </div>
-    <button class="fp-add-pc" onclick={addPC}>+ Add PC</button>
+    <button class="fp-add-pc" on:click={addPC}>+ Add PC</button>
   {/if}
 
   <!-- Milestones Tab -->

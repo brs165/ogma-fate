@@ -1,32 +1,42 @@
 <script>
-  let { data = {}, campName = '', catColor = 'var(--fs-section)' } = $props();
+  import CvLabel from '../CvLabel.svelte';
+  import CvTag from '../CvTag.svelte';
+
+  export let data = {};
+  export let campName = '';
+  export let catColor = 'var(--accent)';
+
+  const CV4_MONO = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
+  const CV4_SANS = "'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif";
 </script>
 
-<div class="fs-section-gap">
-  <div class="fs-stunt" style="border-left:3px solid var(--fs-section); border-radius:0 3px 3px 0; padding:8px 10px">
-    <div style="font-size:10px; font-weight:800; letter-spacing:0.12em; color:var(--fs-section); margin-bottom:3px">NEW SCENE ASPECT</div>
-    <div style="font-size:13px; font-weight:700; color:var(--fs-text); line-height:1.3; margin-bottom:4px">{data.new_aspect || ''}</div>
-    {#if data.type}<span class="fs-skill-badge" style="font-size:9px; padding:2px 8px; text-transform:uppercase">{(data.type || '').toUpperCase()}</span>{/if}
+<div style="flex:1; padding:12px 16px 14px; display:flex; gap:14px">
+  <!-- Left column -->
+  <div style="flex:1; display:flex; flex-direction:column; gap:8px; min-width:0">
+    <div style="padding:8px 10px; background:color-mix(in srgb,{catColor} 8%,var(--cv-card-dark,var(--panel))); border:1px solid {catColor}33; border-left:3px solid {catColor}; border-radius:0 2px 2px 0">
+      <CvLabel label="NEW SCENE ASPECT" color={catColor} />
+      <div style="font-size:12px; font-weight:700; color:var(--text); font-family:{CV4_SANS}; line-height:1.3; margin-bottom:4px">{data.new_aspect || ''}</div>
+      {#if data.type}<CvTag text={(data.type || '').toUpperCase()} color={catColor} />{/if}
+    </div>
+
+    {#if data.arrival}
+      <div>
+        <CvLabel label="ARRIVAL" color={catColor} />
+        <p style="margin:0; font-size:11px; color:var(--text-dim); font-family:{CV4_SANS}; line-height:1.4">{data.arrival}</p>
+      </div>
+    {/if}
   </div>
-</div>
 
-{#if data.arrival}
-  <div class="fs-section-gap">
-    <div class="fs-section-hdr">ARRIVAL</div>
-    <div style="font-size:12px; color:var(--fs-text-dim); line-height:1.4">{data.arrival}</div>
-  </div>
-{/if}
+  <!-- Right column -->
+  <div style="width:160px; flex-shrink:0; display:flex; flex-direction:column; gap:8px">
+    <div style="padding:7px 10px; background:var(--inset); border:1px solid var(--cv-card-bdr,var(--border)); border-radius:2px">
+      <CvLabel label="ENVIRONMENT SHIFT" color={catColor} />
+      <p style="margin:0; font-size:11px; color:var(--text-dim); font-family:{CV4_SANS}; line-height:1.4">{data.env || data.environment_shift || ''}</p>
+    </div>
 
-<div class="fs-section-gap">
-  <div class="fs-section-hdr">ENVIRONMENT SHIFT</div>
-  <div style="font-size:12px; color:var(--fs-text-dim); line-height:1.4">{data.env || data.environment_shift || ''}</div>
-</div>
-
-{#if data.spotlight}
-  <div class="fs-section-gap">
-    <div class="fs-stunt" style="border-left:3px solid var(--fs-section); border-radius:0 3px 3px 0">
-      <div class="fs-stunt-name">SPOTLIGHT</div>
-      <div style="font-size:13px; font-weight:700; color:var(--fs-section); text-transform:capitalize">{data.spotlight}</div>
+    <div style="padding:7px 10px; background:color-mix(in srgb,{catColor} 8%,var(--cv-card-dark,var(--panel))); border:1px solid {catColor}33; border-left:3px solid {catColor}; border-radius:0 2px 2px 0">
+      <CvLabel label="SPOTLIGHT" color={catColor} />
+      <div style="font-size:13px; font-weight:700; color:{catColor}; font-family:{CV4_MONO}; text-transform:capitalize">{data.spotlight || ''}</div>
     </div>
   </div>
-{/if}
+</div>

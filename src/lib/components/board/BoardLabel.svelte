@@ -1,5 +1,9 @@
 <script>
-  let { card = {}, onUpdate = () => {}, onDelete = () => {}, onDragStart = () => {}, childCards = [] } = $props();
+  export let card = {};
+  export let onUpdate = () => {};
+  export let onDelete = () => {};
+  export let onDragStart = () => {};
+
   const LABEL_STYLES = [
     { bg: 'color-mix(in srgb,var(--accent) 10%,var(--panel))', border: 'var(--accent)', text: 'var(--accent)' },
     { bg: 'color-mix(in srgb,var(--c-green,#34c759) 10%,var(--panel))', border: 'var(--c-green,#34c759)', text: 'var(--c-green,#34c759)' },
@@ -8,17 +12,10 @@
     { bg: 'color-mix(in srgb,var(--c-amber,#f4b942) 10%,var(--panel))', border: 'var(--c-amber,#f4b942)', text: 'var(--c-amber,#f4b942)' },
   ];
 
-  let editing = $state(false);
-  let draft = $state(card.text || 'Section');
+  let editing = false;
+  let draft = card.text || 'Section';
 
-  let S = $derived(LABEL_STYLES[card.styleIdx || 0] || LABEL_STYLES[0]);
-  let zoneMode = $derived(card.zoneMode || false);
-  let zoneW = $derived(zoneMode && childCards.length > 0
-    ? Math.max(400, ...childCards.map(c => (c.x - card.x) + 360)) + 40
-    : (card.zoneW || 400));
-  let zoneH = $derived(zoneMode && childCards.length > 0
-    ? Math.max(200, ...childCards.map(c => (c.y - card.y) + 300)) + 40
-    : (card.zoneH || 200));
+  $: S = LABEL_STYLES[card.styleIdx || 0] || LABEL_STYLES[0];
 
   function commit() {
     editing = false;
@@ -64,47 +61,32 @@
   }
 </script>
 
-<!-- svelte-ignore a11y_no_noninteractive_element_interactions a11y_no_noninteractive_tabindex -->
+<!-- svelte-ignore a11y-no-noninteractive-element-interactions a11y-no-noninteractive-tabindex -->
 <div
   class="board-label"
   class:editing
-  class:zone-active={zoneMode}
   style:left="{card.x}px"
   style:top="{card.y}px"
   style:z-index={card.z || 1}
-  style:width="{zoneMode ? zoneW + 'px' : 'auto'}"
-  style:height="{zoneMode ? zoneH + 'px' : 'auto'}"
   tabindex={editing ? -1 : 0}
   role="heading"
   aria-level="2"
   aria-label="Section: {card.text || 'Section'}"
-  onmousedown={onMouseDown}
-  ondblclick={onDoubleClick}
-  onkeydown={onWrapperKeyDown}
+  on:mousedown={onMouseDown}
+  on:dblclick={onDoubleClick}
+  on:keydown={onWrapperKeyDown}
 >
   <div class="bc-actions">
-    <button class="bc-btn" title="Toggle Zone Container" aria-label="Toggle zone"
-      onclick={(e) => { e.stopPropagation(); (() => onUpdate(card.id, { zoneMode: !zoneMode, zoneW: 400, zoneH: 200 }))(e); }}
-    >{zoneMode ? "⊞" : "⊟"}</button>
-    <button class="bc-btn" title="Change colour" aria-label="Change colour" onclick={cycleStyle}>◐</button>
-    <button class="bc-btn" title="Delete" aria-label="Delete" onclick={deleteLabel}>✕</button>
+    <button class="bc-btn" title="Change colour" on:click={cycleStyle}>🎨</button>
+    <button class="bc-btn" title="Delete" on:click={deleteLabel}>✕</button>
   </div>
-
-  {#if zoneMode}
-    <div class="board-zone-container"
-      style:border-color={S.border}
-      style:background={S.bg}
-      style:width="{zoneW}px"
-      style:height="{zoneH}px"
-    ></div>
-  {/if}
 
   <div class="board-label-inner"
        style:background={S.bg}
        style:border-color={S.border}
        style:color={S.text}>
     {#if editing}
-      <!-- svelte-ignore a11y_autofocus -->
+      <!-- svelte-ignore a11y-autofocus -->
       <input
         type="text"
         class="board-label-input"
@@ -119,9 +101,9 @@
         style:font-size="inherit"
         style:font-weight="inherit"
         style:width="100%"
-        onblur={commit}
-        onkeydown={onInputKeyDown}
-        onclick={(e) => e.stopPropagation()}
+        on:blur={commit}
+        on:keydown={onInputKeyDown}
+        on:click|stopPropagation
       />
     {:else}
       <span title="Double-click to rename">{card.text || 'Section'}</span>

@@ -4,8 +4,8 @@
 // Also declares the CAMPAIGNS object that campaign files populate.
 // Must be loaded before any data/[campaign].js file.
 
-// Re-export merged CAMPAIGNS from the campaign registry
-export { CAMPAIGNS } from './index.js';
+// Populated by data/[campaign].js files
+export const CAMPAIGNS = {};
 
 export const GENERATORS = [
   {id:"npc_minor",  label:"Minor NPC",       icon:"◈", sub:"1–2 aspects · skills · stress"},
@@ -47,7 +47,6 @@ export const HELP_CONTENT = {
       "Their weakness aspect is your best compel lever. Invoke it for +2 to tip a roll, or compel it to create complications - whichever fits the moment.",
       "Minor NPCs don't concede - they break, flee, or get taken out. Describe it cinematically.",
     ],
-    rule_urls: ['/fate-condensed/being-game-master#npcs', '/fate-condensed/optional-rules#mobs', '/fate-condensed/aspects-and-fate-points#compels', null],
     gm_tips: [
       "When a PC rolls well, narrate the defeat and skip the dice — mooks exist to lose with style, not to survive.",
       "Give each one line of dialogue and one visible motivation. Anything more is wasted prep.",
@@ -78,7 +77,6 @@ export const HELP_CONTENT = {
       "Major NPCs start each scene with fate points from the GM's shared pool. The pool = 1 per PC facing opposition. Spend to invoke aspects or compel PCs.",
       "A major NPC who concedes escapes - and comes back with more resources and a grudge.",
     ],
-    rule_urls: ['/fate-condensed/being-game-master#npcs', '/fate-condensed/aspects-and-fate-points#compels', '/fate-condensed/being-game-master#npcs', '/fate-condensed/being-game-master#the-gms-fate-points', '/fate-condensed/conflicts#conceding'],
     gm_tips: [
       "Let them concede their first conflict. A villain who escapes with a grudge and earned fate points is worth ten who die in session one.",
       "Show the high concept in action before the PCs engage. Let them win something off-screen so the players respect the stakes.",
@@ -108,7 +106,6 @@ export const HELP_CONTENT = {
       "Zones limit movement. Moving past opposition into another zone costs an action if contested.",
       "Zone aspects are always true - they define what's possible in the zone. Invoke them for +2 with a fate point, as with any aspect.",
     ],
-    rule_urls: ['/fate-condensed/aspects-and-fate-points#situation-aspects', '/fate-condensed/aspects-and-fate-points#situation-aspects', '/fate-condensed/aspects-and-fate-points#situation-aspects', '/fate-condensed/challenges-conflicts-and-contests#zones', '/fate-condensed/challenges-conflicts-and-contests#zones'],
     gm_tips: [
       "Announce exactly two aspects up front — the ones any alert person notices. The rest get discovered through Notice, Investigate, or getting hit.",
       "The hidden aspect is your best tool. Decide before the scene starts which one the players don't know yet — it's your compel setup.",
@@ -137,7 +134,6 @@ export const HELP_CONTENT = {
       "Issues have faces (named NPCs) and places - these are ready-made hooks for scenes.",
       "You can compel an issue aspect whenever a PC's goals conflict with the larger threat.",
     ],
-    rule_urls: ['/fate-condensed/getting-started#define-your-setting', '/fate-condensed/getting-started#define-your-setting', '/fate-condensed/getting-started#define-your-setting', '/fate-condensed/getting-started#define-your-setting', '/fate-condensed/getting-started#define-your-setting'],
     gm_tips: [
       "The current issue is your automatic compel engine. Every time a PC's goal bumps against it, you have a compel ready.",
       "The impending issue is a clock. Narrate it advancing one step between sessions when the party ignores it. Make the progression visible.",
@@ -171,7 +167,6 @@ export const HELP_CONTENT = {
       "Full Defense (p.48): skip your action, get +2 to all defends this round. Use when holding ground or covering someone.",
       "Teamwork (p.32): one rolls, each helper with Average (+1)+ in a relevant skill adds +1. No cap on helpers, just that +1 each.",
     ],
-    rule_urls: ['/fate-condensed/being-game-master#the-gms-fate-points', '/fate-condensed/being-game-master#the-gms-fate-points', null, '/fate-condensed/challenges-conflicts-and-contests#turn-order', null, null, '/fate-condensed/conflicts#conceding', '/fate-condensed/optional-rules#full-defense', '/fate-condensed/challenges-conflicts-and-contests#teamwork'],
     gm_tips: [
       "Your first sentence at the table is the victory condition — say it aloud before any dice roll. Everything else follows.",
       "GM fate points start at 1 per PC. That's your entire compel and invoke budget. Spend it deliberately.",
@@ -211,7 +206,6 @@ export const HELP_CONTENT = {
       "Opposition here follows the same rules as Encounter opposition - mooks and/or a major NPC.",
       "The three-scene structure is a suggestion, not a script. Real sessions are messier and better.",
     ],
-    rule_urls: [null, null, null, null, null, null],
     tips: [
       "The complication should force a choice, not just add an obstacle. Choices are drama.",
       "Pull your literal first sentence from the opening description. Read it exactly.",
@@ -241,7 +235,6 @@ export const HELP_CONTENT = {
       "Refusal costs the player 1 FP. Note it - a drained player is primed to accept the next one.",
       "Remind players they can compel their own aspects. The best player-initiated compels are the ones you didn't see coming.",
     ],
-    rule_urls: ['/fate-condensed/aspects-and-fate-points#compels', '/fate-condensed/aspects-and-fate-points#compels', '/fate-condensed/aspects-and-fate-points#compels', '/fate-condensed/aspects-and-fate-points#compels', '/fate-condensed/aspects-and-fate-points#compels', '/fate-condensed/aspects-and-fate-points#compels'],
     gm_tips: [
       "Compel in Scene 1. It signals to the players that the mechanic is live and fate points are moving.",
       "Offer the fate point first, then state the complication. This order makes acceptance feel like agency rather than punishment.",
@@ -273,7 +266,6 @@ export const HELP_CONTENT = {
       "Failure changes the situation and costs something. It's not a dead end.",
       "Place a free invoke on a scene aspect before the challenge starts. It's a gift the players will remember.",
     ],
-    rule_urls: ['/fate-condensed/challenges-conflicts-and-contests#challenges', null, '/fate-condensed/challenges-conflicts-and-contests#challenges', '/fate-condensed/challenges-conflicts-and-contests#challenges', '/fate-condensed/challenges-conflicts-and-contests#challenges', '/fate-condensed/challenges-conflicts-and-contests#challenges'],
     gm_tips: [
       "A challenge is right when a single roll feels arbitrary but a full conflict would be overkill.",
       "Declare the primary skill and difficulty before any dice touch the table. Players need the playing field first.",
@@ -305,7 +297,6 @@ export const HELP_CONTENT = {
       "Creating Advantages in a contest is risky (p.33): if you fail, your side either forfeits its overcome roll OR you give the other side a free invoke to preserve your roll.",
       "In dangerous environments, add a hazard aspect and compel it as normal. The victory track is unchanged.",
     ],
-    rule_urls: ['/fate-condensed/challenges-conflicts-and-contests#contests', '/fate-condensed/challenges-conflicts-and-contests#contests', '/fate-condensed/challenges-conflicts-and-contests#contests', '/fate-condensed/challenges-conflicts-and-contests#contests', '/fate-condensed/challenges-conflicts-and-contests#contests', '/fate-condensed/challenges-conflicts-and-contests#contests'],
     gm_tips: [
       "Put the victory track (first to 3) on the table where everyone can see both sides. The visible score is half the tension.",
       "Ties are your most powerful tool. When nobody marks a victory, immediately introduce a new situation aspect — don't pause to think.",
@@ -343,7 +334,6 @@ export const HELP_CONTENT = {
       "The GM should compel the consequence at least once before it clears. That is how it earns its keep.",
       "Unlike D&D hit points, consequences are not just damage - they are story hooks with mechanical teeth.",
     ],
-    rule_urls: ['/fate-condensed/challenges-conflicts-and-contests#taking-harm', '/fate-condensed/challenges-conflicts-and-contests#taking-harm', '/fate-condensed/aspects-and-fate-points#compels', '/fate-condensed/aspects-and-fate-points#compels', null],
     tips: [
       "Name them evocatively. 'Badly Burned Hands' beats 'Injured' every time - it does more narrative work.",
       "Compel it in the very next scene. Don't wait. Establishing the pattern early is everything.",
@@ -380,7 +370,6 @@ export const HELP_CONTENT = {
       "Faction goals drive the campaign clock. If PCs do nothing, factions advance toward their goals.",
       "Weaknesses are not automatically known to the PCs - they have to discover them through play.",
     ],
-    rule_urls: [null, null, null, '/fate-system-toolkit/factions', null],
     tips: [
       "Two factions with conflicting goals = engine. Three with overlapping methods = the ideal mess.",
       "Between sessions: narrate what each faction achieved off-screen. One sentence each. It makes them feel real.",
@@ -415,7 +404,6 @@ export const HELP_CONTENT = {
       "Environment shifts may create new zones, require Overcome rolls to traverse, or change which skills apply.",
       "The GM can compel any new aspect immediately - and should offer fate points to do so.",
     ],
-    rule_urls: ['/fate-condensed/aspects-and-fate-points#situation-aspects', '/fate-condensed/aspects-and-fate-points#situation-aspects', null, null, '/fate-condensed/aspects-and-fate-points#compels'],
     tips: [
       "One element, then pause. Let them react before the next one lands.",
       "The best complication is a choice: solve the new problem or push forward. Both should hurt a little.",
@@ -450,7 +438,6 @@ export const HELP_CONTENT = {
       "Let high concept and trouble emerge from the answers. Assigning them in advance kills the discovery.",
       "The opening hook is your literal first sentence at the table. Drop them in.",
     ],
-    rule_urls: ['/fate-condensed/getting-started#create-your-characters', '/fate-condensed/getting-started#create-your-characters', null, null, null],
     tips: [
       "Ask what you don't know. If you already know the answer, you're narrating, not discovering.",
       "Let the answers surprise you. The campaign you didn't plan is better than the one you did.",
@@ -480,7 +467,6 @@ export const HELP_CONTENT = {
       "Obstacle vs enemy: enemies can be taken out. Obstacles cannot. Don't let players try.",
       "Use obstacles to accent enemies, not replace them. One obstacle per scene is usually enough. Overuse frustrates players.",
     ],
-    rule_urls: ['/fate-condensed/optional-rules#obstacles', '/fate-condensed/optional-rules#obstacles', '/fate-condensed/optional-rules#obstacles', '/fate-condensed/optional-rules#obstacles', null, null],
     gm_tips: [
       "One obstacle per scene. It splits PC attention and gives non-combat characters something meaningful to contribute.",
       "Announce the type immediately: hazard (attacks on its turn), block (passive opposition), or distraction (forces a choice).",
@@ -511,7 +497,6 @@ export const HELP_CONTENT = {
       "Stack triggers: one that fires every exchange, one that fires on a specific event. Acceleration is drama.",
       "A visible countdown does more for pacing than three extra enemies.",
     ],
-    rule_urls: ['/fate-condensed/optional-rules#countdowns', '/fate-condensed/optional-rules#countdowns', '/fate-condensed/optional-rules#countdowns', null, null, null],
     gm_tips: [
       "Visible track, no secrets. Put it on the table where everyone can see it from the moment you introduce it.",
       "Check each box, pause a beat, say nothing. The silence does more work than any description.",
@@ -542,7 +527,6 @@ export const HELP_CONTENT = {
       "Limitations work best when the players know about them before they act. Hidden limitations feel like punishments; visible ones feel like tactical puzzles.",
       "Every resistance needs a bypass. No bypass = wall, not constraint. Build the bypass before the session.",
     ],
-    rule_urls: ['/fate-adversary-toolkit/constraints', '/fate-adversary-toolkit/constraints', '/fate-adversary-toolkit/constraints', null, null, null],
     gm_tips: [
       "State limitations before players commit to an action — after the roll is a gotcha. Before the roll is a puzzle.",
       "Resistances require a bypass. The players need to know a bypass exists, even if they don't know what it is yet.",

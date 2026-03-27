@@ -1,3 +1,5 @@
+<svelte:options runes={false} />
+
 <script>
   import { onMount, onDestroy } from 'svelte';
   import { get } from 'svelte/store';
@@ -6,12 +8,14 @@
   import { createPlayStore } from '../../stores/playStore.js';
   import { createBinderStore } from '../../stores/binderStore.js';
   import { createSyncStore } from '../../stores/syncStore.js';
-  import DB, { LS } from '../../db.js';
+  import DB from '../../db.js';
 
   // Child components
   import Topbar from './Topbar.svelte';
   import LeftPanel from '../panels/LeftPanel.svelte';
   import PlayPanel from './PlayPanel.svelte';
+  import BoardCard from './BoardCard.svelte';
+  import BoardLabel from './BoardLabel.svelte';
   import MobileList from './MobileList.svelte';
   import TurnBar from './TurnBar.svelte';
   import CombatTracker from './CombatTracker.svelte';
@@ -20,12 +24,12 @@
   import CommandPalette from './CommandPalette.svelte';
   import ExportPanel from './ExportPanel.svelte';
   import DicePanel from '../dice/DicePanel.svelte';
-  import OgmaCanvas from './OgmaCanvas.svelte';
-  import GenerateFAB from './GenerateFAB.svelte';
   import FatePointTracker from '../campaign/FatePointTracker.svelte';
 
   // ── Props ──────────────────────────────────────────────────────────────────
-  let { campId = 'fantasy', initialMode = 'prep', initialRoom = null } = $props();
+  export let campId = 'fantasy';
+  export let initialMode = 'prep';
+  export let initialRoom = null;
 
   // ── Constants ──────────────────────────────────────────────────────────────
   const BOARD_CANVAS_PREP_KEY = 'board_canvas_v1';
@@ -33,110 +37,93 @@
   const BOARD_FP_KEY = 'board_fp_v1';
 
   // ── Derived (early — needed before stores) ──────────────────────────────
-  let campMeta = $derived(getWorldMeta(campId));
-  let tables = $derived(getWorldTables(campId));
+  $: campMeta = getWorldMeta(campId);
+  $: tables = getWorldTables(campId);
 
   // ── Local state ────────────────────────────────────────────────────────────
-  let mode = $state(initialMode);
-  let modeTransitioning = $state(false);
-  let activeGen = $state('npc_minor');
-  let leftTab = $state('gen');
-  let theme = $state('dark');
-  let isOnline = $state(typeof navigator !== 'undefined' ? navigator.onLine : true);
+  let mode = initialMode;
+  let activeGen = 'npc_minor';
+  let leftTab = 'gen';
+  let theme = 'dark';
+  let isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
 
-  let toast = $state(null);
-  let dossierCard = $state(null);
-  let cmdPalette = $state(false);
-  let cardSearch = $state('');
-  let connectSourceId = $state(null);
-  let connectorLines = $state([]);
-
-  let canvasRef = $state(); // bind to OgmaCanvas for fitAll()
-
-  function handleConnectClick(cardId) {
-    if (!connectSourceId) {
-      connectSourceId = cardId;
-      showToast('Click another card to connect — Esc to cancel');
-    } else if (connectSourceId === cardId) {
-      connectSourceId = null;
-    } else {
-      canvas.addConnector(connectSourceId, cardId);
-      connectSourceId = null;
-      showToast('Connected');
-    }
-  }
-  let showTracker = $state(false);
-  let exportView = $state(false);
+  let toast = null;
+  let dossierCard = null;
+  let cmdPalette = false;
+  let cardSearch = '';
+  let showTracker = false;
+  let exportView = false;
+  let zoom = 0.6;
+  let pan = { x: 0, y: 0 };
 
   // Coach marks
-  let coachCanvas = $state(false);
-  let coachPlay = $state(false);
-  let coachEdge = $state(false);
+  let coachCanvas = false;
+  let coachPlay = false;
 
   // Panel visibility
-  let leftOpen = $state(typeof window !== 'undefined' ? window.innerWidth > 520 : true);
-  let showDice = $state(false);
-  let showClearModal = $state(false);
-  let showFP = $state(false);
-  let showNotes = $state(false);
-  let mobileListView = $state(false);
+  let leftOpen = typeof window !== 'undefined' ? window.innerWidth > 520 : true;
+  let showDice = false;
+  let showFP = false;
+  let showNotes = false;
+  let mobileListView = false;
 
   // Player join state
-  let playerJoinName = $state('');
-  let playerJoinSent = $state(false);
-  let pcStep = $state(0);
+  let playerJoinName = '';
+  let playerJoinSent = false;
+  let pcStep = 0;
   let pcDraft = { hc: '', trouble: '', aspect3: '', skills: {}, avatar: '' };
 
   // FP tracker state
-  let fpState = $state(null);
+  let fpState = null;
 
   // Sync state received from GM
-  let syncState = $state(null);
+  let syncState = null;
 
   // Compel + invoke
-  let compelOffer = $state(null);
-  let pendingInvoke = $state(null);
-  let rollHistory = $state([]);
+  let compelOffer = null;
+  let pendingInvoke = null;
+  let rollHistory = [];
 
-  // Canvas ref — bound to OgmaCanvas for fitAll()
-  // canvasRef is set via bind:this={canvasRef} on <OgmaCanvas>
+  // Canvas refs
+  let canvasRef;
+  let dragRef = null;
+  let panRef = null;
 
   // Context menu
-  let ctx = $state(null);
+  let ctx = null;
 
   // ── Toast queue ────────────────────────────────────────────────────────────
-  let toastTimer = $state(null);
-  let toastQueue = $state([]);
+  let toastTimer = null;
+  let toastQueue = [];
 
   function drainToast() {
-    if (toastQueue.length === 0) { toast = null; toastTimer = null; return; }
-    toast = toastQueue[0];
-    toastQueue = toastQueue.slice(1);  // $state-safe: reassign not mutate
+    if (toastQueue.length === 0) { toast = null; return; }
+    toast = toastQueue.shift();
     toastTimer = setTimeout(drainToast, 1800);
   }
 
   function showToast(msg) {
-    toastQueue = [...toastQueue, msg];  // $state-safe: reassign not mutate
-    if (!toastTimer) {
+    toastQueue.push(msg);
+    if (!toastTimer || toastQueue.length === 1) {
+      clearTimeout(toastTimer);
       drainToast();
     }
   }
 
   // ── Stores ─────────────────────────────────────────────────────────────────
-  let canvasKey = $derived(mode === 'prep' ? BOARD_CANVAS_PREP_KEY : BOARD_CANVAS_PLAY_KEY);
-  let campCanvasKey = $derived(canvasKey + '_' + campId);
+  $: canvasKey = mode === 'prep' ? BOARD_CANVAS_PREP_KEY : BOARD_CANVAS_PLAY_KEY;
+  $: campCanvasKey = canvasKey + '_' + campId;
 
   // These stores are created once on mount and recreated when campId changes
-  let canvas = $state();
-  let play = $state();
-  let binder = $state();
-  let sync = $state();
+  let canvas;
+  let play;
+  let binder;
+  let sync;
 
-  // Svelte Flow context — must be called during init
   function initStores() {
     // Clean up previous subscriptions
     unsubs.forEach(u => u());
-    unsubs = [];  // plain array, fine to reassign
+    unsubs = [];
 
     canvas = createCanvasStore(campCanvasKey, tables, showToast, null);
     play = createPlayStore(campId);
@@ -152,25 +139,7 @@
 
     // Subscribe to store values
     unsubs.push(canvas.cards.subscribe(v => cards = v));
-    unsubs.push(canvas.connectors.subscribe(v => connectorLines = v));
-    let binderLoadedOnce = false;
-    unsubs.push(canvas.loaded.subscribe(v => {
-      loaded = v;
-      if (v && !binderLoadedOnce) {
-        binderLoadedOnce = true;
-        const existing = get(canvas.cards);
-        if (existing && existing.length > 0) {
-          setTimeout(() => fitAll(), 120);
-        }
-        setTimeout(() => {
-          if (mode !== 'prep') return;
-          const currentBinder = get(binder.binderCards);
-          if (currentBinder && currentBinder.length > 0) {
-            canvas.loadBinderToCanvas(currentBinder);
-          }
-        }, 100);
-      }
-    }));
+    unsubs.push(canvas.loaded.subscribe(v => loaded = v));
     unsubs.push(play.players.subscribe(v => players = v));
     unsubs.push(play.round.subscribe(v => round = v));
     unsubs.push(play.order.subscribe(v => order = v));
@@ -187,23 +156,23 @@
   }
 
   // Reactive values from stores — manually subscribed in initStores
-  let cards = $state([]);
-  let loaded = $state(false);
-  let players = $state([]);
-  let round = $state(1);
-  let order = $state([]);
-  let selPlayer = $state(null);
-  let roundFlash = $state(false);
-  let gmPool = $state(0);
-  let binderCards = $state([]);
-  let trayCards = $state([]);
-  let binderOpenVal = $state(false);
-  let playCardIds = $state(new Set());
-  let syncObj = $state(null);
-  let syncStatus = $state('offline');
-  let roomCode = $state('');
+  let cards = [];
+  let loaded = false;
+  let players = [];
+  let round = 1;
+  let order = [];
+  let selPlayer = null;
+  let roundFlash = false;
+  let gmPool = 0;
+  let binderCards = [];
+  let trayCards = [];
+  let binderOpenVal = false;
+  let playCardIds = new Set();
+  let syncObj = null;
+  let syncStatus = 'offline';
+  let roomCode = '';
 
-  let unsubs = [];  // not $state — never rendered, just cleanup refs
+  let unsubs = [];
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
   onMount(() => {
@@ -211,7 +180,8 @@
 
     // Theme restore
     try {
-      const t = LS.get('theme') || 'dark';
+      const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}');
+      const t = p.theme || localStorage.getItem('fate_theme') || 'dark';
       theme = t;
       document.documentElement.setAttribute('data-theme', t);
     } catch (e) {}
@@ -221,7 +191,8 @@
 
     // Coach mark
     try {
-      if (!LS.get('coach_canvas_dismissed')) coachCanvas = true;
+      const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}');
+      if (!p.coach_canvas_dismissed) coachCanvas = true;
     } catch (e) {}
 
     // Online/offline
@@ -239,28 +210,18 @@
     document.addEventListener('keydown', onGlobalKey);
 
     // Mouse move/up for drag
-    // mousemove/mouseup removed — Svelte Flow handles drag
-
-    // Session Zero auto-populate listener
-    window.addEventListener('ogma:sz-pc', onSzPc);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
   });
-
-  function onSzPc(e) {
-    if (!e.detail || !e.detail.genId || !canvas) return;
-    const { genId, data } = e.detail;
-    if (canvas.generateCardWithData) {
-      canvas.generateCardWithData(genId, data, 80, 80);
-    }
-  }
 
   onDestroy(() => {
     unsubs.forEach(u => u());
     if (typeof window !== 'undefined') {
       window.removeEventListener('online', goOnline);
       window.removeEventListener('offline', goOffline);
-      // mousemove/mouseup removed — Svelte Flow handles drag
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
       document.removeEventListener('keydown', onGlobalKey);
-      window.removeEventListener('ogma:sz-pc', onSzPc);
     }
     clearTimeout(toastTimer);
     document.documentElement.removeAttribute('data-campaign');
@@ -270,30 +231,35 @@
   function goOffline() { isOnline = false; }
 
   // ── Mode change — left panel always open in prep ──────────────────────────
-  $effect(() => { if (mode === 'prep') leftOpen = true; });
+  $: if (mode === 'prep') leftOpen = true;
 
   // ── Play mode coach mark ──────────────────────────────────────────────────
-  $effect(() => { if (mode === 'play') {
+  $: if (mode === 'play') {
     try {
-      if (!LS.get('coach_play_dismissed')) coachPlay = true;
+      const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}');
+      if (!p.coach_play_dismissed) coachPlay = true;
     } catch (e) {}
-  } });
+  }
 
   // ── Theme toggle ──────────────────────────────────────────────────────────
   function toggleTheme() {
     theme = theme === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', theme);
-    LS.set('theme', theme);
+    try {
+      const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}');
+      p.theme = theme;
+      localStorage.setItem('fate_prefs_v1', JSON.stringify(p));
+    } catch (e) {}
   }
 
   // ── Coach mark dismiss ────────────────────────────────────────────────────
   function dismissCoachCanvas() {
     coachCanvas = false;
-    LS.set('coach_canvas_dismissed', true);
+    try { const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}'); p.coach_canvas_dismissed = true; localStorage.setItem('fate_prefs_v1', JSON.stringify(p)); } catch (e) {}
   }
   function dismissCoachPlay() {
     coachPlay = false;
-    LS.set('coach_play_dismissed', true);
+    try { const p = JSON.parse(localStorage.getItem('fate_prefs_v1') || '{}'); p.coach_play_dismissed = true; localStorage.setItem('fate_prefs_v1', JSON.stringify(p)); } catch (e) {}
   }
 
   // ── Generator select (left panel click = generate immediately) ────────────
@@ -304,13 +270,8 @@
 
   // ── Mode change handler ───────────────────────────────────────────────────
   function onModeChange(m) {
-    if (m === mode) return;
     if (canvas) canvas.persistCanvas(get(canvas.cards));
-    modeTransitioning = true;
-    setTimeout(() => {
-      mode = m;
-      setTimeout(() => { modeTransitioning = false; }, 350);
-    }, 80);
+    mode = m;
   }
 
   // ── FP persistence ────────────────────────────────────────────────────────
@@ -324,17 +285,127 @@
     rollHistory = [entry, ...rollHistory].slice(0, 12);
   }
 
-  // fitAll — delegated to OgmaCanvas via bind:this
-  function fitAll() { if (canvasRef) canvasRef.fitAll(); }
+  // ── Drag system — direct DOM during drag, single store update on drop ────
+  function onDragStart(e, cardId) {
+    if (e.button !== 0) return;
+    const allCards = canvas ? get(canvas.cards) : [];
+    const card = allCards.find(c => c.id === cardId);
+    if (!card) return;
 
-  // ── Context menu (right-click) ────────────────────────────────────────────
-  function onCanvasContextMenu(screenX, screenY, canvasX, canvasY) {
-    ctx = { screenX, screenY, canvasX, canvasY };
+    const el = e.target.closest('.board-card') || e.target.closest('.board-sticky') || e.target.closest('.board-boost') || e.target.closest('.board-label');
+    if (!el) return;
+
+    const topZ = Date.now();
+    el.style.zIndex = topZ;
+
+    dragRef = {
+      cardId, el,
+      startMouseX: e.clientX, startMouseY: e.clientY,
+      startCardX: card.x, startCardY: card.y,
+      topZ, moved: false, finalX: null, finalY: null,
+    };
+    e.preventDefault();
   }
 
-  function ctxGenerate(genId, canvasX, canvasY) {
-    if (!canvas) return;
-    canvas.generateCard(genId, canvasX, canvasY);
+  function onMouseMove(e) {
+    if (dragRef) {
+      const dx = e.clientX - dragRef.startMouseX;
+      const dy = e.clientY - dragRef.startMouseY;
+      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragRef.moved = true;
+      const newX = dragRef.startCardX + dx / zoom;
+      const newY = dragRef.startCardY + dy / zoom;
+      dragRef.el.style.left = newX + 'px';
+      dragRef.el.style.top = newY + 'px';
+      dragRef.finalX = newX;
+      dragRef.finalY = newY;
+      if (!dragRef.el.classList.contains('drag-active')) {
+        dragRef.el.classList.add('drag-active');
+      }
+    }
+    if (panRef) {
+      const pdx = e.clientX - panRef.startX;
+      const pdy = e.clientY - panRef.startY;
+      pan = { x: panRef.origX + pdx, y: panRef.origY + pdy };
+    }
+  }
+
+  function onMouseUp() {
+    if (dragRef) {
+      const d = dragRef;
+      dragRef = null;
+      if (d.el) d.el.classList.remove('drag-active');
+      if (d.moved && canvas) {
+        const fx = d.finalX != null ? d.finalX : d.startCardX;
+        const fy = d.finalY != null ? d.finalY : d.startCardY;
+        canvas.updateCard(d.cardId, { x: fx, y: fy, z: d.topZ });
+      } else if (canvas) {
+        canvas.updateCard(d.cardId, { z: d.topZ });
+      }
+    }
+    panRef = null;
+  }
+
+  // ── Zoom ──────────────────────────────────────────────────────────────────
+  function changeZoom(delta) {
+    zoom = Math.min(2, Math.max(0.25, Math.round((zoom + delta) * 100) / 100));
+  }
+
+  function fitAll() {
+    if (!cards || cards.length === 0 || !canvasRef) return;
+    const rect = canvasRef.getBoundingClientRect();
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    cards.forEach(c => {
+      if (c.x != null && c.y != null) {
+        minX = Math.min(minX, c.x); minY = Math.min(minY, c.y);
+        maxX = Math.max(maxX, c.x + 320); maxY = Math.max(maxY, c.y + 400);
+      }
+    });
+    if (!isFinite(minX)) return;
+    const cw = maxX - minX + 60, ch = maxY - minY + 60;
+    zoom = Math.min(2, Math.max(0.25, Math.min(rect.width / cw, rect.height / ch) * 0.9));
+    pan = { x: -minX * zoom + (rect.width - cw * zoom) / 2 + 30, y: -minY * zoom + (rect.height - ch * zoom) / 2 + 30 };
+  }
+
+  // ── Canvas pan ────────────────────────────────────────────────────────────
+  function onCanvasMouseDown(e) {
+    if (leftOpen && typeof window !== 'undefined' && window.matchMedia('(max-width:640px)').matches) {
+      leftOpen = false;
+      return;
+    }
+    if (e.target.closest('.board-card') || e.target.closest('.board-sticky')) return;
+    if (e.target.closest('.board-ctx') || e.target.closest('.board-zoom')) return;
+    if (e.button !== 0 && e.button !== 1) return;
+    panRef = { startX: e.clientX, startY: e.clientY, origX: pan.x, origY: pan.y };
+    e.preventDefault();
+  }
+
+  function onCanvasWheel(e) {
+    e.preventDefault();
+    if (!canvasRef) return;
+    const r = canvasRef.getBoundingClientRect();
+    const mx = e.clientX - r.left;
+    const my = e.clientY - r.top;
+    const delta = e.deltaY < 0 ? 1.1 : 0.9;
+    const nz = Math.min(2, Math.max(0.25, Math.round(zoom * delta * 100) / 100));
+    pan = { x: mx - (mx - pan.x) * (nz / zoom), y: my - (my - pan.y) * (nz / zoom) };
+    zoom = nz;
+  }
+
+  // ── Context menu (right-click) ────────────────────────────────────────────
+  function onCanvasContextMenu(e) {
+    if (e.target.closest('.board-card') || e.target.closest('.board-sticky')) return;
+    e.preventDefault();
+    const r = canvasRef.getBoundingClientRect();
+    ctx = {
+      screenX: e.clientX - r.left, screenY: e.clientY - r.top,
+      canvasX: (e.clientX - r.left - pan.x) / zoom,
+      canvasY: (e.clientY - r.top - pan.y) / zoom,
+    };
+  }
+
+  function ctxGenerate(genId) {
+    if (!ctx || !canvas) return;
+    canvas.generateCard(genId, ctx.canvasX, ctx.canvasY);
     ctx = null;
   }
 
@@ -358,7 +429,6 @@
     }
     const tag = (e.target || {}).tagName || '';
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
-    if (e.key === 'Escape' && connectSourceId) { connectSourceId = null; return; }
     if (dossierCard) {
       if (e.key === 'Escape') dossierCard = null;
       return;
@@ -370,9 +440,6 @@
     } else if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
       e.preventDefault();
       if (canvas) canvas.undoLast();
-    } else if ((e.ctrlKey || e.metaKey) && (e.key === 'a' || e.key === 'A')) {
-      e.preventDefault();
-      showToast(cards.length + ' cards on canvas');
     } else if (e.key === 'r' || e.key === 'R') {
       showDice = !showDice;
     } else if (e.key === 'f' || e.key === 'F') {
@@ -381,7 +448,7 @@
   }
 
   // ── Command palette actions ───────────────────────────────────────────────
-  let cmdActions = $derived([
+  $: cmdActions = [
     { id: 'gen-npc', icon: '\u{1F9D1}', label: 'Generate Minor NPC', shortcut: 'Space', fn: () => { if (canvas) canvas.generateCard('npc_minor'); } },
     { id: 'gen-major', icon: '\u{1F451}', label: 'Generate Major NPC', fn: () => { if (canvas) canvas.generateCard('npc_major'); } },
     { id: 'gen-scene', icon: '\u{1F525}', label: 'Generate Scene', fn: () => { if (canvas) canvas.generateCard('scene'); } },
@@ -392,21 +459,28 @@
     { id: 'fp', icon: '\u25CE', label: 'Toggle FP Tracker', fn: () => { showFP = !showFP; } },
     { id: 'export', icon: '\u2193', label: 'Export Cards', fn: () => { exportView = true; } },
     { id: 'fit', icon: '\u2922', label: 'Fit All Cards', shortcut: 'F', fn: fitAll },
-    { id: 'clear', icon: '\u{1F5D1}', label: 'Clear Table', fn: () => { showClearModal = true; } },
     { id: 'undo', icon: '\u21B6', label: 'Undo', shortcut: '\u2318Z', fn: () => { if (canvas) canvas.undoLast(); } },
-    { id: 'selectAll', icon: '\u2610', label: 'Count Cards', shortcut: '\u2318A', fn: () => { showToast(cards.length + ' cards on canvas'); } },
     { id: 'mode', icon: '\u25B6', label: mode === 'prep' ? 'Switch to Play' : 'Switch to Prep', fn: () => onModeChange(mode === 'prep' ? 'play' : 'prep') },
     { id: 'theme', icon: '\u263D', label: 'Toggle Dark/Light', fn: toggleTheme },
-  ]);
+  ];
 
   // ── NPC cards for turn bar ────────────────────────────────────────────────
-  let npcCards = $derived(cards.filter(c => c.genId === 'npc_minor' || c.genId === 'npc_major'));
+  $: npcCards = cards.filter(c => c.genId === 'npc_minor' || c.genId === 'npc_major');
 
+  // ── Search dim ────────────────────────────────────────────────────────────
+  function isSearchMatch(card) {
+    if (!cardSearch) return true;
+    const q = cardSearch.toLowerCase();
+    return (card.title || '').toLowerCase().includes(q) ||
+      (card.summary || '').toLowerCase().includes(q) ||
+      (card.text || '').toLowerCase().includes(q) ||
+      (card.genId || '').toLowerCase().includes(q);
+  }
 </script>
 
 <!-- ── Template ─────────────────────────────────────────────────────────────── -->
 
-<div class="board-app" data-theme={theme} data-mode={mode} onclick={() => ctx = null}>
+<div class="board-app" data-theme={theme} data-mode={mode} on:click={() => ctx = null}>
 
   <!-- ── Topbar ────────────────────────────────────────────────────────────── -->
   <Topbar
@@ -461,16 +535,10 @@
     onExportCanvas={canvas ? canvas.exportCanvas : () => {}}
     onImportCanvas={canvas ? canvas.importCanvas : () => {}}
     onPrint={() => showToast('Print not yet available')}
-    onBack={() => { leftOpen = true; leftTab = 'gen'; }}
   />
 
   <!-- ── Body: left panel + canvas column ──────────────────────────────────── -->
   <div class="board-body">
-
-    <!-- Mobile drawer backdrop — tap to close left panel -->
-    {#if leftOpen}
-      <div class="blp-backdrop" onclick={() => { leftOpen = false; }} aria-hidden="true"></div>
-    {/if}
 
     <!-- Left panel: generators / stunts / help + play panel -->
     <div class="blp-wrap" class:blp-hidden={!leftOpen}>
@@ -486,31 +554,10 @@
         {players}
         {selPlayer}
         onSel={(p) => { if (play) play.selPlayer.set(p); }}
-        onUpd={(id, patch) => {
-          if (play) {
-            // WC-08: Auto-create consequence sticky when a consequence is written
-            if (patch.conseq && canvas) {
-              const oldPlayer = players.find(p => p.id === id);
-              const oldConseq = oldPlayer ? (oldPlayer.conseq || ['', '', '']) : ['', '', ''];
-              const SEVERITY = ['Mild', 'Moderate', 'Severe'];
-              const STICKY_COLOR = [3, 0, 2]; // purple, yellow, orange
-              patch.conseq.forEach((text, i) => {
-                if (text && text.trim() && (!oldConseq[i] || !oldConseq[i].trim())) {
-                  const label = (oldPlayer ? oldPlayer.name : '?') + ' \u2014 ' + SEVERITY[i];
-                  canvas.addStickyWithText(label + ': ' + text, STICKY_COLOR[i]);
-                  showToast(SEVERITY[i] + ' consequence sticky added');
-                }
-              });
-            }
-            play.updPlayer(id, patch);
-          }
-        }}
+        onUpd={(id, patch) => { if (play) play.updPlayer(id, patch); }}
         onAdd={(name) => { if (play) play.addPlayer(name); }}
         collapsed={mode === 'prep'}
         {gmPool}
-        {activeGen}
-        onSelectGen={selectGen}
-        campName={campMeta.name}
         updGmPool={mode === 'play' && play ? play.updGmPool : null}
         onQuickNpc={mode === 'play' ? () => { if (canvas) { canvas.generateCard('npc_minor'); showToast('\u26A1 Quick NPC added'); } } : null}
         onStarterScene={mode === 'play' ? () => {
@@ -538,7 +585,7 @@
       {#if exportView}
         <div class="board-export-page">
           <div class="board-export-page-hdr">
-            <button class="bep-back-btn" onclick={() => { exportView = false; }} aria-label="Back to canvas">&larr; Back</button>
+            <button class="bep-back-btn" on:click={() => { exportView = false; }} aria-label="Back to canvas">&larr; Back</button>
             <h2 class="bep-page-title">Export Cards</h2>
           </div>
           <ExportPanel
@@ -606,7 +653,7 @@
         <!-- Combat tracker toggle + view -->
         {#if mode === 'play' && players.length > 0}
           <div class="ct-toggle-row">
-            <button class="ct-toggle-btn" onclick={() => { showTracker = !showTracker; }}
+            <button class="ct-toggle-btn" on:click={() => { showTracker = !showTracker; }}
               aria-pressed={String(showTracker)} aria-label="Toggle combat tracker">
               {showTracker ? '\u25BC Combat Tracker' : '\u25B6 Combat Tracker'}
             </button>
@@ -621,42 +668,153 @@
           />
         {/if}
 
-        <!-- Canvas area — OgmaCanvas -->
-        <OgmaCanvas
+        <!-- Canvas area -->
+        <div
+          id="board-canvas"
+          class="board-canvas-wrap"
           bind:this={canvasRef}
-          {cards}
-          connectors={connectorLines}
-          {loaded}
-          {mode}
-          {campId}
-          {cardSearch}
-          {connectSourceId}
-          {modeTransitioning}
-          {playCardIds}
-          {ctx}
-          {toast}
-          onUpdateCard={canvas ? canvas.updateCard : null}
-          onDeleteCard={canvas ? canvas.deleteCard : null}
-          onRerollCard={canvas ? canvas.rerollCard : null}
-          onSendToTable={binder ? binder.sendToTable : null}
-          onOpenCard={(card) => { dossierCard = card; }}
-          onInvoke={(opts) => { pendingInvoke = opts; showDice = true; showToast('\u2726 Invoke queued \u2014 +2 on next roll'); }}
-          onConnect={handleConnectClick}
-          onUpdateConnector={canvas ? canvas.updateConnector : null}
-          onContextMenu={onCanvasContextMenu}
-          onCtxClose={() => { ctx = null; }}
-          onCtxGenerate={ctxGenerate}
-          onEdgeCoach={() => { if (!coachEdge) { coachEdge = true; showToast('\u21D4 Click line to cycle label'); } }}
-        />
+          on:contextmenu={onCanvasContextMenu}
+          on:mousedown={onCanvasMouseDown}
+          on:wheel|preventDefault={onCanvasWheel}
+        >
+          <!-- Dot grid background -->
+          <div class="board-dot-grid"></div>
+
+          <!-- Zoomable canvas layer -->
+          <div
+            class="board-canvas-layer"
+            style="transform:translate({pan.x}px,{pan.y}px) scale({zoom});transform-origin:0 0"
+          >
+            {#each cards as card (card.id)}
+              {#if card.genId === 'label'}
+                <BoardLabel
+                  {card}
+                  onDelete={canvas ? canvas.deleteCard : () => {}}
+                  onUpdate={canvas ? canvas.updateCard : () => {}}
+                  {onDragStart}
+                />
+              {:else}
+                <div style={cardSearch && !isSearchMatch(card) ? 'opacity:0.2;pointer-events:none' : ''}>
+                  <BoardCard
+                    {card}
+                    onDelete={canvas ? canvas.deleteCard : null}
+                    onReroll={canvas ? canvas.rerollCard : null}
+                    onSendToTable={binder ? binder.sendToTable : null}
+                    onRemoveFromTable={binder ? binder.removeFromTable : null}
+                    onOpen={(c) => { dossierCard = c; }}
+                    {onDragStart}
+                    onUpdate={canvas ? canvas.updateCard : null}
+                    {mode}
+                    {campId}
+                    isOnTable={playCardIds.has(card.id)}
+                    onInvoke={(inv) => { pendingInvoke = inv; showDice = true; showToast('\u2726 Invoke queued \u2014 +2 on next roll'); }}
+                  />
+                </div>
+              {/if}
+            {/each}
+          </div>
+
+          <!-- Empty state -->
+          {#if cards.length === 0 && loaded}
+            <div class="board-empty">
+              <div class="board-empty-icon">&#x1F3B2;</div>
+              <div class="board-empty-title">Canvas is empty</div>
+              <div class="board-empty-desc">
+                Click any generator in the left panel to place a card.<br/>
+                Right-click anywhere to generate in place.
+              </div>
+            </div>
+          {/if}
+
+          <!-- Coach marks -->
+          {#if coachCanvas && cards.length === 0 && loaded && mode === 'prep'}
+            <div class="board-coach board-coach-canvas" role="dialog" aria-label="Getting started tip">
+              <div class="bc-coach-body">
+                <div class="bc-coach-icon">&#x1F3B2;</div>
+                <div class="bc-coach-text">
+                  <strong>This is your GM canvas</strong>
+                  <span> &mdash; generate cards from the left panel, arrange them here. Switch to <strong>Play</strong> and click <strong>Host</strong> when your players are ready.</span>
+                </div>
+                <button class="bc-coach-dismiss" on:click={dismissCoachCanvas} aria-label="Dismiss tip">&times;</button>
+              </div>
+            </div>
+          {/if}
+
+          {#if coachPlay && mode === 'play'}
+            <div class="board-coach board-coach-play" role="dialog" aria-label="Play mode tip">
+              <div class="bc-coach-body">
+                <div class="bc-coach-icon">&#x25CF;</div>
+                <div class="bc-coach-text">
+                  <strong>Prep cards are private.</strong>
+                  <span> Use <strong>&#x25CF; Send to Table</strong> on any Prep card to share it with connected players.</span>
+                </div>
+                <button class="bc-coach-dismiss" on:click={dismissCoachPlay} aria-label="Dismiss tip">&times;</button>
+              </div>
+            </div>
+          {/if}
+
+          <!-- Context menu -->
+          {#if ctx}
+            <div
+              class="board-ctx"
+              role="menu"
+              aria-label="Generate card"
+              style="left:{ctx.screenX}px;top:{ctx.screenY}px"
+              on:click|stopPropagation
+            >
+              <div class="board-ctx-section" role="none">Generate here</div>
+              {#each CTX_ITEMS as g (g.id)}
+                <div
+                  class="board-ctx-item" role="menuitem" tabindex="0"
+                  on:click={() => ctxGenerate(g.id)}
+                  on:keydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ctxGenerate(g.id); } }}
+                >
+                  <span class="board-ctx-icon" aria-hidden="true">{g.icon}</span>
+                  {g.label}
+                </div>
+              {/each}
+              <div class="board-ctx-sep" role="separator"></div>
+              <div
+                class="board-ctx-item" role="menuitem" tabindex="0"
+                on:click={() => { ctx = null; }}
+                on:keydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ctx = null; } }}
+              >
+                <span class="board-ctx-icon" aria-hidden="true">&times;</span> Cancel
+              </div>
+            </div>
+          {/if}
+
+          <!-- Card search -->
+          <div class="board-search">
+            <input
+              type="text" value={cardSearch}
+              placeholder="&#x1F50D; Search cards&hellip;"
+              on:input={(e) => { cardSearch = e.target.value; }}
+              on:keydown={(e) => { if (e.key === 'Escape') cardSearch = ''; }}
+              aria-label="Search cards on canvas"
+              style="width:{cardSearch ? 140 : 100}px;transition:width .15s"
+            />
+            {#if cardSearch}
+              <button class="board-search-clear" on:click={() => { cardSearch = ''; }} aria-label="Clear search">&times;</button>
+            {/if}
+          </div>
+
+          <!-- Zoom controls -->
+          <div class="board-zoom">
+            <button class="board-zoom-btn" on:click={() => changeZoom(-0.1)} aria-label="Zoom out">&minus;</button>
+            <div class="board-zoom-pct">{Math.round(zoom * 100)}%</div>
+            <button class="board-zoom-btn" on:click={() => changeZoom(0.1)} aria-label="Zoom in">+</button>
+            <button class="board-zoom-btn" on:click={fitAll} aria-label="Fit all cards" title="Zoom to fit all cards">&#x2922;</button>
+          </div>
+
+          <!-- Toast -->
+          {#if toast}
+            <div class="board-toast">{toast}</div>
+          {/if}
+        </div>
       {/if}
     </div>
   </div>
-
-  <!-- Mobile generate FAB — hidden on desktop, visible on mobile -->
-  <GenerateFAB
-    {activeGen}
-    onGenerate={(genId) => { if (canvas) canvas.generateCard(genId); }}
-  />
 
   <!-- Binder right panel (Prep mode only) -->
   {#if mode === 'prep' && binderOpenVal}
@@ -678,10 +836,10 @@
 
   <!-- Dice floater -->
   {#if showDice}
-    <div class="board-floater board-dice-floater" onclick={(e) => e.stopPropagation()}>
+    <div class="board-floater board-dice-floater" on:click|stopPropagation>
       <div class="board-floater-hdr">
-        <span class="board-floater-title"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> Dice</span>
-        <button class="board-floater-close" onclick={() => { showDice = false; }} aria-label="Close dice roller">&times;</button>
+        <span class="board-floater-title">&#x1F3B2; Dice</span>
+        <button class="board-floater-close" on:click={() => { showDice = false; }} aria-label="Close dice roller">&times;</button>
       </div>
       <DicePanel
         players={fpState ? (fpState.pcs || []).map(pc => ({ id: pc.id, name: pc.name, skills: pc.skills || [] })) : []}
@@ -704,10 +862,10 @@
 
   <!-- FP tracker floater -->
   {#if showFP}
-    <div class="board-floater board-fp-floater" onclick={(e) => e.stopPropagation()}>
+    <div class="board-floater board-fp-floater" on:click|stopPropagation>
       <div class="board-floater-hdr">
-        <span class="board-floater-title"><i class="fa-solid fa-coins" aria-hidden="true"></i> Fate Points</span>
-        <button class="board-floater-close" onclick={() => { showFP = false; }} aria-label="Close Fate Point tracker">&times;</button>
+        <span class="board-floater-title">&#x25CE; Fate Points</span>
+        <button class="board-floater-close" on:click={() => { showFP = false; }} aria-label="Close Fate Point tracker">&times;</button>
       </div>
       {#if fpState}
         <FatePointTracker
@@ -720,10 +878,10 @@
 
   <!-- Session notes floater -->
   {#if showNotes}
-    <div class="board-floater board-notes-floater" onclick={(e) => e.stopPropagation()}>
+    <div class="board-floater board-notes-floater" on:click|stopPropagation>
       <div class="board-floater-hdr">
-        <span class="board-floater-title"><i class="fa-solid fa-note-sticky" aria-hidden="true"></i> Session Notes</span>
-        <button class="board-floater-close" onclick={() => { showNotes = false; }} aria-label="Close session notes">&times;</button>
+        <span class="board-floater-title">&#x1F4DD; Session Notes</span>
+        <button class="board-floater-close" on:click={() => { showNotes = false; }} aria-label="Close session notes">&times;</button>
       </div>
       <div style="padding:12px;color:var(--text-muted);font-size:13px">
         Session notes coming soon.
@@ -753,72 +911,5 @@
       campName={campMeta.name}
       {campId}
     />
-  {/if}
-
-
-  <!-- Compel offer modal -->
-  {#if compelOffer}
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="modal-overlay" onclick={() => compelOffer = null} role="presentation">
-      <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-      <div class="modal-box modal-box-narrow" onclick={(e) => e.stopPropagation()}
-        role="dialog" aria-modal="true" aria-label="Compel offer"
-        tabindex="-1">
-        <div class="modal-header">
-          <span class="modal-title">↩ Compel Offer</span>
-          <button class="modal-close" onclick={() => compelOffer = null} aria-label="Close">×</button>
-        </div>
-        <div class="modal-body" style="padding:16px">
-          <div style="margin-bottom:12px; font-size:13px">
-            <strong>{compelOffer.playerName}</strong> — aspect:
-            <em style="color:var(--accent)">{compelOffer.aspect}</em>
-          </div>
-          <div style="font-size:12px; color:var(--text-muted); margin-bottom:16px; line-height:1.5">
-            Offer 1 FP to complicate their situation using this aspect.
-            They can accept (take complication + gain 1 FP) or refuse (pay 1 FP to resist).
-          </div>
-          <div style="display:flex; gap:8px; justify-content:flex-end">
-            <button class="tb-confirm-cancel" onclick={() => compelOffer = null}>Cancel</button>
-            <button class="tb-confirm-ok" onclick={() => {
-              if (play) {
-                const p = players.find(pl => pl.id === compelOffer.playerId);
-                if (p) {
-                  play.updPlayer(compelOffer.playerId, { fp: (p.fp || 0) + 1 });
-                  showToast('↩ Compel accepted — ' + compelOffer.playerName + ' gains 1 FP');
-                }
-              }
-              compelOffer = null;
-            }}>Accept (+1 FP)</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  {/if}
-
-  <!-- Clear table modal -->
-  {#if showClearModal}
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div class="modal-overlay" onclick={() => showClearModal = false} role="presentation">
-      <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-      <div class="modal-box modal-box-narrow" onclick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Clear table options">
-        <div class="modal-header">
-          <span class="modal-title">Clear Table</span>
-          <button class="btn btn-ghost btn-icon" onclick={() => showClearModal = false} aria-label="Close"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
-        </div>
-        <div class="modal-body">
-          <p class="rhp-ready-sub">Choose what to clear. This cannot be undone.</p>
-          <div class="sz-grid">
-            <button class="btn sz-option" onclick={() => { if (canvas) canvas.clearCanvas(); showClearModal = false; }}>
-              <div class="sz-option-title">Clear current canvas</div>
-              <div class="sz-option-sub">Removes all cards from the {mode} canvas</div>
-            </button>
-            <button class="btn sz-option" onclick={() => { showClearModal = false; showToast('Use Prep mode to clear prep canvas'); }}>
-              <div class="sz-option-title">Clear other canvas</div>
-              <div class="sz-option-sub">Switch to {mode === 'prep' ? 'play' : 'prep'} mode first to clear that canvas</div>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
   {/if}
 </div>

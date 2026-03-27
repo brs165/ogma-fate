@@ -1,8 +1,18 @@
 <script>
   // ── BinderPanel — binder library + drafting tray ─────────────────────────────
   import { GENERATORS } from '../../engine.js';
-  import { ToggleGroup } from 'bits-ui';
-  let { campId = '', campName = '', binderCards = [], trayCards = [], onAddToTray = null, onRemoveFromTray = null, onSendTrayToCanvas = null, onSendToCanvas = null, onExportCard = null, onUnpin = null } = $props();
+
+  export let campId            = '';
+  export let campName          = '';
+  export let binderCards       = [];
+  export let trayCards         = [];
+  export let onAddToTray       = null;
+  export let onRemoveFromTray  = null;
+  export let onSendTrayToCanvas = null;
+  export let onSendToCanvas    = null;
+  export let onExportCard      = null;
+  export let onUnpin           = null;
+
   const BINDER_FILTER_GROUPS = {
     people:    ['npc_minor', 'npc_major', 'pc', 'backstory'],
     scene:     ['scene', 'encounter', 'complication', 'seed'],
@@ -18,12 +28,12 @@
     {id:'mechanics',label:'Mech'},
   ];
 
-  let filter = $state('all');
+  let filter = 'all';
 
-  let visible = $derived(binderCards.filter(card => {
+  $: visible = binderCards.filter(card => {
     if (filter === 'all') return true;
     return (BINDER_FILTER_GROUPS[filter] || []).includes(card.genId);
-  }));
+  });
 
   function cardTitle(card) {
     const d = card.data || {};
@@ -59,19 +69,16 @@
 
   <!-- Filter strip -->
   {#if binderCards.length > 0}
-    <ToggleGroup.Root
-      type="single"
-      value={filter}
-      onValueChange={(v) => { if (v) filter = v; }}
-      class="bbp-filters"
-      aria-label="Filter by type"
-    >
+    <div class="bbp-filters" role="group" aria-label="Filter by type">
       {#each filters as f (f.id)}
-        <ToggleGroup.Item value={f.id} class="bbp-filter-btn" aria-label="Filter: {f.label}">
-          {f.label}
-        </ToggleGroup.Item>
+        {@const active = filter === f.id}
+        <button
+          class="bbp-filter-btn{active ? ' active' : ''}"
+          on:click={() => (filter = f.id)}
+          aria-pressed={String(active)}
+        >{f.label}</button>
       {/each}
-    </ToggleGroup.Root>
+    </div>
   {/if}
 
   <!-- Card list -->
@@ -95,23 +102,23 @@
         <div class="bbp-card-actions">
           <button
             class="bbp-action{tray ? ' in-tray' : ''}"
-            onclick={() => toggleTray(card)}
+            on:click={() => toggleTray(card)}
             title={tray ? 'Remove from Tray' : 'Add to Drafting Tray'}
             aria-pressed={String(tray)}
           >{tray ? '★' : '☆'}</button>
           <button
             class="bbp-action bbp-action-canvas"
-            onclick={() => onSendToCanvas && onSendToCanvas(card)}
+            on:click={() => onSendToCanvas && onSendToCanvas(card)}
             title="Place on canvas now"
           >→</button>
           <button
             class="bbp-action"
-            onclick={() => onExportCard && onExportCard(card)}
+            on:click={() => onExportCard && onExportCard(card)}
             title="Export as JSON"
           >↓</button>
           <button
             class="bbp-action bbp-action-remove"
-            onclick={() => onUnpin && onUnpin(card.id)}
+            on:click={() => onUnpin && onUnpin(card.id)}
             title="Remove from Binder"
           >✕</button>
         </div>
@@ -127,7 +134,7 @@
         <span class="bbp-tray-count">{trayCards.length}</span>
         <button
           class="bbp-tray-send"
-          onclick={() => onSendTrayToCanvas && onSendTrayToCanvas()}
+          on:click={() => onSendTrayToCanvas && onSendTrayToCanvas()}
           title="Place all Tray cards on canvas"
         >→ All to canvas</button>
       {/if}
@@ -144,7 +151,7 @@
             <span class="bbp-tray-name">{title}</span>
             <button
               class="bbp-tray-remove"
-              onclick={() => onRemoveFromTray && onRemoveFromTray(card.id)}
+              on:click={() => onRemoveFromTray && onRemoveFromTray(card.id)}
               aria-label="Remove from tray"
             >✕</button>
           </div>

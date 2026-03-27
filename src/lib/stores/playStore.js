@@ -1,4 +1,4 @@
-// playStore.js — Play mode state: players, turn order, rounds, fate points, stress, GM pool
+// playStore.js — from useBoardPlayState (react-source/core/ui-board.js L2081-2250)
 // Factory: createPlayStore(campId)
 import { writable } from 'svelte/store';
 import DB from '../db.js';

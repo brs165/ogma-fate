@@ -33,46 +33,18 @@ import Dexie from 'dexie';
 
     // ── Schema defaults — ensure all known keys have a value ──────────────
     var DEFAULTS = {
-      _v:                      LS_VERSION,
-      theme:                   'dark',
-      textsize:                0,
-      universal_merge:         true,
-      help_level:              'new_fate',
-      gm_mode:                 true,
-      intro_seen:              {},
-      coach_canvas_dismissed:  false,
-      coach_play_dismissed:    false,
-      pwa_nudge_dismissed:     false,
-      safari_warn_dismissed:   false,
-      ios_install_dismissed:   false,
-      visit_counts:            {},
+      _v:              LS_VERSION,
+      theme:           'dark',
+      textsize:        0,
+      universal_merge: true,
+      help_level:      'new_fate',
+      gm_mode:         true,
+      intro_seen:      {},
     };
     var changed = false;
     Object.keys(DEFAULTS).forEach(function(k) {
       if (prefs[k] === undefined) { prefs[k] = DEFAULTS[k]; changed = true; }
     });
-
-    // ── BL-01: Migrate straggler bare localStorage keys into prefs ──────
-    var STRAGGLER_BOOLS = ['pwa_nudge_dismissed', 'safari_warn_dismissed', 'ios_install_dismissed'];
-    STRAGGLER_BOOLS.forEach(function(k) {
-      if (!prefs[k]) {
-        try { if (localStorage.getItem(k)) { prefs[k] = true; changed = true; localStorage.removeItem(k); } } catch(e) {}
-      }
-    });
-    // Migrate visit_count_* keys
-    try {
-      var allKeys = Object.keys(localStorage);
-      allKeys.forEach(function(k) {
-        if (k.startsWith('visit_count_')) {
-          var campId = k.replace('visit_count_', '');
-          var val = parseInt(localStorage.getItem(k) || '0', 10) || 0;
-          if (!prefs.visit_counts) prefs.visit_counts = {};
-          if (!prefs.visit_counts[campId]) { prefs.visit_counts[campId] = val; changed = true; }
-          localStorage.removeItem(k);
-        }
-      });
-    } catch(e) {}
-
     if (!prefs._v) { prefs._v = LS_VERSION; changed = true; }
     if (changed) savePrefs(prefs);
 
@@ -109,17 +81,6 @@ export const LS = {
       var p = ensurePrefs();
       if (p.intro_seen) delete p.intro_seen[worldKey];
       savePrefs(p);
-    },
-    // Visit counts per campaign
-    getVisitCount: function(campId) {
-      return (ensurePrefs().visit_counts || {})[campId] || 0;
-    },
-    incrementVisitCount: function(campId) {
-      var p = ensurePrefs();
-      if (!p.visit_counts) p.visit_counts = {};
-      p.visit_counts[campId] = (p.visit_counts[campId] || 0) + 1;
-      savePrefs(p);
-      return p.visit_counts[campId];
     },
 
 };
@@ -311,7 +272,7 @@ export const DB = {
 
     // ── Export / Import (JSON file) ──────────────────────────────────────────
     exportSession: function(session) {
-      var json = JSON.stringify({ format: 'ogma', version: '2.0.0', type: 'session', exported: new Date().toISOString(), campaign: session.campaign || '', campId: session.campId || '', ts: Date.now(), session: session }, null, 2);
+      var json = JSON.stringify({ ogma: true, version: 1, type: 'session', exported: new Date().toISOString(), session: session }, null, 2);
       var blob = new Blob([json], {type: 'application/json'});
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
@@ -322,7 +283,7 @@ export const DB = {
     },
 
     exportCard: function(card, campName) {
-      var json = JSON.stringify({ format: 'ogma', version: '2.0.0', generator: card.genId || '', campaign: campName || '', campId: card.campId || '', ts: Date.now(), data: card.data || card }, null, 2);
+      var json = JSON.stringify({ ogma: true, version: 1, type: 'card', exported: new Date().toISOString(), campaign: campName || '', card: card }, null, 2);
       var blob = new Blob([json], {type: 'application/json'});
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
@@ -335,13 +296,10 @@ export const DB = {
     // EXP-02: Export all pinned cards for a campaign as a JSON file
     exportCards: function(campId, campName, cards) {
       var json = JSON.stringify({
-        format: 'ogma', version: '2.0.0',
-        campaign: campName || campId,
-        campId: campId,
-        ts: Date.now(),
-        results: cards.map(function(c) {
-          return { generator: c.genId || c.generator || '', label: c.title || c.genId || '', data: c.data || {}, ts: c.ts || Date.now() };
-        })
+        ogma: true, version: 1, type: 'cards',
+        exported: new Date().toISOString(),
+        campaign: campId, campName: campName || campId,
+        cards: cards
       }, null, 2);
       var blob = new Blob([json], {type: 'application/json'});
       var url = URL.createObjectURL(blob);
@@ -359,9 +317,9 @@ export const DB = {
       return DB.loadSession(key).then(function(state) {
         if (!state) throw new Error('Nothing to export — canvas is empty');
         var json = JSON.stringify({
-          format: 'ogma', version: '2.0.0', type: 'canvas',
+          ogma: true, version: 1, type: 'canvas',
           exported: new Date().toISOString(),
-          ts: Date.now(), key: key, state: state
+          key: key, state: state
         }, null, 2);
         var blob = new Blob([json], {type: 'application/json'});
         var url = URL.createObjectURL(blob);

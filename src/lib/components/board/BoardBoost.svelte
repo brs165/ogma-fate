@@ -1,10 +1,15 @@
 <script>
   // ── BoardBoost — ephemeral boost card with 1 free invoke ─────────────────────
-  let { card = {}, onDelete = null, onUpdate = null, onDragStart = null, onInvoke = null } = $props();
-  let editing = $state(false);
-  let draft = $state(card.text || '');
+  export let card        = {};
+  export let onDelete    = null;
+  export let onUpdate    = null;
+  export let onDragStart = null;
+  export let onInvoke    = null;
 
-  let expired = $derived(card.expired || false);
+  let editing = false;
+  let draft   = card.text || '';
+
+  $: expired = card.expired || false;
 
   function commitEdit() {
     editing = false;
@@ -18,6 +23,11 @@
     editing = true;
   }
 
+  function onMouseDown(e) {
+    if (editing) return;
+    if (e.target.closest('.bc-actions')) return;
+    if (onDragStart) onDragStart(e, card.id);
+  }
 
   function onKeyDown(e) {
     if (!editing && (e.key === 'Enter' || e.key === 'F2')) {
@@ -40,22 +50,25 @@
   }
 
   let textareaEl;
-  $effect(() => { if (editing && textareaEl) setTimeout(() => textareaEl && textareaEl.focus(), 0); });
+  $: if (editing && textareaEl) setTimeout(() => textareaEl && textareaEl.focus(), 0);
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <div
   class="board-boost{expired ? ' boost-expired' : ''}{editing ? ' editing' : ''}"
-  style="transform:{editing ? 'rotate(0deg)' : 'rotate(' + (card.rotation || 0) + 'deg)'};"
+  style="left:{card.x}px; top:{card.y}px;
+         transform:{editing ? 'rotate(0deg)' : 'rotate(' + (card.rotation || 0) + 'deg)'};
+         z-index:{card.z || 1}"
   tabindex={editing ? -1 : 0}
   role="note"
   aria-label="Boost: {card.text || 'New Boost'}{expired ? ' (expired)' : ''}"
-  ondblclick={(e) => { e.stopPropagation(); startEdit(e); }}
-  onkeydown={onKeyDown}
+  on:mousedown={onMouseDown}
+  on:dblclick|stopPropagation={startEdit}
+  on:keydown={onKeyDown}
 >
-  <div class="bc-actions nodrag nopan">
+  <div class="bc-actions">
     <button class="bc-btn" title="Delete"
-      onclick={(e) => { e.stopPropagation(); (() => onDelete && onDelete(card.id))(e); }}>✕</button>
+      on:click|stopPropagation={() => onDelete && onDelete(card.id)}>✕</button>
   </div>
 
   <div class="boost-header">
@@ -74,16 +87,16 @@
       style="background:transparent; color:#5a4e00; border:none; border-bottom:2px solid #f4b942;
              outline:none; width:100%; resize:none; font-family:inherit; font-size:12px;
              padding:0; line-height:1.5"
-      onblur={commitEdit}
-      onkeydown={onTextareaKeyDown}
-      onclick={(e) => e.stopPropagation()}
+      on:blur={commitEdit}
+      on:keydown={onTextareaKeyDown}
+      on:click|stopPropagation
     ></textarea>
   {:else}
     <div class="boost-text">{card.text || '"New Boost"'}</div>
   {/if}
 
   <!-- svelte-ignore a11y_click_events_have_key_events -->
-  <div class="boost-invoke-row nodrag nopan" onclick={(e) => e.stopPropagation()}>
+  <div class="boost-invoke-row" on:click|stopPropagation>
     {#if expired}
       <span class="boost-expired-label">Expired — used</span>
     {:else}
@@ -91,7 +104,7 @@
         class="boost-use-btn"
         title="Use free invoke — boost expires after use"
         aria-label="Use boost free invoke"
-        onclick={useInvoke}
+        on:click={useInvoke}
       >● Use Invoke</button>
     {/if}
   </div>
