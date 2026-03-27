@@ -63,7 +63,7 @@
   // ── Stores ─────────────────────────────────────────────────────────────────
   let chrome = $state();
   let session = $state();
-  let unsubs = $state([]);
+  let unsubs = [];
 
   // Reactive values from stores
   let toast = $state(null);

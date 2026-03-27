@@ -54,8 +54,10 @@
   function startEditTitle(e) { e.stopPropagation(); editTitle = true; }
   function startEditBody(e) { e.stopPropagation(); editBody = true; }
 
-  $effect(() => { if (editTitle && titleEl) titleEl.focus(); });
-  $effect(() => { if (editBody && bodyEl) bodyEl.focus(); });
+  $effect(() => {
+    if (editTitle && titleEl) titleEl.focus();
+    else if (editBody && bodyEl) bodyEl.focus();
+  });
 </script>
 
 <!-- Type pill -->

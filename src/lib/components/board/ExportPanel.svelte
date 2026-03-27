@@ -13,9 +13,8 @@
   ));
 
   // Selection state — reset when exportable set changes
-  let sel = {};
+  let sel = $state({});
   $effect(() => {
-    void exportable.length;
     const s = {};
     exportable.forEach(c => { s[c.id] = true; });
     sel = s;

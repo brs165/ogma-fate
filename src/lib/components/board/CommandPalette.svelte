@@ -13,7 +13,7 @@
       )
     : actions);
 
-  $effect(() => { void filtered; sel = 0; });
+  $effect(() => { filtered.length; sel = 0; });
 
   function exec(action) {
     if (action.fn) action.fn();

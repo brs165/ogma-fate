@@ -1,5 +1,6 @@
 <script>
   // ── BoardSticky — inline-editable aspect sticky note ─────────────────────────
+  import { tick } from 'svelte';
   let { card = {}, onDelete = null, onUpdate = null, onDragStart = null, onInvoke = null } = $props();
   const STICKY_COLORS = [
     {bg: '#fff9c4', text: '#5a4e00', label: '#8a7800'},
@@ -56,7 +57,7 @@
   }
 
   let textareaEl;
-  $effect(() => { if (editing && textareaEl) setTimeout(() => textareaEl && textareaEl.focus(), 0); });
+  $effect(() => { if (editing && textareaEl) tick().then(() => textareaEl?.focus()); });
 </script>
 
 <div
