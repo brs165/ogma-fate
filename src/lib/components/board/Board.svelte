@@ -489,7 +489,7 @@
           <AlertDialog.Action
             class="btn"
             style="background:var(--c-red);border-color:var(--c-red);color:#fff"
-            onclick={() => { if (canvas) canvas.clearCanvas(); showToast('Table cleared'); }}
+            onclick={() => { showClearModal = false; if (canvas) canvas.clearCanvas(); showToast('Table cleared'); }}
           >Clear Table</AlertDialog.Action>
         </div>
       </AlertDialog.Content>

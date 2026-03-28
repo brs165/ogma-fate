@@ -15,7 +15,8 @@
 @media(max-width:768px){.wiki-sidebar{display:none}.wiki-content{padding:20px 16px 60px}}
 kbd{display:inline-block;background:var(--panel);border:1px solid var(--border-mid);border-radius:4px;padding:1px 7px;font-family:var(--font-mono);font-size:11px;color:var(--text);box-shadow:0 1px 0 var(--border-mid);white-space:nowrap}
 .wiki-content h1{font-size:var(--text-2xl);font-weight:900;color:var(--text);margin:0 0 8px;letter-spacing:-0.03em;font-family:var(--font-display)}
-.wiki-content h2{font-size:var(--text-xl);font-weight:800;color:var(--text);margin:40px 0 12px;padding-bottom:8px;border-bottom:1.5px solid var(--border-mid);font-family:var(--font-display)}
+.wiki-content h2{font-size:var(--text-xl);font-weight:800;color:var(--text);margin:40px 0 12px;padding-bottom:8px;border-bottom:1.5px solid var(--border-mid);font-family:var(--font-display);scroll-margin-top:72px}
+.wiki-content [id].step-block,.wiki-content [id].wiki-section{scroll-margin-top:72px}
 .wiki-content h2:first-of-type{margin-top:24px}
 .wiki-content h3{font-size:var(--text-lg);font-weight:700;color:var(--text);margin:28px 0 10px;font-family:var(--font-display)}
 .wiki-content h4{font-size:var(--text-base);font-weight:700;color:var(--text);margin:20px 0 8px}
