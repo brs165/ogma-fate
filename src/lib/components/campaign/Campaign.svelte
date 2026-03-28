@@ -75,6 +75,7 @@
   let pinBouncing = $state(false);
   let sessionPack = $state(null);
   let resultAnim = $state(false);
+  let showStreakBadge = $state(false);
 
   function initStores() {
     unsubs.forEach(u => u());
@@ -91,6 +92,7 @@
     unsubs.push(session.pinBouncing.subscribe(v => pinBouncing = v));
     unsubs.push(session.sessionPack.subscribe(v => sessionPack = v));
     unsubs.push(session.resultAnim.subscribe(v => resultAnim = v));
+    if (session.showStreakBadge) unsubs.push(session.showStreakBadge.subscribe(v => showStreakBadge = v));
     if (session.consequenceSev) unsubs.push(session.consequenceSev.subscribe(v => consequenceSev = v));
   }
 
@@ -402,6 +404,9 @@
                         <span aria-hidden="true"><i class="fa-solid fa-dice-d20"></i></span> Roll {gen ? gen.label : ''}
                       {/if}
                     </span>
+                    {#if showStreakBadge}
+                      <span class="streak-badge" aria-live="polite" aria-label="On a roll!">🔥 On a roll!</span>
+                    {/if}
                   </button>
 
                   <!-- Secondary actions -->
@@ -535,6 +540,7 @@
       <!-- Drag divider -->
       <div
         class="cp-divider"
+        class:cp-divider-active={draggingDivider}
         aria-hidden="true"
         onpointerdown={onDividerPointerDown}
         onpointermove={onDividerPointerMove}
