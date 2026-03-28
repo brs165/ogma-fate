@@ -48,9 +48,8 @@
       </ol>
     </details>
 
-    <div class="step-block" id="step-1">
-      <div class="step-num">1</div>
-      <div class="step-title">Fiction first</div>
+    <details class="step-block" id="step-1" open>
+      <summary class="step-summary"><span class="step-num">1</span> Fiction first</summary>
       <div class="step-body">
         <p>In Fate, you describe what your character does in the story, <strong>then</strong> choose the skill and action that fits. The fiction drives the rules, not the other way around. You don't say "I roll Athletics." You say "I leap over the counter and slide behind the bar" — and the GM says "that sounds like Athletics to overcome the obstacle."</p>
         <div class="callout callout-dnd" role="note"><div class="callout-title">⚔ Coming from D&amp;D</div><p>In D&D you pick a skill, then describe the action. In Fate it's reversed. Describe first, mechanics second.</p></div>
@@ -61,11 +60,10 @@
           <HelpDiceRoller mode="basic" label="4dF — raw roll" />
         </div>
       </div>
-    </div>
+    </details>
 
-    <div class="step-block" id="step-2">
-      <div class="step-num">2</div>
-      <div class="step-title">Aspects — the core of everything</div>
+    <details class="step-block" id="step-2">
+      <summary class="step-summary"><span class="step-num">2</span> Aspects — the core of everything</summary>
       <div class="step-body">
         <p>An <strong>aspect</strong> is a short phrase that is true about a character, scene, or situation. "Burned-Out Corp Fixer," "Slippery Deck in the Storm," "The Crown Owes Me a Favour." Aspects do two things: you can <strong>invoke</strong> them (spend a fate point for +2 on a roll when they're relevant) or they can be <strong>compelled</strong> (the GM offers you a fate point to accept a complication).</p>
         <p>Your character has 5 aspects: a <strong>High Concept</strong> (who you are), a <strong>Trouble</strong> (what makes your life complicated), a <strong>Relationship</strong> (your connection to another PC), and two more.</p>
@@ -80,11 +78,10 @@
           </div>
         </div>
       </div>
-    </div>
+    </details>
 
-    <div class="step-block" id="step-3">
-      <div class="step-num">3</div>
-      <div class="step-title">Skills and dice</div>
+    <details class="step-block" id="step-3">
+      <summary class="step-summary"><span class="step-num">3</span> Skills and dice</summary>
       <div class="step-body">
         <p>Your character has 19 skills rated from +0 (Mediocre) to +4 (Great). When you act, you roll 4 Fate dice (each shows +1, 0, or −1), add the relevant skill, and compare to a target number. Results: <strong>Fail</strong> (below target), <strong>Tie</strong> (equal), <strong>Success</strong> (+1 or +2 over), <strong>Success with Style</strong> (+3 or more).</p>
         <p>The four actions you can take: <strong>Overcome</strong> (get past an obstacle), <strong>Create an Advantage</strong> (place a new aspect on the scene), <strong>Attack</strong> (harm someone), <strong>Defend</strong> (stop someone's action).</p>
@@ -96,11 +93,10 @@
           <HelpDiceRoller mode="skill" skill={3} label="Athletics +3" />
         </div>
       </div>
-    </div>
+    </details>
 
-    <div class="step-block" id="step-4">
-      <div class="step-num">4</div>
-      <div class="step-title">Fate points — the economy</div>
+    <details class="step-block" id="step-4">
+      <summary class="step-summary"><span class="step-num">4</span> Fate points — the economy</summary>
       <div class="step-body">
         <p>You start each session with at least 3 <strong>fate points</strong>. Spend one to <strong>invoke</strong> an aspect for +2 on a roll (or a reroll). Earn one when you accept a <strong>compel</strong> — the GM offers a fate point and a complication based on one of your aspects. You can refuse a compel by spending a fate point instead.</p>
         <p>The flow is: accept compels to earn points, spend points to invoke aspects on big rolls. This is the heartbeat of Fate. More compels = more fate points = more dramatic swings.</p>
@@ -112,11 +108,10 @@
           <HelpDiceRoller mode="skill" skill={1} label="Stealth +1 (trouble in play)" />
         </div>
       </div>
-    </div>
+    </details>
 
-    <div class="step-block" id="step-5">
-      <div class="step-num">5</div>
-      <div class="step-title">Stress and consequences</div>
+    <details class="step-block" id="step-5">
+      <summary class="step-summary"><span class="step-num">5</span> Stress and consequences</summary>
       <div class="step-body">
         <p>When you take a hit, you absorb it with <strong>stress boxes</strong> (1 shift each, 3 per track by default — you can mark <em>as many as you need</em> per hit) or <strong>consequences</strong> (named aspects: Mild absorbs 2 shifts, Moderate absorbs 4, Severe absorbs 6). Stress clears at end of every scene. If you can't absorb all the shifts, you're <strong>taken out</strong> — the attacker narrates what happens. You can also <strong>concede before your opponent rolls</strong> — you leave the scene on your terms and earn fate points. Once dice hit the table, the window to concede has passed (FCon p.36).</p>
         <p>Stress clears at the end of every scene. Consequences persist: Mild clears after a scene (with treatment), Moderate after a session, Severe after a breakthrough.</p>
@@ -131,11 +126,10 @@
           </div>
         </div>
       </div>
-    </div>
+    </details>
 
-    <div class="step-block" id="step-6">
-      <div class="step-num">6</div>
-      <div class="step-title">Stunts and advancement</div>
+    <details class="step-block" id="step-6">
+      <summary class="step-summary"><span class="step-num">6</span> Stunts and advancement</summary>
       <div class="step-body">
         <p><strong>Stunts</strong> give your character a special edge: +2 to a specific skill in a specific situation, or a once-per-scene special ability. You start with 3 free; each extra costs 1 Refresh (minimum Refresh 1).</p>
         <p>Characters grow through <strong>milestones</strong> (end of session: swap skills, rewrite aspects or stunts) and <strong>breakthroughs</strong> (end of story arc: increase a skill, rewrite your high concept, begin consequence recovery). No XP. No levels.</p>
@@ -164,11 +158,10 @@
           <div class="learn-npc-note">Notice how both stunts are tied to her High Concept — "knows all the exits" is Exit Strategy, "knows what people owe" is the free invoke. Aspects and stunts reinforce each other.</div>
         </div>
       </div>
-    </div>
+    </details>
 
-    <div class="step-block" id="step-7">
-      <div class="step-num">7 — For the GM</div>
-      <div class="step-title">Running the game</div>
+    <details class="step-block" id="step-7">
+      <summary class="step-summary"><span class="step-num">7</span> Running the game <span class="step-tag">For the GM</span></summary>
       <div class="step-body">
         <p>As a GM, your main tools are: <strong>compels</strong> (offer fate points to create complications), <strong>scene aspects</strong> (set the stage with invokable/compellable truths), <strong>NPCs</strong> (minor = 1-2 aspects, no consequences; major = full character sheet), and the <strong>GM fate point pool</strong> (1 per PC, shared across all NPCs).</p>
         <p>Set difficulty using the adjective ladder: Fair (+2) for routine, Good (+3) for challenging, Great (+4) for hard. Use <strong>challenges</strong> for multi-skill problems, <strong>contests</strong> for opposed races, and <strong>conflicts</strong> when both sides can hurt each other.</p>
@@ -181,7 +174,7 @@
           <HelpDiceRoller mode="skill" skill={2} label="Burglary +2 vs Good (+3) lock" />
         </div>
       </div>
-    </div>
+    </details>
 
     <div class="callout callout-scenario">
       <div class="callout-title">Ready to try it?</div>
@@ -199,17 +192,4 @@
       <a href="/help/how-to-use-ogma">&larr; How to Use Ogma</a>
       <a href="/help/fate-mechanics">Fate Mechanics &rarr;</a>
     </div>
-    <div class="wiki-footer" style="margin-top:16px">
-  <div>
-    <a href="/help">Wiki Home</a> &nbsp;·&nbsp;
-    <a href="/">Open Ogma</a> &nbsp;·&nbsp;
-    <a href="/about">About</a> &nbsp;·&nbsp;
-    <a href="/license">Full Attribution</a> &nbsp;·&nbsp;
-    <!-- FARI_PARKED_2026.03.154 fari.app link --> &nbsp;·&nbsp;
-    <a href="https://fate-srd.com/" target="_blank" rel="noreferrer">fate-srd.com</a>
-  </div>
-  <div style="font-size:var(--text-label);color:var(--text-muted)">
-    Fate&#8482; &amp; Evil Hat Productions, LLC &nbsp;·&nbsp; D&amp;D&#174; &amp; Wizards of the Coast LLC &nbsp;·&nbsp; <a href="/license">CC BY 3.0</a>
-  </div>
-</div>
 </main>

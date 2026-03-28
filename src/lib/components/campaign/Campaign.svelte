@@ -567,6 +567,7 @@
                     <div class="rhp-ready-sub">
                       Click <strong>Roll</strong> or press <strong>Space</strong>
                       to generate a {gen ? gen.label : 'result'}.
+                      <span class="rhp-ready-cmdk"><kbd>Ctrl+K</kbd> for quick commands</span>
                     </div>
 
                     {#if helpEntry}
