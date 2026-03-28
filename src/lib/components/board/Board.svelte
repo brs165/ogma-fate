@@ -3,8 +3,8 @@
   // Sprint 1+2: play/binder/sync removed. Single canvas key. No mode toggle.
   import { onMount, onDestroy } from 'svelte';
   import { get } from 'svelte/store';
-  import { getWorldTables, getWorldMeta } from '../../helpers.js';
   import { createCanvasStore } from '../../stores/canvasStore.js';
+  import { CAMPAIGNS } from '../../../data/shared.js';
   import { DB, LS } from '../../db.js';
 
   import Topbar        from './Topbar.svelte';
@@ -37,8 +37,8 @@
   const BOARD_FP_KEY     = 'board_fp_v1';
 
   // ── Derived ────────────────────────────────────────────────────────────────
-  let campMeta = $derived(getWorldMeta(campId));
-  let tables   = $derived(getWorldTables(campId));
+  let campMeta = $derived((CAMPAIGNS[campId] && CAMPAIGNS[campId].meta) || { name: campId, icon: 'fa-dice-d20' });
+  let tables   = $derived((CAMPAIGNS[campId] && CAMPAIGNS[campId].tables) || {});
 
   // ── UI state ───────────────────────────────────────────────────────────────
   let activeGen    = $state('seed');
