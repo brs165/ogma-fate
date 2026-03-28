@@ -548,29 +548,21 @@
         onpointercancel={onDividerPointerUp}
       ></div>
 
-      <!-- Table column — Board embedded -->
-      <div class="cp-table-col">
+      <!-- Table column — Board embedded (single instance for both desktop & mobile) -->
+      <div class="cp-table-col" class:cp-table-mobile-open={tableOpen}>
+        {#if tableOpen}
+          <div class="cp-mobile-sheet-backdrop" onclick={() => { tableOpen = false; }} aria-hidden="true"></div>
+          <div class="cp-mobile-sheet-hdr">
+            <span class="cp-mobile-sheet-title"><i class="fa-solid fa-table-cells" aria-hidden="true"></i> Table</span>
+            <button class="cp-mobile-sheet-close" onclick={() => { tableOpen = false; }} aria-label="Close Table">&times;</button>
+          </div>
+        {/if}
         <Board
           bind:this={boardRef}
           {campId}
           embedded={true}
         />
       </div>
-
-      <!-- Mobile Table bottom-sheet -->
-      {#if tableOpen}
-        <div class="cp-mobile-sheet-backdrop" onclick={() => { tableOpen = false; }} aria-hidden="true"></div>
-        <div class="cp-mobile-sheet" role="dialog" aria-label="Table">
-          <div class="cp-mobile-sheet-hdr">
-            <span class="cp-mobile-sheet-title"><i class="fa-solid fa-table-cells" aria-hidden="true"></i> Table</span>
-            <button class="cp-mobile-sheet-close" onclick={() => { tableOpen = false; }} aria-label="Close Table">&times;</button>
-          </div>
-          <div class="cp-mobile-sheet-body">
-            <!-- Board also mounts here on mobile — shares same IDB key so same cards -->
-            <Board {campId} embedded={true} />
-          </div>
-        </div>
-      {/if}
 
     </div>
   </div>
