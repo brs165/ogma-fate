@@ -139,6 +139,7 @@
   function onWrapPointerDown(e) {
     if (e.target.closest('.cv-card-pos')) return;
     if (e.target.closest('.cv-controls')) return;
+    if (e.target.closest('.cv-empty-hint')) return;
     if (e.button !== 0) return;
 
     // Track all touch pointers for multi-touch gestures

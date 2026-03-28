@@ -71,6 +71,12 @@ import Dexie from 'dexie';
       });
     } catch(e) {}
 
+    // Clean up orphaned keys from earlier schema versions
+    var ORPHANED = ['coach_canvas_dismissed', 'coach_play_dismissed'];
+    ORPHANED.forEach(function(k) {
+      if (prefs[k] !== undefined) { delete prefs[k]; changed = true; }
+    });
+
     if (!prefs._v) { prefs._v = LS_VERSION; changed = true; }
     if (changed) savePrefs(prefs);
 

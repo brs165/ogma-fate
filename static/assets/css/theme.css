@@ -675,7 +675,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
    ═══════════════════════════════════════════════════════════════════════════*/
 
 /* ── Shell structure ────────────────────────────────────────────────────── */
-.app-shell{min-height:100vh;display:flex;flex-direction:column;font-family:var(--font-camp,var(--font-ui))}
+.app-shell{height:100vh;height:100dvh;display:flex;flex-direction:column;font-family:var(--font-camp,var(--font-ui));overflow:hidden}
 .app-body{flex:1;display:flex;overflow:hidden;position:relative;min-height:0}
 
 /* ── Topbar ─────────────────────────────────────────────────────────────── */
@@ -1308,6 +1308,8 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .footer-legal{margin-bottom:4px}
 .footer-links{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap}
 .footer-sep{color:var(--text-muted)}
+.footer-attribution{margin-top:16px;padding-top:12px;border-top:1px solid var(--border);font-size:10px;line-height:1.5;color:var(--text-muted);opacity:0.7;text-align:left;max-width:640px;margin-left:auto;margin-right:auto}
+.footer-attribution p{margin:0 0 6px}
 
 /* ── R-13: Sticky Roll FAB ─────────────────────────────────────────────────── */
 .roll-fab{position:fixed;bottom:calc(24px + env(safe-area-inset-bottom, 0px));right:max(20px, env(safe-area-inset-right, 20px));z-index:250;width:56px;height:56px;border-radius:50%;background:var(--accent);border:none;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;transition:transform 0.15s,opacity 0.15s;animation:fadeUp 0.2s ease both}
@@ -3147,16 +3149,22 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .pw-action-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
 
 /* ══ HELP SYSTEM — Wiki subpage classes ══ */
-.step-block{display:flex;gap:16px;padding:20px 0;border-bottom:1px solid var(--border)}
+.step-block{padding:20px 0;border-bottom:1px solid var(--border)}
 .step-block:last-child{border-bottom:none}
-.step-num{flex-shrink:0;width:36px;height:36px;border-radius:50%;background:var(--accent);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:var(--text-base);font-weight:900;font-family:var(--font-display);line-height:1;margin-top:2px}
-.step-title{font-size:var(--text-md);font-weight:700;color:var(--text);margin-bottom:8px;font-family:var(--font-display)}
+.step-summary{display:flex;align-items:center;gap:12px;cursor:pointer;list-style:none;font-size:var(--text-md);font-weight:700;color:var(--text);font-family:var(--font-display)}
+.step-summary::-webkit-details-marker{display:none}
+.step-summary::after{content:'\25B6';font-size:10px;color:var(--text-muted);margin-left:auto;transition:transform 0.2s}
+.step-block[open] .step-summary::after{transform:rotate(90deg)}
+.step-num{flex-shrink:0;width:36px;height:36px;border-radius:50%;background:var(--accent);color:var(--bg);display:inline-flex;align-items:center;justify-content:center;font-size:var(--text-base);font-weight:900;font-family:var(--font-display);line-height:1}
+.step-tag{font-size:11px;font-weight:600;color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent);border-radius:4px;padding:2px 8px}
+/* Desktop: always show all step content, hide disclosure arrow */
+@media(min-width:768px){.step-summary::after{display:none}.step-summary{cursor:default}.step-block .step-body{display:block !important}}
 .wiki-section{margin:32px 0}
 .wiki-section-title{font-size:var(--text-xl,1.25rem);font-weight:800;color:var(--text);margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid color-mix(in srgb,var(--accent) 30%,transparent);font-family:var(--font-display)}
 .wiki-back{display:inline-flex;align-items:center;gap:6px;font-size:var(--text-sm);color:var(--accent);text-decoration:none;margin-bottom:20px;opacity:0.8;transition:opacity 0.12s}
 .wiki-back:hover{opacity:1}
-@media(max-width:640px){.step-block{flex-direction:column;gap:10px}.step-num{width:28px;height:28px;font-size:var(--text-sm)}}
-.step-body{flex:1;min-width:0}
+@media(max-width:767px){.step-num{width:28px;height:28px;font-size:var(--text-sm)}.step-summary{font-size:var(--text-base)}}
+.step-body{margin-top:12px}
 .step-body p{margin:0 0 10px;font-size:var(--text-sm);color:var(--text-dim);line-height:1.7}
 
 /* ── Callouts — learn-fate + deep-dive ── */
@@ -3279,6 +3287,9 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .rhp-ready-icon{font-size:40px;margin-bottom:4px;line-height:1;transition:opacity 0.15s,transform 0.15s}
 .rhp-ready-title{font-size:var(--text-md);font-weight:700;color:var(--text)}
 .rhp-ready-sub{font-size:var(--text-sm);color:var(--text-muted);text-align:center;margin-bottom:8px}
+.rhp-ready-cmdk{display:block;margin-top:6px;font-size:11px;color:var(--text-muted);opacity:0.7}
+.rhp-ready-cmdk kbd{background:var(--inset);border:1px solid var(--border-mid);border-radius:3px;padding:1px 5px;font-size:10px;font-family:var(--font-mono)}
+@media(max-width:767px){.rhp-ready-cmdk{display:none}}
 .rhp-shell{width:100%;display:flex;flex-direction:column;gap:10px;margin-top:8px;text-align:left}
 .rhp-block{padding:12px 14px;background:var(--glass-bg);border:1px solid var(--border);border-radius:var(--glass-radius);display:flex;flex-direction:column;gap:6px}
 .rhp-block--gm{border-left:3px solid var(--accent);background:color-mix(in srgb,var(--accent) 5%,transparent)}
@@ -3843,6 +3854,30 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
   }
 }
 
+/* M12a — Touch target audit: 44px minimums on coarse pointer */
+@media(pointer:coarse) {
+  .fp-dot { min-width:44px; min-height:44px; }
+  .fp-btn { width:44px; height:44px; }
+  .board-zoom-btn { min-width:44px; min-height:44px; }
+  .fs-flip-btn { min-height:44px; }
+  .fs-stress-box { min-width:44px; min-height:44px; }
+  .ct-act-btn { min-width:44px; min-height:44px; }
+  .chain-roll-btn { min-height:44px; padding:8px 12px; }
+  .what-next-pill { min-height:44px; padding:8px 12px; }
+  .card-view-btn { min-height:44px; padding:8px 12px; }
+  .fpt-collapse-btn { min-width:44px; min-height:44px; }
+  .dp-collapse-btn { min-width:44px; min-height:44px; }
+  .bwb-avatar-btn { width:44px; height:44px; }
+  .bwb-skill-btn { min-height:44px; padding:8px 12px; }
+  .bc-btn { min-width:44px; min-height:44px; }
+  .vault-btn { min-height:44px; }
+  .bbp-filter-btn { min-height:44px; padding:8px 10px; }
+  .sticky-inv-add { min-width:44px; min-height:44px; }
+  .ps-tent-btn { min-height:44px; padding:8px 10px; }
+  .history-item { min-height:44px; }
+  .tm-entry-row { min-height:44px; }
+}
+
 /* M12 — Topbar safe-area-inset-top when installed as PWA */
 @supports(padding-top: env(safe-area-inset-top)) {
   .bt-bar {
@@ -4045,6 +4080,7 @@ g:hover .cv-edge-label-bg { fill:color-mix(in srgb,var(--accent) 12%,var(--panel
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: none;
   background: rgba(0,0,0,0.45);
   z-index: 900;
   pointer-events: none;
@@ -5695,6 +5731,7 @@ button.fp-dot:focus-visible {
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
   min-width: 100px;
+  pointer-events: auto;
 }
 .cv-empty-tpl-btn:hover {
   background: rgba(255,255,255,0.08);
