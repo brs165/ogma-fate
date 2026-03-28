@@ -2790,6 +2790,11 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .bd-modal{background:var(--panel);border-radius:10px;width:560px;max-width:96vw;max-height:92vh;min-height:380px;box-shadow:0 16px 48px rgba(0,0,0,.35),0 0 0 1px rgba(0,0,0,.08);overflow:hidden;animation:bdSlideUp .22s ease;position:relative;display:flex;flex-direction:column}
 /* GM Screen: compact dossier — GM Guidance + actions, no card re-render */
 .bd-modal-compact{width:420px;min-height:0}
+/* Card dossier: card front + guidance, scrollable, cream bg */
+.bd-modal-card{width:min(520px,96vw);max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.bd-card-front{padding:12px 12px 0;background:var(--fs-bg,#faf8f3)}
+.bd-card-front .fs-card{box-shadow:none}
+.bd-guidance-divider{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);padding:0 0 6px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
 @keyframes bdSlideUp{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
 .bd-close{position:absolute;top:10px;right:10px;width:26px;height:26px;border-radius:5px;border:1px solid var(--border);background:var(--panel);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-muted);z-index:2;transition:background .1s}
 .bd-close:hover{background:var(--hover);color:var(--text)}
