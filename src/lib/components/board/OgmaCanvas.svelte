@@ -9,8 +9,6 @@
   import BoardBoost  from './BoardBoost.svelte';
   import BoardLabel  from './BoardLabel.svelte';
   import BoardGroup  from './BoardGroup.svelte';
-  import CanvasContextMenu from './CanvasContextMenu.svelte';
-
   // ── Props ────────────────────────────────────────────────────────────────
   let {
     cards           = [],
@@ -22,7 +20,6 @@
     cardSearch      = '',
     connectSourceId = null,
     modeTransitioning = false,
-    ctx             = null,
     // Callbacks
     onUpdateCard    = null,
     onDeleteCard    = null,
@@ -33,9 +30,6 @@
     onUpdateConnector = null,
     onUpdateGroup   = null,
     onDeleteGroup   = null,
-    onContextMenu   = null,
-    onCtxClose      = null,
-    onCtxGenerate   = null,
     onCtxTemplate   = null,
     ctxTemplates    = [],
     onEdgeCoach     = null,
@@ -309,14 +303,6 @@
     }
   }
 
-  // ── Context menu ──────────────────────────────────────────────────────────
-  function onContextMenuWrap(e) {
-    if (e.target.closest('.board-card') || e.target.closest('.board-sticky')) return;
-    e.preventDefault();
-    const cp = screenToCanvas(e.clientX, e.clientY);
-    if (onContextMenu) onContextMenu(e.clientX, e.clientY, cp.x, cp.y);
-  }
-
   // ── Connector screen coords ───────────────────────────────────────────────
   function getCardCenter(cardId) {
     const isDragged = dragState?.cardId === cardId;
@@ -406,7 +392,7 @@
   onpointermove={onWrapPointerMove}
   onpointerup={onWrapPointerUp}
   onpointercancel={onWrapPointerUp}
-  oncontextmenu={onContextMenuWrap}
+  oncontextmenu={(e) => e.preventDefault()}
   style="touch-action:none"
   role="application"
   aria-label="Campaign canvas"
@@ -554,7 +540,7 @@
             <span>Click <strong>→ Table</strong> to place it here</span>
           </div>
         </div>
-        <div class="cv-empty-sub">Right-click anywhere to generate directly · <kbd>Ctrl+K</kbd> for commands</div>
+        <div class="cv-empty-sub">Use <i class="fa-solid fa-file-circle-plus" aria-hidden="true"></i> in the toolbar to add cards · <kbd>Ctrl+K</kbd> for commands</div>
       {/if}
       {#if ctxTemplates.length}
         <div class="cv-empty-tpl">
@@ -584,14 +570,14 @@
 
   <!-- Zoom controls -->
   <div class="cv-controls" aria-label="Canvas controls">
-    <button class="cv-ctrl-btn" onclick={() => adjustZoom(0.15)}  aria-label="Zoom in">+</button>
-    <button class="cv-ctrl-btn" onclick={() => adjustZoom(-0.15)} aria-label="Zoom out">−</button>
-    <button class="cv-ctrl-btn" onclick={fitAll}                  aria-label="Fit all cards">⊡</button>
+    <button class="cv-ctrl-btn" onclick={() => adjustZoom(0.15)}  aria-label="Zoom in" title="Zoom in"><i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i></button>
+    <button class="cv-ctrl-btn" onclick={() => adjustZoom(-0.15)} aria-label="Zoom out" title="Zoom out"><i class="fa-solid fa-magnifying-glass-minus" aria-hidden="true"></i></button>
+    <button class="cv-ctrl-btn" onclick={fitAll}                  aria-label="Fit all cards" title="Fit all cards (F)"><i class="fa-solid fa-expand" aria-hidden="true"></i></button>
     {#if cards.length > 0}
       <div class="cv-ctrl-sep" aria-hidden="true"></div>
-      <button class="cv-ctrl-btn" onclick={onAutoArrange} aria-label="Auto-arrange cards">⊞</button>
-      <button class="cv-ctrl-btn" onclick={onExportModal} aria-label="Export / Import">↓</button>
-      <button class="cv-ctrl-btn cv-ctrl-danger" onclick={onClearTable} aria-label="Clear table">✕</button>
+      <button class="cv-ctrl-btn" onclick={onAutoArrange} aria-label="Auto-arrange cards" title="Auto-arrange cards"><i class="fa-solid fa-table-cells" aria-hidden="true"></i></button>
+      <button class="cv-ctrl-btn" onclick={onExportModal} aria-label="Export / Import" title="Export / Import"><i class="fa-solid fa-file-export" aria-hidden="true"></i></button>
+      <button class="cv-ctrl-btn cv-ctrl-danger" onclick={onClearTable} aria-label="Clear table" title="Clear table"><i class="fa-solid fa-trash-can" aria-hidden="true"></i></button>
     {/if}
   </div>
 
@@ -632,15 +618,6 @@
       >{showMinimap ? '▼' : '▲'}</button>
     </div>
   {/if}
-
-  <!-- Context menu -->
-  <CanvasContextMenu
-    {ctx}
-    onClose={onCtxClose}
-    onGenerate={onCtxGenerate}
-    onTemplate={onCtxTemplate}
-    templates={ctxTemplates}
-  />
 
   <!-- Toast -->
   {#if toast}

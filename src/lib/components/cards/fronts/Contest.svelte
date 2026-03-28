@@ -1,5 +1,5 @@
 <script>
-  import { RadioGroup } from 'bits-ui';
+  import { RadioGroup, Checkbox } from 'bits-ui';
   import OgmaTooltip from '../../shared/OgmaTooltip.svelte';
 
   let { data = {}, campName = '', catColor = 'var(--fs-section)', cardState = {}, onUpdate = () => {} } = $props();
@@ -19,6 +19,13 @@
   function addVictory(side) {
     if (side === 'a') onUpdate({ scoreA: Math.min(sA + 1, victories) });
     else              onUpdate({ scoreB: Math.min(sB + 1, victories) });
+  }
+  function toggleVictory(side, idx) {
+    const cur = side === 'a' ? sA : sB;
+    const next = idx < cur ? idx : idx + 1;
+    const clamped = Math.min(next, victories);
+    if (side === 'a') onUpdate({ scoreA: clamped });
+    else              onUpdate({ scoreB: clamped });
   }
   function reset(e) { e.stopPropagation(); onUpdate({ scoreA: 0, scoreB: 0 }); }
 </script>
@@ -46,15 +53,19 @@
         {row.side.label} {row.won ? '✓ WON' : '+ victory'}
         {#if row.won}<span class="contest-trophy" aria-hidden="true">🏆</span>{/if}
       </button>
-      <div style="display:flex; gap:4px; justify-content:center" aria-label="{row.side.label} victories: {row.score} of {victories}">
+      <div class="fs-stress-boxes contest-victory-track" style="justify-content:center" aria-label="{row.side.label} victories: {row.score} of {victories}">
         {#each Array.from({length: victories}) as _, j}
-          <div
-            class="{j < row.score ? 'contest-box-filled' : ''}"
-            style="width:22px; height:22px; border-radius:3px; background:{j < row.score ? row.col : 'transparent'}; border:2px solid {row.col}; transition:all .15s; display:flex; align-items:center; justify-content:center"
-            aria-hidden="true"
+          {@const filled = j < row.score}
+          <Checkbox.Root
+            checked={filled}
+            onCheckedChange={() => toggleVictory(row.key, j)}
+            aria-label="{row.side.label} victory {j + 1}{filled ? ' (won)' : ' (empty)'}"
+            style="border-color:{row.col}; background:{filled ? row.col : 'transparent'}; color:{filled ? '#fff' : row.col};"
           >
-            {#if j < row.score}<i class="fa-solid fa-check" aria-hidden="true" style="font-size:10px; color:#fff"></i>{/if}
-          </div>
+            <Checkbox.Indicator>
+              {#if filled}<i class="fa-solid fa-check" aria-hidden="true"></i>{/if}
+            </Checkbox.Indicator>
+          </Checkbox.Root>
         {/each}
       </div>
       {#if row.side.skills}
