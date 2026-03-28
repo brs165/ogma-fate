@@ -92,7 +92,7 @@
     unsubs.push(session.pinBouncing.subscribe(v => pinBouncing = v));
     unsubs.push(session.sessionPack.subscribe(v => sessionPack = v));
     unsubs.push(session.resultAnim.subscribe(v => resultAnim = v));
-    if (session.showStreakBadge) unsubs.push(session.showStreakBadge.subscribe(v => showStreakBadge = v));
+    unsubs.push(session.showStreakBadge.subscribe(v => showStreakBadge = v));
     if (session.consequenceSev) unsubs.push(session.consequenceSev.subscribe(v => consequenceSev = v));
   }
 
