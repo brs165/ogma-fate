@@ -8,7 +8,8 @@
 		"build": "bash scripts/bump-version.sh && npx vite build",
 		"qa": "node scripts/qa-hard.mjs",
 		"qa:export": "node scripts/qa-export.mjs",
-		"precheck": "node scripts/qa-hard.mjs && node scripts/qa-export.mjs && npm run build",
+		"qa:unit": "node scripts/qa-unit.mjs",
+		"precheck": "node scripts/qa-hard.mjs && node scripts/qa-export.mjs && node scripts/qa-unit.mjs && npm run build",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''"
 	},

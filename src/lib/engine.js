@@ -207,7 +207,8 @@ function generateMajorNPC(t) {
     if (s.name === 'Physique') physR = s.r;
     if (s.name === 'Will') willR = s.r;
   });
-  // FCon: Major NPCs get standard consequence slots (Mild −2, Moderate −4, Severe −6)
+  // FCon: Major NPCs get standard consequence slots (Mild −2, Moderate −4, Severe −6).
+  // NPC peak is rand(3,4) so physR/willR never reach Superb (+5); [2,4,6] is always correct here.
   var consequences = [2, 4, 6];
   return {
     name: name,
@@ -453,6 +454,9 @@ export const UNIVERSAL_INJECT_KEYS = [
  */
 export function mergeUniversal(tables) {
   if (!tables) return {};
+  // Idempotency guard — if already merged (e.g. tables passed in from a cached result),
+  // return as-is rather than doubling every merged array.
+  if (tables.__merged) return tables;
   var u = UNIVERSAL || {};
   if (!u) return tables;
   var merged = {};
@@ -467,6 +471,8 @@ export function mergeUniversal(tables) {
   UNIVERSAL_INJECT_KEYS.forEach(function(key) {
     if (u[key]) merged[key] = u[key];
   });
+  // Mark as merged so double-calls are safe
+  Object.defineProperty(merged, '__merged', { value: true, enumerable: false });
   return merged;
 }
 
@@ -693,8 +699,11 @@ export function generatePC(t) {
     stunts: stunts,
     physical_stress: stressFromRating(physR),
     mental_stress:   stressFromRating(willR),
-    // PCs always get all 3 consequence slots (FCon p.12)
-    // WS-41: Superb (+5)+ Physique/Will grants extra mild (FCon p.12)
+    // PCs always get all 3 consequence slots (FCon p.12).
+    // WS-41: Superb (+5)+ Physique/Will grants an extra mild slot (FCon p.12).
+    // NOTE: The session-zero skill pyramid caps at Great (+4), so physR/willR >= 5
+    // is never reached by this generator. The branch exists for import/advancement
+    // scenarios where a caller passes a pre-built skill set with ratings above +4.
     consequences: (physR >= 5 || willR >= 5) ? [2, 4, 6, 2] : [2, 4, 6],
     extraMild: physR >= 5 || willR >= 5,
     // FCon p.10: refresh 3 at creation, 3 free stunt slots
@@ -756,8 +765,13 @@ function _generate(genId, t, partySize, opts) {
  */
 function generateConsequence(t, opts) {
   var o = opts || {};
-  // F4: severity can be forced via opts.severity ('mild','moderate','severe') or random
-  var severity = o.severity || pick(['mild', 'mild', 'moderate', 'severe']);
+  // F4: severity can be forced via opts.severity ('mild','moderate','severe') or random.
+  // Validate against known values — unknown strings (e.g. typos) fall back to random
+  // rather than silently producing an empty aspect via pick(undefined).
+  var VALID_SEV = { mild: 1, moderate: 1, severe: 1 };
+  var severity = (o.severity && VALID_SEV[o.severity])
+    ? o.severity
+    : pick(['mild', 'mild', 'moderate', 'severe']);
   var aspect = pick(t['consequence_' + severity]);
   var context = pick(t.consequence_contexts);
   var compel_hook = pick(t.compel_situations);
