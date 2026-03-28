@@ -44,6 +44,7 @@
 
     <h2>Choosing your campaign world</h2>
     <p>From the home page, pick one of the <strong>8 campaign worlds</strong>. Each world has a distinct genre, tone, and ~1,500 AI-generated table entries tuned to that aesthetic:</p>
+    <div class="wiki-table-wrap">
     <table class="wiki-table">
       <thead><tr><th>World</th><th>Genre</th><th>Vibes</th></tr></thead>
       <tbody>
@@ -56,6 +57,7 @@
         <tr><td><strong>Dust and Iron</strong></td><td>Frontier Western</td><td>Blood Meridian, Deadwood, True Grit</td></tr>
       </tbody>
     </table>
+    </div>
 
     <h2>Your first roll</h2>
     <ol class="steps">
@@ -64,6 +66,7 @@
       <li><div class="step-body"><strong>Read the result</strong><span>The result card shows the full output. Below it, the <strong>For GM</strong> tab gives running tips and rules references. If you're coming from D&amp;D, the <strong>&#9876; D&amp;D?</strong> tab compares the mechanic.</span></div></li>
       <li><div class="step-body"><strong>Keep it if you want to save it</strong><span>Press <kbd>P</kbd> or click the Save to Binder button. The result goes to your <strong>Binder</strong> (sidebar → Binder) where you can review or export it later.</span></div></li>
     </ol>
+    <p>New to the dice system? The <a href="https://fate-srd.com/fate-condensed/taking-action-rolling-the-dice" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a> covers the full 4dF + Skill mechanic.</p>
 
     <div class="callout callout-scenario">
       <div class="callout-title"><i class="fa-solid fa-gamepad" aria-hidden="true"></i> Scenario: You need a quick NPC mid-session</div>

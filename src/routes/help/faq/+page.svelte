@@ -9,18 +9,37 @@
 <h1>Common questions and fixes</h1>
 <p class="wiki-page-desc">Answers to everything that comes up. If something isn't here, check <a href="/about">About Ogma</a> or open the browser console for error details.</p>
 
-<h2>Fate rules — the questions everyone asks</h2>
+<details class="learn-quickstart" open>
+  <summary class="learn-quickstart-toggle">Quick answers</summary>
+  <ol class="learn-quickstart-list">
+    <li><strong>Stress ≠ HP</strong> — stress clears every scene. Consequences are the lasting damage.</li>
+    <li><strong>Create Advantage</strong> — the most important action. Stack free invokes, then attack.</li>
+    <li><strong>Data is local</strong> — everything stays in your browser. No account, no server.</li>
+    <li><strong>Offline works</strong> — install as a PWA from Chrome/Edge for full offline support.</li>
+    <li><strong>Export everything</strong> — Markdown, JSON, or shareable links. See <a href="/help/export-share">Export &amp; Share</a>.</li>
+  </ol>
+</details>
+
+<nav class="wiki-toc" aria-label="On this page">
+  <div class="wiki-toc-title">On this page</div>
+  <a href="#fate-rules">Fate rules</a>
+  <a href="#data-storage">Data &amp; storage</a>
+  <a href="#offline-install">Offline &amp; installation</a>
+  <a href="#ui-questions">Common UI questions</a>
+</nav>
+
+<h2 id="fate-rules">Fate rules — the questions everyone asks</h2>
 
 <h3>Is stress like hit points?</h3>
 <p><strong>No — and this is the most important difference to internalise.</strong> Stress is a scene-by-scene pacing buffer. All stress boxes clear at the end of every scene. A character with 0 stress boxes left isn't near death — they just can't absorb any more hits <em>this scene</em>. They're back to full after the scene ends.</p>
-<p>Consequences are the thing that persists. Recovery requires a treatment roll first (Overcome at the consequence's difficulty: Fair +2 for Mild, Great +4 for Moderate, Fantastic +6 for Severe) — only then does the timer start. A Mild consequence clears one full scene after treatment, a Moderate clears at end of session after treatment, a Severe clears at a major milestone after treatment. Untreated consequences do not clear. Consequences are aspects — the GM can invoke them against you, and players can compel them for fate points. <em>FCon SRD p.38.</em></p>
+<p>Consequences are the thing that persists. Recovery requires a treatment roll first (Overcome at the consequence's difficulty: Fair +2 for Mild, Great +4 for Moderate, Fantastic +6 for Severe) — only then does the timer start. A Mild consequence clears one full scene after treatment, a Moderate clears at end of session after treatment, a Severe clears at a major milestone after treatment. Untreated consequences do not clear. Consequences are aspects — the GM can invoke them against you, and players can compel them for fate points. <a href="https://fate-srd.com/fate-condensed/challenges-conflicts-and-contests" target="_blank" rel="noreferrer" class="srd-link">FCon SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
 
 <h3>When should I invoke an aspect vs. wait to be compelled?</h3>
 <p><strong>Invoke</strong> when you want to improve an outcome on a roll that matters. Spend a fate point, name the aspect, and get +2 or a reroll. It has to be narratively plausible — "Stronger Than I Look" works for lifting a portcullis, not for picking a lock.</p>
 <p><strong>Compels</strong> come from the GM (or another player). The GM offers you a fate point in exchange for your aspect creating a problem. You accept the complication and earn the point, or you spend a point to refuse. The rhythm: accept more compels early (earn fate points), spend them on the rolls that count.</p>
 
 <h3>When should the GM call for a roll?</h3>
-<p>Ask three questions. (1) Is the outcome uncertain? (2) Would failure be interesting — does it advance the story rather than stall it? (3) Does it matter to the story right now? If any answer is no, don't roll — just narrate the outcome and move forward. A master lockpick opening a basic lock in a low-stakes moment shouldn't roll. <em>FCon SRD p.14.</em></p>
+<p>Ask three questions. (1) Is the outcome uncertain? (2) Would failure be interesting — does it advance the story rather than stall it? (3) Does it matter to the story right now? If any answer is no, don't roll — just narrate the outcome and move forward. A master lockpick opening a basic lock in a low-stakes moment shouldn't roll. <a href="https://fate-srd.com/fate-condensed/taking-action-rolling-the-dice" target="_blank" rel="noreferrer" class="srd-link">FCon SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
 
 <h3>Why would I ever use Create Advantage instead of just attacking?</h3>
 <p>Because free invokes stack, and Attack into a defended +4 is a poor bet without them. Create Advantage places an aspect with free invokes you or your allies can spend later. Two free invokes = +4 on the attack that follows. The tactical loop: Create Advantage to build up free invokes, then Attack with them stacked. See the <a href="/help/fate-mechanics#create-advantage">Create Advantage deep-dive</a>.</p>
@@ -29,7 +48,7 @@
 <p>More than you think. Aim for at least 1–2 compels per session per player. A session where nobody earns or spends fate points is a session where the economy stalled — usually because the GM forgot to compel. The flow: GM compels → players earn points → players invoke aspects on big rolls → GM earns those points back for NPC invokes → repeat.</p>
 
 <h3>What makes a good aspect?</h3>
-<p>Test it in both directions. Can you imagine a moment where invoking it for +2 fits the fiction? Can you imagine a moment where it causes your character a problem worth accepting a fate point for? If both are yes, it's a good aspect. "Skilled Swordsman" only works one way. "Fights to Prove a Point" works both — invoke it when duelling with honour, accept compels when your pride overrides your judgement. <em>FCon SRD p.23.</em></p>
+<p>Test it in both directions. Can you imagine a moment where invoking it for +2 fits the fiction? Can you imagine a moment where it causes your character a problem worth accepting a fate point for? If both are yes, it's a good aspect. "Skilled Swordsman" only works one way. "Fights to Prove a Point" works both — invoke it when duelling with honour, accept compels when your pride overrides your judgement. <a href="https://fate-srd.com/fate-condensed/aspects-and-fate-points" target="_blank" rel="noreferrer" class="srd-link">FCon SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
 
 <h3>What does the GM actually prepare for a Fate session?</h3>
 <p>Situations, not plots. Before a session you want: a current issue (problem already in motion), an impending issue (approaching threat), 3–5 named NPCs with faces and aspects, and 2–3 locations with situation aspects. That's it. Fate's scenario prep takes 20–30 minutes. Ogma's Campaign Frame, Adventure Seed, Faction, and NPC generators produce all of this in under 2 minutes. See <a href="/help/fate-mechanics#what-gms-prepare">What the GM prepares</a>.</p>
@@ -38,17 +57,17 @@
 <p>You can run dungeon exploration, monster fights, and levelling arcs — but Fate will push back on the D&amp;D assumptions behind them. Fate works best when the players care about the characters as much as the challenges. If the goal is tactical encounter design, Fate is the wrong tool. If the goal is characters with personality navigating dangerous situations, Fate is excellent. The <a href="/help/dnd-transition">D&amp;D Transition guide</a> covers every specific difference.</p>
 
 <h3>How do zones work in conflicts?</h3>
-<p>Zones are abstract areas within a scene — not a grid. "The Rooftop," "The Fire Escape," "The Street Below" might be three zones in one conflict. Moving between adjacent zones costs an action or is free depending on whether anything is blocking the move. Zones can have situation aspects ("Smoke-Filled Corridor" in zone 2). The point is to give positioning narrative meaning without requiring a battle map. <em>FCon SRD p.29.</em></p>
+<p>Zones are abstract areas within a scene — not a grid. "The Rooftop," "The Fire Escape," "The Street Below" might be three zones in one conflict. Moving between adjacent zones costs an action or is free depending on whether anything is blocking the move. Zones can have situation aspects ("Smoke-Filled Corridor" in zone 2). The point is to give positioning narrative meaning without requiring a battle map. <a href="https://fate-srd.com/fate-condensed/challenges-conflicts-and-contests" target="_blank" rel="noreferrer" class="srd-link">FCon SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
 
 <h3>What's the difference between a challenge, contest, and conflict?</h3>
 <p><strong>Challenge:</strong> one side faces multiple obstacles in sequence (a series of Overcome rolls). Nobody is directly opposing them. Use when the stakes are "can the party pull this off before time runs out."</p>
 <p><strong>Contest:</strong> two sides race for the same goal without directly harming each other. First to 3 victories wins. Use for chases, debates, or competitive tasks.</p>
-<p><strong>Conflict:</strong> both sides can harm each other. Use when the stakes include taking characters out of the scene by force. <em>FCon SRD p.28–38.</em></p>
+<p><strong>Conflict:</strong> both sides can harm each other. Use when the stakes include taking characters out of the scene by force. <a href="https://fate-srd.com/fate-condensed/challenges-conflicts-and-contests" target="_blank" rel="noreferrer" class="srd-link">FCon SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
 
 <h3>Why do experienced gamers find Fate harder to learn than beginners?</h3>
 <p>Because unlearning is harder than learning. D&amp;D habits — optimising builds, attacking every round, treating the GM as an adversary, waiting for the GM to present the adventure — all actively undermine Fate. Beginners have nothing to uninstall. The single most useful thing an experienced TTRPG player can do when learning Fate is read the <a href="https://bookofhanz.com/" target="_blank" rel="noreferrer">Book of Hanz</a> before playing, specifically the chapters "Fiction, Not Physics" and "What is Fate?"</p>
 
-<h2>Data and storage</h2>
+<h2 id="data-storage">Data and storage</h2>
 
 <h3>I cleared my browser cache and lost my pinned results. Can I recover them?</h3>
 <p><strong>No — the data is gone if you cleared site data.</strong> Ogma stores everything locally in your browser. Clearing cache, cookies, or site data removes it permanently. There is no server backup.</p>
@@ -77,7 +96,7 @@
 <h3>Can I transfer my data to another device or browser?</h3>
 <p>Not directly. The workaround: export saved cards as Markdown from History, then paste them into a note or document on the new device. Ogma doesn't have an import-from-backup feature; what you export is the content, not the app state.</p>
 
-<h2>Offline and installation</h2>
+<h2 id="offline-install">Offline and installation</h2>
 
 <h3>Does Ogma work offline?</h3>
 <p><strong>Yes — fully.</strong> After your first visit, the service worker caches all 740KB of the app. You can open the app with no internet, run sessions, pin results, export Markdown — everything works.</p>
@@ -90,6 +109,7 @@
 <p>Force-refresh bypasses the service worker: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> (Windows/Linux) or <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> (Mac). Alternatively: DevTools → Application → Service Workers → click "Skip waiting" next to the waiting worker.</p>
 
 
+<div class="wiki-table-wrap">
 <table class="wiki-table">
   <thead><tr><th scope="col">Browser</th><th scope="col">Status</th><th scope="col">Notes</th></tr></thead>
   <tbody>
@@ -101,8 +121,9 @@
     <tr><td><strong>Internet Explorer</strong></td><td><i class="fa-solid fa-xmark" aria-hidden="true" style="color:var(--c-red)"></i> Not supported</td><td>React 18 requires modern JS. Use Edge.</td></tr>
   </tbody>
 </table>
+</div>
 
-<h2>Common UI questions</h2>
+<h2 id="ui-questions">Common UI questions</h2>
 
 <h3>What does ↺ Reset do in the FP Tracker?</h3>
 <p>It resets every PC's current Fate Points to their individual Refresh value. Use this at the start of each session. It does not affect saved cards, history, or any other app state.</p>
@@ -126,7 +147,7 @@
 
     <div class="wiki-footer">
   <div>
-    <a href="/help">Wiki Home</a> &nbsp;·&nbsp;
+    <a href="/help">Help Home</a> &nbsp;·&nbsp;
     <a href="/">Open Ogma</a> &nbsp;·&nbsp;
     <a href="/about">About</a> &nbsp;·&nbsp;
     <a href="/license">Full Attribution</a> &nbsp;·&nbsp;

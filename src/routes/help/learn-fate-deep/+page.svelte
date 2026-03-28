@@ -10,7 +10,7 @@
 </svelte:head>
 
 <main class="wiki-content" id="main-content">
-  <a href="/help/learn-fate" class="wiki-back"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to Learn Fate in 7 Steps</a>
+  <div class="wiki-breadcrumb"><a href="/help">Help</a> <span class="sep">/</span> <a href="/help/learn-fate">Learn Fate</a> <span class="sep">/</span> Deep Dive</div>
   <div class="wiki-page-eyebrow">Learn</div>
   <h1>Learn Fate — Deep Dive</h1>
   <p class="wiki-page-desc">You know the 7 steps. Now learn how they feel at the table — through a guided scene, a full walkthrough, a strategy primer, and a session-one checklist.</p>
@@ -219,7 +219,7 @@
     <div class="callout callout-info" role="note">
       <div class="callout-title">Why concede?</div>
       <p><strong>You choose the terms.</strong> When you concede, you narrate how you lose — you escape, you surrender with dignity, you get captured but hide the evidence. If you're Taken Out (reduced to zero), the <em>GM</em> narrates what happens to you. Conceding gives you narrative control over your defeat.<br/><br/>
-      <strong>You earn FP.</strong> 1 fate point base, plus 1 extra per consequence you took during the conflict (FCon p.37). Took a Mild and a Moderate? That's 3 FP. Plus you're alive and still in the story.</p>
+      <strong>You earn FP.</strong> 1 fate point base, plus 1 extra per consequence you took during the conflict (<a href="https://fate-srd.com/fate-condensed/challenges-conflicts-and-contests" target="_blank" rel="noreferrer" class="srd-link">FCon SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>). Took a Mild and a Moderate? That's 3 FP. Plus you're alive and still in the story.</p>
     </div>
     <p><strong>When to concede:</strong> When you've taken a Moderate or Severe consequence and the opposition still looks strong. When losing this fight doesn't mean losing the war. When the story is more interesting if you fail here and come back later.</p>
 

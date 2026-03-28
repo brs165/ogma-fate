@@ -1,5 +1,5 @@
 <script>
-  // ── AddMenu — topbar dropdown for generating cards and dropping templates ──
+  // ── AddMenu — canvas controls dropdown for generating cards and dropping templates ──
   import { DropdownMenu } from 'bits-ui';
 
   let { onGenerate = null, onTemplate = null, onAddGroup = null, templates = [] } = $props();
@@ -19,11 +19,11 @@
 </script>
 
 <DropdownMenu.Root>
-  <DropdownMenu.Trigger class="bt-icon-btn" aria-label="Add to table" title="Add to Table">
+  <DropdownMenu.Trigger class="cv-ctrl-btn" aria-label="Add to table" title="Add to Table">
     <i class="fa-solid fa-file-circle-plus" aria-hidden="true"></i>
   </DropdownMenu.Trigger>
   <DropdownMenu.Portal>
-    <DropdownMenu.Content class="add-dd-content" sideOffset={6} align="end">
+    <DropdownMenu.Content class="add-dd-content" side="top" sideOffset={6} align="end">
       <DropdownMenu.Label class="export-dd-label">Generate</DropdownMenu.Label>
       <DropdownMenu.Separator class="export-dd-sep" />
       {#each GEN_ITEMS as g (g.id)}

@@ -56,4 +56,9 @@
       <div class="callout-title">Tip</div>
       <p>The info tabs below every generated result (<strong>What &middot; How &middot; In play</strong>) answer the three questions you'll have about any generator. Start with "What" to understand the mechanic, read "How" for GM running tips, and check "In play" for concrete invoke/compel examples.</p>
     </div>
+
+    <div class="callout callout-scenario">
+      <div class="callout-title"><i class="fa-solid fa-compass" aria-hidden="true"></i> Related pages</div>
+      <p><a href="/help/generators">Generator Suite</a> — all 16 generators explained. <a href="/help/at-the-table">At the Table</a> — session workflow. <a href="/help/export-share">Export &amp; Share</a> — getting results out of Ogma.</p>
+    </div>
 </main>

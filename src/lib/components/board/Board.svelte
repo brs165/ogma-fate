@@ -320,10 +320,6 @@
     onExportCanvas={canvas ? canvas.exportCanvas : () => {}}
     onImportCanvas={canvas ? canvas.importCanvas : () => {}}
     onCampChange={(newId) => { if (canvas) canvas.persistCanvas(get(canvas.cards)); window.location.href = '/campaigns/' + newId; }}
-    onGenerate={generateFromMenu}
-    onAddGroup={addGroupFromMenu}
-    onTemplate={(tplId) => dropTemplate(tplId)}
-    addTemplates={CANVAS_TEMPLATES}
   />
   {/if}
 
@@ -404,6 +400,10 @@
           onClearTable={() => { showClearModal = true; }}
           onAutoArrange={() => { if (canvas) canvas.autoArrange(); setTimeout(() => fitAll(), 150); }}
           onExportModal={() => { showExportModal = true; }}
+          onGenerate={generateFromMenu}
+          onAddGroup={addGroupFromMenu}
+          onTemplate={(tplId) => dropTemplate(tplId)}
+          addTemplates={CANVAS_TEMPLATES}
           showToast={showToast}
           {embedded}
         />

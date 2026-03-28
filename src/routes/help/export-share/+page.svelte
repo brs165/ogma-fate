@@ -85,7 +85,7 @@
 
     <div class="wiki-footer">
   <div>
-    <a href="/help">Wiki Home</a> &nbsp;·&nbsp;
+    <a href="/help">Help Home</a> &nbsp;·&nbsp;
     <a href="/">Open Ogma</a> &nbsp;·&nbsp;
     <a href="/about">About</a> &nbsp;·&nbsp;
     <a href="/license">Full Attribution</a> &nbsp;·&nbsp;
