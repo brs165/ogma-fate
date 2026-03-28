@@ -82,22 +82,22 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 }
 
 /* ══ CAMPAIGN ACCENTS ══ */
-[data-theme="light"][data-campaign="thelongafter"]{--accent:#9A5E10;--section-hdr:#9A5E10;--accent-dim:#C07A18;--gold:#7A4800;--tag-bg:rgba(196,127,23,0.08);--tag-border:rgba(196,127,23,0.20);--c-red:#D32F2F;--c-green:#2E7D32;--c-blue:#1565C0;--c-purple:#7B1FA2;--orb-a:rgba(245,166,35,0.12);--orb-b:rgba(200,130,20,0.08);--camp-bg:linear-gradient(160deg,#FFF8EE 0%,#FFF0D4 40%,#F8F0E8 100%);--focus-ring:#9A5E10}
+[data-theme="light"][data-campaign="thelongafter"]{--accent:#7a5808;--section-hdr:#7a5808;--accent-dim:#9a7010;--gold:#5a4008;--tag-bg:rgba(208,154,24,0.08);--tag-border:rgba(208,154,24,0.20);--c-red:#D32F2F;--c-green:#2E7D32;--c-blue:#1565C0;--c-purple:#7B1FA2;--orb-a:rgba(208,154,24,0.12);--orb-b:rgba(160,120,16,0.08);--camp-bg:linear-gradient(160deg,#FFF8EE 0%,#FFF0D4 40%,#F8F0E8 100%);--focus-ring:#7a5808}
 [data-theme="light"][data-campaign="cyberpunk"]{--accent:#076478;--section-hdr:#076478;--accent-dim:#0891A2;--gold:#054D5E;--tag-bg:rgba(8,145,162,0.07);--tag-border:rgba(8,145,162,0.18);--c-red:#C62828;--c-green:#2E7D32;--c-blue:#0D47A1;--c-purple:#6A1B9A;--orb-a:rgba(50,215,232,0.10);--orb-b:rgba(20,170,190,0.07);--camp-bg:linear-gradient(160deg,#F0FAFB 0%,#D8F4F8 40%,#EAF8FA 100%);--focus-ring:#076478}
-[data-theme="light"][data-campaign="fantasy"]{--accent:#856508;--section-hdr:#856508;--accent-dim:#9E7A10;--gold:#634B00;--tag-bg:rgba(146,112,10,0.07);--tag-border:rgba(146,112,10,0.18);--c-red:#C62828;--c-green:#2E7D32;--c-blue:#1565C0;--c-purple:#6A1B9A;--orb-a:rgba(212,168,74,0.12);--orb-b:rgba(170,130,40,0.08);--camp-bg:linear-gradient(160deg,#FFFAE8 0%,#FFF2C8 40%,#F8F4E0 100%);--focus-ring:#856508}
+[data-theme="light"][data-campaign="fantasy"]{--accent:#0e6838;--section-hdr:#0e6838;--accent-dim:#189858;--gold:#0a4828;--tag-bg:rgba(24,152,88,0.07);--tag-border:rgba(24,152,88,0.18);--c-red:#C62828;--c-green:#2E7D32;--c-blue:#1565C0;--c-purple:#6A1B9A;--orb-a:rgba(24,152,88,0.10);--orb-b:rgba(16,112,64,0.07);--camp-bg:linear-gradient(160deg,#EAF5F0 0%,#CDE8DC 40%,#E0F0EA 100%);--focus-ring:#0e6838}
 [data-theme="light"][data-campaign="space"]{--accent:#7C3ACD;--section-hdr:#7C3ACD;--accent-dim:#9B59B6;--gold:#5E2CA5;--tag-bg:rgba(124,58,205,0.07);--tag-border:rgba(124,58,205,0.18);--c-red:#C62828;--c-green:#2E7D32;--c-blue:#1565C0;--c-purple:#8E24AA;--orb-a:rgba(191,122,240,0.12);--orb-b:rgba(140,80,210,0.08);--camp-bg:linear-gradient(160deg,#F8F2FF 0%,#EDE0FF 40%,#F4F0FA 100%);--focus-ring:#7C3ACD}
-[data-theme="light"][data-campaign="victorian"]{--accent:#8A6512;--section-hdr:#8A6512;--accent-dim:#A57B18;--gold:#6B4D00;--tag-bg:rgba(138,101,18,0.07);--tag-border:rgba(138,101,18,0.18);--c-red:#C62828;--c-green:#2E7D32;--c-blue:#1565C0;--c-purple:#6A1B9A;--orb-a:rgba(232,169,74,0.12);--orb-b:rgba(190,140,50,0.08);--camp-bg:linear-gradient(160deg,#FFF8EE 0%,#F8EED8 40%,#F4F0E8 100%);--focus-ring:#8A6512}
-[data-theme="light"][data-campaign="postapoc"]{--accent:#A04D12;--section-hdr:#A04D12;--accent-dim:#C06018;--gold:#7A3800;--tag-bg:rgba(160,77,18,0.07);--tag-border:rgba(160,77,18,0.18);--c-red:#C62828;--c-green:#2E7D32;--c-blue:#1565C0;--c-purple:#6A1B9A;--orb-a:rgba(240,128,48,0.12);--orb-b:rgba(200,100,30,0.08);--camp-bg:linear-gradient(160deg,#FFF4EE 0%,#FFE8D0 40%,#F8F0E8 100%);--focus-ring:#A04D12}
-[data-theme="light"][data-campaign="western"]{--accent:#8B4513;--section-hdr:#8B4513;--accent-dim:#A0522D;--gold:#6B3410;--tag-bg:rgba(139,69,19,0.08);--tag-border:rgba(139,69,19,0.20);--c-red:#B71C1C;--c-green:#2E7D32;--c-blue:#1565C0;--c-purple:#6A1B9A;--orb-a:rgba(192,120,48,0.10);--orb-b:rgba(160,90,20,0.07);--camp-bg:linear-gradient(160deg,#FFF8F0 0%,#FFF0DC 40%,#F8EED8 100%);--focus-ring:#8B4513}
+[data-theme="light"][data-campaign="victorian"]{--accent:#1e4090;--section-hdr:#1e4090;--accent-dim:#2858b0;--gold:#162e68;--tag-bg:rgba(30,64,144,0.07);--tag-border:rgba(30,64,144,0.18);--c-red:#C62828;--c-green:#2E7D32;--c-blue:#1565C0;--c-purple:#6A1B9A;--orb-a:rgba(40,88,176,0.10);--orb-b:rgba(30,64,144,0.07);--camp-bg:linear-gradient(160deg,#EEF2FA 0%,#DAE4F8 40%,#E8EEF8 100%);--focus-ring:#1e4090}
+[data-theme="light"][data-campaign="postapoc"]{--accent:#285808;--section-hdr:#285808;--accent-dim:#386810;--gold:#1c4008;--tag-bg:rgba(80,160,24,0.07);--tag-border:rgba(80,160,24,0.18);--c-red:#C62828;--c-green:#2E7D32;--c-blue:#1565C0;--c-purple:#6A1B9A;--orb-a:rgba(80,160,24,0.10);--orb-b:rgba(56,128,16,0.07);--camp-bg:linear-gradient(160deg,#EEF5E8 0%,#DCF0C8 40%,#E8F2E0 100%);--focus-ring:#285808}
+[data-theme="light"][data-campaign="western"]{--accent:#3e5818;--section-hdr:#3e5818;--accent-dim:#4e7020;--gold:#2e4010;--tag-bg:rgba(106,144,48,0.07);--tag-border:rgba(106,144,48,0.18);--c-red:#B71C1C;--c-green:#2E7D32;--c-blue:#1565C0;--c-purple:#6A1B9A;--orb-a:rgba(106,144,48,0.10);--orb-b:rgba(80,120,32,0.07);--camp-bg:linear-gradient(160deg,#F2F5EE 0%,#E4EDD8 40%,#EEF2E8 100%);--focus-ring:#3e5818}
 
 /* ── Campaign accent tokens (decorative only — borders, icons, glow) ── */
-[data-campaign="thelongafter"]{--campaign-accent:#c8a96e}
+[data-campaign="thelongafter"]{--campaign-accent:#d09a18}
 [data-campaign="cyberpunk"]{--campaign-accent:#00f5ff}
-[data-campaign="fantasy"]{--campaign-accent:#9b6dff}
+[data-campaign="fantasy"]{--campaign-accent:#189858}
 [data-campaign="space"]{--campaign-accent:#4fc3f7}
-[data-campaign="victorian"]{--campaign-accent:#b5965a}
-[data-campaign="postapoc"]{--campaign-accent:#e07b54}
-[data-campaign="western"]{--campaign-accent:#a0522d}
+[data-campaign="victorian"]{--campaign-accent:#2858b0}
+[data-campaign="postapoc"]{--campaign-accent:#50a018}
+[data-campaign="western"]{--campaign-accent:#6a9030}
 [data-campaign="dVentiRealm"]{--campaign-accent:#f9c74f}
 
 /* ══ ACCESSIBILITY ══ */
@@ -154,23 +154,23 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
   --fs-radius:6px;
   /* Campaign-tinted header gradients (dark gradient of each world's accent) */
   --fs-hdr-default:linear-gradient(135deg,#1a3a5c,#0e2240);
-  --fs-hdr-thelongafter:linear-gradient(135deg,#3a2800,#1a1208);
+  --fs-hdr-thelongafter:linear-gradient(135deg,#2a1e00,#1a1200);
   --fs-hdr-cyberpunk:linear-gradient(135deg,#041e28,#0a2830);
-  --fs-hdr-fantasy:linear-gradient(135deg,#2a2000,#1a1608);
+  --fs-hdr-fantasy:linear-gradient(135deg,#021408,#011008);
   --fs-hdr-space:linear-gradient(135deg,#1a0830,#200e40);
-  --fs-hdr-victorian:linear-gradient(135deg,#2a1a00,#1a1208);
-  --fs-hdr-postapoc:linear-gradient(135deg,#3a1800,#1a0e08);
-  --fs-hdr-western:linear-gradient(135deg,#2a1208,#1a0e08);
+  --fs-hdr-victorian:linear-gradient(135deg,#040a1c,#081428);
+  --fs-hdr-postapoc:linear-gradient(135deg,#081200,#050e00);
+  --fs-hdr-western:linear-gradient(135deg,#0a1200,#081000);
   --fs-hdr-dVentiRealm:linear-gradient(135deg,#0e1828,#1a2840);
 }
 /* Campaign-specific section/badge accent overrides for fate-sheet cards */
-[data-campaign="thelongafter"]  { --fs-section:#6B4400; --fs-badge-bg:#C8944A; }
+[data-campaign="thelongafter"]  { --fs-section:#3a2a00; --fs-badge-bg:#d09a18; }
 [data-campaign="cyberpunk"]     { --fs-section:#064858; --fs-badge-bg:#0891A2; }
-[data-campaign="fantasy"]       { --fs-section:#4a3800; --fs-badge-bg:#D4A860; }
+[data-campaign="fantasy"]       { --fs-section:#0a2818; --fs-badge-bg:#189858; }
 [data-campaign="space"]         { --fs-section:#3a1860; --fs-badge-bg:#9B59B6; }
-[data-campaign="victorian"]     { --fs-section:#4a3200; --fs-badge-bg:#C8A050; }
-[data-campaign="postapoc"]      { --fs-section:#5a2800; --fs-badge-bg:#E07030; }
-[data-campaign="western"]       { --fs-section:#4a2010; --fs-badge-bg:#A0522D; }
+[data-campaign="victorian"]     { --fs-section:#081838; --fs-badge-bg:#2858b0; }
+[data-campaign="postapoc"]      { --fs-section:#142800; --fs-badge-bg:#50a018; }
+[data-campaign="western"]       { --fs-section:#182800; --fs-badge-bg:#6a9030; }
 [data-campaign="dVentiRealm"]   { --fs-section:#1a3050; --fs-badge-bg:#5AC8FA; }
 
 /* ── Fate Sheet structural classes ──────────────────────────────────── */
@@ -317,7 +317,18 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 
 /* ── Campaign-specific roll button base ────────────────────────────────
    The .btn-roll base uses var(--accent) fill. These overrides give each
-   world its own visual voice while keeping the same dimensions and a11y. */
+   world its own visual voice while keeping the same dimensions and a11y.
+   Light mode: reset dark backgrounds so text stays readable (WCAG AA). */
+
+/* WCAG light-mode reset — prevents dark campaign backgrounds from rendering with dark text */
+[data-theme="light"] [data-campaign] .btn-roll {
+  background: var(--glass-bg) !important;
+  color: var(--text) !important;
+  text-shadow: none !important;
+  animation: none !important;
+}
+[data-theme="light"] [data-campaign] .btn-roll::before,
+[data-theme="light"] [data-campaign] .btn-roll::after { display: none !important; }
 
 .roll-label{position:relative;z-index:1}
 .roll-fx{position:absolute;inset:0;pointer-events:none;border-radius:inherit;overflow:hidden}
@@ -344,9 +355,9 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 [data-campaign="thelongafter"] .btn-roll.rolling::before {
   opacity:1;animation:tla-orbit 0.3s linear infinite;
 }
-@keyframes tla-idle{0%,100%{box-shadow:0 0 20px #F5A62340}50%{box-shadow:0 0 40px #F5A62355}}
+@keyframes tla-idle{0%,100%{box-shadow:0 0 20px #D09A1840}50%{box-shadow:0 0 40px #D09A1855}}
 @keyframes tla-orbit{to{transform:rotate(360deg)}}
-@keyframes tla-detonate{0%{box-shadow:0 0 80px #F5A623,0 0 120px #F5A62388}100%{box-shadow:0 0 20px #F5A62340}}
+@keyframes tla-detonate{0%{box-shadow:0 0 80px #D09A18,0 0 120px #D09A1888}100%{box-shadow:0 0 20px #D09A1840}}
 
 /* ═══ NEON ABYSS — Glitch Interface ═══
    Monospace, sharp corners, scanline idle, RGB-split glitch on click. */
@@ -374,7 +385,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 /* ═══ SHATTERED KINGDOMS — Rune Fracture ═══
    Warm stone, rune text-glow pulse, bright crack-flare on click. */
 [data-campaign="fantasy"] .btn-roll {
-  background:linear-gradient(135deg,#1a0f08,#2a1510);color:var(--text);
+  background:linear-gradient(135deg,#040e08,#081408);color:var(--text);
   border:2px solid color-mix(in srgb,var(--campaign-accent) 40%,transparent);border-radius:6px;
   box-shadow:0 0 15px color-mix(in srgb,var(--campaign-accent) 25%,transparent);
   animation:fan-rune 4s ease-in-out infinite;
@@ -420,7 +431,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 /* ═══ GASLIGHT CHRONICLES — Gas Flame ═══
    Warm amber, constant gas-lamp flicker, dramatic flare-up on click. */
 [data-campaign="victorian"] .btn-roll {
-  background:linear-gradient(180deg,#1a1608,#0f0e08);color:var(--text);
+  background:linear-gradient(180deg,#080c1a,#040810);color:var(--text);
   border:2px solid color-mix(in srgb,var(--campaign-accent) 40%,transparent);border-radius:4px;
   box-shadow:0 -4px 15px color-mix(in srgb,var(--campaign-accent) 25%,transparent),0 0 20px color-mix(in srgb,var(--campaign-accent) 18%,transparent);
   text-shadow:none;
@@ -436,7 +447,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 /* ═══ THE LONG ROAD — Radio Static ═══
    Rust orange, static grain overlay, signal blink, static burst on click. */
 [data-campaign="postapoc"] .btn-roll {
-  background:#1a0e05;color:var(--text);
+  background:#080e05;color:var(--text);
   border:2px solid color-mix(in srgb,var(--campaign-accent) 40%,transparent);border-radius:4px;
   box-shadow:0 0 10px color-mix(in srgb,var(--campaign-accent) 18%,transparent);
   animation:pa-blink 3s ease-in-out infinite;
@@ -1919,7 +1930,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 
 /* ── 4. Dust and Iron roll button — revolver style ───────────────────── */
 [data-campaign="western"] .btn-roll {
-  background:#1a1008;color:var(--text);border:2px solid color-mix(in srgb,var(--campaign-accent) 40%,transparent);border-radius:4px;
+  background:#0e1208;color:var(--text);border:2px solid color-mix(in srgb,var(--campaign-accent) 40%,transparent);border-radius:4px;
   font-family:'Courier New',monospace;letter-spacing:0.05em;
   overflow:visible;
   animation:wi-roll-idle 2s ease-in-out infinite;
@@ -1928,8 +1939,8 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 [data-campaign="western"] .btn-roll:active {
   animation:wi-roll-bang 0.45s ease-out forwards;
 }
-@keyframes wi-roll-idle { 0%,100%{box-shadow:0 0 8px #C8864A22} 50%{box-shadow:0 0 20px #C8864A44} }
-@keyframes wi-roll-bang { 0%{box-shadow:0 0 0 0 #C8864A99,0 0 50px #C8864A;filter:brightness(1.55)} 55%{box-shadow:0 0 0 14px transparent,0 0 12px #C8864A22} 100%{box-shadow:none;filter:brightness(1)} }
+@keyframes wi-roll-idle { 0%,100%{box-shadow:0 0 8px #6A903022} 50%{box-shadow:0 0 20px #6A903044} }
+@keyframes wi-roll-bang { 0%{box-shadow:0 0 0 0 #6A903099,0 0 50px #6A9030;filter:brightness(1.55)} 55%{box-shadow:0 0 0 14px transparent,0 0 12px #6A903022} 100%{box-shadow:none;filter:brightness(1)} }
 
 /* ── 5. Fate point dot coin flip ─────────────────────────────────────── */
 @keyframes fp-coin-flip  { 0%{transform:rotateY(0) scale(1)} 38%{transform:rotateY(90deg) scale(1.1)} 62%{transform:rotateY(270deg) scale(1.1)} 100%{transform:rotateY(360deg) scale(1)} }
@@ -3227,7 +3238,10 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 
 /* ══ RESULT HELP PANEL (rhp-shell) ══ */
 .rhp-empty-state{padding:24px 20px 32px;display:flex;flex-direction:column;align-items:center;gap:6px}
-.rhp-ready-icon{font-size:40px;margin-bottom:4px;line-height:1}
+.rhp-ready-icon-btn{background:none;border:none;cursor:pointer;padding:0;color:var(--campaign-accent,var(--accent));display:block}
+.rhp-ready-icon-btn:hover .rhp-ready-icon,.rhp-ready-icon-btn:focus-visible .rhp-ready-icon{opacity:0.75;transform:scale(1.12)}
+.rhp-ready-icon-btn:focus-visible{outline:2px solid var(--campaign-accent,var(--accent));outline-offset:4px;border-radius:4px}
+.rhp-ready-icon{font-size:40px;margin-bottom:4px;line-height:1;transition:opacity 0.15s,transform 0.15s}
 .rhp-ready-title{font-size:var(--text-md);font-weight:700;color:var(--text)}
 .rhp-ready-sub{font-size:var(--text-sm);color:var(--text-muted);text-align:center;margin-bottom:8px}
 .rhp-shell{width:100%;display:flex;flex-direction:column;gap:10px;margin-top:8px;text-align:left}
@@ -4851,6 +4865,7 @@ g:hover .cv-edge-label-bg { fill:color-mix(in srgb,var(--accent) 12%,var(--panel
 }
 
 /* ── Bits Tooltip — comic speech-bubble style ──────────────────────────── */
+[data-tooltip-trigger] { appearance:none;background:none!important;border:none!important;padding:0!important;box-shadow:none!important; }
 [data-tooltip-content] {
   background: var(--tooltip-bg, #FFF8EE);
   border: 1px solid color-mix(in srgb, var(--tooltip-bg, #FFF8EE) 60%, #8b7e6a);

@@ -24,6 +24,7 @@
   <Tooltip.Root openDelay={delay} closeDelay={100} open={forceOpen || undefined}
     onOpenChange={(o) => { if (!o) forceOpen = false; }}>
     <Tooltip.Trigger asChild
+      style="appearance:none;background:none;border:none;padding:0;display:contents"
       onpointerdown={onPointerDown}
       onpointerup={onPointerUp}
       onpointercancel={onPointerCancel}>

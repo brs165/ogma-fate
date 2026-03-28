@@ -469,7 +469,9 @@
                   </div>
                 {:else}
                   <div class="rhp-empty-state">
-                    <div class="rhp-ready-icon" aria-hidden="true"><i class="fa-solid fa-dice-d20"></i></div>
+                    <button class="rhp-ready-icon-btn" onclick={() => session.doGenerate()} aria-label="Generate {gen ? gen.label : 'result'}">
+                      <div class="rhp-ready-icon" aria-hidden="true"><i class="fa-solid {gen ? gen.icon : 'fa-dice-d20'}"></i></div>
+                    </button>
                     <div class="rhp-ready-title">Ready to generate</div>
                     <div class="rhp-ready-sub">
                       Click <strong>Roll</strong> or press <strong>Space</strong>
