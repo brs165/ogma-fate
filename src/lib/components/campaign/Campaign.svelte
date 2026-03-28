@@ -106,6 +106,19 @@
   let gen = $derived(GENERATORS.find(g => g.id === activeGen) || GENERATORS[0]);
   let helpEntry = $derived(HELP_CONTENT[activeGen] || null);
 
+  // Templates for mobile gen-column empty state (#19)
+  const GEN_TEMPLATES = [
+    { id: 'tpl_opening',       icon: 'fa-clapperboard',     label: 'Opening Scene',  desc: 'Scene + 2 NPCs + Countdown' },
+    { id: 'tpl_investigation', icon: 'fa-magnifying-glass', label: 'Investigation',  desc: 'Scene + Faction + Complication' },
+    { id: 'tpl_climax',        icon: 'fa-fire',             label: 'Climax',         desc: 'Encounter + Contest + Boosts' },
+    { id: 'tpl_session_zero',  icon: 'fa-users',            label: 'Session Zero',   desc: 'Seed + Scene + NPC + Backstory' },
+  ];
+  function dropTemplate(tplId) {
+    if (boardRef && boardRef.dropTemplateFromParent) boardRef.dropTemplateFromParent(tplId);
+    // On mobile, open the table to show the template
+    if (typeof window !== 'undefined' && window.innerWidth <= 700) tableOpen = true;
+  }
+
   // ── Generator groups for sidebar ──────────────────────────────────────────
   const GENERATOR_GROUPS = [
     { id: 'people', label: 'People', gens: ['npc_minor', 'npc_major', 'pc', 'backstory'] },
@@ -132,16 +145,21 @@
     try { gmMode = (LS.get('gm_mode') !== false); } catch (e) {}
     document.documentElement.setAttribute('data-gm-mode', gmMode ? 'on' : 'off');
 
-    // ── Onboarding (#8, #13, #10) ─────────────────────────────────────────
+    // ── Onboarding (#8, #13, #10, #11, #17, #23) ───────────────────────
     try {
       helpLevel = LS.get('help_level') || 'new_fate';
       visitCount = LS.incrementVisitCount(campId);
       // First-visit welcome banner
       if (visitCount === 1 && !LS.getIntroSeen(campId)) showWelcome = true;
-      // Ctrl+K coach mark on 3rd visit
-      if (visitCount === 3) showCoachCmd = true;
-      // Track if this is the first roll opportunity
-      if (visitCount <= 2) isFirstRoll = true;
+      // Ctrl+K coach mark on 3rd+ visit, with persistence (#11)
+      if (visitCount >= 3 && !LS.get('coach_cmd_dismissed')) showCoachCmd = true;
+      // Track if this is the first roll opportunity (visit 1 only) (#23)
+      if (visitCount === 1) isFirstRoll = true;
+      // Auto-upgrade help level after 5 visits (#17)
+      if (visitCount > 5 && helpLevel === 'new_fate') {
+        helpLevel = 'familiar';
+        LS.set('help_level', 'familiar');
+      }
     } catch (e) {}
 
     // Keyboard shortcuts
@@ -176,7 +194,7 @@
       console.warn('[Ogma] sz seed read failed:', e);
     }
 
-    // Session Zero handoff — Send All to Table path
+    // Session Zero handoff — Send All to Table path (#20 retry logic)
     try {
       const szParams = new URLSearchParams(window.location.search);
       if (szParams.get('sz') === '1') {
@@ -185,14 +203,19 @@
           sessionStorage.removeItem('ogma_sz_handoff');
           const handoff = JSON.parse(handoffRaw);
           if (handoff.campId === campId && Array.isArray(handoff.cards) && handoff.cards.length) {
-            // Dispatch after board has mounted and canvasStore is ready
-            setTimeout(() => {
-              handoff.cards.forEach((c, i) => {
-                setTimeout(() => {
-                  if (boardRef) boardRef.sendToTable(c.genId, c.data);
-                }, i * 80); // stagger so cards land in a readable grid
-              });
-            }, 500);
+            // Wait for boardRef with retry instead of fixed timeout
+            function dispatchHandoff(attempts) {
+              if (boardRef) {
+                handoff.cards.forEach((c, i) => {
+                  setTimeout(() => {
+                    if (boardRef) boardRef.sendToTable(c.genId, c.data);
+                  }, i * 80);
+                });
+              } else if (attempts < 20) {
+                setTimeout(() => dispatchHandoff(attempts + 1), 100);
+              }
+            }
+            dispatchHandoff(0);
           }
         }
       }
@@ -220,8 +243,9 @@
   // ── Actions ────────────────────────────────────────────────────────────────
   function doGenerate() {
     if (session && !rolling) {
+      // Dismiss first-roll annotation on the NEXT roll (#13)
+      if (isFirstRoll && result) { isFirstRoll = false; }
       session.doGenerate();
-      if (isFirstRoll) setTimeout(() => { isFirstRoll = false; }, 5000);
     }
   }
   function doInspire() { if (session && !rolling) session.doInspire(); }
@@ -267,9 +291,9 @@
 <div class="app-shell" data-gen={activeGen}>
   <a href="#main" class="skip-link">Skip to main content</a>
 
-  <!-- First-visit welcome banner (#13) -->
+  <!-- First-visit welcome banner (#13, #22 ARIA) -->
   {#if showWelcome}
-    <div class="onb-banner" role="status">
+    <div class="onb-banner" role="note">
       <div class="onb-banner-body">
         <strong>Welcome to Ogma!</strong> New to Fate?
         <a href="/help/learn-fate" class="onb-banner-link">Learn Fate in 15 min</a>
@@ -280,11 +304,11 @@
     </div>
   {/if}
 
-  <!-- Ctrl+K coach mark (#10) -->
+  <!-- Ctrl+K coach mark (#10, #11 persistence, #22 ARIA) -->
   {#if showCoachCmd}
-    <div class="onb-coach" role="status">
+    <div class="onb-coach" role="note">
       <span>Pro tip: press <kbd>Ctrl+K</kbd> for quick commands</span>
-      <button class="onb-coach-close" onclick={() => { showCoachCmd = false; }} aria-label="Dismiss">&times;</button>
+      <button class="onb-coach-close" onclick={() => { showCoachCmd = false; LS.set('coach_cmd_dismissed', true); }} aria-label="Dismiss">&times;</button>
     </div>
   {/if}
 
@@ -591,6 +615,20 @@
 
                       </div>
                     {/if}
+
+                    <!-- Mobile template grid (#19) -->
+                    <div class="cp-gen-templates">
+                      <div class="cv-empty-tpl-label">Or drop a template on the table:</div>
+                      <div class="cv-empty-tpl-grid">
+                        {#each GEN_TEMPLATES as tpl (tpl.id)}
+                          <button class="cv-empty-tpl-btn" onclick={() => dropTemplate(tpl.id)} aria-label="Drop {tpl.label} template">
+                            <i class="fa-solid {tpl.icon}" aria-hidden="true"></i>
+                            <span class="cv-empty-tpl-name">{tpl.label}</span>
+                            <span class="cv-empty-tpl-desc">{tpl.desc}</span>
+                          </button>
+                        {/each}
+                      </div>
+                    </div>
                   </div>
                 {/if}
               </div>
