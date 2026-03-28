@@ -3979,7 +3979,7 @@ g:hover .cv-edge-label-bg { fill:color-mix(in srgb,var(--accent) 12%,var(--panel
 
 /* ── Toast (canvas-local) ────────────────────────────────────────────────── */
 .cv-toast {
-  position:absolute; bottom:52px; left:50%; transform:translateX(-50%);
+  position:absolute; top:12px; left:50%; transform:translateX(-50%);
   background:var(--panel-raised); border:1px solid var(--border);
   color:var(--text); font-size:11px; padding:5px 14px;
   border-radius:16px; white-space:nowrap; z-index:999;
@@ -4851,30 +4851,31 @@ g:hover .cv-edge-label-bg { fill:color-mix(in srgb,var(--accent) 12%,var(--panel
 }
 
 /* ── Bits Tooltip — comic speech-bubble style ──────────────────────────── */
-[data-bits-tooltip-trigger] {
-  all: unset;
-  display: contents;
-}
-[data-bits-tooltip-content] {
+[data-tooltip-content] {
   background: var(--tooltip-bg, #FFF8EE);
-  border: 1.5px solid var(--border-mid);
+  border: 1px solid color-mix(in srgb, var(--tooltip-bg, #FFF8EE) 60%, #8b7e6a);
   border-radius: 10px;
   padding: 8px 14px;
   font-size: 13px;
   font-weight: 500;
-  color: var(--text);
+  color: var(--text, #1a1a1a);
   line-height: 1.5;
-  max-width: 220px;
-  z-index: 9990;
+  max-width: 280px;
+  word-wrap: break-word;
+  z-index: 99999;
   box-shadow: 0 4px 16px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.08);
   animation: fadeDown 0.15s ease both;
   pointer-events: none;
 }
-[data-theme="dark"] [data-bits-tooltip-content] { --tooltip-bg: #2A2520; }
-[data-bits-tooltip-arrow] {
+[data-theme="dark"] [data-tooltip-content] { --tooltip-bg: #2A2520; color: var(--text, #e8e0d4); }
+[data-tooltip-content] [data-arrow] svg {
   fill: var(--tooltip-bg, #FFF8EE);
-  stroke: var(--border-mid);
+  stroke: color-mix(in srgb, var(--tooltip-bg, #FFF8EE) 60%, #8b7e6a);
   stroke-width: 1px;
+}
+/* Touch devices: suppress hover tooltips (long-press handled in component) */
+@media (hover: none) {
+  [data-tooltip-content] { pointer-events: auto; }
 }
 
 /* ── FA content icons — white in dark theme, black in light ────────────── */
