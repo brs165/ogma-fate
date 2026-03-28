@@ -649,10 +649,14 @@
         onpointercancel={onDividerPointerUp}
       ></div>
 
+      <!-- Mobile backdrop — OUTSIDE table-col so it sits behind the sheet -->
+      {#if tableOpen}
+        <div class="cp-mobile-sheet-backdrop" onclick={() => { tableOpen = false; }} aria-hidden="true"></div>
+      {/if}
+
       <!-- Table column — Board embedded (single instance for both desktop & mobile) -->
       <div class="cp-table-col" class:cp-table-mobile-open={tableOpen}>
         {#if tableOpen}
-          <div class="cp-mobile-sheet-backdrop" onclick={() => { tableOpen = false; }} aria-hidden="true"></div>
           <div class="cp-mobile-sheet-hdr">
             <span class="cp-mobile-sheet-title"><i class="fa-solid fa-table-cells" aria-hidden="true"></i> Table</span>
             <button class="cp-mobile-sheet-close" onclick={() => { tableOpen = false; }} aria-label="Close Table">&times;</button>
