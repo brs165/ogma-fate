@@ -1,5 +1,17 @@
 <script>
   import HelpDiceRoller from '$lib/components/shared/HelpDiceRoller.svelte';
+
+  let copied = $state(false);
+  function shareGuide() {
+    const url = window.location.origin + '/help/learn-fate';
+    navigator.clipboard.writeText(url).then(() => {
+      copied = true;
+      setTimeout(() => { copied = false; }, 2500);
+    }).catch(() => {
+      // Fallback for browsers without clipboard API
+      prompt('Copy this link and send it to your players:', url);
+    });
+  }
 </script>
 
 <svelte:head>
@@ -11,6 +23,26 @@
     <div class="wiki-page-eyebrow">Learn</div>
     <h1>Learn Fate in 7 steps</h1>
     <p class="wiki-page-desc">A guided walkthrough of the Fate Condensed rules — everything a player needs, plus the extras a GM needs on top.</p>
+
+    <!-- Share button (#19) -->
+    <div class="learn-share-row">
+      <button class="learn-share-btn" onclick={shareGuide} aria-label="Copy link to share with players">
+        <i class="fa-solid {copied ? 'fa-check' : 'fa-share-nodes'}" aria-hidden="true"></i>
+        {copied ? 'Link copied!' : 'Share this guide with your players'}
+      </button>
+    </div>
+
+    <!-- Quick Start summary (#20) -->
+    <details class="learn-quickstart">
+      <summary class="learn-quickstart-toggle">Quick Start — 5 things to know</summary>
+      <ol class="learn-quickstart-list">
+        <li><strong>Fiction first</strong> — describe what your character does, then pick a skill and roll.</li>
+        <li><strong>Aspects</strong> — short phrases that are true. Spend a fate point to invoke one for +2, or accept a compel for complications + 1 FP.</li>
+        <li><strong>4dF + skill</strong> — roll four Fate dice (−1/0/+1 each), add your skill. Beat the target by 1–2 = success, 3+ = success with style.</li>
+        <li><strong>Fate points</strong> — start with 3. Spend to invoke aspects, earn by accepting compels. This is the heartbeat of Fate.</li>
+        <li><strong>Stress clears each scene</strong> — consequences (Mild/Moderate/Severe) are lasting harm. No HP — just narrative truths.</li>
+      </ol>
+    </details>
 
     <div class="step-block" id="step-1">
       <div class="step-num">1</div>

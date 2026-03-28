@@ -108,7 +108,7 @@
     </Tabs.Content>
 
     <Tabs.Content value="help">
-      <HelpPanel />
+      <HelpPanel {activeGen} />
     </Tabs.Content>
   </Tabs.Root>
 </div>

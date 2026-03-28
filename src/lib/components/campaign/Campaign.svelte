@@ -23,6 +23,13 @@
   let universalMerge = $state(true);
   let gmMode = $state(true);
 
+  // ── Onboarding state ───────────────────────────────────────────────────────
+  let showWelcome   = $state(false);   // first-visit banner
+  let showCoachCmd  = $state(false);   // Ctrl+K coach mark after 3rd visit
+  let visitCount    = $state(0);
+  let isFirstRoll   = $state(false);   // guided first-roll annotations
+  let helpLevel     = $state('new_fate');
+
   // ── Split layout state ─────────────────────────────────────────────────────
   // tableFull: generator hidden, table takes all content area
   // tableOpen: on mobile, whether the bottom-sheet table is visible
@@ -125,6 +132,18 @@
     try { gmMode = (LS.get('gm_mode') !== false); } catch (e) {}
     document.documentElement.setAttribute('data-gm-mode', gmMode ? 'on' : 'off');
 
+    // ── Onboarding (#8, #13, #10) ─────────────────────────────────────────
+    try {
+      helpLevel = LS.get('help_level') || 'new_fate';
+      visitCount = LS.incrementVisitCount(campId);
+      // First-visit welcome banner
+      if (visitCount === 1 && !LS.getIntroSeen(campId)) showWelcome = true;
+      // Ctrl+K coach mark on 3rd visit
+      if (visitCount === 3) showCoachCmd = true;
+      // Track if this is the first roll opportunity
+      if (visitCount <= 2) isFirstRoll = true;
+    } catch (e) {}
+
     // Keyboard shortcuts
     document.addEventListener('keydown', onKey);
 
@@ -199,7 +218,12 @@
   }
 
   // ── Actions ────────────────────────────────────────────────────────────────
-  function doGenerate() { if (session && !rolling) session.doGenerate(); }
+  function doGenerate() {
+    if (session && !rolling) {
+      session.doGenerate();
+      if (isFirstRoll) setTimeout(() => { isFirstRoll = false; }, 5000);
+    }
+  }
   function doInspire() { if (session && !rolling) session.doInspire(); }
 
   function selectGen(genId) {
@@ -210,9 +234,20 @@
   function toggleAcc(s) { sbAcc = sbAcc === s ? null : s; }
 
   function toggleTableFull() { tableFull = !tableFull; }
+  function dismissWelcome() {
+    showWelcome = false;
+    LS.setIntroSeen(campId, true);
+  }
+
   function sendToTable() {
     if (result && boardRef) boardRef.sendToTable(result.genId, result.data);
+    // Mobile FAB hint (#18)
+    if (typeof window !== 'undefined' && window.innerWidth <= 700 && !tableOpen) {
+      sentToTableHint = true;
+      setTimeout(() => { sentToTableHint = false; }, 4000);
+    }
   }
+  let sentToTableHint = $state(false);
 
   // ── Keyboard ───────────────────────────────────────────────────────────────
   function onKey(e) {
@@ -231,6 +266,27 @@
 
 <div class="app-shell" data-gen={activeGen}>
   <a href="#main" class="skip-link">Skip to main content</a>
+
+  <!-- First-visit welcome banner (#13) -->
+  {#if showWelcome}
+    <div class="onb-banner" role="status">
+      <div class="onb-banner-body">
+        <strong>Welcome to Ogma!</strong> New to Fate?
+        <a href="/help/learn-fate" class="onb-banner-link">Learn Fate in 15 min</a>
+        or
+        <a href="/campaigns/sessionzero" class="onb-banner-link">Start the Session Zero Wizard</a>
+      </div>
+      <button class="onb-banner-close" onclick={dismissWelcome} aria-label="Dismiss welcome banner">&times;</button>
+    </div>
+  {/if}
+
+  <!-- Ctrl+K coach mark (#10) -->
+  {#if showCoachCmd}
+    <div class="onb-coach" role="status">
+      <span>Pro tip: press <kbd>Ctrl+K</kbd> for quick commands</span>
+      <button class="onb-coach-close" onclick={() => { showCoachCmd = false; }} aria-label="Dismiss">&times;</button>
+    </div>
+  {/if}
 
   <!-- Mobile slim bar -->
   <header class="sb-slim-bar">
@@ -446,6 +502,13 @@
 
                 <!-- Result display -->
                 {#if result}
+                  <!-- Guided first-roll annotations (#16) -->
+                  {#if isFirstRoll}
+                    <div class="onb-first-roll" role="status">
+                      <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                      Here's your first result! Scroll to read it, then click <strong>GM GUIDANCE</strong> at the bottom to learn how to use it at the table.
+                    </div>
+                  {/if}
                   <div class={resultAnim ? 'result-card-appear' : ''}>
                     {#if result.isSeedPack && result.pack}
                       <div class="seed-pack-header">
@@ -468,7 +531,7 @@
                       </div>
                     {:else}
                       <div style="padding:16px">
-                        <Cv4Card genId={result.genId} data={result.data} campName={campName} />
+                        <Cv4Card genId={result.genId} data={result.data} campName={campName} autoGuidance={isFirstRoll && helpLevel === 'new_fate'} />
                       </div>
                     {/if}
                   </div>
@@ -568,9 +631,12 @@
   </div>
 
   <!-- Mobile Table FAB -->
-  <button class="cp-table-fab" onclick={() => { tableOpen = !tableOpen; }} aria-label="Open Table" title="Open Table">
+  <button class="cp-table-fab" class:cp-table-fab-pulse={sentToTableHint} onclick={() => { tableOpen = !tableOpen; sentToTableHint = false; }} aria-label="Open Table" title="Open Table">
     <i class="fa-solid fa-table-cells" aria-hidden="true"></i>
   </button>
+  {#if sentToTableHint}
+    <div class="onb-fab-hint" role="status">Card added to Table — tap here to see it ↓</div>
+  {/if}
 
   <!-- Toast -->
   {#if toast}
