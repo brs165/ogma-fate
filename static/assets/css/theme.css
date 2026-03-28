@@ -4763,7 +4763,7 @@ g:hover .cv-edge-label-bg { fill:color-mix(in srgb,var(--accent) 12%,var(--panel
   80%  { transform: scale(0.88) rotate(-1deg); }
   100% { transform: scale(1) rotate(0); opacity: 1; }
 }
-.contest-box-filled { animation: victory-pop 0.38s cubic-bezier(0.34,1.56,0.64,1) both; }
+.contest-victory-track [data-bits-checkbox-root][data-state="checked"] { animation: victory-pop 0.38s cubic-bezier(0.34,1.56,0.64,1) both; }
 .contest-trophy { display:inline-block; margin-left:4px; animation: trophy-spring 0.55s cubic-bezier(0.34,1.56,0.64,1) both; }
 
 /* ── Consequence severity — active row pulse on mount ──────────────────── */
@@ -5063,7 +5063,7 @@ g:hover .cv-edge-label-bg { fill:color-mix(in srgb,var(--accent) 12%,var(--panel
   .board-card  { transition: none !important; transform: none !important; }
   .seed-pack-item, .result-card-appear { animation: none !important; }
   .fs-skill-row::after { animation: none !important; width: calc(var(--skill-pct, 0) * 100%); }
-  .contest-box-filled  { animation: none !important; }
+  .contest-victory-track [data-bits-checkbox-root] { animation: none !important; }
   .fs-con-sev-active   { animation: none !important; }
   .pw-step-content     { animation: none !important; }
   .cmd-item            { transition: none !important; }
@@ -5565,6 +5565,24 @@ button.fp-dot:focus-visible {
 }
 .fs-clock-track [data-bits-checkbox-root][data-state="checked"] {
   animation: fd-clock-tick 0.22s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+/* WCAG 2.5.5 — 44px touch targets for all card boxes on coarse pointer */
+@media(pointer:coarse) {
+  [data-bits-checkbox-root] {
+    min-width: 44px;
+    min-height: 44px;
+    width: 44px;
+    height: 44px;
+    font-size: 16px;
+  }
+  .fs-clock-track [data-bits-checkbox-root] {
+    min-width: 44px;
+    min-height: 44px;
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+  }
 }
 
 /* Fix 3 — "Table" label under Table on mobile

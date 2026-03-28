@@ -1,4 +1,5 @@
 <script>
+  import { Checkbox } from 'bits-ui';
   let { data = {}, campName = '', catColor = 'var(--fs-section)', cardState = {}, onUpdate = () => {} } = $props();
 
   const LADDER = {8:"Legendary",7:"Epic",6:"Fantastic",5:"Superb",4:"Great",3:"Good",2:"Fair",1:"Average",0:"Mediocre"};
@@ -58,17 +59,19 @@
       {/if}
       {#if o.stunt}<div style="font-size:11px; color:var(--fs-section); margin-top:2px"><i class="fa-solid fa-star" aria-hidden="true" style="font-size:8px"></i> {o.stunt}</div>{/if}
       <!-- Interactive stress boxes -->
-      <div style="display:flex; gap:4px; margin-top:6px" role="group" aria-label="{o.name} stress track">
+      <div class="fs-stress-boxes" style="margin-top:6px" role="group" aria-label="{o.name} stress track">
         {#each Array.from({length: stressCount}) as _, i}
           {@const hit = isHit(o.name, i)}
-          <button
-            onclick={(e) => { e.stopPropagation(); toggleHit(o.name, i); }}
+          <Checkbox.Root
+            checked={hit}
+            onCheckedChange={() => toggleHit(o.name, i)}
             aria-label="Stress box {i+1}{hit ? ' (hit)' : ' (clear)'}"
-            aria-pressed={String(hit)}
-            style="width:16px; height:16px; border:1.5px solid var(--fs-stress-phy); border-radius:2px; background:{hit ? 'var(--fs-stress-phy)' : 'transparent'}; cursor:pointer; padding:0; display:flex; align-items:center; justify-content:center; transition:all 0.1s; flex-shrink:0"
+            style="border-color:var(--fs-stress-phy); background:{hit ? 'var(--fs-stress-phy)' : 'transparent'}; color:{hit ? '#fff' : 'var(--fs-stress-phy)'};"
           >
-            {#if hit}<i class="fa-solid fa-xmark" aria-hidden="true" style="font-size:8px; color:#fff"></i>{/if}
-          </button>
+            <Checkbox.Indicator>
+              {#if hit}<i class="fa-solid fa-xmark" aria-hidden="true"></i>{/if}
+            </Checkbox.Indicator>
+          </Checkbox.Root>
         {/each}
       </div>
     </div>
