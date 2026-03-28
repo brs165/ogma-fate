@@ -16,10 +16,15 @@
   ));
 
   let sel = $state({});
+  let _prevExportableIds = '';
   $effect(() => {
-    const s = {};
-    exportable.forEach(c => { s[c.id] = true; });
-    sel = s;
+    const ids = exportable.map(c => c.id).join(',');
+    if (ids !== _prevExportableIds) {
+      _prevExportableIds = ids;
+      const s = {};
+      exportable.forEach(c => { s[c.id] = sel[c.id] ?? true; });
+      sel = s;
+    }
   });
 
   let fmt = $state('md');
