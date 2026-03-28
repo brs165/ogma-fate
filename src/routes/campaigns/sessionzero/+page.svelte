@@ -220,7 +220,7 @@
         </div>
 
         {#if backstories.length > 0}
-          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px">Backstory hooks &mdash; one per player</div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px">Backstory hooks &mdash; one per player <span style="font-weight:400;font-style:italic;text-transform:none;letter-spacing:0"> — personal ties to the setting that become aspects the GM can invoke or compel</span></div>
           {#each backstories as b, i}
             {#if b}
               <div style="background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:8px;padding:12px;margin-bottom:8px">
@@ -238,7 +238,7 @@
       {:else if step === 2}
         <div style="font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:6px">STEP 3 OF 6</div>
         <h1 style="font-size:26px;font-weight:800;letter-spacing:-.025em;color:var(--text);margin-bottom:8px;line-height:1.2">What's the situation?</h1>
-        <p style="font-size:13px;color:var(--text-dim);line-height:1.65;margin-bottom:24px">This is your scenario skeleton &mdash; the location, objective, and complication. Prep Scene 1 in full. Follow the players after that.</p>
+        <p style="font-size:13px;color:var(--text-dim);line-height:1.65;margin-bottom:24px">This is your scenario skeleton &mdash; the location, objective, and complication. Prep Scene 1 in full. Follow the players after that. <span style="font-style:italic;color:var(--text-muted)">Everything here is a situation aspect — a fact about the scene anyone can invoke (+2) or compel (complications + fate point).</span></p>
 
         {#if seedData}
           <div style="background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:10px;overflow:hidden;margin-bottom:16px">
@@ -308,7 +308,7 @@
       {:else if step === 4}
         <div style="font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:6px">STEP 5 OF 6</div>
         <h1 style="font-size:26px;font-weight:800;letter-spacing:-.025em;color:var(--text);margin-bottom:8px;line-height:1.2">Who do the players meet first?</h1>
-        <p style="font-size:13px;color:var(--text-dim);line-height:1.65;margin-bottom:24px">Your opening NPC &mdash; could be an antagonist, a contact, or a bystander. Introduce them through what they're doing, not who they are.</p>
+        <p style="font-size:13px;color:var(--text-dim);line-height:1.65;margin-bottom:24px">Your opening NPC &mdash; could be an antagonist, a contact, or a bystander. Introduce them through what they're doing, not who they are. <span style="font-style:italic;color:var(--text-muted)">Their aspects and skills work the same as PCs — invoke for +2, compel for fate points.</span></p>
 
         {#if npcData}
           {@const asp = npcData.aspects || {}}
@@ -339,7 +339,7 @@
                 </div>
               {/if}
             </div>
-            <div style="padding:8px 14px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--glass-border);font-style:italic">Refresh: {npcData.refresh || 3}. Introduce through action &mdash; let the players figure out who they are.</div>
+            <div style="padding:8px 14px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--glass-border);font-style:italic">Refresh: {npcData.refresh || 3} (fate points this NPC starts each scene with). Introduce through action &mdash; let the players figure out who they are.</div>
           </div>
           <button style="font-size:12px;padding:8px 16px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:var(--text-muted);cursor:pointer" onclick={rerollNpc}><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> Reroll NPC</button>
         {:else}

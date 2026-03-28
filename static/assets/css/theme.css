@@ -3073,17 +3073,30 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
   .mn-drawer.mn-open{transform:translateX(0)}
 
   /* Help wiki sidebar — becomes drawer on mobile */
-  .wiki-sidebar{position:fixed;top:52px;left:0;bottom:0;width:280px;z-index:300;transform:translateX(-100%);transition:transform 0.22s cubic-bezier(0.4,0,0.2,1);box-shadow:8px 0 32px rgba(0,0,0,0.5)}
+  .wiki-sidebar{position:fixed;top:52px;left:0;bottom:0;width:280px;z-index:300;background:var(--panel-raised,var(--bg));border-right:1px solid var(--border);transform:translateX(-100%);transition:transform 0.22s cubic-bezier(0.4,0,0.2,1);box-shadow:8px 0 32px rgba(0,0,0,0.5);-webkit-overflow-scrolling:touch}
   .wiki-sidebar.mn-open{transform:translateX(0)}
 
   /* Content takes full width */
   .wiki-shell{flex-direction:column}
+
+  /* Bottom nav — always visible on mobile */
+  .wiki-mobile-nav{display:flex!important}
+
+  /* Pad content above fixed bottom nav */
+  .wiki-shell{padding-bottom:calc(64px + env(safe-area-inset-bottom,0px))}
 }
 
 .wiki-card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0;margin:12px 0 0}
 @media(max-width:500px){.wiki-card-grid{grid-template-columns:repeat(2,1fr)}}
 .wiki-card-grid a{text-decoration:none;display:flex;flex-direction:column;gap:3px;padding:10px 12px;border-radius:var(--glass-radius-sm);border:1px solid var(--glass-border);background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);transition:background 0.12s;min-width:0}
 .wiki-card-grid a:hover{background:color-mix(in srgb,var(--accent) 8%,transparent)}
+
+/* ── Mobile bottom nav for help pages ────────────────────────────────────── */
+.wiki-mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:200;background:var(--panel-raised,var(--bg));border-top:1px solid var(--border);padding:4px 0 calc(4px + env(safe-area-inset-bottom,0px));justify-content:space-around;align-items:center}
+.wiki-mobile-nav-btn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 8px;background:none;border:none;color:var(--text-muted);text-decoration:none;font-size:10px;font-weight:600;cursor:pointer;font-family:var(--font-ui);min-width:52px;-webkit-tap-highlight-color:transparent}
+.wiki-mobile-nav-btn i{font-size:18px}
+.wiki-mobile-nav-btn.active{color:var(--accent)}
+.wiki-mobile-nav-btn:hover{color:var(--text)}
 
 /* ── License page ────────────────────────────────────────────────────────── */
 .lic{max-width:720px;margin:0 auto;padding:24px 20px 80px;position:relative;z-index:1}
@@ -4412,7 +4425,7 @@ g:hover .cv-edge-label-bg { fill:color-mix(in srgb,var(--accent) 12%,var(--panel
 }
 
 /* ── Responsive ───────────────────────────────────────────────────────────── */
-@media (max-width: 700px) {
+@media (max-width: 767px) {
   /* On mobile: generator fills width, table is FAB + bottom-sheet */
   .cp-gen-col {
     width: 100% !important;
@@ -4446,7 +4459,7 @@ g:hover .cv-edge-label-bg { fill:color-mix(in srgb,var(--accent) 12%,var(--panel
   .cp-table-full .cp-gen-col { width: 100% !important; }
 }
 
-@media (min-width: 701px) {
+@media (min-width: 768px) {
   .cp-table-fab { display: none !important; }
   .cp-mobile-sheet-backdrop { display: none !important; }
   .cp-mobile-sheet-hdr { display: none !important; }
@@ -5605,6 +5618,20 @@ button.fp-dot:focus-visible {
   margin-top: 2px;
   flex-shrink: 0;
 }
+.onb-first-roll-dismiss {
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 3px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid var(--accent, var(--gold));
+  border-radius: 4px;
+  background: transparent;
+  color: var(--accent, var(--gold));
+  cursor: pointer;
+  white-space: nowrap;
+}
+.onb-first-roll-dismiss:hover { background: color-mix(in srgb, var(--accent) 12%, transparent); }
 
 /* ── Mobile FAB hint (#18) ─────────────────────────────────────────────────── */
 .onb-fab-hint {

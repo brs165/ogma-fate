@@ -40,8 +40,6 @@ import Dexie from 'dexie';
       help_level:              'new_fate',
       gm_mode:                 true,
       intro_seen:              {},
-      coach_canvas_dismissed:  false,
-      coach_play_dismissed:    false,
       pwa_nudge_dismissed:     false,
       safari_warn_dismissed:   false,
       ios_install_dismissed:   false,
