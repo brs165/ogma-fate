@@ -57,6 +57,12 @@
 
   const MIN_ZOOM = 0.15, MAX_ZOOM = 2.5;
 
+  // ── Multi-touch tracking (two-finger pan/zoom) ──────────────────────────
+  let activePointers = $state(new Map()); // pointerId → { x, y }
+  let pinchState = $state(null); // { dist, midX, midY, startPanX, startPanY, startZoom }
+  let touchHint = $state(false);
+  let touchHintTimer = $state(null);
+
   // ── Coordinate math ───────────────────────────────────────────────────────
   function screenToCanvas(sx, sy) {
     return { x: (sx - panX) / zoom, y: (sy - panY) / zoom };
@@ -100,11 +106,63 @@
     zoom = newZ;
   }
 
+  // ── Touch helpers ──────────────────────────────────────────────────────────
+  function isTouch(e) { return e.pointerType === 'touch'; }
+
+  function pointerDist(a, b) {
+    const dx = a.x - b.x, dy = a.y - b.y;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  function pointerMid(a, b) {
+    return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+  }
+
+  function showTouchHint() {
+    if (touchHintTimer) clearTimeout(touchHintTimer);
+    touchHint = true;
+    touchHintTimer = setTimeout(() => { touchHint = false; touchHintTimer = null; }, 1200);
+  }
+
+  function startPinch() {
+    const pts = [...activePointers.values()];
+    if (pts.length < 2) return;
+    const mid = pointerMid(pts[0], pts[1]);
+    pinchState = {
+      dist: pointerDist(pts[0], pts[1]),
+      midX: mid.x, midY: mid.y,
+      startPanX: panX, startPanY: panY, startZoom: zoom,
+    };
+  }
+
   // ── Pan (drag on empty canvas) ────────────────────────────────────────────
   function onWrapPointerDown(e) {
     if (e.target.closest('.cv-card-pos')) return;
     if (e.target.closest('.cv-controls')) return;
     if (e.button !== 0) return;
+
+    // Track all touch pointers for multi-touch gestures
+    if (isTouch(e)) {
+      activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      activePointers = activePointers; // trigger reactivity
+
+      if (activePointers.size === 1) {
+        // Single touch on canvas — show "use two fingers" hint, don't pan
+        showTouchHint();
+        return;
+      }
+      if (activePointers.size >= 2) {
+        // Two fingers down — start pinch/pan
+        touchHint = false;
+        if (touchHintTimer) { clearTimeout(touchHintTimer); touchHintTimer = null; }
+        startPinch();
+        if (cvWrap) cvWrap.setPointerCapture(e.pointerId);
+        return;
+      }
+      return;
+    }
+
+    // Mouse/pen: single-pointer pan as before
     panDrag = { startX: e.clientX, startY: e.clientY, startPanX: panX, startPanY: panY };
     if (cvWrap) cvWrap.setPointerCapture(e.pointerId);
   }
@@ -115,6 +173,21 @@
     if (e.target.closest('button') || e.target.closest('input') ||
         e.target.closest('textarea') || e.target.closest('select') ||
         e.target.closest('a') || e.target.closest('[contenteditable]')) return;
+
+    // On touch, track pointer for potential pinch gesture
+    if (isTouch(e)) {
+      activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      activePointers = activePointers;
+      if (activePointers.size >= 2) {
+        // Second finger down on a card — start pinch instead of card drag
+        touchHint = false;
+        if (touchHintTimer) { clearTimeout(touchHintTimer); touchHintTimer = null; }
+        dragState = null;
+        startPinch();
+        return;
+      }
+    }
+
     e.stopPropagation();
     const cp = screenToCanvas(e.clientX, e.clientY);
     dragState = {
@@ -129,12 +202,49 @@
   }
 
   function onWrapPointerMove(e) {
+    // Update tracked touch pointer position
+    if (isTouch(e) && activePointers.has(e.pointerId)) {
+      activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      activePointers = activePointers;
+    }
+
+    // Two-finger pinch/pan
+    if (pinchState && activePointers.size >= 2) {
+      const pts = [...activePointers.values()];
+      const newDist = pointerDist(pts[0], pts[1]);
+      const newMid = pointerMid(pts[0], pts[1]);
+
+      // Zoom toward the midpoint of the two fingers
+      const scale = newDist / pinchState.dist;
+      const newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, pinchState.startZoom * scale));
+
+      // Pan follows the midpoint movement + zoom-adjusted offset
+      const rect = cvWrap ? cvWrap.getBoundingClientRect() : { left: 0, top: 0 };
+      const localMidX = newMid.x - rect.left;
+      const localMidY = newMid.y - rect.top;
+      const startLocalMidX = pinchState.midX - rect.left;
+      const startLocalMidY = pinchState.midY - rect.top;
+
+      panX = pinchState.startPanX + (localMidX - startLocalMidX)
+           + (localMidX - pinchState.startPanX) * (1 - newZoom / pinchState.startZoom);
+      panY = pinchState.startPanY + (localMidY - startLocalMidY)
+           + (localMidY - pinchState.startPanY) * (1 - newZoom / pinchState.startZoom);
+      zoom = newZoom;
+      return;
+    }
+
     if (panDrag) {
       panX = panDrag.startPanX + (e.clientX - panDrag.startX);
       panY = panDrag.startPanY + (e.clientY - panDrag.startY);
       return;
     }
     if (dragState) {
+      // If a second touch arrived, cancel card drag in favor of pinch
+      if (isTouch(e) && activePointers.size >= 2) {
+        dragState = null;
+        startPinch();
+        return;
+      }
       const cp = screenToCanvas(e.clientX, e.clientY);
       dragState = {
         ...dragState,
@@ -146,6 +256,20 @@
   }
 
   function onWrapPointerUp(e) {
+    // Remove tracked touch pointer
+    if (isTouch(e)) {
+      activePointers.delete(e.pointerId);
+      activePointers = activePointers;
+      if (activePointers.size < 2) {
+        pinchState = null;
+      }
+      if (activePointers.size === 0) {
+        pinchState = null;
+        panDrag = null;
+      }
+      // Fall through to handle card drag commit on touch
+    }
+
     if (panDrag) { panDrag = null; return; }
     if (dragState) {
       if (dragState.moved && onUpdateCard) {
@@ -282,6 +406,7 @@
   onpointerup={onWrapPointerUp}
   onpointercancel={onWrapPointerUp}
   oncontextmenu={onContextMenuWrap}
+  style="touch-action:none"
   role="application"
   aria-label="Campaign canvas"
 >
@@ -444,6 +569,15 @@
           </div>
         </div>
       {/if}
+    </div>
+  {/if}
+
+  <!-- Two-finger touch hint -->
+  {#if touchHint}
+    <div class="cv-touch-hint" aria-hidden="true">
+      <div class="cv-touch-hint-text">
+        <i class="fa-solid fa-hand" aria-hidden="true"></i> Use two fingers to pan &amp; zoom
+      </div>
     </div>
   {/if}
 
