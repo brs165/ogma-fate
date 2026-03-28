@@ -4851,6 +4851,10 @@ g:hover .cv-edge-label-bg { fill:color-mix(in srgb,var(--accent) 12%,var(--panel
 }
 
 /* ── Bits Tooltip — comic speech-bubble style ──────────────────────────── */
+[data-bits-tooltip-trigger] {
+  all: unset;
+  display: contents;
+}
 [data-bits-tooltip-content] {
   background: var(--tooltip-bg, #FFF8EE);
   border: 1.5px solid var(--border-mid);
