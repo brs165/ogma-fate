@@ -1,6 +1,6 @@
 # Project Memory — Ogma
 _Persistent context for model-switching and session handoffs._
-_Last updated: 2026.03.699 — Onboarding system, Quick Start summaries, mobile UX refinements_
+_Last updated: 2026.03.814 — Help content revamp, AddMenu in canvas controls, card generation fix_
 
 ---
 
@@ -47,7 +47,7 @@ docs/claude/CANVAS-WORKSHOP.md       Canvas sprint status and backlog
 
 ---
 
-## Svelte 5 runes rules (CRITICAL — applies to all 76 .svelte files)
+## Svelte 5 runes rules (CRITICAL — applies to all 77 .svelte files)
 
 - `let x = $state(value)` — mutable local state. Use `$state.raw(value)` for objects always replaced wholesale (avoids deep proxy).
 - `let x = $derived(expr)` — computed values. Expression only, never a wrapping function.
@@ -110,7 +110,7 @@ screenY = cardY * zoom + panY
 
 ---
 
-## Component inventory (76 .svelte files)
+## Component inventory (77 .svelte files)
 
 ```
 src/lib/components/
@@ -119,10 +119,10 @@ src/lib/components/
 │                         Compel, Challenge, Contest, Consequence, Faction,
 │                         Complication, Backstory, Obstacle, Countdown,
 │                         Constraint, Custom, Pc
-├── board/          18    Board, OgmaCanvas, BoardCard, BoardLabel, BoardSticky,
-│                         BoardBoost, BoardGroup, Topbar, DossierModal, ExportMenu,
-│                         ExportModal, ExportPanel, HelpPanel, StuntPanel, MobileList,
-│                         CommandPalette, CanvasContextMenu, GenerateFAB
+├── board/          19    Board, OgmaCanvas, BoardCard, BoardLabel, BoardSticky,
+│                         BoardBoost, BoardGroup, Topbar, AddMenu, DossierModal,
+│                         ExportMenu, ExportModal, ExportPanel, HelpPanel, StuntPanel,
+│                         MobileList, CommandPalette, CanvasContextMenu, GenerateFAB
 ├── campaign/        3    Campaign, FatePointTracker, Landing
 ├── panels/          1    LeftPanel
 ├── dice/            1    DicePanel
@@ -180,7 +180,7 @@ on all help pages, Web Share API, mobile-responsive onboarding CSS, help level a
 Cards render directly via `{#each}` loop in a transformed viewport div. Connectors as SVG
 overlay. Minimap as scaled position rectangles. No `@xyflow/svelte` dependency.
 
-**Svelte 5 migration** — all 76 .svelte files on runes, zero legacy files.
+**Svelte 5 migration** — all 77 .svelte files on runes, zero legacy files.
 
 **Svelte 5 runes compliance audit (v680)** — systematic pass across all components:
 `void`-dependency hacks removed, sync `$effect` anti-patterns replaced with `$derived`,
@@ -224,6 +224,9 @@ consequence stickies, undo (moves + reroll + delete), Ctrl+A select all, canvas 
 - **PDF-08** Dust and Iron
 
 ### Recently completed
+- ~~**Help content revamp**~~ prev/next nav, SRD links, On this page TOC, mobile polish, Wiki→Help rename — v814
+- ~~**AddMenu in canvas controls**~~ moved from Topbar to OgmaCanvas cv-controls panel — v814
+- ~~**Card generation fix**~~ Board.svelte now imports CAMPAIGNS directly (getWorldTables was broken) — v814
 - ~~**Onboarding system**~~ 25 recommendations from play session reports — v699
 - ~~**Code audit**~~ 8 issues fixed, mobile table rewrite — v691
 - ~~**Svelte 5 runes compliance audit**~~ void hacks, sync effects, $state.raw — v680
@@ -243,7 +246,7 @@ consequence stickies, undo (moves + reroll + delete), Ctrl+A select all, canvas 
 - **Zip naming:** source = `YYYY-MM-NNN.zip`, offline = `ogma-offline-YYYY-MM-NNN.zip`
 - **`npx vite build`** — use for all test/intermediate builds. No version bump.
 - **`bash scripts/bump-version.sh`** — run ONCE, immediately before the final zip delivery only.
-- Current version: `2026.03.699`
+- Current version: `2026.03.814`
 
 ---
 

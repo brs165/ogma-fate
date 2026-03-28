@@ -61,8 +61,8 @@ npm run build               # Must print "✔ done"
 [ ] Space bar → generates result
 [ ] Send to Table → card appears on canvas
 [ ] Drag card → position persists on reload
-[ ] Right-click canvas → context menu appears at cursor
-[ ] Context menu generate → card at click position
+[ ] AddMenu (canvas controls) → dropdown opens upward
+[ ] AddMenu generate → card placed on canvas
 [ ] Canvas templates → Opening Scene template drops 4 cards
 [ ] Export → JSON download works
 [ ] Service worker registers (Application tab)

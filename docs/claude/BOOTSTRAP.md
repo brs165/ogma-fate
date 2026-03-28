@@ -47,7 +47,7 @@ Add others per task (e.g. `src/lib/stores/canvasStore.js`, `src/lib/components/b
 
 ## 4. Stack facts (critical)
 
-**Svelte 5 runes — 76 files, zero legacy:**
+**Svelte 5 runes — 77 files, zero legacy:**
 - `$state()` for mutable state; `$state.raw()` for objects always replaced wholesale (no deep proxy)
 - `$props()` for all component props — never `export let`
 - `onclick=` not `on:click=` — Svelte 5 event syntax
@@ -82,7 +82,7 @@ canvasY = (screenY - panY) / zoom
 
 ---
 
-## 5. Component inventory (76 .svelte files)
+## 5. Component inventory (77 .svelte files)
 
 ```
 src/lib/components/
@@ -91,10 +91,10 @@ src/lib/components/
 │                         Complication, Backstory, Obstacle, Countdown,
 │                         Constraint, Custom, Pc
 ├── cards/           4    StressRow, ClockTrack, Cv4Card, BackPanel
-├── board/          18    Board, OgmaCanvas, BoardCard, BoardSticky, BoardBoost,
-│                         BoardLabel, BoardGroup, Topbar, DossierModal, ExportMenu,
-│                         ExportModal, ExportPanel, HelpPanel, StuntPanel, MobileList,
-│                         CommandPalette, CanvasContextMenu, GenerateFAB
+├── board/          19    Board, OgmaCanvas, BoardCard, BoardSticky, BoardBoost,
+│                         BoardLabel, BoardGroup, Topbar, AddMenu, DossierModal,
+│                         ExportMenu, ExportModal, ExportPanel, HelpPanel, StuntPanel,
+│                         MobileList, CommandPalette, CanvasContextMenu, GenerateFAB
 ├── campaign/        3    Campaign, FatePointTracker, Landing
 ├── dice/            1    DicePanel
 ├── panels/          1    LeftPanel
@@ -134,7 +134,7 @@ npx vite build
 cd build && zip -rq ../ogma-offline-YYYY-MM-NNN.zip .
 ```
 
-Current version: `2026.03.699`
+Current version: `2026.03.814`
 
 ---
 
@@ -152,8 +152,10 @@ Current version: `2026.03.699`
 
 ## Recent work
 
+- v814 — Help content revamp (prev/next nav, SRD links, mobile polish, Wiki→Help rename)
+- v814 — AddMenu moved to canvas controls panel, card generation fix
 - v699 — Onboarding system (25 recommendations from play session reports)
 - v691 — Code audit (8 fixes, mobile table rewrite)
 - v680 — Svelte 5 runes compliance audit
 
-See ROADMAP.md for backlog.
+See `docs/claude/PROJECT_MEMORY.md` for full backlog.

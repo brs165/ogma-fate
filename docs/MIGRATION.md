@@ -1,5 +1,9 @@
 # MIGRATION.md — React → Svelte Migration Spec
 
+> **Historical reference only.** This documents the March 2026 migration from React to SvelteKit.
+> SvelteFlow was subsequently removed in v662 (replaced with native canvas).
+> For current architecture, see `PROJECT_MEMORY.md` and `CANVAS-WORKSHOP.md`.
+
 ## ✅ Migration Complete — March 2026
 
 > **Status:** All 10 migration sessions completed. The Svelte codebase is fully functional.

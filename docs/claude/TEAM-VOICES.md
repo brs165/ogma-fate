@@ -12,9 +12,9 @@ Invoke all seven when reviewing features. Invoke relevant subsets for targeted w
 Responsible for: build health, Svelte 5 runes correctness, native canvas integrity,
 store architecture, CSS-only styling, component structure, Bits UI integration.
 
-**Stack (v667+):**
-- SvelteKit + Svelte 5.55 runes
-- Native canvas via `OgmaCanvas.svelte` (SvelteFlow removed at v662)
+**Stack (v814+):**
+- SvelteKit + Svelte 5 runes (^5.51.0)
+- Native canvas via `OgmaCanvas.svelte` (SvelteFlow removed v662)
 - Bits UI 2.16.3 for all interactive primitives
 - Dexie 4 (IDB), FA 7.2 Free, no external CSS frameworks
 
@@ -129,15 +129,11 @@ generation and spatial prep. Online play is solved elsewhere (Foundry, Roll20).
 3. Improvements to existing features → build when stable
 4. New features → validate need before building
 
-**Current priority order (v667+):**
-1. Split layout drag-to-resize (promised, not shipped)
-2. OgmaTooltip wiring (component exists, 0 usages)
-3. Session Zero → Table send-all flow
-4. Content quality: Victorian adjective pass (BL-03), Western depth (BL-08)
-5. Consequence recovery timing display
-6. Canvas templates (WC-05) — starter scene layouts
-7. Node groups (WC-02)
-8. PDF world books (PDF-04–08)
+**Current priority order (v814+):**
+1. Content quality: Victorian adjective pass (BL-03), Western depth (BL-08)
+2. Shareable links (BL-06)
+3. PDF world books (PDF-04–08)
+4. OgmaTooltip wiring (component exists, low usage)
 
 ---
 

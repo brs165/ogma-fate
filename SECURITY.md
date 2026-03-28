@@ -4,7 +4,7 @@
 
 | Version | Supported |
 |---------|-----------|
-| Latest (ogma.net) | ✅ Active |
+| Latest (ogma.net) | Active |
 | Self-hosted forks | Maintainer's discretion |
 
 ## Reporting a Vulnerability
@@ -26,17 +26,17 @@ within **7 days** for critical issues.
 ## Security Architecture
 
 - **No backend.** Ogma has no server, no database, no authentication.
-  All generation logic runs entirely in the browser.
+  All generation logic runs entirely in the browser via SvelteKit (adapter-static).
 - **No data transmitted.** Session data lives in your browser's
-  IndexedDB. Nothing is sent to any server during normal use.
+  IndexedDB (Dexie 4). Nothing is sent to any server during normal use.
 - **Multiplayer relay.** The optional sync server (`ogma-sync`) is a
   dumb WebSocket mirror — it stores the latest canvas snapshot for
   late-joining players and relays messages. It does not persist data
   beyond the active session and transmits nothing to third parties.
-- **CDN dependencies.** React 18.2.0 and Dexie 4.0.10 load from
-  cdnjs with version-pinned URLs and SRI integrity hashes.
+- **CDN dependencies.** Font Awesome 7.2 Free loads from jsDelivr with
+  a version-pinned URL and is cached by the service worker for offline use.
+  All other dependencies are bundled via Vite at build time.
 - **Content Security Policy.** Set via `_headers` on the production
   Cloudflare Pages deployment.
-- **No eval().** The codebase contains no `eval()` or `new Function()`
-  usage. `innerHTML` is used only in `core/intro.js` for typewriter
-  animation with hardcoded content strings, never user-supplied data.
+- **No eval().** The codebase contains no `eval()` or `new Function()`.
+  No `innerHTML` with user-supplied data.

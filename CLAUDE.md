@@ -39,13 +39,13 @@ for GMs. Built with SvelteKit + Svelte 5. Deployed at ogma.net via Cloudflare Pa
 | `docs/claude/BOOTSTRAP.md` | Session startup checklist |
 | `docs/claude/PROJECT_MEMORY.md` | Full project state, known issues, backlog |
 
-## Component inventory (76 .svelte files)
+## Component inventory (77 .svelte files)
 
 | Directory | Count | Contents |
 |-----------|-------|---------|
 | `cards/` | 4 | StressRow, ClockTrack, Cv4Card, BackPanel |
 | `cards/fronts/` | 18 | 18 generator card fronts (all use `fs-*` fate-sheet tokens) |
-| `board/` | 18 | Board, OgmaCanvas, BoardCard, BoardSticky, BoardBoost, BoardLabel, BoardGroup, Topbar, DossierModal, ExportMenu, ExportModal, ExportPanel, HelpPanel, StuntPanel, MobileList, CommandPalette, CanvasContextMenu, GenerateFAB |
+| `board/` | 19 | Board, OgmaCanvas, BoardCard, BoardSticky, BoardBoost, BoardLabel, BoardGroup, Topbar, AddMenu, DossierModal, ExportMenu, ExportModal, ExportPanel, HelpPanel, StuntPanel, MobileList, CommandPalette, CanvasContextMenu, GenerateFAB |
 | `campaign/` | 3 | Campaign, FatePointTracker, Landing |
 | `panels/` | 1 | LeftPanel |
 | `dice/` | 1 | DicePanel |
