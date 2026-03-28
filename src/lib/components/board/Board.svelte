@@ -15,6 +15,7 @@
   import ExportModal   from './ExportModal.svelte';
   import DicePanel     from '../dice/DicePanel.svelte';
   import OgmaCanvas    from './OgmaCanvas.svelte';
+  import MobileList    from './MobileList.svelte';
   import GenerateFAB   from './GenerateFAB.svelte';
   import FatePointTracker from '../campaign/FatePointTracker.svelte';
   import { AlertDialog } from 'bits-ui';
@@ -63,6 +64,7 @@
   let coachEdge    = $state(false);
   let ctx          = $state(null);
   let canvasRef    = $state();
+  let isMobile     = $state(typeof window !== 'undefined' && window.innerWidth < 768);
 
   // ── FP state ───────────────────────────────────────────────────────────────
   let fpState = $state(null);
@@ -363,6 +365,14 @@
             onImport={canvas ? canvas.importCanvas : null}
           />
         </div>
+      {:else if embedded && isMobile}
+        <!-- Mobile: scrollable card list (no canvas) -->
+        <MobileList
+          {cards}
+          {campId}
+          onOpen={(card) => { dossierCard = card; }}
+          onRemove={(id) => { if (canvas) canvas.deleteCard(id); }}
+        />
       {:else}
         <!-- Table canvas -->
         <OgmaCanvas
