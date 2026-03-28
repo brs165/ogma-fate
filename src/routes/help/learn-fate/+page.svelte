@@ -192,17 +192,4 @@
       <a href="/help/how-to-use-ogma">&larr; How to Use Ogma</a>
       <a href="/help/fate-mechanics">Fate Mechanics &rarr;</a>
     </div>
-    <div class="wiki-footer" style="margin-top:16px">
-  <div>
-    <a href="/help">Wiki Home</a> &nbsp;·&nbsp;
-    <a href="/">Open Ogma</a> &nbsp;·&nbsp;
-    <a href="/about">About</a> &nbsp;·&nbsp;
-    <a href="/license">Full Attribution</a> &nbsp;·&nbsp;
-    <!-- FARI_PARKED_2026.03.154 fari.app link --> &nbsp;·&nbsp;
-    <a href="https://fate-srd.com/" target="_blank" rel="noreferrer">fate-srd.com</a>
-  </div>
-  <div style="font-size:var(--text-label);color:var(--text-muted)">
-    Fate&#8482; &amp; Evil Hat Productions, LLC &nbsp;·&nbsp; D&amp;D&#174; &amp; Wizards of the Coast LLC &nbsp;·&nbsp; <a href="/license">CC BY 3.0</a>
-  </div>
-</div>
 </main>
