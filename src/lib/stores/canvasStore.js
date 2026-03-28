@@ -2,7 +2,7 @@
 // Factory: createCanvasStore(campCanvasKey, tables, showToast, onCardsChange)
 import { writable, get } from 'svelte/store';
 import { generate, mergeUniversal, filteredTables, GENERATORS } from '../engine.js';
-import DB from '../db.js';
+import { DB } from '../db.js';
 import { boardUid, extractCardTitle, extractCardSummary, extractCardTags, STICKY_COLORS } from '../helpers.js';
 
 // ── Session Zero pack generator (standalone, no store dependency) ─────────
@@ -71,9 +71,13 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
     loaded.set(true);
   }
 
+  let _persistTimer;
   function persistCanvas(nextCards) {
     if (!DB) return;
-    DB.saveSession(campCanvasKey, { cards: nextCards, ts: Date.now() }).catch(() => {});
+    clearTimeout(_persistTimer);
+    _persistTimer = setTimeout(() => {
+      DB.saveSession(campCanvasKey, { cards: nextCards, ts: Date.now() }).catch(() => {});
+    }, 400);
     if (onCardsChange) onCardsChange(nextCards);
   }
 

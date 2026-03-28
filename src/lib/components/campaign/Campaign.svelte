@@ -4,7 +4,7 @@
   import { CAMPAIGNS, HELP_CONTENT } from '../../../data/shared.js';
   import { createSessionStore } from '../../stores/sessionStore.js';
   import { createChromeStore } from '../../stores/chromeStore.js';
-  import DB, { LS } from '../../db.js';
+  import { DB, LS } from '../../db.js';
   import Cv4Card from '../cards/Cv4Card.svelte';
   import Board from '../board/Board.svelte';
   import { Collapsible } from 'bits-ui';
@@ -32,9 +32,9 @@
 
   // Split ratio: fraction of content-panel width for generator column (0.3–0.7)
   const RATIO_KEY = 'ogma_split_ratio_' + campId;
-  let splitRatio = $state(() => {
+  let splitRatio = $state((() => {
     try { const v = parseFloat(localStorage.getItem(RATIO_KEY)); return (v >= 0.2 && v <= 0.8) ? v : 0.5; } catch { return 0.5; }
-  });
+  })());
   let draggingDivider = $state(false);
   let splitRoot = $state(); // bind:this on .cp-split-root
 

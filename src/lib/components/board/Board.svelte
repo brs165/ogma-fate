@@ -5,7 +5,7 @@
   import { get } from 'svelte/store';
   import { getWorldTables, getWorldMeta } from '../../helpers.js';
   import { createCanvasStore } from '../../stores/canvasStore.js';
-  import DB, { LS } from '../../db.js';
+  import { DB, LS } from '../../db.js';
 
   import Topbar        from './Topbar.svelte';
   import LeftPanel     from '../panels/LeftPanel.svelte';
@@ -46,7 +46,7 @@
   let leftOpen     = $state(typeof window !== 'undefined' ? window.innerWidth > 520 : true);
 
   let toast        = $state(null);
-  let toastTimer   = $state(null);
+  let toastTimer   = null;
   let toastQueue   = $state([]);
 
   let dossierCard  = $state(null);
@@ -261,11 +261,14 @@
     try { theme = LS.get('theme') || 'dark'; document.documentElement.setAttribute('data-theme', theme); } catch(e) {}
     if (campId) document.documentElement.setAttribute('data-campaign', campId);
     if (DB) DB.loadSession(BOARD_FP_KEY + '_' + campId).then(saved => { if (saved && saved.pcs) fpState = saved; }).catch(() => {});
-    window.addEventListener('online',  () => { isOnline = true; });
-    window.addEventListener('offline', () => { isOnline = false; });
+    window.addEventListener('online',  onOnline);
+    window.addEventListener('offline', onOffline);
     document.addEventListener('keydown', onGlobalKey);
     window.addEventListener('ogma:sz-pc', onSzPc);
   });
+
+  function onOnline()  { isOnline = true; }
+  function onOffline() { isOnline = false; }
 
   function onSzPc(e) {
     if (!e.detail || !e.detail.genId || !canvas) return;
@@ -277,6 +280,8 @@
     if (typeof window !== 'undefined') {
       document.removeEventListener('keydown', onGlobalKey);
       window.removeEventListener('ogma:sz-pc', onSzPc);
+      window.removeEventListener('online', onOnline);
+      window.removeEventListener('offline', onOffline);
     }
     clearTimeout(toastTimer);
     document.documentElement.removeAttribute('data-campaign');

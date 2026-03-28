@@ -69,10 +69,14 @@
   export function fitAll() {
     if (!cards.length || !cvWrap) return;
     const CARD_W = 646, CARD_H = 320, PAD = 60;
-    const minX = Math.min(...cards.map(c => c.x)) - PAD;
-    const minY = Math.min(...cards.map(c => c.y)) - PAD;
-    const maxX = Math.max(...cards.map(c => c.x + CARD_W)) + PAD;
-    const maxY = Math.max(...cards.map(c => c.y + CARD_H)) + PAD;
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (const c of cards) {
+      if (c.x < minX) minX = c.x;
+      if (c.y < minY) minY = c.y;
+      if (c.x + CARD_W > maxX) maxX = c.x + CARD_W;
+      if (c.y + CARD_H > maxY) maxY = c.y + CARD_H;
+    }
+    minX -= PAD; minY -= PAD; maxX += PAD; maxY += PAD;
     const w = maxX - minX, h = maxY - minY;
     const rect = cvWrap.getBoundingClientRect();
     const z = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, Math.min(rect.width / w, rect.height / h)));
@@ -237,9 +241,13 @@
   }
   function minimapBounds() {
     if (!cards.length) return null;
-    const xs = cards.map(c => c.x), ys = cards.map(c => c.y);
-    const minX = Math.min(...xs), minY = Math.min(...ys);
-    const maxX = Math.max(...cards.map(c => c.x + 646)), maxY = Math.max(...cards.map(c => c.y + 300));
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (const c of cards) {
+      if (c.x < minX) minX = c.x;
+      if (c.y < minY) minY = c.y;
+      if (c.x + 646 > maxX) maxX = c.x + 646;
+      if (c.y + 300 > maxY) maxY = c.y + 300;
+    }
     const w = maxX - minX || 1, h = maxY - minY || 1;
     return { minX, minY, scale: Math.min((MM_W - 16) / w, (MM_H - 16) / h) };
   }
