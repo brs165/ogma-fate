@@ -2,6 +2,50 @@
 
 ---
 
+## [2026.03.699] — March 2026 — Onboarding System
+
+### Progressive onboarding (25 recommendations from simulated play sessions)
+- First-visit welcome banner with Learn Fate / Session Zero CTAs (`visit_counts` infrastructure)
+- Ctrl+K coach mark appears after 3rd visit, dismissible with localStorage persistence
+- First-roll annotation: highlights result sections with brief explanations for new users
+- Auto-expand "New here?" tab in GM Guidance for users with `help_level === 'new_fate'`
+- `autoGuidance` prop made reactive via `$effect` (was only capturing initial value)
+- Help level auto-upgrade: `new_fate` → `familiar` after 5 visits
+- Mobile FAB hint toast after first "Send to Table" action on mobile
+
+### Contextual help
+- HelpPanel auto-expands section matching active generator (GEN_TO_SECTION mapping)
+- Quick Start `<details open>` summaries on all 8 help pages (5 bullet-point essentials)
+- "Share this guide" button on Learn Fate with Web Share API + clipboard fallback
+
+### Canvas & mobile
+- Canvas templates surfaced in gen-column empty state (4 template grid for mobile discovery)
+- Context-aware empty state in OgmaCanvas via `embedded` prop (mobile vs desktop hints)
+- Session Zero handoff retry loop (up to 20 attempts × 100ms) replacing fixed 500ms timeout
+- `Board.dropTemplateFromParent()` exported for Campaign.svelte template access
+
+### CSS
+- ~218 lines of onboarding component CSS (`.onb-banner`, `.onb-coach`, `.onb-first-roll`, etc.)
+- Mobile responsive overrides at `@media (max-width: 480px)` for all onboarding components
+- Removed duplicate `.cp-table-fab` and `.cp-mobile-sheet-*` CSS blocks
+- ARIA roles: `role="note"` for informational banners, `role="status"` for FAB hint
+
+---
+
+## [2026.03.691] — March 2026 — Code Audit
+
+### 8 issues fixed
+- Character creation infinite loop: `pcDrafts.push()` mutation inside `$effect` → immutable `Array.from` rebuild
+- Export selection reset on card change
+- Event listener leak in reduced-motion `matchMedia` handler
+- Debounced store persistence (was writing to IDB on every keystroke)
+- `Math.min/max` stack overflow with large arrays → loop-based implementation
+- Mobile table rewrite: single-Board architecture with bottom-sheet overlay
+- Duplicate CSS blocks consolidated
+- Session Zero wizard step validation edge case
+
+---
+
 ## [2026.03.680] — March 2026 — Svelte 5 Runes Compliance Audit
 
 ### Critical fixes

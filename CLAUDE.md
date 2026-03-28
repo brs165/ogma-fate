@@ -25,31 +25,45 @@ for GMs. Built with SvelteKit + Svelte 5. Deployed at ogma.net via Cloudflare Pa
 | File | Purpose |
 |------|---------|
 | `src/lib/engine.js` | Pure-function content generator (no Svelte imports) |
-| `src/lib/db.js` | Dexie 4 IndexedDB wrapper (no Svelte imports) |
+| `src/lib/db.js` | Dexie 4 IndexedDB wrapper + localStorage prefs (no Svelte imports) |
 | `src/lib/helpers.js` | Shared utility functions |
-| `src/lib/stores/` | 6 stores: canvas, play, binder, sync, session, chrome |
-| `src/lib/components/board/Board.svelte` | Main app shell |
+| `src/lib/stores/` | 3 stores: canvas, session, chrome |
+| `src/lib/components/board/Board.svelte` | Main app shell + canvas |
+| `src/lib/components/campaign/Campaign.svelte` | Campaign page: generator UI + split layout + onboarding |
 | `src/data/` | 11 campaign data modules |
 | `src/routes/+layout.js` | `ssr=false, prerender=false` |
-| `static/assets/css/theme.css` | Global stylesheet |
+| `static/assets/css/theme.css` | Global stylesheet (~5,700 lines) |
 | `static/sw.js` | Service worker |
 | `static/_redirects` | `/* /index.html 200` |
 | `scripts/bump-version.sh` | Version stamper — run before every zip |
 | `docs/claude/BOOTSTRAP.md` | Session startup checklist |
 | `docs/claude/PROJECT_MEMORY.md` | Full project state, known issues, backlog |
 
-## Component inventory (75 .svelte files)
+## Component inventory (76 .svelte files)
 
 | Directory | Count | Contents |
 |-----------|-------|---------|
 | `cards/` | 4 | StressRow, ClockTrack, Cv4Card, BackPanel |
 | `cards/fronts/` | 18 | 18 generator card fronts (all use `fs-*` fate-sheet tokens) |
-| `board/` | 17 | Board, OgmaCanvas, BoardCard, BoardSticky, BoardBoost, BoardLabel, BoardGroup, Topbar, DossierModal, ExportMenu, ExportPanel, HelpPanel, StuntPanel, MobileList, CommandPalette, CanvasContextMenu, GenerateFAB |
+| `board/` | 18 | Board, OgmaCanvas, BoardCard, BoardSticky, BoardBoost, BoardLabel, BoardGroup, Topbar, DossierModal, ExportMenu, ExportModal, ExportPanel, HelpPanel, StuntPanel, MobileList, CommandPalette, CanvasContextMenu, GenerateFAB |
 | `campaign/` | 3 | Campaign, FatePointTracker, Landing |
 | `panels/` | 1 | LeftPanel |
 | `dice/` | 1 | DicePanel |
 | `shared/` | 3 | HelpDiceRoller, Footer, OgmaTooltip |
-| `routes/` | 27 | Layouts + pages (marketing, help, campaigns) |
+| `routes/` | 28 | Layouts + pages (marketing, help, campaigns) |
+
+## Onboarding system (v699)
+
+Campaign.svelte manages progressive onboarding using `db.js` infrastructure:
+- `help_level` — tracks user experience (`new_fate` → `familiar` auto-upgrade after 5 visits)
+- `visit_counts` — per-campaign visit counter
+- `intro_seen` — per-campaign welcome banner dismissal
+- `coach_cmd_dismissed` — Ctrl+K coach mark persistent dismissal
+- First-visit welcome banner, guided first-roll annotation, auto-expanding GM guidance
+- Mobile FAB hint after sending card to table
+- Canvas templates in empty state (both gen-column and canvas)
+- Contextual HelpPanel auto-expands section matching active generator
+- Quick Start summaries on all 8 help pages
 
 ## Architecture rules
 
@@ -68,9 +82,10 @@ npm run build     # Production build → build/
 npm run preview   # Preview production build
 
 # QA gate (run before every delivery)
-node scripts/qa-hard.mjs
-node scripts/qa-export.mjs
-bash scripts/bump-version.sh  # bump version before zip
+node scripts/qa-hard.mjs     # 189 content + engine + static analysis checks
+node scripts/qa-export.mjs   # Export round-trip checks
+node scripts/qa-unit.mjs     # Unit tests for engine.js
+bash scripts/bump-version.sh # bump version before zip
 ```
 
 ## Deployment

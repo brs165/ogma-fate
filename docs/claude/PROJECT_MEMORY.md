@@ -1,6 +1,6 @@
 # Project Memory — Ogma
 _Persistent context for model-switching and session handoffs._
-_Last updated: 2026.03.680 — Svelte 5 runes compliance audit_
+_Last updated: 2026.03.699 — Onboarding system, Quick Start summaries, mobile UX refinements_
 
 ---
 
@@ -8,16 +8,16 @@ _Last updated: 2026.03.680 — Svelte 5 runes compliance audit_
 
 | Layer | Technology |
 |-------|-----------|
-| Framework | SvelteKit + Svelte 5.55.0 (full runes mode) |
+| Framework | SvelteKit + Svelte 5.51.0 (full runes mode) |
 | Build | Vite 7, `@sveltejs/adapter-static`, `npx vite build` |
 | Canvas | **Native — pointer/wheel events + CSS transform** (SvelteFlow removed in v662) |
 | UI Primitives | `bits-ui@2.16.3` — Dialog, Accordion, DropdownMenu, ToggleGroup, AlertDialog, Collapsible, Select, Popover |
 | Icons | Font Awesome 7.2 Free via jsDelivr CDN (cached by SW for offline) |
 | Card Design | FateX-inspired fate-sheet tokens (`--fs-*`) — off-white `#F5F0E8` body, campaign-tinted headers |
 | State | Svelte `writable`/`derived` stores in plain JS + `$state` in components |
-| Persistence | Dexie 4 (IndexedDB) |
-| Sync | WebSocket multiplayer via PartySocket (`syncStore.js`) |
-| Styling | Global `static/assets/css/theme.css` — no `<style>` blocks in components |
+| Persistence | Dexie 4 (IndexedDB) + localStorage prefs (`fate_prefs_v1`) |
+| Sync | WebSocket multiplayer via PartySocket |
+| Styling | Global `static/assets/css/theme.css` (~5,700 lines) — no `<style>` blocks in components |
 | PWA | `static/sw.js` + `static/manifest.json` |
 | Deploy | Cloudflare Pages (auto-deploy from `main`), `static/_redirects` for SPA routing |
 | Offline | `build/` directory with `start.sh/.bat/.command` launcher scripts + README.txt |
@@ -28,15 +28,13 @@ _Last updated: 2026.03.680 — Svelte 5 runes compliance audit_
 
 ```
 src/lib/engine.js                    Pure-function content generator (no Svelte imports)
-src/lib/db.js                        Dexie 4 IndexedDB wrapper (no Svelte imports)
+src/lib/db.js                        Dexie 4 IndexedDB wrapper + localStorage prefs (no Svelte imports)
 src/lib/helpers.js                   Shared utility functions
 src/lib/stores/canvasStore.js        Canvas: card CRUD, generate, connectors, undo, IDB persist
-src/lib/stores/playStore.js          Play mode: players, turn order, FP, stress, GM pool
-src/lib/stores/binderStore.js        Binder: saved cards, tray, pin/unpin
-src/lib/stores/syncStore.js          WebSocket: connect/disconnect, room code, role
 src/lib/stores/sessionStore.js       Session: active generator, result history, prefs
 src/lib/stores/chromeStore.js        Chrome: toast queue, theme, SW update
 src/lib/components/board/Board.svelte         Main app shell + native canvas
+src/lib/components/campaign/Campaign.svelte   Campaign page: generator UI, split layout, onboarding
 src/data/                            8 campaign data files + shared + universal + index
 src/routes/+layout.js                ssr=false, prerender=false
 static/assets/css/theme.css          ALL styling — never add <style> to components
@@ -49,7 +47,7 @@ docs/claude/CANVAS-WORKSHOP.md       Canvas sprint status and backlog
 
 ---
 
-## Svelte 5 runes rules (CRITICAL — applies to all 75 components)
+## Svelte 5 runes rules (CRITICAL — applies to all 76 .svelte files)
 
 - `let x = $state(value)` — mutable local state. Use `$state.raw(value)` for objects always replaced wholesale (avoids deep proxy).
 - `let x = $derived(expr)` — computed values. Expression only, never a wrapping function.
@@ -110,14 +108,9 @@ screenY = cardY * zoom + panY
 - `pointerup`: release capture, persist to store
 - Cards do NOT have `position:absolute` with `left/top` via inline style on the card component itself — only the `.cv-card-positioner` wrapper has those
 
-**canvasStore (v662+) — removed:**
-- `nodes` derived store (SvelteFlow format)
-- `edges` derived store (SvelteFlow format)
-- `syncNodePositions()` function
-
 ---
 
-## Component inventory (75 .svelte files)
+## Component inventory (76 .svelte files)
 
 ```
 src/lib/components/
@@ -126,23 +119,38 @@ src/lib/components/
 │                         Compel, Challenge, Contest, Consequence, Faction,
 │                         Complication, Backstory, Obstacle, Countdown,
 │                         Constraint, Custom, Pc
-├── board/          17    Board, OgmaCanvas, BoardCard, BoardLabel, BoardSticky,
+├── board/          18    Board, OgmaCanvas, BoardCard, BoardLabel, BoardSticky,
 │                         BoardBoost, BoardGroup, Topbar, DossierModal, ExportMenu,
-│                         ExportPanel, HelpPanel, StuntPanel, MobileList,
+│                         ExportModal, ExportPanel, HelpPanel, StuntPanel, MobileList,
 │                         CommandPalette, CanvasContextMenu, GenerateFAB
 ├── campaign/        3    Campaign, FatePointTracker, Landing
 ├── panels/          1    LeftPanel
 ├── dice/            1    DicePanel
 └── shared/          3    HelpDiceRoller, Footer, OgmaTooltip
 
-src/routes/                27 route page/layout files
+src/routes/                28 route page/layout files
 ```
 
-**Deleted in v662:** `nodes/CardNode.svelte`, `nodes/StickyNode.svelte`,
-`nodes/BoostNode.svelte`, `nodes/LabelNode.svelte`, `nodeTypes.js`
+**Stores (3):** canvasStore.js, sessionStore.js, chromeStore.js
+**Deleted stores:** playStore.js, binderStore.js, syncStore.js (play mode removed v665)
 
-**Deleted in v665:** `TurnBar.svelte`, `PlayerRow.svelte`, `CombatTracker.svelte`,
-`PlayPanel.svelte`, `BinderPanel.svelte`, `PlayerSurface.svelte` (play mode removed)
+---
+
+## Onboarding system (v699)
+
+Progressive onboarding managed by Campaign.svelte using `db.js` localStorage prefs:
+
+| Feature | Trigger | Persistence |
+|---------|---------|-------------|
+| Welcome banner | `visitCount === 1 && !introSeen` | `intro_seen[campId]` in LS |
+| Ctrl+K coach mark | `visitCount >= 3 && !coachDismissed` | `coach_cmd_dismissed` in LS |
+| First-roll annotation | `visitCount === 1` | Session only |
+| Auto-expand GM guidance | `isFirstRoll && helpLevel === 'new_fate'` | Session only |
+| Mobile FAB hint | After sendToTable on mobile | Session only (4s timeout) |
+| Help level auto-upgrade | `visitCount > 5` | `help_level` in LS |
+| Contextual HelpPanel | Active generator maps to section | Reactive |
+| Canvas templates (empty state) | `cards.length === 0` | N/A |
+| Quick Start summaries | All 8 help pages | Static (open by default) |
 
 ---
 
@@ -163,36 +171,38 @@ src/routes/                27 route page/layout files
 
 ## What's complete
 
+**Onboarding system (v699)** — 25 recommendations from simulated play session reports:
+welcome banner, coach marks, first-roll guidance, contextual help panel, Session Zero
+jargon tooltips, canvas templates in empty state, mobile FAB hint, Quick Start summaries
+on all help pages, Web Share API, mobile-responsive onboarding CSS, help level auto-upgrade.
+
 **Native canvas migration (v662)** — SvelteFlow replaced with pointer/wheel native pan/zoom.
 Cards render directly via `{#each}` loop in a transformed viewport div. Connectors as SVG
 overlay. Minimap as scaled position rectangles. No `@xyflow/svelte` dependency.
 
-**Svelte 5 migration** — all 75 components on runes, zero legacy files.
+**Svelte 5 migration** — all 76 .svelte files on runes, zero legacy files.
 
-**Svelte 5 runes compliance audit (v680)** — systematic pass across all 75 components:
-`void`-dependency hacks removed, sync `$effect` anti-patterns replaced with `$derived` or
-init-on-edit patterns, `$state.raw` adopted for wholesale-replaced objects (`cardState`),
-`tick()` replaces `setTimeout(..., 0)` for post-render focus, `Scene.svelte` missing
-`$props()` declaration fixed (critical), `{#snippet}` adopted in `NpcMajor.svelte`.
+**Svelte 5 runes compliance audit (v680)** — systematic pass across all components:
+`void`-dependency hacks removed, sync `$effect` anti-patterns replaced with `$derived`,
+`$state.raw` adopted for wholesale-replaced objects, `tick()` replaces `setTimeout(..., 0)`.
 
-**FateX-style card restyling (v600)** — all 18 card fronts + Cv4Card shell rewritten
-with `--fs-*` fate-sheet design tokens.
+**Code audit (v691)** — 8 issues fixed: character creation infinite loop, export selection
+reset, event listener leak, debounced store persistence, Math.min/max stack overflow,
+mobile table single-Board architecture.
+
+**Canvas features** — edge labels, card minimise/expand, search dim, connect mode, NPC acted
+state, clock trigger ring, empty canvas hint with templates, fitAll on load, gmOnly toggle,
+consequence stickies, undo (moves + reroll + delete), Ctrl+A select all, canvas templates
+(Opening Scene, Investigation, Climax, Session Zero), node groups.
+
+**FateX-style card restyling (v600)** — all 18 card fronts + Cv4Card shell with `--fs-*` tokens.
 
 **Font Awesome 7.2 Free (v593)** — loaded via jsDelivr CDN. ~200 emoji→FA replacements.
-Zero emoji HTML entities in any .svelte file.
 
 **Legal compliance (v586)** — Fate Condensed attribution corrected. All HTTP→HTTPS.
-Shared Footer.svelte on all 6 page layouts.
 
-**Mobile UX (iPhone 13 target)** — 12 fixes: iOS zoom fix, GenerateFAB, 44px touch targets,
-drawer backdrop, topbar overflow menu, safe-area-inset.
-
-**Offline distribution** — build/ with launcher scripts, README.txt, SW precaching.
-
-**Canvas features** — edge labels (click cycles: Knows/Opposes/Ally/Fears/Owes/Loves/Rival/Commands/Seeks),
-card minimise/expand, search dim, connect mode visual, NPC acted state, clock trigger ring,
-empty canvas hint, fitAll on load, gmOnly card toggle, consequence stickies auto-placed,
-undo covers card moves + reroll + delete, Ctrl+A select all.
+**Mobile UX** — single-Board mobile architecture, bottom-sheet table, safe-area-inset padding,
+44px touch targets, responsive onboarding components, compact banner on small screens.
 
 ---
 
@@ -203,10 +213,8 @@ undo covers card moves + reroll + delete, Ctrl+A select all.
 - **BL-08** Western world content depth [M] — more tables
 
 ### Tier 2 — Features
-- **WC-02** Node groups — scene spatial grouping on canvas [M]
-- **WC-05** Canvas templates — starter scene layouts [M]
 - **BL-06** Shareable links [M]
-- **BL-16** Ogma rebrand [M, needs GitHub username confirmation — BL-12]
+- **BL-11** Shared learning state in multiplayer [L] — GM sees player help progress
 
 ### Tier 3 — PDF books (remaining)
 - **PDF-04** Shattered Kingdoms
@@ -216,24 +224,26 @@ undo covers card moves + reroll + delete, Ctrl+A select all.
 - **PDF-08** Dust and Iron
 
 ### Recently completed
-- ~~**Svelte 5 runes compliance audit**~~ `void` hacks, sync effects, `$state.raw`, snippets — v680
+- ~~**Onboarding system**~~ 25 recommendations from play session reports — v699
+- ~~**Code audit**~~ 8 issues fixed, mobile table rewrite — v691
+- ~~**Svelte 5 runes compliance audit**~~ void hacks, sync effects, $state.raw — v680
 - ~~**Canvas migration**~~ SvelteFlow → native pointer/wheel canvas — v662
+- ~~**WC-02**~~ Node groups — v670
+- ~~**WC-05**~~ Canvas templates — v670
 - ~~**BL-01**~~ localStorage schema — v624
 - ~~**BL-02**~~ Stunt data — v627
 - ~~**BL-07**~~ GM Tips depth — v630
 - ~~**BL-15**~~ Mobile nav overhaul — v621
-- ~~**WC-07**~~ gmOnly card toggle — v636
-- ~~**WC-08**~~ Consequence stickies — v648
 
 ---
 
 ## Build / version rules
 
-- **Version format:** `YYYY.MM.NNN` (e.g. `2026.03.677`)
+- **Version format:** `YYYY.MM.NNN` (e.g. `2026.03.699`)
 - **Zip naming:** source = `YYYY-MM-NNN.zip`, offline = `ogma-offline-YYYY-MM-NNN.zip`
 - **`npx vite build`** — use for all test/intermediate builds. No version bump.
 - **`bash scripts/bump-version.sh`** — run ONCE, immediately before the final zip delivery only.
-- Current version: `2026.03.680`
+- Current version: `2026.03.699`
 
 ---
 
@@ -242,5 +252,5 @@ undo covers card moves + reroll + delete, Ctrl+A select all.
 - **URL:** ogma.net
 - **Platform:** Cloudflare Pages — auto-deploys from `main` branch
 - **Repo:** github.com/brs165/ogma-fate
-- **Build command:** `npm run build` (runs bump-version.sh + vite build — use `npx vite build` to avoid auto-bump)
+- **Build command:** `npm run build` (runs bump-version.sh + vite build)
 - **Build output:** `build/`
