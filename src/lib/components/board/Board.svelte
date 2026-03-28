@@ -29,6 +29,7 @@
   }
   export function toggleDice() { showDice = !showDice; }
   export function toggleFP()   { showFP   = !showFP;   }
+  export function dropTemplateFromParent(tplId) { dropTemplate(tplId); }
 
   // ── Constants ──────────────────────────────────────────────────────────────
   const BOARD_CANVAS_KEY = 'board_canvas_v1';
@@ -398,6 +399,7 @@
           onAutoArrange={() => { if (canvas) canvas.autoArrange(); setTimeout(() => fitAll(), 150); }}
           onExportModal={() => { showExportModal = true; }}
           showToast={showToast}
+          {embedded}
         />
       {/if}
     </div>

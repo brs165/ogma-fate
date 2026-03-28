@@ -9,6 +9,15 @@
     <h1>How to use Ogma</h1>
     <p class="wiki-page-desc">Three paths depending on what you need right now. Each takes about 2 minutes to read.</p>
 
+    <details class="learn-quickstart" open>
+      <summary class="learn-quickstart-toggle">Quick Start — 3 paths</summary>
+      <ol class="learn-quickstart-list">
+        <li><strong>Prep a session</strong> — use the Session Zero Wizard or roll generators directly.</li>
+        <li><strong>Run at the table</strong> — roll NPCs, compels, and complications mid-session. Press Space.</li>
+        <li><strong>Learn the rules</strong> — read "Learn Fate in 7 Steps" for the complete Fate Condensed walkthrough.</li>
+      </ol>
+    </details>
+
     <div id="prep" class="callout">
       <div class="callout-title"><i class="fa-solid fa-scroll" aria-hidden="true"></i> Path 1: Use Ogma to prep a session</div>
       <p>You're a GM getting ready for game night. You want material you can use at the table.</p>

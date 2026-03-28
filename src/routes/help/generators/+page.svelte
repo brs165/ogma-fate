@@ -9,6 +9,17 @@
     <h1>16 generators. 8 worlds. 128 combinations.</h1>
     <p class="wiki-page-desc">Every generator produces a mechanically complete, thematically correct Fate Condensed result. Each one is tuned to its campaign world — a Minor NPC in Shattered Kingdoms gets dark fantasy names and aspects; the same generator in Neon Abyss gets chrome and neon.</p>
 
+    <details class="learn-quickstart" open>
+      <summary class="learn-quickstart-toggle">Quick Start — 5 generator essentials</summary>
+      <ol class="learn-quickstart-list">
+        <li><strong>16 generators</strong> — NPCs, Scenes, Encounters, Seeds, Factions, Compels, Consequences, and more.</li>
+        <li><strong>8 worlds</strong> — each has ~1,500 themed table entries. Same generator, different world = different flavour.</li>
+        <li><strong>Every card has GM guidance</strong> — click "GM GUIDANCE" on any result for running tips and rules refs.</li>
+        <li><strong>Seeds = adventure packs</strong> — one roll gives you a scene, NPCs, and complications ready to play.</li>
+        <li><strong>Space to roll, → Table to place</strong> — generate in the left panel, build your session on the canvas.</li>
+      </ol>
+    </details>
+
     <h2>How generators and campaigns combine</h2>
     <p>When you roll, Ogma pulls from <strong>two table layers</strong>:</p>
     <ul>

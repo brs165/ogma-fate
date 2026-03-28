@@ -9,6 +9,17 @@
     <h1>Your first session with Ogma</h1>
     <p class="wiki-page-desc">Ogma is ready to use the moment you open it — no login, no setup, no internet after first load. This guide explains how it works and what you need to know to use it safely.</p>
 
+    <details class="learn-quickstart" open>
+      <summary class="learn-quickstart-toggle">Quick Start — 5 essentials</summary>
+      <ol class="learn-quickstart-list">
+        <li><strong>Everything is local</strong> — your data lives in your browser. No account, no cloud.</li>
+        <li><strong>Press Space to roll</strong> — pick a generator on the left, hit Space, read the result.</li>
+        <li><strong>Send to Table</strong> — click "→ Table" to place cards on your prep canvas.</li>
+        <li><strong>Export before clearing cache</strong> — clearing browser data deletes everything permanently.</li>
+        <li><strong>Install as PWA</strong> — works fully offline after first visit. Add to home screen on mobile.</li>
+      </ol>
+    </details>
+
     <h2>The local-first philosophy</h2>
     <p>Ogma stores <strong>everything in your browser</strong> — there is no server, no cloud sync, no account. This is a deliberate design choice: it means the tool works offline, loads instantly, and your data is private by default.</p>
     <p>Specifically, Ogma uses two browser storage mechanisms:</p>

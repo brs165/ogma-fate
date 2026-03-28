@@ -9,6 +9,17 @@
 <h1>Fate Condensed — the mechanics behind the generators</h1>
 <p class="wiki-page-desc">Ogma generates mechanically correct Fate Condensed content. This page explains the mechanics behind the generators, with deep dives into Create Advantage, the fate point economy, GM prep structure, common errors, and further reading.</p>
 
+<details class="learn-quickstart" open>
+  <summary class="learn-quickstart-toggle">Quick Start — 5 core mechanics</summary>
+  <ol class="learn-quickstart-list">
+    <li><strong>4dF + Skill</strong> — roll four Fate dice (range −4 to +4), add your skill rating. Beat the target number.</li>
+    <li><strong>Four actions</strong> — Overcome, Create Advantage, Attack, Defend. Every roll is one of these.</li>
+    <li><strong>Aspects</strong> — true facts. Invoke for +2 (costs 1 FP) or compel for complications (earns 1 FP).</li>
+    <li><strong>Stress + Consequences</strong> — stress clears each scene. Consequences (Mild −2, Moderate −4, Severe −6) persist.</li>
+    <li><strong>Create Advantage is king</strong> — stacking free invokes before a big roll is how Fate groups win fights.</li>
+  </ol>
+</details>
+
 <div class="callout callout-info">
   <div class="callout-title"><i class="fa-solid fa-book-open" aria-hidden="true"></i> New to Fate?</div>
   <p>Start with the <a href="/help/learn-fate">Quick Start guide</a> or the <a href="/help/dnd-transition">D&amp;D Transition guide</a>. This page goes deeper into specific mechanics.</p>

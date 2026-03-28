@@ -4,11 +4,15 @@
   let copied = $state(false);
   function shareGuide() {
     const url = window.location.origin + '/help/learn-fate';
+    // Use native share sheet on mobile (#16), clipboard on desktop
+    if (navigator.share) {
+      navigator.share({ title: 'Learn Fate — Ogma', url }).catch(() => {});
+      return;
+    }
     navigator.clipboard.writeText(url).then(() => {
       copied = true;
       setTimeout(() => { copied = false; }, 2500);
     }).catch(() => {
-      // Fallback for browsers without clipboard API
       prompt('Copy this link and send it to your players:', url);
     });
   }
@@ -33,7 +37,7 @@
     </div>
 
     <!-- Quick Start summary (#20) -->
-    <details class="learn-quickstart">
+    <details class="learn-quickstart" open>
       <summary class="learn-quickstart-toggle">Quick Start — 5 things to know</summary>
       <ol class="learn-quickstart-list">
         <li><strong>Fiction first</strong> — describe what your character does, then pick a skill and roll.</li>

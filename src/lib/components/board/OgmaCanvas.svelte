@@ -44,6 +44,7 @@
     onExportModal   = null,
     toast           = null,
     showToast       = null,
+    embedded        = false,
   } = $props();
 
   // ── Canvas state (fully owned here) ──────────────────────────────────────
@@ -396,26 +397,39 @@
     {/each}
   </div>
 
-  <!-- Empty canvas CTA -->
+  <!-- Empty canvas CTA (#15 — context-aware for embedded/mobile) -->
   {#if loaded && cards.length === 0}
     <div class="cv-empty-hint" aria-hidden="true">
       <div class="cv-empty-icon">◈</div>
       <div class="cv-empty-title">Table is ready</div>
-      <div class="cv-empty-steps">
-        <div class="cv-empty-step">
-          <span class="cv-empty-step-num">1</span>
-          <span>Pick a generator on the left</span>
+      {#if embedded}
+        <div class="cv-empty-steps">
+          <div class="cv-empty-step">
+            <span class="cv-empty-step-num">1</span>
+            <span>Roll a generator, then tap <strong>→ Table</strong></span>
+          </div>
+          <div class="cv-empty-step">
+            <span class="cv-empty-step-num">2</span>
+            <span>Or pick a template below to get started</span>
+          </div>
         </div>
-        <div class="cv-empty-step">
-          <span class="cv-empty-step-num">2</span>
-          <span>Hit <kbd>Space</kbd> or <strong>Roll</strong></span>
+      {:else}
+        <div class="cv-empty-steps">
+          <div class="cv-empty-step">
+            <span class="cv-empty-step-num">1</span>
+            <span>Pick a generator on the left</span>
+          </div>
+          <div class="cv-empty-step">
+            <span class="cv-empty-step-num">2</span>
+            <span>Hit <kbd>Space</kbd> or <strong>Roll</strong></span>
+          </div>
+          <div class="cv-empty-step">
+            <span class="cv-empty-step-num">3</span>
+            <span>Click <strong>→ Table</strong> to place it here</span>
+          </div>
         </div>
-        <div class="cv-empty-step">
-          <span class="cv-empty-step-num">3</span>
-          <span>Click <strong>→ Table</strong> to place it here</span>
-        </div>
-      </div>
-      <div class="cv-empty-sub">Right-click anywhere to generate directly · <kbd>Ctrl+K</kbd> for commands</div>
+        <div class="cv-empty-sub">Right-click anywhere to generate directly · <kbd>Ctrl+K</kbd> for commands</div>
+      {/if}
       {#if ctxTemplates.length}
         <div class="cv-empty-tpl">
           <div class="cv-empty-tpl-label">Or start with a template:</div>

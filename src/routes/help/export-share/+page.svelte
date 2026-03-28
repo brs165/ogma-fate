@@ -9,6 +9,17 @@
 <h1>Getting your results out of Ogma</h1>
 <p class="wiki-page-desc">Ogma is fully offline and local-first — but your results shouldn't stay trapped. Here's every way to get content out, from quick clipboard copy to full VTT import.</p>
 
+<details class="learn-quickstart" open>
+  <summary class="learn-quickstart-toggle">Quick Start — 5 export options</summary>
+  <ol class="learn-quickstart-list">
+    <li><strong>Copy as Markdown</strong> — press C to copy the current result for pasting into notes or VTT.</li>
+    <li><strong>Export canvas as JSON</strong> — download your entire table as a portable Ogma file.</li>
+    <li><strong>Import JSON</strong> — load a previously exported canvas or share tables between sessions.</li>
+    <li><strong>Print reference card</strong> — one-page A4 cheat sheet at /help/reference for physical tables.</li>
+    <li><strong>Back up regularly</strong> — everything is in your browser. Export before clearing cache.</li>
+  </ol>
+</details>
+
 <h2 id="markdown-export">Copy as Markdown — single result</h2>
 <p>Press <kbd>C</kbd> or click the 📋 button in the action bar to copy the current result as formatted Markdown. This gives you:</p>
 <ul>

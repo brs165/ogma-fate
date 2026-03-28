@@ -4378,93 +4378,6 @@ g:hover .cv-edge-label-bg { fill:color-mix(in srgb,var(--accent) 12%,var(--panel
   z-index: auto;
 }
 
-/* ── Mobile Table FAB ─────────────────────────────────────────────────────── */
-.cp-table-fab {
-  display: none; /* shown via media query below */
-  position: fixed;
-  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-  right: 16px;
-  z-index: 280;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: var(--accent);
-  border: none;
-  color: #fff;
-  font-size: 20px;
-  cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.35);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.15s;
-}
-.cp-table-fab:hover { transform: scale(1.06); }
-
-/* ── Mobile bottom-sheet ──────────────────────────────────────────────────── */
-.cp-mobile-sheet-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.55);
-  z-index: 290;
-  animation: bsheet-fade 0.2s ease both;
-}
-.cp-mobile-sheet {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 80vh;
-  z-index: 295;
-  background: var(--panel-raised);
-  border-radius: 16px 16px 0 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  animation: bsheet-in 0.28s cubic-bezier(0.4,0,0.2,1);
-  box-shadow: 0 -4px 32px rgba(0,0,0,0.4);
-}
-.cp-mobile-sheet-hdr {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 16px 10px;
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-.cp-mobile-sheet-title {
-  flex: 1;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text);
-}
-.cp-mobile-sheet-close {
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-  color: var(--text-muted);
-  line-height: 1;
-  padding: 4px 6px;
-  min-width: 44px;
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.cp-mobile-sheet-body {
-  flex: 1;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-.cp-mobile-sheet-body .board-app {
-  position: static;
-  height: 100%;
-  inset: unset;
-  z-index: auto;
-}
-
 /* ── Responsive ───────────────────────────────────────────────────────────── */
 @media (max-width: 700px) {
   /* On mobile: generator fills width, table is FAB + bottom-sheet */
@@ -5789,3 +5702,55 @@ button.fp-dot:focus-visible {
   line-height: 1.5;
 }
 .learn-quickstart-list li::marker { color: var(--accent, var(--gold)); }
+
+/* ── Gen-column template grid (#19) — visible on all viewports ──────────── */
+.cp-gen-templates {
+  margin-top: 20px;
+  padding: 0 16px;
+}
+
+/* ── Mobile responsive overrides for onboarding (#18, #21) ──────────────── */
+@media (max-width: 480px) {
+  /* Welcome banner compact layout (#21) */
+  .onb-banner {
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    position: relative;
+  }
+  .onb-banner-close {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+  }
+  .onb-banner-body {
+    padding-right: 24px;
+  }
+
+  /* Coach mark compact */
+  .onb-coach {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  /* First-roll annotation compact */
+  .onb-first-roll {
+    margin: 0 8px 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  /* Template grid: 2 columns on small mobile */
+  .cv-empty-tpl-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .cv-empty-tpl-btn {
+    min-width: unset;
+    padding: 8px 10px;
+  }
+  .cv-empty-tpl-desc {
+    max-width: unset;
+  }
+}

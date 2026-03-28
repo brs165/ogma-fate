@@ -9,6 +9,17 @@
 <h1>Running your session with Ogma</h1>
 <p class="wiki-page-desc">Ogma is designed for session prep — generating content, keeping results, and exporting them to your table. This guide covers the tools that make prep fast and seamless.</p>
 
+<details class="learn-quickstart" open>
+  <summary class="learn-quickstart-toggle">Quick Start — 5 table tools</summary>
+  <ol class="learn-quickstart-list">
+    <li><strong>FP Tracker</strong> — click ◎ in the action bar. Tracks fate points for GM pool and all PCs.</li>
+    <li><strong>Dice Roller</strong> — press R or click the dice icon. Supports 4dF + skill with invoke toggle.</li>
+    <li><strong>Quick Prep Pack</strong> — roll a Seed to get a scene, NPCs, and complications in one batch.</li>
+    <li><strong>Copy as Markdown</strong> — press C to copy any result for pasting into notes or VTT chat.</li>
+    <li><strong>Canvas Table</strong> — drag cards, connect them with lines, and auto-arrange for clean layouts.</li>
+  </ol>
+</details>
+
 <h2 id="fate-point-tracker">Fate Point Tracker</h2>
 <p>Click the ◎ button in the action bar to open the FP Tracker. It has three tabs:</p>
 <ul>
