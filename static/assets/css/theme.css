@@ -4851,7 +4851,7 @@ g:hover .cv-edge-label-bg { fill:color-mix(in srgb,var(--accent) 12%,var(--panel
 }
 
 /* ── Bits Tooltip — comic speech-bubble style ──────────────────────────── */
-[data-bits-tooltip-content] {
+[data-tooltip-content] {
   background: var(--tooltip-bg, #FFF8EE);
   border: 1px solid color-mix(in srgb, var(--tooltip-bg, #FFF8EE) 60%, #8b7e6a);
   border-radius: 10px;
@@ -4867,15 +4867,15 @@ g:hover .cv-edge-label-bg { fill:color-mix(in srgb,var(--accent) 12%,var(--panel
   animation: fadeDown 0.15s ease both;
   pointer-events: none;
 }
-[data-theme="dark"] [data-bits-tooltip-content] { --tooltip-bg: #2A2520; color: var(--text, #e8e0d4); }
-[data-bits-tooltip-arrow] {
+[data-theme="dark"] [data-tooltip-content] { --tooltip-bg: #2A2520; color: var(--text, #e8e0d4); }
+[data-tooltip-content] [data-arrow] svg {
   fill: var(--tooltip-bg, #FFF8EE);
   stroke: color-mix(in srgb, var(--tooltip-bg, #FFF8EE) 60%, #8b7e6a);
   stroke-width: 1px;
 }
 /* Touch devices: suppress hover tooltips (long-press handled in component) */
 @media (hover: none) {
-  [data-bits-tooltip-content] { pointer-events: auto; }
+  [data-tooltip-content] { pointer-events: auto; }
 }
 
 /* ── FA content icons — white in dark theme, black in light ────────────── */
