@@ -1097,65 +1097,80 @@ export function toMarkdown(genId, data, campName) {
     case 'encounter': {
       var d = data;
       var oppLines = [];
-      d.opposition.forEach(function(o) {
-        oppLines.push('### ' + o.name + (o.qty > 1 ? ' ×' + o.qty : '') + ' `' + o.type.toUpperCase() + '`');
-        o.aspects.forEach(function(a) { oppLines.push('*' + a + '*'); });
-        oppLines.push('**Skills:** ' + o.skills.map(function(s) { return '+' + s.r + ' ' + s.name; }).join(', '));
+      (d.opposition||[]).forEach(function(o) {
+        oppLines.push('### ' + o.name + (o.qty > 1 ? ' ×' + o.qty : '') + ' `' + (o.type||'').toUpperCase() + '`');
+        (o.aspects||[]).forEach(function(a) { oppLines.push('*' + a + '*'); });
+        oppLines.push('**Skills:** ' + (o.skills||[]).map(function(s) { return '+' + s.r + ' ' + s.name; }).join(', '));
         if (o.stunt) oppLines.push('**Stunt:** ' + o.stunt);
         oppLines.push('**Stress:** ' + mdBoxes(o.stress));
         oppLines.push('');
       });
-      return [
+      var lines = [
         '# Encounter', '> *' + campName + '*\n',
-        '## Situation Aspects',
-      ].concat(d.aspects.map(function(a) { return '- *' + a + '*'; })).concat([
-        '\n## Zones',
-      ]).concat(d.zones.map(function(z) {
-        return '- **' + z.name + '**' + (z.aspect ? ' - *' + z.aspect + '*' : '');
-      })).concat(['\n## Opposition']).concat(oppLines).concat([
-        '## GM Fate Points',
-        '●'.repeat(d.gm_fate_points) + ' *(= number of PCs)*\n',
+        '## Scene Aspects',
+      ];
+      (d.aspects||[]).forEach(function(a) { lines.push('- *' + (typeof a === 'string' ? a : (a.name||'')) + '*'); });
+      lines.push('\n## Opposition');
+      lines = lines.concat(oppLines);
+      lines.push(
         '## Stakes',
         '| | Condition |',
         '|--|-----------|',
-        '| **Victory** | ' + d.victory + ' |',
-        '| **Defeat** | ' + d.defeat + ' |',
-        '| **Twist** | *' + d.twist + '* |',
-        MD_FOOTER,
-      ]).join('\n');
+        '| **Win** | ' + (d.victory||'') + ' |',
+        '| **Lose** | ' + (d.defeat||'') + ' |',
+      );
+      if (d.twist) { lines.push('\n## Twist', '*' + d.twist + '*'); }
+      if ((d.zones||[]).length) {
+        lines.push('\n## Zones');
+        d.zones.forEach(function(z) {
+          lines.push('- **' + (z.name||'') + '**' + (z.aspect ? ' - *' + z.aspect + '*' : ''));
+        });
+      }
+      if (d.gm_fate_points) {
+        lines.push('\n## GM Fate Points', '●'.repeat(d.gm_fate_points) + ' *(= number of PCs)*');
+      }
+      lines.push(MD_FOOTER);
+      return lines.join('\n');
     }
     case 'seed': {
       var d = data;
-      var sceneLines = d.scenes.map(function(s) {
+      var sceneLines = (d.scenes||[]).map(function(s) {
         return '### Scene ' + s.num + ' - ' + s.type + '\n' + s.brief;
       }).join('\n\n');
-      var oppLines = d.opposition.map(function(o) {
-        return '- **' + o.name + '** (' + (o.type === 'major' ? 'Major NPC' : 'Mook') + (o.qty > 1 ? ' ×' + o.qty : '') + ') - *' + o.aspects.join(', ') + '*'
-          + '\n  Skills: ' + o.skills.map(function(s) { return '+' + s.r + ' ' + s.name; }).join(', ')
+      var oppLines = (d.opposition||[]).map(function(o) {
+        return '- **' + o.name + '** (' + (o.type === 'major' ? 'Major NPC' : 'Mook') + (o.qty > 1 ? ' ×' + o.qty : '') + ') - *' + (o.aspects||[]).join(', ') + '*'
+          + '\n  Skills: ' + (o.skills||[]).map(function(s) { return '+' + s.r + ' ' + s.name; }).join(', ')
           + ' · Stress: ' + o.stress;
       }).join('\n');
-      return [
+      var lines = [
         '# Adventure Seed', '> *' + campName + '*\n',
-        '## Premise',
-        '**Location:** ' + d.location,
-        '**Objective:** ' + d.objective,
-        '**Complication:** ' + d.complication,
-        '\n## Three Scene Sketch',
+        '## Objective',
+        d.objective,
+        '\n## Location',
+        d.location,
+      ];
+      if (d.issue) { lines.push('\n## Issue in Play', d.issue); }
+      if (d.setting_asp) { lines.push('\n## Setting Aspect', '*' + d.setting_asp + '*'); }
+      lines.push(
+        '\n## Complication',
+        d.complication,
+        '\n## 3-Scene Skeleton',
         sceneLines,
-        '\n## Opposition',
-        oppLines,
+      );
+      if (d.twist) { lines.push('\n## Twist', '*' + d.twist + '*'); }
+      lines.push(
         '\n## Stakes',
         '| | Condition |',
         '|--|-----------|',
-        '| **Victory** | ' + d.victory + ' |',
-        '| **Defeat** | ' + d.defeat + ' |',
-        '| **Twist** | *' + d.twist + '* |',
-        '\n## Campaign Anchor',
-        '**Setting Aspect:** *' + d.setting_asp + '*',
-        '**Active Issue:** ' + d.issue,
+        '| **Win** | ' + (d.victory||'') + ' |',
+        '| **Lose** | ' + (d.defeat||'') + ' |',
+      );
+      if (oppLines) { lines.push('\n## Opposition', oppLines); }
+      lines.push(
         '\n> Prep Scene 1 in full. Scenes 2 and 3 are targets - follow the players. State victory/defeat before the first roll.',
         MD_FOOTER,
-      ].join('\n\n');
+      );
+      return lines.join('\n\n');
     }
     case 'compel': {
       var d = data;
@@ -1238,13 +1253,15 @@ export function toMarkdown(genId, data, campName) {
     }
     case 'faction': {
       var d = data;
+      var f = d.face || {};
+      var faceLine = typeof f === 'string' ? f : ('**' + (f.name||'') + '** - ' + (f.role||''));
       return [
         '# Faction: ' + d.name, '> *' + campName + '*\n',
-        '**Goal:** ' + d.goal,
-        '**Method:** ' + d.method,
-        '**Weakness:** ' + d.weakness,
-        '\n## Named Face',
-        '**' + d.face.name + '** - ' + d.face.role,
+        '## Goal', d.goal,
+        '\n## Method', d.method,
+        '\n## Weakness', d.weakness,
+        '\n## The Face',
+        faceLine,
         MD_FOOTER,
       ].join('\n\n');
     }
@@ -1533,7 +1550,7 @@ function toMermaid(genId, data, campName) {
         '  G[' + mq('\uD83C\uDFAF Goal: ' + (data.goal || '')) + ']',
         '  M[' + mq('\u2694 Method: ' + (data.method || '')) + ']',
         '  W[' + mq('\u26A0 Weakness: ' + (data.weakness || '')) + ']',
-        '  P[' + mq('\uD83D\uDC64 Face: ' + (data.face || '')) + ']',
+        '  P[' + mq('\uD83D\uDC64 Face: ' + (typeof data.face === 'string' ? data.face : ((data.face||{}).name||''))) + ']',
         '  F --> G',
         '  G --> M',
         '  F --> W',
@@ -1567,20 +1584,26 @@ function toMermaid(genId, data, campName) {
 
     // ── Seed ──────────────────────────────────────────────────────────────
     case 'seed': {
-      return [
+      var lines = [
         'flowchart TD',
-        '  A[\uD83C\uDF31 Situation\\n' + mq(data.location || data.situation || '') + ']',
-        '  B[\uD83C\uDFAF Objective\\n' + mq(data.objective || '') + ']',
+        '  OBJ[\uD83C\uDFAF Objective\\n' + mq(data.objective || '') + ']',
+        '  LOC[\uD83C\uDF31 Location\\n' + mq(data.location || '') + ']',
+      ];
+      lines.push('  OBJ --> LOC');
+      if (data.issue) { lines.push('  ISS["Issue: ' + ms(data.issue) + '"]', '  LOC --> ISS'); }
+      lines.push(
         '  C[\u26A0 Complication\\n' + mq(data.complication || '') + ']',
-        '  D[\uD83D\uDD0D Twist\\n' + mq(data.twist || '') + ']',
-        '  E[\u2714 Win: ' + mq(data.victory || data.stakes_good || '') + ']',
-        '  F[\u2716 Lose: ' + mq(data.defeat || data.stakes_bad || '') + ']',
-        '  A --> B',
-        '  B --> C',
-        '  C --> D',
-        '  D --> E',
-        '  D --> F',
-      ].join('\n');
+        '  ' + (data.issue ? 'ISS' : 'LOC') + ' --> C',
+      );
+      if (data.twist) { lines.push('  D[\uD83D\uDD0D Twist\\n' + mq(data.twist) + ']', '  C --> D'); }
+      var prev = data.twist ? 'D' : 'C';
+      lines.push(
+        '  E[\u2714 Win: ' + mq(data.victory || '') + ']',
+        '  F[\u2716 Lose: ' + mq(data.defeat || '') + ']',
+        '  ' + prev + ' --> E',
+        '  ' + prev + ' --> F',
+      );
+      return lines.join('\n');
     }
 
     // ── Campaign ──────────────────────────────────────────────────────────
@@ -1602,19 +1625,25 @@ function toMermaid(genId, data, campName) {
     // ── Encounter ─────────────────────────────────────────────────────────
     case 'encounter': {
       var opp = data.opposition || [];
-      var lines = [
-        'graph TD',
-        '  WIN[\u2714 ' + mq(data.victory || '') + ']',
-        '  LOSE[\u2716 ' + mq(data.defeat || '') + ']',
-      ];
+      var lines = ['graph TD'];
       opp.forEach(function(o, i) {
         var n = o.name || o;
         var q = o.qty && o.qty > 1 ? '\u00d7' + o.qty + ' ' : '';
         lines.push('  O' + i + '["' + ms(q + n) + '"]');
+      });
+      lines.push(
+        '  WIN[\u2714 ' + mq(data.victory || '') + ']',
+        '  LOSE[\u2716 ' + mq(data.defeat || '') + ']',
+      );
+      opp.forEach(function(o, i) {
         lines.push('  O' + i + ' --> WIN');
         lines.push('  O' + i + ' --> LOSE');
       });
       if (data.twist) lines.push('  T["\\u21A9 Twist: ' + ms(data.twist) + '"]');
+      (data.zones||[]).forEach(function(z, i) {
+        var n = typeof z === 'string' ? z : (z.name || '');
+        lines.push('  Z' + i + '["' + ms(n) + '"]');
+      });
       return lines.join('\n');
     }
 
@@ -1839,21 +1868,30 @@ function toObsidianMD(genId, data, campName) {
       return lines.join('\n');
     }
     case 'faction': {
+      var f = data.face || {};
+      var faceText = typeof f === 'string' ? f : ((f.name||'') + (f.role ? ' — ' + f.role : ''));
       return ['# ' + data.name, '*Faction' + (campName ? ' \u00b7 ' + campName : '') + '*', '',
         callout('abstract', 'Goal', data.goal||''), '',
         callout('example', 'Method', data.method||''), '',
         callout('danger', 'Weakness', data.weakness||''), '',
-        callout('info', 'Face', data.face||''),
+        callout('info', 'The Face', faceText),
       ].join('\n');
     }
     case 'seed': {
-      return ['# ' + (data.location || 'Adventure Seed'), '*Seed' + (campName ? ' \u00b7 ' + campName : '') + '*', '',
+      var scenes = (data.scenes||[]).map(function(s){ return '**' + s.type + ':** ' + s.brief; }).join('\n');
+      var opp = (data.opposition||[]).map(function(o){ return '- **' + o.name + '** ×' + (o.qty||1) + ' — ' + (o.skills||[]).map(function(s){return '+'+s.r+' '+s.name;}).join(', '); }).join('\n');
+      var lines = ['# ' + (data.location || 'Adventure Seed'), '*Seed' + (campName ? ' \u00b7 ' + campName : '') + '*', '',
         callout('abstract', 'Objective', data.objective||''), '',
-        callout('warning', 'Complication', data.complication||''), '',
-        callout('danger', 'Twist', data.twist||''), '',
-        '**Win:** ' + (data.victory || data.stakes_good||''),
-        '**Lose:** ' + (data.defeat || data.stakes_bad||''),
-      ].join('\n');
+        '**Location:** ' + (data.location||''), '',
+      ];
+      if (data.issue) { lines.push(callout('note', 'Issue in Play', data.issue), ''); }
+      if (data.setting_asp) { lines.push('**Setting Aspect:** *' + data.setting_asp + '*', ''); }
+      lines.push(callout('warning', 'Complication', data.complication||''), '');
+      if (scenes) { lines.push('## 3-Scene Skeleton', scenes, ''); }
+      if (data.twist) { lines.push(callout('danger', 'Twist', data.twist), ''); }
+      lines.push('**Win:** ' + (data.victory||''), '**Lose:** ' + (data.defeat||''));
+      if (opp) { lines.push('', '## Opposition', opp); }
+      return lines.join('\n');
     }
     case 'campaign': {
       var cur = data.current || {}; var imp = data.impending || {}; var setting = data.setting || [];
@@ -2023,17 +2061,40 @@ export function toPlainText(genId, data, campName) {
       break;
     }
     case 'faction': {
+      var f = data.face || {};
+      var faceStr = typeof f === 'string' ? f : ((f.name||'') + (f.role ? ' - ' + f.role : ''));
       out += row(data.name||''); out += row('');
-      out += row('GOAL     '+(data.goal||'')); out += row('METHOD   '+(data.method||''));
-      out += row('WEAKNESS '+(data.weakness||'')); out += row('FACE     '+(data.face||''));
+      wrap('GOAL: '+(data.goal||''),'',W-2).split('\n').forEach(function(l){out+=row(l);});
+      out += row('');
+      wrap('METHOD: '+(data.method||''),'',W-2).split('\n').forEach(function(l){out+=row(l);});
+      out += row('');
+      wrap('WEAKNESS: '+(data.weakness||''),'',W-2).split('\n').forEach(function(l){out+=row(l);});
+      out += row('');
+      out += row('FACE: '+faceStr);
       break;
     }
     case 'seed': {
       out += row(data.location||data.situation||''); out += row('');
-      out += row('OBJECTIVE    '+(data.objective||'')); out += row('COMPLICATION '+(data.complication||''));
-      out += row('TWIST        '+(data.twist||'')); out += row('');
+      wrap('OBJECTIVE: '+(data.objective||''),'',W-2).split('\n').forEach(function(l){out+=row(l);});
+      out += row('LOCATION: '+(data.location||''));
+      if (data.issue) { out += row('ISSUE: '+(data.issue)); }
+      if (data.setting_asp) { out += row('SETTING ASP: '+(data.setting_asp)); }
+      out += row('');
+      wrap('COMPLICATION: '+(data.complication||''),'',W-2).split('\n').forEach(function(l){out+=row(l);});
+      out += row('');
+      (data.scenes||[]).forEach(function(s){
+        wrap(s.type+': '+s.brief,'',W-2).split('\n').forEach(function(l){out+=row(l);});
+      });
+      if (data.twist) { out += row(''); out += row('TWIST: '+(data.twist)); }
+      out += row('');
       out += row('WIN  '+(data.victory||data.stakes_good||''));
       out += row('LOSE '+(data.defeat||data.stakes_bad||''));
+      if ((data.opposition||[]).length) {
+        out += row('');
+        (data.opposition).forEach(function(o){
+          out += row(o.name+' x'+(o.qty||1)+' ('+(o.type||'')+')');
+        });
+      }
       break;
     }
     default: {
