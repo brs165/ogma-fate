@@ -278,7 +278,7 @@
             </div>
             <div style="padding:14px">
               {#if Array.isArray(sceneData.aspects) && sceneData.aspects.length > 0}
-                <div style="font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:6px">Situation aspects</div>
+                <div style="font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:6px">Situation aspects <span style="font-weight:400;font-style:italic">— facts about the scene anyone can use (invoke for +2 or compel for complications)</span></div>
                 <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
                   {#each sceneData.aspects as a}
                     <span style="font-size:11px;padding:3px 8px;background:var(--inset);border:1px solid var(--border);border-radius:4px;color:var(--text-dim);font-style:italic">{typeof a === 'string' ? a : (a.name || '')}</span>
@@ -286,7 +286,7 @@
                 </div>
               {/if}
               {#if Array.isArray(sceneData.zones) && sceneData.zones.length > 0}
-                <div style="font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:5px">Zones</div>
+                <div style="font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:5px">Zones <span style="font-weight:400;font-style:italic">— areas in the scene; moving between zones costs an action</span></div>
                 <div style="display:flex;flex-direction:column;gap:4px">
                   {#each sceneData.zones.slice(0, 3) as z}
                     <div style="font-size:11px;color:var(--text-dim)">
@@ -321,10 +321,10 @@
             </div>
             <div style="padding:14px">
               {#if asp.high_concept}
-                <div style="margin-bottom:8px"><div style="font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:3px">High Concept</div><div style="font-size:13px;color:var(--text);font-style:italic">{asp.high_concept}</div></div>
+                <div style="margin-bottom:8px"><div style="font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:3px">High Concept <span style="font-weight:400;font-style:italic">— their defining trait; invoke it for +2 or compel it for complications</span></div><div style="font-size:13px;color:var(--text);font-style:italic">{asp.high_concept}</div></div>
               {/if}
               {#if asp.trouble}
-                <div style="margin-bottom:8px"><div style="font-size:10px;font-weight:700;color:var(--c-red,#f87171);margin-bottom:3px">Trouble</div><div style="font-size:13px;color:var(--text-dim);font-style:italic">{asp.trouble}</div></div>
+                <div style="margin-bottom:8px"><div style="font-size:10px;font-weight:700;color:var(--c-red,#f87171);margin-bottom:3px">Trouble <span style="font-weight:400;font-style:italic">— their main weakness; compel it to earn fate points</span></div><div style="font-size:13px;color:var(--text-dim);font-style:italic">{asp.trouble}</div></div>
               {/if}
               {#if skills.length > 0}
                 <div style="margin-top:8px">

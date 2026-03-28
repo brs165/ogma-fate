@@ -416,6 +416,20 @@
         </div>
       </div>
       <div class="cv-empty-sub">Right-click anywhere to generate directly · <kbd>Ctrl+K</kbd> for commands</div>
+      {#if ctxTemplates.length}
+        <div class="cv-empty-tpl">
+          <div class="cv-empty-tpl-label">Or start with a template:</div>
+          <div class="cv-empty-tpl-grid">
+            {#each ctxTemplates as tpl}
+              <button class="cv-empty-tpl-btn" onclick={() => { if (onCtxTemplate) onCtxTemplate(tpl.id); }} aria-label="Drop {tpl.label} template">
+                <i class="fa-solid {tpl.icon}" aria-hidden="true"></i>
+                <span class="cv-empty-tpl-name">{tpl.label}</span>
+                <span class="cv-empty-tpl-desc">{tpl.desc}</span>
+              </button>
+            {/each}
+          </div>
+        </div>
+      {/if}
     </div>
   {/if}
 
