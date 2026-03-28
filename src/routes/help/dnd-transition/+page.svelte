@@ -9,6 +9,17 @@
 <h1>Coming from D&amp;D 5e</h1>
 <p class="wiki-page-desc">You already know how to play TTRPGs. Here's every major mechanical and philosophical difference between D&amp;D 5e and Fate Condensed — section by section, with concrete play examples.</p>
 
+<details class="learn-quickstart" open>
+  <summary class="learn-quickstart-toggle">Quick Start — 5 biggest differences from D&amp;D</summary>
+  <ol class="learn-quickstart-list">
+    <li><strong>Fiction first</strong> — describe the action, then pick a skill. Not the other way around.</li>
+    <li><strong>No HP</strong> — stress clears every scene. Consequences are narrative wounds ("Broken Arm"), not numbers.</li>
+    <li><strong>Aspects replace everything</strong> — no ability scores, feats, or backgrounds. Just short phrases that are true.</li>
+    <li><strong>Failure moves the story</strong> — a failed roll never means "nothing happens." The situation always changes.</li>
+    <li><strong>Fate points = drama currency</strong> — spend to boost rolls (+2), earn by accepting complications from your flaws.</li>
+  </ol>
+</details>
+
 <div class="callout callout-info">
   <div class="callout-title"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Where this fits</div>
   <p>This is the deep-dive reference. For a quick overview of the three biggest shifts, see <a href="/help/new-to-ogma#from-dnd">New to Ogma? → I play D&amp;D</a>. For Fate mechanics without D&amp;D comparison, see <a href="/help/fate-mechanics">Fate Mechanics</a>.</p>

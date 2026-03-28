@@ -399,6 +399,7 @@
           onAutoArrange={() => { if (canvas) canvas.autoArrange(); setTimeout(() => fitAll(), 150); }}
           onExportModal={() => { showExportModal = true; }}
           showToast={showToast}
+          {embedded}
         />
       {/if}
     </div>

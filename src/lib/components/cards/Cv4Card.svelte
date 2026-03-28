@@ -70,7 +70,9 @@
   let { genId = 'npc_minor', campName = '', data = {}, onUpdate = null, savedCardState = null, autoGuidance = false } = $props();
 
   // ── UI state ─────────────────────────────────────────────────────────────
-  let guidanceOpen = $state(autoGuidance);
+  let guidanceOpen = $state(false);
+  // React to autoGuidance prop changes (#12)
+  $effect(() => { if (autoGuidance) guidanceOpen = true; });
   let hovered = $state(false);
   let visible = $state(true);
   let reduced = $state(false);
