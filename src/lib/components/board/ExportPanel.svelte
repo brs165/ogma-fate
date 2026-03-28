@@ -12,12 +12,17 @@
     c.genId && c.genId !== 'sticky' && c.genId !== 'boost' && c.genId !== 'label' && c.data
   ));
 
-  // Selection state — reset when exportable set changes
+  // Selection state — only reset when the set of exportable card IDs changes
   let sel = $state({});
+  let _prevExportableIds = '';
   $effect(() => {
-    const s = {};
-    exportable.forEach(c => { s[c.id] = true; });
-    sel = s;
+    const ids = exportable.map(c => c.id).join(',');
+    if (ids !== _prevExportableIds) {
+      _prevExportableIds = ids;
+      const s = {};
+      exportable.forEach(c => { s[c.id] = sel[c.id] ?? true; });
+      sel = s;
+    }
   });
 
   let fmt = $state('md');

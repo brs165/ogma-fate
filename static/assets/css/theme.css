@@ -12,6 +12,10 @@ body {
   -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
   transition: background 0.4s, color 0.3s; position: relative;
   scroll-padding-bottom: 80px;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 /* Animated background orbs for glass depth — editorial scale */
 body::before, body::after {

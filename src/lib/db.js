@@ -400,7 +400,7 @@ export const DB = {
           reader.onload = function(ev) {
             try {
               var data = JSON.parse(ev.target.result);
-              if (!data.ogma) return reject(new Error('Not an Ogma file'));
+              if (data.format !== 'ogma') return reject(new Error('Not an Ogma file'));
               resolve(data);
             } catch(err) { reject(err); }
           };
@@ -1041,5 +1041,3 @@ export const DB = {
     },
 
   };
-
-export default DB;
