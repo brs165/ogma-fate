@@ -260,6 +260,7 @@ async function testNavigation(page) {
     }
 
     // Click License link from footer
+    await sleep(300);
     const licLink = page.locator('a[href="/license"]').first();
     if (await licLink.count() > 0) {
       await licLink.click();

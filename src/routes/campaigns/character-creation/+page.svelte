@@ -1,5 +1,5 @@
 <script>
-  import { onMount } from 'svelte';
+  import { onMount, untrack } from 'svelte';
   import { VERSION } from '$lib/version.js';
   import { LS } from '$lib/db.js';
   import Footer from '$lib/components/shared/Footer.svelte';
@@ -54,8 +54,11 @@
   let pcIndex = $state(0);
   let pcDrafts = $state([]);
   $effect(() => {
-    pcDrafts = Array.from({ length: pcCount }, (_, i) =>
-      pcDrafts[i] ?? { name: '', hc: '', trouble: '' }
+    const count = pcCount;
+    pcDrafts = untrack(() =>
+      Array.from({ length: count }, (_, i) =>
+        pcDrafts[i] ?? { name: '', hc: '', trouble: '' }
+      )
     );
   });
   let currentPc = $derived(pcDrafts[pcIndex] || { name: '', hc: '', trouble: '' });
