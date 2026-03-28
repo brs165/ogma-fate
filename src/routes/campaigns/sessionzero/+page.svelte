@@ -28,14 +28,14 @@
   ];
 
   const WORLD_META = {
-    thelongafter: { name: 'The Long After', icon: '◈', genre: 'Sword & Planet' },
-    cyberpunk:    { name: 'Neon Abyss', icon: '⬡', genre: 'Cyberpunk' },
-    fantasy:      { name: 'Shattered Kingdoms', icon: '✦', genre: 'Dark Fantasy' },
-    space:        { name: 'Void Runners', icon: '◯', genre: 'Space Western' },
-    victorian:    { name: 'The Gaslight Chronicles', icon: '⊕', genre: 'Gothic Horror' },
-    postapoc:     { name: 'The Long Road', icon: '◻', genre: 'Post-Apocalypse' },
-    western:      { name: 'Dust and Iron', icon: '◈', genre: 'Frontier Western' },
-    dVentiRealm:  { name: 'dVenti Realm', icon: '⬟', genre: 'High Fantasy' },
+    thelongafter: { name: 'The Long After', icon: 'fa-compass', genre: 'Sword & Planet' },
+    cyberpunk:    { name: 'Neon Abyss', icon: 'fa-microchip', genre: 'Cyberpunk' },
+    fantasy:      { name: 'Shattered Kingdoms', icon: 'fa-dragon', genre: 'Dark Fantasy' },
+    space:        { name: 'Void Runners', icon: 'fa-shuttle-space', genre: 'Space Western' },
+    victorian:    { name: 'The Gaslight Chronicles', icon: 'fa-magnifying-glass', genre: 'Gothic Horror' },
+    postapoc:     { name: 'The Long Road', icon: 'fa-biohazard', genre: 'Post-Apocalypse' },
+    western:      { name: 'Dust and Iron', icon: 'fa-hat-cowboy', genre: 'Frontier Western' },
+    dVentiRealm:  { name: 'dVenti Realm', icon: 'fa-dice-d20', genre: 'High Fantasy' },
   };
   const WORLD_IDS = Object.keys(WORLD_META);
 
@@ -195,7 +195,7 @@
               onclick={() => selectWorld(id)}
               aria-pressed={String(campId === id)}
             >
-              <div style="font-size:22px;margin-bottom:6px">{WORLD_META[id].icon}</div>
+              <div style="font-size:22px;margin-bottom:6px"><i class="fa-solid {WORLD_META[id].icon}" aria-hidden="true"></i></div>
               <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px">{WORLD_META[id].name}</div>
               <div style="font-size:10px;color:var(--text-muted)">{WORLD_META[id].genre}</div>
             </button>
