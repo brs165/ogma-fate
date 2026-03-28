@@ -7,7 +7,7 @@ import DB from '../db.js';
 const TOAST_MS = 2500;
 
 export function createSessionStore(campId, campMeta, tables, prefs, showToast) {
-  const activeGen       = writable('npc_minor');
+  const activeGen       = writable('seed');
   const result          = writable(null);
   const rolling         = writable(false);
   const history         = writable([]);
