@@ -40,6 +40,7 @@
         style="width:100%; background:none; border:none; cursor:pointer; color:{row.col}; font-size:11px; font-weight:700; text-align:center; padding:0 0 6px; font-family:var(--font-mono); letter-spacing:0.06em"
       >
         {row.side.label} {row.won ? '✓ WON' : '+ victory'}
+        {#if row.won}<span class="contest-trophy" aria-hidden="true">🏆</span>{/if}
       </button>
       <div style="display:flex; gap:4px; justify-content:center" aria-label="{row.side.label} victories: {row.score} of {victories}">
         {#each Array.from({length: victories}) as _, j}

@@ -2,7 +2,7 @@
   let { data = {}, campName = '', catColor = 'var(--fs-section)' } = $props();
 </script>
 
-<div class="fs-section-gap">
+<div class="fs-section-gap compel-result-appear">
   <div class="fs-stunt" style="border-left:3px solid var(--fs-section); border-radius:0 3px 3px 0; padding:8px 10px">
     <div style="font-size:10px; font-weight:800; letter-spacing:0.12em; color:var(--fs-section); margin-bottom:2px">SITUATION</div>
     <div style="font-size:13px; font-weight:700; color:var(--fs-text); line-height:1.35">{data.situation || ''}</div>
