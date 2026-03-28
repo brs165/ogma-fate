@@ -4015,6 +4015,32 @@ g:hover .cv-edge-label-bg { fill:color-mix(in srgb,var(--accent) 12%,var(--panel
   pointer-events:none; box-shadow:0 2px 10px rgba(0,0,0,.15);
 }
 
+/* ── Two-finger touch hint overlay ────────────────────────────────────── */
+.cv-touch-hint {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.45);
+  z-index: 900;
+  pointer-events: none;
+  animation: cv-hint-in 0.2s ease both;
+}
+.cv-touch-hint-text {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  padding: 12px 24px;
+  border-radius: 10px;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  line-height: 1.5;
+}
+.cv-touch-hint-text i { margin-right: 6px; }
+@keyframes cv-hint-in { from { opacity:0; } to { opacity:1; } }
+
 /* ── Mobile: hide minimap on small screens ───────────────────────────────── */
 @media(max-width:640px){ .cv-minimap { display:none; } }
 
@@ -4155,7 +4181,7 @@ g:hover .cv-edge-label-bg { fill:color-mix(in srgb,var(--accent) 12%,var(--panel
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.5);
-  z-index: 350;
+  z-index: 290;
   animation: bsheet-fade 0.2s ease both;
 }
 .cp-mobile-sheet {
@@ -4177,6 +4203,8 @@ g:hover .cv-edge-label-bg { fill:color-mix(in srgb,var(--accent) 12%,var(--panel
   padding: 14px 16px 10px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
+  position: relative;
+  z-index: 2;
 }
 .cp-mobile-sheet-title {
   flex: 1;
