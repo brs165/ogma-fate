@@ -1,11 +1,11 @@
 <svelte:head>
-  <title>Help &amp; Wiki — Ogma Help</title>
+  <title>Help — Ogma</title>
   <meta name="description" content="Everything you need to master Ogma — the local-first, offline-ready generator suite for Fate Condensed." />
 </svelte:head>
 
 <main class="wiki-content" id="main-content">
 
-    <div class="wiki-page-eyebrow">Ogma Help &amp; Wiki</div>
+    <div class="wiki-page-eyebrow">Ogma Help</div>
     <h1>Everything you need to master Ogma</h1>
     <p class="wiki-page-desc">Ogma is a <strong>local-first, offline-ready generator suite</strong> for Fate Condensed. This wiki covers every feature — from your first roll to session export.</p>
 
@@ -47,6 +47,11 @@
         <div class="gen-card-name">Customise</div>
         <div class="gen-card-desc">Result reference panel, Table Manager, Session Zero, theme, and more.</div>
       </a>
+      <a href="/help/hosting" class="gen-card">
+        <div class="gen-card-icon"><i class="fa-solid fa-globe" aria-hidden="true"></i></div>
+        <div class="gen-card-name">Hosting &amp; Multiplayer</div>
+        <div class="gen-card-desc">WebSocket multiplayer, PartyKit deploy, and session hosting.</div>
+      </a>
       <a href="/help/faq" class="gen-card">
         <div class="gen-card-icon"><i class="fa-solid fa-circle-question" aria-hidden="true"></i></div>
         <div class="gen-card-name">FAQ</div>
@@ -55,6 +60,7 @@
     </div>
 
     <h2>Quick reference — keyboard shortcuts</h2>
+    <div class="wiki-table-wrap">
     <table class="wiki-table">
       <thead><tr><th>Key</th><th>Action</th></tr></thead>
       <tbody>
@@ -69,6 +75,7 @@
         <tr><td><kbd>Esc</kbd></td><td>Close any open panel or sidebar</td></tr>
       </tbody>
     </table>
+    </div>
 
     <h2>About Ogma</h2>
     <p>Ogma — <strong>O</strong>n-demand <strong>G</strong>enerator for <strong>M</strong>asterful <strong>A</strong>dventures — is an independent fan project built on the <a href="https://fate-srd.com" target="_blank" rel="noreferrer">Fate Condensed SRD</a> (CC BY 3.0). It runs entirely in your browser with no server, no account, and no internet connection required after the first load.</p>

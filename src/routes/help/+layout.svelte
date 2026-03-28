@@ -83,6 +83,12 @@
       { id: 'challenges-contests-conflicts', label: 'Challenges & Contests' },
       { id: 'quick-faq', label: 'Quick FAQ' },
     ],
+    '/help/faq': [
+      { id: 'fate-rules', label: 'Fate Rules' },
+      { id: 'data-storage', label: 'Data & Storage' },
+      { id: 'offline-install', label: 'Offline & Install' },
+      { id: 'ui-questions', label: 'UI Questions' },
+    ],
     '/help/learn-fate-deep': [
       { id: 'tutorial', label: 'Interactive Tutorial' },
       { id: 'walkthrough', label: 'Play-by-Post' },
@@ -189,6 +195,28 @@
     const clean = href.replace(/\/$/, '') || '/';
     return !!PAGE_SECTIONS[clean];
   }
+
+  // ── Page order for prev/next navigation ──────────────────────────────
+  const PAGE_ORDER = [
+    { href: '/help',                label: 'Help Home' },
+    { href: '/help/new-to-ogma',    label: 'New to Ogma?' },
+    { href: '/help/getting-started', label: 'Getting Started' },
+    { href: '/help/learn-fate',     label: 'Learn Fate' },
+    { href: '/help/learn-fate-deep', label: 'Learn Fate — Deep Dive' },
+    { href: '/help/dnd-transition', label: 'D&D Transition' },
+    { href: '/help/how-to-use-ogma', label: 'How to Use Ogma' },
+    { href: '/help/generators',     label: 'Generator Suite' },
+    { href: '/help/fate-mechanics', label: 'Fate Mechanics' },
+    { href: '/help/at-the-table',   label: 'At the Table' },
+    { href: '/help/export-share',   label: 'Export & Share' },
+    { href: '/help/customise',      label: 'Customise' },
+    { href: '/help/hosting',        label: 'Hosting & Multiplayer' },
+    { href: '/help/faq',            label: 'FAQ' },
+  ];
+
+  let currentPageIdx = $derived(PAGE_ORDER.findIndex(p => p.href === currentPath));
+  let prevPage = $derived(currentPageIdx > 0 ? PAGE_ORDER[currentPageIdx - 1] : null);
+  let nextPage = $derived(currentPageIdx >= 0 && currentPageIdx < PAGE_ORDER.length - 1 ? PAGE_ORDER[currentPageIdx + 1] : null);
 </script>
 
 <div class="land-shell">
@@ -223,7 +251,7 @@
       <div class="wiki-sidebar-section">
         <div class="wiki-sidebar-label">Getting Started</div>
         <a href="/help" class="wiki-sidebar-link" class:active={isActive('/help')}>
-          <span class="icon"><i class="fa-solid fa-house" aria-hidden="true"></i></span>Wiki Home
+          <span class="icon"><i class="fa-solid fa-house" aria-hidden="true"></i></span>Help Home
         </a>
 
         {#if linkHasSections('/help/new-to-ogma')}
@@ -420,13 +448,46 @@
 
       <div class="wiki-sidebar-section">
         <div class="wiki-sidebar-label">Help</div>
-        <a href="/help/faq" class="wiki-sidebar-link" class:active={isActive('/help/faq')}>
-          <span class="icon"><i class="fa-solid fa-circle-question" aria-hidden="true"></i></span>FAQ
-        </a>
+
+        {#if linkHasSections('/help/faq')}
+          <button class="wiki-sidebar-parent" class:active={isActive('/help/faq')}
+            aria-expanded={String(isParentOpen('/help/faq'))}
+            onclick={() => { toggleParent('/help/faq'); }}>
+            <span class="wiki-sidebar-parent-label"><span class="icon"><i class="fa-solid fa-circle-question" aria-hidden="true"></i></span>FAQ</span>
+            <span class="wiki-sidebar-chevron" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></span>
+          </button>
+          {#if isParentOpen('/help/faq')}
+            <nav class="wiki-sidebar-children open" aria-label="FAQ sections">
+              {#each PAGE_SECTIONS['/help/faq'] as sec}
+                <a class="wiki-sidebar-child" class:active={activeSection === sec.id && isActive('/help/faq')}
+                  href="/help/faq#{sec.id}" onclick={closeNavOnClick}>{sec.label}</a>
+              {/each}
+            </nav>
+          {/if}
+        {/if}
       </div>
     </aside>
 
-    {@render children?.()}
+    <div class="wiki-main-col">
+      {@render children?.()}
+
+      {#if prevPage || nextPage}
+        <nav class="wiki-prev-next" aria-label="Page navigation">
+          {#if prevPage}
+            <a href={prevPage.href} class="wiki-prev-next-link">
+              <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> {prevPage.label}
+            </a>
+          {:else}
+            <span></span>
+          {/if}
+          {#if nextPage}
+            <a href={nextPage.href} class="wiki-prev-next-link">
+              {nextPage.label} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+            </a>
+          {/if}
+        </nav>
+      {/if}
+    </div>
   </div>
 
   <!-- Mobile bottom nav — always visible on small screens for help navigation -->

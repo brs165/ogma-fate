@@ -60,6 +60,7 @@ git push -u origin main</code></pre>
     <h3>Step 2 — Add two secrets to your GitHub repo</h3>
     <p>Go to your <code>ogma-sync</code> repo &rarr; <strong>Settings &rarr; Secrets and variables &rarr; Actions &rarr; New repository secret</strong> and add both of these:</p>
 
+    <div class="wiki-table-wrap">
     <table class="wiki-table">
       <thead>
         <tr>
@@ -78,6 +79,7 @@ git push -u origin main</code></pre>
         </tr>
       </tbody>
     </table>
+    </div>
 
     <div class="callout callout-warning">
       <div class="callout-title"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Two secrets are required</div>

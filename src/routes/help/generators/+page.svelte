@@ -97,4 +97,9 @@
       <li><strong>Lock</strong> a table to always use that entry (e.g. fix a PC's name)</li>
       <li><strong>Add custom entries</strong> that sit alongside the built-in content</li>
     </ul>
+
+    <div class="callout callout-scenario">
+      <div class="callout-title"><i class="fa-solid fa-compass" aria-hidden="true"></i> Related pages</div>
+      <p><a href="/help/fate-mechanics">Fate Mechanics</a> — the rules behind each generator. <a href="/help/at-the-table">At the Table</a> — using generated content during play. <a href="/help/customise">Customise</a> — filtering and extending generator tables.</p>
+    </div>
 </main>

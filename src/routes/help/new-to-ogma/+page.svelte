@@ -108,7 +108,7 @@
 
     <h2 id="run-better"><i class="fa-solid fa-masks-theater" aria-hidden="true"></i> Help me run Fate better</h2>
 
-    <p>You understand the rules. You've read the book. Now you need to make it <em>work at the table</em>.</p>
+    <p>You understand the rules. You've read the book. Now you need to make it <em>work at the table</em>. <a href="https://fate-srd.com/fate-condensed/being-the-game-master" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
 
     <p><strong>Scene framing.</strong> Every scene needs a question. "Can the party get past the guards?" "Will the informant trust them?" If you can't state it in one sentence, the scene isn't focused enough. When the question is answered — the scene is over. Cut immediately.</p>
 
@@ -130,6 +130,7 @@
     </ul>
 
     <h2>Quick reference — adjective ladder + stress</h2>
+    <div class="wiki-table-wrap">
     <table class="wiki-table">
       <thead><tr><th>Rating</th><th>Label</th><th>Stress model (FCon)</th></tr></thead>
       <tbody>
@@ -144,4 +145,5 @@
         <tr><td>+0</td><td>Mediocre</td></tr>
       </tbody>
     </table>
+    </div>
 </main>

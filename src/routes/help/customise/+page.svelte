@@ -9,8 +9,20 @@
     <h1>Making Ogma work for your table</h1>
     <p class="wiki-page-desc">Ogma adapts to different experience levels, play styles, and table setups. Here's how to tune it to your needs.</p>
 
+    <details class="learn-quickstart" open>
+      <summary class="learn-quickstart-toggle">Quick Start — 5 ways to customise</summary>
+      <ol class="learn-quickstart-list">
+        <li><strong>Reference panel depth</strong> — switch between GM, New Player, and D&amp;D tabs below every result.</li>
+        <li><strong>Skills</strong> — use the default Fate Condensed 19 or define your own custom skill list.</li>
+        <li><strong>Table Manager</strong> — filter, sort, and merge generator tables across worlds.</li>
+        <li><strong>Session Zero</strong> — guided character creation wizard with aspect prompts.</li>
+        <li><strong>Theme</strong> — dark/light mode toggle plus adjustable text size.</li>
+      </ol>
+    </details>
+
     <h2 id="reference-panel-depth">Result Reference Panel</h2>
     <p>Every generator result shows a reference panel directly below it. <strong>What this is &middot; For GM</strong> shows what the generator produces, rules references, and GM running tips. The <strong>&#9876; D&amp;D?</strong> tab appears when a D&amp;D comparison is available.</p>
+    <div class="wiki-table-wrap">
     <table class="wiki-table">
       <thead><tr><th scope="col">Tab</th><th scope="col">Who it's for</th><th scope="col">What it shows</th></tr></thead>
       <tbody>
@@ -19,6 +31,7 @@
         <tr><td><strong>&#9876; D&amp;D?</strong></td><td>Converting from D&amp;D 5e / Pathfinder</td><td>Side-by-side comparison of Fate and D&amp;D mechanics — aspects vs ability scores, stress vs HP, fate points vs inspiration</td></tr>
       </tbody>
     </table>
+    </div>
 
     <h2 id="skills">Skills</h2>
     <p>Ogma uses the <strong>19 default Fate Condensed skills</strong> (Academics, Athletics, Burglary, Contacts, Crafts, Deceive, Drive, Empathy, Fight, Investigate, Lore, Notice, Physique, Provoke, Rapport, Resources, Shoot, Stealth, Will). If your campaign uses a custom skill list or approaches (from Fate Accelerated), the generated skill pyramids will use FCon defaults. The <a href="https://fate-srd.com/fate-system-toolkit/skills-and-stunts" target="_blank" rel="noopener noreferrer">Fate System Toolkit</a> has guidance on building custom skill lists.</p>
@@ -44,7 +57,7 @@
     <p>For collaborative character creation with your players, use the Character Creation Wizard — it walks a group through the Phase Trio, skills, stunts, and refresh.</p>
 
     <h2>D&amp;D Transition guide</h2>
-    <p>The <a href="/help/dnd-transition">D&amp;D Transition guide</a> explains every major mechanical difference between Fate Condensed and D&amp;D — side by side, in plain language. Available from the wiki sidebar on any Help &amp; Wiki page.</p>
+    <p>The <a href="/help/dnd-transition">D&amp;D Transition guide</a> explains every major mechanical difference between Fate Condensed and D&amp;D — side by side, in plain language. Available from the sidebar on any Help page.</p>
 
     <h2>Theme and text size</h2>
     <p>Press the <i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i> button in the topbar to toggle between dark and light mode. Your preference is saved to localStorage.</p>

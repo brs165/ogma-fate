@@ -25,8 +25,27 @@
   <p>Start with the <a href="/help/learn-fate">Quick Start guide</a> or the <a href="/help/dnd-transition">D&amp;D Transition guide</a>. This page goes deeper into specific mechanics.</p>
 </div>
 
+<nav class="wiki-toc" aria-label="On this page">
+  <div class="wiki-toc-title">On this page</div>
+  <a href="#aspects">Aspects</a>
+  <a href="#the-skill-ladder">The Skill Ladder</a>
+  <a href="#stress">Stress</a>
+  <a href="#consequences">Consequences</a>
+  <a href="#fate-points-and-refresh">Fate Points &amp; Refresh</a>
+  <a href="#stunts">Stunts</a>
+  <a href="#contests">Contests</a>
+  <a href="#challenges">Challenges</a>
+  <a href="#countdowns">Countdowns</a>
+  <a href="#compels">Compels</a>
+  <a href="#create-advantage">Create an Advantage</a>
+  <a href="#fate-point-economy-gm">Fate Point Economy (GM)</a>
+  <a href="#what-gms-prepare">What GMs Prepare</a>
+  <a href="#common-errors">Common Errors</a>
+  <a href="#further-reading">Further Reading</a>
+</nav>
+
 <h2 id="aspects">Aspects</h2>
-<p>An <strong>Aspect</strong> is a short phrase that describes something true and important about a character, scene, or situation. Aspects can be <strong>invoked</strong> (spend a Fate Point for +2 or a reroll) or <strong>compelled</strong> (the GM offers a Fate Point to introduce a complication).</p>
+<p>An <strong>Aspect</strong> is a short phrase that describes something true and important about a character, scene, or situation. Aspects can be <strong>invoked</strong> (spend a Fate Point for +2 or a reroll) or <strong>compelled</strong> (the GM offers a Fate Point to introduce a complication). <a href="https://fate-srd.com/fate-condensed/aspects-and-fate-points" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
 <p>Every NPC Ogma generates has:</p>
 <ul>
   <li><strong>High Concept</strong> — the character in a phrase. "Chrome Fixer with a Debt to the Yakuza." Always invokable for the character's core competency.</li>
@@ -35,7 +54,7 @@
 </ul>
 
 <h2 id="the-skill-ladder">The Skill Ladder</h2>
-<p>Skills are rated on the <strong>Fate Ladder</strong>: Average (+1), Fair (+2), Good (+3), Great (+4), Superb (+5), Fantastic (+6), Epic (+7), Legendary (+8). Most NPCs have a peak skill of Good (+3) to Superb (+5). Major NPCs have 5 rated skills; Minor NPCs have 1.</p>
+<p>Skills are rated on the <strong>Fate Ladder</strong>: Average (+1), Fair (+2), Good (+3), Great (+4), Superb (+5), Fantastic (+6), Epic (+7), Legendary (+8). Most NPCs have a peak skill of Good (+3) to Superb (+5). Major NPCs have 5 rated skills; Minor NPCs have 1. <a href="https://fate-srd.com/fate-condensed/getting-started" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
 <p>The four actions in Fate are <strong>Overcome</strong> (clear an obstacle), <strong>Create an Advantage</strong> (place or discover an aspect), <strong>Attack</strong> (inflict stress), and <strong>Defend</strong> (resist an action).</p>
 
 <div class="callout callout-dnd">
@@ -44,12 +63,13 @@
 </div>
 
 <h2 id="stress">Stress</h2>
-<p>Stress is <strong>not hit points</strong>. It measures how long a character can stay in a conflict before being taken out. All stress boxes clear at the end of every scene — there is no long-term attrition from stress alone.</p>
+<p>Stress is <strong>not hit points</strong>. It measures how long a character can stay in a conflict before being taken out. All stress boxes clear at the end of every scene — there is no long-term attrition from stress alone. <a href="https://fate-srd.com/fate-condensed/challenges-conflicts-and-contests" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
 <p>Fate Condensed uses <strong>1-point stress boxes</strong> (not escalating like Fate Core). Minor NPCs have 1–3 stress boxes. Major NPCs have physical and mental tracks separately, each 2–4 boxes depending on Physique/Will.</p>
 <p>Ogma's interactive stress track lets you tap boxes during play. When all boxes are filled, the character is <strong>Taken Out</strong> — the TAKEN OUT overlay fires .</p>
 
 <h2 id="consequences">Consequences</h2>
-<p>Consequences are lasting aspects that a character takes to avoid being Taken Out. They persist beyond the scene and must be treated:</p>
+<p>Consequences are lasting aspects that a character takes to avoid being Taken Out. They persist beyond the scene and must be treated. <a href="https://fate-srd.com/fate-condensed/challenges-conflicts-and-contests" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
+<div class="wiki-table-wrap">
 <table class="wiki-table">
   <thead><tr><th scope="col">Severity</th><th scope="col">Shifts absorbed</th><th scope="col">Treatment difficulty</th><th scope="col">Clears after</th></tr></thead>
   <tbody>
@@ -58,6 +78,7 @@
     <tr><td><strong>Severe (−6)</strong></td><td>6 shifts</td><td>Fantastic (+6)</td><td>After a Breakthrough</td></tr>
   </tbody>
 </table>
+</div>
 <p>The Consequence generator produces a named aspect ready to write on a character sheet. Always name it specifically — <em>"Badly Burned Hands"</em> not just <em>"Injured"</em>. The aspect must work as a compel hook.</p>
 
 <div class="callout callout-tip">
@@ -66,12 +87,12 @@
 </div>
 
 <h2 id="fate-points-and-refresh">Fate Points and Refresh</h2>
-<p>Fate Points are the economy of player agency. Players start each session with their <strong>Refresh</strong> (usually 3). They spend Fate Points to invoke aspects; they earn them when they accept compels.</p>
+<p>Fate Points are the economy of player agency. Players start each session with their <strong>Refresh</strong> (usually 3). They spend Fate Points to invoke aspects; they earn them when they accept compels. <a href="https://fate-srd.com/fate-condensed/aspects-and-fate-points" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
 <p>Major NPCs have a <strong>Refresh</strong> calculated as <code>max(1, 3 − stunts)</code>. The GM starts each scene with this many Fate Points for that NPC. The FP Tracker in Ogma manages this automatically.</p>
 <p>See the <a href="/help/at-the-table">At the Table guide</a> for how to use the FP Tracker during play.</p>
 
 <h2 id="stunts">Stunts</h2>
-<p>Stunts give characters specific mechanical advantages. Fate Condensed has two types:</p>
+<p>Stunts give characters specific mechanical advantages. Fate Condensed has two types. <a href="https://fate-srd.com/fate-condensed/getting-started" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
 <ul>
   <li><strong>+2 Bonus stunts</strong> — when a specific condition applies, add +2 to a named skill. E.g. "When I bluff a mark face to face with Deceive, add +2."</li>
   <li><strong>Once-per-scene stunts</strong> — a special mechanical effect beyond a simple +2. Can only be used once per scene. E.g. "Once per scene, I can treat a failed Physique roll as a tie."</li>
@@ -80,6 +101,7 @@
 
 <h3>What makes a good stunt?</h3>
 <p>A stunt should do two things: name a specific skill, and name a specific condition. Vague stunts ("I'm better at fighting") aren't stunts — they're wishful thinking. Specific stunts create interesting moments:</p>
+<div class="wiki-table-wrap">
 <table class="rules-table">
   <thead><tr><th scope="col">Weak ✗</th><th scope="col">Strong ✓</th></tr></thead>
   <tbody>
@@ -88,6 +110,7 @@
     <tr><td>Once per scene I can do something impressive</td><td>Once per scene, spend a Fate Point to automatically succeed on one Overcome roll with Crafts</td></tr>
   </tbody>
 </table>
+</div>
 
 <h3>Stunt browser — all world stunts in one place</h3>
 <p>The <strong>stunt browser</strong> is available in the sidebar under <strong>Generate</strong>. It shows every stunt from the current world plus the universal pool (56+ stunts total). Filter by skill, tag, or keyword. Click any stunt to copy its name and description to the clipboard — ready to paste into a character sheet or session notes.</p>
@@ -114,7 +137,7 @@
 </dl>
 
 <h2 id="contests">Contests</h2>
-<p>A Contest is used when two sides compete for the same goal without directly harming each other. Each exchange, both sides roll — the higher effort marks a victory. <strong>First to 3 victories wins.</strong> A tie (equal effort) means neither side scores; instead, introduce a twist aspect.</p>
+<p>A Contest is used when two sides compete for the same goal without directly harming each other. Each exchange, both sides roll — the higher effort marks a victory. <strong>First to 3 victories wins.</strong> A tie (equal effort) means neither side scores; instead, introduce a twist aspect. <a href="https://fate-srd.com/fate-condensed/challenges-conflicts-and-contests" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
 <p>The Contest generator gives you the two sides, their relevant skills, a situation aspect, and 3 pre-rolled twists. The interactive victory track lets you tap boxes during play — scores appear live .</p>
 
 <div class="callout callout-dnd">
@@ -123,25 +146,25 @@
 </div>
 
 <h2 id="challenges">Challenges</h2>
-<p>A Challenge is a sequence of Overcome actions against different obstacles, each with its own skill and difficulty. The group succeeds on the whole challenge only if they pass all individual rolls — or accepts success at a cost when they fail some.</p>
+<p>A Challenge is a sequence of Overcome actions against different obstacles, each with its own skill and difficulty. The group succeeds on the whole challenge only if they pass all individual rolls — or accepts success at a cost when they fail some. <a href="https://fate-srd.com/fate-condensed/challenges-conflicts-and-contests" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
 <p>The Challenge generator gives you a named challenge, success and failure consequences, and a situation aspect. Use it when the party needs to accomplish something complex before an external pressure resolves.</p>
 
 <h2 id="countdowns">Countdowns</h2>
-<p>A Countdown is a threat clock. It has 4–8 boxes and fills when a trigger condition occurs. When the last box fills, the outcome happens — no exceptions. Use countdowns to create temporal pressure the players can see building.</p>
+<p>A Countdown is a threat clock. It has 4–8 boxes and fills when a trigger condition occurs. When the last box fills, the outcome happens — no exceptions. Use countdowns to create temporal pressure the players can see building. <a href="https://fate-srd.com/fate-condensed/challenges-conflicts-and-contests" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
 <p>The live countdown track fills as the GM marks boxes. When the clock hits zero, particles fire and the outcome appears.</p>
 
 <h2 id="compels">Compels</h2>
-<p>A Compel is when the GM offers a Fate Point to a player in exchange for an aspect making their character's life harder. The player can spend a Fate Point to refuse — but they have to spend one they already have.</p>
+<p>A Compel is when the GM offers a Fate Point to a player in exchange for an aspect making their character's life harder. The player can spend a Fate Point to refuse — but they have to spend one they already have. <a href="https://fate-srd.com/fate-condensed/aspects-and-fate-points" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
 <p>The Compel generator produces a ready-to-offer compel: the situation ("You've been made by the corporate drone") and the consequence if accepted ("Your only exit is the one they're watching"). Offer the Fate Point before you describe the consequence.</p>
 
     <hr style="border:none;border-top:1px solid var(--border);margin:32px 0">
 
     <h2 id="create-advantage">Create an Advantage — the most important action</h2>
-    <p><strong>Create an Advantage</strong> is the action new players skip and experienced players build entire sessions around. It places a new aspect on a scene, character, or situation — or discovers an existing hidden aspect — and gives you one or two free invokes on it.</p>
+    <p><strong>Create an Advantage</strong> is the action new players skip and experienced players build entire sessions around. It places a new aspect on a scene, character, or situation — or discovers an existing hidden aspect — and gives you one or two free invokes on it. <a href="https://fate-srd.com/fate-condensed/taking-action-rolling-the-dice" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
     <p>Why it matters: a free invoke stacks on top of a paid invoke (+2 each). Stack two free invokes before your Attack and you're rolling at effectively +4 over your skill — without spending a single Fate Point.</p>
 
     <div class="callout callout-warning">
-      <div class="callout-title"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> The four outcomes of Create Advantage (FCon p.19)</div>
+      <div class="callout-title"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> The four outcomes of Create Advantage (<a href="https://fate-srd.com/fate-condensed/taking-action-rolling-the-dice" target="_blank" rel="noreferrer" class="srd-link">FCon SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>)</div>
       <ul>
         <li><strong>Fail:</strong> You don't create the aspect, or — if it already existed — your opponent gets a free invoke on it instead.</li>
         <li><strong>Tie:</strong> You <em>do</em> create the aspect, but you get <strong>no free invoke</strong>. The aspect exists and anyone can invoke it by spending a fate point.</li>
@@ -167,7 +190,7 @@
     </div>
 
     <h2 id="fate-point-economy-gm">The fate point economy — a GM guide</h2>
-    <p>The economy breaks when GMs forget to compel. Here's the full cycle:</p>
+    <p>The economy breaks when GMs forget to compel. Here's the full cycle. <a href="https://fate-srd.com/fate-condensed/aspects-and-fate-points" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
     <ol>
       <li><strong>Session start:</strong> Each player gets fate points equal to their Refresh (usually 3). The GM gets 1 per PC per scene — not per NPC, not per encounter. A party of 4 = 4 GM fate points per scene.</li>
       <li><strong>During the scene:</strong> GM offers compels to create complications. Players who accept earn 1 FP. Players who refuse spend 1 FP. The GM uses their pool for NPC invokes.</li>
@@ -234,7 +257,7 @@
     <div class="wiki-footer">
 
   <div>
-    <a href="/help">Wiki Home</a> &nbsp;·&nbsp;
+    <a href="/help">Help Home</a> &nbsp;·&nbsp;
     <a href="/">Open Ogma</a> &nbsp;·&nbsp;
     <a href="/about">About</a> &nbsp;·&nbsp;
     <a href="/license">Full Attribution</a> &nbsp;·&nbsp;
