@@ -73,7 +73,7 @@
       </div>
     </details>
 
-    <details class="step-block" id="step-2">
+    <details class="step-block" id="step-2" open>
       <summary class="step-summary"><span class="step-num">2</span> Aspects — the core of everything</summary>
       <div class="step-body">
         <p>An <strong>aspect</strong> is a short phrase that is true about a character, scene, or situation. "Burned-Out Corp Fixer," "Slippery Deck in the Storm," "The Crown Owes Me a Favour." Aspects do two things: you can <strong>invoke</strong> them (spend a fate point for +2 on a roll when they're relevant) or they can be <strong>compelled</strong> (the GM offers you a fate point to accept a complication).</p>
@@ -91,7 +91,7 @@
       </div>
     </details>
 
-    <details class="step-block" id="step-3">
+    <details class="step-block" id="step-3" open>
       <summary class="step-summary"><span class="step-num">3</span> Skills and dice</summary>
       <div class="step-body">
         <p>Your character has 19 skills rated from +0 (Mediocre) to +4 (Great). When you act, you roll 4 Fate dice (each shows +1, 0, or −1), add the relevant skill, and compare to a target number. Results: <strong>Fail</strong> (below target), <strong>Tie</strong> (equal), <strong>Success</strong> (+1 or +2 over), <strong>Success with Style</strong> (+3 or more).</p>
@@ -106,7 +106,7 @@
       </div>
     </details>
 
-    <details class="step-block" id="step-4">
+    <details class="step-block" id="step-4" open>
       <summary class="step-summary"><span class="step-num">4</span> Fate points — the economy</summary>
       <div class="step-body">
         <p>You start each session with at least 3 <strong>fate points</strong>. Spend one to <strong>invoke</strong> an aspect for +2 on a roll (or a reroll). Earn one when you accept a <strong>compel</strong> — the GM offers a fate point and a complication based on one of your aspects. You can refuse a compel by spending a fate point instead.</p>
@@ -121,7 +121,7 @@
       </div>
     </details>
 
-    <details class="step-block" id="step-5">
+    <details class="step-block" id="step-5" open>
       <summary class="step-summary"><span class="step-num">5</span> Stress and consequences</summary>
       <div class="step-body">
         <p>When you take a hit, you absorb it with <strong>stress boxes</strong> (1 shift each, 3 per track by default — you can mark <em>as many as you need</em> per hit) or <strong>consequences</strong> (named aspects: Mild absorbs 2 shifts, Moderate absorbs 4, Severe absorbs 6). Stress clears at end of every scene. If you can't absorb all the shifts, you're <strong>taken out</strong> — the attacker narrates what happens. You can also <strong>concede before your opponent rolls</strong> — you leave the scene on your terms and earn fate points. Once dice hit the table, the window to concede has passed (<a href="https://fate-srd.com/fate-condensed/challenges-conflicts-and-contests" target="_blank" rel="noreferrer" class="srd-link">FCon SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>).</p>
@@ -139,7 +139,7 @@
       </div>
     </details>
 
-    <details class="step-block" id="step-6">
+    <details class="step-block" id="step-6" open>
       <summary class="step-summary"><span class="step-num">6</span> Stunts and advancement</summary>
       <div class="step-body">
         <p><strong>Stunts</strong> give your character a special edge: +2 to a specific skill in a specific situation, or a once-per-scene special ability. You start with 3 free; each extra costs 1 Refresh (minimum Refresh 1).</p>
@@ -171,7 +171,7 @@
       </div>
     </details>
 
-    <details class="step-block" id="step-7">
+    <details class="step-block" id="step-7" open>
       <summary class="step-summary"><span class="step-num">7</span> Running the game <span class="step-tag">For the GM</span></summary>
       <div class="step-body">
         <p>As a GM, your main tools are: <strong>compels</strong> (offer fate points to create complications), <strong>scene aspects</strong> (set the stage with invokable/compellable truths), <strong>NPCs</strong> (minor = 1-2 aspects, no consequences; major = full character sheet), and the <strong>GM fate point pool</strong> (1 per PC, shared across all NPCs).</p>
