@@ -1,5 +1,6 @@
 <script>
   import { RadioGroup } from 'bits-ui';
+  import OgmaTooltip from '../../shared/OgmaTooltip.svelte';
 
   let { data = {}, campName = '', catColor = 'var(--fs-section)', cardState = {}, onUpdate = () => {} } = $props();
 
@@ -31,6 +32,9 @@
 {/if}
 
 <!-- Score panels -->
+<OgmaTooltip tip="Victory track — each exchange, both sides roll. The winner marks a victory. First to {victories} victories wins the contest (FCon p.24).">
+  <div class="fs-section-hdr" style="cursor:help; margin-bottom:6px" tabindex="0">VICTORIES (first to {victories})</div>
+</OgmaTooltip>
 <div class="fs-section-gap" style="display:flex; gap:8px">
   {#each [{ side: sideA, col: colA, score: sA, won: winA, key: 'a' }, { side: sideB, col: colB, score: sB, won: winB, key: 'b' }] as row}
     <div style="flex:1; background:{row.won ? 'color-mix(in srgb,' + row.col + ' 10%,transparent)' : 'var(--fs-bg-inset)'}; border:1.5px solid {row.won ? row.col : 'var(--fs-border)'}; border-radius:4px; padding:8px; transition:all .2s">
