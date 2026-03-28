@@ -1,5 +1,6 @@
 <script>
   import { Tabs } from 'bits-ui';
+  import OgmaTooltip from '../shared/OgmaTooltip.svelte';
   let { state = { pcs: [], pool: 0 }, onUpdate = () => {} } = $props();
   let lastFPAnim = $state(null);
   let fpTab = $state('fp');
@@ -106,7 +107,8 @@
             onchange={(e) => setName(pc.id, e.target.value)} aria-label="PC name" />
           <div class="fp-controls">
             <button class="fp-btn fp-minus" onclick={() => adjustPC(pc.id, -1)} disabled={pc.current === 0} aria-label="Spend">&minus;</button>
-            <div class="fp-dots" role="group" aria-label="Fate points for {pc.name}">
+            <OgmaTooltip tip="Fate points — spend to invoke aspects (+2 or reroll), refuse compels, or power stunts. Earn by accepting compels. Refreshes to {pc.refresh} each session.">
+            <div class="fp-dots" role="group" aria-label="Fate points for {pc.name}" tabindex="0">
               {#each [0,1,2,3,4,5] as i}
                 {@const filled = i < pc.current}
                 {@const isAnim = lastFPAnim && lastFPAnim.id === pc.id && lastFPAnim.dot === i}
@@ -120,6 +122,7 @@
                 ></button>
               {/each}
             </div>
+            </OgmaTooltip>
             <button class="fp-btn fp-plus" onclick={() => adjustPC(pc.id, 1)} aria-label="Gain">+</button>
             {#key pc.current}<span class="fp-count fp-count-anim">{pc.current}</span>{/key}
           </div>
@@ -128,7 +131,9 @@
       {/each}
     </div>
     <div class="fp-pool-row">
-      <span class="fp-pool-label">GM Pool</span>
+      <OgmaTooltip tip="GM pool — fate points the GM spends to invoke NPC aspects or make hostile invocations against PCs. Starts at 1 per PC each scene.">
+        <span class="fp-pool-label" style="cursor:help" tabindex="0">GM Pool</span>
+      </OgmaTooltip>
       <button class="fp-btn fp-minus" onclick={() => adjustPool(-1)} disabled={(state.pool||0)===0} aria-label="Decrease pool">&minus;</button>
       <span class="fp-pool-count" aria-live="polite">{state.pool || 0}</span>
       <button class="fp-btn fp-plus" onclick={() => adjustPool(1)} aria-label="Increase pool">+</button>

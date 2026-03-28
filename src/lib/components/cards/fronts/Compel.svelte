@@ -1,5 +1,12 @@
 <script>
+  import OgmaTooltip from '../../shared/OgmaTooltip.svelte';
   let { data = {}, campName = '', catColor = 'var(--fs-section)' } = $props();
+
+  const TYPE_TIPS = {
+    event:    'Event compel — the world imposes a complication because of the aspect. The player had no choice; it just happens.',
+    decision: 'Decision compel — the character chooses to act in line with an aspect, creating trouble. Accept for 1 FP or refuse by spending 1 FP.',
+  };
+  let typeTip = $derived(TYPE_TIPS[(data.template_type || 'event').toLowerCase()] || TYPE_TIPS.event);
 </script>
 
 <div class="fs-section-gap compel-result-appear">
@@ -17,7 +24,9 @@
 <div style="display:flex; gap:10px; margin-bottom:14px">
   <div style="flex-shrink:0">
     <div class="fs-section-hdr">TYPE</div>
-    <span class="fs-skill-badge" style="font-size:12px; padding:3px 10px; text-transform:uppercase">{data.template_type || 'event'}</span>
+    <OgmaTooltip tip={typeTip}>
+      <span class="fs-skill-badge" style="font-size:12px; padding:3px 10px; text-transform:uppercase; cursor:help" tabindex="0">{data.template_type || 'event'}</span>
+    </OgmaTooltip>
   </div>
   <div style="flex:1">
     <div class="fs-section-hdr">PLAYER CHOICE</div>
