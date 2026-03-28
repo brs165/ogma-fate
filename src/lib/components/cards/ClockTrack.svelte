@@ -11,7 +11,7 @@
   }
 </script>
 
-<div class="fs-clock-track {full ? 'cd-triggered-shake' : ''}">
+<div class="fs-clock-track" class:cd-triggered-shake={full}>
   <div class="fs-section-hdr" style="color:{labelColor}; border-color:{labelColor}">{labelText}</div>
   <div style="display:flex; gap:5px; flex-wrap:wrap; margin-bottom:4px" role="group" aria-label="Countdown clock boxes">
     {#each Array.from({ length: boxes }) as _, i (i)}
