@@ -4474,6 +4474,27 @@ g:hover .cv-edge-label-bg { fill:color-mix(in srgb,var(--accent) 12%,var(--panel
   }
   .cp-divider { display: none !important; }
   .cp-table-col { display: none; }
+  .cp-table-col.cp-table-mobile-open {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 80vh;
+    z-index: 295;
+    background: var(--panel-raised);
+    border-radius: 16px 16px 0 0;
+    overflow: hidden;
+    animation: bsheet-in 0.28s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: 0 -4px 32px rgba(0,0,0,0.4);
+  }
+  .cp-table-col.cp-table-mobile-open .board-app {
+    position: static;
+    height: 100%;
+    inset: unset;
+    z-index: auto;
+    flex: 1;
+    min-height: 0;
+  }
   .cp-table-fab { display: flex; }
   /* Full-table toggle has no effect on mobile */
   .cp-table-full .cp-gen-col { width: 100% !important; }
@@ -4481,8 +4502,8 @@ g:hover .cv-edge-label-bg { fill:color-mix(in srgb,var(--accent) 12%,var(--panel
 
 @media (min-width: 701px) {
   .cp-table-fab { display: none !important; }
-  .cp-mobile-sheet { display: none !important; }
   .cp-mobile-sheet-backdrop { display: none !important; }
+  .cp-mobile-sheet-hdr { display: none !important; }
 }
 
 /* ══ SPRINT 4: DICE PANEL — card UI + draggable ══════════════════════════════ */
