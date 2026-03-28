@@ -429,5 +429,29 @@
     {@render children?.()}
   </div>
 
+  <!-- Mobile bottom nav — always visible on small screens for help navigation -->
+  <nav class="wiki-mobile-nav" aria-label="Help pages">
+    <a href="/help" class="wiki-mobile-nav-btn" class:active={isActive('/help')}>
+      <i class="fa-solid fa-house" aria-hidden="true"></i>
+      <span>Home</span>
+    </a>
+    <a href="/help/learn-fate" class="wiki-mobile-nav-btn" class:active={currentPath.startsWith('/help/learn-fate')}>
+      <i class="fa-solid fa-dice-d20" aria-hidden="true"></i>
+      <span>Learn</span>
+    </a>
+    <a href="/help/generators" class="wiki-mobile-nav-btn" class:active={isActive('/help/generators')}>
+      <i class="fa-solid fa-gears" aria-hidden="true"></i>
+      <span>Generators</span>
+    </a>
+    <a href="/help/fate-mechanics" class="wiki-mobile-nav-btn" class:active={isActive('/help/fate-mechanics')}>
+      <i class="fa-solid fa-book-open" aria-hidden="true"></i>
+      <span>Mechanics</span>
+    </a>
+    <button class="wiki-mobile-nav-btn" onclick={() => { navOpen = !navOpen; }} aria-label="All help topics">
+      <i class="fa-solid fa-bars" aria-hidden="true"></i>
+      <span>More</span>
+    </button>
+  </nav>
+
   <Footer />
 </div>
