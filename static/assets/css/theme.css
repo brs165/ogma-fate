@@ -4425,7 +4425,7 @@ g:hover .cv-edge-label-bg { fill:color-mix(in srgb,var(--accent) 12%,var(--panel
 }
 
 /* ── Responsive ───────────────────────────────────────────────────────────── */
-@media (max-width: 700px) {
+@media (max-width: 767px) {
   /* On mobile: generator fills width, table is FAB + bottom-sheet */
   .cp-gen-col {
     width: 100% !important;
@@ -4459,7 +4459,7 @@ g:hover .cv-edge-label-bg { fill:color-mix(in srgb,var(--accent) 12%,var(--panel
   .cp-table-full .cp-gen-col { width: 100% !important; }
 }
 
-@media (min-width: 701px) {
+@media (min-width: 768px) {
   .cp-table-fab { display: none !important; }
   .cp-mobile-sheet-backdrop { display: none !important; }
   .cp-mobile-sheet-hdr { display: none !important; }
@@ -5618,6 +5618,20 @@ button.fp-dot:focus-visible {
   margin-top: 2px;
   flex-shrink: 0;
 }
+.onb-first-roll-dismiss {
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 3px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid var(--accent, var(--gold));
+  border-radius: 4px;
+  background: transparent;
+  color: var(--accent, var(--gold));
+  cursor: pointer;
+  white-space: nowrap;
+}
+.onb-first-roll-dismiss:hover { background: color-mix(in srgb, var(--accent) 12%, transparent); }
 
 /* ── Mobile FAB hint (#18) ─────────────────────────────────────────────────── */
 .onb-fab-hint {

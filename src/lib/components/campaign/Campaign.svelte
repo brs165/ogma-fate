@@ -116,7 +116,7 @@
   function dropTemplate(tplId) {
     if (boardRef && boardRef.dropTemplateFromParent) boardRef.dropTemplateFromParent(tplId);
     // On mobile, open the table to show the template
-    if (typeof window !== 'undefined' && window.innerWidth <= 700) tableOpen = true;
+    if (typeof window !== 'undefined' && window.innerWidth < 768) tableOpen = true;
   }
 
   // ── Generator groups for sidebar ──────────────────────────────────────────
@@ -243,8 +243,6 @@
   // ── Actions ────────────────────────────────────────────────────────────────
   function doGenerate() {
     if (session && !rolling) {
-      // Dismiss first-roll annotation on the NEXT roll (#13)
-      if (isFirstRoll && result) { isFirstRoll = false; }
       session.doGenerate();
     }
   }
@@ -266,7 +264,7 @@
   function sendToTable() {
     if (result && boardRef) boardRef.sendToTable(result.genId, result.data);
     // Mobile FAB hint (#18)
-    if (typeof window !== 'undefined' && window.innerWidth <= 700 && !tableOpen) {
+    if (typeof window !== 'undefined' && window.innerWidth < 768 && !tableOpen) {
       sentToTableHint = true;
       setTimeout(() => { sentToTableHint = false; }, 4000);
     }
@@ -531,6 +529,7 @@
                     <div class="onb-first-roll" role="status">
                       <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
                       Here's your first result! Scroll to read it, then click <strong>GM GUIDANCE</strong> at the bottom to learn how to use it at the table.
+                      <button class="onb-first-roll-dismiss" onclick={() => { isFirstRoll = false; }} aria-label="Dismiss annotation">Got it</button>
                     </div>
                   {/if}
                   <div class={resultAnim ? 'result-card-appear' : ''}>

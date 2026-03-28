@@ -106,14 +106,14 @@
   let mode = $state('standard');
 
   const CAMPAIGNS = {
-    thelongafter: { name: 'The Long After',          icon: '◈', genre: 'Sword & Planet',   tagline: 'Warlords and ruined gods in the wreckage of civilisation' },
-    cyberpunk:    { name: 'Neon Abyss',              icon: '⬡', genre: 'Cyberpunk',        tagline: 'Chrome, corp-blood, and the city that eats its own' },
-    fantasy:      { name: 'Shattered Kingdoms',      icon: '✦', genre: 'Dark Fantasy',     tagline: 'Grim blades, older magic, and the weight of history' },
-    space:        { name: 'Void Runners',            icon: '◯', genre: 'Space Western',    tagline: 'Hard vacuum, hard choices, and no one coming to help' },
-    victorian:    { name: 'The Gaslight Chronicles',  icon: '⊕', genre: 'Gothic Horror',   tagline: 'Gaslight and secrets and things that should not exist' },
-    postapoc:     { name: 'The Long Road',           icon: '◻', genre: 'Post-Apocalypse',  tagline: 'The world already ended. Survive what comes next' },
-    western:      { name: 'Dust and Iron',           icon: '◈', genre: 'Frontier Western', tagline: 'Frontier justice. Railroad money and the weight of the old war' },
-    dVentiRealm:  { name: 'dVenti Realm',            icon: '⬟', genre: 'High Fantasy',    tagline: 'The Senate collapsed. The Vaults are still here. So is everything sealed inside them.' },
+    thelongafter: { name: 'The Long After',          icon: 'fa-compass',           genre: 'Sword & Planet',   tagline: 'Warlords and ruined gods in the wreckage of civilisation' },
+    cyberpunk:    { name: 'Neon Abyss',              icon: 'fa-microchip',         genre: 'Cyberpunk',        tagline: 'Chrome, corp-blood, and the city that eats its own' },
+    fantasy:      { name: 'Shattered Kingdoms',      icon: 'fa-dragon',            genre: 'Dark Fantasy',     tagline: 'Grim blades, older magic, and the weight of history' },
+    space:        { name: 'Void Runners',            icon: 'fa-shuttle-space',     genre: 'Space Western',    tagline: 'Hard vacuum, hard choices, and no one coming to help' },
+    victorian:    { name: 'The Gaslight Chronicles',  icon: 'fa-magnifying-glass', genre: 'Gothic Horror',   tagline: 'Gaslight and secrets and things that should not exist' },
+    postapoc:     { name: 'The Long Road',           icon: 'fa-biohazard',         genre: 'Post-Apocalypse',  tagline: 'The world already ended. Survive what comes next' },
+    western:      { name: 'Dust and Iron',           icon: 'fa-hat-cowboy',        genre: 'Frontier Western', tagline: 'Frontier justice. Railroad money and the weight of the old war' },
+    dVentiRealm:  { name: 'dVenti Realm',            icon: 'fa-dice-d20',          genre: 'High Fantasy',    tagline: 'The Senate collapsed. The Vaults are still here. So is everything sealed inside them.' },
   };
 
   let camp = $derived(campId ? CAMPAIGNS[campId] : null);
@@ -429,7 +429,7 @@
           <label class="sz-input-label" for="pc-name">Character Name</label>
           <input id="pc-name" type="text" class="sz-input" placeholder="Leave blank to fill in later" value={currentPc.name} oninput={e => updateCurrentPc('name', e.target.value)} autocomplete="off" />
         </div>
-        <p>Who is this character? One phrase that captures their role in the story.</p>
+        <p>Who is this character? One phrase that captures their role in the story. <span style="font-style:italic;color:var(--text-muted)">Mechanically, anyone at the table can invoke your High Concept for +2 when it applies, or the GM can compel it to create complications (you earn a fate point when that happens).</span></p>
         <div class="sz-prompt-box">"If someone asked <em>what's your character about?</em> at a bar, what would you say?"</div>
         <div class="sz-input-group">
           <label class="sz-input-label" for="pc-hc">High Concept</label>
@@ -458,7 +458,7 @@
             </div>
           </div>
         {/if}
-        <p>What makes {currentPc.name || 'this character'}'s life harder? This is the aspect that will earn the most fate points.</p>
+        <p>What makes {currentPc.name || 'this character'}'s life harder? This is the aspect that will earn the most fate points. <span style="font-style:italic;color:var(--text-muted)">When the GM compels your Trouble to make your life complicated, you receive a fate point. The worse the Trouble, the more fate points you earn — and FP fuel invokes (+2) on your other rolls.</span></p>
         <div class="sz-prompt-box">"When things go wrong for your character, <em>why</em> do they go wrong? What keeps pulling them back into trouble?"</div>
         <div class="sz-input-group">
           <label class="sz-input-label" for="pc-trouble">Trouble</label>
@@ -478,7 +478,7 @@
 
     {:else if stepId === 'relationship'}
       <div class="sz-body">
-        <p>Pair up. Each player connects their character to one other PC. Good relationships have tension &mdash; not hostility, but imbalance.</p>
+        <p>Pair up. Each player connects their character to one other PC. Good relationships have tension &mdash; not hostility, but imbalance. <span style="font-style:italic;color:var(--text-muted)">Like all aspects, this can be invoked (+2) when the relationship helps, or compelled (fate point + complication) when it causes friction.</span></p>
         <div class="sz-card">
           <div class="sz-card-title">Pick a Template</div>
           <ul class="sz-template-list">
