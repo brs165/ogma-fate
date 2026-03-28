@@ -9,6 +9,7 @@
   import BoardBoost  from './BoardBoost.svelte';
   import BoardLabel  from './BoardLabel.svelte';
   import BoardGroup  from './BoardGroup.svelte';
+  import AddMenu     from './AddMenu.svelte';
   // ── Props ────────────────────────────────────────────────────────────────
   let {
     cards           = [],
@@ -36,6 +37,10 @@
     onClearTable    = null,
     onAutoArrange   = null,
     onExportModal   = null,
+    onGenerate      = null,
+    onAddGroup      = null,
+    onTemplate      = null,
+    addTemplates    = [],
     toast           = null,
     showToast       = null,
     embedded        = false,
@@ -568,8 +573,10 @@
     </div>
   {/if}
 
-  <!-- Zoom controls -->
+  <!-- Canvas controls -->
   <div class="cv-controls" aria-label="Canvas controls">
+    <AddMenu {onGenerate} {onTemplate} {onAddGroup} templates={addTemplates} />
+    <div class="cv-ctrl-sep" aria-hidden="true"></div>
     <button class="cv-ctrl-btn" onclick={() => adjustZoom(0.15)}  aria-label="Zoom in" title="Zoom in"><i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i></button>
     <button class="cv-ctrl-btn" onclick={() => adjustZoom(-0.15)} aria-label="Zoom out" title="Zoom out"><i class="fa-solid fa-magnifying-glass-minus" aria-hidden="true"></i></button>
     <button class="cv-ctrl-btn" onclick={fitAll}                  aria-label="Fit all cards" title="Fit all cards (F)"><i class="fa-solid fa-expand" aria-hidden="true"></i></button>

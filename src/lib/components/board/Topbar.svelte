@@ -1,9 +1,8 @@
 <script>
   import ExportMenu from './ExportMenu.svelte';
-  import AddMenu from './AddMenu.svelte';
   import { Select, DropdownMenu } from 'bits-ui';
 
-  let { campMeta = {}, campId = '', onCampChange = () => {}, isOnline = true, panels = {}, exportActions = {}, cards = [], campName = '', onExportCanvas = () => {}, onImportCanvas = () => {}, onExportView = null, onExportModal = null, onClose = null, onGenerate = null, onAddGroup = null, onTemplate = null, addTemplates = [] } = $props();
+  let { campMeta = {}, campId = '', onCampChange = () => {}, isOnline = true, panels = {}, exportActions = {}, cards = [], campName = '', onExportCanvas = () => {}, onImportCanvas = () => {}, onExportView = null, onExportModal = null, onClose = null } = $props();
 
   let leftOpen      = $derived(panels.leftOpen);
   let onToggleLeft  = $derived(panels.onToggleLeft || (() => {}));
@@ -73,9 +72,6 @@
 
   <!-- Right nav -->
   <div class="bt-right">
-
-    <!-- Add to table -->
-    <AddMenu {onGenerate} {onTemplate} {onAddGroup} templates={addTemplates} />
 
     <!-- Offline chip -->
     {#if !isOnline}
