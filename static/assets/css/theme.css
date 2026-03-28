@@ -3550,6 +3550,16 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .export-dd-name { font-size:12px; font-weight:600; color:var(--text); }
 .export-dd-sub { font-size:10px; color:var(--text-muted); }
 
+/* ── Add-to-table dropdown ─────────────────────────────────────────────── */
+.add-dd-content {
+  background:var(--panel-raised); border:1.5px solid var(--border-mid);
+  border-radius:6px; padding:4px 0; min-width:220px;
+  max-height:70vh; overflow-y:auto;
+  box-shadow:0 8px 24px rgba(0,0,0,.3), 4px 4px 0 rgba(0,0,0,.15);
+  z-index:9000;
+  animation:fadeDown .14s ease;
+}
+
 /* ══ BITS UI — TOOLTIP ══ */
 .bt-tooltip {
   background:var(--panel-raised); border:1px solid var(--border-mid);

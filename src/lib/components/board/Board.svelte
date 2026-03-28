@@ -62,7 +62,6 @@
   let showClearModal = $state(false);
   let showExportModal = $state(false);
   let coachEdge    = $state(false);
-  let ctx          = $state(null);
   let canvasRef    = $state();
   let isMobile     = $state(typeof window !== 'undefined' && window.innerWidth < 768);
 
@@ -189,18 +188,15 @@
       }, i * 80);
     });
     showToast(tpl.label + ' template dropped');
-    ctx = null;
   }
 
-  // ── Context menu ───────────────────────────────────────────────────────────
-  function onCanvasContextMenu(screenX, screenY, canvasX, canvasY) {
-    ctx = { screenX, screenY, canvasX, canvasY };
-  }
-  function ctxGenerate(genId, canvasX, canvasY) {
+  // ── Topbar Add menu ────────────────────────────────────────────────────────
+  function generateFromMenu(genId) {
     if (!canvas) return;
-    if (genId === '__group__') { canvas.addGroup(canvasX, canvasY); ctx = null; return; }
-    canvas.generateCard(genId, canvasX, canvasY);
-    ctx = null;
+    canvas.generateCard(genId);
+  }
+  function addGroupFromMenu() {
+    if (canvas) canvas.addGroup(60, 60);
   }
 
   // ── Generator select ──────────────────────────────────────────────────────
@@ -292,7 +288,7 @@
 </script>
 
 <!-- ── Template ──────────────────────────────────────────────────────────── -->
-<div class="board-app{embedded ? ' board-embedded' : ''}" data-theme={embedded ? undefined : theme} onclick={() => ctx = null}>
+<div class="board-app{embedded ? ' board-embedded' : ''}" data-theme={embedded ? undefined : theme}>
 
   {#if !embedded}
   <!-- Topbar -->
@@ -324,6 +320,10 @@
     onExportCanvas={canvas ? canvas.exportCanvas : () => {}}
     onImportCanvas={canvas ? canvas.importCanvas : () => {}}
     onCampChange={(newId) => { if (canvas) canvas.persistCanvas(get(canvas.cards)); window.location.href = '/campaigns/' + newId; }}
+    onGenerate={generateFromMenu}
+    onAddGroup={addGroupFromMenu}
+    onTemplate={(tplId) => dropTemplate(tplId)}
+    addTemplates={CANVAS_TEMPLATES}
   />
   {/if}
 
@@ -387,7 +387,6 @@
           {connectSourceId}
           modeTransitioning={false}
           playCardIds={new Set()}
-          {ctx}
           {toast}
           onUpdateCard={canvas ? canvas.updateCard : null}
           onDeleteCard={canvas ? canvas.deleteCard : null}
@@ -399,10 +398,7 @@
           onUpdateConnector={canvas ? canvas.updateConnector : null}
           onUpdateGroup={canvas ? canvas.updateGroup : null}
           onDeleteGroup={canvas ? canvas.deleteGroup : null}
-          onContextMenu={onCanvasContextMenu}
-          onCtxClose={() => { ctx = null; }}
-          onCtxGenerate={ctxGenerate}
-          onCtxTemplate={(tplId) => dropTemplate(tplId, ctx?.canvasX ?? 60, ctx?.canvasY ?? 60)}
+          onCtxTemplate={(tplId) => dropTemplate(tplId)}
           ctxTemplates={CANVAS_TEMPLATES}
           onEdgeCoach={() => { if (!coachEdge) { coachEdge = true; showToast('\u21D4 Click line to cycle label'); } }}
           onClearTable={() => { showClearModal = true; }}
