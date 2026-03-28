@@ -3876,6 +3876,10 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
   .ps-tent-btn { min-height:44px; padding:8px 10px; }
   .history-item { min-height:44px; }
   .tm-entry-row { min-height:44px; }
+  .cv-ctrl-btn { width:44px; height:44px; padding:8px; }
+  .cv-mm-toggle { padding:8px 12px; min-height:44px; min-width:44px; }
+  .bml-expand, .bml-remove { width:44px; height:44px; padding:6px; }
+  .wiki-mobile-nav-btn { padding:12px 8px; min-height:44px; }
 }
 
 /* M12 — Topbar safe-area-inset-top when installed as PWA */
