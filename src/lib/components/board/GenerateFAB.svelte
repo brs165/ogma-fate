@@ -25,17 +25,19 @@
   </DropdownMenu.Trigger>
   <DropdownMenu.Portal>
     <DropdownMenu.Content class="gen-fab-content" side="top" align="end" sideOffset={12}>
-      <DropdownMenu.GroupHeading class="gen-fab-label">Generate</DropdownMenu.GroupHeading>
-      <DropdownMenu.Separator class="export-dd-sep" />
-      {#each FAB_ITEMS as g (g.id)}
-        <DropdownMenu.Item
-          class="gen-fab-item{activeGen === g.id ? ' active' : ''}"
-          onSelect={() => onGenerate?.(g.id)}
-        >
-          <span class="gen-fab-icon"><i class="fa-solid {g.icon}" aria-hidden="true"></i></span>
-          <span class="gen-fab-name">{g.label}</span>
-        </DropdownMenu.Item>
-      {/each}
+      <DropdownMenu.Group>
+        <DropdownMenu.GroupHeading class="gen-fab-label">Generate</DropdownMenu.GroupHeading>
+        <DropdownMenu.Separator class="export-dd-sep" />
+        {#each FAB_ITEMS as g (g.id)}
+          <DropdownMenu.Item
+            class="gen-fab-item{activeGen === g.id ? ' active' : ''}"
+            onSelect={() => onGenerate?.(g.id)}
+          >
+            <span class="gen-fab-icon"><i class="fa-solid {g.icon}" aria-hidden="true"></i></span>
+            <span class="gen-fab-name">{g.label}</span>
+          </DropdownMenu.Item>
+        {/each}
+      </DropdownMenu.Group>
     </DropdownMenu.Content>
   </DropdownMenu.Portal>
 </DropdownMenu.Root>

@@ -1,5 +1,6 @@
 <script>
   import { VERSION } from '$lib/version.js';
+  import { Accordion } from 'bits-ui';
 </script>
 
 <svelte:head>
@@ -53,17 +54,54 @@
     <p style="font-size:var(--text-sm);color:var(--text-dim)">The generator engine (<code>src/lib/engine.js</code>) has zero Svelte or DOM dependencies and runs in Node for QA &mdash; <strong>136 generator/campaign combinations</strong> are smoke-tested before every release, plus 187 QA checks covering component structure, CSS consistency, touch target compliance, and Fate rules accuracy.</p>
 
     <h2>How Ogma Is Built</h2>
-    <p>Ogma is developed using a structured team of specialised AI roles, each with a defined domain. The generator logic, UI, and QA harness are built and tested systematically &mdash; 136 generator/campaign combinations are verified before every release.</p>
-    <p>The table content &mdash; names, aspects, factions, scene details &mdash; is AI-generated. It is not manually written or independently reviewed. The Fate Condensed SRD is used as the reference for rules accuracy in the generator engine.</p>
+    <p>Ogma is developed using a structured team of specialised AI roles, each with a defined domain. The generator logic, UI, and QA harness are built and tested systematically &mdash; 136 generator/campaign combinations verified before every release.</p>
+    <p>The table content &mdash; names, aspects, factions, scene details &mdash; is AI-generated and not manually written or independently reviewed. The Fate Condensed SRD is the reference for rules accuracy.</p>
 
-    <div class="about-card" style="font-size:var(--text-sm);line-height:1.9;color:var(--text-dim);padding:14px 18px">
-      <strong style="color:var(--accent)">Rules Expert + Content Designer</strong> &rarr; campaign table content and GM tips<br>
-      <strong style="color:var(--accent)">Senior Dev + CSS Engineer</strong> &rarr; UI features, interactive renderers, design system<br>
-      <strong style="color:var(--accent)">UX Researcher + IA Specialist</strong> &rarr; navigation, information architecture, help site structure<br>
-      <strong style="color:var(--accent)">QA Engineer + Senior Dev</strong> &rarr; every code change (187 QA checks required)<br>
-      <strong style="color:var(--accent)">A11y Specialist</strong> &rarr; WCAG AA compliance, keyboard navigation, touch targets<br>
-      <strong style="color:var(--accent)">Documentation Lead</strong> &rarr; the Help &amp; Wiki &mdash; zero-questions standard
+    <div class="about-team-roles">
+      <div class="about-team-role"><span class="about-team-role-name">Rules Expert + Content Designer</span><span class="about-team-role-desc">Campaign table content and GM tips</span></div>
+      <div class="about-team-role"><span class="about-team-role-name">Senior Dev + CSS Engineer</span><span class="about-team-role-desc">UI features, interactive renderers, design system</span></div>
+      <div class="about-team-role"><span class="about-team-role-name">UX Researcher + IA Specialist</span><span class="about-team-role-desc">Navigation, information architecture, help site structure</span></div>
+      <div class="about-team-role"><span class="about-team-role-name">QA Engineer + Senior Dev</span><span class="about-team-role-desc">Every code change &mdash; 189 QA checks required</span></div>
+      <div class="about-team-role"><span class="about-team-role-name">A11y Specialist</span><span class="about-team-role-desc">WCAG AA compliance, keyboard navigation, touch targets</span></div>
+      <div class="about-team-role"><span class="about-team-role-name">Documentation Lead</span><span class="about-team-role-desc">Help &amp; Wiki &mdash; zero-questions standard</span></div>
     </div>
+
+    <Accordion.Root type="single" class="about-prompt-acc">
+      <Accordion.Item value="prompts" class="about-prompt-item">
+        <Accordion.Header>
+          <Accordion.Trigger class="about-prompt-trigger">
+            <span>View role prompts</span>
+            <i class="fa-solid fa-chevron-down about-prompt-chevron" aria-hidden="true"></i>
+          </Accordion.Trigger>
+        </Accordion.Header>
+        <Accordion.Content class="about-prompt-content">
+          <div class="about-prompt-role">
+            <div class="about-prompt-role-name">Rules Expert + Content Designer</div>
+            <div class="about-prompt-role-text">You are a Fate Condensed rules expert and fiction writer specialising in tabletop RPG content. Generate thematic table entries &mdash; names, aspects, factions, scene hooks, NPC concepts &mdash; that are rules-mechanically sound and tonally specific to each of Ogma's eight campaign worlds. All output must follow the Fate Condensed SRD and be formatted as JavaScript array literals compatible with the existing data module schema.</div>
+          </div>
+          <div class="about-prompt-role">
+            <div class="about-prompt-role-name">Senior Dev + CSS Engineer</div>
+            <div class="about-prompt-role-text">You are a senior Svelte 5 developer and CSS engineer working on a SvelteKit + Vite project in full runes mode. Use $state, $derived, $props, $effect &mdash; never legacy prop syntax or on:event syntax. All styling goes to static/assets/css/theme.css only; no &lt;style&gt; blocks. Implement UI features for the native pointer/wheel canvas, interactive card renderers, and the design system using bits-ui primitives. Preserve WCAG 2.1 AA on every change.</div>
+          </div>
+          <div class="about-prompt-role">
+            <div class="about-prompt-role-name">UX Researcher + IA Specialist</div>
+            <div class="about-prompt-role-text">You design navigation structure, generator discovery flow, and help site architecture for Ogma. Follow mobile-first principles with 44px minimum touch targets. Your decisions are grounded in how GMs use the tool at the table &mdash; fast-access prep, progressive onboarding for new Fate players, and expert shortcuts for veterans. Produce IA audits, navigation proposals, and information hierarchy diagrams.</div>
+          </div>
+          <div class="about-prompt-role">
+            <div class="about-prompt-role-name">QA Engineer + Senior Dev</div>
+            <div class="about-prompt-role-text">You are a QA engineer for the Ogma generator suite. Run scripts/qa-hard.mjs (189 checks), scripts/qa-export.mjs (166 export round-trip checks), and scripts/qa-unit.mjs before approving any delivery. Verify npx vite build prints &#x2714; done. Review component structure against architecture rules, flag regressions in content coverage or Fate rules accuracy, and confirm zero broken a11y attributes.</div>
+          </div>
+          <div class="about-prompt-role">
+            <div class="about-prompt-role-name">A11y Specialist</div>
+            <div class="about-prompt-role-text">You are an accessibility specialist mandated with WCAG 2.1 AA compliance across all 78 Svelte components. Review every component for semantic HTML, correct ARIA roles and labels, keyboard navigability, focus management in dialogs and menus, contrast ratios, and minimum 44dp touch targets. Produce a compliance report with each violation and required fix before approving delivery.</div>
+          </div>
+          <div class="about-prompt-role">
+            <div class="about-prompt-role-name">Documentation Lead</div>
+            <div class="about-prompt-role-text">You are the documentation lead for Ogma's help site. Write to a zero-questions standard &mdash; every page answers the question a GM would ask before they need to ask it. Maintain consistency across all help pages: Quick Start summary at top, core concept explanation, GM tips, common mistakes, and cross-links to related generators. Write for GMs coming from D&amp;D 5e as well as Fate veterans.</div>
+          </div>
+        </Accordion.Content>
+      </Accordion.Item>
+    </Accordion.Root>
 
     <h2>Credits</h2>
     <p>Ogma is an independent fan project. See the <a href="/license">License &amp; Attribution</a> page for full credits, Fate SRD attribution blocks, and open-source library notices.</p>

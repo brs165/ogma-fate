@@ -7,6 +7,7 @@
   import { DB, LS } from '../../db.js';
   import Cv4Card from '../cards/Cv4Card.svelte';
   import Board from '../board/Board.svelte';
+  import MobileTableFan from '../board/MobileTableFan.svelte';
   import { Collapsible } from 'bits-ui';
 
   let { campId = 'fantasy' } = $props();
@@ -33,9 +34,9 @@
   // ── Split layout state ─────────────────────────────────────────────────────
   // tableFull: generator hidden, table takes all content area
   // tableOpen: on mobile, whether the bottom-sheet table is visible
-  let tableFull  = $state(false);
-  let tableOpen  = $state(false); // mobile only
-  let boardRef   = $state();      // bind:this on Board for sendToTable etc
+  let tableFull     = $state(false);
+  let boardRef      = $state();      // bind:this on Board for sendToTable etc
+  let boardCardsList = $state([]);   // mirror of Board's canvas cards for MobileTableFan
 
   // Split ratio: fraction of content-panel width for generator column (0.3–0.7)
   const RATIO_KEY = 'ogma_split_ratio_' + campId;
@@ -115,8 +116,6 @@
   ];
   function dropTemplate(tplId) {
     if (boardRef && boardRef.dropTemplateFromParent) boardRef.dropTemplateFromParent(tplId);
-    // On mobile, open the table to show the template
-    if (typeof window !== 'undefined' && window.innerWidth < 768) tableOpen = true;
   }
 
   // ── Generator groups for sidebar ──────────────────────────────────────────
@@ -263,13 +262,7 @@
 
   function sendToTable() {
     if (result && boardRef) boardRef.sendToTable(result.genId, result.data);
-    // Mobile FAB hint (#18)
-    if (typeof window !== 'undefined' && window.innerWidth < 768 && !tableOpen) {
-      sentToTableHint = true;
-      setTimeout(() => { sentToTableHint = false; }, 4000);
-    }
   }
-  let sentToTableHint = $state(false);
 
   // ── Keyboard ───────────────────────────────────────────────────────────────
   function onKey(e) {
@@ -355,7 +348,7 @@
               <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-solid {tableFull ? 'fa-compress' : 'fa-expand'}"></i></span>
               <span class="sidebar-item-label">{tableFull ? 'Split view' : 'Full Table'}</span>
             </button>
-            <button class="sb-acc-item sb-mobile-only" onclick={() => { tableOpen = !tableOpen; showSidebar = false; }}>
+            <button class="sb-acc-item sb-mobile-only" onclick={() => { showSidebar = false; }}>
               <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-solid fa-mobile-screen"></i></span>
               <span class="sidebar-item-label">Table on mobile</span>
             </button>
@@ -652,6 +645,15 @@
 
           </div>
         </main>
+
+        <!-- Mobile table fan — replaces FAB + bottom sheet on ≤640px -->
+        <MobileTableFan
+          cards={boardCardsList}
+          campName={campName}
+          campId={campId}
+          onCardDelete={(id) => boardRef?.deleteCard(id)}
+          onCardReroll={(id) => boardRef?.rerollCard(id)}
+        />
       </div>
 
       <!-- Drag divider -->
@@ -665,36 +667,18 @@
         onpointercancel={onDividerPointerUp}
       ></div>
 
-      <!-- Mobile backdrop — OUTSIDE table-col so it sits behind the sheet -->
-      {#if tableOpen}
-        <div class="cp-mobile-sheet-backdrop" onclick={() => { tableOpen = false; }} aria-hidden="true"></div>
-      {/if}
-
       <!-- Table column — Board embedded (single instance for both desktop & mobile) -->
-      <div class="cp-table-col" class:cp-table-mobile-open={tableOpen}>
-        {#if tableOpen}
-          <div class="cp-mobile-sheet-hdr">
-            <span class="cp-mobile-sheet-title"><i class="fa-solid fa-table-cells" aria-hidden="true"></i> Table</span>
-            <button class="cp-mobile-sheet-close" onclick={() => { tableOpen = false; }} aria-label="Close Table">&times;</button>
-          </div>
-        {/if}
+      <div class="cp-table-col">
         <Board
           bind:this={boardRef}
           {campId}
           embedded={true}
+          onCardsChange={(c) => { boardCardsList = c; }}
         />
       </div>
 
     </div>
   </div>
-
-  <!-- Mobile Table FAB -->
-  <button class="cp-table-fab" class:cp-table-fab-pulse={sentToTableHint} onclick={() => { tableOpen = !tableOpen; sentToTableHint = false; }} aria-label="Open Table" title="Open Table">
-    <i class="fa-solid fa-table-cells" aria-hidden="true"></i>
-  </button>
-  {#if sentToTableHint}
-    <div class="onb-fab-hint" role="status">Card added to Table — tap here to see it ↓</div>
-  {/if}
 
   <!-- Toast -->
   {#if toast}

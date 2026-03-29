@@ -2764,7 +2764,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .board-coach-play .bc-coach-icon{color:var(--c-green,#30d158)}
 
 /* Context menu */
-.board-ctx{position:absolute;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:6px;min-width:180px;box-shadow:0 4px 24px rgba(0,0,0,.2);z-index:500}
+.board-ctx{position:absolute;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:6px;min-width:180px;box-shadow:0 4px 24px rgba(0,0,0,.2);z-index:500;opacity:0.9}
 .board-ctx-section{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);padding:4px 10px 2px}
 .board-ctx-item{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:6px;cursor:pointer;font-size:12px;color:var(--text);transition:background .1s}
 .board-ctx-item:hover{background:var(--hover)}
@@ -3034,6 +3034,20 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .about-stat{display:inline-block;text-align:center;padding:12px 20px}
 .about-stat-n{font-size:var(--text-2xl);font-weight:800;color:var(--accent,var(--text))}
 .about-stat-l{font-size:var(--text-label);color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em}
+/* ── About: Team roles + prompt accordion ───────────────────────────────── */
+.about-team-roles{margin:18px 0;border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.about-team-role{display:flex;align-items:baseline;gap:10px;padding:9px 16px;background:var(--glass-bg)}
+.about-team-role+.about-team-role{border-top:1px solid var(--border)}
+.about-team-role-name{font-size:12px;font-weight:700;color:var(--accent);flex-shrink:0}
+.about-team-role-desc{font-size:12px;color:var(--text-muted)}
+.about-prompt-acc{margin-top:8px;border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.about-prompt-trigger{display:flex;align-items:center;justify-content:space-between;width:100%;padding:11px 16px;background:var(--inset);border:none;cursor:pointer;font-size:12px;font-weight:700;color:var(--text-muted);font-family:inherit;text-align:left;letter-spacing:.04em;transition:background .12s}
+.about-prompt-trigger:hover{background:var(--hover)}
+.about-prompt-chevron{transition:transform 0.2s;font-size:11px}
+[data-state="open"] .about-prompt-chevron{transform:rotate(180deg)}
+.about-prompt-content{padding:16px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:14px}
+.about-prompt-role-name{font-size:10px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:5px;font-family:var(--font-mono)}
+.about-prompt-role-text{font-size:12px;line-height:1.65;color:var(--text-dim);background:var(--inset);border-left:2px solid var(--accent);padding:8px 12px;border-radius:0 4px 4px 0}
 /* ── Mobile Nav — shared hamburger/drawer pattern for marketing + help ── */
 .mn-hamburger{display:none;width:44px;height:44px;background:none;border:none;color:var(--text);cursor:pointer;font-size:18px;flex-shrink:0;align-items:center;justify-content:center;border-radius:4px}
 .mn-hamburger:hover{background:color-mix(in srgb,var(--accent) 10%,transparent)}
@@ -3531,7 +3545,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
   background:var(--panel-raised); border:1.5px solid var(--border-mid);
   border-radius:6px; padding:4px 0; min-width:210px;
   box-shadow:0 8px 24px rgba(0,0,0,.3), 4px 4px 0 rgba(0,0,0,.15);
-  z-index:9000;
+  z-index:9000; opacity:0.9;
   animation:fadeDown .14s ease;
 }
 .export-dd-label {
@@ -3560,7 +3574,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
   border-radius:6px; padding:4px 0; min-width:220px;
   max-height:70vh; overflow-y:auto;
   box-shadow:0 8px 24px rgba(0,0,0,.3), 4px 4px 0 rgba(0,0,0,.15);
-  z-index:9000;
+  z-index:9000; opacity:0.9;
   animation:fadeDown .14s ease;
 }
 
@@ -3570,7 +3584,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
   border-radius:4px; padding:4px 8px; font-size:11px; font-weight:500;
   color:var(--text); box-shadow:0 2px 8px rgba(0,0,0,.25);
   animation:fadeDown .12s ease; pointer-events:none; z-index:9999;
-  white-space:nowrap;
+  white-space:nowrap; opacity:0.9;
 }
 .bt-kbd {
   display:inline-block; background:var(--inset); border:1px solid var(--border-mid);
@@ -3665,7 +3679,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
   background:var(--panel-raised); border:1.5px solid var(--border-mid);
   border-radius:8px; padding:6px; min-width:190px; max-height:320px; overflow-y:auto;
   box-shadow:0 8px 24px rgba(0,0,0,.3), 4px 4px 0 rgba(0,0,0,.12);
-  animation:fadeDown .14s ease; z-index:9000;
+  animation:fadeDown .14s ease; z-index:9000; opacity:0.9;
 }
 .bt-world-viewport { display:flex; flex-direction:column; gap:1px; }
 .bt-world-item {
@@ -3762,7 +3776,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
   border-radius:12px; padding:6px; min-width:200px;
   box-shadow:0 8px 32px rgba(0,0,0,.4);
   animation:fadeDown .15s cubic-bezier(.34,1.56,.64,1);
-  z-index:9000; max-height:70vh; overflow-y:auto;
+  z-index:9000; max-height:70vh; overflow-y:auto; opacity:0.9;
 }
 .gen-fab-label {
   padding:6px 12px 4px; font-size:10px; font-weight:800;
@@ -4342,6 +4356,55 @@ g:hover .cv-edge-label-bg { fill:color-mix(in srgb,var(--accent) 12%,var(--panel
     box-shadow: 0 4px 20px rgba(0,0,0,0.4);
     cursor: pointer;
   }
+}
+
+/* ══ MOBILE TABLE FAN (MobileTableFan.svelte) ════════════════════════════════
+   Hero card + fan-drawer strip list. Mobile-only (≤640px).
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.mtf-root{display:none}
+@media(max-width:640px){
+  .mtf-root{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;background:var(--bg);position:relative}
+  /* Empty state */
+  .mtf-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--text-muted);font-size:13px;padding:32px 24px;text-align:center}
+  .mtf-empty i{font-size:28px;margin-bottom:4px}
+  .mtf-empty-hint{font-size:11px;color:var(--text-dim);margin-top:4px}
+  /* Hero */
+  .mtf-hero{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;padding:8px 12px 0;transition:padding-bottom 0.32s cubic-bezier(0.4,0,0.2,1)}
+  .mtf-hero--fan-open{padding-bottom:calc(var(--fan-h,0px) + 8px)}
+  /* Badge */
+  .mtf-badge{display:flex;justify-content:space-between;align-items:center;padding:0 2px 6px}
+  .mtf-badge-idx{font-size:10px;font-family:var(--font-mono);font-weight:700;color:var(--text-muted);letter-spacing:.08em}
+  .mtf-badge-type{font-size:9px;font-family:var(--font-mono);font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+  /* Card wrapper */
+  .mtf-cv4-wrap{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,.4)}
+  .mtf-cv4-wrap .fs-card{width:100%!important;max-width:100%!important;border-radius:12px}
+  /* Actions */
+  .mtf-card-actions{display:flex;gap:8px;padding:8px 0 6px;flex-shrink:0}
+  .mtf-action-btn{flex:1;font-size:12px;font-weight:700;padding:8px 0;border-radius:10px;border:1px solid var(--border-mid);background:var(--panel-raised);color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;min-height:40px;transition:background .12s,color .12s}
+  .mtf-action-reroll:hover,.mtf-action-reroll:active{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent);border-color:color-mix(in srgb,var(--accent) 30%,transparent)}
+  .mtf-action-delete:hover,.mtf-action-delete:active{background:color-mix(in srgb,var(--c-red,#c45a5a) 12%,transparent);color:var(--c-red,#c45a5a);border-color:color-mix(in srgb,var(--c-red,#c45a5a) 30%,transparent)}
+  /* Fan trigger */
+  .mtf-fan-trigger{width:100%;display:flex;align-items:center;gap:10px;padding:8px 14px;background:var(--glass-bg);backdrop-filter:var(--glass-blur-sm);-webkit-backdrop-filter:var(--glass-blur-sm);border:none;border-top:1px solid var(--border);cursor:pointer;flex-shrink:0;min-height:44px}
+  .mtf-fan-trigger-dots{display:flex;gap:4px;align-items:center;flex:1}
+  .mtf-dot{width:6px;height:6px;border-radius:3px;background:var(--border-mid);transition:width .18s,background .18s;flex-shrink:0}
+  .mtf-dot--active{width:14px}
+  .mtf-fan-trigger-label{font-size:11px;font-weight:700;color:var(--text-muted);white-space:nowrap;display:flex;align-items:center;gap:5px}
+  /* Fan list */
+  .mtf-fan-list{background:var(--bg);border-top:1px solid var(--border);overflow-y:auto;max-height:50vh;display:flex;flex-direction:column;gap:2px;padding:4px 0}
+  /* Fan strip */
+  .mtf-fan-strip{display:flex;align-items:center;gap:10px;padding:0 12px 0 0;height:54px;background:var(--panel-raised);border:none;cursor:pointer;text-align:left;width:100%;position:relative;overflow:hidden;animation:mtf-strip-in 0.22s cubic-bezier(0.4,0,0.2,1) both;animation-delay:var(--strip-delay,0ms);transition:background .1s}
+  .mtf-fan-list--reduced .mtf-fan-strip{animation:none}
+  .mtf-fan-strip:hover,.mtf-fan-strip:active{background:color-mix(in srgb,var(--strip-color) 10%,var(--panel-raised))}
+  @keyframes mtf-strip-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .mtf-strip-bar{width:3px;align-self:stretch;flex-shrink:0;border-radius:0 2px 2px 0}
+  .mtf-strip-icon{font-size:16px;width:22px;text-align:center;flex-shrink:0}
+  .mtf-strip-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+  .mtf-strip-title{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2}
+  .mtf-strip-type{font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;font-family:var(--font-mono)}
+  .mtf-strip-cue{font-size:12px;color:var(--text-dim);flex-shrink:0}
+  /* Add hint */
+  .mtf-fan-add-hint{font-size:11px;color:var(--text-dim);padding:10px 16px 12px;text-align:center;border-top:1px solid var(--border);margin-top:2px}
+  .mtf-fan-add-hint strong{color:var(--accent)}
 }
 
 /* ══ SPRINT 2 — 50/50 SPLIT LAYOUT (Generator | Table) ══════════════════════
@@ -4954,7 +5017,8 @@ g:hover .cv-edge-label-bg { fill:color-mix(in srgb,var(--accent) 12%,var(--panel
 .blp-icon i, .cmd-item-icon i, .sidebar-item-icon i,
 .land-world-icon i, .land-npc-world i, .board-ctx-icon i,
 .gen-fab-icon i, .bc-mini-icon i, .bc-type i,
-.bt-world-icon i, .bt-world-item-icon i, .bd-badge i { color: #fff; }
+.bt-world-icon i, .bt-world-item-icon i, .bd-badge i,
+.sb-acc-sec-ico i, .sb-dock-ico i { color: #fff; }
 [data-theme="light"] .blp-icon i, [data-theme="light"] .cmd-item-icon i,
 [data-theme="light"] .sidebar-item-icon i,
 [data-theme="light"] .land-world-icon i,
@@ -4962,7 +5026,10 @@ g:hover .cv-edge-label-bg { fill:color-mix(in srgb,var(--accent) 12%,var(--panel
 [data-theme="light"] .board-ctx-icon i,
 [data-theme="light"] .gen-fab-icon i, [data-theme="light"] .bc-mini-icon i,
 [data-theme="light"] .bc-type i, [data-theme="light"] .bt-world-icon i,
-[data-theme="light"] .bt-world-item-icon i, [data-theme="light"] .bd-badge i { color: #000; }
+[data-theme="light"] .bt-world-item-icon i, [data-theme="light"] .bd-badge i,
+[data-theme="light"] .sb-acc-sec-ico i, [data-theme="light"] .sb-dock-ico i { color: #000; }
+/* Restore accent on open sidebar sections (higher specificity overrides the white/black rule) */
+.sb-acc-hdr.is-open .sb-acc-sec-ico i { color: var(--accent); }
 
 /* ── Bits ScrollArea ────────────────────────────────────────────────────── */
 [data-bits-scroll-area-root] { overflow: hidden; position: relative; flex: 1; }
