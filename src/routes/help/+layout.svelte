@@ -229,6 +229,11 @@
     <a href="/" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
     <div class="topbar-spacer" style="flex:1"></div>
     <div class="topbar-status">
+      <button class="btn btn-icon btn-ghost mn-hamburger"
+        onclick={() => { navOpen = !navOpen; }}
+        aria-label={navOpen ? 'Close navigation' : 'Open navigation'}
+        aria-expanded={String(navOpen)}
+      >{navOpen ? '\u2715' : '\u2630'}</button>
       <a href="/help" class="btn btn-ghost topbar-nav-btn mn-desktop-only" style="font-size:13px;text-decoration:none"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Help</a>
       <a href="/about" class="btn btn-ghost topbar-nav-btn mn-desktop-only" style="font-size:13px;text-decoration:none">About</a>
       <button class="btn btn-icon btn-ghost" onclick={toggleTheme}
@@ -485,30 +490,6 @@
       {/if}
     </div>
   </div>
-
-  <!-- Mobile bottom nav — always visible on small screens for help navigation -->
-  <nav class="wiki-mobile-nav" aria-label="Help pages">
-    <a href="/help" class="wiki-mobile-nav-btn" class:active={isActive('/help')}>
-      <i class="fa-solid fa-house" aria-hidden="true"></i>
-      <span>Home</span>
-    </a>
-    <a href="/help/learn-fate" class="wiki-mobile-nav-btn" class:active={currentPath.startsWith('/help/learn-fate')}>
-      <i class="fa-solid fa-dice-d20" aria-hidden="true"></i>
-      <span>Learn</span>
-    </a>
-    <a href="/help/generators" class="wiki-mobile-nav-btn" class:active={isActive('/help/generators')}>
-      <i class="fa-solid fa-gears" aria-hidden="true"></i>
-      <span>Generators</span>
-    </a>
-    <a href="/help/fate-mechanics" class="wiki-mobile-nav-btn" class:active={isActive('/help/fate-mechanics')}>
-      <i class="fa-solid fa-book-open" aria-hidden="true"></i>
-      <span>Mechanics</span>
-    </a>
-    <button class="wiki-mobile-nav-btn" onclick={() => { navOpen = !navOpen; }} aria-label="All help topics">
-      <i class="fa-solid fa-bars" aria-hidden="true"></i>
-      <span>More</span>
-    </button>
-  </nav>
 
   <Footer />
 </div>

@@ -18,6 +18,7 @@
   import Complication from './fronts/Complication.svelte';
   import Pc          from './fronts/Pc.svelte';
   import Backstory   from './fronts/Backstory.svelte';
+  import Stunt       from './fronts/Stunt.svelte';
   import Obstacle    from './fronts/Obstacle.svelte';
   import Countdown   from './fronts/Countdown.svelte';
   import Constraint  from './fronts/Constraint.svelte';
@@ -28,7 +29,7 @@
     scene: Scene, campaign: Campaign, encounter: Encounter,
     seed: Seed, compel: Compel, challenge: Challenge,
     contest: Contest, consequence: Consequence, complication: Complication,
-    pc: Pc, backstory: Backstory, obstacle: Obstacle,
+    pc: Pc, backstory: Backstory, stunt: Stunt, obstacle: Obstacle,
     countdown: Countdown, constraint: Constraint, custom: Custom,
   };
 
@@ -48,6 +49,7 @@
     complication: { icon: 'fa-solid fa-triangle-exclamation', label: 'Complication' },
     pc:           { icon: 'fa-solid fa-star',              label: 'Player Character' },
     backstory:    { icon: 'fa-solid fa-book-open',         label: 'PC Backstory' },
+    stunt:        { icon: 'fa-solid fa-wand-magic-sparkles', label: 'Stunt' },
     obstacle:     { icon: 'fa-solid fa-shield-halved',     label: 'Obstacle' },
     countdown:    { icon: 'fa-solid fa-hourglass-half',    label: 'Countdown' },
     constraint:   { icon: 'fa-solid fa-lock',              label: 'Constraint' },

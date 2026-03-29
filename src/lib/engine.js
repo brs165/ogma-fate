@@ -745,6 +745,7 @@ function _generate(genId, t, partySize, opts) {
     case 'faction':      return generateFaction(t);
     case 'complication': return generateComplication(t);
     case 'backstory':    return generateBackstory(t);
+    case 'stunt':        return generateStunt(t);
     case 'obstacle':     return generateObstacle(t);
     case 'countdown':    return generateCountdown(t);
     case 'constraint':   return generateConstraint(t);
@@ -844,6 +845,18 @@ function generateBackstory(t) {
     relationship: relationship,
     hook: hook,
   };
+}
+
+/**
+ * Generate a stunt: picks a random stunt from campaign tables or the universal pool.
+ * @param {object} t - Filtered world tables.
+ * @returns {object} Stunt result object.
+ */
+function generateStunt(t) {
+  var pool = (t.stunts || []).concat(UNIVERSAL && UNIVERSAL.stunts ? UNIVERSAL.stunts : []);
+  if (!pool.length) return { name: 'Unnamed Stunt', skill: 'varies', desc: 'No stunts available in this campaign.', type: 'bonus', tags: [] };
+  var s = pick(pool);
+  return { name: s.name || '', skill: s.skill || 'varies', desc: s.desc || s.description || '', type: s.type || 'bonus', tags: s.tags || [] };
 }
 
 // ════════════════════════════════════════════════════════════════════════
@@ -1338,6 +1351,18 @@ export function toMarkdown(genId, data, campName) {
         d.hook,
         MD_FOOTER,
       ].join('\n\n');
+    }
+    case 'stunt': {
+      var d = data;
+      return [
+        '# Stunt: ' + d.name,
+        '> *' + campName + '*\n',
+        '**Skill:** ' + d.skill,
+        '**Type:** ' + (d.type || 'bonus'),
+        '\n' + d.desc,
+        d.tags && d.tags.length ? '\n**Tags:** ' + d.tags.join(', ') : '',
+        MD_FOOTER,
+      ].filter(function(l){return l!=='';}).join('\n');
     }
     case 'obstacle': {
       var d = data;
