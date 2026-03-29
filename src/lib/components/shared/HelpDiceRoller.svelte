@@ -95,7 +95,7 @@
   <div class="dr-top">
     <span class="dr-label">{displayLabel}</span>
     {#if mode === 'skill'}
-      <span class="dr-label">—</span>
+      <span class="dr-sep" aria-hidden="true">·</span>
       <span class="dr-skill-badge"><span class="dr-skill-val">{skillText}</span></span>
     {/if}
   </div>
