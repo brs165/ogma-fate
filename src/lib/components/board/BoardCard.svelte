@@ -3,7 +3,7 @@
   import Cv4Card from '../cards/Cv4Card.svelte';
   import { GENERATORS } from '../../engine.js';
 
-  let { card = {}, onDelete = null, onReroll = null, onSendToTable = null, onRemoveFromTable = null, onOpen = null, onDragStart = null, onUpdate = null, isOnTable = false, mode = 'prep', campId = '', onInvoke = null, onConnect = null, isConnectSource = false, stackCount = 0 } = $props();
+  let { card = {}, onDelete = null, onReroll = null, onOpen = null, onDragStart = null, onUpdate = null, campId = '', onInvoke = null, onConnect = null, isConnectSource = false, stackCount = 0 } = $props();
   const BOARD_TYPE_COLOR = {
     npc_minor:    {stripe:'#e8b83a', tc:'#b8860b', bg:'#fffbee'},
     npc_major:    {stripe:'#e8793a', tc:'#c4581a', bg:'#fff3ee'},
@@ -101,12 +101,6 @@
     <button class="bc-btn bc-btn-connect" class:connecting={isConnectSource}
       aria-label="Draw connection line to another card"
       onclick={(e) => { e.stopPropagation(); if (onConnect) onConnect && onConnect(card.id); }}>⤢</button>
-    <button class="bc-btn" aria-label="Pin to Table"
-      onclick={(e) => { e.stopPropagation(); (() => onSendToTable && onSendToTable(card))(e); }}>⊞</button>
-    {#if mode === 'prep'}
-      <button class="bc-btn" aria-label="Move to Table"
-        onclick={(e) => { e.stopPropagation(); (() => { if (onSendToTable) onSendToTable(card); if (onDelete) onDelete(card.id); })(e); }}>→</button>
-    {/if}
     <button class="bc-btn bc-btn-gm-only" class:active={gmOnly}
       
       aria-label="{gmOnly ? 'GM only — hidden from players' : 'Visible to players'}"
@@ -149,29 +143,7 @@
     {/if}
   </div>
 
-  <!-- Table strip (PREP mode only) -->
-  {#if mode === 'prep'}
-    <div class="bc-table-strip">
-      {#if isOnTable}
-        <span class="bc-on-table">● On table</span>
-        {#if onRemoveFromTable}
-          <button
-            class="bc-remove-table"
-            onclick={(e) => { e.stopPropagation(); onRemoveFromTable(card.id); }}
-            aria-label="Remove {card.title || 'card'} from table"
-          >✕</button>
-        {/if}
-      {:else}
-        <button
-          class="bc-send-table"
-          onclick={(e) => { e.stopPropagation(); if (onSendToTable) onSendToTable && onSendToTable(card); }}
-          aria-label="Put {card.title || 'card'} on table"
-        >→ Table</button>
-      {/if}
-    </div>
-  {/if}
-
-  {#if card.sourceCanvas === 'prep' && mode === 'prep'}
+  {#if card.sourceCanvas === 'prep'}
     <div class="bc-source-badge">PREP</div>
   {/if}
   {/if}
