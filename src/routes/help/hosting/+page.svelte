@@ -9,6 +9,18 @@
     <h1>Online multiplayer with Ogma</h1>
     <p class="wiki-page-desc">Ogma supports real-time remote play. The GM runs the session normally — generating cards, tracking stress, rolling dice — and players follow along on their own devices. No accounts, no installs, no subscription. Just a room code.</p>
 
+    <nav class="wiki-toc" aria-label="On this page">
+      <div class="wiki-toc-title">On this page</div>
+      <a href="#how-it-works">How it works</a>
+      <a href="#quick-start">Quick start</a>
+      <a href="#deploy-server">Deploy your own server</a>
+      <a href="#host-a-session">Hosting a session</a>
+      <a href="#join-a-session">Joining a session</a>
+      <a href="#player-controls">Player controls</a>
+      <a href="#custom-server">Custom sync server</a>
+      <a href="#troubleshooting">Troubleshooting</a>
+    </nav>
+
     <h2 id="how-it-works">How it works</h2>
     <p>Ogma uses a small relay server hosted on Cloudflare to pass state between browsers. The GM's browser is always the source of truth. The relay just forwards the GM's state to players and forwards player actions (FP changes, stress boxes) back to the GM.</p>
     <ul>
@@ -178,4 +190,19 @@ jobs:
 
     <h3>The room code expired</h3>
     <p>Room codes are only active while the GM has the Table canvas open and is connected. If you close the tab or click Stop, the room ends. Start a new session with a new code — card state is saved locally in your browser and reloads automatically when you reopen the Table canvas.</p>
+
+    <div class="wiki-footer">
+      <div>
+        <a href="/help">Help Home</a> &nbsp;·&nbsp;
+        <a href="/">Open Ogma</a> &nbsp;·&nbsp;
+        <a href="/about">About</a> &nbsp;·&nbsp;
+        <a href="/license">Full Attribution</a> &nbsp;·&nbsp;
+        <a href="https://fate-srd.com/" target="_blank" rel="noreferrer">fate-srd.com</a>
+      </div>
+      <div class="wiki-footer-meta">
+        Fate&#8482; is a trademark of Evil Hat Productions, LLC &nbsp;·&nbsp;
+        D&amp;D&#174; is a trademark of Wizards of the Coast LLC &nbsp;·&nbsp;
+        Released under <a href="/license">CC BY 3.0</a>
+      </div>
+    </div>
 </main>

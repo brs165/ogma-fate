@@ -20,6 +20,18 @@
   </ol>
 </details>
 
+<nav class="wiki-toc" aria-label="On this page">
+  <div class="wiki-toc-title">On this page</div>
+  <a href="#fate-point-tracker">Fate Point Tracker</a>
+  <a href="#inspiration-mode">Inspiration mode</a>
+  <a href="#quick-prep-pack-prep-packet">Quick Prep Pack</a>
+  <a href="#session-history">Session history</a>
+  <a href="#table-prep">Table Prep</a>
+  <a href="#campaign-guide">Campaign Guide</a>
+  <a href="#session-structure">Session structure</a>
+  <a href="#conflict-walkthrough">Conflict walkthrough</a>
+</nav>
+
 <h2 id="fate-point-tracker">Fate Point Tracker</h2>
 <p>Click the ◎ button in the action bar to open the FP Tracker. It has three tabs:</p>
 <ul>
@@ -33,7 +45,7 @@
   <p>You've rolled a Contest — two gangs racing to reach the weapons cache. As each exchange resolves, you tap the victory boxes on your screen. The left track (Crimson Scars) and right track (Iron Saints) fill up. On the third tie, the twist aspect — "The Cache is Already Open" — gets revealed. Export the final state as Ogma JSON so players can see it on their devices.</p>
 </div>
 
-<h2>Inspiration Mode</h2>
+<h2 id="inspiration-mode">Inspiration mode</h2>
 <p>Press <kbd>I</kbd> to enter Inspiration Mode. Ogma rolls three results simultaneously. They display as overlapping ghost cards. Click the one you want to use — the others fade out. If none work, press <kbd>I</kbd> again for three more. Useful when a single roll isn't sparking anything creative.</p>
 
 <h2 id="quick-prep-pack-prep-packet">Quick Prep Pack prep packet</h2>
@@ -45,7 +57,7 @@
 </ul>
 <p>These three cards together are a Session 1 prep packet — enough to run 2–3 hours of play with no other prep. Click "Keep all" to save all three to your session at once.</p>
 
-<h2>History and your session</h2>
+<h2 id="session-history">Session history</h2>
 <p>Every roll goes into a history ring (last 8 results). Kept cards persist until you remove them. Open History with the 📋 button in the action bar or press the keyboard shortcut.</p>
 <p>From History you can:</p>
 <ul>
@@ -70,7 +82,7 @@
   <p>Saved Prep stores everything in your browser's IndexedDB. It works fully offline. JSON files are the way to move sessions between devices or share with other GMs.</p>
 </div>
 
-<h2>Campaign Guide pages</h2>
+<h2 id="campaign-guide">Campaign Guide pages</h2>
 <p>Each campaign world has a dedicated Guide page (accessible from the sidebar under Navigate → Campaign Guide). These pages contain:</p>
 <ul>
   <li>World tone and atmosphere</li>
@@ -80,7 +92,7 @@
 </ul>
 <p>Guide pages are printable — use Ctrl+P to print a reference sheet for your players.</p>
 
-    <hr style="border:none;border-top:1px solid var(--border);margin:32px 0">
+    <hr class="wiki-divider">
 
     <h2 id="session-structure">What a Fate session looks like</h2>
     <p>A Fate session has no fixed structure — but most sessions follow a natural rhythm:</p>
@@ -139,7 +151,7 @@
     <!-- FARI_PARKED_2026.03.154 fari.app link --> &nbsp;·&nbsp;
     <a href="https://fate-srd.com/" target="_blank" rel="noreferrer">fate-srd.com</a>
   </div>
-  <div style="font-size:var(--text-label);color:var(--text-muted)">
+  <div class="wiki-footer-meta">
     Fate&#8482; is a trademark of Evil Hat Productions, LLC &nbsp;·&nbsp;
     D&amp;D&#174; is a trademark of Wizards of the Coast LLC &nbsp;·&nbsp;
     Released under <a href="/license">CC BY 3.0</a>

@@ -92,7 +92,7 @@
     <!-- FARI_PARKED_2026.03.154 fari.app link --> &nbsp;·&nbsp;
     <a href="https://fate-srd.com/" target="_blank" rel="noreferrer">fate-srd.com</a>
   </div>
-  <div style="font-size:var(--text-label);color:var(--text-muted)">
+  <div class="wiki-footer-meta">
     Fate&#8482; is a trademark of Evil Hat Productions, LLC &nbsp;·&nbsp;
     D&amp;D&#174; is a trademark of Wizards of the Coast LLC &nbsp;·&nbsp;
     Released under <a href="/license">CC BY 3.0</a>

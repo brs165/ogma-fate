@@ -80,6 +80,10 @@
         <p>Your character has 5 aspects: a <strong>High Concept</strong> (who you are), a <strong>Trouble</strong> (what makes your life complicated), a <strong>Relationship</strong> (your connection to another PC), and two more. <a href="https://fate-srd.com/fate-condensed/aspects-and-fate-points" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
         <div class="callout callout-dnd" role="note"><div class="callout-title">⚔ Coming from D&amp;D</div><p>Aspects replace ability scores, feats, and background features in one mechanic. "Strong as an Ox" is not a Strength score — it's a narrative truth you can invoke for +2 on any roll where being strong matters, and get compelled when being big is a problem.</p></div>
         <div class="callout callout-tip" role="note"><div class="callout-title">✍ Writing good aspects</div><p>Test every aspect in both directions before writing it down. Can you imagine a moment where invoking it for +2 makes narrative sense? Can you imagine a moment where it causes you a problem worth a fate point? If not — rewrite it. "Skilled Fighter" only works one way. "Fights Before Thinking" works both.</p></div>
+        <div class="callout callout-info" role="note">
+          <div class="callout-title"><i class="fa-solid fa-crosshairs" aria-hidden="true"></i> Invoking aspects you don't own</div>
+          <p>You can invoke <em>any</em> aspect that's currently true in the scene — not just your own. An enemy's consequence (<em>"Badly Burned Hands"</em>), a situation aspect (<em>"Smoke-Filled Corridor"</em>), a boost your teammate just created — all fair game. Spend 1 FP and explain the narrative relevance. The aspect's owner doesn't matter; its <strong>fictional truth</strong> does. This is also how you punish over-extended enemies: the GM can invoke a PC's trouble against them, and players can invoke NPC aspects right back.</p>
+        </div>
         <div class="callout callout-scenario" role="note">
           <div class="callout-title">Try an invoke — roll twice, pick the better result</div>
           <p>Pick an aspect like <em>"Stronger Than I Look."</em> Roll 4dF. That's your base. Now roll again with <strong>+2</strong> (the invoke bonus) — that's your roll after spending a fate point. Feel the difference.</p>
@@ -94,7 +98,15 @@
     <details class="step-block" id="step-3" open>
       <summary class="step-summary"><span class="step-num">3</span> Skills and dice</summary>
       <div class="step-body">
-        <p>Your character has 19 skills rated from +0 (Mediocre) to +4 (Great). When you act, you roll 4 Fate dice (each shows +1, 0, or −1), add the relevant skill, and compare to a target number. Results: <strong>Fail</strong> (below target), <strong>Tie</strong> (equal), <strong>Success</strong> (+1 or +2 over), <strong>Success with Style</strong> (+3 or more).</p>
+        <p>Your character has <strong>18 skills</strong> rated from +0 (Mediocre) to +4 (Great), arranged in a pyramid — 1 peak skill, 2 at the next tier, 3 below that, 4 at Average, and everything else defaults to +0. When you act, roll 4 Fate dice (each shows +1, 0, or −1), add the relevant skill, and compare to a target number. Results: <strong>Fail</strong> (below target), <strong>Tie</strong> (equal — succeeds with a complication), <strong>Success</strong> (+1 or +2 over), <strong>Success with Style</strong> (+3 or more).</p>
+        <div class="lf-skill-pyramid" aria-label="FCon skill pyramid">
+          <div class="lf-sp-tier"><span class="lf-sp-rating">Great (+4)</span><span class="lf-sp-slots">× 1</span></div>
+          <div class="lf-sp-tier"><span class="lf-sp-rating">Good (+3)</span><span class="lf-sp-slots">× 2</span></div>
+          <div class="lf-sp-tier"><span class="lf-sp-rating">Fair (+2)</span><span class="lf-sp-slots">× 3</span></div>
+          <div class="lf-sp-tier"><span class="lf-sp-rating">Average (+1)</span><span class="lf-sp-slots">× 4</span></div>
+          <div class="lf-sp-all">All others: Mediocre (+0)</div>
+          <div class="lf-sp-list">Athletics · Burglary · Contacts · Crafts · Deceive · Drive · Empathy · Fight · Investigate · Lore · Notice · Physique · Provoke · Rapport · Resources · Shoot · Stealth · Will</div>
+        </div>
         <p>Every roll uses one of four actions. Choose the one that fits what your character is doing. <a href="https://fate-srd.com/fate-condensed/taking-action-rolling-the-dice" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
         <div class="lf-actions-grid" role="list" aria-label="The four Fate actions">
           <div class="lf-action lf-action-overcome" role="listitem">
@@ -146,6 +158,16 @@
             </div>
           </div>
         </div>
+        <div class="callout callout-warning" role="note">
+          <div class="callout-title"><i class="fa-solid fa-ban" aria-hidden="true"></i> When NOT to roll</div>
+          <p>Ask three questions before picking up the dice. If <em>any</em> answer is <strong>no</strong>, skip the roll and narrate the outcome.</p>
+          <ol>
+            <li><strong>Is the outcome uncertain?</strong> A master locksmith opening a basic lock isn't uncertain — it's automatic.</li>
+            <li><strong>Would failure be interesting?</strong> Failure should push the story forward, not stall it. If failing just means "try again next round," don't roll.</li>
+            <li><strong>Does the outcome matter right now?</strong> Stakes must be active in this scene. Rolling for things that have no consequences wastes the dice.</li>
+          </ol>
+          <p>Rolling for everything devalues the dice. <a href="https://fate-srd.com/fate-condensed/taking-action-rolling-the-dice" target="_blank" rel="noreferrer" class="srd-link">FCon SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
+        </div>
         <div class="callout callout-info" role="note">
           <div class="callout-title"><i class="fa-solid fa-bolt" aria-hidden="true"></i> What is a boost?</div>
           <p>A <strong>boost</strong> is a fleeting aspect with exactly <strong>one free invoke</strong>. You earn it from Success with Style on most actions, or a Tie on Attack. Name it immediately — <em>"Off Balance,"</em> <em>"Momentary Opening,"</em> <em>"Blinded by Debris."</em> Use the free invoke on your next roll (or pass it to an ally this exchange). Once used, or when the scene ends, the boost disappears. It costs no Fate Point to create and none to use — it's pure momentum reward for exceptional rolling.</p>
@@ -179,9 +201,17 @@
       <summary class="step-summary"><span class="step-num">5</span> Stress and consequences</summary>
       <div class="step-body">
         <p>When you take a hit, you absorb it with <strong>stress boxes</strong> (1 shift each, 3 per track by default — you can mark <em>as many as you need</em> per hit) or <strong>consequences</strong> (named aspects: Mild absorbs 2 shifts, Moderate absorbs 4, Severe absorbs 6). Stress clears at end of every scene. If you can't absorb all the shifts, you're <strong>taken out</strong> — the attacker narrates what happens. You can also <strong>concede before your opponent rolls</strong> — you leave the scene on your terms and earn fate points. Once dice hit the table, the window to concede has passed (<a href="https://fate-srd.com/fate-condensed/challenges-conflicts-and-contests" target="_blank" rel="noreferrer" class="srd-link">FCon SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>).</p>
-        <p>Stress clears at the end of every scene. Consequences persist: Mild clears after a scene (with treatment), Moderate after a session, Severe after a breakthrough. <a href="https://fate-srd.com/fate-condensed/challenges-conflicts-and-contests" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
-        <div class="callout callout-dnd" role="note"><div class="callout-title">⚔ Coming from D&amp;D</div><p>There are no hit points. Stress is plot armour — it goes away after every scene. Consequences are the real damage, and they're aspects that can be invoked and compelled. "Badly Burned Hands" affects you in every scene until it heals.</p></div>
-        <div class="callout callout-warning" role="note"><div class="callout-title">⚠ Common mistake — consequence recovery</div><p>Consequences don't heal automatically. They require a treatment roll first (Overcome against the consequence's difficulty), <em>then</em> the timer starts. Mild: Fair +2 difficulty, clears end of next scene. Moderate: Great +4, clears end of session. Severe: Fantastic +6, clears end of breakthrough. <a href="https://fate-srd.com/fate-condensed/challenges-conflicts-and-contests" target="_blank" rel="noreferrer" class="srd-link">FCon SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p></div>
+        <div class="callout callout-dnd" role="note"><div class="callout-title">⚔ Coming from D&amp;D</div><p>There are no hit points. Stress is plot armour — it goes away after every scene. Consequences are the real lasting damage, and they're aspects that can be invoked and compelled. "Badly Burned Hands" affects you every scene until healed.</p></div>
+        <div class="callout callout-info" role="note">
+          <div class="callout-title"><i class="fa-solid fa-heart-pulse" aria-hidden="true"></i> Consequence recovery — the exact steps</div>
+          <ol>
+            <li><strong>Take the consequence</strong> — write a named aspect on your sheet (<em>"Badly Burned Hands"</em>). It absorbs: Mild = 2 shifts · Moderate = 4 shifts · Severe = 6 shifts.</li>
+            <li><strong>Get treated</strong> — someone makes an Overcome roll against the consequence's difficulty: Mild Fair (+2) · Moderate Great (+4) · Severe Fantastic (+6). Must succeed before recovery starts.</li>
+            <li><strong>Timer starts after treatment</strong> — Mild: clears at the end of the <em>next scene</em> · Moderate: clears at the end of the <em>next session</em> · Severe: clears after a <em>breakthrough</em>.</li>
+            <li><strong>Until cleared</strong> — the consequence is a live aspect. The GM can invoke it against you; you can compel it for fate points. Untreated consequences never clear on their own.</li>
+          </ol>
+          <p><a href="https://fate-srd.com/fate-condensed/challenges-conflicts-and-contests" target="_blank" rel="noreferrer" class="srd-link">FCon SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
+        </div>
         <div class="callout callout-scenario" role="note">
           <div class="callout-title">Try an attack roll — see how many shifts hit</div>
           <p>An enemy has Fight +2. You defend with Athletics +1. Roll both — the difference is the shifts. Under 3 shifts: tick stress boxes. 3–5: take a consequence. 6+: you're in trouble.</p>
@@ -197,7 +227,25 @@
       <summary class="step-summary"><span class="step-num">6</span> Stunts and advancement</summary>
       <div class="step-body">
         <p><strong>Stunts</strong> give your character a special edge: +2 to a specific skill in a specific situation, or a once-per-scene special ability. You start with 3 free; each extra costs 1 Refresh (minimum Refresh 1).</p>
-        <p>Characters grow through <strong>milestones</strong> (end of session: swap skills, rewrite aspects or stunts) and <strong>breakthroughs</strong> (end of story arc: increase a skill, rewrite your high concept, begin consequence recovery). No XP. No levels. <a href="https://fate-srd.com/fate-condensed/getting-started" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
+        <p>Characters grow through two advancement types — no XP, no levels. Every session ends with a <strong>Milestone</strong>. Story arcs end with a <strong>Breakthrough</strong>. <a href="https://fate-srd.com/fate-condensed/advancement" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
+        <div class="wiki-table-wrap">
+        <table class="wiki-table">
+          <thead><tr><th scope="col">Type</th><th scope="col">When</th><th scope="col">What you can do — choose one per option</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Milestone</strong></td>
+              <td>End of every session</td>
+              <td>Swap two skill ratings · rename one aspect · swap one stunt for another · begin recovering a Mild consequence (if untreated)</td>
+            </tr>
+            <tr>
+              <td><strong>Breakthrough</strong></td>
+              <td>End of a story arc</td>
+              <td>All Milestone options, plus: add +1 to a skill column · add a new stunt (costs 1 Refresh) · rewrite your High Concept · begin recovering a Severe consequence</td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+        <div class="callout callout-info" role="note"><div class="callout-title"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> Characters change sideways, not just up</div><p>Fate advancement is mostly <strong>lateral</strong> — you swap and reshape rather than pile up power. A character after five sessions looks different, not just stronger. This keeps the game from the power-creep spiral that breaks D&D campaigns at high level. The question at each Milestone is: <em>what did this session teach my character?</em></p></div>
         <div class="callout callout-dnd" role="note"><div class="callout-title">⚔ Coming from D&amp;D</div><p>Stunts replace feats but are narrower and cheaper. Milestones replace levelling up but happen every session. Characters change laterally (different) more than vertically (stronger).</p></div>
         <div class="callout callout-info" role="note"><div class="callout-title">📋 Stunt format — two valid patterns</div><p><strong>Pattern 1 (most common):</strong> "+2 to [Skill] when [specific condition]." The condition must be narrow enough that it doesn't apply every roll. <strong>Pattern 2:</strong> "Once per scene, [special effect] when [trigger]." No fate point cost. Stunts should never charge a fate point — that's compels. <a href="https://fate-srd.com/fate-condensed/getting-started" target="_blank" rel="noreferrer" class="srd-link">FCon SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p></div>
         <div class="callout callout-scenario" role="note">
@@ -228,9 +276,51 @@
     <details class="step-block" id="step-7" open>
       <summary class="step-summary"><span class="step-num">7</span> Running the game <span class="step-tag">For the GM</span></summary>
       <div class="step-body">
-        <p>As a GM, your main tools are: <strong>compels</strong> (offer fate points to create complications), <strong>scene aspects</strong> (set the stage with invokable/compellable truths), <strong>NPCs</strong> (minor = 1-2 aspects, no consequences; major = full character sheet), and the <strong>GM fate point pool</strong> (1 per PC, shared across all NPCs).</p>
-        <p>Set difficulty using the adjective ladder: Fair (+2) for routine, Good (+3) for challenging, Great (+4) for hard. Use <strong>challenges</strong> for multi-skill problems, <strong>contests</strong> for opposed races, and <strong>conflicts</strong> when both sides can hurt each other.</p>
-        <p>The golden rule: <strong>failure is never boring.</strong> On a failed roll, the situation changes — it doesn't stall. "Success at a cost" is your best friend: they get what they want, but something else goes wrong. <a href="https://fate-srd.com/fate-condensed/being-the-game-master" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
+        <p>As a GM, your main tools are: <strong>compels</strong> (offer fate points to create complications), <strong>scene aspects</strong> (set the stage with invokable/compellable truths), <strong>NPCs</strong> (minor = 1–2 aspects, no consequences; major = full character sheet), and the <strong>GM fate point pool</strong>. <a href="https://fate-srd.com/fate-condensed/being-the-game-master" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
+
+        <div class="callout callout-info" role="note">
+          <div class="callout-title"><i class="fa-solid fa-coins" aria-hidden="true"></i> The GM fate point pool</div>
+          <p>The GM starts <strong>each scene</strong> with <strong>1 fate point per PC</strong> — shared across all NPCs in that scene. A party of 4 = 4 GM fate points per scene. The pool <strong>resets at the start of every scene</strong> — unspent points don't carry over. Use these for NPC invokes. When a player refuses a compel (spending 1 FP), you pocket that point into your pool. This is your only source of mid-scene income beyond refusing.</p>
+        </div>
+
+        <div class="callout callout-tip" role="note">
+          <div class="callout-title"><i class="fa-solid fa-film" aria-hidden="true"></i> Scene framing</div>
+          <p>Start every scene with the action already in motion — not "you arrive at the warehouse" but "you're inside, and the crates are moving." Establish three things: (1) <strong>what's at stake</strong>, (2) <strong>what aspects are true</strong> (situation aspects), (3) <strong>what happens if the PCs don't act</strong>. End the scene the moment the dramatic question is answered. Don't linger. Cut immediately to the next scene.</p>
+        </div>
+
+        <p><strong>Setting difficulty:</strong> Use the Fate Ladder as a guide. When in doubt, Fair (+2) is the baseline — a competent character should succeed more often than not. Raise it when failure is genuinely interesting; don't raise it to make the game harder.</p>
+        <div class="wiki-table-wrap">
+        <table class="wiki-table">
+          <thead><tr><th scope="col">Difficulty</th><th scope="col">Rating</th><th scope="col">Use when…</th></tr></thead>
+          <tbody>
+            <tr><td>Mediocre</td><td>+0</td><td>Any trained person auto-succeeds — roll only if you want narrative drama</td></tr>
+            <tr><td>Average</td><td>+1</td><td>Minor obstacle; specialists barely notice it</td></tr>
+            <tr><td>Fair</td><td>+2</td><td>Routine challenge; a competent character succeeds more often than not</td></tr>
+            <tr><td>Good</td><td>+3</td><td>Genuinely hard; even skilled characters might fail</td></tr>
+            <tr><td>Great</td><td>+4</td><td>Requires specialisation or free invokes; reserve for important moments</td></tr>
+            <tr><td>Superb (+5) or higher</td><td>+5+</td><td>Exceptional feats; climactic moments only — very rare</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <p><strong>Choosing the right structure:</strong> Before reaching for conflict, ask whether challenge or contest fits better.</p>
+        <div class="wiki-table-wrap">
+        <table class="wiki-table">
+          <thead><tr><th scope="col">Structure</th><th scope="col">Use when…</th><th scope="col">How it works</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Challenge</strong></td><td>Group faces multiple obstacles in sequence; no direct opponent</td><td>Series of Overcome rolls vs. set difficulties; partial success accepted</td></tr>
+            <tr><td><strong>Contest</strong></td><td>Two sides race for a goal without trying to harm each other</td><td>Both sides roll each exchange; higher effort wins a point. First to 3 points wins</td></tr>
+            <tr><td><strong>Conflict</strong></td><td>Both sides intend to harm or forcibly remove the other</td><td>Attack vs. Defend each exchange; shifts = stress; ends when one side is taken out or concedes</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <div class="callout callout-info" role="note">
+          <div class="callout-title"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> Conflict turn order</div>
+          <p>FCon determines turn order by who noticed the conflict first, or dramatically. Each exchange, every character acts once in that order. Many tables use <strong>Popcorn Initiative</strong>: after acting, you choose who goes next (any character not yet acted this exchange). This keeps everyone engaged and rewards tactical coordination. It's not in the FCon rules explicitly, but it fits the fiction-first philosophy perfectly.</p>
+        </div>
+
+        <p>The golden rule: <strong>failure is never boring.</strong> On a failed roll, the situation changes — it doesn't stall. On a Tie, the player succeeds but something complicates it. "Success at a cost" on a failure is an option too: offer the player what they want, with a consequence attached. <a href="https://fate-srd.com/fate-condensed/being-the-game-master" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
         <div class="callout callout-tip" role="note"><div class="callout-title">🎲 GM tip — failure moves the story</div><p>Never let a failed roll mean "nothing happens." On a failure, the situation changes — the character doesn't get what they wanted AND something new enters the fiction. A failed Stealth roll doesn't just mean the guard heard them; it means the guard is now between them and the exit, with backup on the way. <em>FCon SRD p.20: "Fail forward."</em></p></div>
         <div class="callout callout-tip" role="note"><div class="callout-title">🎲 For the GM</div><p>Ogma's generators create all of this for you: NPCs with aspects and skills, scenes with zones and situation aspects, encounters with opposition and stake conditions, and more. The <strong>How</strong> tab below every result gives you running tips specific to that generator.</p></div>
         <div class="callout callout-scenario" role="note">
@@ -251,6 +341,21 @@
       <p><strong>Ready for more?</strong> <a href="/help/learn-fate-deep"><strong>Learn Fate — Deep Dive</strong></a> has an interactive tutorial scene, a full play-by-post walkthrough, a strategy guide covering Create Advantage and the FP economy, and a first session checklist.</p>
       <p>The community's #1 recommended resource for truly understanding Fate: <a href="https://bookofhanz.com/" target="_blank" rel="noreferrer"><strong>The Book of Hanz</strong></a> — Robert Hanz's essays on Fate philosophy. Free to read. Start with "Fate Doesn't Have a Damage System."</p>
       <p>For the full mechanics reference: <a href="/help/fate-mechanics"><strong>Fate Mechanics &rarr;</strong></a> · For a conflict walkthrough: <a href="/help/at-the-table#conflict-walkthrough"><strong>At the Table &rarr;</strong></a></p>
+    </div>
+
+    <div class="wiki-footer">
+      <div>
+        <a href="/help">Help Home</a> &nbsp;·&nbsp;
+        <a href="/">Open Ogma</a> &nbsp;·&nbsp;
+        <a href="/about">About</a> &nbsp;·&nbsp;
+        <a href="/license">Full Attribution</a> &nbsp;·&nbsp;
+        <a href="https://fate-srd.com/" target="_blank" rel="noreferrer">fate-srd.com</a>
+      </div>
+      <div class="wiki-footer-meta">
+        Fate&#8482; is a trademark of Evil Hat Productions, LLC &nbsp;·&nbsp;
+        D&amp;D&#174; is a trademark of Wizards of the Coast LLC &nbsp;·&nbsp;
+        Released under <a href="/license">CC BY 3.0</a>
+      </div>
     </div>
 
 </main>

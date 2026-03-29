@@ -28,6 +28,7 @@
       { id: 'fate-points-and-refresh', label: 'Fate Points & Refresh' },
       { id: 'stunts', label: 'Stunts' },
       { id: 'contests', label: 'Contests' },
+      { id: 'initiative', label: 'Turn order' },
       { id: 'challenges', label: 'Challenges' },
       { id: 'zones', label: 'Zones' },
       { id: 'countdowns', label: 'Countdowns' },
@@ -290,7 +291,7 @@
               <a class="wiki-sidebar-child" class:active={activeSection === sec.id && currentPath === '/help/learn-fate'}
                 href="/help/learn-fate#{sec.id}" onclick={closeNavOnClick}>{sec.label}</a>
             {/each}
-            <a class="wiki-sidebar-child" href="/help/learn-fate-deep" style="font-weight:600;color:var(--accent)" onclick={closeNavOnClick}><i class="fa-solid fa-graduation-cap" aria-hidden="true" style="font-size:10px"></i> Deep Dive</a>
+            <a class="wiki-sidebar-child wiki-sidebar-child--featured" href="/help/learn-fate-deep" onclick={closeNavOnClick}><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> Deep Dive</a>
           </nav>
         {/if}
 

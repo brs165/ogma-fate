@@ -5,7 +5,7 @@
 
 <main class="wiki-content" id="main-content">
 
-    <div class="wiki-page-eyebrow">Ogma Help</div>
+    <div class="wiki-page-eyebrow">Overview</div>
     <h1>Everything you need to master Ogma</h1>
     <p class="wiki-page-desc">Ogma is a <strong>local-first, offline-ready generator suite</strong> for Fate Condensed. This wiki covers every feature — from your first roll to session export.</p>
 
@@ -64,7 +64,7 @@
       </a>
     </div>
 
-    <details class="learn-quickstart" style="margin-top:4px">
+    <details class="learn-quickstart learn-quickstart--compact">
       <summary class="learn-quickstart-toggle">Fate Condensed glossary — quick definitions</summary>
       <dl class="gloss-grid">
         <div class="gloss-item"><dt class="gloss-term">Aspect</dt><dd class="gloss-def">A phrase that is narratively true. Invoke by spending 1 FP for +2 on a roll; get compelled for a complication and earn 1 FP.</dd></div>
@@ -103,4 +103,19 @@
     <h2>About Ogma</h2>
     <p>Ogma — <strong>O</strong>n-demand <strong>G</strong>enerator for <strong>M</strong>asterful <strong>A</strong>dventures — is an independent fan project built on the <a href="https://fate-srd.com" target="_blank" rel="noreferrer">Fate Condensed SRD</a> (CC BY 3.0). It runs entirely in your browser with no server, no account, and no internet connection required after the first load.</p>
     <p><strong>8 campaign worlds.</strong> <strong>16 generators.</strong> <strong>128 generator/campaign combinations.</strong> <strong>9,900+ table entries.</strong></p>
+
+    <div class="wiki-footer">
+      <div>
+        <a href="/help">Help Home</a> &nbsp;·&nbsp;
+        <a href="/">Open Ogma</a> &nbsp;·&nbsp;
+        <a href="/about">About</a> &nbsp;·&nbsp;
+        <a href="/license">Full Attribution</a> &nbsp;·&nbsp;
+        <a href="https://fate-srd.com/" target="_blank" rel="noreferrer">fate-srd.com</a>
+      </div>
+      <div class="wiki-footer-meta">
+        Fate&#8482; is a trademark of Evil Hat Productions, LLC &nbsp;·&nbsp;
+        D&amp;D&#174; is a trademark of Wizards of the Coast LLC &nbsp;·&nbsp;
+        Released under <a href="/license">CC BY 3.0</a>
+      </div>
+    </div>
 </main>
