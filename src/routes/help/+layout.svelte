@@ -21,6 +21,7 @@
     ],
     '/help/fate-mechanics': [
       { id: 'aspects', label: 'Aspects' },
+      { id: 'boosts', label: 'Boosts' },
       { id: 'the-skill-ladder', label: 'The Skill Ladder' },
       { id: 'stress', label: 'Stress' },
       { id: 'consequences', label: 'Consequences' },
@@ -28,6 +29,7 @@
       { id: 'stunts', label: 'Stunts' },
       { id: 'contests', label: 'Contests' },
       { id: 'challenges', label: 'Challenges' },
+      { id: 'zones', label: 'Zones' },
       { id: 'countdowns', label: 'Countdowns' },
       { id: 'compels', label: 'Compels' },
       { id: 'create-advantage', label: 'Create an Advantage' },
