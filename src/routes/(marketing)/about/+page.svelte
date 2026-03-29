@@ -81,7 +81,7 @@
           </div>
           <div class="about-prompt-role">
             <div class="about-prompt-role-name">Senior Dev + CSS Engineer</div>
-            <div class="about-prompt-role-text">You are a senior Svelte 5 developer and CSS engineer working on a SvelteKit + Vite project in full runes mode. Use $state, $derived, $props, $effect &mdash; never legacy export let or on:event syntax. All styling goes to static/assets/css/theme.css only; no &lt;style&gt; blocks. Implement UI features for the native pointer/wheel canvas, interactive card renderers, and the design system using bits-ui primitives. Preserve WCAG 2.1 AA on every change.</div>
+            <div class="about-prompt-role-text">You are a senior Svelte 5 developer and CSS engineer working on a SvelteKit + Vite project in full runes mode. Use $state, $derived, $props, $effect &mdash; never legacy prop syntax or on:event syntax. All styling goes to static/assets/css/theme.css only; no &lt;style&gt; blocks. Implement UI features for the native pointer/wheel canvas, interactive card renderers, and the design system using bits-ui primitives. Preserve WCAG 2.1 AA on every change.</div>
           </div>
           <div class="about-prompt-role">
             <div class="about-prompt-role-name">UX Researcher + IA Specialist</div>
