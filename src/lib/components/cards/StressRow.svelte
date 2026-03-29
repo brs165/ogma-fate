@@ -28,9 +28,7 @@
         aria-label="{label} stress box {i + 1}{v ? ' (marked)' : ' (clear)'}"
         style="border-color:{color}; background:{v ? color : 'transparent'}; color:{v ? '#fff' : color};"
       >
-        <Checkbox.Indicator>
-          {#if v}<i class="fa-solid fa-xmark" aria-hidden="true"></i>{/if}
-        </Checkbox.Indicator>
+        {#if v}<i class="fa-solid fa-xmark" aria-hidden="true"></i>{/if}
       </Checkbox.Root>
     {/each}
   </div>

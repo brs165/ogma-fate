@@ -178,7 +178,7 @@
         aria-label="Session Zero progress"
         style="margin-bottom:20px"
       >
-        <Progress.Indicator style="width:{(step / (STEPS.length - 1)) * 100}%" />
+        <div style="height:100%; width:{(step / (STEPS.length - 1)) * 100}%; background:var(--accent); border-radius:inherit" />
       </Progress.Root>
 
       <!-- ── STEP 1: Choose World ──────────────────────────────────── -->

@@ -69,9 +69,7 @@
             aria-label="Stress box {i+1}{hit ? ' (hit)' : ' (clear)'}"
             style="border-color:var(--fs-stress-phy); background:{hit ? 'var(--fs-stress-phy)' : 'transparent'}; color:{hit ? '#fff' : 'var(--fs-stress-phy)'};"
           >
-            <Checkbox.Indicator>
-              {#if hit}<i class="fa-solid fa-xmark" aria-hidden="true"></i>{/if}
-            </Checkbox.Indicator>
+            {#if hit}<i class="fa-solid fa-xmark" aria-hidden="true"></i>{/if}
           </Checkbox.Root>
         {/each}
       </div>

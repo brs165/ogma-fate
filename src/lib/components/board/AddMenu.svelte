@@ -24,7 +24,7 @@
   </DropdownMenu.Trigger>
   <DropdownMenu.Portal>
     <DropdownMenu.Content class="add-dd-content" side="top" sideOffset={6} align="end">
-      <DropdownMenu.Label class="export-dd-label">Generate</DropdownMenu.Label>
+      <DropdownMenu.GroupHeading class="export-dd-label">Generate</DropdownMenu.GroupHeading>
       <DropdownMenu.Separator class="export-dd-sep" />
       {#each GEN_ITEMS as g (g.id)}
         <DropdownMenu.Item
@@ -43,7 +43,7 @@
       {/each}
       {#if templates.length > 0}
         <DropdownMenu.Separator class="export-dd-sep" />
-        <DropdownMenu.Label class="export-dd-label">Templates</DropdownMenu.Label>
+        <DropdownMenu.GroupHeading class="export-dd-label">Templates</DropdownMenu.GroupHeading>
         <DropdownMenu.Separator class="export-dd-sep" />
         {#each templates as t (t.id)}
           <DropdownMenu.Item
