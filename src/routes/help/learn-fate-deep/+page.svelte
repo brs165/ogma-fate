@@ -11,16 +11,16 @@
 
 <main class="wiki-content" id="main-content">
   <div class="wiki-breadcrumb"><a href="/help">Help</a> <span class="sep">/</span> <a href="/help/learn-fate">Learn Fate</a> <span class="sep">/</span> Deep Dive</div>
-  <div class="wiki-page-eyebrow">Learn</div>
+  <div class="wiki-page-eyebrow">Deep Dive</div>
   <h1>Learn Fate — Deep Dive</h1>
   <p class="wiki-page-desc">You know the 7 steps. Now learn how they feel at the table — through a guided scene, a full walkthrough, a strategy primer, and a session-one checklist.</p>
 
   <nav class="wiki-section" aria-label="Page sections" style="margin-bottom:32px">
     <div class="wiki-card-grid">
-      <a href="#tutorial"><span style="font-size:18px"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i></span><strong>Interactive Tutorial</strong><span class="wiki-card-sub">Guided scene: describe, roll, interpret</span></a>
-      <a href="#walkthrough"><span style="font-size:18px"><i class="fa-solid fa-book-open" aria-hidden="true"></i></span><strong>Play-by-Post</strong><span class="wiki-card-sub">A full scene played out beat by beat</span></a>
-      <a href="#strategy"><span style="font-size:18px"><i class="fa-solid fa-chess" aria-hidden="true"></i></span><strong>Strategy Guide</strong><span class="wiki-card-sub">Create Advantage, FP economy, conceding</span></a>
-      <a href="#checklist"><span style="font-size:18px"><i class="fa-solid fa-list-check" aria-hidden="true"></i></span><strong>First Session</strong><span class="wiki-card-sub">What to prep, what to skip, how to pace</span></a>
+      <a href="#tutorial"><span class="card-icon"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i></span><strong>Interactive Tutorial</strong><span class="wiki-card-sub">Guided scene: describe, roll, interpret</span></a>
+      <a href="#walkthrough"><span class="card-icon"><i class="fa-solid fa-book-open" aria-hidden="true"></i></span><strong>Play-by-Post</strong><span class="wiki-card-sub">A full scene played out beat by beat</span></a>
+      <a href="#strategy"><span class="card-icon"><i class="fa-solid fa-chess" aria-hidden="true"></i></span><strong>Strategy Guide</strong><span class="wiki-card-sub">Create Advantage, FP economy, conceding</span></a>
+      <a href="#checklist"><span class="card-icon"><i class="fa-solid fa-list-check" aria-hidden="true"></i></span><strong>First Session</strong><span class="wiki-card-sub">What to prep, what to skip, how to pace</span></a>
     </div>
   </nav>
 
@@ -236,7 +236,7 @@
     <h2 class="wiki-section-title"><i class="fa-solid fa-list-check" aria-hidden="true"></i> First Session Checklist</h2>
     <p>Running your first Fate Condensed session? Here's what to prepare, what to skip, and how to pace.</p>
 
-    <h3><i class="fa-solid fa-check" aria-hidden="true" style="color:#2e7d32"></i> Before the session (30 min prep)</h3>
+    <h3><i class="fa-solid fa-check icon-success" aria-hidden="true"></i> Before the session (30 min prep)</h3>
     <div class="callout callout-info" role="note">
       <div class="callout-title">What to prepare</div>
       <p><strong>One current issue</strong> — the thing that's already on fire. Write it as an aspect: <em>"The Water Supply Is Poisoned and Nobody Knows Why."</em><br/>
@@ -246,7 +246,7 @@
       <strong>Three scene aspects for your opening location</strong> — use Ogma's scene generator.</p>
     </div>
 
-    <h3><i class="fa-solid fa-xmark" aria-hidden="true" style="color:#c62828"></i> What to skip</h3>
+    <h3><i class="fa-solid fa-xmark icon-danger" aria-hidden="true"></i> What to skip</h3>
     <div class="callout callout-info" role="note">
       <div class="callout-title">Don't prepare these</div>
       <p><strong>Don't write a plot.</strong> Fate is not a scripted adventure. Prepare situations, not storylines.<br/>
@@ -265,7 +265,7 @@
       <strong>Last 30 minutes:</strong> Wrap up. Ask each player: "What does your character do after?" Hand out milestone advances if earned.</p>
     </div>
 
-    <h3><i class="fa-solid fa-triangle-exclamation" aria-hidden="true" style="color:#b8860b"></i> Common first-session mistakes</h3>
+    <h3><i class="fa-solid fa-triangle-exclamation icon-warning" aria-hidden="true"></i> Common first-session mistakes</h3>
     <div class="callout callout-dnd" role="note">
       <div class="callout-title"><i class="fa-solid fa-dragon" aria-hidden="true"></i> D&amp;D habits to unlearn</div>
       <p><strong>"I search the room" syndrome:</strong> In Fate, don't passively investigate. <em>Declare what you want to find and why.</em> The GM sets difficulty based on how interesting failure would be.<br/><br/>
@@ -280,7 +280,22 @@
     </div>
   </div>
 
-  <div style="text-align:center; margin:32px 0">
-    <a href="/help/learn-fate" class="wiki-back" style="font-size:14px"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to Learn Fate in 7 Steps</a>
+  <div class="wiki-back-center">
+    <a href="/help/learn-fate" class="wiki-back"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to Learn Fate in 7 Steps</a>
+  </div>
+
+  <div class="wiki-footer">
+    <div>
+      <a href="/help">Help Home</a> &nbsp;·&nbsp;
+      <a href="/">Open Ogma</a> &nbsp;·&nbsp;
+      <a href="/about">About</a> &nbsp;·&nbsp;
+      <a href="/license">Full Attribution</a> &nbsp;·&nbsp;
+      <a href="https://fate-srd.com/" target="_blank" rel="noreferrer">fate-srd.com</a>
+    </div>
+    <div class="wiki-footer-meta">
+      Fate&#8482; is a trademark of Evil Hat Productions, LLC &nbsp;·&nbsp;
+      D&amp;D&#174; is a trademark of Wizards of the Coast LLC &nbsp;·&nbsp;
+      Released under <a href="/license">CC BY 3.0</a>
+    </div>
   </div>
 </main>

@@ -5,7 +5,7 @@
 
 <main class="wiki-content" id="main-content">
 
-    <div class="wiki-page-eyebrow">New to Ogma?</div>
+    <div class="wiki-page-eyebrow">New to Ogma</div>
     <h1>Start here — pick your path</h1>
     <p class="wiki-page-desc">Ogma is a Fate Condensed generator suite. Before diving into the tool, pick the guide that matches where you're coming from. Five minutes of reading will save hours of confusion at the table.</p>
 
@@ -16,23 +16,23 @@
 
     <h2>Choose your background</h2>
 
-    <div class="gen-grid" style="grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px">
-      <a href="#new-ttrpg" style="text-decoration:none" class="gen-card">
+    <div class="gen-grid gen-grid--2col">
+      <a href="#new-ttrpg" class="gen-card">
         <div class="gen-card-icon"><i class="fa-solid fa-seedling" aria-hidden="true"></i></div>
         <div class="gen-card-name">I've never played a TTRPG</div>
         <div class="gen-card-desc">Start from zero. What the game is, what dice do, what a GM does. No jargon.</div>
       </a>
-      <a href="#from-dnd" style="text-decoration:none" class="gen-card">
+      <a href="#from-dnd" class="gen-card">
         <div class="gen-card-icon"><i class="fa-solid fa-burst" aria-hidden="true"></i></div>
         <div class="gen-card-name">I play D&amp;D (4e, 5e, or similar)</div>
         <div class="gen-card-desc">You know TTRPGs. The three things D&amp;D taught you that will actively mislead you in Fate.</div>
       </a>
-      <a href="#from-other" style="text-decoration:none" class="gen-card">
+      <a href="#from-other" class="gen-card">
         <div class="gen-card-icon"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i></div>
         <div class="gen-card-name">I play other RPGs</div>
         <div class="gen-card-desc">PbtA, Savage Worlds, CoC, Blades — what Fate does differently and why it matters.</div>
       </a>
-      <a href="#run-better" style="text-decoration:none" class="gen-card">
+      <a href="#run-better" class="gen-card">
         <div class="gen-card-icon"><i class="fa-solid fa-masks-theater" aria-hidden="true"></i></div>
         <div class="gen-card-name">I know Fate — help me GM better</div>
         <div class="gen-card-desc">Scene framing, the compel rhythm, fail forward, Create Advantage cascades.</div>
@@ -145,5 +145,20 @@
         <tr><td>+0</td><td>Mediocre</td></tr>
       </tbody>
     </table>
+    </div>
+
+    <div class="wiki-footer">
+      <div>
+        <a href="/help">Help Home</a> &nbsp;·&nbsp;
+        <a href="/">Open Ogma</a> &nbsp;·&nbsp;
+        <a href="/about">About</a> &nbsp;·&nbsp;
+        <a href="/license">Full Attribution</a> &nbsp;·&nbsp;
+        <a href="https://fate-srd.com/" target="_blank" rel="noreferrer">fate-srd.com</a>
+      </div>
+      <div class="wiki-footer-meta">
+        Fate&#8482; is a trademark of Evil Hat Productions, LLC &nbsp;·&nbsp;
+        D&amp;D&#174; is a trademark of Wizards of the Coast LLC &nbsp;·&nbsp;
+        Released under <a href="/license">CC BY 3.0</a>
+      </div>
     </div>
 </main>

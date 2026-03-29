@@ -343,4 +343,19 @@
       <p>For the full mechanics reference: <a href="/help/fate-mechanics"><strong>Fate Mechanics &rarr;</strong></a> · For a conflict walkthrough: <a href="/help/at-the-table#conflict-walkthrough"><strong>At the Table &rarr;</strong></a></p>
     </div>
 
+    <div class="wiki-footer">
+      <div>
+        <a href="/help">Help Home</a> &nbsp;·&nbsp;
+        <a href="/">Open Ogma</a> &nbsp;·&nbsp;
+        <a href="/about">About</a> &nbsp;·&nbsp;
+        <a href="/license">Full Attribution</a> &nbsp;·&nbsp;
+        <a href="https://fate-srd.com/" target="_blank" rel="noreferrer">fate-srd.com</a>
+      </div>
+      <div class="wiki-footer-meta">
+        Fate&#8482; is a trademark of Evil Hat Productions, LLC &nbsp;·&nbsp;
+        D&amp;D&#174; is a trademark of Wizards of the Coast LLC &nbsp;·&nbsp;
+        Released under <a href="/license">CC BY 3.0</a>
+      </div>
+    </div>
+
 </main>

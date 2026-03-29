@@ -5,7 +5,7 @@
 
 <main class="wiki-content" id="main-content">
 
-    <div class="wiki-page-eyebrow">Generator Suite</div>
+    <div class="wiki-page-eyebrow">Generators</div>
     <h1>16 generators. 8 worlds. 128 combinations.</h1>
     <p class="wiki-page-desc">Every generator produces a mechanically complete, thematically correct Fate Condensed result. Each one is tuned to its campaign world — a Minor NPC in Shattered Kingdoms gets dark fantasy names and aspects; the same generator in Neon Abyss gets chrome and neon.</p>
 
@@ -20,7 +20,20 @@
       </ol>
     </details>
 
-    <h2>How generators and campaigns combine</h2>
+    <nav class="wiki-toc" aria-label="On this page">
+      <div class="wiki-toc-title">On this page</div>
+      <a href="#how-generators-combine">How generators combine</a>
+      <a href="#characters">Characters</a>
+      <a href="#scenes">Scenes</a>
+      <a href="#pacing">Pacing</a>
+      <a href="#world">World</a>
+      <a href="#the-result-panel">The result panel</a>
+      <a href="#pinning-results">Pinning results</a>
+      <a href="#quick-prep-pack-prep">Quick Prep Pack</a>
+      <a href="#table-manager">Table Manager</a>
+    </nav>
+
+    <h2 id="how-generators-combine">How generators and campaigns combine</h2>
     <p>When you roll, Ogma pulls from <strong>two table layers</strong>:</p>
     <ul>
       <li><strong>Campaign-specific tables</strong> — names, aspects, factions, and world details tuned to your chosen world (e.g. Shattered Kingdoms' "Blight-touched" aspects).</li>
@@ -77,7 +90,7 @@
       <li><strong>&#9876; D&amp;D?</strong> — side-by-side comparison of Fate and D&amp;D mechanics for GMs switching systems.</li>
     </ul>
 
-    <h2>Pinning results</h2>
+    <h2 id="pinning-results">Pinning results</h2>
     <p>Press <kbd>P</kbd> or click the Save to Table Prep button on any result to pin it. Open pinned cards from the <strong>Binder</strong> section in the sidebar.</p>
     <p>From History you can: re-view any card, copy or download as Markdown, export your whole session as an Ogma JSON file, or import a previously saved <code>.ogma.json</code> file.</p>
 
@@ -90,7 +103,7 @@
     <h2 id="quick-prep-pack-prep">Quick Prep Pack prep</h2>
     <p>In the <strong>Binder</strong> section of the sidebar, click <strong>Quick Prep Pack</strong> to generate an Adventure Seed + Countdown + Compel as a stacked 3-card packet. This is your Session 1 prep in one click — location, first threat, and a ready-to-offer complication.</p>
 
-    <h2>Table Manager</h2>
+    <h2 id="table-manager">Table Manager</h2>
     <p>Click the <i class="fa-solid fa-square-plus" aria-hidden="true"></i> icon in the action bar to open the Table Manager. You can:</p>
     <ul>
       <li><strong>Exclude</strong> any table from generation (e.g. if you've already used that faction name)</li>
@@ -101,5 +114,20 @@
     <div class="callout callout-scenario">
       <div class="callout-title"><i class="fa-solid fa-compass" aria-hidden="true"></i> Related pages</div>
       <p><a href="/help/fate-mechanics">Fate Mechanics</a> — the rules behind each generator. <a href="/help/at-the-table">At the Table</a> — using generated content during play. <a href="/help/customise">Customise</a> — filtering and extending generator tables.</p>
+    </div>
+
+    <div class="wiki-footer">
+      <div>
+        <a href="/help">Help Home</a> &nbsp;·&nbsp;
+        <a href="/">Open Ogma</a> &nbsp;·&nbsp;
+        <a href="/about">About</a> &nbsp;·&nbsp;
+        <a href="/license">Full Attribution</a> &nbsp;·&nbsp;
+        <a href="https://fate-srd.com/" target="_blank" rel="noreferrer">fate-srd.com</a>
+      </div>
+      <div class="wiki-footer-meta">
+        Fate&#8482; is a trademark of Evil Hat Productions, LLC &nbsp;·&nbsp;
+        D&amp;D&#174; is a trademark of Wizards of the Coast LLC &nbsp;·&nbsp;
+        Released under <a href="/license">CC BY 3.0</a>
+      </div>
     </div>
 </main>

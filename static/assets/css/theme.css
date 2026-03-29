@@ -6085,6 +6085,41 @@ button.fp-dot:focus-visible {
 .gloss-term{font-size:12px;font-weight:800;letter-spacing:0.04em;color:var(--text)}
 .gloss-def{font-size:12px;color:var(--text-dim);line-height:1.5;margin:0}
 
+/* ── Callout: Warning (amber) — was missing, caused fallback to unstyled .callout */
+.callout-warning{background:color-mix(in srgb,#b8860b 6%,transparent);border-color:color-mix(in srgb,#b8860b 22%,transparent)}
+.callout-warning .callout-title{color:#b8860b}
+
+/* ── Icon color utilities (replaces hardcoded hex inline styles) */
+.icon-success{color:#2e7d32}
+.icon-warning{color:#b8860b}
+.icon-danger{color:#c62828}
+
+/* ── Sidebar featured child (Deep Dive link) */
+.wiki-sidebar-child--featured{font-weight:600;color:var(--accent) !important}
+.wiki-sidebar-child--featured .fa-graduation-cap{font-size:10px}
+
+/* ── gen-grid 2-column layout modifier */
+.gen-grid--2col{grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px}
+@media(max-width:540px){.gen-grid--2col{grid-template-columns:1fr}}
+
+/* ── Anchor gen-cards: suppress browser link decoration */
+a.gen-card{text-decoration:none}
+
+/* ── Back-link centered wrapper (replaces inline style="text-align:center;margin:32px 0") */
+.wiki-back-center{text-align:center;margin:32px 0}
+
+/* ── wiki-card-grid icon spans */
+.wiki-card-grid a span.card-icon{font-size:18px;line-height:1}
+
+/* ── wiki-footer attribution line (replaces repeated inline style) */
+.wiki-footer-meta{font-size:var(--text-label);color:var(--text-muted)}
+
+/* ── learn-quickstart compact top margin variant */
+.learn-quickstart--compact{margin-top:4px}
+
+/* ── Section divider rule (replaces inline style on <hr>) */
+.wiki-divider{border:none;border-top:1px solid var(--border);margin:32px 0}
+
 /* Skill pyramid — learn-fate step 3 */
 .lf-skill-pyramid{display:flex;flex-direction:column;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin:12px 0;font-size:13px}
 .lf-sp-tier{display:flex;align-items:center;gap:8px;padding:6px 12px;border-bottom:1px solid var(--border);background:var(--panel)}
