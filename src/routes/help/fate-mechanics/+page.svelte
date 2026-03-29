@@ -28,6 +28,7 @@
 <nav class="wiki-toc" aria-label="On this page">
   <div class="wiki-toc-title">On this page</div>
   <a href="#aspects">Aspects</a>
+  <a href="#boosts">Boosts</a>
   <a href="#the-skill-ladder">The Skill Ladder</a>
   <a href="#stress">Stress</a>
   <a href="#consequences">Consequences</a>
@@ -52,6 +53,21 @@
   <li><strong>Trouble</strong> — the thing that makes their life complicated. "The Magic is Burning Out of Me." The GM's primary compel lever.</li>
   <li><strong>Other aspects</strong> — supporting details. Can be invoked or compelled situationally.</li>
 </ul>
+
+<h2 id="boosts">Boosts</h2>
+<p>A <strong>boost</strong> is a special temporary aspect with exactly <strong>one free invoke</strong>, created in the moment and gone when used. Boosts are not aspects you write on a sheet — they're fleeting narrative momentum. <a href="https://fate-srd.com/fate-condensed/aspects-and-fate-points#boosts" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
+<p><strong>When you get a boost:</strong></p>
+<ul>
+  <li><strong>Success with Style (+3 margin)</strong> on Overcome or Create Advantage</li>
+  <li><strong>Tie (0 margin)</strong> on an Attack — the attacker earns a boost even though no damage lands</li>
+  <li><strong>Success with Style</strong> on Defend — the defender earns a boost</li>
+  <li>Some stunts grant boosts under specific conditions</li>
+</ul>
+<p><strong>Rules:</strong> Give it a name immediately — <em>"Stunned,"</em> <em>"Off Balance,"</em> <em>"Momentary Opening."</em> The free invoke works just like invoking any aspect (+2 or reroll), costs no Fate Point, and can be passed to an ally in the same exchange. Use it or lose it — a boost expires as soon as the scene ends or when the free invoke is spent.</p>
+<div class="callout callout-tip">
+  <div class="callout-title"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> Boost vs. aspect</div>
+  <p>A boost is a stripped-down aspect. It cannot be invoked a second time (there's only one free invoke), cannot be compelled, and has no persistence. If you want a lasting effect, use Create Advantage for a real aspect instead. The practical difference: boosts reward exceptional rolls with immediate firepower; aspects reward patient setup with reusable leverage.</p>
+</div>
 
 <h2 id="the-skill-ladder">The Skill Ladder</h2>
 <p>Skills are rated on the <strong>Fate Ladder</strong>: Average (+1), Fair (+2), Good (+3), Great (+4), Superb (+5), Fantastic (+6), Epic (+7), Legendary (+8). Most NPCs have a peak skill of Good (+3) to Superb (+5). Major NPCs have 5 rated skills; Minor NPCs have 1. <a href="https://fate-srd.com/fate-condensed/getting-started" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>

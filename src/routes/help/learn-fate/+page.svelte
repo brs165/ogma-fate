@@ -146,6 +146,10 @@
             </div>
           </div>
         </div>
+        <div class="callout callout-info" role="note">
+          <div class="callout-title"><i class="fa-solid fa-bolt" aria-hidden="true"></i> What is a boost?</div>
+          <p>A <strong>boost</strong> is a fleeting aspect with exactly <strong>one free invoke</strong>. You earn it from Success with Style on most actions, or a Tie on Attack. Name it immediately — <em>"Off Balance,"</em> <em>"Momentary Opening,"</em> <em>"Blinded by Debris."</em> Use the free invoke on your next roll (or pass it to an ally this exchange). Once used, or when the scene ends, the boost disappears. It costs no Fate Point to create and none to use — it's pure momentum reward for exceptional rolling.</p>
+        </div>
         <div class="callout callout-dnd" role="note"><div class="callout-title">⚔ Coming from D&amp;D</div><p>4dF averages to 0 with a range of −4 to +4. Your skill rating IS your expected result. A +3 skill hits Fair (+2) difficulty most of the time. No d20 swingyness.</p></div>
         <div class="callout callout-info" role="note"><div class="callout-title">📋 Ties succeed — with a cost</div><p>A tie (matching the difficulty exactly) is not a failure. The player achieves their goal, but something complicates it — they take a minor cost, the situation shifts, or a new complication enters the scene. <a href="https://fate-srd.com/fate-condensed/taking-action-rolling-the-dice" target="_blank" rel="noreferrer" class="srd-link">FCon SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a> Never use a tie to simply block forward progress.</p></div>
         <div class="callout callout-scenario" role="note">
