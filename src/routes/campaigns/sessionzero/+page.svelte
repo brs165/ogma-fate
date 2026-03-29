@@ -1,6 +1,6 @@
 <script>
   import { onMount, untrack } from 'svelte';
-  import { generate, mergeUniversal, filteredTables, suggestSkillPyramid, suggestAspects, suggestStunts } from '$lib/engine.js';
+  import { generate, mergeUniversal, filteredTables, suggestSkillPyramid, suggestAspects, suggestStunts, stressFromRating } from '$lib/engine.js';
   import { CAMPAIGNS } from '$lib/../data/shared.js';
   import { WORLD_META, WORLD_DATA, ALL_SKILLS, SKILL_LABEL } from '$lib/../data/shared.js';
   import { LS } from '$lib/db.js';
@@ -115,6 +115,65 @@
     if (tables) freeSuggestions = suggestAspects('free', tables, 4);
   }
 
+  // ── Skill pyramid helpers ──
+  const PYRAMID_SHAPE = [
+    { r: 4, label: 'Great (+4)', count: 1 },
+    { r: 3, label: 'Good (+3)', count: 2 },
+    { r: 2, label: 'Fair (+2)', count: 3 },
+    { r: 1, label: 'Average (+1)', count: 4 },
+  ];
+
+  function suggestPyramidForCurrent() {
+    if (!tables) return;
+    const result = suggestSkillPyramid(currentPc.hc, currentPc.trouble, tables);
+    updateCurrentPc('skills', result);
+  }
+
+  function setSkill(slotIdx, skillName) {
+    const skills = (currentPc.skills || []).slice();
+    if (skills[slotIdx]) skills[slotIdx] = { ...skills[slotIdx], name: skillName };
+    updateCurrentPc('skills', skills);
+  }
+
+  // Get skills assigned at a specific pyramid index, excluding already-used skills
+  function usedSkillNames(excludeIdx) {
+    return (currentPc.skills || []).filter((s, i) => i !== excludeIdx && s && s.name).map(s => s.name);
+  }
+
+  // ── Stunt helpers ──
+  let stuntSuggestions = $state([]);
+  let showStuntBrowser = $state(false);
+  let stuntFilter = $state('');
+
+  function refreshStuntSuggestions() {
+    if (!tables) return;
+    const topSkills = (currentPc.skills || []).slice(0, 3).map(s => s?.name).filter(Boolean);
+    stuntSuggestions = suggestStunts(topSkills, tables, 8);
+  }
+
+  function addStunt(stunt) {
+    const current = currentPc.stunts || [];
+    if (current.length >= 3) return;
+    if (current.some(s => s.name === stunt.name)) return;
+    updateCurrentPc('stunts', [...current, stunt]);
+  }
+
+  function removeStunt(idx) {
+    const current = (currentPc.stunts || []).slice();
+    current.splice(idx, 1);
+    updateCurrentPc('stunts', current);
+  }
+
+  // ── Stress calculation ──
+  function getStressBoxes(skillName) {
+    const skills = currentPc.skills || [];
+    const sk = skills.find(s => s && s.name === skillName);
+    return stressFromRating(sk ? sk.r : 0);
+  }
+
+  let physStress = $derived(getStressBoxes('Physique'));
+  let mentalStress = $derived(getStressBoxes('Will'));
+
   function reroll() { rerolls += 1; }
 
   // ── Navigation ──
@@ -135,6 +194,7 @@
       if (nid === 'trouble') refreshTrSuggestions();
       if (nid === 'relationship') refreshRelSuggestions();
       if (nid === 'freeaspects') refreshFreeSuggestions();
+      if (nid === 'stunts') refreshStuntSuggestions();
     }
   }
   function back() {
@@ -481,7 +541,178 @@
         <div class="sz-warn">For now, write only your High Concept and Trouble. Leave the other three slots blank.</div>
       </div>
 
-    <!-- ── PLACEHOLDER: remaining steps (Layers 3-4) ── -->
+    <!-- ── STEP: Skills ──────────────────────────────── -->
+    {:else if stepId === 'skills'}
+      <div class="sz-body">
+        {#if pcCount > 1}
+          <div class="sz-pc-progress">
+            <span class="sz-pc-progress-label">Player {pcIndex + 1} of {pcCount} &mdash; Skills</span>
+            <div class="sz-pc-progress-pips">
+              {#each pcDrafts as _, i}<div class="sz-pc-pip" class:active={i === pcIndex} class:done={i < pcIndex}></div>{/each}
+            </div>
+          </div>
+        {/if}
+        <p>Your skill pyramid defines what {currentPc.name || 'your character'} is good at. Assign ratings in this shape:</p>
+
+        <button class="btn btn-primary" onclick={suggestPyramidForCurrent} type="button" style="margin-bottom:16px">
+          <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> Suggest Pyramid Based on Aspects
+        </button>
+
+        <div class="sz-skill-pyramid">
+          {#each PYRAMID_SHAPE as tier, tIdx}
+            {@const startIdx = tIdx === 0 ? 0 : PYRAMID_SHAPE.slice(0, tIdx).reduce((a, t) => a + t.count, 0)}
+            <div class="sz-skill-row-wrap">
+              <span class="sz-skill-label">{tier.label}</span>
+              <div class="sz-skill-row">
+                {#each Array(tier.count) as _, slotI}
+                  {@const idx = startIdx + slotI}
+                  {@const currentSkill = currentPc.skills?.[idx]?.name || ''}
+                  {@const used = usedSkillNames(idx)}
+                  <div class="sz-skill-slot">
+                    <select class="sz-skill-select" value={currentSkill} onchange={e => setSkill(idx, e.target.value)} aria-label="{tier.label} slot {slotI + 1}">
+                      <option value="">--</option>
+                      {#each ALL_SKILLS as sk}
+                        {#if sk === currentSkill || !used.includes(sk)}
+                          <option value={sk}>{sk}</option>
+                        {/if}
+                      {/each}
+                    </select>
+                  </div>
+                {/each}
+              </div>
+            </div>
+          {/each}
+        </div>
+
+        <div class="sz-mutable"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> You can swap two skill ranks at every milestone</div>
+
+        <div class="sz-dnd">D&amp;D has 6 ability scores + 18 skills. Fate has 19 skills that cover both. Your skill rating IS your expected result &mdash; no separate modifier calculation. A +3 in Fight means you reliably hit Good (+3) difficulty.</div>
+        <div class="sz-tip">Physique sets your physical stress boxes. Will sets your mental stress boxes. Characters with neither above +0 get 3 boxes each &mdash; which isn't much.</div>
+      </div>
+
+    <!-- ── STEP: Stunts ────────────────────────────────── -->
+    {:else if stepId === 'stunts'}
+      <div class="sz-body">
+        {#if pcCount > 1}
+          <div class="sz-pc-progress">
+            <span class="sz-pc-progress-label">Player {pcIndex + 1} of {pcCount} &mdash; Stunts</span>
+            <div class="sz-pc-progress-pips">
+              {#each pcDrafts as _, i}<div class="sz-pc-pip" class:active={i === pcIndex} class:done={i < pcIndex}></div>{/each}
+            </div>
+          </div>
+        {/if}
+        <p>There are two types of stunts:</p>
+        <div class="sz-card">
+          <div class="sz-card-title">+2 Bonus Stunt</div>
+          <p>"Because I [describe why], I get +2 when I use [skill] to [action] when [circumstance]."</p>
+        </div>
+        <div class="sz-card">
+          <div class="sz-card-title">Rule-Changing Stunt</div>
+          <p>"Because I [describe why], I can [special effect], but only [limitation]."</p>
+        </div>
+        <div class="sz-card sz-card--success">
+          <div class="sz-card-title"><i class="fa-solid fa-check" aria-hidden="true"></i> Leave All Three Blank</div>
+          <p>Define stunts the first time you wish you had one. "I wish I could do X right now" is the perfect moment to write a stunt. This is official Condensed design.</p>
+        </div>
+
+        <!-- Selected stunts -->
+        {#if (currentPc.stunts || []).length > 0}
+          <div style="margin-top:12px">
+            {#each currentPc.stunts as st, idx}
+              <div class="sz-stunt-pick">
+                <span class="sz-stunt-pick-name">{st.name}</span>
+                <span class="sz-stunt-pick-skill">{st.skill || ''}</span>
+                <button class="sz-stunt-remove" onclick={() => removeStunt(idx)} type="button" aria-label="Remove stunt {st.name}">&times;</button>
+              </div>
+            {/each}
+          </div>
+        {/if}
+
+        {#if (currentPc.stunts || []).length < 3}
+          <button class="btn btn-ghost" onclick={() => { showStuntBrowser = !showStuntBrowser; if (showStuntBrowser) refreshStuntSuggestions(); }} type="button" style="margin-top:8px">
+            <i class="fa-solid fa-book-open" aria-hidden="true"></i> {showStuntBrowser ? 'Hide' : 'Browse'} Stunts
+          </button>
+        {/if}
+
+        {#if showStuntBrowser && (currentPc.stunts || []).length < 3}
+          <div style="margin-top:12px">
+            <input type="text" class="sz-input" placeholder="Filter stunts..." bind:value={stuntFilter} autocomplete="off" style="margin-bottom:8px" />
+            {#each stuntSuggestions.filter(s => !stuntFilter || s.name.toLowerCase().includes(stuntFilter.toLowerCase()) || (s.skill || '').toLowerCase().includes(stuntFilter.toLowerCase()) || (s.desc || '').toLowerCase().includes(stuntFilter.toLowerCase())) as st}
+              <div class="sz-stunt-pick" role="button" tabindex="0" onclick={() => addStunt(st)} onkeydown={e => { if (e.key === 'Enter') addStunt(st); }} style="cursor:pointer" aria-label="Add stunt: {st.name}">
+                <span class="sz-stunt-pick-name">{st.name}</span>
+                <span class="sz-stunt-pick-skill">{st.skill || ''}</span>
+                <span style="font-size:11px;color:var(--text-muted);flex-shrink:0">+ Add</span>
+              </div>
+            {/each}
+            <button class="btn btn-ghost sz-reroll" onclick={refreshStuntSuggestions} type="button" style="margin-top:8px"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> More stunts</button>
+          </div>
+        {/if}
+
+        <div class="sz-mutable"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> Stunts can be rewritten at every milestone</div>
+        <div class="sz-dnd">In D&amp;D, feats are picked at creation and rarely change. In Fate, stunts can be rewritten at every milestone. Pick what sounds fun now; change it when you learn what your character actually needs.</div>
+      </div>
+
+    <!-- ── STEP: Stress & Consequences ─────────────── -->
+    {:else if stepId === 'stress'}
+      <div class="sz-body">
+        {#if pcCount > 1}
+          <div class="sz-pc-progress">
+            <span class="sz-pc-progress-label">Player {pcIndex + 1} of {pcCount} &mdash; Stress</span>
+            <div class="sz-pc-progress-pips">
+              {#each pcDrafts as _, i}<div class="sz-pc-pip" class:active={i === pcIndex} class:done={i < pcIndex}></div>{/each}
+            </div>
+          </div>
+        {/if}
+        <p>Stress boxes are set by your Physique and Will ratings. Here's what {currentPc.name || 'your character'} gets:</p>
+
+        <div class="sz-card">
+          <div class="sz-card-title">Physical Stress (from Physique)</div>
+          <div class="sz-stress-boxes">
+            {#each Array(physStress) as _, i}
+              <div class="sz-stress-box" aria-label="Physical stress box {i + 1}"></div>
+            {/each}
+          </div>
+          <p style="font-size:12px;color:var(--text-muted);margin-top:6px">{physStress} boxes</p>
+        </div>
+
+        <div class="sz-card">
+          <div class="sz-card-title">Mental Stress (from Will)</div>
+          <div class="sz-stress-boxes">
+            {#each Array(mentalStress) as _, i}
+              <div class="sz-stress-box" aria-label="Mental stress box {i + 1}"></div>
+            {/each}
+          </div>
+          <p style="font-size:12px;color:var(--text-muted);margin-top:6px">{mentalStress} boxes</p>
+        </div>
+
+        <table class="sz-stress-table">
+          <thead><tr><th>Skill Rating</th><th>Stress Boxes</th></tr></thead>
+          <tbody>
+            <tr><td>Mediocre (+0)</td><td>3 boxes</td></tr>
+            <tr><td>Average (+1) or Fair (+2)</td><td>4 boxes</td></tr>
+            <tr><td>Good (+3) or Great (+4)</td><td>6 boxes</td></tr>
+            <tr><td>Superb (+5)+</td><td>6 boxes + extra mild consequence</td></tr>
+          </tbody>
+        </table>
+
+        <div class="sz-card">
+          <div class="sz-card-title">Consequences</div>
+          <p>Everyone starts with three consequence slots:</p>
+          <table class="sz-stress-table">
+            <tbody>
+              <tr><td>Mild</td><td>Absorbs 2 shifts</td><td>Clears: next scene after treatment</td></tr>
+              <tr><td>Moderate</td><td>Absorbs 4 shifts</td><td>Clears: full session after treatment</td></tr>
+              <tr><td>Severe</td><td>Absorbs 6 shifts</td><td>Clears: after a breakthrough + treatment</td></tr>
+            </tbody>
+          </table>
+          <p style="font-size:12px;color:var(--text-muted);margin-top:6px">Treatment requires a successful overcome roll: Academics for physical, Empathy for mental.</p>
+        </div>
+
+        <div class="sz-dnd">D&amp;D has hit points. Fate has stress (plot armour that clears every scene) and consequences (named aspects that stick). "Badly Burned Hands" isn't just damage &mdash; it's an aspect the GM can compel and enemies can invoke.</div>
+        <div class="sz-tip">Stress clears after every scene. Consequences stick around and can be compelled against you &mdash; but they also earn you fate points when they cause trouble.</div>
+      </div>
+
+    <!-- ── PLACEHOLDER: remaining steps (Layer 4) ───── -->
     {:else}
       <div class="sz-body">
         <div class="sz-card">
