@@ -28,6 +28,7 @@
       { id: 'fate-points-and-refresh', label: 'Fate Points & Refresh' },
       { id: 'stunts', label: 'Stunts' },
       { id: 'contests', label: 'Contests' },
+      { id: 'initiative', label: 'Turn order' },
       { id: 'challenges', label: 'Challenges' },
       { id: 'zones', label: 'Zones' },
       { id: 'countdowns', label: 'Countdowns' },

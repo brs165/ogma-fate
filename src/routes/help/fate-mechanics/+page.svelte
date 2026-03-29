@@ -35,6 +35,7 @@
   <a href="#fate-points-and-refresh">Fate Points &amp; Refresh</a>
   <a href="#stunts">Stunts</a>
   <a href="#contests">Contests</a>
+  <a href="#initiative">Turn order</a>
   <a href="#challenges">Challenges</a>
   <a href="#zones">Zones</a>
   <a href="#countdowns">Countdowns</a>
@@ -160,6 +161,14 @@
 <div class="callout callout-dnd">
   <div class="callout-title">&#9876; Coming from D&amp;D — contests vs. opposed checks</div>
   <p>D&amp;D uses opposed ability checks (both sides roll, higher wins) for everything from arm wrestling to chases. Fate separates Contests (race for a goal, first to 3 victories) from Conflicts (mutual harm) and Challenges (obstacle sequences). The distinction forces you to think about what the scene is <em>really about</em> — not just "who rolls higher."</p>
+</div>
+
+<h2 id="initiative">Turn order in conflicts</h2>
+<p>Fate Condensed doesn't use rolled initiative. At the start of a conflict, determine turn order from the fiction — who saw the threat first, who was in the best position to act. Each <strong>exchange</strong> (one round), every character acts once in that order. <a href="https://fate-srd.com/fate-condensed/challenges-conflicts-and-contests" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
+<p>Many Fate tables use <strong>Popcorn Initiative</strong>: after a character acts, that player (or the GM for NPCs) chooses who goes next — any character who hasn't acted this exchange. This variant isn't in the FCon rules explicitly, but is widely used because it rewards tactical coordination: players can build advantage chains before the key attacker's turn.</p>
+<div class="callout callout-dnd">
+  <div class="callout-title">&#9876; Coming from D&amp;D — initiative</div>
+  <p>D&amp;D rolls initiative once, locks the order for the whole combat, and enforces it rigidly. Fate's turn order is established from narrative logic and can flex. The real difference: in Fate, <em>who acts when</em> is a tactical decision the group makes together, not a number rolled in isolation at the start of the session.</p>
 </div>
 
 <h2 id="challenges">Challenges</h2>
@@ -326,6 +335,10 @@
     <div class="callout callout-info">
       <div class="callout-title"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> "Players attack every round instead of Create Advantage"</div>
       <p><strong>Fix:</strong> Have an NPC use Create Advantage against them. Let them feel "Sand in His Eyes" when it's used against a PC. Once players see how effective it is, they start using it. You can also explicitly suggest it: "You could attack, or you could try to Create Advantage — maybe 'Off Balance' after that near-miss?"</p>
+    </div>
+    <div class="callout callout-info">
+      <div class="callout-title"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> "We confused Tie with 'success at a cost'"</div>
+      <p><strong>Fix:</strong> These are related but different. A <strong>Tie</strong> (roll matches target exactly) is always success — the player gets what they wanted, but a complication enters. "Success at a cost" on a Fail is the GM's <em>optional</em> offer: "You don't make it, but I'll let you succeed if you accept this cost." A Tie is mechanical and automatic. "Success at a cost" on a failure is a GM tool for forward momentum. Never use a Tie to mean "nothing happens."</p>
     </div>
     <div class="callout callout-info">
       <div class="callout-title"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> "Stress feels like hit points and runs out too fast"</div>

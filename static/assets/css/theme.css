@@ -6084,3 +6084,12 @@ button.fp-dot:focus-visible {
 .gloss-item{display:flex;flex-direction:column;gap:2px;padding:8px 10px;background:var(--panel);border:1px solid var(--border);border-radius:6px}
 .gloss-term{font-size:12px;font-weight:800;letter-spacing:0.04em;color:var(--text)}
 .gloss-def{font-size:12px;color:var(--text-dim);line-height:1.5;margin:0}
+
+/* Skill pyramid — learn-fate step 3 */
+.lf-skill-pyramid{display:flex;flex-direction:column;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin:12px 0;font-size:13px}
+.lf-sp-tier{display:flex;align-items:center;gap:8px;padding:6px 12px;border-bottom:1px solid var(--border);background:var(--panel)}
+.lf-sp-tier:last-of-type{border-bottom:1px solid var(--border)}
+.lf-sp-rating{font-weight:700;color:var(--text);min-width:110px}
+.lf-sp-slots{font-size:12px;color:var(--text-muted);background:var(--panel-raised);padding:2px 8px;border-radius:4px;border:1px solid var(--border)}
+.lf-sp-all{padding:6px 12px;font-size:12px;color:var(--text-muted);background:var(--panel);border-bottom:1px solid var(--border)}
+.lf-sp-list{padding:8px 12px;font-size:12px;color:var(--text-dim);background:var(--bg);line-height:1.7;letter-spacing:0.01em}

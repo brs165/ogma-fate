@@ -52,7 +52,7 @@
 </div>
 
 <h2 id="skills-broad-strokes">Skills: Broad strokes, not specifics</h2>
-<p>D&amp;D has 18 skills. Fate Condensed has 19 skills — but they're dramatically broader. <strong>Athletics</strong> covers everything D&amp;D's Acrobatics, Athletics, and some Survival tasks do. <strong>Notice</strong> covers Perception and some Investigation. There are no tool proficiencies, no weapon proficiencies, no saving throw proficiencies.</p>
+<p>D&amp;D has 18 skills. Fate Condensed has 18 skills — but they're dramatically broader. <strong>Athletics</strong> covers everything D&amp;D's Acrobatics, Athletics, and some Survival tasks do. <strong>Notice</strong> covers Perception and some Investigation. There are no tool proficiencies, no weapon proficiencies, no saving throw proficiencies.</p>
 <p>The skill pyramid means every character is <em>deliberately incompetent</em> at most things. This is by design — the incompetence creates drama and supports character specialisation without requiring a 20-level ability progression.</p>
 
 <h2 id="the-four-actions-not-attack-bonus-move-reaction">The four actions — not attack/bonus/move/reaction</h2>
