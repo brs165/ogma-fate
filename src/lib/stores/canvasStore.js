@@ -6,7 +6,16 @@ import { DB } from '../db.js';
 import { boardUid, extractCardTitle, extractCardSummary, extractCardTags, STICKY_COLORS } from '../helpers.js';
 
 // ── Session Zero pack generator (standalone, no store dependency) ─────────
-export function generateSzPack(pcDrafts, campId, campName, campData, mode) {
+/**
+ * Generate a full Session Zero card pack for the canvas.
+ * @param {Array} pcDrafts - [{name, hc, trouble, ...}] per player
+ * @param {string} campId - Campaign ID
+ * @param {string} campName - Display name
+ * @param {object} campData - Campaign data object (tables, meta)
+ * @param {string} mode - Creation mode ('standard'|'trio'|'flashback')
+ * @param {object} [gmPrep] - Optional GM prep data: {seed, scene, npc}
+ */
+export function generateSzPack(pcDrafts, campId, campName, campData, mode, gmPrep) {
   const tables = filteredTables(mergeUniversal(campData.tables || {}), {});
   const allCards = [];
   const CARD_W = 360, CARD_GAP = 24, COLS = 3;
@@ -17,12 +26,30 @@ export function generateSzPack(pcDrafts, campId, campName, campData, mode) {
     allCards.push({ id: boardUid(), genId: 'campaign', sourceCanvas: 'prep', title: campName + ' — Campaign Frame', summary: '', tags: [], data: frameData, x: 24, y: 24, z: Date.now(), ts: Date.now(), gmOnly: false });
   } catch(e) {}
 
-  // Per-PC cards
+  // GM Prep cards (seed, scene, NPC) — placed in top row after campaign frame
+  if (gmPrep) {
+    let gmX = 24 + CARD_W + CARD_GAP;
+    if (gmPrep.seed) {
+      allCards.push({ id: boardUid(), genId: 'seed', sourceCanvas: 'prep', title: gmPrep.seed.location || 'Adventure Seed', summary: gmPrep.seed.objective || '', tags: [], data: gmPrep.seed, x: gmX, y: 24, z: Date.now() + 0.1, ts: Date.now(), gmOnly: true });
+      gmX += CARD_W + CARD_GAP;
+    }
+    if (gmPrep.scene) {
+      allCards.push({ id: boardUid(), genId: 'scene', sourceCanvas: 'prep', title: 'Opening Scene', summary: '', tags: [], data: gmPrep.scene, x: gmX, y: 24, z: Date.now() + 0.2, ts: Date.now(), gmOnly: true });
+      gmX += CARD_W + CARD_GAP;
+    }
+    if (gmPrep.npc) {
+      allCards.push({ id: boardUid(), genId: 'npc_major', sourceCanvas: 'prep', title: gmPrep.npc.name || 'Opening NPC', summary: gmPrep.npc.aspects?.high_concept || '', tags: [], data: gmPrep.npc, x: gmX, y: 24, z: Date.now() + 0.3, ts: Date.now(), gmOnly: true });
+    }
+  }
+
+  // Per-PC cards — offset down if GM prep cards exist
+  const pcStartY = gmPrep ? 24 + 600 : 24;
+
   pcDrafts.forEach((pc, idx) => {
-    const col = (idx + 1) % COLS;
-    const row = Math.floor((idx + 1) / COLS);
+    const col = gmPrep ? (idx % COLS) : ((idx + 1) % COLS);
+    const row = gmPrep ? Math.floor(idx / COLS) : Math.floor((idx + 1) / COLS);
     const baseX = 24 + col * (CARD_W + CARD_GAP);
-    const baseY = 24 + row * 600;
+    const baseY = pcStartY + row * 600;
 
     let pcData = {};
     try { pcData = generate('pc', tables, 4, {}); } catch(e) {}

@@ -22,6 +22,7 @@ export const GENERATORS = [
   {id:"complication",label:"Complication", icon:"fa-triangle-exclamation", sub:"New aspect · arrival · environment shift"},
   {id:"pc",          label:"Player Character", icon:"fa-star",      sub:"5 aspects · skill pyramid · stunts · refresh 3"},
   {id:"backstory",   label:"PC Backstory",    icon:"fa-masks-theater", sub:"Session Zero questions · relationship web · hook"},
+  {id:"stunt",       label:"Stunt",           icon:"fa-wand-magic-sparkles", sub:"Campaign stunt · skill · type"},
   {id:"obstacle",    label:"Obstacle",        icon:"fa-shield-halved", sub:"Hazard · block · distraction - not an enemy"},
   {id:"countdown",   label:"Countdown",       icon:"fa-clock", sub:"Track · trigger · outcome - pacing pressure"},
   {id:"constraint",  label:"Constraint",      icon:"fa-lock", sub:"Limitation or resistance - forces Plan B"},
@@ -488,6 +489,34 @@ export const HELP_CONTENT = {
       ],
     },
   },
+  stunt: {
+    title: "Stunt",
+    what: "A specialised trick or training that gives a character +2 in a narrowly defined situation, or a once-per-scene rule exception.",
+    output: "Stunt name, the skill it modifies, a description of the effect, and type (bonus or special rule).",
+    rules: [
+      "Each character gets 3 free stunts at creation. A 4th stunt costs 1 Refresh (minimum Refresh 1).",
+      "Stunts must be conditional — '+2 to Fight when outnumbered' is legal. '+2 to all Fight rolls' is not.",
+      "A stunt can swap the +2 for a once-per-scene rule exception that does something no normal roll can.",
+      "The bonus applies to one of the four actions (overcome, create advantage, attack, defend) in a specific circumstance.",
+    ],
+    rule_urls: ['/fate-condensed/skills-and-stunts#stunts', '/fate-condensed/skills-and-stunts#building-stunts', '/fate-condensed/skills-and-stunts#building-stunts', '/fate-condensed/skills-and-stunts#building-stunts'],
+    gm_tips: [
+      "Use generated stunts as suggestions for players during character creation or advancement.",
+      "Let players rename any generated stunt to fit their character concept — the mechanics don't change.",
+      "A stunt is a licence to be cinematically excellent in one specific lane. Make the circumstance clear enough to trigger reliably at the table.",
+    ],
+    invoke_example: "A PC has the stunt 'Danger Sense: +2 to defend against surprise attacks.' The villain opens the scene with an ambush. The stunt triggers automatically — the PC adds +2 to their defend roll without spending a fate point.",
+    compel_example: "Stunts don't get compelled directly. But if the PC's high concept is 'Always Ready for a Fight,' the GM might compel it to make them draw their weapon in a social scene where that would be a problem.",
+    beginner: {
+      what: "A stunt is a special ability that gives your character an edge in a specific situation. Unlike aspects, stunts don't cost fate points — they just work when the condition is met. Think of them as a trained technique, a signature move, or a professional specialisation.",
+      terms: [
+        ["Stunt", "A special ability giving +2 in a narrow circumstance, or a once-per-scene rule exception."],
+        ["Refresh", "The fate points you start each session with. Stunts beyond the first 3 cost 1 Refresh each."],
+        ["Conditional", "Stunts only fire when their specific condition is met — they can't be +2 to everything."],
+        ["Once-per-scene", "Some stunts replace the +2 with a unique ability you can use once per scene instead."],
+      ],
+    },
+  },
   obstacle: {
     title: "Obstacle",
     what: "An obstacle is NOT an enemy - it cannot be attacked and taken out. It must be avoided, circumvented, or endured. Three types: hazards attack, blocks prevent, distractions force choices.",
@@ -926,3 +955,74 @@ export const HELP_ENTRIES = [
 
 export const SKILL_LABEL = { 1:"Average", 2:"Fair", 3:"Good", 4:"Great", 5:"Superb", 6:"Fantastic" };
 export const ALL_SKILLS = ["Academics","Athletics","Burglary","Contacts","Crafts","Deceive","Drive","Empathy","Fight","Investigate","Lore","Notice","Physique","Provoke","Rapport","Resources","Shoot","Stealth","Will"];
+
+// ── Session Zero world data — curated examples, issues, questions per campaign ──
+export const WORLD_META = {
+  thelongafter: { name: 'The Long After', icon: 'fa-compass', genre: 'Sword & Planet' },
+  cyberpunk:    { name: 'Neon Abyss', icon: 'fa-microchip', genre: 'Cyberpunk' },
+  fantasy:      { name: 'Shattered Kingdoms', icon: 'fa-dragon', genre: 'Dark Fantasy' },
+  space:        { name: 'Void Runners', icon: 'fa-shuttle-space', genre: 'Space Western' },
+  victorian:    { name: 'The Gaslight Chronicles', icon: 'fa-magnifying-glass', genre: 'Gothic Horror' },
+  postapoc:     { name: 'The Long Road', icon: 'fa-biohazard', genre: 'Post-Apocalypse' },
+  western:      { name: 'Dust and Iron', icon: 'fa-hat-cowboy', genre: 'Frontier Western' },
+  dVentiRealm:  { name: 'dVenti Realm', icon: 'fa-dice-d20', genre: 'High Fantasy' },
+};
+
+export const WORLD_DATA = {
+  thelongafter: {
+    current:  [{ name: 'The Warlords Are Consolidating', desc: 'Three rival warlords have begun absorbing smaller settlements. Travel is dangerous. Tribute is mandatory.' }, { name: 'The Phade Vaults Are Waking Up', desc: 'Ancient automated systems are reactivating across the waste. Some offer miracles. Some enforce quarantine protocols.' }],
+    impending: [{ name: 'The God-Machine Stirs', desc: 'Something beneath the Cradle is broadcasting. The signal is old. The response will not be kind.' }, { name: 'The Pilgrim Roads Are Being Taxed', desc: 'Movement between settlements now requires paying tribute to whoever controls the nearest checkpoint. Trade is dying. So is goodwill.' }],
+    hc: ['Last Cartographer of the Before-Times', 'Scavenger-Priest of the Rusted Saints', 'Vault Delver Who Reads the Old Signs', 'Road Tax Collector with a Legitimate Monopoly'],
+    troubles: ['The Map Shows a City That Shouldn\'t Exist', 'Faith Built on Parts That No Longer Fit', 'The Route That Pays My Salary Doesn\'t Exist Anymore', 'The Old Machines Listen to Me \u2014 and That Scares People'],
+    questions: ['What do you carry from the Before-Times that you cannot use but will not abandon?', 'Which warlord\'s territory did you cross to get here, and what did you leave behind as payment?', 'What did the last Phade vault you entered show you that you wish you could forget?', 'Who taught you to survive, and why did they stop traveling with you?', 'What do you believe about the God-Machine, and how does that belief put you at odds with someone at this table?', 'What skill do you have that is useless in this world but defined who you were in the old one?'],
+  },
+  cyberpunk: {
+    current:  [{ name: 'The Blackout Districts Are Expanding', desc: 'Corporate infrastructure is failing in the lower city. No grid, no law, no extraction.' }, { name: 'Neural Debt Is the New Slavery', desc: 'Corpo clinics offer free augmentation. The contract is lifetime. Default means repossession \u2014 of the implant, not the debt.' }],
+    impending: [{ name: 'The AI Quarantine Is Failing', desc: 'Something behind the Cage is learning to speak through people. The signs are subtle. The corps know.' }, { name: 'The Mesh Is Going Dark in Patches', desc: 'Comms blackouts are spreading district by district. Someone is cutting the network deliberately. No one is claiming responsibility.' }],
+    hc: ['Debt-Bonded Neural Translator', 'Ex-Corpo Medic Running an Unlicensed Clinic', 'Protest Archivist Who Films Everything', 'Street Doc with a Corporate Kill Switch'],
+    troubles: ['My Employer Owns My Language Centers', 'Every Patient Is Evidence', 'The Footage Has Made Me a Target', 'The Kill Switch Has a Timer I Can\'t See'],
+    questions: ['What piece of yourself did you sell to survive, and do you want it back?', 'Who in the lower city depends on you, and what happens to them if you disappear?', 'What corporate secret did you stumble onto, and why haven\'t they silenced you yet?', 'Which district do you refuse to enter, and what happened there?', 'What augmentation do you wish you\'d never installed?', 'Who was the last person you trusted completely, and how did that end?'],
+  },
+  fantasy: {
+    current:  [{ name: 'The Blight Spreads East', desc: 'A slow fungal transformation that doesn\'t kill but rewrites. Three border towns have gone silent.' }, { name: 'The Inquisition Hunts Hedge Magic', desc: 'The Church has declared all unsanctioned magic heretical. Practitioners are disappearing.' }],
+    impending: [{ name: 'The Old Oaths Are Waking', desc: 'The dead are rising not as enemies, but as creditors. Ancient bargains demand payment.' }, { name: 'The Hedge Witches Are Disappearing', desc: 'One by one, the folk practitioners who kept the villages healthy are vanishing. The Church says nothing. The villages are starting to ask.' }],
+    hc: ['Disgraced Knight-Inquisitor Who Saw What the Blight Actually Is', 'Hedge Witch Paid in Secrets', 'Exiled Prince Hiding as a Traveling Merchant', 'Battle-Surgeon Who Stitches with Scar-Thread'],
+    troubles: ['The Crown\'s Spies Recognize My Hands', 'I Know Too Much to Be Safe Anywhere', 'The Magic Is Burning Out of Me', 'The Thread Remembers What It Healed'],
+    questions: ['What oath did you break, and who still holds you to the original terms?', 'What did the Blight change about someone you loved?', 'Which faction offered you protection, and what did they ask in return?', 'What magic do you carry that you don\'t fully understand?', 'Who at this table wronged you before the campaign begins \u2014 and do they know?', 'What is the one thing you would never do, no matter the cost?'],
+  },
+  space: {
+    current:  [{ name: 'The Belt Is Blockaded', desc: 'Fleet patrols have cut off the outer stations. Supply chains are breaking. Prices are tripling.' }, { name: 'Jump Drive Fuel Is Running Out', desc: 'The refinery at Ceres went dark. Without new supply, long-range travel stops within months.' }],
+    impending: [{ name: 'The Signal from Beyond the Gate', desc: 'Something is transmitting from outside charted space. The frequency matches no known language.' }, { name: 'A New Faction Is Buying Debt', desc: 'Someone is purchasing outstanding station contracts at face value. No one knows who or why. Ships that take the offer stop being heard from.' }],
+    hc: ['Jump Drive Mechanic Three Payments Behind', 'Retired Fleet Medic Running Cargo', 'Salvage Auctioneer with a Questionable Ledger', 'Station-Born Pilot Who\'s Never Touched Dirt'],
+    troubles: ['The Drive Works. The Paperwork Doesn\'t.', 'The Fleet Wants Me Back and Won\'t Take No', 'Half My Inventory Has Prior Owners', 'I\'ve Never Breathed Air I Didn\'t Pay For'],
+    questions: ['What did you leave behind on your last station, and why can\'t you go back for it?', 'What does your ship mean to you \u2014 is it a tool, a home, or an escape?', 'Who in the Fleet still has authority over you, and what would it take to sever that tie?', 'What cargo did you agree to carry without asking what was inside?', 'What happened the last time you trusted a stranger in the void?', 'What do you owe, and to whom, and what happens when they collect?'],
+  },
+  victorian: {
+    current:  [{ name: 'The Fog Hides Things That Hunt', desc: 'Disappearances in Whitechapel are accelerating. The police have stopped investigating.' }, { name: 'The Royal Society Has a Secret Wing', desc: 'Behind the lectures and papers, something is being studied that defies natural law.' }],
+    impending: [{ name: 'The Threshold Is Thinning', desc: 'The boundary between what is real and what should not be is weakening. The signs are in the mirrors.' }, { name: 'The Clockwork Servants Are Dreaming', desc: 'Automated devices across the city are exhibiting unscheduled behaviours at night. The engineers who built them have no explanation.' }],
+    hc: ['Alienist Who Studies What Studies Him Back', 'Society Photographer with a Darkroom Secret', 'Clockwork Surgeon Wanted by the College', 'Inspector Who Sees Patterns No One Else Can'],
+    troubles: ['My Notes Are Starting to Write Themselves', 'Some Subjects Appear in the Negative That Weren\'t in the Room', 'My Methods Work. My Methods Are Illegal.', 'The Patterns Lead Somewhere I Don\'t Want to Go'],
+    questions: ['What did you see that no one else believes?', 'Which institution protects you, and what do they expect in return?', 'What personal vice or obsession do you use to cope with what you know?', 'Who in your social circle would be destroyed if your true work were revealed?', 'What experiment or investigation went wrong, and what did it cost?', 'What draws you to the darkness \u2014 curiosity, duty, or something you can\'t name?'],
+  },
+  postapoc: {
+    current:  [{ name: 'The Water War Has Started', desc: 'Two convoys are fighting over the last clean aquifer. Everyone else is choosing sides.' }, { name: 'Radio Silence from the Northern Settlements', desc: 'Three communities stopped broadcasting. Scouts haven\'t returned.' }],
+    impending: [{ name: 'Winter Is Coming Early', desc: 'The growing season is shortening. Food stores won\'t last. Migration or conflict is inevitable.' }, { name: 'The Seeds Aren\'t Germinating', desc: 'This season\'s planting has produced almost nothing. The soil isn\'t dead \u2014 something is in it that shouldn\'t be.' }],
+    hc: ['Convoy Medic Who Buries What She Can\'t Fix', 'Water-Finder Who Charges What the Water\'s Worth', 'Radio Operator Who Heard Something in the Static', 'Former Teacher Keeping Knowledge Alive'],
+    troubles: ['The Graves Are Catching Up', 'Everyone Needs Me. Nobody Trusts Me.', 'The Voice on the Radio Knows My Name', 'The Children Don\'t Understand What Was Lost'],
+    questions: ['What do you remember about the world before, and how does that memory help or hurt you?', 'Who did you fail to save, and how does that shape what you do now?', 'What resource do you control or protect, and who wants to take it from you?', 'What rule have you made for yourself that you will not break?', 'Who at this table did you meet on the road, and what happened that made you decide to travel together?', 'What are you walking toward \u2014 a place, a person, or an idea?'],
+  },
+  western: {
+    current:  [{ name: 'The Railroad Is Buying Everything', desc: 'Land agents are making offers that aren\'t optional. Holdouts are finding their water rights disputed.' }, { name: 'A Hanging Gone Wrong', desc: 'The wrong man swung. The real killer is still out there. The town knows but won\'t speak.' }],
+    impending: [{ name: 'The Army Is Coming', desc: 'Fort Reno is deploying a full regiment. Whatever they\'re responding to, the frontier won\'t be the same after.' }, { name: 'The Water Rights Are Being Redrawn', desc: 'A federal surveyor arrived last week with new maps. By his reckoning, every claim downstream of the ridge belongs to the railroad now.' }],
+    hc: ['Land Surveyor Working Both Sides of the Deed', 'Circuit Rider Preacher with a Warrant', 'Assay Office Clerk Who Knows Every Vein', 'Former Cavalry Scout Who Walked Away'],
+    troubles: ['Three Towns Believe the Same Acre Is Theirs', 'The Lord\'s Work and the Law\'s Work Crossed Once', 'The Company Pays My Salary and Owns My Silence', 'I Saw What Happened at Sand Creek'],
+    questions: ['What brought you west \u2014 opportunity, escape, or something you can\'t name?', 'What do you own that someone powerful wants?', 'Which side of the law are you on, and has that always been the case?', 'Who do you owe a debt to that money can\'t settle?', 'What happened in the last town that means you can\'t go back?', 'What do you believe about justice, and when was that belief last tested?'],
+  },
+  dVentiRealm: {
+    current:  [{ name: 'The Senate Has Collapsed', desc: 'The governing body of the realm has dissolved. Regional powers are filling the vacuum. Law is local and contradictory.' }, { name: 'The Vaults Are Opening', desc: 'Ancient sealed repositories are cracking. What comes out is valuable, dangerous, and claimed by multiple factions.' }],
+    impending: [{ name: 'The Sealed Ones Are Waking', desc: 'The things that were locked in the Vaults are becoming aware. They are not grateful.' }, { name: 'The Arbiters\' Guild Has Gone Quiet', desc: 'The guild that mediated disputes between the regional powers has stopped responding to summons. Without them, every disagreement becomes a confrontation.' }],
+    hc: ['Vault Warden Who Lost Their Key', 'Senate Exile with Dangerous Testimony', 'Guild Artificer Whose Creations Malfunction Creatively', 'Wandering Arbiter with No Authority Left'],
+    troubles: ['The Key Wasn\'t Lost \u2014 It Was Taken', 'My Testimony Would Destroy Three Houses', 'The Malfunctions Are Getting Smarter', 'I Judge by Laws That No Longer Exist'],
+    questions: ['What was your role before the Senate fell, and what is it now?', 'Which Vault have you seen opened, and what came out?', 'What faction wants your loyalty, and what are they offering?', 'What skill or knowledge do you have that makes you valuable \u2014 and dangerous?', 'Who at this table do you know from before the collapse, and has your relationship changed?', 'What would you restore if you could \u2014 the Senate, the Vaults, or something else entirely?'],
+  },
+};

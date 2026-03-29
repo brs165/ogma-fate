@@ -120,7 +120,7 @@
 
   // ── Generator groups for sidebar ──────────────────────────────────────────
   const GENERATOR_GROUPS = [
-    { id: 'people', label: 'People', gens: ['npc_minor', 'npc_major', 'pc', 'backstory'] },
+    { id: 'people', label: 'People', gens: ['npc_minor', 'npc_major', 'pc', 'backstory', 'stunt'] },
     { id: 'scene', label: 'Scene', gens: ['scene', 'encounter', 'complication'] },
     { id: 'story', label: 'Story', gens: ['seed', 'campaign', 'faction'] },
     { id: 'mechanics', label: 'Mechanics', gens: ['compel', 'consequence', 'challenge', 'contest', 'obstacle', 'countdown', 'constraint'] },
@@ -338,22 +338,18 @@
       <div class="sb-acc" role="navigation" aria-label="Campaign navigation">
 
         <!-- TABLE section -->
-        <Collapsible.Root open={sbAcc === 'table'} onOpenChange={(o) => { sbAcc = o ? 'table' : null; }} class="sb-acc-sec">
-          <Collapsible.Trigger class="sb-acc-hdr{sbAcc === 'table' ? ' is-open' : ''}">
-            <span aria-hidden="true" class="sb-acc-sec-ico"><i class="fa-solid fa-table-cells"></i></span>
-            <span class="sb-acc-sec-name">Table</span>
-          </Collapsible.Trigger>
-          <Collapsible.Content class="sb-acc-body">
+        <div class="sb-acc-sec">
+          <div class="sb-acc-body">
             <button class="sb-acc-item" onclick={toggleTableFull} aria-pressed={String(tableFull)}>
               <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-solid {tableFull ? 'fa-compress' : 'fa-expand'}"></i></span>
-              <span class="sidebar-item-label">{tableFull ? 'Split view' : 'Full Table'}</span>
+              <span class="sidebar-item-label">{tableFull ? 'Split Table View' : 'Full Table View'}</span>
             </button>
             <button class="sb-acc-item sb-mobile-only" onclick={() => { showSidebar = false; }}>
               <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-solid fa-mobile-screen"></i></span>
-              <span class="sidebar-item-label">Table on mobile</span>
+              <span class="sidebar-item-label">Mobile Table View</span>
             </button>
-          </Collapsible.Content>
-        </Collapsible.Root>
+          </div>
+        </div>
 
         <!-- GENERATE section -->
         <Collapsible.Root open={sbAcc === 'generate'} onOpenChange={(o) => { sbAcc = o ? 'generate' : null; }} class="sb-acc-sec">
@@ -395,7 +391,7 @@
             </button>
             <a href="/help" class="sb-acc-item" style="text-decoration:none">
               <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-solid fa-book-open"></i></span>
-              <span class="sidebar-item-label">Help &amp; Wiki</span>
+              <span class="sidebar-item-label">Help</span>
             </a>
             <a href="/about" class="sb-acc-item" style="text-decoration:none">
               <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-solid fa-circle-info"></i></span>
@@ -409,27 +405,6 @@
         </Collapsible.Root>
       </div>
 
-      <div style="height:8px;flex-shrink:0"></div>
-
-      <!-- Dock -->
-      <div class="sb-dock" role="toolbar" aria-label="Site navigation and status">
-        <a href="/help/learn-fate" class="sb-dock-btn" aria-label="Learn Fate">
-          <span aria-hidden="true" class="sb-dock-ico"><i class="fa-solid fa-book-open"></i></span>
-          <span class="sb-dock-lbl">Learn</span>
-        </a>
-        <a href="/help/reference" class="sb-dock-btn" target="_blank" rel="noopener" aria-label="Print reference card">
-          <span aria-hidden="true" class="sb-dock-ico"><i class="fa-solid fa-print"></i></span>
-          <span class="sb-dock-lbl">Ref</span>
-        </a>
-        <a href="/" class="sb-dock-btn" aria-label="All Worlds">
-          <span aria-hidden="true" class="sb-dock-ico"><i class="fa-solid fa-earth-americas"></i></span>
-          <span class="sb-dock-lbl">Worlds</span>
-        </a>
-        <div class="sb-dock-btn sb-dock-status" role="status" aria-live="polite" aria-label={isOnline ? 'Online' : 'Offline'} tabindex="-1">
-          <span aria-hidden="true" class="sb-status-dot" class:offline={!isOnline}></span>
-          <span class="sb-dock-lbl" style="color:{isOnline ? 'var(--c-green,#4CD964)' : 'var(--c-red,#E06060)'}">{isOnline ? 'Online' : 'Offline'}</span>
-        </div>
-      </div>
     </nav>
 
     <!-- Main content panel — split: generator | table -->
