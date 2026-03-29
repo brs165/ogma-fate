@@ -22,13 +22,15 @@
   import { AlertDialog } from 'bits-ui';
 
   // ── Props ──────────────────────────────────────────────────────────────────
-  let { campId = 'fantasy', onClose = null, embedded = false } = $props();
+  let { campId = 'fantasy', onClose = null, embedded = false, onCardsChange = null } = $props();
 
   // ── Exposed for embedded parent ────────────────────────────────────────────
   export function sendToTable(genId, data) {
     if (!canvas) return;
     canvas.generateCardWithData(genId, data);
   }
+  export function deleteCard(id) { if (canvas) canvas.deleteCard(id); }
+  export function rerollCard(id) { if (canvas) canvas.rerollCard(id); }
   export function toggleDice() { showDice = !showDice; }
   export function toggleFP()   { showFP   = !showFP;   }
   export function dropTemplateFromParent(tplId) { dropTemplate(tplId); }
@@ -86,7 +88,7 @@
     unsubs.forEach(u => u());
     unsubs = [];
     canvas = createCanvasStore(campCanvasKey, tables, showToast, null);
-    unsubs.push(canvas.cards.subscribe(v => cards = v));
+    unsubs.push(canvas.cards.subscribe(v => { cards = v; onCardsChange?.(v); }));
     unsubs.push(canvas.connectors.subscribe(v => connectorLines = v));
     unsubs.push(canvas.groups.subscribe(v => groups = v));
     unsubs.push(canvas.loaded.subscribe(v => {
