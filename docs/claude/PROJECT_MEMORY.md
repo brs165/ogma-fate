@@ -249,8 +249,9 @@ consequence stickies, undo (moves + reroll + delete), Ctrl+A select all, canvas 
 - **Version format:** `YYYY.MM.NNN` (e.g. `2026.03.699`)
 - **Zip naming:** source = `YYYY-MM-NNN.zip`, offline = `ogma-offline-YYYY-MM-NNN.zip`
 - **`npx vite build`** — use for all test/intermediate builds. No version bump.
-- **`bash scripts/bump-version.sh`** — run ONCE, immediately before the final zip delivery only.
-- Current version: `2026.03.814`
+- **`npm run build`** — same as `npx vite build`. Does NOT bump. Safe for CF Pages.
+- **`bash scripts/bump-version.sh`** — run ONCE, immediately before the final zip delivery only. **Auto-commits the bump** — the change is never lost.
+- Current version: `2026.03.819`
 
 ---
 
@@ -259,5 +260,5 @@ consequence stickies, undo (moves + reroll + delete), Ctrl+A select all, canvas 
 - **URL:** ogma.net
 - **Platform:** Cloudflare Pages — auto-deploys from `main` branch
 - **Repo:** github.com/brs165/ogma-fate
-- **Build command:** `npm run build` (runs bump-version.sh + vite build)
+- **Build command:** `npm run build` (just `npx vite build` — no bump in CF)
 - **Build output:** `build/`

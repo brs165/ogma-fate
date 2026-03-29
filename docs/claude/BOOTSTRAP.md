@@ -120,12 +120,13 @@ npx vite build               # Must print "✔ done"
 ## 7. Zip delivery
 
 ```bash
-# BUILD SCRIPT RULE:
-# - `npx vite build` for test builds — NO version bump
+# BUILD RULE — DO NOT use npm run build for test builds
+# - `npx vite build` for all test/intermediate builds — NO version bump
 # - `bash scripts/bump-version.sh` ONCE only, immediately before the final zip
+#   The script auto-commits the bump — it CANNOT be accidentally lost.
 
 # Source zip (for GitHub push)
-bash scripts/bump-version.sh
+bash scripts/bump-version.sh   # bumps + auto-commits
 zip -rq YYYY-MM-NNN.zip . \
   -x "node_modules/*" -x ".svelte-kit/*" -x "build/*" -x ".git/*"
 
@@ -134,7 +135,7 @@ npx vite build
 cd build && zip -rq ../ogma-offline-YYYY-MM-NNN.zip .
 ```
 
-Current version: `2026.03.814`
+Current version: `2026.03.819`
 
 ---
 
