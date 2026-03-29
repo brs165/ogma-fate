@@ -176,6 +176,129 @@
 
   function reroll() { rerolls += 1; }
 
+  // ── GM Prep ──
+  function roll(genId) {
+    if (!campId || !CAMPAIGNS[campId]) return null;
+    try {
+      const t = filteredTables(mergeUniversal(CAMPAIGNS[campId].tables), {});
+      return generate(genId, t, pcCount, {});
+    } catch (e) {
+      console.error('Session Zero generate failed:', genId, e);
+      return null;
+    }
+  }
+
+  function generateGmPrep() {
+    if (!seedData) seedData = roll('seed');
+    if (!sceneData) sceneData = roll('scene');
+    if (!npcData) npcData = roll('npc_major');
+  }
+
+  function rerollSeed() { seedData = roll('seed'); }
+  function rerollScene() { sceneData = roll('scene'); }
+  function rerollNpc() { npcData = roll('npc_major'); }
+
+  // ── Export & Handoff ──
+  let copied = $state('');
+  let sentToPrep = $state(false);
+  let campName = $derived(camp ? camp.name : '');
+
+  function goToBoard() {
+    window.location.href = '/campaigns/' + (campId || 'fantasy');
+  }
+
+  async function sendAllToTable() {
+    if (!campId) return;
+    try {
+      const { generateSzPack } = await import('$lib/stores/canvasStore.js');
+      const campData = CAMPAIGNS[campId];
+      if (!campData) return;
+      const campN = campData.meta?.name || campName || campId;
+      const gmPrep = (seedData || sceneData || npcData) ? { seed: seedData, scene: sceneData, npc: npcData } : null;
+      const pack = generateSzPack(pcDrafts, campId, campN, campData, mode, gmPrep);
+      const DB = (await import('$lib/db.js')).default;
+      const prepKey = 'board_canvas_prep_v1_' + campId;
+      const existing = await DB.loadSession(prepKey).catch(() => null);
+      const prev = existing?.cards || [];
+      await DB.saveSession(prepKey, { cards: prev.concat(pack), ts: Date.now() });
+      sentToPrep = true;
+      setTimeout(() => { sentToPrep = false; }, 3000);
+    } catch(e) { console.error('[Ogma] sendAllToTable failed:', e); }
+  }
+
+  function exportJSON() {
+    const items = [];
+    if (seedData) items.push({ generator: 'seed', label: seedData.location || 'Seed', data: seedData, ts: Date.now() });
+    if (sceneData) items.push({ generator: 'scene', label: 'Scene', data: sceneData, ts: Date.now() });
+    if (npcData) items.push({ generator: 'npc_major', label: npcData.name || 'NPC', data: npcData, ts: Date.now() });
+    pcDrafts.forEach((pc, i) => {
+      items.push({ generator: 'pc', label: pc.name || 'PC ' + (i + 1), data: pc, ts: Date.now() });
+    });
+    const exportObj = {
+      format: 'ogma', version: '2.0.0',
+      campaign: campName || '', campId: campId || '',
+      ts: Date.now(),
+      results: items,
+    };
+    const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (campId || 'ogma') + '-session-zero.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function copyMarkdown() {
+    const modeLabel = mode === 'trio' ? 'Phase Trio' : mode === 'flashback' ? 'Flashback Slots' : 'Condensed Standard';
+    const lines = [
+      '# Session Zero Summary',
+      '**Campaign:** ' + (campName || '-'),
+      '**Mode:** ' + modeLabel,
+      '**Date:** ' + new Date().toLocaleDateString(),
+      '', '---', '',
+    ];
+    pcDrafts.forEach((pc, i) => {
+      lines.push('## ' + (pc.name || 'Player ' + (i + 1)));
+      lines.push('- **High Concept:** ' + (pc.hc || '___'));
+      lines.push('- **Trouble:** ' + (pc.trouble || '___'));
+      if (mode === 'standard') {
+        lines.push('- **Relationship:** ' + (pc.relationship || '___'));
+        lines.push('- **Free Aspect:** ' + (pc.free1 || '___'));
+        lines.push('- **Free Aspect:** ' + (pc.free2 || '___'));
+      } else if (mode === 'trio') {
+        lines.push('- **Phase 1:** ' + (pc.phase1 || '___'));
+        lines.push('- **Phase 2:** ' + (pc.phase2 || '___'));
+        lines.push('- **Phase 3:** ' + (pc.phase3 || '___'));
+      } else {
+        lines.push('- **Flashback 1:** _(discover during play)_');
+        lines.push('- **Flashback 2:** _(discover during play)_');
+        lines.push('- **Flashback 3:** _(discover during play)_');
+      }
+      if (pc.skills?.length > 0) {
+        lines.push('', '### Skills');
+        pc.skills.forEach(sk => { if (sk?.name) lines.push('- **' + (SKILL_LABEL[sk.r] || '+' + sk.r) + ':** ' + sk.name); });
+      }
+      if (pc.stunts?.length > 0) {
+        lines.push('', '### Stunts');
+        pc.stunts.forEach((st, j) => lines.push((j + 1) + '. **' + st.name + '** (' + (st.skill || '') + ')'));
+      }
+      lines.push('- **Refresh:** 3', '');
+    });
+    if (seedData) {
+      lines.push('---', '', '## GM Prep');
+      lines.push('**Seed:** ' + (seedData.location || '') + ' — ' + (seedData.objective || ''));
+      if (npcData) lines.push('**NPC:** ' + (npcData.name || ''));
+    }
+    lines.push('', '---', '*Generated by Ogma Session Zero Wizard*');
+    const md = lines.join('\n');
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(md).then(() => { copied = 'Copied!'; setTimeout(() => { copied = ''; }, 2000); });
+    }
+  }
+
   // ── Navigation ──
   function next() {
     // PC loop: cycle through PCs on HC and Trouble steps
@@ -195,6 +318,7 @@
       if (nid === 'relationship') refreshRelSuggestions();
       if (nid === 'freeaspects') refreshFreeSuggestions();
       if (nid === 'stunts') refreshStuntSuggestions();
+      if (nid === 'gmprep') generateGmPrep();
     }
   }
   function back() {
@@ -712,12 +836,214 @@
         <div class="sz-tip">Stress clears after every scene. Consequences stick around and can be compelled against you &mdash; but they also earn you fate points when they cause trouble.</div>
       </div>
 
-    <!-- ── PLACEHOLDER: remaining steps (Layer 4) ───── -->
-    {:else}
+    <!-- ── STEP: GM Prep ─────────────────────────────── -->
+    {:else if stepId === 'gmprep'}
       <div class="sz-body">
+        <p>Now that your characters exist, here's a situation to drop them into. The seed, scene, and NPC are generated from your world and can reference your PCs' aspects.</p>
+
+        {#if seedData}
+          <div class="sz-prep-section">
+            <div class="sz-prep-hdr">
+              <span class="sz-prep-hdr-label">Adventure Seed</span>
+              <span class="sz-prep-hdr-name">{seedData.location || ''}</span>
+            </div>
+            {#if seedData.objective}
+              <div class="sz-prep-field"><div class="sz-prep-field-label">Objective</div><div class="sz-prep-field-value">{seedData.objective}</div></div>
+            {/if}
+            {#if seedData.complication}
+              <div class="sz-prep-field"><div class="sz-prep-field-label">Complication</div><div class="sz-prep-field-value">{seedData.complication}</div></div>
+            {/if}
+            {#if seedData.twist}
+              <div class="sz-prep-field"><div class="sz-prep-field-label">Twist (reveal late)</div><div class="sz-prep-field-value" style="font-style:italic">{seedData.twist}</div></div>
+            {/if}
+            <button class="btn btn-ghost sz-reroll" onclick={rerollSeed} type="button"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> Reroll seed</button>
+          </div>
+        {/if}
+
+        {#if sceneData}
+          <div class="sz-prep-section">
+            <div class="sz-prep-hdr">
+              <span class="sz-prep-hdr-label">Opening Scene</span>
+            </div>
+            {#if Array.isArray(sceneData.aspects) && sceneData.aspects.length > 0}
+              <div class="sz-prep-field">
+                <div class="sz-prep-field-label">Situation Aspects</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">
+                  {#each sceneData.aspects as a}
+                    <span style="font-size:11px;padding:3px 8px;background:var(--inset);border:1px solid var(--border);border-radius:4px;color:var(--text-dim);font-style:italic">{typeof a === 'string' ? a : (a.name || '')}</span>
+                  {/each}
+                </div>
+              </div>
+            {/if}
+            {#if Array.isArray(sceneData.zones) && sceneData.zones.length > 0}
+              <div class="sz-prep-field">
+                <div class="sz-prep-field-label">Zones</div>
+                {#each sceneData.zones.slice(0, 3) as z}
+                  <div class="sz-prep-field-value">
+                    <strong>{typeof z === 'string' ? z : (z.name || z[0] || '')}</strong>
+                    {#if typeof z === 'object'} &mdash; {z.aspect || z[1] || ''}{/if}
+                  </div>
+                {/each}
+              </div>
+            {/if}
+            <button class="btn btn-ghost sz-reroll" onclick={rerollScene} type="button"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> Reroll scene</button>
+          </div>
+        {/if}
+
+        {#if npcData}
+          {@const asp = npcData.aspects || {}}
+          {@const npcSkills = npcData.skills || []}
+          <div class="sz-prep-section">
+            <div class="sz-prep-hdr">
+              <span class="sz-prep-hdr-label">Opening NPC</span>
+              <span class="sz-prep-hdr-name">{npcData.name || ''}</span>
+            </div>
+            {#if asp.high_concept}
+              <div class="sz-prep-field"><div class="sz-prep-field-label">High Concept</div><div class="sz-prep-field-value" style="font-style:italic">{asp.high_concept}</div></div>
+            {/if}
+            {#if asp.trouble}
+              <div class="sz-prep-field"><div class="sz-prep-field-label">Trouble</div><div class="sz-prep-field-value" style="font-style:italic">{asp.trouble}</div></div>
+            {/if}
+            {#if npcSkills.length > 0}
+              <div class="sz-prep-field">
+                <div class="sz-prep-field-label">Top Skills</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
+                  {#each npcSkills.slice(0, 4) as s}
+                    <span style="font-size:11px;color:var(--text-dim);background:var(--inset);border:1px solid var(--border);border-radius:4px;padding:2px 7px">
+                      <strong style="color:var(--accent);font-family:var(--font-mono);margin-right:4px">+{s.r}</strong>{s.name}
+                    </span>
+                  {/each}
+                </div>
+              </div>
+            {/if}
+            <button class="btn btn-ghost sz-reroll" onclick={rerollNpc} type="button"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> Reroll NPC</button>
+          </div>
+        {/if}
+
+        <div class="sz-tip">This is a situation, not a plot. The players' choices are the story. Prep Scene 1 in full. Follow the players after that.</div>
+      </div>
+
+    <!-- ── STEP: Questions ─────────────────────────────── -->
+    {:else if stepId === 'questions'}
+      <div class="sz-body">
+        <p>Go around the table. Each player answers two of these questions aloud. Every answer should name another character. These become aspect seeds.</p>
+
+        {#if wd && wd.questions}
+          <div class="sz-card">
+            <div class="sz-card-title">World Questions &mdash; {campName}</div>
+            <ol style="margin:8px 0 0 18px;color:var(--text-dim);line-height:1.8">
+              {#each wd.questions as q}
+                <li style="padding:3px 0">{q}</li>
+              {/each}
+            </ol>
+          </div>
+        {/if}
+
+        <div class="sz-tip">High Concept and Trouble are enough to start play. The other three aspects reveal themselves in the first session.</div>
+      </div>
+
+    <!-- ── STEP: Summary & Export ──────────────────────── -->
+    {:else if stepId === 'summary'}
+      {@const modeLabel = mode === 'trio' ? 'Phase Trio' : mode === 'flashback' ? 'Flashback Slots' : 'Condensed Standard'}
+      <div class="sz-body">
+        <div class="sz-summary-section">
+          <div class="sz-summary-label">Campaign</div>
+          <div class="sz-summary-value">{campName}</div>
+        </div>
+        <div class="sz-summary-section">
+          <div class="sz-summary-label">Mode</div>
+          <div class="sz-summary-value">{modeLabel}</div>
+        </div>
+
+        <!-- PC summaries -->
+        {#each pcDrafts as pc, i}
+          <div class="sz-summary-pc">
+            <div class="sz-summary-pc-name">{pc.name || 'Player ' + (i + 1)}</div>
+            <div class="sz-summary-aspect"><span class="sz-summary-aspect-label">HC</span><span class="sz-summary-aspect-val">{pc.hc || '(blank)'}</span></div>
+            <div class="sz-summary-aspect"><span class="sz-summary-aspect-label">Trouble</span><span class="sz-summary-aspect-val">{pc.trouble || '(blank)'}</span></div>
+            {#if mode === 'standard'}
+              <div class="sz-summary-aspect"><span class="sz-summary-aspect-label">Relationship</span><span class="sz-summary-aspect-val">{pc.relationship || '(blank)'}</span></div>
+              <div class="sz-summary-aspect"><span class="sz-summary-aspect-label">Free 1</span><span class="sz-summary-aspect-val">{pc.free1 || '(blank)'}</span></div>
+              <div class="sz-summary-aspect"><span class="sz-summary-aspect-label">Free 2</span><span class="sz-summary-aspect-val">{pc.free2 || '(blank)'}</span></div>
+            {:else if mode === 'trio'}
+              <div class="sz-summary-aspect"><span class="sz-summary-aspect-label">Phase 1</span><span class="sz-summary-aspect-val">{pc.phase1 || '(blank)'}</span></div>
+              <div class="sz-summary-aspect"><span class="sz-summary-aspect-label">Phase 2</span><span class="sz-summary-aspect-val">{pc.phase2 || '(blank)'}</span></div>
+              <div class="sz-summary-aspect"><span class="sz-summary-aspect-label">Phase 3</span><span class="sz-summary-aspect-val">{pc.phase3 || '(blank)'}</span></div>
+            {:else}
+              <div class="sz-summary-aspect"><span class="sz-summary-aspect-label">Flashbacks</span><span class="sz-summary-aspect-val">3 slots (discover during play)</span></div>
+            {/if}
+            {#if pc.skills?.length > 0}
+              <div style="margin-top:6px;font-size:11px;color:var(--text-muted)">
+                {#each pc.skills.filter(s => s?.name) as sk}
+                  <span style="margin-right:8px"><strong style="color:var(--accent)">+{sk.r}</strong> {sk.name}</span>
+                {/each}
+              </div>
+            {/if}
+            {#if pc.stunts?.length > 0}
+              <div style="margin-top:4px;font-size:11px;color:var(--text-muted)">
+                Stunts: {pc.stunts.map(s => s.name).join(', ')}
+              </div>
+            {/if}
+          </div>
+        {/each}
+
+        <!-- GM Prep summary -->
+        {#if seedData || sceneData || npcData}
+          <div class="sz-summary-section">
+            <div class="sz-summary-label">GM Prep</div>
+            {#if seedData}<div class="sz-summary-value" style="font-size:13px">{seedData.location || 'Seed'} &mdash; {seedData.objective || ''}</div>{/if}
+            {#if npcData}<div class="sz-summary-value" style="font-size:13px">NPC: {npcData.name || ''}</div>{/if}
+          </div>
+        {/if}
+
+        <!-- Advancement -->
         <div class="sz-card">
-          <div class="sz-card-title">Coming Next</div>
-          <p>This step ({stepId}) is being built in the next layer.</p>
+          <div class="sz-card-title">Milestones &amp; Breakthroughs</div>
+          <div style="margin-bottom:10px">
+            <strong style="color:var(--gold)">Milestone</strong>
+            <span style="color:var(--text-muted)"> (end of each session)</span>
+            <div style="font-size:14px;color:var(--text-dim);margin-top:4px">Swap two skill ranks, rewrite a stunt, rewrite one aspect (not high concept), or buy a new stunt for 1 Refresh.</div>
+          </div>
+          <div>
+            <strong style="color:var(--gold)">Breakthrough</strong>
+            <span style="color:var(--text-muted)"> (end of a story arc)</span>
+            <div style="font-size:14px;color:var(--text-dim);margin-top:4px">Everything from a milestone PLUS: rewrite your high concept, increase one skill by +1, and begin recovery of moderate/severe consequences.</div>
+          </div>
+        </div>
+
+        <!-- Export bar -->
+        <div class="sz-export-bar">
+          <button class="btn btn-primary" onclick={sendAllToTable}><i class="fa-solid fa-table-cells" aria-hidden="true"></i> Send All to Table</button>
+          <button class="btn btn-ghost" onclick={copyMarkdown}><i class="fa-solid fa-clipboard" aria-hidden="true"></i> Markdown</button>
+          <button class="btn btn-ghost" onclick={exportJSON}><i class="fa-solid fa-arrow-down" aria-hidden="true"></i> JSON</button>
+          <button class="btn btn-ghost" onclick={() => { if (typeof window !== 'undefined') window.print(); }}><i class="fa-solid fa-print" aria-hidden="true"></i> Print</button>
+        </div>
+        {#if copied}
+          <div class="sz-copied">{copied}</div>
+        {/if}
+        {#if sentToPrep}
+          <div class="sz-copied"><i class="fa-solid fa-check" aria-hidden="true"></i> Session zero pack sent to prep canvas</div>
+        {/if}
+
+        <div class="sz-tip">Session 1 starts IN the situation. No tavern. No meeting. The opening hook drops the PCs directly into the action.</div>
+
+        <!-- Start session -->
+        <div class="sz-ready-box">
+          <div class="sz-ready-label"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> Ready to play?</div>
+          <div class="sz-ready-desc">Start a local session on this device. The board opens in Prep mode with your world loaded.</div>
+          <button class="btn btn-primary sz-ready-cta" onclick={() => {
+            if (typeof window === 'undefined') return;
+            try {
+              localStorage.setItem('ogma_sz_seed', JSON.stringify({
+                _sz_auto_pc: true, campId: campId || 'fantasy', ts: Date.now(), mode,
+              }));
+            } catch(e) {}
+            window.location.href = '/campaigns/' + (campId || 'fantasy') + '?canvas=prep&sz=1';
+          }}><i class="fa-solid fa-play" aria-hidden="true"></i> Open {campName} Prep Canvas</button>
+        </div>
+
+        <div style="text-align:center;margin-top:16px">
+          <button class="btn btn-ghost" onclick={() => { step = 0; campId = null; seedData = null; sceneData = null; npcData = null; pcDrafts = []; pcIndex = 0; }} style="font-size:12px">Start over</button>
         </div>
       </div>
     {/if}
