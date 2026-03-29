@@ -128,7 +128,7 @@
               <div class="lf-action-outcomes">
                 <div class="lf-out-row"><span class="lf-out lf-out-fail">Fail</span>Attack misses or is absorbed</div>
                 <div class="lf-out-row"><span class="lf-out lf-out-tie">Tie</span>No damage, but attacker earns a boost</div>
-                <div class="lf-out-row"><span class="lf-out lf-out-win">Success</span>Shifts of damage dealt as stress</div>
+                <div class="lf-out-row"><span class="lf-out lf-out-win">Success</span>Shifts of damage dealt as stress (1 shift = 1 box)</div>
                 <div class="lf-out-row"><span class="lf-out lf-out-style">Style</span>Shifts dealt — or reduce by 1 for a boost</div>
               </div>
             </div>
@@ -164,7 +164,7 @@
       <summary class="step-summary"><span class="step-num">4</span> Fate points — the economy</summary>
       <div class="step-body">
         <p>You start each session with at least 3 <strong>fate points</strong>. Spend one to <strong>invoke</strong> an aspect for +2 on a roll (or a reroll). Earn one when you accept a <strong>compel</strong> — the GM offers a fate point and a complication based on one of your aspects. You can refuse a compel by spending a fate point instead.</p>
-        <p>The flow is: accept compels to earn points, spend points to invoke aspects on big rolls. This is the heartbeat of Fate. More compels = more fate points = more dramatic swings. <a href="https://fate-srd.com/fate-condensed/aspects-and-fate-points" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
+        <p>The flow is: accept compels to earn points, spend points to invoke aspects on big rolls. This is the heartbeat of Fate. More compels = more fate points = more dramatic swings. <a href="https://fate-srd.com/fate-condensed/aspects-and-fate-points" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a> For the GM-side of the economy (how many points the GM starts with per scene), see <a href="/help/fate-mechanics#fate-point-economy-gm">Fate Point Economy →</a></p>
         <div class="callout callout-dnd" role="note"><div class="callout-title">⚔ Coming from D&amp;D</div><p>There is no equivalent in D&D. The closest analogy: imagine if every flaw on your character sheet gave you Inspiration when it caused problems, and you could spend Inspiration for +2 on any roll. That's the fate point economy.</p></div>
         <div class="callout callout-tip" role="note"><div class="callout-title">🎲 GM tip — compel honestly</div><p>A compel is an offer, not a punishment. Frame it as a question: "Your aspect <em>Always Takes the Hard Way</em> — would your character take the obvious exit, or insist on going back for the contact?" The player decides what their character would actually do. If it feels like a gotcha, it's not a compel — it's a trap.</p></div>
         <div class="callout callout-scenario" role="note">

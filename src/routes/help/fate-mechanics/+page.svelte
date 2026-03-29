@@ -36,6 +36,7 @@
   <a href="#stunts">Stunts</a>
   <a href="#contests">Contests</a>
   <a href="#challenges">Challenges</a>
+  <a href="#zones">Zones</a>
   <a href="#countdowns">Countdowns</a>
   <a href="#compels">Compels</a>
   <a href="#create-advantage">Create an Advantage</a>
@@ -63,7 +64,7 @@
   <li><strong>Success with Style</strong> on Defend — the defender earns a boost</li>
   <li>Some stunts grant boosts under specific conditions</li>
 </ul>
-<p><strong>Rules:</strong> Give it a name immediately — <em>"Stunned,"</em> <em>"Off Balance,"</em> <em>"Momentary Opening."</em> The free invoke works just like invoking any aspect (+2 or reroll), costs no Fate Point, and can be passed to an ally in the same exchange. Use it or lose it — a boost expires as soon as the scene ends or when the free invoke is spent.</p>
+<p><strong>Rules:</strong> Give it a name immediately — <em>"Stunned,"</em> <em>"Off Balance,"</em> <em>"Momentary Opening."</em> The free invoke works just like invoking any aspect (+2 or reroll), costs no Fate Point, and can be passed to an ally before it expires (end of scene or when used). Use it or lose it — a boost expires as soon as the scene ends or when the free invoke is spent.</p>
 <div class="callout callout-tip">
   <div class="callout-title"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> Boost vs. aspect</div>
   <p>A boost is a stripped-down aspect. It cannot be invoked a second time (there's only one free invoke), cannot be compelled, and has no persistence. If you want a lasting effect, use Create Advantage for a real aspect instead. The practical difference: boosts reward exceptional rolls with immediate firepower; aspects reward patient setup with reusable leverage.</p>
@@ -165,6 +166,48 @@
 <p>A Challenge is a sequence of Overcome actions against different obstacles, each with its own skill and difficulty. The group succeeds on the whole challenge only if they pass all individual rolls — or accepts success at a cost when they fail some. <a href="https://fate-srd.com/fate-condensed/challenges-conflicts-and-contests" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
 <p>The Challenge generator gives you a named challenge, success and failure consequences, and a situation aspect. Use it when the party needs to accomplish something complex before an external pressure resolves.</p>
 
+<h2 id="zones">Zones</h2>
+<p>A <strong>zone</strong> is an abstract area within a conflict scene. Zones replace precise grid positioning with narrative space — anywhere you can act without meaningful effort is the same zone. Most conflicts use 2–4 zones; more than that becomes logistics rather than drama. <a href="https://fate-srd.com/fate-condensed/challenges-conflicts-and-contests" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
+<ul>
+  <li><strong>Within a zone:</strong> Free to move. Attack anyone in the same zone without restriction.</li>
+  <li><strong>Adjacent zone:</strong> Costs one exchange action to move — or an Overcome roll if something blocks the path.</li>
+  <li><strong>Ranged attacks:</strong> Certain weapons and stunts let you attack into an adjacent zone.</li>
+  <li><strong>Zone aspects:</strong> Each zone gets 1–2 situation aspects. Anyone in the zone can invoke them.</li>
+</ul>
+
+<div class="zone-map" role="img" aria-label="Three-zone conflict example: Street, Warehouse Floor, Loading Dock">
+  <div class="zone-box">
+    <div class="zone-name">Street</div>
+    <div class="zone-asp">"Rain-Slicked Cobbles"</div>
+  </div>
+  <div class="zone-connector" aria-hidden="true">
+    <span class="zone-arrow">⇄</span>
+    <span class="zone-cost">1 action</span>
+  </div>
+  <div class="zone-box zone-box--focus">
+    <div class="zone-name">Warehouse Floor</div>
+    <div class="zone-asp">"Crates Everywhere"</div>
+    <div class="zone-asp">"Unstable Upper Catwalk"</div>
+  </div>
+  <div class="zone-connector" aria-hidden="true">
+    <span class="zone-arrow">⇄</span>
+    <span class="zone-cost">1 action</span>
+  </div>
+  <div class="zone-box">
+    <div class="zone-name">Loading Dock</div>
+    <div class="zone-asp">"One Exit — One Guard"</div>
+  </div>
+</div>
+
+<div class="callout callout-tip">
+  <div class="callout-title"><i class="fa-solid fa-map" aria-hidden="true"></i> Design each zone to offer different tactics</div>
+  <p>"Crates Everywhere" invites Create Advantage for cover; "One Exit — One Guard" creates escape pressure. Zones that all feel identical flatten the conflict. Aim for one zone that favours melee, one that favours ranged or fleeing, one that creates narrative urgency. Let terrain generate decisions before the dice hit the table.</p>
+</div>
+<div class="callout callout-dnd">
+  <div class="callout-title">⚔ Coming from D&D</div>
+  <p>D&D uses 5-foot squares with precise movement and opportunity attacks. Fate uses narrative zones: instead of "move 30 feet to K14," you say "I sprint into the warehouse." Movement is a dramatic question — <em>are these two people in the same space of the story?</em> — not a geometry problem. This lets the fiction drive positioning rather than the grid.</p>
+</div>
+
 <h2 id="countdowns">Countdowns</h2>
 <p>A Countdown is a threat clock. It has 4–8 boxes and fills when a trigger condition occurs. When the last box fills, the outcome happens — no exceptions. Use countdowns to create temporal pressure the players can see building. <a href="https://fate-srd.com/fate-condensed/challenges-conflicts-and-contests" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
 <p>The live countdown track fills as the GM marks boxes. When the clock hits zero, particles fire and the outcome appears.</p>
@@ -196,6 +239,34 @@
       <p><strong>With Create Advantage:</strong> You throw sand (Athletics +2) to Create Advantage "Sand in His Eyes" — a new situation aspect with one free invoke. You succeed. Next exchange, you Attack at Fight +3 <em>plus</em> your free invoke (+2) = effectively +5 vs. their +4. You're now the favourite.</p>
       <p>The fight changed because you thought before you swung.</p>
     </div>
+    <div class="callout callout-scenario">
+      <div class="callout-title"><i class="fa-solid fa-users" aria-hidden="true"></i> Group tactics — two allies, stacked free invokes</div>
+      <p>The real power appears when a party coordinates. Your group faces Vex, an elite enforcer with Fight +5.</p>
+      <div class="fm-invoke-stack">
+        <div class="fm-is-row fm-is-setup">
+          <span class="fm-is-who">Crow (Notice +2)</span>
+          <span class="fm-is-action">Create Advantage → Success → <em>"Exposed Flank"</em></span>
+          <span class="fm-is-badge">1 free invoke</span>
+        </div>
+        <div class="fm-is-row fm-is-setup">
+          <span class="fm-is-who">River (Provoke +3)</span>
+          <span class="fm-is-action">Create Advantage → Style → <em>"Rattled and Off-Balance"</em></span>
+          <span class="fm-is-badge">2 free invokes</span>
+        </div>
+        <div class="fm-is-divider"></div>
+        <div class="fm-is-row fm-is-attack">
+          <span class="fm-is-who">Crow attacks</span>
+          <span class="fm-is-action">Fight +3 &nbsp;+&nbsp; Exposed Flank +2 &nbsp;+&nbsp; Rattled +2</span>
+          <span class="fm-is-badge fm-is-badge--total">= +7 effective</span>
+        </div>
+        <div class="fm-is-row fm-is-defend">
+          <span class="fm-is-who">Vex defends</span>
+          <span class="fm-is-action">Fight +5</span>
+          <span class="fm-is-badge fm-is-badge--outcome">+2 margin → 2 stress</span>
+        </div>
+      </div>
+      <p>Two rounds of setup produced a +4 swing on the attack without spending a single Fate Point. This is the tactical heartbeat of Fate group combat: build free invokes together, spend them together.</p>
+    </div>
     <div class="callout callout-dnd">
       <div class="callout-title">⚔ Coming from D&amp;D</div>
       <p>D&amp;D has no equivalent to Create Advantage. The closest analogy is the Help action — but Help gives advantage to one ally on one roll. Create Advantage places a reusable aspect that <em>anyone</em> can invoke, stacks with other free invokes, and creates narrative facts the fiction must honour. It's fundamentally more powerful and more interesting than Help.</p>
@@ -208,7 +279,7 @@
     <h2 id="fate-point-economy-gm">The fate point economy — a GM guide</h2>
     <p>The economy breaks when GMs forget to compel. Here's the full cycle. <a href="https://fate-srd.com/fate-condensed/aspects-and-fate-points" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
     <ol>
-      <li><strong>Session start:</strong> Each player gets fate points equal to their Refresh (usually 3). The GM gets 1 per PC per scene — not per NPC, not per encounter. A party of 4 = 4 GM fate points per scene.</li>
+      <li><strong>Session start:</strong> Each player gets fate points equal to their Refresh (usually 3). The GM gets 1 per PC per scene — not per NPC, not per encounter. A party of 4 = 4 GM fate points at the start of each scene (resets every scene).</li>
       <li><strong>During the scene:</strong> GM offers compels to create complications. Players who accept earn 1 FP. Players who refuse spend 1 FP. The GM uses their pool for NPC invokes.</li>
       <li><strong>End of scene:</strong> Reset GM pool to 1 per PC. Player pools carry over — they don't reset until a breakthrough.</li>
     </ol>
