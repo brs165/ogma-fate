@@ -39,7 +39,7 @@ for GMs. Built with SvelteKit + Svelte 5. Deployed at ogma.net via Cloudflare Pa
 | `docs/claude/BOOTSTRAP.md` | Session startup checklist |
 | `docs/claude/PROJECT_MEMORY.md` | Full project state, known issues, backlog |
 
-## Component inventory (77 .svelte files)
+## Component inventory (78 .svelte files)
 
 | Directory | Count | Contents |
 |-----------|-------|---------|
@@ -50,7 +50,7 @@ for GMs. Built with SvelteKit + Svelte 5. Deployed at ogma.net via Cloudflare Pa
 | `panels/` | 1 | LeftPanel |
 | `dice/` | 1 | DicePanel |
 | `shared/` | 3 | HelpDiceRoller, Footer, OgmaTooltip |
-| `routes/` | 28 | Layouts + pages (marketing, help, campaigns) |
+| `routes/` | 29 | Layouts + pages (marketing, help, campaigns) |
 
 ## Onboarding system (v699)
 

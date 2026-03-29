@@ -47,7 +47,7 @@ docs/claude/CANVAS-WORKSHOP.md       Canvas sprint status and backlog
 
 ---
 
-## Svelte 5 runes rules (CRITICAL — applies to all 77 .svelte files)
+## Svelte 5 runes rules (CRITICAL — applies to all 78 .svelte files)
 
 - `let x = $state(value)` — mutable local state. Use `$state.raw(value)` for objects always replaced wholesale (avoids deep proxy).
 - `let x = $derived(expr)` — computed values. Expression only, never a wrapping function.
@@ -110,7 +110,7 @@ screenY = cardY * zoom + panY
 
 ---
 
-## Component inventory (77 .svelte files)
+## Component inventory (78 .svelte files)
 
 ```
 src/lib/components/
@@ -128,7 +128,7 @@ src/lib/components/
 ├── dice/            1    DicePanel
 └── shared/          3    HelpDiceRoller, Footer, OgmaTooltip
 
-src/routes/                28 route page/layout files
+src/routes/                29 route page/layout files
 ```
 
 **Stores (3):** canvasStore.js, sessionStore.js, chromeStore.js
@@ -180,7 +180,7 @@ on all help pages, Web Share API, mobile-responsive onboarding CSS, help level a
 Cards render directly via `{#each}` loop in a transformed viewport div. Connectors as SVG
 overlay. Minimap as scaled position rectangles. No `@xyflow/svelte` dependency.
 
-**Svelte 5 migration** — all 77 .svelte files on runes, zero legacy files.
+**Svelte 5 migration** — all 78 .svelte files on runes, zero legacy files.
 
 **Svelte 5 runes compliance audit (v680)** — systematic pass across all components:
 `void`-dependency hacks removed, sync `$effect` anti-patterns replaced with `$derived`,
@@ -224,6 +224,10 @@ consequence stickies, undo (moves + reroll + delete), Ctrl+A select all, canvas 
 - **PDF-08** Dust and Iron
 
 ### Recently completed
+- ~~**JIT tooltips**~~ OgmaTooltip on ~15 card elements across 10 fronts (NpcMinor, NpcMajor, Encounter, Obstacle, Complication, Consequence, Constraint, Faction, Scene, Seed) — v815
+- ~~**/help/mistakes page**~~ 20 common Fate errors with D&D comparisons, fixes, FCon citations — v815
+- ~~**Generator cross-links**~~ `related` field in HELP_CONTENT, clickable buttons in Campaign How tab — v815
+- ~~**Boost in BackPanel**~~ Added boost entry to CV4_HELP for card flip-side help — v815
 - ~~**Help content revamp**~~ prev/next nav, SRD links, On this page TOC, mobile polish, Wiki→Help rename — v814
 - ~~**AddMenu in canvas controls**~~ moved from Topbar to OgmaCanvas cv-controls panel — v814
 - ~~**Card generation fix**~~ Board.svelte now imports CAMPAIGNS directly (getWorldTables was broken) — v814

@@ -82,7 +82,7 @@ canvasY = (screenY - panY) / zoom
 
 ---
 
-## 5. Component inventory (77 .svelte files)
+## 5. Component inventory (78 .svelte files)
 
 ```
 src/lib/components/
@@ -100,7 +100,7 @@ src/lib/components/
 ├── panels/          1    LeftPanel
 └── shared/          3    HelpDiceRoller, Footer, OgmaTooltip
 
-src/routes/         28    route pages/layouts
+src/routes/         29    route pages/layouts
 ```
 
 > Deleted in v662: `board/nodes/` (4 files) + `nodeTypes.js`. Deleted in v665: TurnBar, PlayerRow, CombatTracker, PlayPanel, BinderPanel, PlayerSurface (play mode removed).
