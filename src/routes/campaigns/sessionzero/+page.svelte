@@ -99,12 +99,20 @@
   // ── Suggestion helpers ──
   let hcSuggestions = $state([]);
   let trSuggestions = $state([]);
+  let relSuggestions = $state([]);
+  let freeSuggestions = $state([]);
 
   function refreshHcSuggestions() {
     if (tables) hcSuggestions = suggestAspects('high_concept', tables, 4);
   }
   function refreshTrSuggestions() {
     if (tables) trSuggestions = suggestAspects('trouble', tables, 4);
+  }
+  function refreshRelSuggestions() {
+    if (tables) relSuggestions = suggestAspects('relationship', tables, 4);
+  }
+  function refreshFreeSuggestions() {
+    if (tables) freeSuggestions = suggestAspects('free', tables, 4);
   }
 
   function reroll() { rerolls += 1; }
@@ -125,6 +133,8 @@
       const nid = STEPS[step].id;
       if (nid === 'highconcept') refreshHcSuggestions();
       if (nid === 'trouble') refreshTrSuggestions();
+      if (nid === 'relationship') refreshRelSuggestions();
+      if (nid === 'freeaspects') refreshFreeSuggestions();
     }
   }
   function back() {
@@ -334,7 +344,144 @@
         <div class="sz-tip">A boring trouble earns you nothing. "Has Enemies" is flat. "The Warlord's Daughter Wants Me Dead" is a compel waiting to happen every single session.</div>
       </div>
 
-    <!-- ── PLACEHOLDER: remaining steps (Layers 2-4) ─── -->
+    <!-- ── STEP: Relationship (standard mode) ────────── -->
+    {:else if stepId === 'relationship'}
+      <div class="sz-body">
+        {#if pcCount > 1}
+          <div class="sz-pc-progress">
+            <span class="sz-pc-progress-label">Player {pcIndex + 1} of {pcCount} &mdash; Relationship</span>
+            <div class="sz-pc-progress-pips">
+              {#each pcDrafts as _, i}<div class="sz-pc-pip" class:active={i === pcIndex} class:done={i < pcIndex}></div>{/each}
+            </div>
+          </div>
+        {/if}
+        <p>Pair up. Each player connects their character to one other PC. Good relationships have tension &mdash; not hostility, but imbalance. <span style="font-style:italic;color:var(--text-muted)">Like all aspects, this can be invoked (+2) when the relationship helps, or compelled (fate point + complication) when it causes friction.</span></p>
+        <div class="sz-card">
+          <div class="sz-card-title">Pick a Template</div>
+          <ul class="sz-template-list">
+            <li>We served together, but one of us got the other in trouble.</li>
+            <li>You saved my life. I still don't know why.</li>
+            <li>We want the same thing but disagree on how to get it.</li>
+            <li>I owe you something I can never repay.</li>
+            <li>We used to be close. Something changed.</li>
+          </ul>
+        </div>
+        <div class="sz-input-group">
+          <label class="sz-input-label" for="pc-rel">Relationship Aspect</label>
+          <input id="pc-rel" type="text" class="sz-input" placeholder="e.g. We Survived the Siege Together" value={currentPc.relationship} oninput={e => updateCurrentPc('relationship', e.target.value)} autocomplete="off" />
+          <div class="sz-mutable"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> You can change this after any session</div>
+        </div>
+        {#if relSuggestions.length > 0}
+          <div class="sz-card">
+            <div class="sz-card-title">Setting Suggestions</div>
+            <div class="sz-suggest-row">
+              {#each relSuggestions as s}
+                <button class="sz-suggest-btn" type="button" onclick={() => updateCurrentPc('relationship', s)}>{s}</button>
+              {/each}
+            </div>
+            <button class="btn btn-ghost sz-reroll" onclick={refreshRelSuggestions} type="button" style="margin-top:8px"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> More suggestions</button>
+          </div>
+        {/if}
+        <div class="sz-tip">The relationship aspect is the strongest compel material in the entire campaign. Cross-PC history is fuel. Invest here.</div>
+      </div>
+
+    <!-- ── STEP: Free Aspects (standard mode) ──────── -->
+    {:else if stepId === 'freeaspects'}
+      <div class="sz-body">
+        {#if pcCount > 1}
+          <div class="sz-pc-progress">
+            <span class="sz-pc-progress-label">Player {pcIndex + 1} of {pcCount} &mdash; Free Aspects</span>
+            <div class="sz-pc-progress-pips">
+              {#each pcDrafts as _, i}<div class="sz-pc-pip" class:active={i === pcIndex} class:done={i < pcIndex}></div>{/each}
+            </div>
+          </div>
+        {/if}
+        <p>These can be anything &mdash; gear, history, reputation, a catchphrase, a connection to the setting. No restrictions beyond fitting the world.</p>
+        <div class="sz-card sz-card--success">
+          <div class="sz-card-title"><i class="fa-solid fa-check" aria-hidden="true"></i> You Can Leave These Blank</div>
+          <p>Official Condensed rule (p.47). Most experienced Fate GMs recommend leaving at least one blank. You'll know what your character needs after the first scene, not before it.</p>
+        </div>
+        <div class="sz-input-group">
+          <label class="sz-input-label" for="pc-free1">Free Aspect 1</label>
+          <input id="pc-free1" type="text" class="sz-input" placeholder="Leave blank to discover during play" value={currentPc.free1} oninput={e => updateCurrentPc('free1', e.target.value)} autocomplete="off" />
+          <div class="sz-mutable"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> You can change this after any session</div>
+        </div>
+        <div class="sz-input-group">
+          <label class="sz-input-label" for="pc-free2">Free Aspect 2</label>
+          <input id="pc-free2" type="text" class="sz-input" placeholder="Leave blank to discover during play" value={currentPc.free2} oninput={e => updateCurrentPc('free2', e.target.value)} autocomplete="off" />
+          <div class="sz-mutable"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> You can change this after any session</div>
+        </div>
+        {#if freeSuggestions.length > 0}
+          <div class="sz-card">
+            <div class="sz-card-title">Aspect Ideas from {camp ? camp.name : 'your world'}</div>
+            <div class="sz-suggest-row">
+              {#each freeSuggestions as s}
+                <button class="sz-suggest-btn" type="button" onclick={() => {
+                  if (!currentPc.free1) updateCurrentPc('free1', s);
+                  else if (!currentPc.free2) updateCurrentPc('free2', s);
+                }}>{s}</button>
+              {/each}
+            </div>
+            <button class="btn btn-ghost sz-reroll" onclick={refreshFreeSuggestions} type="button" style="margin-top:8px"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> More suggestions</button>
+          </div>
+        {/if}
+      </div>
+
+    <!-- ── STEP: Phase 1 (trio mode) ───────────────── -->
+    {:else if stepId === 'phase1'}
+      <div class="sz-body">
+        <p>Go around the table. Each player tells a short story about something that happened to their character before the campaign begins.</p>
+        <div class="sz-prompt-box">"I was at <span class="sz-prompt-fill">[location]</span> when <span class="sz-prompt-fill">[threat]</span> happened, and I survived by <span class="sz-prompt-fill">______</span>."</div>
+        <div class="sz-example">"I was at the Sealed Phade Vault when the Servitors reactivated, and I survived by talking to the lead unit in a language I shouldn't know." &rarr; Aspect: "The Old Machines Listen to Me"</div>
+        <p>After you narrate, ask yourself: "What does this say about who I am?" Write that as your third aspect.</p>
+        <div class="sz-input-group">
+          <label class="sz-input-label" for="pc-phase1">Phase 1 Aspect</label>
+          <input id="pc-phase1" type="text" class="sz-input" placeholder="The aspect that emerges from your story" value={currentPc.phase1} oninput={e => updateCurrentPc('phase1', e.target.value)} autocomplete="off" />
+          <div class="sz-mutable"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> You can change this after any session</div>
+        </div>
+      </div>
+
+    <!-- ── STEP: Phase 2 (trio mode) ───────────────── -->
+    {:else if stepId === 'phase2'}
+      <div class="sz-body">
+        <p>Pass your Phase 1 story to the player on your left. They were there. How were they involved?</p>
+        <p>This produces your <strong>Relationship aspect</strong> &mdash; grounded in a shared story.</p>
+        <p>Narrate one sentence about how you were involved, then write the aspect.</p>
+        <div class="sz-input-group">
+          <label class="sz-input-label" for="pc-phase2">Phase 2 Aspect (Relationship)</label>
+          <input id="pc-phase2" type="text" class="sz-input" placeholder="The relationship aspect from this shared story" value={currentPc.phase2} oninput={e => updateCurrentPc('phase2', e.target.value)} autocomplete="off" />
+          <div class="sz-mutable"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> You can change this after any session</div>
+        </div>
+        <div class="sz-tip">If someone is struggling: "I was the one who brought the rope" is enough. The aspect writes itself from there.</div>
+      </div>
+
+    <!-- ── STEP: Phase 3 (trio mode) ───────────────── -->
+    {:else if stepId === 'phase3'}
+      <div class="sz-body">
+        <p>Pass your Phase 1 story to the player on your <strong>right</strong> (a different player than Phase 2). They pick a role and narrate their involvement. This produces your fifth and final aspect.</p>
+        <div class="sz-input-group">
+          <label class="sz-input-label" for="pc-phase3">Phase 3 Aspect</label>
+          <input id="pc-phase3" type="text" class="sz-input" placeholder="Your fifth aspect from this collaboration" value={currentPc.phase3} oninput={e => updateCurrentPc('phase3', e.target.value)} autocomplete="off" />
+          <div class="sz-mutable"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> You can change this after any session</div>
+        </div>
+        <div class="sz-tip">After this step, every character should have five aspects: High Concept, Trouble, and three from the Phase Trio.</div>
+        <div class="sz-warn">Write all five aspects down before moving to Skills.</div>
+      </div>
+
+    <!-- ── STEP: Flashbacks (flashback mode) ───────── -->
+    {:else if stepId === 'flashbacks'}
+      <div class="sz-body">
+        <div class="sz-card sz-card--success">
+          <div class="sz-card-title">The Rule</div>
+          <p>At any point during play, when a dramatic moment calls for it, declare a flashback. Narrate a brief scene from your character's past. Write the resulting aspect and use it immediately.</p>
+        </div>
+        <div class="sz-example">"Wait &mdash; I know this mercenary! We served together in the Siege of Orizon." &rarr; Write the aspect: "Brothers in Arms from the Siege of Orizon" &rarr; Use it now.</div>
+        <p>You have three flashback slots for your Relationship aspect and two free aspects. Start Session 1 with only High Concept and Trouble written down.</p>
+        <div class="sz-tip">This method produces the best aspects because they emerge from actual dramatic need.</div>
+        <div class="sz-warn">For now, write only your High Concept and Trouble. Leave the other three slots blank.</div>
+      </div>
+
+    <!-- ── PLACEHOLDER: remaining steps (Layers 3-4) ── -->
     {:else}
       <div class="sz-body">
         <div class="sz-card">
