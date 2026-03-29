@@ -326,7 +326,7 @@
 
       <div class="wiki-sidebar-section">
         <div class="wiki-sidebar-label">Prep &amp; Play</div>
-        <a href="/campaigns/character-creation" class="wiki-sidebar-link" aria-label="Session Zero — guided character creation">
+        <a href="/campaigns/sessionzero" class="wiki-sidebar-link" aria-label="Session Zero — guided character creation">
           <span class="icon"><i class="fa-solid fa-masks-theater" aria-hidden="true"></i></span>Session Zero
         </a>
 

@@ -56,7 +56,7 @@
 <div class="cg-sample">A ruined mage tower with wards that are still actively hostile</div>
 
 <h2>Building Your Character</h2>
-<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="/campaigns/character-creation?world=fantasy">Session Zero tool</a> walks you through every step — or use the guide below.</p>
+<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="/campaigns/sessionzero?world=fantasy">Session Zero tool</a> walks you through every step — or use the guide below.</p>
 
 <div class="cg-card">
   <p style="margin:0 0 10px"><strong>Step 1 — Two aspects</strong></p>
@@ -82,7 +82,7 @@
   <p style="margin:0 0 6px;font-size:var(--text-sm);color:var(--text-dim)">Choose one stunt from the Shattered Kingdoms list. Shattered Kingdoms stunts cover swordcraft, hedge magic, field medicine, and Blight-lore. Your refresh starts at 3; each additional stunt costs 1.</p>
 </div>
 
-<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="/campaigns/character-creation?world=fantasy">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
+<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="/campaigns/sessionzero?world=fantasy">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
 
 <h2>Content Overview</h2>
 <div class="cg-card"><p style="margin:0;font-size:var(--text-sm);line-height:2;color:var(--text-dim)">
@@ -103,7 +103,7 @@
 
 <div class="cg-cta">
 <a href="/campaigns/fantasy" class="cg-cta-primary">🎲 Open Generator</a>
-<a href="/campaigns/character-creation" class="cg-cta-secondary">🎭 Session Zero</a>
+<a href="/campaigns/sessionzero" class="cg-cta-secondary">🎭 Session Zero</a>
 </div>
 </div>
 
@@ -144,7 +144,7 @@
 <div class="cg-sample">A luxury arcology whose internal systems have been compromised for three days</div>
 
 <h2>Building Your Character</h2>
-<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="/campaigns/character-creation?world=cyberpunk">Session Zero tool</a> walks you through every step — or use the guide below.</p>
+<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="/campaigns/sessionzero?world=cyberpunk">Session Zero tool</a> walks you through every step — or use the guide below.</p>
 
 <div class="cg-card">
   <p style="margin:0 0 10px"><strong>Step 1 — Two aspects</strong></p>
@@ -170,7 +170,7 @@
   <p style="margin:0 0 6px;font-size:var(--text-sm);color:var(--text-dim)">Choose one stunt from the Neon Abyss list. Neon Abyss stunts cover hacking, augment exploitation, social engineering, and black-market access. Your refresh starts at 3; each additional stunt costs 1.</p>
 </div>
 
-<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="/campaigns/character-creation?world=cyberpunk">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
+<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="/campaigns/sessionzero?world=cyberpunk">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
 
 <h2>Content Overview</h2>
 <div class="cg-card"><p style="margin:0;font-size:var(--text-sm);line-height:2;color:var(--text-dim)">
@@ -191,7 +191,7 @@
 
 <div class="cg-cta">
 <a href="/campaigns/cyberpunk" class="cg-cta-primary">🎲 Open Generator</a>
-<a href="/campaigns/character-creation" class="cg-cta-secondary">🎭 Session Zero</a>
+<a href="/campaigns/sessionzero" class="cg-cta-secondary">🎭 Session Zero</a>
 </div>
 </div>
 
@@ -232,7 +232,7 @@
 <div class="cg-sample">An arena city where the games have been suspended without explanation</div>
 
 <h2>Building Your Character</h2>
-<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="/campaigns/character-creation?world=thelongafter">Session Zero tool</a> walks you through every step — or use the guide below.</p>
+<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="/campaigns/sessionzero?world=thelongafter">Session Zero tool</a> walks you through every step — or use the guide below.</p>
 
 <div class="cg-card">
   <p style="margin:0 0 10px"><strong>Step 1 — Two aspects</strong></p>
@@ -258,7 +258,7 @@
   <p style="margin:0 0 6px;font-size:var(--text-sm);color:var(--text-dim)">Choose one stunt from the The Long After list. The Long After stunts cover ruin navigation, Phade identification, desert survival, and arena tactics. Your refresh starts at 3; each additional stunt costs 1.</p>
 </div>
 
-<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="/campaigns/character-creation?world=thelongafter">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
+<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="/campaigns/sessionzero?world=thelongafter">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
 
 <h2>Content Overview</h2>
 <div class="cg-card"><p style="margin:0;font-size:var(--text-sm);line-height:2;color:var(--text-dim)">
@@ -286,7 +286,7 @@
 
 <div class="cg-cta">
 <a href="/campaigns/thelongafter" class="cg-cta-primary">🎲 Open Generator</a>
-<a href="/campaigns/character-creation" class="cg-cta-secondary">🎭 Session Zero</a>
+<a href="/campaigns/sessionzero" class="cg-cta-secondary">🎭 Session Zero</a>
 </div>
 </div>
 
@@ -327,7 +327,7 @@
 <div class="cg-sample">A black-market station hidden inside a declared exclusion zone</div>
 
 <h2>Building Your Character</h2>
-<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="/campaigns/character-creation?world=space">Session Zero tool</a> walks you through every step — or use the guide below.</p>
+<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="/campaigns/sessionzero?world=space">Session Zero tool</a> walks you through every step — or use the guide below.</p>
 
 <div class="cg-card">
   <p style="margin:0 0 10px"><strong>Step 1 — Two aspects</strong></p>
@@ -353,7 +353,7 @@
   <p style="margin:0 0 6px;font-size:var(--text-sm);color:var(--text-dim)">Choose one stunt from the Void Runners list. Void Runners stunts cover ship handling, vacuum survival, cargo negotiation, and jump navigation. Your refresh starts at 3; each additional stunt costs 1.</p>
 </div>
 
-<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="/campaigns/character-creation?world=space">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
+<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="/campaigns/sessionzero?world=space">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
 
 <h2>Content Overview</h2>
 <div class="cg-card"><p style="margin:0;font-size:var(--text-sm);line-height:2;color:var(--text-dim)">
@@ -374,7 +374,7 @@
 
 <div class="cg-cta">
 <a href="/campaigns/space" class="cg-cta-primary">🎲 Open Generator</a>
-<a href="/campaigns/character-creation" class="cg-cta-secondary">🎭 Session Zero</a>
+<a href="/campaigns/sessionzero" class="cg-cta-secondary">🎭 Session Zero</a>
 </div>
 </div>
 
@@ -415,7 +415,7 @@
 <div class="cg-sample">A hospital wing that was closed for renovation and has not been opened - the renovation never began</div>
 
 <h2>Building Your Character</h2>
-<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="/campaigns/character-creation?world=victorian">Session Zero tool</a> walks you through every step — or use the guide below.</p>
+<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="/campaigns/sessionzero?world=victorian">Session Zero tool</a> walks you through every step — or use the guide below.</p>
 
 <div class="cg-card">
   <p style="margin:0 0 10px"><strong>Step 1 — Two aspects</strong></p>
@@ -441,7 +441,7 @@
   <p style="margin:0 0 6px;font-size:var(--text-sm);color:var(--text-dim)">Choose one stunt from the Gaslight Chronicles list. Gaslight Chronicles stunts cover forensic investigation, occult scholarship, social navigation, and self-control under the uncanny. Your refresh starts at 3; each additional stunt costs 1.</p>
 </div>
 
-<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="/campaigns/character-creation?world=victorian">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
+<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="/campaigns/sessionzero?world=victorian">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
 
 <h2>Content Overview</h2>
 <div class="cg-card"><p style="margin:0;font-size:var(--text-sm);line-height:2;color:var(--text-dim)">
@@ -469,7 +469,7 @@
 
 <div class="cg-cta">
 <a href="/campaigns/victorian" class="cg-cta-primary">🎲 Open Generator</a>
-<a href="/campaigns/character-creation" class="cg-cta-secondary">🎭 Session Zero</a>
+<a href="/campaigns/sessionzero" class="cg-cta-secondary">🎭 Session Zero</a>
 </div>
 </div>
 
@@ -510,7 +510,7 @@
 <div class="cg-sample">A dead city with a functioning power grid and no obvious source for the power</div>
 
 <h2>Building Your Character</h2>
-<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="/campaigns/character-creation?world=postapoc">Session Zero tool</a> walks you through every step — or use the guide below.</p>
+<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="/campaigns/sessionzero?world=postapoc">Session Zero tool</a> walks you through every step — or use the guide below.</p>
 
 <div class="cg-card">
   <p style="margin:0 0 10px"><strong>Step 1 — Two aspects</strong></p>
@@ -536,7 +536,7 @@
   <p style="margin:0 0 6px;font-size:var(--text-sm);color:var(--text-dim)">Choose one stunt from the The Long Road list. The Long Road stunts cover scavenging, field medicine, road navigation, and salvage trading. Your refresh starts at 3; each additional stunt costs 1.</p>
 </div>
 
-<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="/campaigns/character-creation?world=postapoc">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
+<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="/campaigns/sessionzero?world=postapoc">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
 
 <h2>Content Overview</h2>
 <div class="cg-card"><p style="margin:0;font-size:var(--text-sm);line-height:2;color:var(--text-dim)">
@@ -564,7 +564,7 @@
 
 <div class="cg-cta">
 <a href="/campaigns/postapoc" class="cg-cta-primary">🎲 Open Generator</a>
-<a href="/campaigns/character-creation" class="cg-cta-secondary">🎭 Session Zero</a>
+<a href="/campaigns/sessionzero" class="cg-cta-secondary">🎭 Session Zero</a>
 </div>
 </div>
 
@@ -617,7 +617,7 @@
 
 
 <h2>Building Your Character</h2>
-<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="/campaigns/character-creation?world=western">Session Zero tool</a> walks you through every step — or use the guide below.</p>
+<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="/campaigns/sessionzero?world=western">Session Zero tool</a> walks you through every step — or use the guide below.</p>
 
 <div class="cg-card">
   <p style="margin:0 0 10px"><strong>Step 1 — Two aspects</strong></p>
@@ -643,7 +643,7 @@
   <p style="margin:0 0 6px;font-size:var(--text-sm);color:var(--text-dim)">Choose one stunt from the Dust and Iron list. Dust and Iron stunts cover quick draw, tracking, intimidation, and wilderness survival. Your refresh starts at 3; each additional stunt costs 1.</p>
 </div>
 
-<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="/campaigns/character-creation?world=western">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
+<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="/campaigns/sessionzero?world=western">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
 <h2>Content Overview</h2>
 <div class="cg-card"><p style="margin:0;font-size:var(--text-sm);line-height:2;color:var(--text-dim)">
 <strong>NPCs:</strong> 33 first names, 26 surnames, variety-matrix minor + major concepts, 50 troubles, 28 stunts<br>
@@ -663,7 +663,7 @@
 
 <div class="cg-cta">
 <a href="/campaigns/western" class="cg-cta-primary">🎲 Open Generator</a>
-<a href="/campaigns/character-creation" class="cg-cta-secondary">🎭 Session Zero</a>
+<a href="/campaigns/sessionzero" class="cg-cta-secondary">🎭 Session Zero</a>
 </div>
 </div>
 <div class="cg-guide-nav">
@@ -723,7 +723,7 @@
 
 
 <h2>Building Your Character</h2>
-<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="/campaigns/character-creation?world=dVentiRealm">Session Zero tool</a> walks you through every step — or use the guide below.</p>
+<p>Fate Condensed characters have five aspects, a skill pyramid, one stunt, and two stress tracks. The <a href="/campaigns/sessionzero?world=dVentiRealm">Session Zero tool</a> walks you through every step — or use the guide below.</p>
 
 <div class="cg-card">
   <p style="margin:0 0 10px"><strong>Step 1 — Two aspects</strong></p>
@@ -749,7 +749,7 @@
   <p style="margin:0 0 6px;font-size:var(--text-sm);color:var(--text-dim)">Choose one stunt from the dVenti Realm list. All 28 dVenti stunts are translated D&D class features — Sneak Attack, Counterspell, Bardic Inspiration and more. Your class is your High Concept; your signature move is your stunt. Your refresh starts at 3; each additional stunt costs 1.</p>
 </div>
 
-<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="/campaigns/character-creation?world=dVentiRealm">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
+<p style="font-size:var(--text-sm);color:var(--text-muted)">The <a href="/campaigns/sessionzero?world=dVentiRealm">Session Zero tool</a> handles the pyramid maths and exports a clean character sheet. If joining a live board session, the character builder runs automatically when you connect.</p>
 <h2>Content Overview</h2>
 <div class="cg-card"><p style="margin:0;font-size:var(--text-sm);line-height:2;color:var(--text-dim)">
 <strong>NPCs:</strong> 80 first names, 50 epithets, variety-matrix concepts, 40 troubles, 28 stunts<br>
@@ -769,7 +769,7 @@
 
 <div class="cg-cta">
 <a href="/campaigns/dVentiRealm" class="cg-cta-primary">🎲 Open Generator</a>
-<a href="/campaigns/character-creation" class="cg-cta-secondary">🎭 Session Zero</a>
+<a href="/campaigns/sessionzero" class="cg-cta-secondary">🎭 Session Zero</a>
 </div>
 </div></div>
 
