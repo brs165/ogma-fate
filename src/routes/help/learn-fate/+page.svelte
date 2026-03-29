@@ -95,13 +95,67 @@
       <summary class="step-summary"><span class="step-num">3</span> Skills and dice</summary>
       <div class="step-body">
         <p>Your character has 19 skills rated from +0 (Mediocre) to +4 (Great). When you act, you roll 4 Fate dice (each shows +1, 0, or −1), add the relevant skill, and compare to a target number. Results: <strong>Fail</strong> (below target), <strong>Tie</strong> (equal), <strong>Success</strong> (+1 or +2 over), <strong>Success with Style</strong> (+3 or more).</p>
-        <p>The four actions you can take: <strong>Overcome</strong> (get past an obstacle), <strong>Create an Advantage</strong> (place a new aspect on the scene), <strong>Attack</strong> (harm someone), <strong>Defend</strong> (stop someone's action). <a href="https://fate-srd.com/fate-condensed/taking-action-rolling-the-dice" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
+        <p>Every roll uses one of four actions. Choose the one that fits what your character is doing. <a href="https://fate-srd.com/fate-condensed/taking-action-rolling-the-dice" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
+        <div class="lf-actions-grid" role="list" aria-label="The four Fate actions">
+          <div class="lf-action lf-action-overcome" role="listitem">
+            <div class="lf-action-hdr"><i class="fa-solid fa-forward" aria-hidden="true"></i> Overcome</div>
+            <div class="lf-action-body">
+              <div class="lf-action-use">Push past any obstacle standing between you and a goal — locked door, flooded river, hostile crowd, ticking clock.</div>
+              <div class="lf-action-outcomes">
+                <div class="lf-out-row"><span class="lf-out lf-out-fail">Fail</span>Don't get through, or succeed at serious cost</div>
+                <div class="lf-out-row"><span class="lf-out lf-out-tie">Tie</span>Get through with a minor complication</div>
+                <div class="lf-out-row"><span class="lf-out lf-out-win">Success</span>Clear the obstacle cleanly</div>
+                <div class="lf-out-row"><span class="lf-out lf-out-style">Style</span>Clear it and earn a boost</div>
+              </div>
+            </div>
+          </div>
+          <div class="lf-action lf-action-advantage" role="listitem">
+            <div class="lf-action-hdr"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Create an Advantage</div>
+            <div class="lf-action-body">
+              <div class="lf-action-use">Place a new aspect on the scene or a character with a free invoke. Set up the fiction before the decisive roll.</div>
+              <div class="lf-action-outcomes">
+                <div class="lf-out-row"><span class="lf-out lf-out-fail">Fail</span>GM gets a free invoke against you instead</div>
+                <div class="lf-out-row"><span class="lf-out lf-out-tie">Tie</span>Aspect created, but no free invoke</div>
+                <div class="lf-out-row"><span class="lf-out lf-out-win">Success</span>Aspect + one free invoke</div>
+                <div class="lf-out-row"><span class="lf-out lf-out-style">Style</span>Aspect + two free invokes</div>
+              </div>
+            </div>
+          </div>
+          <div class="lf-action lf-action-attack" role="listitem">
+            <div class="lf-action-hdr"><i class="fa-solid fa-burst" aria-hidden="true"></i> Attack</div>
+            <div class="lf-action-body">
+              <div class="lf-action-use">Inflict stress or consequences on a target in a conflict. Only valid when you intend to harm — physically, socially, or mentally.</div>
+              <div class="lf-action-outcomes">
+                <div class="lf-out-row"><span class="lf-out lf-out-fail">Fail</span>Attack misses or is absorbed</div>
+                <div class="lf-out-row"><span class="lf-out lf-out-tie">Tie</span>No damage, but attacker earns a boost</div>
+                <div class="lf-out-row"><span class="lf-out lf-out-win">Success</span>Shifts of damage dealt as stress</div>
+                <div class="lf-out-row"><span class="lf-out lf-out-style">Style</span>Shifts dealt — or reduce by 1 for a boost</div>
+              </div>
+            </div>
+          </div>
+          <div class="lf-action lf-action-defend" role="listitem">
+            <div class="lf-action-hdr"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Defend</div>
+            <div class="lf-action-body">
+              <div class="lf-action-use">React to stop an Attack or Create Advantage against you. Usually triggered automatically — you don't declare it, you roll when targeted.</div>
+              <div class="lf-action-outcomes">
+                <div class="lf-out-row"><span class="lf-out lf-out-fail">Fail</span>Attacker's action succeeds fully</div>
+                <div class="lf-out-row"><span class="lf-out lf-out-tie">Tie</span>Attacker succeeds but you can spend a FP to stop it</div>
+                <div class="lf-out-row"><span class="lf-out lf-out-win">Success</span>Attack or advantage fails completely</div>
+                <div class="lf-out-row"><span class="lf-out lf-out-style">Style</span>Block the action and earn a boost</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="callout callout-info" role="note">
+          <div class="callout-title"><i class="fa-solid fa-bolt" aria-hidden="true"></i> What is a boost?</div>
+          <p>A <strong>boost</strong> is a fleeting aspect with exactly <strong>one free invoke</strong>. You earn it from Success with Style on most actions, or a Tie on Attack. Name it immediately — <em>"Off Balance,"</em> <em>"Momentary Opening,"</em> <em>"Blinded by Debris."</em> Use the free invoke on your next roll (or pass it to an ally this exchange). Once used, or when the scene ends, the boost disappears. It costs no Fate Point to create and none to use — it's pure momentum reward for exceptional rolling.</p>
+        </div>
         <div class="callout callout-dnd" role="note"><div class="callout-title">⚔ Coming from D&amp;D</div><p>4dF averages to 0 with a range of −4 to +4. Your skill rating IS your expected result. A +3 skill hits Fair (+2) difficulty most of the time. No d20 swingyness.</p></div>
         <div class="callout callout-info" role="note"><div class="callout-title">📋 Ties succeed — with a cost</div><p>A tie (matching the difficulty exactly) is not a failure. The player achieves their goal, but something complicates it — they take a minor cost, the situation shifts, or a new complication enters the scene. <a href="https://fate-srd.com/fate-condensed/taking-action-rolling-the-dice" target="_blank" rel="noreferrer" class="srd-link">FCon SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a> Never use a tie to simply block forward progress.</p></div>
         <div class="callout callout-scenario" role="note">
           <div class="callout-title">Try a roll — Good (+3) Athlete vs. Fair (+2) difficulty</div>
           <p>Your character has Athletics +3. Roll 4dF and add 3. <strong>+1 or +2 over target = Success. +3 or more = Success with Style. 0 = Tie. Below = Fail.</strong> Roll a few times — feel how rarely you land on extremes.</p>
-          <HelpDiceRoller mode="skill" skill={3} label="Athletics +3" />
+          <HelpDiceRoller mode="skill" skill={3} difficulty={2} label="Athletics +3" />
         </div>
       </div>
     </details>
@@ -132,8 +186,8 @@
           <div class="callout-title">Try an attack roll — see how many shifts hit</div>
           <p>An enemy has Fight +2. You defend with Athletics +1. Roll both — the difference is the shifts. Under 3 shifts: tick stress boxes. 3–5: take a consequence. 6+: you're in trouble.</p>
           <div class="learn-double-roll">
-            <HelpDiceRoller mode="skill" skill={2} label="Enemy Attack (Fight +2)" />
-            <HelpDiceRoller mode="skill" skill={1} label="Your Defence (Athletics +1)" />
+            <HelpDiceRoller mode="skill" skill={2} label="Enemy Attack (Fight +2)" noOutcome={true} />
+            <HelpDiceRoller mode="skill" skill={1} label="Your Defence (Athletics +1)" noOutcome={true} />
           </div>
         </div>
       </div>
@@ -182,7 +236,7 @@
         <div class="callout callout-scenario" role="note">
           <div class="callout-title">Set a difficulty — does the player beat it?</div>
           <p>A player wants to pick a lock (Burglary +2). You set difficulty at Good (+3) — challenging but not impossible. Roll for the player and see if they succeed, tie (succeed at a cost), or fail (situation changes).</p>
-          <HelpDiceRoller mode="skill" skill={2} label="Burglary +2 vs Good (+3) lock" />
+          <HelpDiceRoller mode="skill" skill={2} difficulty={3} label="Burglary +2 vs Good (+3) lock" />
         </div>
       </div>
     </details>

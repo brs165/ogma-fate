@@ -223,13 +223,6 @@
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
   <header class="land-topnav topbar">
-    <!-- Hamburger — mobile only -->
-    <button
-      class="mn-hamburger"
-      onclick={() => { navOpen = !navOpen; }}
-      aria-label={navOpen ? 'Close navigation' : 'Open navigation'}
-      aria-expanded={String(navOpen)}
-    ><i class={navOpen ? 'fa-solid fa-xmark' : 'fa-solid fa-bars'} aria-hidden="true"></i></button>
     <a href="/" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
     <div class="topbar-spacer" style="flex:1"></div>
     <div class="topbar-status">
