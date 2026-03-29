@@ -151,7 +151,7 @@
         <div class="callout callout-scenario" role="note">
           <div class="callout-title">Try a roll — Good (+3) Athlete vs. Fair (+2) difficulty</div>
           <p>Your character has Athletics +3. Roll 4dF and add 3. <strong>+1 or +2 over target = Success. +3 or more = Success with Style. 0 = Tie. Below = Fail.</strong> Roll a few times — feel how rarely you land on extremes.</p>
-          <HelpDiceRoller mode="skill" skill={3} label="Athletics +3" />
+          <HelpDiceRoller mode="skill" skill={3} difficulty={2} label="Athletics +3" />
         </div>
       </div>
     </details>
@@ -182,8 +182,8 @@
           <div class="callout-title">Try an attack roll — see how many shifts hit</div>
           <p>An enemy has Fight +2. You defend with Athletics +1. Roll both — the difference is the shifts. Under 3 shifts: tick stress boxes. 3–5: take a consequence. 6+: you're in trouble.</p>
           <div class="learn-double-roll">
-            <HelpDiceRoller mode="skill" skill={2} label="Enemy Attack (Fight +2)" />
-            <HelpDiceRoller mode="skill" skill={1} label="Your Defence (Athletics +1)" />
+            <HelpDiceRoller mode="skill" skill={2} label="Enemy Attack (Fight +2)" noOutcome={true} />
+            <HelpDiceRoller mode="skill" skill={1} label="Your Defence (Athletics +1)" noOutcome={true} />
           </div>
         </div>
       </div>
@@ -232,7 +232,7 @@
         <div class="callout callout-scenario" role="note">
           <div class="callout-title">Set a difficulty — does the player beat it?</div>
           <p>A player wants to pick a lock (Burglary +2). You set difficulty at Good (+3) — challenging but not impossible. Roll for the player and see if they succeed, tie (succeed at a cost), or fail (situation changes).</p>
-          <HelpDiceRoller mode="skill" skill={2} label="Burglary +2 vs Good (+3) lock" />
+          <HelpDiceRoller mode="skill" skill={2} difficulty={3} label="Burglary +2 vs Good (+3) lock" />
         </div>
       </div>
     </details>

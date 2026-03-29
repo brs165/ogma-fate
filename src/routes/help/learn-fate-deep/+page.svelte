@@ -57,7 +57,7 @@
         <div class="callout callout-scenario" role="note">
           <div class="callout-title"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> Roll Stealth (+1)</div>
           <p>Roll 4dF and add your Stealth of +1. You need to beat Fair (+2).</p>
-          <HelpDiceRoller mode="basic" label="4dF + Stealth (+1)" />
+          <HelpDiceRoller mode="skill" skill={1} difficulty={2} label="Stealth +1" />
         </div>
 
         <div class="callout callout-info" role="note">
@@ -113,7 +113,7 @@
 
         <div class="callout callout-scenario" role="note">
           <div class="callout-title"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> Roll Athletics (+3)</div>
-          <HelpDiceRoller mode="basic" label="4dF + Athletics (+3)" />
+          <HelpDiceRoller mode="skill" skill={3} difficulty={2} label="Athletics +3" />
         </div>
 
         <div class="callout callout-tip" role="note">

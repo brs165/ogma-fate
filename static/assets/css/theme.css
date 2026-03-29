@@ -1451,6 +1451,14 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .dr-sep{font-size:14px;color:var(--text-muted);line-height:1;opacity:0.6}
 .dr-skill-badge{display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:22px;border-radius:11px;background:color-mix(in srgb,var(--accent) 15%,transparent);padding:0 7px}
 .dr-skill-val{font-size:12px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums}
+.dr-formula{display:flex;align-items:flex-start;justify-content:center;gap:6px;padding:4px 0;flex-wrap:wrap}
+.dr-f-part{display:flex;flex-direction:column;align-items:center;gap:2px}
+.dr-f-num{font-size:15px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.dr-f-tag{font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted)}
+.dr-f-op{font-size:12px;color:var(--text-muted);line-height:1;padding-top:2px}
+.dr-f-skill{color:var(--accent)}
+.dr-f-tot{color:var(--text)}
+.dr-f-target{color:var(--text-muted)}
 .dr-dice-row{display:flex;gap:10px;align-items:center;justify-content:center}
 .dr-die{display:inline-flex;align-items:center;justify-content:center;width:68px;height:68px;border-radius:12px;font-size:28px;font-weight:800;border:2px solid;transition:all .12s;font-family:'Jost','Futura','Century Gothic','Trebuchet MS',sans-serif;letter-spacing:-0.02em}
 .dr-die-pos{background:color-mix(in srgb,var(--c-green,#34c759) 14%,var(--panel,#fff));border-color:color-mix(in srgb,var(--c-green,#34c759) 45%,transparent);color:color-mix(in srgb,var(--c-green,#34c759) 85%,var(--text-muted))}
