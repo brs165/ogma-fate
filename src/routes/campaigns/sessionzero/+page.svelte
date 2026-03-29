@@ -1,129 +1,147 @@
 <script>
-  import { onMount } from 'svelte';
-  import { Progress } from 'bits-ui';
-  import { generate, mergeUniversal, filteredTables } from '$lib/engine.js';
+  import { onMount, untrack } from 'svelte';
+  import { generate, mergeUniversal, filteredTables, suggestSkillPyramid, suggestAspects, suggestStunts } from '$lib/engine.js';
   import { CAMPAIGNS } from '$lib/../data/shared.js';
+  import { WORLD_META, WORLD_DATA, ALL_SKILLS, SKILL_LABEL } from '$lib/../data/shared.js';
   import { LS } from '$lib/db.js';
   import Footer from '$lib/components/shared/Footer.svelte';
 
   let theme = $state('dark');
   let step = $state(0);
   let campId = $state(null);
-  let playerCount = $state(3);
+  let mode = $state('standard');
+  let pcCount = $state(2);
+  let pcIndex = $state(0);
+  let pcDrafts = $state([]);
+  let rerolls = $state(0);
 
-  // Generated content per step
-  let backstories = $state([]);
+  // GM Prep state (Layer 4)
   let seedData = $state(null);
   let sceneData = $state(null);
   let npcData = $state(null);
-  let extras = $state([]);
 
-  const STEPS = [
-    { id: 'world',   n: 1, label: 'World' },
-    { id: 'players', n: 2, label: 'Players' },
-    { id: 'seed',    n: 3, label: 'Seed' },
-    { id: 'scene',   n: 4, label: 'Scene' },
-    { id: 'npc',     n: 5, label: 'NPC' },
-    { id: 'done',    n: 6, label: 'Done' },
-  ];
-
-  const WORLD_META = {
-    thelongafter: { name: 'The Long After', icon: 'fa-compass', genre: 'Sword & Planet' },
-    cyberpunk:    { name: 'Neon Abyss', icon: 'fa-microchip', genre: 'Cyberpunk' },
-    fantasy:      { name: 'Shattered Kingdoms', icon: 'fa-dragon', genre: 'Dark Fantasy' },
-    space:        { name: 'Void Runners', icon: 'fa-shuttle-space', genre: 'Space Western' },
-    victorian:    { name: 'The Gaslight Chronicles', icon: 'fa-magnifying-glass', genre: 'Gothic Horror' },
-    postapoc:     { name: 'The Long Road', icon: 'fa-biohazard', genre: 'Post-Apocalypse' },
-    western:      { name: 'Dust and Iron', icon: 'fa-hat-cowboy', genre: 'Frontier Western' },
-    dVentiRealm:  { name: 'dVenti Realm', icon: 'fa-dice-d20', genre: 'High Fantasy' },
-  };
   const WORLD_IDS = Object.keys(WORLD_META);
 
-  let campName = $derived(campId && WORLD_META[campId] ? WORLD_META[campId].name : '');
+  const MODES = [
+    { id: 'standard',  label: 'Condensed Standard', tag: 'Recommended', sub: 'High Concept, Trouble, Relationship, leave the rest blank, play. Fastest path to the table.' },
+    { id: 'trio',      label: 'Phase Trio',         tag: 'Enriched',    sub: 'Collaborative backstory workshop. Three phases produce all five aspects through shared stories. ~20 min extra.' },
+    { id: 'flashback', label: 'Flashback Slots',    tag: 'Play-First',  sub: 'Start with High Concept + Trouble + top skill only. Discover the rest during play through flashback moments.' },
+  ];
 
-  function roll(genId) {
+  // ── Dynamic step list based on mode ──
+  let STEPS = $derived((() => {
+    const base = [
+      { id: 'world',       title: 'Choose Your World' },
+      { id: 'players',     title: 'How Many Players?' },
+      { id: 'mode',        title: 'How Deep Do You Want to Go?' },
+      { id: 'setting',     title: 'The World You\'re Playing In' },
+      { id: 'highconcept', title: 'High Concept' },
+      { id: 'trouble',     title: 'Trouble' },
+    ];
+    if (mode === 'trio') {
+      base.push(
+        { id: 'phase1', title: 'Phase 1 \u2014 Your First Adventure' },
+        { id: 'phase2', title: 'Phase 2 \u2014 Crossing Paths' },
+        { id: 'phase3', title: 'Phase 3 \u2014 Crossing Paths Again' },
+      );
+    } else if (mode === 'flashback') {
+      base.push({ id: 'flashbacks', title: 'Flashback Slots' });
+    } else {
+      base.push(
+        { id: 'relationship', title: 'Relationship Aspect' },
+        { id: 'freeaspects',  title: 'Free Aspects' },
+      );
+    }
+    base.push(
+      { id: 'skills',    title: 'Skills' },
+      { id: 'stunts',    title: 'Stunts' },
+      { id: 'stress',    title: 'Stress & Consequences' },
+      { id: 'gmprep',    title: 'GM Prep' },
+      { id: 'questions', title: 'Session Zero Questions' },
+      { id: 'summary',   title: 'Summary & Export' },
+    );
+    return base;
+  })());
+
+  let totalSteps = $derived(STEPS.length);
+  let stepId = $derived(STEPS[step] ? STEPS[step].id : 'world');
+  let progress = $derived(((step + 1) / totalSteps * 100));
+  $effect(() => { if (step >= STEPS.length) step = 0; });
+
+  // ── PC drafts ──
+  $effect(() => {
+    const count = pcCount;
+    pcDrafts = untrack(() =>
+      Array.from({ length: count }, (_, i) =>
+        pcDrafts[i] ?? { name: '', hc: '', trouble: '', relationship: '', free1: '', free2: '', skills: [], stunts: [], phase1: '', phase2: '', phase3: '' }
+      )
+    );
+  });
+  let currentPc = $derived(pcDrafts[pcIndex] || { name: '', hc: '', trouble: '' });
+
+  function updateCurrentPc(field, value) {
+    pcDrafts = pcDrafts.map((pc, i) => i === pcIndex ? { ...pc, [field]: value } : pc);
+  }
+
+  // ── Tables for suggestion engine ──
+  let tables = $derived((() => {
     if (!campId || !CAMPAIGNS[campId]) return null;
-    try {
-      const t = filteredTables(mergeUniversal(CAMPAIGNS[campId].tables), {});
-      return generate(genId, t, playerCount, {});
-    } catch (e) {
-      console.error('Prep Wizard generate failed:', genId, e);
-      return null;
+    try { return filteredTables(mergeUniversal(CAMPAIGNS[campId].tables), {}); }
+    catch(e) { return null; }
+  })());
+
+  // ── World data ──
+  let wd = $derived(campId ? WORLD_DATA[campId] : null);
+  let camp = $derived(campId ? WORLD_META[campId] : null);
+  let ciIdx = $derived(wd ? rerolls % wd.current.length : 0);
+  let iiIdx = $derived(wd && wd.impending.length > 1 ? (rerolls + 1) % wd.impending.length : 0);
+
+  // ── Suggestion helpers ──
+  let hcSuggestions = $state([]);
+  let trSuggestions = $state([]);
+
+  function refreshHcSuggestions() {
+    if (tables) hcSuggestions = suggestAspects('high_concept', tables, 4);
+  }
+  function refreshTrSuggestions() {
+    if (tables) trSuggestions = suggestAspects('trouble', tables, 4);
+  }
+
+  function reroll() { rerolls += 1; }
+
+  // ── Navigation ──
+  function next() {
+    // PC loop: cycle through PCs on HC and Trouble steps
+    if (stepId === 'trouble' && pcIndex < pcCount - 1) {
+      pcIndex += 1;
+      step = STEPS.findIndex(s => s.id === 'highconcept');
+      refreshHcSuggestions();
+      return;
+    }
+    if (stepId === 'trouble') pcIndex = 0;
+    if (step < totalSteps - 1) step += 1;
+    // Auto-refresh suggestions when entering relevant steps
+    if (STEPS[step]) {
+      const nid = STEPS[step].id;
+      if (nid === 'highconcept') refreshHcSuggestions();
+      if (nid === 'trouble') refreshTrSuggestions();
     }
   }
-
-  function selectWorld(id) { campId = id; }
-
-  function nextStep() {
-    if (step === 0 && !campId) return;
-    step += 1;
-    // Auto-generate content for steps that need it
-    if (step === 1) generateBackstories();
-    if (step === 2 && !seedData) seedData = roll('seed');
-    if (step === 3 && !sceneData) sceneData = roll('scene');
-    if (step === 4 && !npcData) npcData = roll('npc_major');
-  }
-  function prevStep() { if (step > 0) step -= 1; }
-
-  function generateBackstories() {
-    backstories = [];
-    for (let i = 0; i < playerCount; i++) {
-      backstories.push(roll('backstory'));
+  function back() {
+    if (stepId === 'highconcept' && pcIndex > 0) {
+      pcIndex -= 1;
+      step = STEPS.findIndex(s => s.id === 'trouble');
+      refreshTrSuggestions();
+      return;
     }
-    backstories = backstories;
+    if (step > 0) step -= 1;
   }
 
-  function rerollBackstory(i) {
-    backstories[i] = roll('backstory');
-    backstories = backstories;
-  }
-
-  function rerollSeed() { seedData = roll('seed'); }
-  function rerollScene() { sceneData = roll('scene'); }
-  function rerollNpc() { npcData = roll('npc_major'); }
-
-  function goToBoard() {
-    window.location.href = '/campaigns/' + (campId || 'fantasy');
-  }
-
-  function sendAllToTable() {
-    // Pack all generated cards into sessionStorage, navigate to campaign
-    // Campaign.svelte reads ogma_sz_handoff on mount and fires ogma:sz-card events
-    const cards = [];
-    if (seedData)   cards.push({ genId: 'seed',      data: seedData });
-    if (sceneData)  cards.push({ genId: 'scene',     data: sceneData });
-    if (npcData)    cards.push({ genId: 'npc_major', data: npcData });
-    backstories.forEach(b => { if (b) cards.push({ genId: 'backstory', data: b }); });
-    if (!cards.length) { goToBoard(); return; }
-    try {
-      sessionStorage.setItem('ogma_sz_handoff', JSON.stringify({ campId, cards, ts: Date.now() }));
-    } catch(e) {}
-    window.location.href = '/campaigns/' + (campId || 'fantasy') + '?sz=1';
-  }
-
-  function exportSession() {
-    const items = [];
-    if (seedData) items.push({ generator: 'seed', label: seedData.location || 'Seed', data: seedData, ts: Date.now() });
-    if (sceneData) items.push({ generator: 'scene', label: (sceneData.aspects && sceneData.aspects[0]) ? (sceneData.aspects[0].name || 'Scene') : 'Scene', data: sceneData, ts: Date.now() });
-    if (npcData) items.push({ generator: 'npc_major', label: npcData.name || 'NPC', data: npcData, ts: Date.now() });
-    backstories.forEach((b, i) => {
-      if (b) items.push({ generator: 'backstory', label: 'Backstory ' + (i + 1), data: b, ts: Date.now() });
-    });
-    const exportObj = {
-      format: 'ogma', version: '2.0.0',
-      campaign: campName || '', campId: campId || '',
-      ts: Date.now(),
-      results: items,
-    };
-    const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = (campId || 'ogma') + '-session-prep.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  // ── Theme ──
+  function toggleTheme() {
+    theme = theme === 'dark' ? 'light' : 'dark';
+    if (typeof document !== 'undefined') document.documentElement.setAttribute('data-theme', theme);
+    LS.set('theme', theme);
   }
 
   onMount(() => {
@@ -132,21 +150,15 @@
       document.documentElement.setAttribute('data-theme', theme);
     } catch (e) {}
   });
-
-  function toggleTheme() {
-    theme = theme === 'dark' ? 'light' : 'dark';
-    if (typeof document !== 'undefined') document.documentElement.setAttribute('data-theme', theme);
-    LS.set('theme', theme);
-  }
 </script>
 
 <svelte:head>
-  <title>Prep Wizard — Ogma</title>
-  <meta name="description" content="10-minute GM prep wizard for Fate Condensed. Start with a world, end with a session." />
+  <title>Session Zero \u2014 Ogma</title>
+  <meta name="description" content="Unified Fate Condensed session zero wizard. World setup, character creation, and GM prep in one flow." />
 </svelte:head>
 
 <div class="land-shell">
-  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <a href="#main" class="skip-link">Skip to main content</a>
 
   <header class="land-topnav topbar">
     <a href="/" class="topbar-wordmark" aria-label="Ogma home">OGMA</a>
@@ -156,269 +168,196 @@
       <a href="/about" class="btn btn-ghost topbar-nav-btn" style="font-size:13px;text-decoration:none">About</a>
       <button class="btn btn-icon btn-ghost" onclick={toggleTheme}
         aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-        style="width:44px;height:44px">{theme === 'dark' ? '☀️' : '◑'}</button>
+        style="width:44px;height:44px">{theme === 'dark' ? '\u2600\uFE0F' : '\u25D1'}</button>
     </div>
   </header>
 
-  <main id="main-content" style="flex:1;display:flex;flex-direction:column;align-items:center;padding:24px 16px 80px">
-    <div style="width:100%;max-width:600px">
+  <div class="sz-container" id="main">
+    {#if step === 0}
+      <div class="sz-header">
+        <div class="sz-title">Session Zero</div>
+        <div class="sz-subtitle">Fate Condensed \u2014 World, Characters & GM Prep</div>
+      </div>
+    {/if}
 
-      <!-- Progress tracker -->
-      <div class="pw-track" aria-label="Wizard progress">
-        {#each STEPS as s, i}
-          <div class="pw-track-step" class:done={i < step} class:active={i === step}>
-            <div class="pw-track-dot">{i < step ? '✓' : s.n}</div>
-            <div class="pw-track-label">{s.label}</div>
-          </div>
+    <!-- Progress -->
+    <div class="sz-progress-wrap">
+      <div class="sz-step-counter">Step {step + 1} of {totalSteps}</div>
+      <div class="sz-progress-bar" role="progressbar"
+        aria-valuenow={step + 1} aria-valuemin={1} aria-valuemax={totalSteps}
+        aria-label="Step {step + 1} of {totalSteps}">
+        <div class="sz-progress-fill" style="width:{progress}%"></div>
+      </div>
+    </div>
+
+    <div class="sz-step-title">{STEPS[step].title}</div>
+
+    <!-- ── STEP: World ─────────────────────────────────── -->
+    {#if stepId === 'world'}
+      <div class="sz-body">
+        <p>Which world are you playing in? This determines setting details, example aspects, and story prompts throughout the wizard.</p>
+        <div class="sz-info-box">
+          <span style="font-size:18px;flex-shrink:0"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i></span>
+          <span><strong style="color:var(--text);font-weight:600">Works solo or with your full table.</strong> Run it alone to prep your campaign and print character sheets, or share your screen and walk through it together as a group.</span>
+        </div>
+      </div>
+      <div class="sz-grid sz-grid-2">
+        {#each WORLD_IDS as id}
+          <button class="sz-option" class:selected={campId === id} onclick={() => { campId = id; }} type="button" aria-pressed={String(campId === id)}>
+            <div class="sz-option-title"><i class="fa-solid {WORLD_META[id].icon}" aria-hidden="true" style="margin-right:6px"></i>{WORLD_META[id].name}</div>
+            <div class="sz-option-sub">{WORLD_META[id].genre}</div>
+          </button>
         {/each}
       </div>
-      <Progress.Root
-        value={step}
-        max={STEPS.length - 1}
-        aria-label="Session Zero progress"
-        style="margin-bottom:20px"
-      >
-        <div style="height:100%; width:{(step / (STEPS.length - 1)) * 100}%; background:var(--accent); border-radius:inherit" />
-      </Progress.Root>
 
-      <!-- ── STEP 1: Choose World ──────────────────────────────────── -->
-      {#if step === 0}
-        <div class="pw-step-content">
-        <div style="font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:6px">STEP 1 OF 6</div>
-        <h1 style="font-size:26px;font-weight:800;letter-spacing:-.025em;color:var(--text);margin-bottom:8px;line-height:1.2">Which world are you running?</h1>
-        <p style="font-size:13px;color:var(--text-dim);line-height:1.65;margin-bottom:24px">Pick a campaign setting. Everything after this is tailored to your world.</p>
-
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:24px">
-          {#each WORLD_IDS as id}
-            <button
-              style="background:{campId === id ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'var(--glass-bg)'};border:1px solid {campId === id ? 'var(--accent)' : 'var(--glass-border)'};border-radius:10px;padding:14px;cursor:pointer;text-align:left;font-family:var(--font-ui);{campId === id ? 'box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent)' : ''}"
-              onclick={() => selectWorld(id)}
-              aria-pressed={String(campId === id)}
-            >
-              <div style="font-size:22px;margin-bottom:6px"><i class="fa-solid {WORLD_META[id].icon}" aria-hidden="true"></i></div>
-              <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px">{WORLD_META[id].name}</div>
-              <div style="font-size:10px;color:var(--text-muted)">{WORLD_META[id].genre}</div>
+    <!-- ── STEP: Players ───────────────────────────────── -->
+    {:else if stepId === 'players'}
+      <div class="sz-body">
+        <p>How many players are at the table? The wizard will collect a name, High Concept, and Trouble for each one.</p>
+        <div class="sz-pc-count-row">
+          {#each [1,2,3,4,5,6] as n}
+            <button class="sz-option sz-pc-count-btn" class:selected={pcCount === n} onclick={() => { pcCount = n; pcIndex = 0; }} type="button" aria-pressed={String(pcCount === n)}>
+              <div class="sz-option-title">{n}</div>
+              <div class="sz-option-sub">{n === 1 ? 'Solo' : n + ' players'}</div>
             </button>
           {/each}
         </div>
-
-        </div><!-- /pw-step-content -->
-
-      <!-- ── STEP 2: Player Count ──────────────────────────────────── -->
-      {:else if step === 1}
-        <div style="font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:6px">STEP 2 OF 6</div>
-        <h1 style="font-size:26px;font-weight:800;letter-spacing:-.025em;color:var(--text);margin-bottom:8px;line-height:1.2">How many players?</h1>
-        <p style="font-size:13px;color:var(--text-dim);line-height:1.65;margin-bottom:24px">This sets the opposition scale and generates a backstory hook for each player to kick off the session.</p>
-
-        <div style="display:flex;align-items:center;justify-content:center;gap:24px;margin-bottom:24px">
-          <button style="width:44px;height:44px;border-radius:50%;border:2px solid var(--border);background:var(--panel);color:var(--text);font-size:20px;font-weight:700;cursor:pointer" disabled={playerCount <= 1} onclick={() => { playerCount -= 1; generateBackstories(); }}>&minus;</button>
-          <div style="text-align:center">
-            <div style="font-size:48px;font-weight:900;color:var(--text);line-height:1">{playerCount}</div>
-            <div style="font-size:11px;color:var(--text-muted);margin-top:4px">{playerCount === 1 ? 'player' : 'players'}</div>
-          </div>
-          <button style="width:44px;height:44px;border-radius:50%;border:2px solid var(--border);background:var(--panel);color:var(--text);font-size:20px;font-weight:700;cursor:pointer" disabled={playerCount >= 6} onclick={() => { playerCount += 1; generateBackstories(); }}>+</button>
-        </div>
-
-        {#if backstories.length > 0}
-          <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px">Backstory hooks &mdash; one per player <span style="font-weight:400;font-style:italic;text-transform:none;letter-spacing:0"> — personal ties to the setting that become aspects the GM can invoke or compel</span></div>
-          {#each backstories as b, i}
-            {#if b}
-              <div style="background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:8px;padding:12px;margin-bottom:8px">
-                <div style="font-size:10px;font-weight:700;color:var(--accent);margin-bottom:4px">Player {i + 1}</div>
-                {#if b.question}<div style="font-size:12px;color:var(--text-dim);font-style:italic;margin-bottom:4px">"{b.question}"</div>{/if}
-                {#if b.aspect}<div style="font-size:12px;color:var(--text);font-weight:600">{b.aspect}</div>{/if}
-                {#if b.hook}<div style="font-size:11px;color:var(--text-dim);margin-top:4px">{b.hook}</div>{/if}
-                <button style="margin-top:6px;font-size:11px;padding:4px 10px;border:1px solid var(--border);border-radius:4px;background:var(--panel);color:var(--text-muted);cursor:pointer" onclick={() => rerollBackstory(i)}><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> New hook</button>
-              </div>
-            {/if}
-          {/each}
-        {/if}
-
-      <!-- ── STEP 3: Quick Adventure Start (Seed) ─────────────────── -->
-      {:else if step === 2}
-        <div style="font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:6px">STEP 3 OF 6</div>
-        <h1 style="font-size:26px;font-weight:800;letter-spacing:-.025em;color:var(--text);margin-bottom:8px;line-height:1.2">What's the situation?</h1>
-        <p style="font-size:13px;color:var(--text-dim);line-height:1.65;margin-bottom:24px">This is your scenario skeleton &mdash; the location, objective, and complication. Prep Scene 1 in full. Follow the players after that. <span style="font-style:italic;color:var(--text-muted)">Everything here is a situation aspect — a fact about the scene anyone can invoke (+2) or compel (complications + fate point).</span></p>
-
-        {#if seedData}
-          <div style="background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:10px;overflow:hidden;margin-bottom:16px">
-            <div style="padding:10px 14px;background:color-mix(in srgb,var(--accent) 8%,transparent);border-bottom:1px solid var(--glass-border);display:flex;align-items:center;gap:8px">
-              <span style="font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)">Quick Adventure Start</span>
-              <span style="flex:1"></span>
-              <span style="font-size:13px;font-weight:700;color:var(--text)">{seedData.location || ''}</span>
-            </div>
-            <div style="padding:14px">
-              {#if seedData.objective}
-                <div style="margin-bottom:10px"><div style="font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:3px">Objective</div><div style="font-size:13px;color:var(--text)">{seedData.objective}</div></div>
-              {/if}
-              {#if seedData.complication}
-                <div style="margin-bottom:10px"><div style="font-size:10px;font-weight:700;color:var(--c-red,#f87171);margin-bottom:3px">Complication</div><div style="font-size:13px;color:var(--text-dim)">{seedData.complication}</div></div>
-              {/if}
-              {#if seedData.twist}
-                <div><div style="font-size:10px;font-weight:700;color:var(--c-purple,#a78bfa);margin-bottom:3px">Twist &mdash; reveal late</div><div style="font-size:13px;color:var(--text-dim);font-style:italic">{seedData.twist}</div></div>
-              {/if}
-            </div>
-            <div style="padding:8px 14px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--glass-border);font-style:italic">This is a situation, not a plot. The players' choices are the story.</div>
-          </div>
-          <button style="font-size:12px;padding:8px 16px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:var(--text-muted);cursor:pointer" onclick={rerollSeed}><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> Reroll seed</button>
-        {:else}
-          <div style="text-align:center;padding:40px;color:var(--text-muted)">Generating&hellip;</div>
-        {/if}
-
-      <!-- ── STEP 4: Scene Setup ───────────────────────────────────── -->
-      {:else if step === 3}
-        <div style="font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:6px">STEP 4 OF 6</div>
-        <h1 style="font-size:26px;font-weight:800;letter-spacing:-.025em;color:var(--text);margin-bottom:8px;line-height:1.2">Where does Session 1 open?</h1>
-        <p style="font-size:13px;color:var(--text-dim);line-height:1.65;margin-bottom:24px">Read zone names aloud when you describe the scene. Reveal visible aspects now &mdash; keep hidden ones for discovery rolls.</p>
-
-        {#if sceneData}
-          <div style="background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:10px;overflow:hidden;margin-bottom:16px">
-            <div style="padding:10px 14px;background:color-mix(in srgb,var(--accent) 8%,transparent);border-bottom:1px solid var(--glass-border)">
-              <span style="font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)">Scene Setup</span>
-            </div>
-            <div style="padding:14px">
-              {#if Array.isArray(sceneData.aspects) && sceneData.aspects.length > 0}
-                <div style="font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:6px">Situation aspects <span style="font-weight:400;font-style:italic">— facts about the scene anyone can use (invoke for +2 or compel for complications)</span></div>
-                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
-                  {#each sceneData.aspects as a}
-                    <span style="font-size:11px;padding:3px 8px;background:var(--inset);border:1px solid var(--border);border-radius:4px;color:var(--text-dim);font-style:italic">{typeof a === 'string' ? a : (a.name || '')}</span>
-                  {/each}
-                </div>
-              {/if}
-              {#if Array.isArray(sceneData.zones) && sceneData.zones.length > 0}
-                <div style="font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:5px">Zones <span style="font-weight:400;font-style:italic">— areas in the scene; moving between zones costs an action</span></div>
-                <div style="display:flex;flex-direction:column;gap:4px">
-                  {#each sceneData.zones.slice(0, 3) as z}
-                    <div style="font-size:11px;color:var(--text-dim)">
-                      <strong style="color:var(--text);margin-right:6px">{typeof z === 'string' ? z : (z.name || z[0] || '')}</strong>
-                      <span>{typeof z === 'object' ? (z.aspect || z[1] || '') : ''}</span>
-                    </div>
-                  {/each}
-                </div>
-              {/if}
-            </div>
-            <div style="padding:8px 14px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--glass-border);font-style:italic">Put at least one usable aspect in reach &mdash; players love having options.</div>
-          </div>
-          <button style="font-size:12px;padding:8px 16px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:var(--text-muted);cursor:pointer" onclick={rerollScene}><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> Reroll scene</button>
-        {:else}
-          <div style="text-align:center;padding:40px;color:var(--text-muted)">Setting the scene&hellip;</div>
-        {/if}
-
-      <!-- ── STEP 5: Opening NPC ───────────────────────────────────── -->
-      {:else if step === 4}
-        <div style="font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:6px">STEP 5 OF 6</div>
-        <h1 style="font-size:26px;font-weight:800;letter-spacing:-.025em;color:var(--text);margin-bottom:8px;line-height:1.2">Who do the players meet first?</h1>
-        <p style="font-size:13px;color:var(--text-dim);line-height:1.65;margin-bottom:24px">Your opening NPC &mdash; could be an antagonist, a contact, or a bystander. Introduce them through what they're doing, not who they are. <span style="font-style:italic;color:var(--text-muted)">Their aspects and skills work the same as PCs — invoke for +2, compel for fate points.</span></p>
-
-        {#if npcData}
-          {@const asp = npcData.aspects || {}}
-          {@const skills = npcData.skills || []}
-          <div style="background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:10px;overflow:hidden;margin-bottom:16px">
-            <div style="padding:10px 14px;background:color-mix(in srgb,var(--accent) 8%,transparent);border-bottom:1px solid var(--glass-border);display:flex;align-items:center;gap:8px">
-              <span style="font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)">Major NPC</span>
-              <span style="flex:1"></span>
-              <span style="font-size:13px;font-weight:700;color:var(--text)">{npcData.name || ''}</span>
-            </div>
-            <div style="padding:14px">
-              {#if asp.high_concept}
-                <div style="margin-bottom:8px"><div style="font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:3px">High Concept <span style="font-weight:400;font-style:italic">— their defining trait; invoke it for +2 or compel it for complications</span></div><div style="font-size:13px;color:var(--text);font-style:italic">{asp.high_concept}</div></div>
-              {/if}
-              {#if asp.trouble}
-                <div style="margin-bottom:8px"><div style="font-size:10px;font-weight:700;color:var(--c-red,#f87171);margin-bottom:3px">Trouble <span style="font-weight:400;font-style:italic">— their main weakness; compel it to earn fate points</span></div><div style="font-size:13px;color:var(--text-dim);font-style:italic">{asp.trouble}</div></div>
-              {/if}
-              {#if skills.length > 0}
-                <div style="margin-top:8px">
-                  <div style="font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:5px">Top skills</div>
-                  <div style="display:flex;gap:6px;flex-wrap:wrap">
-                    {#each skills.slice(0, 4) as s}
-                      <span style="font-size:11px;color:var(--text-dim);background:var(--inset);border:1px solid var(--border);border-radius:4px;padding:2px 7px">
-                        <strong style="color:var(--accent);font-family:var(--font-mono);margin-right:4px">+{s.r}</strong>{s.name}
-                      </span>
-                    {/each}
-                  </div>
-                </div>
-              {/if}
-            </div>
-            <div style="padding:8px 14px;font-size:11px;color:var(--text-muted);border-top:1px solid var(--glass-border);font-style:italic">Refresh: {npcData.refresh || 3} (fate points this NPC starts each scene with). Introduce through action &mdash; let the players figure out who they are.</div>
-          </div>
-          <button style="font-size:12px;padding:8px 16px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:var(--text-muted);cursor:pointer" onclick={rerollNpc}><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> Reroll NPC</button>
-        {:else}
-          <div style="text-align:center;padding:40px;color:var(--text-muted)">Generating your opening NPC&hellip;</div>
-        {/if}
-
-      <!-- ── STEP 6: Done ──────────────────────────────────────────── -->
-      {:else if step === 5}
-        <div style="text-align:center;padding:16px 0 0;margin-bottom:24px">
-          <div style="display:inline-flex;align-items:center;gap:8px;background:color-mix(in srgb,var(--c-green) 12%,transparent);border:1px solid color-mix(in srgb,var(--c-green) 25%,transparent);border-radius:100px;padding:8px 20px;font-size:14px;font-weight:800;color:var(--c-green);margin-bottom:20px;letter-spacing:.04em"><i class="fa-solid fa-check" aria-hidden="true"></i> Ready to play</div>
-          <h1 style="font-size:24px;font-weight:800;color:var(--text);margin-bottom:8px;letter-spacing:-.02em">You have a session.</h1>
-          <p style="font-size:13px;color:var(--text-dim);line-height:1.65;margin-bottom:24px;max-width:440px;margin-left:auto;margin-right:auto">
-            Seed, scene, NPC{backstories.length > 0 ? `, and ${backstories.length} backstory hook${backstories.length > 1 ? 's' : ''}` : ''}. Open the generator and your cards are ready to play.
-          </p>
-        </div>
-
-        <div class="pw-summary-items">
-          {#if seedData}
-            <div class="pw-summary-item">
-              <span class="pw-summary-gen">Seed</span>
-              <span class="pw-summary-text">{seedData.location || ''} &mdash; {seedData.objective || ''}</span>
-            </div>
-          {/if}
-          {#if sceneData}
-            <div class="pw-summary-item">
-              <span class="pw-summary-gen">Scene</span>
-              <span class="pw-summary-text">{Array.isArray(sceneData.aspects) && sceneData.aspects[0] ? (typeof sceneData.aspects[0] === 'string' ? sceneData.aspects[0] : sceneData.aspects[0].name || 'Scene ready') : 'Scene ready'}</span>
-            </div>
-          {/if}
-          {#if npcData}
-            <div class="pw-summary-item">
-              <span class="pw-summary-gen">NPC</span>
-              <span class="pw-summary-text">{npcData.name || ''}{npcData.aspects?.high_concept ? ' — ' + npcData.aspects.high_concept : ''}</span>
-            </div>
-          {/if}
-        </div>
-
-        <div class="pw-action-row">
-          <button
-            style="display:inline-flex;align-items:center;gap:8px;background:var(--accent);border:2px solid var(--accent);border-radius:8px;padding:13px 28px;font-size:14px;font-weight:800;color:#fff;cursor:pointer;box-shadow:0 0 16px color-mix(in srgb,var(--accent) 35%,transparent)"
-            onclick={sendAllToTable}
-          ><i class="fa-solid fa-table-cells" aria-hidden="true"></i> Send All to Table</button>
-          <button
-            style="display:inline-flex;align-items:center;gap:8px;background:var(--glass-bg);border:2px solid var(--border-mid);border-radius:8px;padding:13px 28px;font-size:14px;font-weight:800;color:var(--text);cursor:pointer"
-            onclick={goToBoard}
-          ><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> Open Generator</button>
-          <button
-            style="background:none;border:1px solid var(--border);border-radius:8px;padding:12px 20px;font-size:13px;font-weight:600;color:var(--text-dim);cursor:pointer"
-            onclick={exportSession}
-            title="Export all prep cards as Ogma JSON"
-            aria-label="Export session prep as JSON"
-          ><i class="fa-solid fa-arrow-down" aria-hidden="true"></i> Export JSON</button>
-          <button
-            style="background:none;border:1px solid var(--border);border-radius:8px;padding:12px 20px;font-size:13px;font-weight:700;color:var(--text-dim);cursor:pointer"
-            onclick={() => { if (typeof window !== 'undefined') window.print(); }}
-            title="Print your session sheet"
-          ><i class="fa-solid fa-print" aria-hidden="true"></i> Print</button>
-          <a href="/campaigns/character-creation?world={campId}&mode=standard&from=sz" class="btn btn-ghost" style="font-size:13px;font-weight:600;padding:12px 20px">&rarr; Character Creation</a>
-        </div>
-
-        <div style="text-align:center;margin-top:12px">
-          <button style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;text-decoration:underline" onclick={() => { step = 0; campId = null; seedData = null; sceneData = null; npcData = null; backstories = []; }}>Start over</button>
-        </div>
-      {/if}
-
-      <!-- ── Navigation ────────────────────────────────────────────── -->
-      <div style="display:flex;justify-content:space-between;margin-top:32px;padding-top:16px;border-top:1px solid var(--border)">
-        {#if step > 0}
-          <button style="padding:10px 20px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:var(--text-dim);cursor:pointer;font-size:14px;font-weight:600" onclick={prevStep}>&larr; Back</button>
-        {:else}
-          <div></div>
-        {/if}
-        {#if step < 5}
-          <button style="padding:10px 20px;border:2px solid var(--accent);border-radius:6px;background:var(--glass-bg);color:var(--text);cursor:pointer;font-size:14px;font-weight:700;box-shadow:0 0 8px color-mix(in srgb,var(--accent) 20%,transparent)" disabled={step === 0 && !campId} onclick={nextStep}>Next &rarr;</button>
-        {/if}
+        <div class="sz-tip">You can run the wizard once per player if you prefer. This loops through all PCs in one pass.</div>
       </div>
 
+    <!-- ── STEP: Mode ──────────────────────────────────── -->
+    {:else if stepId === 'mode'}
+      <div class="sz-body">
+        <p>All three methods produce valid Fate Condensed characters. Choose based on how much time you have and how much pre-play collaboration your group wants.</p>
+      </div>
+      <div class="sz-grid">
+        {#each MODES as md}
+          <button class="sz-option" class:selected={mode === md.id} onclick={() => { mode = md.id; }} type="button" aria-pressed={String(mode === md.id)} style="text-align:left">
+            <div class="sz-option-tag">{md.tag}</div>
+            <div class="sz-option-title">{md.label}</div>
+            <div class="sz-option-sub">{md.sub}</div>
+          </button>
+        {/each}
+      </div>
+
+    <!-- ── STEP: Setting ───────────────────────────────── -->
+    {:else if stepId === 'setting'}
+      <div class="sz-body">
+        <p>Read these aloud. These are the pressures that define your campaign world. Everything your characters do will exist in the shadow of these issues.</p>
+
+        {#if wd}
+          <div class="sz-card">
+            <div class="sz-card-title">&#9889; Current Issue &mdash; Happening NOW</div>
+            <div class="sz-issue-name">{wd.current[ciIdx].name}</div>
+            <div class="sz-issue-desc">{wd.current[ciIdx].desc}</div>
+          </div>
+
+          <div class="sz-card">
+            <div class="sz-card-title"><i class="fa-solid fa-cloud-bolt" aria-hidden="true"></i> Impending Issue &mdash; Brewing on the Horizon</div>
+            <div class="sz-issue-name">{wd.impending[iiIdx].name}</div>
+            <div class="sz-issue-desc">{wd.impending[iiIdx].desc}</div>
+          </div>
+
+          <button class="btn btn-ghost sz-reroll" onclick={reroll} type="button"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> Different issues</button>
+        {/if}
+
+        <div class="sz-tip">Discuss for 5 minutes: What does this world feel like? Who has power? What's at stake? This shared understanding is the foundation everything else builds on.</div>
+      </div>
+
+    <!-- ── STEP: High Concept ──────────────────────────── -->
+    {:else if stepId === 'highconcept'}
+      <div class="sz-body">
+        {#if pcCount > 1}
+          <div class="sz-pc-progress">
+            <span class="sz-pc-progress-label">Player {pcIndex + 1} of {pcCount}</span>
+            <div class="sz-pc-progress-pips">
+              {#each pcDrafts as _, i}<div class="sz-pc-pip" class:active={i === pcIndex} class:done={i < pcIndex}></div>{/each}
+            </div>
+          </div>
+        {/if}
+        <div class="sz-input-group">
+          <label class="sz-input-label" for="pc-name">Character Name</label>
+          <input id="pc-name" type="text" class="sz-input" placeholder="Leave blank to fill in later" value={currentPc.name} oninput={e => updateCurrentPc('name', e.target.value)} autocomplete="off" />
+          <div class="sz-mutable"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> You can change this after any session</div>
+        </div>
+        <p>Who is this character? One phrase that captures their role in the story. <span style="font-style:italic;color:var(--text-muted)">Anyone can invoke your High Concept for +2 when it applies, or the GM can compel it to create complications (you earn a fate point).</span></p>
+        <div class="sz-prompt-box">"If someone asked <em>what's your character about?</em> at a bar, what would you say?"</div>
+        <div class="sz-input-group">
+          <label class="sz-input-label" for="pc-hc">High Concept</label>
+          <input id="pc-hc" type="text" class="sz-input" placeholder="e.g. Burned Ex-Corporate Fixer" value={currentPc.hc} oninput={e => updateCurrentPc('hc', e.target.value)} autocomplete="off" />
+          <div class="sz-mutable"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> You can change this after any session</div>
+        </div>
+        {#if hcSuggestions.length > 0}
+          <div class="sz-card">
+            <div class="sz-card-title">{camp ? camp.name : ''} Suggestions</div>
+            <div class="sz-suggest-row">
+              {#each hcSuggestions as s}
+                <button class="sz-suggest-btn" type="button" onclick={() => updateCurrentPc('hc', s)}>{s}</button>
+              {/each}
+            </div>
+            <button class="btn btn-ghost sz-reroll" onclick={refreshHcSuggestions} type="button" style="margin-top:8px"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> More suggestions</button>
+          </div>
+        {/if}
+        <div class="sz-dnd">In D&amp;D, your class + race IS your character concept. In Fate, High Concept is a narrative phrase that can be invoked and compelled.</div>
+        <div class="sz-tip">Double-edged = good. "Sword-Sworn to a Dead King" helps AND causes problems.</div>
+      </div>
+
+    <!-- ── STEP: Trouble ───────────────────────────────── -->
+    {:else if stepId === 'trouble'}
+      <div class="sz-body">
+        {#if pcCount > 1}
+          <div class="sz-pc-progress">
+            <span class="sz-pc-progress-label">Player {pcIndex + 1} of {pcCount} &mdash; Trouble</span>
+            <div class="sz-pc-progress-pips">
+              {#each pcDrafts as _, i}<div class="sz-pc-pip" class:active={i === pcIndex} class:done={i < pcIndex}></div>{/each}
+            </div>
+          </div>
+        {/if}
+        <p>What makes {currentPc.name || 'this character'}'s life harder? This is the aspect that will earn the most fate points. <span style="font-style:italic;color:var(--text-muted)">When the GM compels your Trouble, you receive a fate point. The worse the Trouble, the more fate points you earn &mdash; and FP fuel invokes (+2) on your other rolls.</span></p>
+        <div class="sz-prompt-box">"When things go wrong for your character, <em>why</em> do they go wrong? What keeps pulling them back into trouble?"</div>
+        <div class="sz-input-group">
+          <label class="sz-input-label" for="pc-trouble">Trouble</label>
+          <input id="pc-trouble" type="text" class="sz-input" placeholder="e.g. The Handler Knows Everything" value={currentPc.trouble} oninput={e => updateCurrentPc('trouble', e.target.value)} autocomplete="off" />
+          <div class="sz-mutable"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> You can change this after any session</div>
+        </div>
+        {#if trSuggestions.length > 0}
+          <div class="sz-card">
+            <div class="sz-card-title">Setting Suggestions</div>
+            <div class="sz-suggest-row">
+              {#each trSuggestions as s}
+                <button class="sz-suggest-btn" type="button" onclick={() => updateCurrentPc('trouble', s)}>{s}</button>
+              {/each}
+            </div>
+            <button class="btn btn-ghost sz-reroll" onclick={refreshTrSuggestions} type="button" style="margin-top:8px"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> More suggestions</button>
+          </div>
+        {/if}
+        <div class="sz-tip">A boring trouble earns you nothing. "Has Enemies" is flat. "The Warlord's Daughter Wants Me Dead" is a compel waiting to happen every single session.</div>
+      </div>
+
+    <!-- ── PLACEHOLDER: remaining steps (Layers 2-4) ─── -->
+    {:else}
+      <div class="sz-body">
+        <div class="sz-card">
+          <div class="sz-card-title">Coming Next</div>
+          <p>This step ({stepId}) is being built in the next layer.</p>
+        </div>
+      </div>
+    {/if}
+
+    <!-- ── Navigation ──────────────────────────────────── -->
+    <div class="sz-nav">
+      {#if step > 0}
+        <button class="btn btn-ghost" onclick={back}>&larr; Back</button>
+      {:else}
+        <div></div>
+      {/if}
+      {#if step < totalSteps - 1}
+        <button class="btn btn-primary" onclick={next} disabled={stepId === 'world' && !campId}>
+          {stepId === 'trouble' && pcIndex < pcCount - 1 ? 'Next Player \u2192' : 'Next \u2192'}
+        </button>
+      {/if}
     </div>
-  </main>
+  </div>
 
   <Footer />
 </div>
