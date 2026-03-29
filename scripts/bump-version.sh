@@ -19,5 +19,5 @@ sed -i "s/const CACHE_NAME = .*/const CACHE_NAME = 'ogma-${NEW}';/" static/sw.js
 npm version "${YEAR}.${MONTH}.${NEXT}" --no-git-tag-version --allow-same-version 2>/dev/null
 echo "Bumped: ${CURRENT} → ${NEW}"
 # Commit so the bump is never lost to a later git checkout/reset
-git add src/lib/version.js static/sw.js package.json
+git add src/lib/version.js static/sw.js package.json package-lock.json
 git commit -m "Bump version ${CURRENT} → ${NEW}"
