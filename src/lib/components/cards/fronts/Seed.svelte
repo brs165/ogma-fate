@@ -1,4 +1,5 @@
 <script>
+  import OgmaTooltip from '../../shared/OgmaTooltip.svelte';
   let { data = {}, campName = '', catColor = 'var(--fs-section)' } = $props();
 
   let scenes = $derived(Array.isArray(data.scenes) ? data.scenes : []);
@@ -49,7 +50,9 @@
 
 <!-- 3-Scene Skeleton -->
 <div class="fs-section-gap">
-  <div class="fs-section-hdr">3-SCENE SKELETON</div>
+  <OgmaTooltip tip="Three beats: setup, complication, climax. Let players fill the gaps.">
+    <div class="fs-section-hdr">3-SCENE SKELETON</div>
+  </OgmaTooltip>
   {#each scenes as s, i}
     {@const brief = truncate(s.brief || '', 120)}
     <div class="fs-stunt" style="border-left:3px solid {SCENE_COLORS[i] || 'var(--fs-section)'}; border-radius:0 3px 3px 0">

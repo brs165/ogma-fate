@@ -1,5 +1,6 @@
 <script>
   import { Checkbox } from 'bits-ui';
+  import OgmaTooltip from '../../shared/OgmaTooltip.svelte';
   let { data = {}, campName = '', catColor = 'var(--fs-section)', cardState = {}, onUpdate = () => {} } = $props();
 
   const LADDER = {8:"Legendary",7:"Epic",6:"Fantastic",5:"Superb",4:"Great",3:"Good",2:"Fair",1:"Average",0:"Mediocre"};
@@ -81,11 +82,15 @@
 <!-- Win / Lose -->
 <div style="display:flex; gap:8px; margin-bottom:14px">
   <div class="fs-stunt" style="flex:1; border-left:3px solid #2e7d32; border-radius:0 3px 3px 0">
-    <div class="fs-stunt-name" style="color:#2e7d32">WIN</div>
+    <OgmaTooltip tip="Declare before the first roll. What the PCs achieve on victory.">
+      <div class="fs-stunt-name" style="color:#2e7d32">WIN</div>
+    </OgmaTooltip>
     <div class="fs-stunt-desc">{data.victory || ''}</div>
   </div>
   <div class="fs-stunt" style="flex:1; border-left:3px solid #c62828; border-radius:0 3px 3px 0">
-    <div class="fs-stunt-name" style="color:#c62828">LOSE</div>
+    <OgmaTooltip tip="Declare before the first roll. What happens if the PCs are defeated or concede.">
+      <div class="fs-stunt-name" style="color:#c62828">LOSE</div>
+    </OgmaTooltip>
     <div class="fs-stunt-desc">{data.defeat || ''}</div>
   </div>
 </div>
@@ -109,7 +114,9 @@
   </div>
   {#if data.gm_fate_points}
     <div style="text-align:center; flex-shrink:0; width:60px">
-      <div class="fs-section-hdr">GM FP</div>
+      <OgmaTooltip tip="GM fate points: 1 per PC. Spend to invoke scene aspects against PCs or activate NPC stunts.">
+        <div class="fs-section-hdr">GM FP</div>
+      </OgmaTooltip>
       <div style="font-size:28px; font-weight:800; color:var(--fs-text); line-height:1">{data.gm_fate_points}</div>
     </div>
   {/if}

@@ -57,6 +57,11 @@
         <div class="gen-card-name">FAQ</div>
         <div class="gen-card-desc">Cache, offline use, data loss prevention, browser support.</div>
       </a>
+      <a href="/help/mistakes" class="gen-card">
+        <div class="gen-card-icon"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div>
+        <div class="gen-card-name">20 Common Mistakes</div>
+        <div class="gen-card-desc">Errors that trip up new GMs and D&D converts, with fixes and FCon page refs.</div>
+      </a>
     </div>
 
     <h2>Quick reference — keyboard shortcuts</h2>

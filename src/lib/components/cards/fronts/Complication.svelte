@@ -1,10 +1,13 @@
 <script>
+  import OgmaTooltip from '../../shared/OgmaTooltip.svelte';
   let { data = {}, campName = '', catColor = 'var(--fs-section)' } = $props();
 </script>
 
 <div class="fs-section-gap">
   <div class="fs-stunt" style="border-left:3px solid var(--fs-section); border-radius:0 3px 3px 0; padding:8px 10px">
-    <div style="font-size:10px; font-weight:800; letter-spacing:0.12em; color:var(--fs-section); margin-bottom:3px">NEW SCENE ASPECT</div>
+    <OgmaTooltip tip="Arrives with one free invoke. Remove only when the fiction justifies it.">
+      <div style="font-size:10px; font-weight:800; letter-spacing:0.12em; color:var(--fs-section); margin-bottom:3px">NEW SCENE ASPECT</div>
+    </OgmaTooltip>
     <div style="font-size:13px; font-weight:700; color:var(--fs-text); line-height:1.3; margin-bottom:4px">{data.new_aspect || ''}</div>
     {#if data.type}<span class="fs-skill-badge" style="font-size:9px; padding:2px 8px; text-transform:uppercase">{(data.type || '').toUpperCase()}</span>{/if}
   </div>

@@ -87,7 +87,9 @@
 <!-- Framing Questions -->
 {#if fqs.length > 0}
   <div class="fs-section-gap">
-    <div class="fs-section-hdr">FRAMING QUESTIONS</div>
+    <OgmaTooltip tip="Answer before play to decide if this scene is worth playing.">
+      <div class="fs-section-hdr">FRAMING QUESTIONS</div>
+    </OgmaTooltip>
     {#each fqs.slice(0,3) as q}
       <p style="margin:0 0 4px; font-size:12px; color:var(--fs-text-muted); line-height:1.4"><i class="fa-solid fa-circle" aria-hidden="true" style="font-size:4px; vertical-align:middle; margin-right:6px; color:var(--fs-section)"></i>{q}</p>
     {/each}

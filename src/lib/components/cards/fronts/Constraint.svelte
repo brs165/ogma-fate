@@ -1,4 +1,5 @@
 <script>
+  import OgmaTooltip from '../../shared/OgmaTooltip.svelte';
   let { data = {}, campName = '', catColor = 'var(--fs-section)' } = $props();
   // constraint_type: 'limitation' | 'resistance'
   let isLimitation = $derived((data.constraint_type || '') === 'limitation');
@@ -36,7 +37,9 @@
 
   <div style="width:100px; flex-shrink:0; text-align:center">
     <div style="font-size:10px; font-weight:800; letter-spacing:0.12em; color:var(--fs-section); margin-bottom:6px">TYPE</div>
-    <span class="fs-skill-badge" style="font-size:12px; padding:4px 12px; text-transform:capitalize">{data.constraint_type || ''}</span>
+    <OgmaTooltip tip={isLimitation ? 'Limitation: restricts a specific action. Forces the party to find another approach.' : 'Resistance: protects against a type of action. Cannot be overcome by rolling higher.'}>
+      <span class="fs-skill-badge" style="font-size:12px; padding:4px 12px; text-transform:capitalize">{data.constraint_type || ''}</span>
+    </OgmaTooltip>
     {#if data.gm_note}
       <div class="fs-stunt" style="margin-top:10px; text-align:left">
         <div class="fs-stunt-name">GM NOTE</div>

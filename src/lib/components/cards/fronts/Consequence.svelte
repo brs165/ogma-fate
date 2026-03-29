@@ -36,13 +36,17 @@
 
 <!-- Compel Hook -->
 <div class="fs-section-gap">
-  <div class="fs-section-hdr">COMPEL HOOK</div>
+  <OgmaTooltip tip="A suggested way the GM can compel this consequence in future scenes, creating new complications.">
+    <div class="fs-section-hdr">COMPEL HOOK</div>
+  </OgmaTooltip>
   <div style="font-size:12px; color:var(--fs-text-dim); font-style:italic; line-height:1.4">"{data.compel_hook || ''}"</div>
 </div>
 
 <!-- Severity ladder -->
 <div class="fs-section-gap">
-  <div class="fs-section-hdr">SEVERITY</div>
+  <OgmaTooltip tip="Severity determines shifts absorbed and recovery time. Higher = more damage absorbed but longer to heal.">
+    <div class="fs-section-hdr">SEVERITY</div>
+  </OgmaTooltip>
   <div style="display:flex; flex-direction:column; gap:3px">
     {#each ROWS as r}
       <div style="display:flex; gap:8px; align-items:center; opacity:{r.label.toLowerCase() === sev ? 1 : 0.3}">
