@@ -2258,3 +2258,146 @@ export function parseOgmaJSON(str) {
 
 export { GENERATORS };
 export { toBatchMermaid, toBatchObsidianMD, toBatchTypst };
+
+// ════════════════════════════════════════════════════════════════════════
+// SESSION ZERO WIZARD — suggestion helpers
+// ════════════════════════════════════════════════════════════════════════
+
+/**
+ * Suggest a skill pyramid for a PC based on high concept and trouble text.
+ * Uses keyword matching to bias skill selection toward thematically appropriate
+ * skills, then fills remaining slots randomly to complete the pyramid.
+ *
+ * Pyramid: 1×Great(+4), 2×Good(+3), 3×Fair(+2), 4×Average(+1) = 10 rated skills.
+ *
+ * @param {string} hc - High concept text (may be empty).
+ * @param {string} trouble - Trouble text (may be empty).
+ * @param {object} [t] - Filtered world tables (unused for now, reserved for future).
+ * @returns {Array<{name:string, r:number}>} 10 skills with ratings.
+ */
+export function suggestSkillPyramid(hc, trouble, t) {
+  // Keyword → skill affinity map (lowercase keywords → skill names)
+  var AFFINITY = {
+    fight: 'Fight', combat: 'Fight', warrior: 'Fight', knight: 'Fight', soldier: 'Fight', sword: 'Fight', blade: 'Fight', martial: 'Fight',
+    shoot: 'Shoot', sniper: 'Shoot', gun: 'Shoot', archer: 'Shoot', marksman: 'Shoot', rifle: 'Shoot', ranged: 'Shoot',
+    stealth: 'Stealth', thief: 'Stealth', shadow: 'Stealth', hidden: 'Stealth', spy: 'Stealth', assassin: 'Stealth', covert: 'Stealth',
+    burglary: 'Burglary', burglar: 'Burglary', lock: 'Burglary', security: 'Burglary', vault: 'Burglary', break: 'Burglary',
+    drive: 'Drive', pilot: 'Drive', driver: 'Drive', vehicle: 'Drive', ship: 'Drive', mechanic: 'Drive', rider: 'Drive',
+    athletics: 'Athletics', acrobat: 'Athletics', climb: 'Athletics', run: 'Athletics', agile: 'Athletics', scout: 'Athletics',
+    physique: 'Physique', strong: 'Physique', tough: 'Physique', brute: 'Physique', endure: 'Physique', muscle: 'Physique',
+    will: 'Will', determined: 'Will', stubborn: 'Will', resolve: 'Will', unshakeable: 'Will', mental: 'Will',
+    empathy: 'Empathy', healer: 'Empathy', medic: 'Empathy', counselor: 'Empathy', empath: 'Empathy', read: 'Empathy',
+    rapport: 'Rapport', diplomat: 'Rapport', charming: 'Rapport', negotiat: 'Rapport', persuad: 'Rapport', trust: 'Rapport',
+    provoke: 'Provoke', intimidat: 'Provoke', menac: 'Provoke', threaten: 'Provoke', fear: 'Provoke', warlord: 'Provoke',
+    deceive: 'Deceive', liar: 'Deceive', con: 'Deceive', trick: 'Deceive', disguise: 'Deceive', fraud: 'Deceive',
+    investigate: 'Investigate', detective: 'Investigate', inspector: 'Investigate', clue: 'Investigate', forensic: 'Investigate', evidence: 'Investigate',
+    notice: 'Notice', watchful: 'Notice', alert: 'Notice', percep: 'Notice', aware: 'Notice', vigilant: 'Notice',
+    lore: 'Lore', scholar: 'Lore', wizard: 'Lore', arcane: 'Lore', magic: 'Lore', ancient: 'Lore', occult: 'Lore', witch: 'Lore',
+    academics: 'Academics', doctor: 'Academics', professor: 'Academics', scien: 'Academics', medic: 'Academics', surgeon: 'Academics', knowledge: 'Academics', teacher: 'Academics',
+    contacts: 'Contacts', connected: 'Contacts', network: 'Contacts', fixer: 'Contacts', broker: 'Contacts', trader: 'Contacts',
+    crafts: 'Crafts', engineer: 'Crafts', build: 'Crafts', repair: 'Crafts', artificer: 'Crafts', inventor: 'Crafts', tinker: 'Crafts',
+    resources: 'Resources', wealthy: 'Resources', merchant: 'Resources', rich: 'Resources', noble: 'Resources', prince: 'Resources', collector: 'Resources',
+  };
+
+  var text = ((hc || '') + ' ' + (trouble || '')).toLowerCase();
+  var words = text.split(/\W+/).filter(function(w) { return w.length > 2; });
+
+  // Score each skill by keyword hits
+  var scores = {};
+  ALL_SKILLS.forEach(function(s) { scores[s] = 0; });
+  words.forEach(function(w) {
+    // Check each affinity keyword — support partial matching (startsWith)
+    Object.keys(AFFINITY).forEach(function(kw) {
+      if (w.indexOf(kw) === 0 || kw.indexOf(w) === 0) {
+        scores[AFFINITY[kw]] += 1;
+      }
+    });
+  });
+
+  // Sort by score descending, then shuffle ties
+  var ranked = ALL_SKILLS.slice().sort(function(a, b) {
+    var diff = scores[b] - scores[a];
+    if (diff !== 0) return diff;
+    return _rng() - 0.5; // random tiebreaker
+  });
+
+  // Build pyramid: top 10 skills
+  var chosen = ranked.slice(0, 10);
+  return [
+    { name: chosen[0], r: 4 },
+    { name: chosen[1], r: 3 }, { name: chosen[2], r: 3 },
+    { name: chosen[3], r: 2 }, { name: chosen[4], r: 2 }, { name: chosen[5], r: 2 },
+    { name: chosen[6], r: 1 }, { name: chosen[7], r: 1 }, { name: chosen[8], r: 1 }, { name: chosen[9], r: 1 },
+  ];
+}
+
+/**
+ * Suggest aspects for a PC using world tables. Returns multiple options for a given slot.
+ *
+ * @param {string} slot - 'high_concept' | 'trouble' | 'relationship' | 'free'
+ * @param {object} t - Filtered world tables.
+ * @param {number} [count=4] - How many suggestions to return.
+ * @returns {string[]} Array of suggested aspect phrases.
+ */
+export function suggestAspects(slot, t, count) {
+  var n = count || 4;
+  if (!t) return [];
+
+  switch (slot) {
+    case 'high_concept': {
+      var pool = t.pc_high_concepts || t.major_concepts;
+      if (!pool || !pool.length) return [];
+      // Use fillTemplate for variety-matrix tables, pick for plain arrays
+      if (Array.isArray(pool) && typeof pool[0] === 'string') return pickN(pool, n);
+      var out = [];
+      for (var i = 0; i < n * 3 && out.length < n; i++) {
+        var a = fillTemplate(pool);
+        if (a && out.indexOf(a) === -1) out.push(a);
+      }
+      return out;
+    }
+    case 'trouble': {
+      var pool = t.troubles || [];
+      if (!pool.length) return [];
+      return pickN(pool, n);
+    }
+    case 'relationship': {
+      // Generate from other_aspects or backstory relationship tables
+      var pool = t.backstory_relationship
+        ? (Array.isArray(t.backstory_relationship) ? t.backstory_relationship : [t.backstory_relationship])
+        : [];
+      if (pool.length) return pickN(pool, n);
+      // Fallback: generate from other_aspects
+      var out = [];
+      for (var i = 0; i < n * 3 && out.length < n; i++) {
+        var a = fillTemplate(t.other_aspects);
+        if (a && out.indexOf(a) === -1) out.push(a);
+      }
+      return out;
+    }
+    case 'free':
+    default: {
+      var out = [];
+      for (var i = 0; i < n * 3 && out.length < n; i++) {
+        var a = fillTemplate(t.other_aspects);
+        if (a && out.indexOf(a) === -1) out.push(a);
+      }
+      return out;
+    }
+  }
+}
+
+/**
+ * Suggest stunts filtered to match a set of skills. Returns stunt objects.
+ *
+ * @param {Array<{name:string, r:number}>} skills - PC's assigned skills.
+ * @param {object} t - Filtered world tables.
+ * @param {number} [count=6] - How many suggestions to return.
+ * @returns {Array<{name:string, skill:string, desc:string, type:string}>}
+ */
+export function suggestStunts(skills, t, count) {
+  var n = count || 6;
+  var pool = (t && t.stunts ? t.stunts : []).concat(UNIVERSAL && UNIVERSAL.stunts ? UNIVERSAL.stunts : []);
+  if (!pool.length) return [];
+  return pickStuntsForSkills(pool, n, skills || []);
+}

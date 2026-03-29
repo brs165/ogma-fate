@@ -3295,6 +3295,50 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
 .sz-info-box{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--glass-radius);font-size:var(--text-sm);color:var(--text-dim);line-height:1.6}
 .sz-info-icon{font-size:18px;flex-shrink:0}
 
+/* ── Session Zero unified wizard additions ─────────────────────────────── */
+/* Suggestion buttons */
+.sz-suggest-row{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.sz-suggest-btn{font-size:var(--text-sm);padding:5px 12px;border:1px solid var(--border-mid);border-radius:var(--glass-radius-sm,4px);background:var(--glass-bg);color:var(--text-dim);cursor:pointer;font-family:var(--font-ui);transition:all 0.12s;text-align:left;line-height:1.4}
+.sz-suggest-btn:hover{border-color:var(--accent);color:var(--accent);background:color-mix(in srgb,var(--accent) 6%,transparent)}
+.sz-suggest-btn:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
+/* "Nothing is permanent" badge */
+.sz-mutable{font-size:10px;color:var(--text-muted);display:inline-flex;align-items:center;gap:4px;margin-top:4px;letter-spacing:0.02em}
+.sz-mutable i{font-size:9px;color:var(--c-green)}
+/* PC progress pips */
+.sz-pc-bar{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.sz-pc-bar-label{font-size:var(--text-sm);font-weight:600;color:var(--text-dim)}
+.sz-pc-pips{display:flex;gap:4px}
+.sz-pc-pip{width:10px;height:10px;border-radius:50%;background:var(--border-mid);transition:background 0.15s}
+.sz-pc-pip.active{background:var(--accent)}
+.sz-pc-pip.done{background:var(--c-green)}
+/* Interactive skill pyramid select */
+.sz-skill-select{flex:1;padding:6px 8px;background:var(--inset);border:1px solid var(--border-mid);border-radius:var(--glass-radius-sm,4px);font-size:var(--text-sm);color:var(--text);font-family:var(--font-ui);cursor:pointer;min-width:0;appearance:none;-webkit-appearance:none}
+.sz-skill-select:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 20%,transparent)}
+.sz-skill-select option{background:var(--panel);color:var(--text)}
+/* Stunt pick list */
+.sz-stunt-pick{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--glass-bg);border:1px solid var(--border);border-radius:var(--glass-radius-sm,4px);font-size:var(--text-sm);color:var(--text-dim);margin-bottom:6px}
+.sz-stunt-pick-name{font-weight:700;color:var(--text);flex:1;min-width:0}
+.sz-stunt-pick-skill{font-size:10px;font-weight:600;color:var(--accent);letter-spacing:0.06em;text-transform:uppercase}
+.sz-stunt-remove{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;padding:2px 6px}
+.sz-stunt-remove:hover{color:var(--c-red)}
+/* GM prep combined view */
+.sz-prep-section{padding:14px;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--glass-radius);margin-bottom:12px}
+.sz-prep-hdr{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.sz-prep-hdr-label{font-size:10px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent)}
+.sz-prep-hdr-name{font-size:var(--text-base);font-weight:700;color:var(--text);margin-left:auto}
+.sz-prep-field{margin-bottom:8px}
+.sz-prep-field-label{font-size:10px;font-weight:700;color:var(--text-muted);margin-bottom:3px}
+.sz-prep-field-value{font-size:var(--text-sm);color:var(--text-dim);line-height:1.5}
+/* Stress boxes display */
+.sz-stress-boxes{display:flex;gap:4px;margin:4px 0}
+.sz-stress-box{width:20px;height:20px;border:2px solid var(--border-mid);border-radius:3px;background:var(--inset)}
+/* Summary PC card */
+.sz-summary-pc{padding:14px;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--glass-radius);margin-bottom:10px}
+.sz-summary-pc-name{font-size:var(--text-base);font-weight:800;color:var(--text);margin-bottom:8px}
+.sz-summary-aspect{font-size:var(--text-sm);color:var(--text-dim);padding:3px 0;display:flex;gap:8px}
+.sz-summary-aspect-label{font-size:10px;font-weight:700;color:var(--text-muted);min-width:80px;text-transform:uppercase;letter-spacing:0.06em;flex-shrink:0}
+.sz-summary-aspect-val{color:var(--text);font-weight:600}
+
 /* ══ RESULT HELP PANEL (rhp-shell) ══ */
 .rhp-empty-state{padding:24px 20px 32px;display:flex;flex-direction:column;align-items:center;gap:6px}
 .rhp-ready-icon-btn{background:none;border:none;cursor:pointer;padding:0;color:var(--campaign-accent,var(--accent));display:block}
