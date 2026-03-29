@@ -63,7 +63,7 @@
   <li><strong>Success with Style</strong> on Defend — the defender earns a boost</li>
   <li>Some stunts grant boosts under specific conditions</li>
 </ul>
-<p><strong>Rules:</strong> Give it a name immediately — <em>"Stunned,"</em> <em>"Off Balance,"</em> <em>"Momentary Opening."</em> The free invoke works just like invoking any aspect (+2 or reroll), costs no Fate Point, and can be passed to an ally in the same exchange. Use it or lose it — a boost expires as soon as the scene ends or when the free invoke is spent.</p>
+<p><strong>Rules:</strong> Give it a name immediately — <em>"Stunned,"</em> <em>"Off Balance,"</em> <em>"Momentary Opening."</em> The free invoke works just like invoking any aspect (+2 or reroll), costs no Fate Point, and can be passed to an ally before it expires (end of scene or when used). Use it or lose it — a boost expires as soon as the scene ends or when the free invoke is spent.</p>
 <div class="callout callout-tip">
   <div class="callout-title"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> Boost vs. aspect</div>
   <p>A boost is a stripped-down aspect. It cannot be invoked a second time (there's only one free invoke), cannot be compelled, and has no persistence. If you want a lasting effect, use Create Advantage for a real aspect instead. The practical difference: boosts reward exceptional rolls with immediate firepower; aspects reward patient setup with reusable leverage.</p>
@@ -208,7 +208,7 @@
     <h2 id="fate-point-economy-gm">The fate point economy — a GM guide</h2>
     <p>The economy breaks when GMs forget to compel. Here's the full cycle. <a href="https://fate-srd.com/fate-condensed/aspects-and-fate-points" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
     <ol>
-      <li><strong>Session start:</strong> Each player gets fate points equal to their Refresh (usually 3). The GM gets 1 per PC per scene — not per NPC, not per encounter. A party of 4 = 4 GM fate points per scene.</li>
+      <li><strong>Session start:</strong> Each player gets fate points equal to their Refresh (usually 3). The GM gets 1 per PC per scene — not per NPC, not per encounter. A party of 4 = 4 GM fate points at the start of each scene (resets every scene).</li>
       <li><strong>During the scene:</strong> GM offers compels to create complications. Players who accept earn 1 FP. Players who refuse spend 1 FP. The GM uses their pool for NPC invokes.</li>
       <li><strong>End of scene:</strong> Reset GM pool to 1 per PC. Player pools carry over — they don't reset until a breakthrough.</li>
     </ol>

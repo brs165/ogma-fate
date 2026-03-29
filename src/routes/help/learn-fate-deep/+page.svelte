@@ -252,7 +252,7 @@
       <p><strong>Don't write a plot.</strong> Fate is not a scripted adventure. Prepare situations, not storylines.<br/>
       <strong>Don't plan more than 3 scenes.</strong> You won't use them. Players will go somewhere unexpected by scene 2.<br/>
       <strong>Don't stat out a big bad.</strong> For session one, minor NPCs and environmental challenges are enough. The antagonist can emerge from play.<br/>
-      <strong>Don't fill all stunt slots.</strong> Leave 1–2 blank for each PC. Fill them during play when a player says "I wish I could..."</p>
+      <strong>Don't fill all stunt slots.</strong> Leave 1–2 blank for each PC. Fill them during play when a player says "I wish I could..." — each stunt costs 1 Refresh (minimum Refresh 1), so pre-writing all slots locks Refresh before the character's playstyle is known.</p>
     </div>
 
     <h3><i class="fa-solid fa-clock" aria-hidden="true" style="color:var(--accent)"></i> Pacing the session</h3>
