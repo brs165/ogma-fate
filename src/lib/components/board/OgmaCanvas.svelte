@@ -16,7 +16,6 @@
     connectors      = [],
     groups          = [],
     loaded          = false,
-    mode            = 'prep',
     campId          = '',
     cardSearch      = '',
     connectSourceId = null,
@@ -463,8 +462,7 @@
         {:else}
           {@const stackCount = card.stackId ? cards.filter(c => c.stackId === card.stackId || c.id === card.stackId).length : 1}
           <BoardCard
-            {card} {mode} {campId}
-            isOnTable={false}
+            {card} {campId}
             {stackCount}
             onDelete={onDeleteCard}
             onReroll={onRerollCard}
@@ -503,7 +501,6 @@
               }
               if (onUpdateCard) onUpdateCard(id, patch);
             }}
-            onSendToTable={null}
             onOpen={onOpenCard}
             onInvoke={onInvoke}
             onConnect={onConnect}

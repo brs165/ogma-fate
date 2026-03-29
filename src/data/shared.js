@@ -762,6 +762,35 @@ export const HELP_CONTENT = {
   });
 })();
 
+// ═══════════════════════════════════════════════════════════════
+// RELATED GENERATORS — cross-links shown in the How tab
+// ═══════════════════════════════════════════════════════════════
+(function() {
+  var rel = {
+    npc_minor:    ['scene', 'complication', 'compel'],
+    npc_major:    ['encounter', 'faction', 'consequence'],
+    scene:        ['encounter', 'obstacle', 'complication'],
+    campaign:     ['faction', 'seed', 'countdown'],
+    encounter:    ['scene', 'npc_major', 'countdown'],
+    seed:         ['scene', 'encounter', 'compel'],
+    compel:       ['consequence', 'encounter', 'campaign'],
+    challenge:    ['countdown', 'obstacle', 'scene'],
+    contest:      ['scene', 'complication', 'countdown'],
+    consequence:  ['encounter', 'compel', 'npc_major'],
+    faction:      ['npc_major', 'campaign', 'encounter'],
+    complication: ['scene', 'contest', 'encounter'],
+    pc:           ['backstory', 'campaign', 'seed'],
+    backstory:    ['pc', 'campaign', 'faction'],
+    obstacle:     ['scene', 'encounter', 'challenge'],
+    countdown:    ['encounter', 'campaign', 'constraint'],
+    constraint:   ['scene', 'obstacle', 'challenge'],
+    boost:        ['encounter', 'scene', 'compel'],
+  };
+  Object.keys(rel).forEach(function(k) {
+    if (HELP_CONTENT[k]) HELP_CONTENT[k].related = rel[k];
+  });
+})();
+
 export const HELP_ENTRIES = [
   {
     id:"npc_minor", icon:"fa-user", label:"Minor NPC",

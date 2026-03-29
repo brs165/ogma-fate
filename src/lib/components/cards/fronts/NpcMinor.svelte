@@ -60,7 +60,9 @@
 <!-- Stunt -->
 {#if stunt}
   <div class="fs-section-gap">
-    <div class="fs-section-hdr">STUNT</div>
+    <OgmaTooltip tip="Stunts give +2 to a skill in a specific situation, or a once-per-scene special ability.">
+      <div class="fs-section-hdr">STUNT</div>
+    </OgmaTooltip>
     <div class="fs-stunt">
       <div class="fs-stunt-name">{stunt.name}</div>
       <div class="fs-stunt-desc">{stunt.desc || ''}</div>

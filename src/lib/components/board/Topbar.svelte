@@ -55,7 +55,7 @@
             {#each worlds as w (w.id)}
               <Select.Item value={w.id} label={w.name} class="bt-world-item" aria-label={w.name}>
                 <span class="bt-world-item-icon" aria-hidden="true"><i class="fa-solid {w.icon}"></i></span>
-                <Select.ItemText class="bt-world-item-name">{w.name}</Select.ItemText>
+                <span class="bt-world-item-name">{w.name}</span>
                 {#if w.id === campId}
                   <span class="bt-world-item-check" aria-hidden="true">✓</span>
                 {/if}

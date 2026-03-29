@@ -1,4 +1,5 @@
 <script>
+  import OgmaTooltip from '../../shared/OgmaTooltip.svelte';
   let { data = {}, campName = '', catColor = 'var(--fs-section)' } = $props();
 
   let face = $derived(data.face || {});
@@ -18,7 +19,9 @@
 
 <div class="fs-section-gap">
   <div class="fs-stunt" style="border-left:3px solid #c62828; border-radius:0 3px 3px 0">
-    <div class="fs-stunt-name" style="color:#c62828">WEAKNESS</div>
+    <OgmaTooltip tip="How the faction can be disrupted without direct confrontation. Exploit creatively.">
+      <div class="fs-stunt-name" style="color:#c62828">WEAKNESS</div>
+    </OgmaTooltip>
     <div class="fs-stunt-desc">{data.weakness || ''}</div>
   </div>
 </div>

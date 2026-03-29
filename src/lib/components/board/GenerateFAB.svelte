@@ -25,7 +25,7 @@
   </DropdownMenu.Trigger>
   <DropdownMenu.Portal>
     <DropdownMenu.Content class="gen-fab-content" side="top" align="end" sideOffset={12}>
-      <DropdownMenu.Label class="gen-fab-label">Generate</DropdownMenu.Label>
+      <DropdownMenu.GroupHeading class="gen-fab-label">Generate</DropdownMenu.GroupHeading>
       <DropdownMenu.Separator class="export-dd-sep" />
       {#each FAB_ITEMS as g (g.id)}
         <DropdownMenu.Item

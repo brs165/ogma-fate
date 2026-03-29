@@ -24,7 +24,7 @@
 
   <DropdownMenu.Portal>
     <DropdownMenu.Content class="export-dd-content" sideOffset={6} align="end">
-      <DropdownMenu.Label class="export-dd-label">Export</DropdownMenu.Label>
+      <DropdownMenu.GroupHeading class="export-dd-label">Export</DropdownMenu.GroupHeading>
       <DropdownMenu.Separator class="export-dd-sep" />
 
       <DropdownMenu.Item class="export-dd-item" onSelect={() => onExportCanvas?.()}>

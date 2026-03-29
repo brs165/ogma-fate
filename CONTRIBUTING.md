@@ -1,6 +1,6 @@
 # Contributing to Ogma
 
-Ogma is a Fate Condensed GM aid built with SvelteKit + Svelte 5 + SvelteFlow.
+Ogma is a Fate Condensed GM aid built with SvelteKit + Svelte 5.
 
 ---
 
@@ -16,7 +16,7 @@ Read these first:
 ## Stack
 
 - **SvelteKit + Svelte 5** — runes mode (`$state`, `$derived`, `$props`)
-- **@xyflow/svelte** — canvas pan/zoom/connect
+- **Native canvas** — pointer/wheel pan-zoom (no SvelteFlow)
 - **bits-ui** — headless accessible UI components
 - **Dexie 4** — IndexedDB persistence
 - **Vite 7 + adapter-static** — build and deploy
@@ -34,8 +34,9 @@ npm run build     # production build → build/
 
 QA gate — must pass before any PR:
 ```bash
-node scripts/qa-hard.mjs    # content + engine checks
+node scripts/qa-hard.mjs    # content + engine checks (189 checks)
 node scripts/qa-export.mjs  # export round-trip checks
+node scripts/qa-unit.mjs    # engine.js unit tests
 npm run build               # must exit 0
 ```
 
@@ -68,10 +69,9 @@ let label = $derived(GENERATORS.find(g => g.id === activeGen)?.label ?? '');
 
 1. **CSS in `static/assets/css/theme.css` only** — no `<style>` blocks in components
 2. **`engine.js` and `db.js` are pure JS** — no Svelte imports, ever
-3. **SvelteFlow `nodes`/`edges` must be `writable()` stores** — not `$state([])`
-4. **Card components must not have `left/top` style or `onmousedown`** — SvelteFlow positions them
-5. **`nodeTypes.js` at module level** — never inside a component or reactive block
-6. **Preserve all a11y** — `role`, `aria-label`, `aria-pressed`, `aria-expanded`
+3. **Native canvas** — pan/zoom via pointer/wheel events + CSS transform in OgmaCanvas.svelte
+4. **Card components must not have `left/top` style** — only the `.cv-card-positioner` wrapper
+5. **Preserve all a11y** — `role`, `aria-label`, `aria-pressed`, `aria-expanded`
 
 ---
 
@@ -92,9 +92,8 @@ See `docs/content-authoring.md` for full world-building guide.
 1. Add entry to `GENERATORS` array in `src/data/shared.js`
 2. Add generate function to `src/lib/engine.js`
 3. Create `src/lib/components/cards/fronts/[GenName].svelte`
-4. Register in `src/lib/components/board/nodeTypes.js`
-5. Add to `CTX_ITEMS` in `src/lib/components/board/CanvasContextMenu.svelte`
-6. Run QA gate
+4. Add to `GEN_ITEMS` in `src/lib/components/board/AddMenu.svelte`
+5. Run QA gate
 
 ---
 

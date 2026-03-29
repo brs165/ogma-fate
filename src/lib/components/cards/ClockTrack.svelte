@@ -24,9 +24,7 @@
         aria-label="Clock box {i + 1}{ticked ? ' (ticked)' : ' (empty)'}"
         style="width:28px; height:28px; border-color:{borderColor}; background:{ticked ? bg : 'transparent'}; color:{ticked ? '#fff' : borderColor};"
       >
-        <Checkbox.Indicator>
-          {#if ticked}<i class="fa-solid fa-check" aria-hidden="true"></i>{/if}
-        </Checkbox.Indicator>
+        {#if ticked}<i class="fa-solid fa-check" aria-hidden="true"></i>{/if}
       </Checkbox.Root>
     {/each}
   </div>

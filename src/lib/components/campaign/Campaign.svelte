@@ -613,6 +613,22 @@
                           </div>
                         {/if}
 
+                        {#if helpEntry.related && helpEntry.related.length}
+                          <div class="rhp-block rhp-block--related">
+                            <div class="rhp-block-label"><i class="fa-solid fa-link" aria-hidden="true" style="font-size:10px; margin-right:4px"></i>Related generators</div>
+                            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px">
+                              {#each helpEntry.related as relId}
+                                {@const relGen = GENERATORS.find(x => x.id === relId)}
+                                {#if relGen}
+                                  <button class="rhp-related-btn" onclick={() => selectGen(relId)} aria-label="Switch to {relGen.label}">
+                                    <i class="fa-solid {relGen.icon}" aria-hidden="true" style="font-size:10px"></i> {relGen.label}
+                                  </button>
+                                {/if}
+                              {/each}
+                            </div>
+                          </div>
+                        {/if}
+
                       </div>
                     {/if}
 

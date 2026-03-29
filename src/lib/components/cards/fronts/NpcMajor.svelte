@@ -82,12 +82,16 @@
 <!-- Consequences -->
 {#snippet conRow(label, cls)}
   <div class="fs-con-row">
-    <span class="fs-con-label {cls}">{label}</span>
+    <OgmaTooltip tip={label === 'Mild (2)' ? 'Absorbs 2 shifts. Clears end of next scene after treatment.' : label === 'Moderate (4)' ? 'Absorbs 4 shifts. Clears end of session after treatment.' : 'Absorbs 6 shifts. Clears end of arc after treatment.'}>
+      <span class="fs-con-label {cls}">{label}</span>
+    </OgmaTooltip>
     <div class="fs-con-line"></div>
   </div>
 {/snippet}
 <div class="fs-section-gap">
-  <div class="fs-section-hdr">CONSEQUENCES</div>
+  <OgmaTooltip tip="Lasting injuries that are aspects — can be invoked for +2 or compelled for complications. Recovery requires a treatment roll first.">
+    <div class="fs-section-hdr">CONSEQUENCES</div>
+  </OgmaTooltip>
   {@render conRow('Mild (2)',     'fs-con-label-mild')}
   {@render conRow('Moderate (4)', 'fs-con-label-mod')}
   {@render conRow('Severe (6)',   'fs-con-label-sev')}
@@ -96,7 +100,9 @@
 <!-- Stunts -->
 {#if stunts.length > 0}
   <div class="fs-section-gap">
-    <div class="fs-section-hdr">STUNTS</div>
+    <OgmaTooltip tip="Special abilities: +2 to a skill in a narrow situation, or a once-per-scene effect. Don\u2019t forget to use them.">
+      <div class="fs-section-hdr">STUNTS</div>
+    </OgmaTooltip>
     {#each stunts as s}
       <div class="fs-stunt">
         <div class="fs-stunt-name">{s.name}{s.skill ? ` (${s.skill})` : ''}</div>

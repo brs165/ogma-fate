@@ -62,9 +62,7 @@
             aria-label="{row.side.label} victory {j + 1}{filled ? ' (won)' : ' (empty)'}"
             style="border-color:{row.col}; background:{filled ? row.col : 'transparent'}; color:{filled ? '#fff' : row.col};"
           >
-            <Checkbox.Indicator>
-              {#if filled}<i class="fa-solid fa-check" aria-hidden="true"></i>{/if}
-            </Checkbox.Indicator>
+            {#if filled}<i class="fa-solid fa-check" aria-hidden="true"></i>{/if}
           </Checkbox.Root>
         {/each}
       </div>

@@ -172,6 +172,16 @@
       invoke: 'The constraint is \u201cNo Weapons Inside the Negotiation Chamber\u201d. Invoke it on a Contacts roll to establish that a PC has a contact who can smuggle one in \u2014 using the rule as the hook.',
       compel: 'Same constraint. A PC goes for their weapon anyway \u2014 compel their impulsive trouble. Guards move. The room goes hostile. Fate point, and the negotiation just became a conflict.',
     },
+    boost: {
+      srd_url: '/fate-condensed/aspects-and-fate-points#boosts',
+      what: 'A fragile, temporary aspect with one free invoke that vanishes after use.',
+      when: 'After succeeding with style on an attack or overcome, or tying on defence. Boosts represent momentary advantage.',
+      rule: 'Boosts have one free invoke and no other uses. Once invoked, they disappear. They cannot be compelled. If not used by the end of the next exchange, they fade.',
+      mistakes: 'Don\u2019t forget boosts exist. Many tables ignore them and leave free +2s on the table. Also: boosts can be placed on opponents ("Off Balance", "Distracted") — they\u2019re not just self-buffs. Name them vividly so the fiction remembers them.',
+      pairs: 'Encounter (boosts flow naturally from combat exchanges), Scene (boost aspects describe momentary scene details), Compel (boosts can\u2019t be compelled — but the action that created one can set up a compel on a real aspect).',
+      invoke: 'You succeed with style on a Fight roll and place "Stumbling Backward" on the enemy. Next exchange, invoke it for +2 on your follow-up attack — then it vanishes.',
+      compel: 'Boosts cannot be compelled — they\u2019re too fleeting. But the fiction that created the boost might justify compelling a real aspect. "Stumbling Backward" suggests the NPC is rattled; compel their Trouble next.',
+    },
     custom: {
       srd_url: null,
       what: 'A blank card you fill in yourself \u2014 title, type, and notes all editable in place.',

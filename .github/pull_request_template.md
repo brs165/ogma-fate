@@ -13,13 +13,14 @@
 
 ## Testing
 
-- [ ] `node devdocs/qa_named.js` passes (103/103)
-- [ ] Smoke test passes (128/128)
+- [ ] `node scripts/qa-hard.mjs` passes (189 checks)
+- [ ] `node scripts/qa-export.mjs` passes
+- [ ] `npm run build` exits 0
 - [ ] Tested in Chrome and Firefox
 
 ## For content contributions
 
-- [ ] Aspects follow the quality bar: invokable AND compellable, 3–8 words
+- [ ] Aspects follow the quality bar: invokable AND compellable, 3-8 words
 - [ ] World voice consistent with existing entries
 - [ ] No FCon rules violations (no "+2 to all" stunts, no "significant milestone")
 - [ ] No duplicate entries in name/trouble pools

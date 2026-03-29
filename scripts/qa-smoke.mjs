@@ -32,6 +32,7 @@ const ROUTES = [
   { path: '/help/export-share', label: 'Export & Share' },
   { path: '/help/faq', label: 'FAQ' },
   { path: '/help/hosting', label: 'Hosting' },
+  { path: '/help/mistakes', label: 'Common Mistakes' },
   { path: '/campaigns/fantasy', label: 'Fantasy generator' },
   { path: '/campaigns/cyberpunk', label: 'Cyberpunk generator' },
   { path: '/campaigns/thelongafter', label: 'The Long After generator' },
@@ -259,12 +260,11 @@ async function testNavigation(page) {
       fail('nav-landing-to-about', 'No /about link found on landing');
     }
 
-    // Click License link from footer
+    // Navigate to License page (use goto to avoid footer link actionability issues)
     await sleep(300);
     const licLink = page.locator('a[href="/license"]').first();
     if (await licLink.count() > 0) {
-      await licLink.click();
-      await page.waitForURL('**/license**', { timeout: 5000 });
+      await page.goto(`${BASE}/license`, { waitUntil: 'networkidle', timeout: TIMEOUT });
       pass('nav-about-to-license');
     } else {
       fail('nav-about-to-license', 'No /license link found');

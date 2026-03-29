@@ -4,6 +4,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { get } from 'svelte/store';
   import { createCanvasStore } from '../../stores/canvasStore.js';
+  import { generate, mergeUniversal } from '../../engine.js';
   import { CAMPAIGNS } from '../../../data/shared.js';
   import { DB, LS } from '../../db.js';
 
@@ -182,9 +183,14 @@
     if (!canvas) return;
     const tpl = CANVAS_TEMPLATES.find(t => t.id === tplId);
     if (!tpl) return;
+    // Generate data at call time using current tables so cards are always fully populated
+    const mergedT = mergeUniversal(tables);
     tpl.cards.forEach((slot, i) => {
       setTimeout(() => {
-        canvas.generateCard(slot.genId, originX + slot.dx, originY + slot.dy);
+        if (slot.genId === 'boost') { canvas.generateCard('boost', originX + slot.dx, originY + slot.dy); return; }
+        if (slot.genId === 'sticky') { canvas.generateCard('sticky', originX + slot.dx, originY + slot.dy); return; }
+        const data = generate(slot.genId, mergedT, 4);
+        if (data) canvas.generateCardWithData(slot.genId, data, originX + slot.dx, originY + slot.dy);
       }, i * 80);
     });
     showToast(tpl.label + ' template dropped');
@@ -377,7 +383,6 @@
           connectors={connectorLines}
           {groups}
           {loaded}
-          mode="prep"
           {campId}
           {cardSearch}
           {connectSourceId}
@@ -387,7 +392,6 @@
           onUpdateCard={canvas ? canvas.updateCard : null}
           onDeleteCard={canvas ? canvas.deleteCard : null}
           onRerollCard={canvas ? canvas.rerollCard : null}
-          onSendToTable={null}
           onOpenCard={(card) => { dossierCard = card; }}
           onInvoke={null}
           onConnect={handleConnectClick}
@@ -463,8 +467,6 @@
       onClose={() => { dossierCard = null; }}
       onReroll={canvas ? canvas.rerollCard : null}
       onDelete={canvas ? canvas.deleteCard : null}
-      isOnTable={false}
-      mode="prep"
       campName={campMeta.name}
       {campId}
     />
