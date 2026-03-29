@@ -24,39 +24,43 @@
   </DropdownMenu.Trigger>
   <DropdownMenu.Portal>
     <DropdownMenu.Content class="add-dd-content" side="top" sideOffset={6} align="end">
-      <DropdownMenu.GroupHeading class="export-dd-label">Generate</DropdownMenu.GroupHeading>
-      <DropdownMenu.Separator class="export-dd-sep" />
-      {#each GEN_ITEMS as g (g.id)}
-        <DropdownMenu.Item
-          class="export-dd-item"
-          onSelect={() => {
-            if (g.id === '__group__') { onAddGroup?.(); }
-            else { onGenerate?.(g.id); }
-          }}
-        >
-          <span class="export-dd-icon"><i class="fa-solid {g.icon}" aria-hidden="true"></i></span>
-          <span class="export-dd-body">
-            <span class="export-dd-name">{g.label}</span>
-            <span class="export-dd-sub">{g.tip}</span>
-          </span>
-        </DropdownMenu.Item>
-      {/each}
-      {#if templates.length > 0}
+      <DropdownMenu.Group>
+        <DropdownMenu.GroupHeading class="export-dd-label">Generate</DropdownMenu.GroupHeading>
         <DropdownMenu.Separator class="export-dd-sep" />
-        <DropdownMenu.GroupHeading class="export-dd-label">Templates</DropdownMenu.GroupHeading>
-        <DropdownMenu.Separator class="export-dd-sep" />
-        {#each templates as t (t.id)}
+        {#each GEN_ITEMS as g (g.id)}
           <DropdownMenu.Item
             class="export-dd-item"
-            onSelect={() => onTemplate?.(t.id)}
+            onSelect={() => {
+              if (g.id === '__group__') { onAddGroup?.(); }
+              else { onGenerate?.(g.id); }
+            }}
           >
-            <span class="export-dd-icon"><i class="fa-solid {t.icon}" aria-hidden="true"></i></span>
+            <span class="export-dd-icon"><i class="fa-solid {g.icon}" aria-hidden="true"></i></span>
             <span class="export-dd-body">
-              <span class="export-dd-name">{t.label}</span>
-              <span class="export-dd-sub">{t.desc}</span>
+              <span class="export-dd-name">{g.label}</span>
+              <span class="export-dd-sub">{g.tip}</span>
             </span>
           </DropdownMenu.Item>
         {/each}
+      </DropdownMenu.Group>
+      {#if templates.length > 0}
+        <DropdownMenu.Separator class="export-dd-sep" />
+        <DropdownMenu.Group>
+          <DropdownMenu.GroupHeading class="export-dd-label">Templates</DropdownMenu.GroupHeading>
+          <DropdownMenu.Separator class="export-dd-sep" />
+          {#each templates as t (t.id)}
+            <DropdownMenu.Item
+              class="export-dd-item"
+              onSelect={() => onTemplate?.(t.id)}
+            >
+              <span class="export-dd-icon"><i class="fa-solid {t.icon}" aria-hidden="true"></i></span>
+              <span class="export-dd-body">
+                <span class="export-dd-name">{t.label}</span>
+                <span class="export-dd-sub">{t.desc}</span>
+              </span>
+            </DropdownMenu.Item>
+          {/each}
+        </DropdownMenu.Group>
       {/if}
     </DropdownMenu.Content>
   </DropdownMenu.Portal>
