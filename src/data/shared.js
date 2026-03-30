@@ -55,15 +55,15 @@ export const HELP_CONTENT = {
       "Invoke or compel the weakness in the first exchange.",
       "Treat a mob as one entity with a shared stress track."
     ],
-    invoke_example: "The mook's aspect is 'Only Follows Orders.' A PC rushes past. Invoke for +2 on Athletics — someone who only follows orders doesn't improvise.",
-    compel_example: "The same mook stands guard. The GM offers a fate point: 'Only Follows Orders' fires — they sound the alarm before the PCs act, because orders say so.",
+    invoke_example: "The mook's aspect is 'Only Follows Orders.' A PC rushes past. Invoke for +2 on Athletics — someone following orders doesn't improvise.",
+    compel_example: "The same mook stands guard. The GM offers a fate point: 'Only Follows Orders' fires — they sound the alarm before the PCs act.",
     beginner: {
-      what: "A minor NPC is a simple GM-controlled character — a guard, a shopkeeper, a thug. Think of them as movie extras: they show up and get out of the way.",
+      what: "A minor NPC is a simple GM-controlled character — a guard, a shopkeeper, a thug. Think of them as movie extras.",
       terms: [
-        ["Aspect", "A short true phrase about a character or scene, used for bonuses or complications."],
+        ["Aspect", "A short phrase about a character or scene, used for bonuses or complications."],
         ["Stress", "Boxes you check when hit. All checked means you're out."],
-        ["Stunt", "A special ability: +2 in a specific situation, or a once-per-scene exception."],
-        ["Invoke", "Spend a fate point and name a relevant aspect for +2 on your roll."],
+        ["Stunt", "A special ability: +2 in a narrow situation, or a once-per-scene exception."],
+        ["Invoke", "Spend a fate point on a relevant aspect for +2 on your roll."],
         ["Compel", "The GM offers a fate point if you accept a complication from an aspect."],
       ],
     },
@@ -74,27 +74,27 @@ export const HELP_CONTENT = {
     output: "5 aspects (high concept, trouble, 3 others), skill pyramid, 2 stunts, full stress tracks + all three consequence slots, Refresh 3.",
     rules: [
       "Treat exactly like a PC — they concede, take consequences, and invoke aspects.",
-      "Their trouble aspect is your primary compel lever. Use it in their first scene.",
+      "Their trouble aspect is your primary compel lever.",
       "High concept = what they are. Trouble = what makes them dangerous and human.",
-      "Major NPCs draw fate points from the GM pool (1 per PC). Spend to invoke or compel.",
-      "A major NPC who concedes escapes — and returns with more resources and a grudge.",
+      "Major NPCs draw fate points from the GM pool (1 per PC).",
+      "A major NPC who concedes escapes — and returns stronger.",
     ],
     rule_urls: ['/fate-condensed/being-game-master#npcs', '/fate-condensed/aspects-and-fate-points#compels', '/fate-condensed/being-game-master#npcs', '/fate-condensed/being-game-master#the-gms-fate-points', '/fate-condensed/conflicts#conceding'],
     gm_tips: [
-      "Let them concede their first conflict. A villain who escapes is worth ten who die in session one.",
-      "Show the high concept in action before PCs engage. Let them win off-screen first.",
-      "Invoke their high concept for +2 on their biggest roll. Show the gap between capable and dangerous."
+      "Let them concede their first conflict. An escaped villain outweighs ten dead ones.",
+      "Show the high concept in action before PCs engage.",
+      "Invoke their high concept for +2 on their biggest roll."
     ],
-    invoke_example: "The villain's high concept is 'Ruthless Veteran Who's Seen Everything.' Interrogating a prisoner, spend a fate point for +2 on Provoke — decades of experience make the pressure precise, not angry.",
-    compel_example: "The villain has the party cornered. The GM offers a fate point on their trouble: 'Can't Let Go of the Old Code.' They hesitate — something personal they can't finish. The party escapes.",
+    invoke_example: "The villain's high concept is 'Ruthless Veteran Who's Seen Everything.' Interrogating a prisoner, spend a fate point for +2 on Provoke — decades of experience make the pressure precise.",
+    compel_example: "The villain has the party cornered. The GM offers a fate point on their trouble: 'Can't Let Go of the Old Code.' They hesitate. The party escapes.",
     beginner: {
-      what: "A major NPC is a fully-detailed GM-controlled character — a villain, rival, or powerful ally. They have a complete sheet: aspects, skills, stunts, and stress tracks, just like a PC.",
+      what: "A major NPC is a fully-detailed GM-controlled character — a villain, rival, or powerful ally. Built just like a PC.",
       terms: [
-        ["High Concept", "One phrase capturing who they are. 'Burned Ex-Corp Fixer' says it all."],
+        ["High Concept", "One phrase capturing who they are."],
         ["Trouble", "What complicates their life — and what players can exploit."],
-        ["Refresh", "Fate points they start with. Default 3, reduced by extra stunts."],
-        ["Concede", "Give up and leave the scene instead of being defeated. They survive and return."],
-        ["Skill Pyramid", "Skills in pyramid shape: one highest, two next, three below. Higher = better."],
+        ["Refresh", "Fate points per session. Default 3, reduced by extra stunts."],
+        ["Concede", "Leave the scene instead of being taken out. They survive and return."],
+        ["Skill Pyramid", "Skills ranked in pyramid shape: one highest, two next, three below."],
       ],
     },
   },
@@ -103,25 +103,25 @@ export const HELP_CONTENT = {
     what: "Situation aspects for any scene — combat, social, exploration, standoffs, or chases.",
     output: "3–5 tagged situation aspects (tone, movement, cover, danger, usable) plus 2–4 named zones with their own aspects.",
     rules: [
-      "Situation aspects exist until removed by an overcome action or the scene ends.",
-      "Anyone (PC or NPC) can invoke them for +2 or a reroll. GMs can compel them.",
-      "🎲 Free invoke shown on an aspect = it's pre-placed for players to find. Hand them an index card. In play, free invokes come from Create Advantage.",
-      "Zones limit movement. Moving past opposition into another zone costs an action if contested.",
-      "Zone aspects are always true - they define what's possible in the zone. Invoke them for +2 with a fate point, as with any aspect.",
-    
-      "Create Advantage tie (FCon p.19): the aspect is created but you get NO free invoke. Still worth it — the aspect is real. Spend a fate point to invoke it immediately, or bank it for anyone to invoke later.",
+      "Situation aspects persist until overcome or the scene ends.",
+      "Anyone can invoke them for +2 or a reroll. GMs can compel them.",
+      "🎲 Free invoke on an aspect = pre-placed for discovery. In play, free invokes come from Create Advantage.",
+      "Zones limit movement. Moving past opposition costs an action.",
+      "Zone aspects are always true. Invoke for +2 with a fate point.",
+
+      "Create Advantage tie (FCon p.19): aspect created, NO free invoke. Spend a fate point to invoke, or bank it.",
     ],
     rule_urls: ['/fate-condensed/aspects-and-fate-points#situation-aspects', '/fate-condensed/aspects-and-fate-points#situation-aspects', '/fate-condensed/aspects-and-fate-points#situation-aspects', '/fate-condensed/challenges-conflicts-and-contests#zones', '/fate-condensed/challenges-conflicts-and-contests#zones'],
     gm_tips: [
-      "Announce exactly two aspects up front — the ones any alert person notices. The rest get discovered through Notice, Investigate, or getting hit.",
-      "The hidden aspect is your best tool. Decide before the scene starts which one the players don't know yet — it's your compel setup.",
-      "When a PC fails a roll, check whether a scene aspect just got worse or a new one just appeared.",
-      "Name each zone and give it one aspect. Players will immediately start exploiting them — that's the point."
+      "Announce two aspects up front. The rest get discovered through Notice, Investigate, or getting hit.",
+      "Decide which aspect is hidden before the scene starts — it's your compel setup.",
+      "When a PC fails, check whether a scene aspect worsened or a new one appeared.",
+      "Name each zone and give it one aspect. Players will exploit them — that's the point."
     ],
-    invoke_example: "The scene has 'Slippery Deck' as a zone aspect. A PC is chasing someone across the boat. Spend a fate point to invoke 'Slippery Deck' - the target loses their footing, giving the PC +2 on their Athletics roll to catch them.",
-    compel_example: "The same 'Slippery Deck' is in play when a PC tries to take a precise shot. The GM offers a fate point: the aspect compels a misfire - the PC slips just as they fire, and the shot goes wide. They take the fate point and accept the consequence.",
+    invoke_example: "The scene has 'Slippery Deck' as a zone aspect. A PC chases someone across the boat. Invoke for +2 on Athletics — the target loses their footing.",
+    compel_example: "'Slippery Deck' is in play when a PC takes a precise shot. The GM offers a fate point: the PC slips as they fire and the shot goes wide.",
     beginner: {
-      what: "This generates the setup for a scene — the place where the action happens. It creates situation aspects (short phrases describing what's true about the environment) and zones (distinct areas characters can move between). Think of it as the GM describing the room before the action starts.",
+      what: "This generates the setup for a scene — situation aspects describing the environment and zones characters move between. The GM describes the room before the action starts.",
       terms: [
         ["Situation Aspect", "A phrase that's true about the scene: 'Slippery Deck,' 'Thick Smoke,' 'Crowded Market.' Anyone can use these for bonuses or complications."],
         ["Zone", "A distinct area within the scene. A bar might have zones: 'Behind the Counter,' 'Dance Floor,' 'Back Alley.' Moving between zones can cost an action."],
