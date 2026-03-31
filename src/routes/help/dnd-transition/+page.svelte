@@ -7,7 +7,7 @@
     
 <div class="wiki-page-eyebrow">D&amp;D Transition</div>
 <h1>Coming from D&amp;D 5e</h1>
-<p class="wiki-page-desc">You already know how to play TTRPGs. Here's every major mechanical and philosophical difference between D&amp;D 5e and Fate Condensed — section by section, with concrete play examples.</p>
+<p class="wiki-page-desc">Every major mechanical and philosophical difference between D&amp;D 5e and Fate Condensed.</p>
 
 <details class="learn-quickstart" open>
   <summary class="learn-quickstart-toggle">Quick Start — 5 biggest differences from D&amp;D</summary>
@@ -40,9 +40,8 @@
 </nav>
 
 <h2 id="the-big-shift">The big philosophical shift</h2>
-<p>D&amp;D asks: <em>"What can your character do?"</em> — and answers it with a class, subclass, ability scores, proficiencies, and a grid of features.</p>
-<p>Fate asks: <em>"Who is your character?"</em> — and answers it with five short phrases (aspects) that are always true, a skill pyramid, and three stunts. Everything else is narrated, not tracked.</p>
-<p>This matters because it changes what you optimise for. In D&amp;D, you build around mechanical capability. In Fate, you build around narrative interest — a character is interesting <em>because of their flaws</em>, not despite them. <a href="https://fate-srd.com/fate-condensed/getting-started" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
+<p><strong>D&D asks:</strong> <em>"What can your character do?"</em> — class, subclass, ability scores, proficiencies.</p>
+<p><strong>Fate asks:</strong> <em>"Who is your character?"</em> — five short phrases, a skill pyramid, three stunts. In Fate, you build around narrative interest. A character is interesting <em>because of their flaws</em>. <a href="https://fate-srd.com/fate-condensed/getting-started" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
 
 <h2 id="characters-aspects-vs-ability-scores">Characters: Aspects vs. ability scores</h2>
 <div class="wiki-table-wrap">
@@ -66,8 +65,8 @@
 </div>
 
 <h2 id="skills-broad-strokes">Skills: Broad strokes, not specifics</h2>
-<p>D&amp;D has 18 skills. Fate Condensed has 18 skills — but they're dramatically broader. <strong>Athletics</strong> covers everything D&amp;D's Acrobatics, Athletics, and some Survival tasks do. <strong>Notice</strong> covers Perception and some Investigation. There are no tool proficiencies, no weapon proficiencies, no saving throw proficiencies.</p>
-<p>The skill pyramid means every character is <em>deliberately incompetent</em> at most things. This is by design — the incompetence creates drama and supports character specialisation without requiring a 20-level ability progression.</p>
+<p>Both have 18 skills — but Fate's are dramatically broader. <strong>Athletics</strong> covers D&D's Acrobatics + Athletics + some Survival. <strong>Notice</strong> covers Perception + some Investigation. No tool, weapon, or saving throw proficiencies.</p>
+<p>The skill pyramid makes every character <em>deliberately incompetent</em> at most things. The incompetence creates drama.</p>
 
 <h2 id="the-four-actions-not-attack-bonus-move-reaction">The four actions — not attack/bonus/move/reaction</h2>
 <div class="wiki-table-wrap">
@@ -81,10 +80,10 @@
   </tbody>
 </table>
 </div>
-<p>The most important action D&amp;D doesn't have is <strong>Create Advantage</strong>. It places a new aspect on a target, an ally, or the scene. That aspect has a free invoke — anyone can cash it for +2 on a relevant roll. Stacking two or three free invokes before the decisive attack is Fate's version of "pre-buffing." It's the tactically optimal play that most D&amp;D converts discover in their second session. <a href="https://fate-srd.com/fate-condensed/taking-action-rolling-the-dice" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
+<p>D&D has no equivalent to <strong>Create Advantage</strong>. It places a new aspect with a free invoke (+2) anyone can use. Stack two or three free invokes before the decisive attack — that's Fate's pre-buffing. Most D&D converts discover this in their second session. <a href="https://fate-srd.com/fate-condensed/taking-action-rolling-the-dice" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
 
 <h2 id="aspects-the-heart-of-the-system">Aspects: The heart of the system</h2>
-<p>Every aspect is a phrase that is <strong>always narratively true</strong>. If the room is <em>Pitch Black</em>, you cannot see — no roll to perceive light that isn't there. If an NPC has the aspect <em>Loyal to the Old King</em>, you can compel that to complicate their relationship with the new regime.</p>
+<p>An aspect is <strong>always narratively true</strong>. If the room is <em>Pitch Black</em>, you cannot see — no roll needed. If an NPC has <em>Loyal to the Old King</em>, compel it when the new regime demands loyalty.</p>
 <p>Aspects are mechanically active in two ways:</p>
 <ul>
   <li><strong>Invoke</strong> — spend a fate point (or use a free invoke) to get +2 or a reroll. You must explain how the aspect is relevant.</li>
@@ -92,14 +91,14 @@
 </ul>
 
 <h2 id="fate-points-the-economy">Fate Points: The economy of drama</h2>
-<p>In D&amp;D, inspiration is a binary bonus you either have or don't. In Fate, fate points are a <em>flowing economy</em>.</p>
+<p>D&D inspiration is a binary you either have or don't. Fate points are a <em>flowing economy</em>.</p>
 <ul>
   <li>You start each session at your Refresh (default 3).</li>
   <li>You spend fate points to invoke aspects (be more awesome now).</li>
   <li>You earn fate points by accepting compels (accept trouble now, be awesome later).</li>
   <li>At zero fate points, you cannot refuse compels — the story bends toward your trouble aspects.</li>
 </ul>
-<p>The optimal play is <em>not</em> to conserve fate points — it's to spend freely and accept compels to refill. GMs who understand this hand out compels constantly and the economy hums. <a href="https://fate-srd.com/fate-condensed/aspects-and-fate-points" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
+<p>Optimal play: spend freely, accept compels to refill. <a href="https://fate-srd.com/fate-condensed/aspects-and-fate-points" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
 
 <h2 id="combat-stress-consequences">Combat: Stress, Consequences, and Taken Out</h2>
 <div class="wiki-table-wrap">
@@ -116,12 +115,11 @@
 
 <div class="callout callout-warning">
   <div class="callout-title"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Stress is NOT hit points</div>
-  <p>Stress boxes each absorb exactly 1 shift and clear at the end of every scene. There is no "5 HP remaining" equivalent. A character who took 3 stress boxes in scene 1 is fully reset in scene 2. The persistent damage track is the <strong>consequence slots</strong> — not stress. <a href="https://fate-srd.com/fate-condensed/challenges-conflicts-and-contests" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
+  <p>Stress boxes each absorb 1 shift and clear every scene. No "5 HP remaining." Persistent damage is in <strong>consequence slots</strong> — not stress. <a href="https://fate-srd.com/fate-condensed/challenges-conflicts-and-contests" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
 </div>
 
 <h2 id="initiative-popcorn-style">Initiative: Popcorn style</h2>
-<p>D&amp;D uses fixed initiative order (roll dex, act in sequence). Fate Condensed uses <strong>popcorn initiative</strong>: after you act, you choose who goes next — ally or enemy. There is no fixed turn order.</p>
-<p>This creates tactical decisions about pacing. Enemies can chain activations. Players can chain activations. The group that controls the sequencing controls the tempo of the conflict.</p>
+<p>D&D rolls dex and locks order. Fate uses <strong>popcorn initiative</strong>: after you act, choose who goes next — ally or enemy. The group that controls sequencing controls the tempo.</p>
 
 <h2 id="challenges-contests-conflicts">Challenges, Contests, and Conflicts</h2>
 <p>In D&amp;D, almost all dramatic situations resolve as combat. Fate Condensed has three structured scene types:</p>
@@ -132,10 +130,10 @@
 </ul>
 
 <h2 id="quick-faq">Quick FAQ</h2>
-<p><strong>Where's the damage? How much does a sword do?</strong> In Fate, weapons don't deal fixed damage — you roll your Fight skill, and shifts above the defender's effort become stress. A sword might grant +1 Weapon rating (add +1 to shifts on successful attacks), but there's no d6/d8/d10 damage die.</p>
-<p><strong>Can my character die?</strong> Yes, but only if you agree. The standard outcome of being Taken Out is narrative removal from the conflict — captured, fled, dramatically incapacitated. Permanent death is a table conversation, not a mechanical outcome.</p>
-<p><strong>There's no CR. How do I know if an encounter is appropriate?</strong> You don't balance by math — you balance by stakes. A fight where the GM doesn't know who will win is a fight worth having. Most encounters in Fate are significantly harder than "appropriate-by-CR," because consequences create lasting complications even from victories.</p>
-<p><strong>What about magic?</strong> There's no spell list. Magic is handled by aspects and stunts. "I am a Flame-Touched Witch" as a High Concept means you can invoke it to justify fire-related attacks and creates advantages. A stunt might say "once per session, I can cause a fire to erupt at any visible point within 30 feet."</p>
+<p><strong>Where's the damage?</strong> Roll Fight; shifts above the defender's effort become stress. A sword might grant +1 Weapon rating. No d6/d8/d10.</p>
+<p><strong>Can my character die?</strong> Yes, but only with table agreement. Being Taken Out normally means captured, fled, or incapacitated — not dead. Permanent death is a conversation.</p>
+<p><strong>No CR. How do I balance encounters?</strong> Balance by stakes, not math. A fight where nobody knows who'll win is worth having.</p>
+<p><strong>What about magic?</strong> No spell list. Magic lives in aspects and stunts. "I am a Flame-Touched Witch" justifies fire-related actions. A stunt gives the specific mechanical effect.</p>
 
     <div class="wiki-footer">
   <div>

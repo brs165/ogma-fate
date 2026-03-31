@@ -13,7 +13,7 @@
   <div class="wiki-breadcrumb"><a href="/help">Help</a> <span class="sep">/</span> <a href="/help/learn-fate">Learn Fate</a> <span class="sep">/</span> Deep Dive</div>
   <div class="wiki-page-eyebrow">Deep Dive</div>
   <h1>Learn Fate — Deep Dive</h1>
-  <p class="wiki-page-desc">You know the 7 steps. Now learn how they feel at the table — through a guided scene, a full walkthrough, a strategy primer, and a session-one checklist.</p>
+  <p class="wiki-page-desc">How Fate feels at the table — guided scene, play-by-post walkthrough, strategy primer, and first session checklist.</p>
 
   <nav class="wiki-section" aria-label="Page sections" style="margin-bottom:32px">
     <div class="wiki-card-grid">
@@ -29,7 +29,7 @@
   <!-- ══════════════════════════════════════════════════════════════════════ -->
   <div class="wiki-section" id="tutorial">
     <h2 class="wiki-section-title"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> Interactive Tutorial — Your First Scene</h2>
-    <p>This walks you through a single Fate Condensed scene, step by step. At each beat, you'll describe what your character does, then roll dice to see what happens. The Teacher voice explains the <em>why</em> behind every mechanic as it comes up.</p>
+    <p>A single Fate Condensed scene, step by step. Describe what your character does, roll dice, see what happens. The Teacher explains each mechanic as it comes up.</p>
 
     <div class="callout callout-info" role="note">
       <div class="callout-title"><i class="fa-solid fa-user" aria-hidden="true"></i> Your character</div>
@@ -193,7 +193,7 @@
   <!-- ══════════════════════════════════════════════════════════════════════ -->
   <div class="wiki-section" id="strategy">
     <h2 class="wiki-section-title"><i class="fa-solid fa-chess" aria-hidden="true"></i> Strategy Guide</h2>
-    <p>Fate looks simple, but there's deep tactical play hiding beneath the fiction. These are the strategies that separate a first-session player from a skilled one.</p>
+    <p>Strategies that separate a first-session player from a skilled one.</p>
 
     <h3 id="strat-ca"><i class="fa-solid fa-plus-circle" aria-hidden="true" style="color:var(--accent)"></i> Create Advantage — the action you should use most</h3>
     <p>In D&amp;D, the default action is Attack. In Fate, the default action should be <strong>Create Advantage</strong>. Here's why:</p>
@@ -205,14 +205,14 @@
     <p><strong>When NOT to:</strong> When the opposition is about to be Taken Out and one more shift finishes the job. When the scene is almost over and you need results now.</p>
 
     <h3 id="strat-fp"><i class="fa-solid fa-coins" aria-hidden="true" style="color:var(--accent)"></i> Fate point economy — the hidden game</h3>
-    <p>Fate points are the most important resource in the game. More important than skills, more important than stunts. The player who manages their FP well plays Fate better than everyone else at the table.</p>
+    <p>Fate points matter more than skills or stunts. FP management separates good players from great ones.</p>
     <div class="callout callout-dnd" role="note">
       <div class="callout-title"><i class="fa-solid fa-dragon" aria-hidden="true"></i> Coming from D&amp;D</div>
       <p>Fate points are like Inspiration, except you use them constantly, they flow both directions (GM gives and takes), and running out means you can't invoke <em>any</em> of your aspects. A PC with 0 FP is functionally weaker than their character sheet suggests.</p>
     </div>
     <p><strong>Earning FP:</strong> Accept compels (GM or self-compel). Start of session (refresh to 3). Concede a conflict (1 base + 1 per consequence taken).</p>
     <p><strong>Spending FP:</strong> Invoke an aspect for +2 or a reroll. Refuse a compel (costs 1 FP).</p>
-    <p><strong>The rhythm:</strong> Early in a session, accept compels aggressively — bank FP. Mid-session, spend FP on pivotal rolls. Late session, if you're at 0 FP, self-compel to earn one back. Never refuse a compel unless the complication would derail something you care about deeply.</p>
+    <p><strong>The rhythm:</strong> Early session — accept compels, bank FP. Mid session — spend on pivotal rolls. At 0 FP — self-compel. Refuse a compel only if the complication derails something you deeply care about.</p>
 
     <h3 id="strat-concede"><i class="fa-solid fa-flag" aria-hidden="true" style="color:var(--accent)"></i> Conceding — the strategic surrender</h3>
     <p>In D&amp;D, you fight until you win or die. In Fate, you <strong>concede</strong> — and it's one of the smartest things you can do.</p>
@@ -224,9 +224,7 @@
     <p><strong>When to concede:</strong> When you've taken a Moderate or Severe consequence and the opposition still looks strong. When losing this fight doesn't mean losing the war. When the story is more interesting if you fail here and come back later.</p>
 
     <h3 id="strat-self"><i class="fa-solid fa-hand-point-right" aria-hidden="true" style="color:var(--accent)"></i> Self-compels — getting paid to make the story better</h3>
-    <p>You don't have to wait for the GM to compel you. You can compel <em>yourself</em>.</p>
-    <p><strong>How:</strong> Look at your aspects. Say: <em>"My Trouble is 'Can't Walk Away From a Broken Thing.' This engine is about to explode, but I think my character would try to fix it anyway. Can I compel myself?"</em> If the table agrees it fits, you earn 1 FP.</p>
-    <p><strong>Why this is powerful:</strong> You choose the timing. You choose the complication. You get a fate point for doing something your character would do anyway. GMs love self-compels because they create player-driven drama.</p>
+    <p>You can compel <em>yourself</em>. Say: <em>"My Trouble is 'Can't Walk Away From a Broken Thing' — I think Kira tries to fix this engine even though it's about to explode. Can I self-compel?"</em> Table agrees, you earn 1 FP. You choose the timing, you choose the complication.</p>
   </div>
 
   <!-- ══════════════════════════════════════════════════════════════════════ -->

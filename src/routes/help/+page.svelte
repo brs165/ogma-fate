@@ -7,7 +7,7 @@
 
     <div class="wiki-page-eyebrow">Overview</div>
     <h1>Everything you need to master Ogma</h1>
-    <p class="wiki-page-desc">Ogma is a <strong>local-first, offline-ready generator suite</strong> for Fate Condensed. This wiki covers every feature — from your first roll to session export.</p>
+    <p class="wiki-page-desc">Local-first Fate Condensed generator suite. Every feature covered — first roll to session export.</p>
 
     <div class="callout callout-scenario">
       <div class="callout-title"><i class="fa-solid fa-play" aria-hidden="true"></i> Start here — pick your path</div>
@@ -101,8 +101,8 @@
     </div>
 
     <h2>About Ogma</h2>
-    <p>Ogma — <strong>O</strong>n-demand <strong>G</strong>enerator for <strong>M</strong>asterful <strong>A</strong>dventures — is an independent fan project built on the <a href="https://fate-srd.com" target="_blank" rel="noreferrer">Fate Condensed SRD</a> (CC BY 3.0). It runs entirely in your browser with no server, no account, and no internet connection required after the first load.</p>
-    <p><strong>8 campaign worlds.</strong> <strong>16 generators.</strong> <strong>128 generator/campaign combinations.</strong> <strong>9,900+ table entries.</strong></p>
+    <p>Ogma is an independent fan project built on the <a href="https://fate-srd.com" target="_blank" rel="noreferrer">Fate Condensed SRD</a> (CC BY 3.0). Runs entirely in your browser — no server, no account, no internet after first load.</p>
+    <p><strong>8 worlds · 16 generators · 128 combinations · 9,900+ table entries.</strong></p>
 
     <div class="wiki-footer">
       <div>
