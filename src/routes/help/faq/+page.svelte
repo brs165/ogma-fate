@@ -7,7 +7,7 @@
     
 <div class="wiki-page-eyebrow">FAQ & Troubleshooting</div>
 <h1>Common questions and fixes</h1>
-<p class="wiki-page-desc">Answers to everything that comes up. If something isn't here, check <a href="/about">About Ogma</a> or open the browser console for error details.</p>
+<p class="wiki-page-desc">Answers to the most common Ogma and Fate questions.</p>
 
 <details class="learn-quickstart" open>
   <summary class="learn-quickstart-toggle">Quick answers</summary>
@@ -31,11 +31,11 @@
 <h2 id="fate-rules">Fate rules — the questions everyone asks</h2>
 
 <h3>Is stress like hit points?</h3>
-<p><strong>No — and this is the most important difference to internalise.</strong> Stress is a scene-by-scene pacing buffer. All stress boxes clear at the end of every scene. A character with 0 stress boxes left isn't near death — they just can't absorb any more hits <em>this scene</em>. They're back to full after the scene ends.</p>
-<p>Consequences are the thing that persists. Recovery requires a treatment roll first (Overcome at the consequence's difficulty: Fair +2 for Mild, Great +4 for Moderate, Fantastic +6 for Severe) — only then does the timer start. A Mild consequence clears one full scene after treatment, a Moderate clears at end of session after treatment, a Severe clears at a major milestone after treatment. Untreated consequences do not clear. Consequences are aspects — the GM can invoke them against you, and players can compel them for fate points. <a href="https://fate-srd.com/fate-condensed/challenges-conflicts-and-contests" target="_blank" rel="noreferrer" class="srd-link">FCon SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
+<p><strong>No.</strong> Stress is a scene-by-scene buffer — all boxes clear at scene end. A character at 0 stress isn't near death; they just can't absorb more hits <em>this scene</em>.</p>
+<p>Consequences are what persist. Recovery requires a treatment roll first (Fair +2 for Mild, Great +4 for Moderate, Fantastic +6 for Severe), then the timer starts: Mild clears one scene later, Moderate at session end, Severe at a major milestone. Untreated consequences don't clear. As aspects, they can be invoked against the character or compelled for FP. <a href="https://fate-srd.com/fate-condensed/challenges-conflicts-and-contests" target="_blank" rel="noreferrer" class="srd-link">FCon SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
 
 <h3>What happens if I run out of stress boxes and have no consequence slots left?</h3>
-<p>You are <strong>taken out</strong>. The attacker decides what happens to you — you are removed from the conflict, and the outcome can be serious (captured, unconscious, humiliated, destroyed — whatever fits the fiction and scale). You don't die automatically; that's a narrative decision, not a mechanical one. To avoid being taken out, you can <strong>concede before your opponent rolls</strong>: you exit the conflict on your own terms and earn 1 fate point, plus 1 per consequence you've already taken. Conceding after the dice land is too late. <a href="https://fate-srd.com/fate-condensed/challenges-conflicts-and-contests" target="_blank" rel="noreferrer" class="srd-link">FCon SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
+<p>You are <strong>taken out</strong>. The attacker narrates the outcome — captured, unconscious, fled, destroyed. Death isn't automatic; that's a narrative decision. To avoid it, <strong>concede before your opponent rolls</strong>: exit on your terms and earn 1 FP plus 1 per consequence taken. Conceding after the dice land is too late. <a href="https://fate-srd.com/fate-condensed/challenges-conflicts-and-contests" target="_blank" rel="noreferrer" class="srd-link">FCon SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
 
 <h3>When should I invoke an aspect vs. wait to be compelled?</h3>
 <p><strong>Invoke</strong> when you want to improve an outcome on a roll that matters. Spend a fate point, name the aspect, and get +2 or a reroll. It has to be narratively plausible — "Stronger Than I Look" works for lifting a portcullis, not for picking a lock.</p>
@@ -92,18 +92,15 @@
 </div>
 
 <h3>Where exactly is my data stored?</h3>
-<p><strong>IndexedDB</strong> stores: session state (last result, history ring, saved cards, FP tracker state). Database name: <code>fate_generator</code>.</p>
-<p><strong>localStorage</strong> stores: theme preference, universal merge preference, PWA install dismissal. Table customisations, session prep data (saved cards, prep packs, session notes), and visit state use IndexedDB for reliability.</p>
-<p>To view it: open browser DevTools → Application → Storage → IndexedDB / Local Storage → (your site origin).</p>
+<p><strong>IndexedDB</strong> (<code>fate_generator</code>): session state, history ring, saved cards, FP tracker, table customisations, prep packs, visit state. <strong>localStorage</strong>: theme preference, universal merge, PWA install dismissal. View it in DevTools → Application → Storage.</p>
 
 <h3>Can I transfer my data to another device or browser?</h3>
-<p>Not directly. The workaround: export saved cards as Markdown from History, then paste them into a note or document on the new device. Ogma doesn't have an import-from-backup feature; what you export is the content, not the app state.</p>
+<p>Not directly. Export saved cards from History (Markdown or JSON), then import on the new device. What you move is content, not app state.</p>
 
 <h2 id="offline-install">Offline and installation</h2>
 
 <h3>Does Ogma work offline?</h3>
-<p><strong>Yes — fully.</strong> After your first visit, the service worker caches all 740KB of the app. You can open the app with no internet, run sessions, pin results, export Markdown — everything works.</p>
-<p>The only thing that requires internet: the initial first load to install the service worker, and future update checks (which happen silently in the background).</p>
+<p><strong>Yes — fully.</strong> After first visit, the service worker caches the entire app. Run sessions, pin results, export — all offline. Internet is only needed for the initial load and silent background update checks.</p>
 
 <h3>I see "Update available — reload?" — should I click it?</h3>
 <p>Yes. This means a new version of Ogma has been deployed. Your data is not affected by updates. Clicking reload fetches the latest files and clears the old service worker cache. If you don't click it, the old version continues to work until you next close the tab.</p>

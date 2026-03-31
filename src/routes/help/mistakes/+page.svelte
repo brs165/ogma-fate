@@ -41,7 +41,7 @@
       <p><strong>The mistake:</strong> Turn-by-turn "I attack, they attack" with no Create Advantage actions. Combat becomes a hit-point grind.</p>
       <p><strong>The fix:</strong> Encourage Create Advantage every exchange. Stacking free invokes (+2 each) on a single big attack is how Fate combat works. One player sets up, another strikes.</p>
       <p class="wiki-cite">FCon p.20 — Create an Advantage</p>
-      <p><strong>D&D comparison:</strong> In D&D, attacking is almost always optimal. In Fate, setting up an advantage and then attacking with stacked invokes is far more effective than raw attacks every round.</p>
+      <p><strong>D&D:</strong> Attacking is almost always optimal. <strong>Fate:</strong> Setting up first, then attacking with stacked invokes, is far more effective.</p>
     </div>
   </details>
 
@@ -62,7 +62,7 @@
       <p><strong>The mistake:</strong> Opposition is routinely Great (+4) or higher. Players fail constantly and stop engaging with the fiction.</p>
       <p><strong>The fix:</strong> Default opposition is Fair (+2). Use Good (+3) for hard things, Great (+4) for exceptional challenges. A +4 peak PC should succeed at Fair most of the time — that's the design.</p>
       <p class="wiki-cite">FCon p.18 — Setting Difficulty</p>
-      <p><strong>D&D comparison:</strong> D&D scales DCs from 5–30. Fate's ladder is much tighter: +0 to +8 covers the entire range. A +2 difference is huge in Fate.</p>
+      <p><strong>D&D:</strong> DCs scale from 5–30. <strong>Fate:</strong> +0 to +8 covers the whole range — a +2 difference is huge.</p>
     </div>
   </details>
 
@@ -163,7 +163,7 @@
       <p><strong>The mistake:</strong> The GM narrates everything. Players roll dice but never describe what their character does or how the aspect applies.</p>
       <p><strong>The fix:</strong> When a player invokes an aspect, they narrate how it helps. When they Create Advantage, they describe the new aspect. Fate is collaborative fiction — share the camera.</p>
       <p class="wiki-cite">FCon p.12 — Invoking Aspects</p>
-      <p><strong>D&D comparison:</strong> In D&D, the DM typically narrates the result of actions. In Fate, the player who invokes or creates an aspect owns the narration of how it manifests.</p>
+      <p><strong>D&D:</strong> The DM narrates results. <strong>Fate:</strong> The player who invokes or creates an aspect narrates how it manifests.</p>
     </div>
   </details>
 
@@ -174,7 +174,7 @@
       <p><strong>The mistake:</strong> Players track stress like HP, assuming more stress boxes = more health. They forget stress clears at end of scene.</p>
       <p><strong>The fix:</strong> Stress is plot armour, not health. It represents close calls, not injuries. It clears completely at end of scene. Consequences are the real injuries. Don't confuse the two.</p>
       <p class="wiki-cite">FCon p.24 — Stress</p>
-      <p><strong>D&D comparison:</strong> D&D hit points persist until healed. Fate stress resets every scene. If you take 3 stress in scene 1, you start scene 2 fresh. Only consequences carry over.</p>
+      <p><strong>D&D:</strong> HP persists until healed. <strong>Fate:</strong> Stress resets every scene. 3 stress in scene 1 — you start scene 2 fresh. Only consequences carry over.</p>
     </div>
   </details>
 
