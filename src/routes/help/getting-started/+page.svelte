@@ -7,7 +7,7 @@
 
     <div class="wiki-page-eyebrow">Getting Started</div>
     <h1>Your first session with Ogma</h1>
-    <p class="wiki-page-desc">Ogma is ready to use the moment you open it — no login, no setup, no internet after first load. This guide explains how it works and what you need to know to use it safely.</p>
+    <p class="wiki-page-desc">Ready the moment you open it — no login, no setup, no internet after first load.</p>
 
     <details class="learn-quickstart" open>
       <summary class="learn-quickstart-toggle">Quick Start — 5 essentials</summary>
@@ -21,8 +21,7 @@
     </details>
 
     <h2>The local-first philosophy</h2>
-    <p>Ogma stores <strong>everything in your browser</strong> — there is no server, no cloud sync, no account. This is a deliberate design choice: it means the tool works offline, loads instantly, and your data is private by default.</p>
-    <p>Specifically, Ogma uses two browser storage mechanisms:</p>
+    <p>Ogma stores <strong>everything in your browser</strong> — no server, no cloud sync, no account. Works offline, loads instantly, and your data is private by default. Two storage mechanisms:</p>
     <ul>
       <li><strong>IndexedDB</strong> — stores your session state: last result, saved cards, FP tracker state, history ring. This persists across browser restarts.</li>
       <li><strong>localStorage</strong> — stores your preferences: theme, universal merge. Table customisations and session data use IndexedDB for reliability.</li>
@@ -34,8 +33,7 @@
     </div>
 
     <h2>The service worker — offline first</h2>
-    <p>On your first visit, Ogma installs a <strong>service worker</strong> that caches all 740KB of assets (HTML, CSS, JS, fonts, data) to your device. After that, the tool works with no internet connection at all — you can run it in a cabin with no signal.</p>
-    <p>When a new version of Ogma is deployed, the service worker detects the change and shows an <strong>"Update available — reload?"</strong> toast. Clicking it reloads with the latest version. Your data is not affected by updates.</p>
+    <p>On first visit, Ogma installs a <strong>service worker</strong> that caches all 740KB of assets. After that, runs with no internet — cabin, no-signal venue, anywhere. When a new version deploys, a <strong>"Update available — reload?"</strong> toast appears. Click it. Your data is unaffected.</p>
 
     <div class="callout callout-tip">
       <div class="callout-title"><i class="fa-solid fa-camera" aria-hidden="true"></i> Install as a PWA</div>
@@ -82,5 +80,5 @@
     </ul>
 
     <h2>Offline use</h2>
-    <p>Ogma works fully offline after your first visit. The service worker caches all assets automatically — generators, campaign data, styles, and scripts. No internet required after the initial load. You can also download the zip and serve it locally with <code>npx serve</code> or any static web server.</p>
+    <p>Ogma works fully offline after first visit. You can also download the ZIP and serve it locally with <code>npx serve</code> or any static web server.</p>
 </main>

@@ -20,7 +20,7 @@
 
     <div id="prep" class="callout">
       <div class="callout-title"><i class="fa-solid fa-scroll" aria-hidden="true"></i> Path 1: Use Ogma to prep a session</div>
-      <p>You're a GM getting ready for game night. You want material you can use at the table.</p>
+      <p>You're prepping for game night and need material you can use at the table.</p>
       <ol>
         <li><strong>Pick a campaign world</strong> — choose one of the 8 worlds from the landing page, or use any world's generators for setting-agnostic content.</li>
         <li><strong>Pick a generator</strong> — the sidebar groups all 16 generators by category: NPCs, Scenes, Campaign, Encounters, and Toolbox. Start with whatever you need most.</li>
@@ -32,7 +32,7 @@
 
     <div id="gm-table" class="callout">
       <div class="callout-title"><i class="fa-solid fa-headphones" aria-hidden="true"></i> Path 2: Use Ogma as a GM at the table</div>
-      <p>Your session is live. You need something right now — an NPC name, a scene twist, an encounter complication.</p>
+      <p>Session is live. You need something right now — NPC name, scene twist, encounter complication.</p>
       <ol>
         <li><strong>Open your campaign page</strong> — if you prepped earlier, your saved cards are still there (saved automatically).</li>
         <li><strong>Export to your table</strong> — use Ogma JSON to save and re-import results, print/PDF for physical cards, or Markdown to share with other GMs.</li>
@@ -44,7 +44,7 @@
 
     <div id="player" class="callout">
       <div class="callout-title"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> Path 3: Use Ogma as a player</div>
-      <p>Your GM uses Ogma. Here's what you need to know.</p>
+      <p>Your GM uses Ogma. Three things to know.</p>
       <ol>
         <li><strong>Ask your GM for exports</strong> — your GM can share session content via Ogma JSON, printed cards, or Markdown files. Ogma generates the content; your table tool of choice displays it.</li>
         <li><strong>Explore the help pages</strong> — the <a href="/help/fate-mechanics">Fate Mechanics</a> page explains stress, consequences, aspects, and fate points. The <a href="/help/dnd-transition">D&amp;D Transition Guide</a> helps if you're coming from D&amp;D.</li>
