@@ -5709,6 +5709,8 @@ button.fp-dot:focus-visible {
    Checkbox.Root renders as <button> — without explicit size it inherits
    browser button defaults which vary. Stress boxes, clock boxes, all uniform. */
 [data-bits-checkbox-root] {
+  appearance: none;
+  -webkit-appearance: none;
   width: 22px;
   height: 22px;
   min-width: 22px;
