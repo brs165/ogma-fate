@@ -4,10 +4,11 @@ See `docs/claude/PROJECT_MEMORY.md` for full project state and `docs/claude/TEAM
 
 ---
 
-## Current version: v2026.03.699
+## Current version: v2026.04.822
 
 **Stack:** SvelteKit + Svelte 5.51.0 runes + native canvas (OgmaCanvas.svelte) + Bits UI 2.16.3 + Dexie 4 + FA 7.2 Free
-**QA gate:** 76 `.svelte` files (48 components + 28 routes) | 3 stores | 189 hard checks | 166 export checks
+**Theme:** Forest Green default + RetroUI hard-shadow aesthetic (Archivo Black / Space Grotesk)
+**QA gate:** 78 `.svelte` files (49 components + 29 routes) | 3 stores | 189 hard checks | 166 export checks
 
 ---
 
@@ -76,6 +77,21 @@ Shipped: The Long Road (35pp, v648), The Long After (40pp, v651), The Gaslight C
 ---
 
 ## Completed
+
+### v2026.04.822 — RetroUI full UX overhaul
+- Hard offset box-shadows tinted by campaign `--accent-dim` (auto-shifts per world)
+- `--glass-blur: none` — all backdrop-filter blur removed; panels solidified
+- 2px solid borders throughout; `--fd-stamp-radius` 4px
+- Roll button: glow replaced with hard accent offset shadow + translate press
+- Canvas cards: hard stamp shadow; hover shows directional accent shadow
+- Button active: translate(2px,2px) + collapsed shadow (RetroUI press pattern)
+- Topbar, sidebar, bottom-nav, modal, toast, floater, hist-panel: 2px border-mid
+
+### v2026.04.821 — Forest Green theme + typography + PWA
+- Forest Green default accent (`--accent:#52A875` dark / `#2E7D32` light, WCAG AAA)
+- Archivo Black display font + Space Grotesk 300–700 UI/mono via Google Fonts
+- PWA `theme-color` + `manifest.json` `theme_color` updated to `#0e2818`
+- Google Fonts added to service worker fetch allowlist (offline cached)
 
 ### v2026.03.699 — Onboarding system (25 recommendations)
 - Progressive onboarding: welcome banner, coach marks, first-roll guidance

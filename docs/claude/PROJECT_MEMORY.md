@@ -1,6 +1,6 @@
 # Project Memory — Ogma
 _Persistent context for model-switching and session handoffs._
-_Last updated: 2026.03.814 — Help content revamp, AddMenu in canvas controls, card generation fix_
+_Last updated: 2026.04.822 — RetroUI full UX overhaul; Forest Green default theme; Archivo Black + Space Grotesk typography_
 
 ---
 
@@ -17,7 +17,7 @@ _Last updated: 2026.03.814 — Help content revamp, AddMenu in canvas controls, 
 | State | Svelte `writable`/`derived` stores in plain JS + `$state` in components |
 | Persistence | Dexie 4 (IndexedDB) + localStorage prefs (`fate_prefs_v1`) |
 | Sync | WebSocket multiplayer via PartySocket |
-| Styling | Global `static/assets/css/theme.css` (~5,700 lines) — no `<style>` blocks in components |
+| Styling | Global `static/assets/css/theme.css` (~5,800 lines) — no `<style>` blocks in components |
 | PWA | `static/sw.js` + `static/manifest.json` |
 | Deploy | Cloudflare Pages (auto-deploy from `main`), `static/_redirects` for SPA routing |
 | Offline | `build/` directory with `start.sh/.bat/.command` launcher scripts + README.txt |
@@ -171,6 +171,9 @@ Progressive onboarding managed by Campaign.svelte using `db.js` localStorage pre
 
 ## What's complete
 
+**RetroUI full UX overhaul (v822)** — Complete redesign of the visual language to match RetroUI Svelte aesthetic:
+`--glass-blur: none` solidifies all panels, hard 3px/5px offset shadows tinted by `--accent-dim` (auto-shifts per campaign world), 2px solid borders throughout, button/roll-button/canvas-card press interactions with translate feedback. Forest Green default accent (`#52A875` dark / `#2E7D32` light). Archivo Black display font + Space Grotesk UI/mono. PWA theme-color and manifest updated. Google Fonts offline-cached via service worker.
+
 **Onboarding system (v699)** — 25 recommendations from simulated play session reports:
 welcome banner, coach marks, first-roll guidance, contextual help panel, Session Zero
 jargon tooltips, canvas templates in empty state, mobile FAB hint, Quick Start summaries
@@ -224,6 +227,8 @@ consequence stickies, undo (moves + reroll + delete), Ctrl+A select all, canvas 
 - **PDF-08** Dust and Iron
 
 ### Recently completed
+- ~~**RetroUI UX overhaul**~~ Hard offset shadows (campaign accent), solid panels, 2px borders, roll button press animation, canvas card retro shadows — v822
+- ~~**Forest Green theme + RetroUI typography**~~ Archivo Black + Space Grotesk, forest green accent, PWA branding, Google Fonts offline — v821
 - ~~**JIT tooltips**~~ OgmaTooltip on ~15 card elements across 10 fronts (NpcMinor, NpcMajor, Encounter, Obstacle, Complication, Consequence, Constraint, Faction, Scene, Seed) — v815
 - ~~**/help/mistakes page**~~ 20 common Fate errors with D&D comparisons, fixes, FCon citations — v815
 - ~~**Generator cross-links**~~ `related` field in HELP_CONTENT, clickable buttons in Campaign How tab — v815
@@ -251,7 +256,7 @@ consequence stickies, undo (moves + reroll + delete), Ctrl+A select all, canvas 
 - **`npx vite build`** — use for all test/intermediate builds. No version bump.
 - **`npm run build`** — same as `npx vite build`. Does NOT bump. Safe for CF Pages.
 - **`bash scripts/bump-version.sh`** — run ONCE, immediately before the final zip delivery only. **Auto-commits the bump** — the change is never lost.
-- Current version: `2026.03.819`
+- Current version: `2026.04.822`
 
 ---
 

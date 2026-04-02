@@ -24,9 +24,11 @@ Generate world-specific content, run sessions, track players — all in one tab.
 - **Native canvas** — pointer/wheel pan-zoom (OgmaCanvas.svelte, SvelteFlow removed v662)
 - **bits-ui** — accessible headless UI components
 - **Font Awesome 7.2 Free** — icons (cached by SW for offline)
+- **Archivo Black + Space Grotesk** — fonts via Google Fonts (offline-cached by SW)
 - **Dexie 4** — IndexedDB persistence
 - **Vite 7** + `adapter-static` — build
 - **Cloudflare Pages** — deploy
+- **Forest Green theme** + **RetroUI aesthetic** — hard offset shadows, solid panels, campaign-accent tinted shadows
 
 ---
 
@@ -91,4 +93,5 @@ See `LICENSING.md` for full attribution.
 
 Built March 2026. Original React 18 CDN UMD codebase migrated to SvelteKit + Svelte 5.
 SvelteFlow canvas replaced with native pointer/wheel canvas in v662.
+Forest Green default theme + RetroUI hard-shadow aesthetic (Archivo Black / Space Grotesk) added in v821–v822.
 The `react-source/` directory contains the original codebase (read-only reference).
