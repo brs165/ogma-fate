@@ -15,7 +15,9 @@ for GMs. Built with SvelteKit + Svelte 5. Deployed at ogma.net via Cloudflare Pa
 - **State:** Svelte stores (`writable`, `derived`) in plain JS + `$state` in components
 - **Persistence:** Dexie 4 (IndexedDB)
 - **Sync:** WebSocket multiplayer via PartySocket
-- **Styling:** `static/assets/css/theme.css` — ALL styling here, no `<style>` blocks
+- **Styling:** `static/assets/css/theme.css` (~5,800 lines) — ALL styling here, no `<style>` blocks
+- **Theme:** Forest Green default (`--accent:#52A875` dark / `#2E7D32` light); RetroUI aesthetic — hard offset shadows tinted by `--accent-dim`, `--glass-blur:none` (solid panels), 2px borders
+- **Fonts:** Archivo Black (display/hero) + Space Grotesk 300–700 (UI/mono) via Google Fonts (offline-cached by SW)
 - **Card design:** FateX-inspired fate-sheet tokens (`--fs-*`) — off-white body, campaign-tinted headers
 - **PWA:** `static/sw.js` + `static/manifest.json`
 - **Deploy:** Cloudflare Pages, auto-deploy from `main`, `static/_redirects` for SPA routing
@@ -32,7 +34,7 @@ for GMs. Built with SvelteKit + Svelte 5. Deployed at ogma.net via Cloudflare Pa
 | `src/lib/components/campaign/Campaign.svelte` | Campaign page: generator UI + split layout + onboarding |
 | `src/data/` | 11 campaign data modules |
 | `src/routes/+layout.js` | `ssr=false, prerender=false` |
-| `static/assets/css/theme.css` | Global stylesheet (~5,700 lines) |
+| `static/assets/css/theme.css` | Global stylesheet (~5,800 lines) |
 | `static/sw.js` | Service worker |
 | `static/_redirects` | `/* /index.html 200` |
 | `scripts/bump-version.sh` | Version stamper — run before every zip |

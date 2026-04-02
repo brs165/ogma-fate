@@ -47,7 +47,7 @@ Add others per task (e.g. `src/lib/stores/canvasStore.js`, `src/lib/components/b
 
 ## 4. Stack facts (critical)
 
-**Svelte 5 runes — 77 files, zero legacy:**
+**Svelte 5 runes — 78 files, zero legacy:**
 - `$state()` for mutable state; `$state.raw()` for objects always replaced wholesale (no deep proxy)
 - `$props()` for all component props — never `export let`
 - `onclick=` not `on:click=` — Svelte 5 event syntax
@@ -135,7 +135,7 @@ npx vite build
 cd build && zip -rq ../ogma-offline-YYYY-MM-NNN.zip .
 ```
 
-Current version: `2026.03.819`
+Current version: `2026.04.822`
 
 ---
 
@@ -153,10 +153,10 @@ Current version: `2026.03.819`
 
 ## Recent work
 
+- v822 — RetroUI full UX overhaul (hard offset shadows, solid panels, 2px borders, campaign accent shadows)
+- v821 — Forest Green default theme + Archivo Black / Space Grotesk typography + PWA branding + Google Fonts offline cache
+- v815 — JIT tooltips (OgmaTooltip on 15 card elements), /help/mistakes page, generator cross-links
 - v814 — Help content revamp (prev/next nav, SRD links, mobile polish, Wiki→Help rename)
-- v814 — AddMenu moved to canvas controls panel, card generation fix
 - v699 — Onboarding system (25 recommendations from play session reports)
-- v691 — Code audit (8 fixes, mobile table rewrite)
-- v680 — Svelte 5 runes compliance audit
 
 See `docs/claude/PROJECT_MEMORY.md` for full backlog.
