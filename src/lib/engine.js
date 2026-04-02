@@ -748,8 +748,11 @@ function _generate(genId, t, partySize, opts) {
     case 'stunt':        return generateStunt(t);
     case 'obstacle':     return generateObstacle(t);
     case 'countdown':    return generateCountdown(t);
-    case 'constraint':   return generateConstraint(t);
-    case 'pc':           return generatePC(t);
+    case 'constraint':      return generateConstraint(t);
+    case 'pc':              return generatePC(t);
+    case 'npc_instant':     return generateNpcInstant(t, opts);
+    case 'scene_hook':      return generateSceneHook(t);
+    case 'location_flavor': return generateLocationFlavor(t);
     default: return {};
   }
 }
@@ -955,6 +958,109 @@ function generateConstraint(t) {
       gm_note: 'Resistances force Plan B. The party discovers the resistance, researches the bypass, and then executes the plan. A good resistance drives most of a session.',
     };
   }
+}
+
+// ════════════════════════════════════════════════════════════════════════
+// GM INTERFACE GENERATORS (Phase 3)
+// ════════════════════════════════════════════════════════════════════════
+
+/**
+ * NPC Instant-Stat: quick NPC at a chosen power level.
+ * Returns name, high concept, optional trouble, peak skill, stress, optional stunt.
+ * @param {object} t - Filtered world tables.
+ * @param {object} [opts] - Options: { powerLevel: 'mook'|'average'|'fair'|'good'|'great' }
+ * @returns {object} NPC Instant result object.
+ */
+function generateNpcInstant(t, opts) {
+  var POWER = {
+    mook:    { peakRating: 1, aspects: 1, stress: 1, stunt: false },
+    average: { peakRating: 2, aspects: 2, stress: 2, stunt: false },
+    fair:    { peakRating: 3, aspects: 2, stress: 3, stunt: true  },
+    good:    { peakRating: 4, aspects: 3, stress: 4, stunt: true  },
+    great:   { peakRating: 5, aspects: 4, stress: 5, stunt: true  },
+  };
+  var powerLevel = (opts && opts.powerLevel) || 'average';
+  var p = POWER[powerLevel] || POWER.average;
+  var name = pick(t.names_first) + ' ' + pick(t.names_last);
+  var highConcept = fillTemplate(t.minor_concepts);
+  highConcept = highConcept.charAt(0).toUpperCase() + highConcept.slice(1);
+  var trouble = p.aspects >= 2 ? pick(t.troubles) : null;
+  if (trouble) trouble = trouble.charAt(0).toUpperCase() + trouble.slice(1);
+  var peakSkill = pick(ALL_SKILLS);
+  var bonusStunts = (t.stunts || []).filter(function(s) { return s.type === 'bonus'; });
+  var stunt = p.stunt && bonusStunts.length > 0
+    ? pickStuntsForSkills(bonusStunts, 1, [{name: peakSkill, r: p.peakRating}])[0] || null
+    : null;
+  return {
+    name: name,
+    highConcept: highConcept,
+    trouble: trouble,
+    peakSkill: { name: peakSkill, rating: p.peakRating },
+    stress: p.stress,
+    stunt: stunt,
+    powerLevel: powerLevel,
+  };
+}
+
+/**
+ * Scene Hook: generates a scene aspect with type and two compel suggestions.
+ * @param {object} t - Filtered world tables.
+ * @returns {object} Scene Hook result object.
+ */
+function generateSceneHook(t) {
+  var cats = ['scene_tone', 'scene_movement', 'scene_cover', 'scene_danger', 'scene_usable'];
+  var catKey = pick(cats);
+  var category = catKey.replace('scene_', '');
+  var aspectRaw = fillTemplate(t[catKey]);
+  var sceneAspect = aspectRaw ? aspectRaw.charAt(0).toUpperCase() + aspectRaw.slice(1) : 'Unusual Circumstances';
+  var compel1 = {
+    target: 'a PC with a related aspect',
+    pressure: pick(t.compel_situations || []) || 'The situation demands action',
+    consequence: pick(t.compel_consequences || []) || 'Things get worse',
+  };
+  var compel2 = {
+    target: 'the party as a whole',
+    pressure: pick(t.compel_situations || []) || 'An unexpected twist',
+    consequence: pick(t.compel_consequences || []) || 'A new complication arises',
+  };
+  var framing = t.scene_framing_questions || [];
+  return {
+    sceneAspect: sceneAspect,
+    aspectType: category,
+    compels: [compel1, compel2],
+    framingQuestion: framing.length > 0 ? pick(framing) : null,
+  };
+}
+
+/**
+ * Location Flavor: visual description, zones, and a hidden "discovery" aspect.
+ * @param {object} t - Filtered world tables.
+ * @returns {object} Location Flavor result object.
+ */
+function generateLocationFlavor(t) {
+  var location = pick(t.seed_locations) || 'An unremarkable place';
+  var toneRaw = fillTemplate(t.scene_tone);
+  var coverRaw = fillTemplate(t.scene_cover);
+  var tone = toneRaw ? toneRaw.charAt(0).toUpperCase() + toneRaw.slice(1) : '';
+  var cover = coverRaw ? coverRaw.charAt(0).toUpperCase() + coverRaw.slice(1) : '';
+  var description = tone + (tone && cover ? '. ' : '') + cover;
+  var usableRaw = fillTemplate(t.scene_usable);
+  var discoveryName = usableRaw ? usableRaw.charAt(0).toUpperCase() + usableRaw.slice(1) : 'Something Hidden';
+  var discoverSkills = ['Notice', 'Investigate', 'Lore'];
+  var hiddenDiscovery = {
+    name: discoveryName,
+    discoverSkill: pick(discoverSkills),
+    difficulty: rand(2, 4),
+  };
+  var zones = pickN(t.zones || [], rand(2, 3)).map(function(z) {
+    return { name: z[0], aspect: z[1], description: z[2] };
+  });
+  return {
+    location: location,
+    description: description,
+    hiddenDiscovery: hiddenDiscovery,
+    zones: zones,
+  };
 }
 
 // ════════════════════════════════════════════════════════════════════════
@@ -1451,6 +1557,59 @@ export function toMarkdown(genId, data, campName) {
           MD_FOOTER,
         ].join('\n\n');
       }
+    }
+    case 'npc_instant': {
+      var di = data;
+      var lines = ['# ' + (di.name || 'NPC') + ' (' + (di.powerLevel || 'average') + ')'];
+      if (campName) lines[0] += '\n*' + campName + '*';
+      lines.push('\n## Aspects');
+      lines.push('**High Concept:** ' + (di.highConcept || ''));
+      if (di.trouble) lines.push('**Trouble:** ' + di.trouble);
+      lines.push('\n## Peak Skill');
+      lines.push('**+' + (di.peakSkill ? di.peakSkill.rating : 0) + '** ' + (di.peakSkill ? di.peakSkill.name : ''));
+      lines.push('\n## Stress');
+      lines.push(mdBoxes(di.stress || 1));
+      if (di.stunt) { lines.push('\n## Stunt'); lines.push(mdStunt(di.stunt)); }
+      lines.push(MD_FOOTER);
+      return lines.join('\n');
+    }
+    case 'scene_hook': {
+      var dh = data;
+      var lines = ['# Scene Hook'];
+      if (campName) lines[0] += '\n*' + campName + '*';
+      lines.push('\n## Scene Aspect (' + (dh.aspectType || 'tone') + ')');
+      lines.push('**' + (dh.sceneAspect || '') + '**');
+      if (dh.compels && dh.compels.length) {
+        lines.push('\n## Compel Suggestions');
+        dh.compels.forEach(function(c, i) {
+          lines.push('### Compel ' + (i + 1) + ' — ' + c.target);
+          lines.push('**Pressure:** ' + c.pressure);
+          lines.push('**Consequence:** ' + c.consequence);
+        });
+      }
+      if (dh.framingQuestion) lines.push('\n**Framing:** ' + dh.framingQuestion);
+      lines.push(MD_FOOTER);
+      return lines.join('\n');
+    }
+    case 'location_flavor': {
+      var dl = data;
+      var lines = ['# ' + (dl.location || 'Location')];
+      if (campName) lines[0] += '\n*' + campName + '*';
+      lines.push('\n## Description');
+      lines.push(dl.description || '');
+      if (dl.hiddenDiscovery) {
+        lines.push('\n## Hidden Discovery (GM Only)');
+        lines.push('**Aspect:** ' + dl.hiddenDiscovery.name);
+        lines.push('**Discover:** ' + dl.hiddenDiscovery.discoverSkill + ' at +' + dl.hiddenDiscovery.difficulty);
+      }
+      if (dl.zones && dl.zones.length) {
+        lines.push('\n## Zones');
+        dl.zones.forEach(function(z) {
+          lines.push('- **' + (z.name || '') + '** — ' + (z.aspect || ''));
+        });
+      }
+      lines.push(MD_FOOTER);
+      return lines.join('\n');
     }
     default: return '';
   }

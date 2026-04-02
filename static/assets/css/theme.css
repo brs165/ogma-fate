@@ -151,6 +151,12 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
   --fs-con-mild:#2980b9;
   --fs-con-mod:#b8860b;
   --fs-con-sev:#c0392b;
+  --asp-situation:#5C7A99;
+  --asp-character:#C8944A;
+  --asp-boost:#4CAF50;
+  --asp-consequence:#C62828;
+  --asp-campaign:#7B1FA2;
+  --asp-hidden:#78909C;
   --fs-badge-text:#fff;
   --fs-stunt-bg:rgba(28,20,10,0.04);
   --fs-stunt-border:rgba(28,20,10,0.10);
@@ -6162,3 +6168,105 @@ a.gen-card{text-decoration:none}
 .lf-sp-slots{font-size:12px;color:var(--text-muted);background:var(--panel-raised);padding:2px 8px;border-radius:4px;border:1px solid var(--border)}
 .lf-sp-all{padding:6px 12px;font-size:12px;color:var(--text-muted);background:var(--panel);border-bottom:1px solid var(--border)}
 .lf-sp-list{padding:8px 12px;font-size:12px;color:var(--text-dim);background:var(--bg);line-height:1.7;letter-spacing:0.01em}
+
+/* ════════════════════════════════════════════════════════════════════════
+   GM INTERFACE — Monitor Panel, Conflict Grid, Aspect Tokens
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ── Monitor Panel ─────────────────────────────────────────────────────── */
+.monitor-panel{height:100%;display:flex;flex-direction:column}
+.monitor-body{padding:8px 10px;display:flex;flex-direction:column;gap:12px}
+.monitor-section{display:flex;flex-direction:column;gap:4px}
+.monitor-section-hdr{font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);padding:4px 0 2px;display:flex;align-items:center;gap:6px}
+.monitor-count{font-size:9px;font-weight:600;background:var(--accent);color:var(--bg);padding:0 5px;border-radius:8px;line-height:1.5}
+
+/* Monitor: Conflict Grid toggle */
+.monitor-grid-toggle{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--panel);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;transition:background 0.15s,border-color 0.15s}
+.monitor-grid-toggle:hover{background:var(--panel-raised,var(--panel));border-color:var(--accent)}
+.monitor-grid-toggle i{color:var(--accent);font-size:11px}
+.monitor-badge{font-size:9px;font-weight:700;background:var(--accent);color:var(--bg);padding:1px 6px;border-radius:8px;margin-left:auto}
+
+/* Monitor: Aspect rows */
+.monitor-aspect-row{display:flex;align-items:center;gap:6px;padding:3px 6px;border:none;background:transparent;color:var(--text);font-size:11px;cursor:pointer;border-radius:4px;width:100%;text-align:left;transition:background 0.12s}
+.monitor-aspect-row:hover{background:rgba(255,255,255,0.05)}
+[data-theme="light"] .monitor-aspect-row:hover{background:rgba(0,0,0,0.04)}
+.monitor-cat-pip{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.monitor-aspect-text{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-style:italic;font-weight:500}
+.monitor-aspect-source{font-size:9px;color:var(--text-muted);flex-shrink:0;max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Monitor: NPC roster */
+.monitor-npc-row{display:flex;flex-direction:column;gap:2px;padding:5px 8px;border:none;background:transparent;color:var(--text);cursor:pointer;border-radius:4px;width:100%;text-align:left;border-left:3px solid var(--accent);transition:background 0.12s}
+.monitor-npc-row:hover{background:rgba(255,255,255,0.05)}
+[data-theme="light"] .monitor-npc-row:hover{background:rgba(0,0,0,0.04)}
+.monitor-npc-name{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.monitor-npc-info{display:flex;align-items:center;gap:8px;font-size:10px}
+.monitor-skill-badge{font-family:'JetBrains Mono','Fira Code',monospace;font-weight:700;font-size:10px;color:var(--accent)}
+.monitor-stress-inline{display:flex;gap:3px;align-items:center}
+.monitor-stress-box{width:10px;height:10px;border:1.5px solid var(--fs-stress-phy);border-radius:2px;background:transparent}
+.monitor-stress-box.monitor-stress-hit{background:var(--fs-stress-phy)}
+
+/* Monitor: Countdown rows */
+.monitor-countdown-row{display:flex;align-items:center;gap:8px;padding:3px 6px}
+.monitor-countdown-name{border:none;background:transparent;color:var(--text);font-size:11px;font-weight:600;cursor:pointer;padding:0;flex-shrink:0}
+.monitor-countdown-name:hover{color:var(--accent)}
+.monitor-countdown-boxes{display:flex;gap:3px;flex-wrap:wrap}
+.monitor-cd-box{width:16px;height:16px;border:1.5px solid var(--fs-section);border-radius:2px;background:transparent;cursor:pointer;padding:0;transition:background 0.12s}
+.monitor-cd-box:hover{border-color:var(--accent)}
+.monitor-cd-box.monitor-cd-ticked{background:var(--fs-section)}
+
+/* Monitor: Empty state */
+.monitor-empty{text-align:center;padding:40px 20px;color:var(--text-muted)}
+.monitor-empty i{font-size:28px;margin-bottom:12px;display:block;opacity:0.5}
+.monitor-empty p{margin:4px 0;font-size:12px;line-height:1.5}
+
+/* ── Conflict Grid ─────────────────────────────────────────────────────── */
+.conflict-grid-overlay{position:fixed;inset:0;z-index:200;display:flex;align-items:flex-end;justify-content:center;pointer-events:none}
+.conflict-grid-container{pointer-events:auto;width:100%;max-width:900px;max-height:50vh;background:var(--panel);border:1px solid var(--border);border-bottom:none;border-radius:10px 10px 0 0;box-shadow:0 -4px 20px rgba(0,0,0,0.25);display:flex;flex-direction:column;overflow:hidden}
+.conflict-grid-header{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--panel);flex-shrink:0}
+.conflict-grid-title{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text);display:flex;align-items:center;gap:6px}
+.conflict-grid-title i{color:var(--accent);font-size:12px}
+.conflict-grid-count{font-size:10px;color:var(--text-muted);margin-left:auto}
+.conflict-grid-close{border:none;background:transparent;color:var(--text-muted);cursor:pointer;padding:4px 6px;font-size:14px;border-radius:4px;transition:color 0.12s}
+.conflict-grid-close:hover{color:var(--text)}
+.conflict-grid-empty{text-align:center;padding:30px;color:var(--text-muted);font-size:12px}
+.conflict-grid-empty i{font-size:24px;margin-bottom:8px;display:block;opacity:0.5}
+
+/* Conflict Grid: Columns */
+.conflict-grid-columns{display:flex;gap:1px;background:var(--border);overflow-x:auto;overflow-y:auto;flex:1}
+.conflict-col{flex:1;min-width:140px;max-width:220px;background:var(--panel);padding:8px;display:flex;flex-direction:column;gap:6px;transition:max-width 0.2s ease}
+.conflict-col-expanded{max-width:300px}
+.conflict-col-header{border:none;background:transparent;color:var(--text);cursor:pointer;padding:0;text-align:left;width:100%}
+.conflict-col-header:hover .conflict-col-name{color:var(--accent)}
+.conflict-col-name{font-size:12px;font-weight:700;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:color 0.12s}
+.conflict-col-hc{font-size:10px;font-style:italic;color:var(--accent);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px}
+.conflict-col-trouble{font-size:10px;font-style:italic;color:var(--fs-trouble);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.conflict-col-peak{display:flex;align-items:center;gap:4px;font-size:10px}
+.conflict-skill-badge{font-family:'JetBrains Mono','Fira Code',monospace;font-weight:700;font-size:11px;color:var(--accent);background:rgba(200,148,74,0.12);padding:1px 5px;border-radius:3px}
+.conflict-skill-name{font-weight:500;color:var(--text)}
+.conflict-col-stress{font-size:10px}
+.conflict-col-stress .fs-stress-track{gap:4px}
+.conflict-col-stress .fs-stress-label{font-size:8px}
+
+/* Conflict Grid: Consequence inputs */
+.conflict-col-consequences{display:flex;flex-direction:column;gap:3px}
+.conflict-con-row{display:flex;align-items:center;gap:4px}
+.conflict-con-label{font-size:8px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;min-width:32px;flex-shrink:0}
+.conflict-con-input{flex:1;border:none;border-bottom:1px solid var(--border);background:transparent;color:var(--text);font-size:10px;font-style:italic;padding:2px 4px;outline:none;min-width:0;transition:border-color 0.15s}
+.conflict-con-input:focus{border-color:var(--accent)}
+.conflict-con-input::placeholder{color:var(--text-muted);opacity:0.5}
+
+/* Conflict Grid: Expanded content */
+.conflict-col-expanded-content{border-top:1px solid var(--border);padding-top:6px;display:flex;flex-direction:column;gap:6px}
+.conflict-expanded-section{display:flex;flex-direction:column;gap:2px}
+.conflict-expanded-hdr{font-size:8px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted)}
+.conflict-expanded-aspect{font-size:10px;font-style:italic;color:var(--text);line-height:1.3}
+.conflict-expanded-skill{font-size:10px;color:var(--text);display:flex;align-items:center;gap:4px}
+.conflict-expanded-stunt{margin-bottom:4px}
+.conflict-stunt-name{font-size:10px;font-weight:600;color:var(--text)}
+.conflict-stunt-desc{font-size:9px;color:var(--text-muted);line-height:1.3}
+
+/* ── Responsive: Conflict Grid on mobile ──────────────────────────────── */
+@media(max-width:768px){
+  .conflict-grid-container{max-height:65vh;border-radius:8px 8px 0 0}
+  .conflict-col{min-width:120px}
+}

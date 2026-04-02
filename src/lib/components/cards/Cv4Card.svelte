@@ -21,8 +21,11 @@
   import Stunt       from './fronts/Stunt.svelte';
   import Obstacle    from './fronts/Obstacle.svelte';
   import Countdown   from './fronts/Countdown.svelte';
-  import Constraint  from './fronts/Constraint.svelte';
-  import Custom      from './fronts/Custom.svelte';
+  import Constraint      from './fronts/Constraint.svelte';
+  import NpcInstant      from './fronts/NpcInstant.svelte';
+  import SceneHook       from './fronts/SceneHook.svelte';
+  import LocationFlavor  from './fronts/LocationFlavor.svelte';
+  import Custom          from './fronts/Custom.svelte';
 
   const FRONTS = {
     npc_minor: NpcMinor, npc_major: NpcMajor, faction: Faction,
@@ -30,7 +33,9 @@
     seed: Seed, compel: Compel, challenge: Challenge,
     contest: Contest, consequence: Consequence, complication: Complication,
     pc: Pc, backstory: Backstory, stunt: Stunt, obstacle: Obstacle,
-    countdown: Countdown, constraint: Constraint, custom: Custom,
+    countdown: Countdown, constraint: Constraint,
+    npc_instant: NpcInstant, scene_hook: SceneHook, location_flavor: LocationFlavor,
+    custom: Custom,
   };
 
   // ── Generator meta ──────────────────────────────────────────────────────
@@ -53,7 +58,10 @@
     obstacle:     { icon: 'fa-solid fa-shield-halved',     label: 'Obstacle' },
     countdown:    { icon: 'fa-solid fa-hourglass-half',    label: 'Countdown' },
     constraint:   { icon: 'fa-solid fa-lock',              label: 'Constraint' },
-    custom:       { icon: 'fa-solid fa-pen-to-square',     label: 'Custom' },
+    npc_instant:     { icon: 'fa-solid fa-bolt-lightning',     label: 'Instant NPC' },
+    scene_hook:      { icon: 'fa-solid fa-anchor',            label: 'Scene Hook' },
+    location_flavor: { icon: 'fa-solid fa-map-location-dot',  label: 'Location Flavor' },
+    custom:          { icon: 'fa-solid fa-pen-to-square',     label: 'Custom' },
   };
 
   // ── Campaign header gradient map ────────────────────────────────────────

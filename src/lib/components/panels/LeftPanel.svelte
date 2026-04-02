@@ -1,9 +1,25 @@
 <script>
   import HelpPanel from '../board/HelpPanel.svelte';
   import StuntPanel from '../board/StuntPanel.svelte';
+  import MonitorPanel from '../board/MonitorPanel.svelte';
   import { Tabs, ScrollArea } from 'bits-ui';
   // Derive world stunts from CAMPAIGNS global
-  let { activeGen = 'npc_minor', onSelectGen = () => {}, campId = '', activeTab = 'gen', onTabChange = () => {}, campName = '' } = $props();
+  let {
+    activeGen = 'npc_minor',
+    onSelectGen = () => {},
+    campId = '',
+    activeTab = 'gen',
+    onTabChange = () => {},
+    campName = '',
+    cards = [],
+    onPanToCard = () => {},
+    onUpdateCard = null,
+    showConflictGrid = false,
+    onToggleConflictGrid = () => {},
+    sessionHistory = [],
+    pinnedCards = [],
+  } = $props();
+
   let worldStunts = $derived((typeof globalThis.CAMPAIGNS !== 'undefined' && globalThis.CAMPAIGNS[campId] &&
     globalThis.CAMPAIGNS[campId].tables && globalThis.CAMPAIGNS[campId].tables.stunts)
     ? globalThis.CAMPAIGNS[campId].tables.stunts : []);
@@ -14,6 +30,7 @@
       gens: [
         { id: 'npc_minor', label: 'Minor NPC', sub: 'name \u00b7 aspect \u00b7 weakness', icon: 'fa-user' },
         { id: 'npc_major', label: 'Major NPC', sub: '5 aspects \u00b7 skills \u00b7 stunts', icon: 'fa-crown' },
+        { id: 'npc_instant', label: 'Instant NPC', sub: 'quick stat at chosen power level', icon: 'fa-bolt-lightning' },
         { id: 'backstory', label: 'PC Backstory', sub: 'hook \u00b7 secret \u00b7 connection', icon: 'fa-masks-theater' },
       ]
     },
@@ -21,7 +38,9 @@
       id: 'scenes', label: 'Scenes',
       gens: [
         { id: 'scene', label: 'Scene Setup', sub: 'aspects \u00b7 zones \u00b7 framing', icon: 'fa-fire' },
+        { id: 'scene_hook', label: 'Scene Hook', sub: 'aspect + two compel suggestions', icon: 'fa-anchor' },
         { id: 'encounter', label: 'Encounter', sub: 'opposition \u00b7 aspects \u00b7 stakes', icon: 'fa-burst' },
+        { id: 'location_flavor', label: 'Location Flavor', sub: 'description \u00b7 zones \u00b7 hidden aspect', icon: 'fa-map-location-dot' },
         { id: 'complication', label: 'Complication', sub: 'aspect that makes things harder', icon: 'fa-triangle-exclamation' },
       ]
     },
@@ -61,6 +80,7 @@
   <Tabs.Root value={activeTab} onValueChange={(v) => onTabChange(v)}>
     <Tabs.List aria-label="Panel sections">
       <Tabs.Trigger value="gen">Generate</Tabs.Trigger>
+      <Tabs.Trigger value="monitor">Monitor</Tabs.Trigger>
       <Tabs.Trigger value="stunts">Stunts</Tabs.Trigger>
       <Tabs.Trigger value="help">Help</Tabs.Trigger>
     </Tabs.List>
@@ -101,6 +121,16 @@
           <ScrollArea.Thumb />
         </ScrollArea.Scrollbar>
       </ScrollArea.Root>
+    </Tabs.Content>
+
+    <Tabs.Content value="monitor">
+      <MonitorPanel
+        {cards}
+        {onPanToCard}
+        {onUpdateCard}
+        {showConflictGrid}
+        {onToggleConflictGrid}
+      />
     </Tabs.Content>
 
     <Tabs.Content value="stunts">

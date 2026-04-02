@@ -26,6 +26,9 @@ export const GENERATORS = [
   {id:"obstacle",    label:"Obstacle",        icon:"fa-shield-halved", sub:"Hazard · block · distraction - not an enemy"},
   {id:"countdown",   label:"Countdown",       icon:"fa-clock", sub:"Track · trigger · outcome - pacing pressure"},
   {id:"constraint",  label:"Constraint",      icon:"fa-lock", sub:"Limitation or resistance - forces Plan B"},
+  {id:"npc_instant",     label:"Instant NPC",     icon:"fa-bolt-lightning", sub:"Quick name · concept · peak skill at chosen power"},
+  {id:"scene_hook",      label:"Scene Hook",      icon:"fa-anchor", sub:"Scene aspect + two compel suggestions"},
+  {id:"location_flavor", label:"Location Flavor",  icon:"fa-map-location-dot", sub:"Description · zones · hidden discovery aspect"},
 ];
 
 export const GENERATOR_GROUPS = [
@@ -33,6 +36,7 @@ export const GENERATOR_GROUPS = [
   {id:"scene",     label:"Scene",     icon:"fa-clapperboard", gens:["scene","encounter","complication"]},
   {id:"story",     label:"Story",     icon:"fa-earth-americas", gens:["seed","campaign","faction"]},
   {id:"mechanics", label:"Mechanics", icon:"fa-gears",  gens:["compel","consequence","challenge","contest","obstacle","countdown","constraint"]},
+  {id:"quick",     label:"Quick Tools", icon:"fa-bolt-lightning", gens:["npc_instant","scene_hook","location_flavor"]},
 ];
 
 
@@ -619,6 +623,87 @@ export const HELP_CONTENT = {
   },
 
 
+  npc_instant: {
+    title: "Instant NPC",
+    what: "A quick-stat NPC at a chosen power level — from disposable mook to formidable great-rated opponent. For when you need an NPC right now.",
+    output: "Name, high concept, optional trouble, one peak skill at the power level rating, stress boxes, and an optional stunt.",
+    rules: [
+      "Power levels set the peak skill: mook (+1), average (+2), fair (+3), good (+4), great (+5).",
+      "Mooks and average NPCs have no consequence slots — stress out = taken out.",
+      "Fair+ NPCs get a stunt matched to their peak skill.",
+      "Use the peak skill for everything the NPC does. Other skills default to Mediocre (+0).",
+    ],
+    rule_urls: ['/fate-condensed/being-game-master#npcs', '/fate-condensed/being-game-master#npcs', null, null],
+    gm_tips: [
+      "Use mooks for background threats. Average for named opposition. Fair+ for mini-bosses.",
+      "The peak skill IS the NPC. A +3 Fight thug fights. A +3 Deceive spy lies.",
+      "Don't over-stat instant NPCs. They exist to serve the scene, not survive it.",
+    ],
+    invoke_example: "The instant NPC's high concept is 'Hired Muscle.' Invoke for +2 on Fight when physically intimidating someone.",
+    compel_example: "'Hired Muscle' means they're only in it for the money. Offer a fate point: they walk away when the pay isn't worth the pain.",
+    beginner: {
+      what: "A quick NPC generated at a specific power level. Choose how tough they should be and get a ready-to-play character.",
+      terms: [
+        ["Power Level", "How strong the NPC is — from mook (weakest) to great (strongest)."],
+        ["Peak Skill", "The one skill this NPC is best at. Used for all their important rolls."],
+        ["Stress", "Hit points, essentially. More boxes = harder to take out."],
+      ],
+    },
+  },
+  scene_hook: {
+    title: "Scene Hook",
+    what: "A scene-starting aspect paired with two ready-made compel suggestions. Drop this at the start of a scene to have instant dramatic pressure.",
+    output: "One typed scene aspect (danger/cover/tone/movement/usable) and two compel suggestions with targets, pressure, and consequences.",
+    rules: [
+      "The scene aspect persists until overcome or the scene ends.",
+      "Anyone can invoke it for +2 or a reroll with a fate point.",
+      "Compels from scene aspects generate fate points for affected players.",
+      "Use the compel suggestions as written or adapt them to the current situation.",
+    ],
+    rule_urls: ['/fate-condensed/aspects-and-fate-points#situation-aspects', '/fate-condensed/aspects-and-fate-points#situation-aspects', '/fate-condensed/aspects-and-fate-points#compels', null],
+    gm_tips: [
+      "Open the scene by announcing the aspect. Let players decide how to engage with it.",
+      "Fire one compel in the first exchange. Save the second for when things slow down.",
+      "The aspect type tells you how to use it: danger attacks, cover defends, tone compels.",
+    ],
+    invoke_example: "The scene hook generated a danger aspect. A PC tries to flee — invoke the danger for +2 opposition on their Athletics roll.",
+    compel_example: "The generated compel targets 'a PC with a related aspect.' Find the PC whose trouble connects and offer the fate point.",
+    beginner: {
+      what: "A ready-made scene starter. It gives you one dramatic aspect and two ways to create trouble with it.",
+      terms: [
+        ["Scene Aspect", "A true statement about the scene that anyone can use for bonuses or complications."],
+        ["Compel", "The GM offers a fate point if a player accepts a complication from an aspect."],
+        ["Aspect Type", "Categories like danger, cover, tone — they hint at how the aspect behaves in play."],
+      ],
+    },
+  },
+  location_flavor: {
+    title: "Location Flavor",
+    what: "A location with atmospheric description, zones, and a hidden 'discovery' aspect that players can uncover through investigation.",
+    output: "Location name, sensory description, 2–3 zones with aspects, and one hidden discovery aspect with skill and difficulty to find it.",
+    rules: [
+      "The hidden discovery is a situation aspect waiting to be found.",
+      "Players find it with the listed skill at the listed difficulty.",
+      "Once discovered, it becomes a normal situation aspect anyone can invoke.",
+      "Zones limit movement — moving past opposition costs an action.",
+    ],
+    rule_urls: ['/fate-condensed/aspects-and-fate-points#situation-aspects', null, '/fate-condensed/aspects-and-fate-points#situation-aspects', '/fate-condensed/challenges-conflicts-and-contests#zones'],
+    gm_tips: [
+      "Describe the location using the generated text but don't mention the hidden aspect.",
+      "If a player asks 'do I notice anything unusual?' — that's a roll against the discovery difficulty.",
+      "Revealed discoveries often become the turning point of a scene. Place them strategically.",
+    ],
+    invoke_example: "A player discovers the hidden aspect 'Loose Floorboard Concealing an Escape Route.' They invoke it for +2 on Athletics to flee the collapsing building.",
+    compel_example: "The hidden aspect 'Unstable Ceiling' is discovered. The GM compels it: debris falls, separating the party.",
+    beginner: {
+      what: "A location with a secret. It gives you a place to describe, areas to move through, and something hidden for players to discover.",
+      terms: [
+        ["Zone", "A distinct area within the location. Moving between zones can cost an action."],
+        ["Hidden Discovery", "A secret aspect the GM knows about but players must find through skill rolls."],
+        ["Difficulty", "The skill rating needed to succeed at finding the hidden aspect."],
+      ],
+    },
+  },
   boost: {
     title: "Boost",
     what: "A boost is a fleeting, unnamed advantage — a momentary edge. It has one free invoke and vanishes as soon as that invoke is used (or the scene ends).",
