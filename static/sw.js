@@ -38,9 +38,10 @@ self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
   if (event.request.method !== 'GET') return;
 
-  // Handle Font Awesome CDN requests (cache-first for offline)
+  // Handle CDN font requests (cache-first for offline)
   const isFA = url.hostname === 'cdn.jsdelivr.net' && url.pathname.includes('fontawesome');
-  if (url.origin !== self.location.origin && !isFA) return;
+  const isGoogleFonts = url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com';
+  if (url.origin !== self.location.origin && !isFA && !isGoogleFonts) return;
 
   event.respondWith(
     caches.match(event.request).then(cached => {
