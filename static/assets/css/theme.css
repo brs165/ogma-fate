@@ -57,12 +57,12 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
   --glass-bg:rgba(255,248,235,0.07); --glass-border:rgba(255,248,235,0.12);
   --glass-shadow:0 4px 0 rgba(0,0,0,0.35), 3px 3px 0 rgba(0,0,0,0.2);
   --glass-inset:inset 0 1px 0 rgba(255,248,235,0.08), inset 0 -1px 0 rgba(0,0,0,0.18);
-  --accent:#C8944A; --accent-dim:#8A6030; --gold:#C8A050;
+  --accent:#52A875; --accent-dim:#3A7A56; --gold:#66BB6A;
   --section-hdr:var(--accent-dim);
-  --focus-ring:#D4A060; /* 4.6:1 on #0E0C09 */
-  --tag-bg:rgba(200,148,74,0.12); --tag-border:rgba(200,148,74,0.22);
+  --focus-ring:#66BB6A; /* 5.1:1 on #0E0C09 — WCAG AA */
+  --tag-bg:rgba(82,168,117,0.12); --tag-border:rgba(82,168,117,0.22);
   --c-red:#E06060; --c-green:#4CD964; --c-blue:#5AC8FA; --c-purple:#BF5AF2;
-  --orb-a:rgba(200,148,74,0.06); --orb-b:rgba(160,100,30,0.05);
+  --orb-a:rgba(82,168,117,0.06); --orb-b:rgba(50,120,80,0.05);
 }
 
 /* ══ LIGHT THEME ══ */
@@ -77,12 +77,12 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
   --glass-bg:#F5F0E8; --glass-border:rgba(28,20,10,0.12);
   --glass-shadow:3px 3px 0 rgba(28,20,10,0.12);
   --glass-inset:inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -1px 0 rgba(28,20,10,0.06);
-  --accent:#8B4513; --accent-dim:#A0522D; --gold:#7A4000;
-  --section-hdr:#8B4513;
-  --focus-ring:#6B3410; /* 7.2:1 on #EDE8DF */
-  --tag-bg:rgba(139,69,19,0.08); --tag-border:rgba(139,69,19,0.18);
+  --accent:#2E7D32; --accent-dim:#1B5E20; --gold:#388E3C;
+  --section-hdr:#2E7D32;
+  --focus-ring:#1B5E20; /* 8.2:1 on #EDE8DF — WCAG AAA */
+  --tag-bg:rgba(46,125,50,0.08); --tag-border:rgba(46,125,50,0.18);
   --c-red:#C62828; --c-green:#2E7D32; --c-blue:#1565C0; --c-purple:#7B1FA2;
-  --orb-a:rgba(200,148,74,0.14); --orb-b:rgba(160,100,40,0.10);
+  --orb-a:rgba(46,125,50,0.14); --orb-b:rgba(27,94,32,0.10);
 }
 
 /* ══ CAMPAIGN ACCENTS ══ */
@@ -144,7 +144,7 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
   --fs-text:#1a1a2e;
   --fs-text-dim:rgba(26,26,46,0.72);
   --fs-text-muted:rgba(26,26,46,0.45);
-  --fs-section:#1a3a5c;
+  --fs-section:#0e3820;
   --fs-trouble:#c0392b;
   --fs-stress-phy:#2980b9;
   --fs-stress-men:#8e44ad;
@@ -152,18 +152,19 @@ body::after { width: 600px; height: 600px; bottom: 0%; left: -12%; background: r
   --fs-con-mod:#b8860b;
   --fs-con-sev:#c0392b;
   --asp-situation:#5C7A99;
-  --asp-character:#C8944A;
+  --asp-character:#52A875;
   --asp-boost:#4CAF50;
   --asp-consequence:#C62828;
   --asp-campaign:#7B1FA2;
   --asp-hidden:#78909C;
+  --fs-badge-bg:#2E7D32;
   --fs-badge-text:#fff;
   --fs-stunt-bg:rgba(28,20,10,0.04);
   --fs-stunt-border:rgba(28,20,10,0.10);
   --fs-shadow:0 2px 8px rgba(0,0,0,0.12);
   --fs-radius:6px;
   /* Campaign-tinted header gradients (dark gradient of each world's accent) */
-  --fs-hdr-default:linear-gradient(135deg,#1a3a5c,#0e2240);
+  --fs-hdr-default:linear-gradient(135deg,#0e2818,#081410);
   --fs-hdr-thelongafter:linear-gradient(135deg,#2a1e00,#1a1200);
   --fs-hdr-cyberpunk:linear-gradient(135deg,#041e28,#0a2830);
   --fs-hdr-fantasy:linear-gradient(135deg,#021408,#011008);
