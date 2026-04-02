@@ -29,6 +29,8 @@ export function getWorldMeta(campId) {
 export function extractCardTitle(genId, data) {
   if (!data) return genId;
   if (genId === 'custom') return data.title || 'Custom Card';
+  if (genId === 'scene_hook') return data.sceneAspect || 'Scene Hook';
+  if (genId === 'location_flavor') return data.location || 'Location';
   return data.name || data.location || data.situation || data.title ||
     (data.aspects && data.aspects.high_concept) || genId;
 }
@@ -65,6 +67,14 @@ export function extractCardSummary(genId, data) {
   } else if (genId === 'countdown') {
     if (data.track_name) lines.push(data.track_name);
     if (data.trigger) lines.push('Trigger: ' + data.trigger);
+  } else if (genId === 'npc_instant') {
+    if (data.highConcept) lines.push(data.highConcept);
+    if (data.peakSkill) lines.push('+' + data.peakSkill.rating + ' ' + data.peakSkill.name);
+  } else if (genId === 'scene_hook') {
+    if (data.sceneAspect) lines.push(data.sceneAspect);
+    if (data.aspectType) lines.push('Type: ' + data.aspectType);
+  } else if (genId === 'location_flavor') {
+    if (data.description) lines.push(data.description);
   } else {
     const keys = ['description', 'text', 'body', 'summary'];
     for (let k = 0; k < keys.length; k++) {
@@ -94,6 +104,13 @@ export function extractCardTags(genId, data) {
     if (data.moderate) tags.push('Moderate');
     else if (data.severe) tags.push('Severe');
     else if (data.mild) tags.push('Mild');
+  } else if (genId === 'npc_instant') {
+    if (data.powerLevel) tags.push(data.powerLevel);
+    if (data.peakSkill) tags.push('+' + data.peakSkill.rating + ' ' + data.peakSkill.name);
+  } else if (genId === 'scene_hook') {
+    if (data.aspectType) tags.push(data.aspectType);
+  } else if (genId === 'location_flavor') {
+    if (data.hiddenDiscovery) tags.push('Hidden: ' + data.hiddenDiscovery.discoverSkill);
   }
   return tags;
 }

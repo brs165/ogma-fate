@@ -19,6 +19,7 @@
   import MobileList    from './MobileList.svelte';
   import GenerateFAB   from './GenerateFAB.svelte';
   import FatePointTracker from '../campaign/FatePointTracker.svelte';
+  import ConflictGrid from './ConflictGrid.svelte';
   import { AlertDialog } from 'bits-ui';
 
   // ── Props ──────────────────────────────────────────────────────────────────
@@ -67,6 +68,7 @@
   let coachEdge    = $state(false);
   let canvasRef    = $state();
   let isMobile     = $state(typeof window !== 'undefined' && window.innerWidth < 768);
+  let showConflictGrid = $state(false);
 
   // ── FP state ───────────────────────────────────────────────────────────────
   let fpState = $state(null);
@@ -125,6 +127,20 @@
 
   // ── fitAll via OgmaCanvas ref ──────────────────────────────────────────────
   function fitAll() { if (canvasRef) canvasRef.fitAll(); }
+
+  // ── Pan to a specific card on the canvas ──────────────────────────────────
+  function panToCard(cardId) {
+    if (!canvasRef) return;
+    if (canvasRef.panToCard) canvasRef.panToCard(cardId);
+  }
+
+  // ── Update card state from Monitor/ConflictGrid ───────────────────────────
+  function updateCardFromPanel(cardId, patch) {
+    if (!canvas) return;
+    if (patch.cardState) {
+      canvas.updateCard(cardId, { cardState: patch.cardState });
+    }
+  }
 
   // ── Canvas templates (WC-05) ───────────────────────────────────────────────
   const CANVAS_TEMPLATES = [
@@ -240,26 +256,57 @@
       showDice = !showDice;
     } else if (e.key === 'f' || e.key === 'F') {
       fitAll();
+    } else if (e.key === 'n' || e.key === 'N') {
+      if (canvas) canvas.generateCard('npc_minor');
+    } else if (e.key === 's' || e.key === 'S') {
+      if (canvas) canvas.generateCard('scene');
+    } else if (e.key === 'b' || e.key === 'B') {
+      if (canvas) canvas.generateCard('boost');
+    } else if (e.key === 'a' || e.key === 'A') {
+      if (canvas) canvas.generateCard('sticky');
+    } else if (e.key === 'g' || e.key === 'G') {
+      showConflictGrid = !showConflictGrid;
     }
   }
 
   let cmdActions = $derived([
-    { id: 'gen-npc',     icon: 'fa-user', label: 'Generate Minor NPC',  shortcut: 'Space', fn: () => { if (canvas) canvas.generateCard('npc_minor'); } },
-    { id: 'gen-major',   icon: 'fa-crown', label: 'Generate Major NPC',              fn: () => { if (canvas) canvas.generateCard('npc_major'); } },
-    { id: 'gen-scene',   icon: 'fa-fire', label: 'Generate Scene',                  fn: () => { if (canvas) canvas.generateCard('scene'); } },
-    { id: 'gen-encounter',icon: 'fa-burst',   label: 'Generate Encounter',              fn: () => { if (canvas) canvas.generateCard('encounter'); } },
-    { id: 'gen-sticky',  icon: 'fa-note-sticky', label: 'Add Aspect Sticky',               fn: () => { if (canvas) canvas.generateCard('sticky'); } },
+    // Generators
+    { id: 'gen-npc',       icon: 'fa-user',              label: 'Generate Minor NPC',    shortcut: 'N',  sub: 'name \u00b7 aspect \u00b7 weakness',       fn: () => { if (canvas) canvas.generateCard('npc_minor'); } },
+    { id: 'gen-major',     icon: 'fa-crown',             label: 'Generate Major NPC',                    sub: '5 aspects \u00b7 skills \u00b7 stunts',     fn: () => { if (canvas) canvas.generateCard('npc_major'); } },
+    { id: 'gen-instant',   icon: 'fa-bolt-lightning',    label: 'Generate Instant NPC',                  sub: 'quick stat at chosen power level',          fn: () => { if (canvas) canvas.generateCard('npc_instant'); } },
+    { id: 'gen-scene',     icon: 'fa-fire',              label: 'Generate Scene',        shortcut: 'S',  sub: 'aspects \u00b7 zones \u00b7 framing',      fn: () => { if (canvas) canvas.generateCard('scene'); } },
+    { id: 'gen-hook',      icon: 'fa-anchor',            label: 'Generate Scene Hook',                   sub: 'aspect + compel suggestions',               fn: () => { if (canvas) canvas.generateCard('scene_hook'); } },
+    { id: 'gen-location',  icon: 'fa-map-location-dot',  label: 'Generate Location',                     sub: 'description \u00b7 zones \u00b7 hidden',   fn: () => { if (canvas) canvas.generateCard('location_flavor'); } },
+    { id: 'gen-encounter', icon: 'fa-burst',             label: 'Generate Encounter',                    sub: 'opposition \u00b7 stakes \u00b7 twist',     fn: () => { if (canvas) canvas.generateCard('encounter'); } },
+    { id: 'gen-seed',      icon: 'fa-seedling',          label: 'Generate Adventure Seed',               sub: '3-scene skeleton',                          fn: () => { if (canvas) canvas.generateCard('seed'); } },
+    { id: 'gen-faction',   icon: 'fa-flag',              label: 'Generate Faction',                      sub: 'goal \u00b7 method \u00b7 weakness',        fn: () => { if (canvas) canvas.generateCard('faction'); } },
+    { id: 'gen-compel',    icon: 'fa-rotate-left',       label: 'Generate Compel',                       sub: 'aspect compel suggestion',                  fn: () => { if (canvas) canvas.generateCard('compel'); } },
+    { id: 'gen-challenge', icon: 'fa-bullseye',          label: 'Generate Challenge',                    sub: 'overcome series',                           fn: () => { if (canvas) canvas.generateCard('challenge'); } },
+    { id: 'gen-contest',   icon: 'fa-trophy',            label: 'Generate Contest',                      sub: 'race to 3 victories',                       fn: () => { if (canvas) canvas.generateCard('contest'); } },
+    { id: 'gen-countdown', icon: 'fa-clock',             label: 'Generate Countdown',                    sub: 'ticking clock',                             fn: () => { if (canvas) canvas.generateCard('countdown'); } },
+    { id: 'gen-obstacle',  icon: 'fa-shield-halved',     label: 'Generate Obstacle',                     sub: 'hazard \u00b7 block \u00b7 distraction',   fn: () => { if (canvas) canvas.generateCard('obstacle'); } },
+    { id: 'gen-constraint',icon: 'fa-lock',              label: 'Generate Constraint',                   sub: 'limitation or resistance',                  fn: () => { if (canvas) canvas.generateCard('constraint'); } },
+    { id: 'gen-complication',icon:'fa-triangle-exclamation', label: 'Generate Complication',              sub: 'new aspect mid-scene',                      fn: () => { if (canvas) canvas.generateCard('complication'); } },
+    // Canvas tools
+    { id: 'gen-sticky',   icon: 'fa-note-sticky',        label: 'Add Aspect Sticky',     shortcut: 'A',  fn: () => { if (canvas) canvas.generateCard('sticky'); } },
+    { id: 'gen-boost',    icon: 'fa-bolt',               label: 'Add Boost',             shortcut: 'B',  fn: () => { if (canvas) canvas.generateCard('boost'); } },
+    // Templates
     ...CANVAS_TEMPLATES.map(t => ({
       id: t.id, icon: t.icon, label: 'Template: ' + t.label, sub: t.desc,
       fn: () => dropTemplate(t.id),
     })),
-    { id: 'dice',        icon: 'fa-dice-d20', label: 'Toggle Dice Roller', shortcut: 'R', fn: () => { showDice = !showDice; } },
-    { id: 'fp',          icon: 'fa-coins',    label: 'Toggle Fate Points',              fn: () => { showFP = !showFP; } },
-    { id: 'export',      icon: 'fa-file-export',    label: 'Export Cards',                    fn: () => { exportView = true; } },
-    { id: 'fit',         icon: 'fa-expand',    label: 'Fit All Cards',      shortcut: 'F', fn: fitAll },
-    { id: 'clear',       icon: 'fa-trash-can', label: 'Clear Table',                     fn: () => { showClearModal = true; } },
-    { id: 'undo',        icon: 'fa-rotate-left',    label: 'Undo',               shortcut: '\u2318Z', fn: () => { if (canvas) canvas.undoLast(); } },
-    { id: 'theme',       icon: 'fa-circle-half-stroke',    label: 'Toggle Theme',                    fn: toggleTheme },
+    // GM Interface
+    { id: 'grid',         icon: 'fa-table-cells',        label: 'Toggle Conflict Grid',  shortcut: 'G',  fn: () => { showConflictGrid = !showConflictGrid; } },
+    // Panels
+    { id: 'dice',         icon: 'fa-dice-d20',           label: 'Toggle Dice Roller',    shortcut: 'R',  fn: () => { showDice = !showDice; } },
+    { id: 'fp',           icon: 'fa-coins',              label: 'Toggle Fate Points',                    fn: () => { showFP = !showFP; } },
+    { id: 'monitor',      icon: 'fa-binoculars',         label: 'Switch to Monitor Tab',                 fn: () => { leftTab = 'monitor'; leftOpen = true; } },
+    // Actions
+    { id: 'export',       icon: 'fa-file-export',        label: 'Export Cards',                          fn: () => { exportView = true; } },
+    { id: 'fit',          icon: 'fa-expand',             label: 'Fit All Cards',         shortcut: 'F',  fn: fitAll },
+    { id: 'clear',        icon: 'fa-trash-can',          label: 'Clear Table',                           fn: () => { showClearModal = true; } },
+    { id: 'undo',         icon: 'fa-rotate-left',        label: 'Undo',                  shortcut: '\u2318Z', fn: () => { if (canvas) canvas.undoLast(); } },
+    { id: 'theme',        icon: 'fa-circle-half-stroke', label: 'Toggle Theme',                          fn: toggleTheme },
   ]);
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
@@ -349,6 +396,11 @@
         activeTab={leftTab}
         onTabChange={(t) => { leftTab = t; }}
         campName={campMeta.name}
+        {cards}
+        onPanToCard={panToCard}
+        onUpdateCard={updateCardFromPanel}
+        {showConflictGrid}
+        onToggleConflictGrid={() => { showConflictGrid = !showConflictGrid; }}
       />
     </div>
     {/if}
@@ -423,6 +475,15 @@
     {activeGen}
     onGenerate={(genId) => { if (canvas) canvas.generateCard(genId); }}
   />
+  {/if}
+
+  <!-- Conflict Grid -->
+  {#if showConflictGrid}
+    <ConflictGrid
+      {cards}
+      onUpdateCard={updateCardFromPanel}
+      onClose={() => { showConflictGrid = false; }}
+    />
   {/if}
 
   <!-- Dice floater -->
