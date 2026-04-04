@@ -4,15 +4,16 @@
   import { CAMPAIGNS, HELP_CONTENT } from '../../../data/shared.js';
   import { createSessionStore } from '../../stores/sessionStore.js';
   import { createChromeStore } from '../../stores/chromeStore.js';
-  import DB, { LS } from '../../db.js';
+  import { DB, LS } from '../../db.js';
   import Cv4Card from '../cards/Cv4Card.svelte';
   import Board from '../board/Board.svelte';
+  import MobileTableFan from '../board/MobileTableFan.svelte';
   import { Collapsible } from 'bits-ui';
 
   let { campId = 'fantasy' } = $props();
 
   // ── Derived ────────────────────────────────────────────────────────────────
-  let camp = $derived(CAMPAIGNS[campId] || { meta: { name: campId, icon: '\u25C8' }, tables: {}, colors: {} });
+  let camp = $derived(CAMPAIGNS[campId] || { meta: { name: campId, icon: 'fa-dice-d20' }, tables: {}, colors: {} });
   let campName = $derived(camp.meta ? camp.meta.name : campId);
 
   // ── Local state ────────────────────────────────────────────────────────────
@@ -23,18 +24,25 @@
   let universalMerge = $state(true);
   let gmMode = $state(true);
 
+  // ── Onboarding state ───────────────────────────────────────────────────────
+  let showWelcome   = $state(false);   // first-visit banner
+  let showCoachCmd  = $state(false);   // Ctrl+K coach mark after 3rd visit
+  let visitCount    = $state(0);
+  let isFirstRoll   = $state(false);   // guided first-roll annotations
+  let helpLevel     = $state('new_fate');
+
   // ── Split layout state ─────────────────────────────────────────────────────
   // tableFull: generator hidden, table takes all content area
   // tableOpen: on mobile, whether the bottom-sheet table is visible
-  let tableFull  = $state(false);
-  let tableOpen  = $state(false); // mobile only
-  let boardRef   = $state();      // bind:this on Board for sendToTable etc
+  let tableFull     = $state(false);
+  let boardRef      = $state();      // bind:this on Board for sendToTable etc
+  let boardCardsList = $state([]);   // mirror of Board's canvas cards for MobileTableFan
 
   // Split ratio: fraction of content-panel width for generator column (0.3–0.7)
   const RATIO_KEY = 'ogma_split_ratio_' + campId;
-  let splitRatio = $state(() => {
+  let splitRatio = $state((() => {
     try { const v = parseFloat(localStorage.getItem(RATIO_KEY)); return (v >= 0.2 && v <= 0.8) ? v : 0.5; } catch { return 0.5; }
-  });
+  })());
   let draggingDivider = $state(false);
   let splitRoot = $state(); // bind:this on .cp-split-root
 
@@ -63,18 +71,19 @@
   // ── Stores ─────────────────────────────────────────────────────────────────
   let chrome = $state();
   let session = $state();
-  let unsubs = $state([]);
+  let unsubs = [];
 
   // Reactive values from stores
   let toast = $state(null);
   let isOnline = $state(true);
-  let activeGen = $state('npc_minor');
+  let activeGen = $state('seed');
   let result = $state(null);
   let rolling = $state(false);
   let consequenceSev = $state('');
   let pinBouncing = $state(false);
   let sessionPack = $state(null);
   let resultAnim = $state(false);
+  let showStreakBadge = $state(false);
 
   function initStores() {
     unsubs.forEach(u => u());
@@ -91,15 +100,27 @@
     unsubs.push(session.pinBouncing.subscribe(v => pinBouncing = v));
     unsubs.push(session.sessionPack.subscribe(v => sessionPack = v));
     unsubs.push(session.resultAnim.subscribe(v => resultAnim = v));
+    unsubs.push(session.showStreakBadge.subscribe(v => showStreakBadge = v));
     if (session.consequenceSev) unsubs.push(session.consequenceSev.subscribe(v => consequenceSev = v));
   }
 
   let gen = $derived(GENERATORS.find(g => g.id === activeGen) || GENERATORS[0]);
   let helpEntry = $derived(HELP_CONTENT[activeGen] || null);
 
+  // Templates for mobile gen-column empty state (#19)
+  const GEN_TEMPLATES = [
+    { id: 'tpl_opening',       icon: 'fa-clapperboard',     label: 'Opening Scene',  desc: 'Scene + 2 NPCs + Countdown' },
+    { id: 'tpl_investigation', icon: 'fa-magnifying-glass', label: 'Investigation',  desc: 'Scene + Faction + Complication' },
+    { id: 'tpl_climax',        icon: 'fa-fire',             label: 'Climax',         desc: 'Encounter + Contest + Boosts' },
+    { id: 'tpl_session_zero',  icon: 'fa-users',            label: 'Session Zero',   desc: 'Seed + Scene + NPC + Backstory' },
+  ];
+  function dropTemplate(tplId) {
+    if (boardRef && boardRef.dropTemplateFromParent) boardRef.dropTemplateFromParent(tplId);
+  }
+
   // ── Generator groups for sidebar ──────────────────────────────────────────
   const GENERATOR_GROUPS = [
-    { id: 'people', label: 'People', gens: ['npc_minor', 'npc_major', 'pc', 'backstory'] },
+    { id: 'people', label: 'People', gens: ['npc_minor', 'npc_major', 'pc', 'backstory', 'stunt'] },
     { id: 'scene', label: 'Scene', gens: ['scene', 'encounter', 'complication'] },
     { id: 'story', label: 'Story', gens: ['seed', 'campaign', 'faction'] },
     { id: 'mechanics', label: 'Mechanics', gens: ['compel', 'consequence', 'challenge', 'contest', 'obstacle', 'countdown', 'constraint'] },
@@ -122,6 +143,23 @@
     // GM mode
     try { gmMode = (LS.get('gm_mode') !== false); } catch (e) {}
     document.documentElement.setAttribute('data-gm-mode', gmMode ? 'on' : 'off');
+
+    // ── Onboarding (#8, #13, #10, #11, #17, #23) ───────────────────────
+    try {
+      helpLevel = LS.get('help_level') || 'new_fate';
+      visitCount = LS.incrementVisitCount(campId);
+      // First-visit welcome banner
+      if (visitCount === 1 && !LS.getIntroSeen(campId)) showWelcome = true;
+      // Ctrl+K coach mark on 3rd+ visit, with persistence (#11)
+      if (visitCount >= 3 && !LS.get('coach_cmd_dismissed')) showCoachCmd = true;
+      // Track if this is the first roll opportunity (visit 1 only) (#23)
+      if (visitCount === 1) isFirstRoll = true;
+      // Auto-upgrade help level after 5 visits (#17)
+      if (visitCount > 5 && helpLevel === 'new_fate') {
+        helpLevel = 'familiar';
+        LS.set('help_level', 'familiar');
+      }
+    } catch (e) {}
 
     // Keyboard shortcuts
     document.addEventListener('keydown', onKey);
@@ -155,7 +193,7 @@
       console.warn('[Ogma] sz seed read failed:', e);
     }
 
-    // Session Zero handoff — Send All to Table path
+    // Session Zero handoff — Send All to Table path (#20 retry logic)
     try {
       const szParams = new URLSearchParams(window.location.search);
       if (szParams.get('sz') === '1') {
@@ -164,14 +202,19 @@
           sessionStorage.removeItem('ogma_sz_handoff');
           const handoff = JSON.parse(handoffRaw);
           if (handoff.campId === campId && Array.isArray(handoff.cards) && handoff.cards.length) {
-            // Dispatch after board has mounted and canvasStore is ready
-            setTimeout(() => {
-              handoff.cards.forEach((c, i) => {
-                setTimeout(() => {
-                  if (boardRef) boardRef.sendToTable(c.genId, c.data);
-                }, i * 80); // stagger so cards land in a readable grid
-              });
-            }, 500);
+            // Wait for boardRef with retry instead of fixed timeout
+            function dispatchHandoff(attempts) {
+              if (boardRef) {
+                handoff.cards.forEach((c, i) => {
+                  setTimeout(() => {
+                    if (boardRef) boardRef.sendToTable(c.genId, c.data);
+                  }, i * 80);
+                });
+              } else if (attempts < 20) {
+                setTimeout(() => dispatchHandoff(attempts + 1), 100);
+              }
+            }
+            dispatchHandoff(0);
           }
         }
       }
@@ -197,7 +240,11 @@
   }
 
   // ── Actions ────────────────────────────────────────────────────────────────
-  function doGenerate() { if (session && !rolling) session.doGenerate(); }
+  function doGenerate() {
+    if (session && !rolling) {
+      session.doGenerate();
+    }
+  }
   function doInspire() { if (session && !rolling) session.doInspire(); }
 
   function selectGen(genId) {
@@ -208,6 +255,11 @@
   function toggleAcc(s) { sbAcc = sbAcc === s ? null : s; }
 
   function toggleTableFull() { tableFull = !tableFull; }
+  function dismissWelcome() {
+    showWelcome = false;
+    LS.setIntroSeen(campId, true);
+  }
+
   function sendToTable() {
     if (result && boardRef) boardRef.sendToTable(result.genId, result.data);
   }
@@ -229,6 +281,27 @@
 
 <div class="app-shell" data-gen={activeGen}>
   <a href="#main" class="skip-link">Skip to main content</a>
+
+  <!-- First-visit welcome banner (#13, #22 ARIA) -->
+  {#if showWelcome}
+    <div class="onb-banner" role="note">
+      <div class="onb-banner-body">
+        <strong>Welcome to Ogma!</strong> New to Fate?
+        <a href="/help/learn-fate" class="onb-banner-link">Learn Fate in 15 min</a>
+        or
+        <a href="/campaigns/sessionzero" class="onb-banner-link">Start the Session Zero Wizard</a>
+      </div>
+      <button class="onb-banner-close" onclick={dismissWelcome} aria-label="Dismiss welcome banner">&times;</button>
+    </div>
+  {/if}
+
+  <!-- Ctrl+K coach mark (#10, #11 persistence, #22 ARIA) -->
+  {#if showCoachCmd}
+    <div class="onb-coach" role="note">
+      <span>Pro tip: press <kbd>Ctrl+K</kbd> for quick commands</span>
+      <button class="onb-coach-close" onclick={() => { showCoachCmd = false; LS.set('coach_cmd_dismissed', true); }} aria-label="Dismiss">&times;</button>
+    </div>
+  {/if}
 
   <!-- Mobile slim bar -->
   <header class="sb-slim-bar">
@@ -265,23 +338,18 @@
       <div class="sb-acc" role="navigation" aria-label="Campaign navigation">
 
         <!-- TABLE section -->
-        <Collapsible.Root open={sbAcc === 'table'} onOpenChange={(o) => { sbAcc = o ? 'table' : null; }} class="sb-acc-sec">
-          <Collapsible.Trigger class="sb-acc-hdr{sbAcc === 'table' ? ' is-open' : ''}">
-            <span aria-hidden="true" class="sb-acc-sec-ico"><i class="fa-solid fa-table-cells"></i></span>
-            <span class="sb-acc-sec-name">Table</span>
-            <span aria-hidden="true" class="sb-acc-chev"><i class="fa-solid fa-chevron-right"></i></span>
-          </Collapsible.Trigger>
-          <Collapsible.Content class="sb-acc-body">
+        <div class="sb-acc-sec">
+          <div class="sb-acc-body">
             <button class="sb-acc-item" onclick={toggleTableFull} aria-pressed={String(tableFull)}>
               <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-solid {tableFull ? 'fa-compress' : 'fa-expand'}"></i></span>
-              <span class="sidebar-item-label">{tableFull ? 'Split view' : 'Full Table'}</span>
+              <span class="sidebar-item-label">{tableFull ? 'Split Table View' : 'Full Table View'}</span>
             </button>
-            <button class="sb-acc-item sb-mobile-only" onclick={() => { tableOpen = !tableOpen; showSidebar = false; }}>
+            <button class="sb-acc-item sb-mobile-only" onclick={() => { showSidebar = false; }}>
               <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-solid fa-mobile-screen"></i></span>
-              <span class="sidebar-item-label">Table on mobile</span>
+              <span class="sidebar-item-label">Mobile Table View</span>
             </button>
-          </Collapsible.Content>
-        </Collapsible.Root>
+          </div>
+        </div>
 
         <!-- GENERATE section -->
         <Collapsible.Root open={sbAcc === 'generate'} onOpenChange={(o) => { sbAcc = o ? 'generate' : null; }} class="sb-acc-sec">
@@ -289,7 +357,6 @@
             <span aria-hidden="true" class="sb-acc-sec-ico"><i class="fa-solid fa-dice-d20"></i></span>
             <span class="sb-acc-sec-name">Generate</span>
             <span aria-hidden="true" class="sb-acc-meta">{gen ? gen.label.split(' ').slice(0, 2).join(' ') : ''}</span>
-            <span aria-hidden="true" class="sb-acc-chev"><i class="fa-solid fa-chevron-right"></i></span>
           </Collapsible.Trigger>
           <Collapsible.Content class="sb-acc-body sb-acc-generate-body">
             {#each GENERATOR_GROUPS as group (group.id)}
@@ -302,7 +369,7 @@
                       onclick={() => selectGen(genId)}
                       aria-label={g.label}
                     >
-                      <span aria-hidden="true" class="sidebar-item-icon">{g.icon || ''}</span>
+                      <span aria-hidden="true" class="sidebar-item-icon">{#if g.icon}<i class="fa-solid {g.icon}"></i>{/if}</span>
                       <span class="sidebar-item-label">{g.label}</span>
                     </button>
                   {/if}
@@ -316,16 +383,15 @@
           <Collapsible.Trigger class="sb-acc-hdr sb-acc-hdr-settings{sbAcc === 'settings' ? ' is-open' : ''}">
             <span aria-hidden="true" class="sb-acc-sec-ico sb-acc-sec-ico-sm"><i class="fa-solid fa-gear"></i></span>
             <span class="sb-acc-sec-name sb-acc-sec-name-muted">Settings</span>
-            <span aria-hidden="true" class="sb-acc-chev"><i class="fa-solid fa-chevron-right"></i></span>
           </Collapsible.Trigger>
           <Collapsible.Content class="sb-acc-body">
             <button class="sb-acc-item" onclick={toggleTheme}>
-              <span aria-hidden="true" class="sidebar-item-icon">{theme === 'dark' ? '\u2600' : '\u25D1'}</span>
+              <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-solid {theme === 'dark' ? 'fa-sun' : 'fa-circle-half-stroke'}"></i></span>
               <span class="sidebar-item-label">{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
             </button>
             <a href="/help" class="sb-acc-item" style="text-decoration:none">
               <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-solid fa-book-open"></i></span>
-              <span class="sidebar-item-label">Help &amp; Wiki</span>
+              <span class="sidebar-item-label">Help</span>
             </a>
             <a href="/about" class="sb-acc-item" style="text-decoration:none">
               <span aria-hidden="true" class="sidebar-item-icon"><i class="fa-solid fa-circle-info"></i></span>
@@ -339,27 +405,6 @@
         </Collapsible.Root>
       </div>
 
-      <div style="height:8px;flex-shrink:0"></div>
-
-      <!-- Dock -->
-      <div class="sb-dock" role="toolbar" aria-label="Site navigation and status">
-        <a href="/help/learn-fate" class="sb-dock-btn" aria-label="Learn Fate">
-          <span aria-hidden="true" class="sb-dock-ico"><i class="fa-solid fa-book-open"></i></span>
-          <span class="sb-dock-lbl">Learn</span>
-        </a>
-        <a href="/help/reference" class="sb-dock-btn" target="_blank" rel="noopener" aria-label="Print reference card">
-          <span aria-hidden="true" class="sb-dock-ico"><i class="fa-solid fa-print"></i></span>
-          <span class="sb-dock-lbl">Ref</span>
-        </a>
-        <a href="/" class="sb-dock-btn" aria-label="All Worlds">
-          <span aria-hidden="true" class="sb-dock-ico"><i class="fa-solid fa-earth-americas"></i></span>
-          <span class="sb-dock-lbl">Worlds</span>
-        </a>
-        <div class="sb-dock-btn sb-dock-status" role="status" aria-live="polite" aria-label={isOnline ? 'Online' : 'Offline'} tabindex="-1">
-          <span aria-hidden="true" class="sb-status-dot" class:offline={!isOnline}></span>
-          <span class="sb-dock-lbl" style="color:{isOnline ? 'var(--c-green,#4CD964)' : 'var(--c-red,#E06060)'}">{isOnline ? 'Online' : 'Offline'}</span>
-        </div>
-      </div>
     </nav>
 
     <!-- Main content panel — split: generator | table -->
@@ -405,6 +450,9 @@
                         <span aria-hidden="true"><i class="fa-solid fa-dice-d20"></i></span> Roll {gen ? gen.label : ''}
                       {/if}
                     </span>
+                    {#if showStreakBadge}
+                      <span class="streak-badge" aria-live="polite" aria-label="On a roll!">🔥 On a roll!</span>
+                    {/if}
                   </button>
 
                   <!-- Secondary actions -->
@@ -444,6 +492,14 @@
 
                 <!-- Result display -->
                 {#if result}
+                  <!-- Guided first-roll annotations (#16) -->
+                  {#if isFirstRoll}
+                    <div class="onb-first-roll" role="status">
+                      <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                      Here's your first result! Scroll to read it, then click <strong>GM GUIDANCE</strong> at the bottom to learn how to use it at the table.
+                      <button class="onb-first-roll-dismiss" onclick={() => { isFirstRoll = false; }} aria-label="Dismiss annotation">Got it</button>
+                    </div>
+                  {/if}
                   <div class={resultAnim ? 'result-card-appear' : ''}>
                     {#if result.isSeedPack && result.pack}
                       <div class="seed-pack-header">
@@ -466,17 +522,20 @@
                       </div>
                     {:else}
                       <div style="padding:16px">
-                        <Cv4Card genId={result.genId} data={result.data} campName={campName} />
+                        <Cv4Card genId={result.genId} data={result.data} campName={campName} autoGuidance={isFirstRoll && helpLevel === 'new_fate'} />
                       </div>
                     {/if}
                   </div>
                 {:else}
                   <div class="rhp-empty-state">
-                    <div class="rhp-ready-icon" aria-hidden="true"><i class="fa-solid fa-dice-d20"></i></div>
+                    <button class="rhp-ready-icon-btn" onclick={() => session.doGenerate()} aria-label="Generate {gen ? gen.label : 'result'}">
+                      <div class="rhp-ready-icon" aria-hidden="true"><i class="fa-solid {gen ? gen.icon : 'fa-dice-d20'}"></i></div>
+                    </button>
                     <div class="rhp-ready-title">Ready to generate</div>
                     <div class="rhp-ready-sub">
                       Click <strong>Roll</strong> or press <strong>Space</strong>
                       to generate a {gen ? gen.label : 'result'}.
+                      <span class="rhp-ready-cmdk"><kbd>Ctrl+K</kbd> for quick commands</span>
                     </div>
 
                     {#if helpEntry}
@@ -522,8 +581,38 @@
                           </div>
                         {/if}
 
+                        {#if helpEntry.related && helpEntry.related.length}
+                          <div class="rhp-block rhp-block--related">
+                            <div class="rhp-block-label"><i class="fa-solid fa-link" aria-hidden="true" style="font-size:10px; margin-right:4px"></i>Related generators</div>
+                            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px">
+                              {#each helpEntry.related as relId}
+                                {@const relGen = GENERATORS.find(x => x.id === relId)}
+                                {#if relGen}
+                                  <button class="rhp-related-btn" onclick={() => selectGen(relId)} aria-label="Switch to {relGen.label}">
+                                    <i class="fa-solid {relGen.icon}" aria-hidden="true" style="font-size:10px"></i> {relGen.label}
+                                  </button>
+                                {/if}
+                              {/each}
+                            </div>
+                          </div>
+                        {/if}
+
                       </div>
                     {/if}
+
+                    <!-- Mobile template grid (#19) -->
+                    <div class="cp-gen-templates">
+                      <div class="cv-empty-tpl-label">Or drop a template on the table:</div>
+                      <div class="cv-empty-tpl-grid">
+                        {#each GEN_TEMPLATES as tpl (tpl.id)}
+                          <button class="cv-empty-tpl-btn" onclick={() => dropTemplate(tpl.id)} aria-label="Drop {tpl.label} template">
+                            <i class="fa-solid {tpl.icon}" aria-hidden="true"></i>
+                            <span class="cv-empty-tpl-name">{tpl.label}</span>
+                            <span class="cv-empty-tpl-desc">{tpl.desc}</span>
+                          </button>
+                        {/each}
+                      </div>
+                    </div>
                   </div>
                 {/if}
               </div>
@@ -531,11 +620,21 @@
 
           </div>
         </main>
+
+        <!-- Mobile table fan — replaces FAB + bottom sheet on ≤640px -->
+        <MobileTableFan
+          cards={boardCardsList}
+          campName={campName}
+          campId={campId}
+          onCardDelete={(id) => boardRef?.deleteCard(id)}
+          onCardReroll={(id) => boardRef?.rerollCard(id)}
+        />
       </div>
 
       <!-- Drag divider -->
       <div
         class="cp-divider"
+        class:cp-divider-active={draggingDivider}
         aria-hidden="true"
         onpointerdown={onDividerPointerDown}
         onpointermove={onDividerPointerMove}
@@ -543,37 +642,18 @@
         onpointercancel={onDividerPointerUp}
       ></div>
 
-      <!-- Table column — Board embedded -->
+      <!-- Table column — Board embedded (single instance for both desktop & mobile) -->
       <div class="cp-table-col">
         <Board
           bind:this={boardRef}
           {campId}
           embedded={true}
+          onCardsChange={(c) => { boardCardsList = c; }}
         />
       </div>
 
-      <!-- Mobile Table bottom-sheet -->
-      {#if tableOpen}
-        <div class="cp-mobile-sheet-backdrop" onclick={() => { tableOpen = false; }} aria-hidden="true"></div>
-        <div class="cp-mobile-sheet" role="dialog" aria-label="Table">
-          <div class="cp-mobile-sheet-hdr">
-            <span class="cp-mobile-sheet-title"><i class="fa-solid fa-table-cells" aria-hidden="true"></i> Table</span>
-            <button class="cp-mobile-sheet-close" onclick={() => { tableOpen = false; }} aria-label="Close Table">&times;</button>
-          </div>
-          <div class="cp-mobile-sheet-body">
-            <!-- Board also mounts here on mobile — shares same IDB key so same cards -->
-            <Board {campId} embedded={true} />
-          </div>
-        </div>
-      {/if}
-
     </div>
   </div>
-
-  <!-- Mobile Table FAB -->
-  <button class="cp-table-fab" onclick={() => { tableOpen = !tableOpen; }} aria-label="Open Table" title="Open Table">
-    <i class="fa-solid fa-table-cells" aria-hidden="true"></i>
-  </button>
 
   <!-- Toast -->
   {#if toast}

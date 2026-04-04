@@ -1,4 +1,6 @@
 <script>
+  import { Checkbox } from 'bits-ui';
+  import OgmaTooltip from '../../shared/OgmaTooltip.svelte';
   let { data = {}, campName = '', catColor = 'var(--fs-section)', cardState = {}, onUpdate = () => {} } = $props();
 
   const LADDER = {8:"Legendary",7:"Epic",6:"Fantastic",5:"Superb",4:"Great",3:"Good",2:"Fair",1:"Average",0:"Mediocre"};
@@ -58,17 +60,17 @@
       {/if}
       {#if o.stunt}<div style="font-size:11px; color:var(--fs-section); margin-top:2px"><i class="fa-solid fa-star" aria-hidden="true" style="font-size:8px"></i> {o.stunt}</div>{/if}
       <!-- Interactive stress boxes -->
-      <div style="display:flex; gap:4px; margin-top:6px" role="group" aria-label="{o.name} stress track">
+      <div class="fs-stress-boxes" style="margin-top:6px" role="group" aria-label="{o.name} stress track">
         {#each Array.from({length: stressCount}) as _, i}
           {@const hit = isHit(o.name, i)}
-          <button
-            onclick={(e) => { e.stopPropagation(); toggleHit(o.name, i); }}
+          <Checkbox.Root
+            checked={hit}
+            onCheckedChange={() => toggleHit(o.name, i)}
             aria-label="Stress box {i+1}{hit ? ' (hit)' : ' (clear)'}"
-            aria-pressed={String(hit)}
-            style="width:16px; height:16px; border:1.5px solid var(--fs-stress-phy); border-radius:2px; background:{hit ? 'var(--fs-stress-phy)' : 'transparent'}; cursor:pointer; padding:0; display:flex; align-items:center; justify-content:center; transition:all 0.1s; flex-shrink:0"
+            style="border-color:var(--fs-stress-phy); background:{hit ? 'var(--fs-stress-phy)' : 'transparent'}; color:{hit ? '#fff' : 'var(--fs-stress-phy)'};"
           >
-            {#if hit}<i class="fa-solid fa-xmark" aria-hidden="true" style="font-size:8px; color:#fff"></i>{/if}
-          </button>
+            {#if hit}<i class="fa-solid fa-xmark" aria-hidden="true"></i>{/if}
+          </Checkbox.Root>
         {/each}
       </div>
     </div>
@@ -78,11 +80,15 @@
 <!-- Win / Lose -->
 <div style="display:flex; gap:8px; margin-bottom:14px">
   <div class="fs-stunt" style="flex:1; border-left:3px solid #2e7d32; border-radius:0 3px 3px 0">
-    <div class="fs-stunt-name" style="color:#2e7d32">WIN</div>
+    <OgmaTooltip tip="Declare before the first roll. What the PCs achieve on victory.">
+      <div class="fs-stunt-name" style="color:#2e7d32">WIN</div>
+    </OgmaTooltip>
     <div class="fs-stunt-desc">{data.victory || ''}</div>
   </div>
   <div class="fs-stunt" style="flex:1; border-left:3px solid #c62828; border-radius:0 3px 3px 0">
-    <div class="fs-stunt-name" style="color:#c62828">LOSE</div>
+    <OgmaTooltip tip="Declare before the first roll. What happens if the PCs are defeated or concede.">
+      <div class="fs-stunt-name" style="color:#c62828">LOSE</div>
+    </OgmaTooltip>
     <div class="fs-stunt-desc">{data.defeat || ''}</div>
   </div>
 </div>
@@ -106,7 +112,9 @@
   </div>
   {#if data.gm_fate_points}
     <div style="text-align:center; flex-shrink:0; width:60px">
-      <div class="fs-section-hdr">GM FP</div>
+      <OgmaTooltip tip="GM fate points: 1 per PC. Spend to invoke scene aspects against PCs or activate NPC stunts.">
+        <div class="fs-section-hdr">GM FP</div>
+      </OgmaTooltip>
       <div style="font-size:28px; font-weight:800; color:var(--fs-text); line-height:1">{data.gm_fate_points}</div>
     </div>
   {/if}

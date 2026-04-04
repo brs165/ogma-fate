@@ -9,8 +9,20 @@
     <h1>Online multiplayer with Ogma</h1>
     <p class="wiki-page-desc">Ogma supports real-time remote play. The GM runs the session normally — generating cards, tracking stress, rolling dice — and players follow along on their own devices. No accounts, no installs, no subscription. Just a room code.</p>
 
+    <nav class="wiki-toc" aria-label="On this page">
+      <div class="wiki-toc-title">On this page</div>
+      <a href="#how-it-works">How it works</a>
+      <a href="#quick-start">Quick start</a>
+      <a href="#deploy-server">Deploy your own server</a>
+      <a href="#host-a-session">Hosting a session</a>
+      <a href="#join-a-session">Joining a session</a>
+      <a href="#player-controls">Player controls</a>
+      <a href="#custom-server">Custom sync server</a>
+      <a href="#troubleshooting">Troubleshooting</a>
+    </nav>
+
     <h2 id="how-it-works">How it works</h2>
-    <p>Ogma uses a small relay server hosted on Cloudflare to pass state between browsers. The GM's browser is always the source of truth. The relay just forwards the GM's state to players and forwards player actions (FP changes, stress boxes) back to the GM.</p>
+    <p>A Cloudflare relay passes state between browsers. The GM's browser is the source of truth. The relay forwards GM state to players and player actions (FP, stress) back to the GM.</p>
     <ul>
       <li><strong>Offline play is unchanged.</strong> If you never click Host, nothing is different from before.</li>
       <li><strong>GM-only cards stay private.</strong> Cards marked GM are never sent over the wire — only the GM sees them.</li>
@@ -39,7 +51,7 @@
     </div>
 
     <h2 id="deploy-server">Deploying your own sync server</h2>
-    <p>Ogma's shared server handles casual play. If you run regular campaigns, host events, or want full privacy, deploying your own takes about five minutes and is free.</p>
+    <p>Ogma's shared server covers casual play. For regular campaigns or full privacy, deploy your own — free, five minutes.</p>
 
     <h3>What you need</h3>
     <ul>
@@ -60,6 +72,7 @@ git push -u origin main</code></pre>
     <h3>Step 2 — Add two secrets to your GitHub repo</h3>
     <p>Go to your <code>ogma-sync</code> repo &rarr; <strong>Settings &rarr; Secrets and variables &rarr; Actions &rarr; New repository secret</strong> and add both of these:</p>
 
+    <div class="wiki-table-wrap">
     <table class="wiki-table">
       <thead>
         <tr>
@@ -78,6 +91,7 @@ git push -u origin main</code></pre>
         </tr>
       </tbody>
     </table>
+    </div>
 
     <div class="callout callout-warning">
       <div class="callout-title"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Two secrets are required</div>
@@ -108,7 +122,7 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: $&#123;&#123; secrets.CLOUDFLARE_API_TOKEN &#125;&#125;
           CLOUDFLARE_ACCOUNT_ID: $&#123;&#123; secrets.CLOUDFLARE_ACCOUNT_ID &#125;&#125;</code></pre>
-    <p>It's already committed in the repo — just push and it runs. As soon as you push to <code>main</code> it runs automatically — no configuration needed. It takes about 30 seconds. When it finishes, look for this line in the Actions log:</p>
+    <p>Push to <code>main</code> and it runs automatically — about 30 seconds. When it finishes, look for this line in the Actions log:</p>
     <pre><code>https://ogma-sync.&lt;your-subdomain&gt;.workers.dev</code></pre>
     <p>That's your sync server URL — copy it, you'll need it in Step 4. You can also trigger the deploy manually any time: Actions tab &rarr; <strong>Deploy to Cloudflare Workers</strong> &rarr; <strong>Run workflow</strong>.</p>
 
@@ -126,19 +140,11 @@ jobs:
     <p>In the Table toolbar, click the small <strong><i class="fa-solid fa-gear" aria-hidden="true"></i></strong> button (visible when not connected, next to the Join button). Paste your worker URL. Ogma saves it to your browser preferences — you only need to do this once per device.</p>
 
     <h2 id="host-a-session">Hosting a session</h2>
-    <p>Open any campaign's <strong>Table</strong> canvas. Click <strong><i class="fa-solid fa-globe" aria-hidden="true"></i> Host</strong> in the toolbar. Ogma generates a 4-character room code and connects to the sync server. A green pill appears in the toolbar showing the code and how many players are online.</p>
-    <p>Click the <i class="fa-solid fa-clipboard" aria-hidden="true"></i> icon inside the pill to copy a full join link. Share it anywhere — Discord, iMessage, email. Players who open it go directly to the join screen.</p>
-    <p>The toolbar also shows a live count of connected players. When a player joins you'll see the number tick up — no separate notification needed.</p>
-    <p>Click <strong>Stop</strong> in the pill to end the session. Players see a "GM disconnected" toast. If you accidentally close the tab, reopen it, click Host with the same room code (if you remember it) and everyone reconnects. Card state is saved locally in your browser's IndexedDB regardless of connectivity.</p>
+    <p>Open any campaign's <strong>Table</strong> canvas and click <strong><i class="fa-solid fa-globe" aria-hidden="true"></i> Host</strong>. Ogma generates a 4-character room code. A green pill shows the code and live player count. Click <i class="fa-solid fa-clipboard" aria-hidden="true"></i> inside the pill to copy the join link — share it anywhere.</p>
+    <p>Click <strong>Stop</strong> to end the session. Players see a "GM disconnected" toast. If you close the tab by accident, reopen it, click Host again, and everyone reconnects. Card state is saved locally regardless of connectivity.</p>
 
     <h2 id="join-a-session">Joining a session</h2>
-    <p>Open the join link your GM shared. You'll see:</p>
-    <blockquote>
-      <strong><i class="fa-solid fa-globe" aria-hidden="true"></i> Joining Room 7K3F</strong><br>
-      You've been invited to a live Ogma session. Enter your name to join as a player.
-    </blockquote>
-    <p>Type your name and click <strong>Join Session</strong>. If your name matches a character already on the GM's board, you're auto-claimed as that character. Otherwise you join as a spectator and can click <strong>This is me</strong> next to any character to claim it.</p>
-    <p>You can also click <strong>Watch only</strong> to join without a character — useful for a co-GM or someone observing.</p>
+    <p>Open the link your GM shared. Enter your name and click <strong>Join Session</strong>. If your name matches a character on the board, you're auto-claimed. Otherwise click <strong>This is me</strong> next to any character. Click <strong>Watch only</strong> to observe without claiming a character.</p>
 
     <h2 id="player-controls">What players can control</h2>
     <p>Once you've claimed a character you can:</p>
@@ -153,12 +159,12 @@ jobs:
 
     <div class="callout callout-dnd">
       <div class="callout-title">&#9876; Coming from D&amp;D VTTs</div>
-      <p>Ogma's multiplayer is deliberately lighter than Foundry or Roll20. There's no shared map, no token movement, and no dice rolling by default (players roll their own physical dice or use the Dice tab). Ogma's job is scene management and content generation, not combat simulation. Use it alongside your preferred voice/video tool.</p>
+      <p>Ogma is lighter than Foundry or Roll20 — no shared map, no token movement. It handles scene management and content generation. Use it alongside your preferred voice/video tool.</p>
     </div>
 
     <h2 id="custom-server">Custom sync server</h2>
-    <p>The sync server is open source at <code>github.com/brs165/ogma-sync</code>. Anyone can deploy their own instance for free using Cloudflare's free tier (100,000 WebSocket message-days per month — enough for roughly 125 four-hour sessions). The <strong>Deploy to Cloudflare</strong> button in the repo README does the whole setup in one click if you prefer not to use the command line.</p>
-    <p>To point your Ogma installation at a custom server, click <i class="fa-solid fa-gear" aria-hidden="true"></i> in the toolbar (visible when not connected) and enter the server URL. This is saved in your browser and used for all future sessions on that device.</p>
+    <p>The sync server is open source at <code>github.com/brs165/ogma-sync</code>. Cloudflare's free tier covers roughly 125 four-hour sessions per month. The <strong>Deploy to Cloudflare</strong> button in the README sets it up in one click.</p>
+    <p>To point Ogma at a custom server, click <i class="fa-solid fa-gear" aria-hidden="true"></i> in the toolbar (visible when not connected) and enter the URL. Saved to your browser — set once per device.</p>
 
     <h2 id="troubleshooting">Troubleshooting</h2>
 
@@ -176,4 +182,19 @@ jobs:
 
     <h3>The room code expired</h3>
     <p>Room codes are only active while the GM has the Table canvas open and is connected. If you close the tab or click Stop, the room ends. Start a new session with a new code — card state is saved locally in your browser and reloads automatically when you reopen the Table canvas.</p>
+
+    <div class="wiki-footer">
+      <div>
+        <a href="/help">Help Home</a> &nbsp;·&nbsp;
+        <a href="/">Open Ogma</a> &nbsp;·&nbsp;
+        <a href="/about">About</a> &nbsp;·&nbsp;
+        <a href="/license">Full Attribution</a> &nbsp;·&nbsp;
+        <a href="https://fate-srd.com/" target="_blank" rel="noreferrer">fate-srd.com</a>
+      </div>
+      <div class="wiki-footer-meta">
+        Fate&#8482; is a trademark of Evil Hat Productions, LLC &nbsp;·&nbsp;
+        D&amp;D&#174; is a trademark of Wizards of the Coast LLC &nbsp;·&nbsp;
+        Released under <a href="/license">CC BY 3.0</a>
+      </div>
+    </div>
 </main>

@@ -2,7 +2,7 @@
   import ExportMenu from './ExportMenu.svelte';
   import { Select, DropdownMenu } from 'bits-ui';
 
-  let { campMeta = {}, campId = '', onCampChange = () => {}, isOnline = true, panels = {}, exportActions = {}, cards = [], campName = '', onExportCanvas = () => {}, onImportCanvas = () => {}, onExportView = null, onClose = null } = $props();
+  let { campMeta = {}, campId = '', onCampChange = () => {}, isOnline = true, panels = {}, exportActions = {}, cards = [], campName = '', onExportCanvas = () => {}, onImportCanvas = () => {}, onExportView = null, onExportModal = null, onClose = null } = $props();
 
   let leftOpen      = $derived(panels.leftOpen);
   let onToggleLeft  = $derived(panels.onToggleLeft || (() => {}));
@@ -17,9 +17,9 @@
     ? Object.keys(globalThis.CAMPAIGNS).map(id => ({
         id,
         name: ((globalThis.CAMPAIGNS[id] || {}).meta || {}).name || id,
-        icon: ((globalThis.CAMPAIGNS[id] || {}).meta || {}).icon || '◈',
+        icon: ((globalThis.CAMPAIGNS[id] || {}).meta || {}).icon || 'fa-dice-d20',
       }))
-    : [{ id: campId, name: (campMeta && campMeta.name) || campId, icon: campMeta?.icon || '◈' }]);
+    : [{ id: campId, name: (campMeta && campMeta.name) || campId, icon: campMeta?.icon || 'fa-dice-d20' }]);
   let selectedWorld = $derived(worlds.find(w => w.id === campId) || worlds[0]);
 
   function toggleA11yPatterns() {
@@ -45,7 +45,7 @@
       onValueChange={(v) => { if (v && v !== campId) onCampChange(v); }}
     >
       <Select.Trigger class="bt-world-trigger" aria-label="Switch world">
-        <span class="bt-world-icon" aria-hidden="true">{selectedWorld?.icon || '◈'}</span>
+        <span class="bt-world-icon" aria-hidden="true"><i class="fa-solid {selectedWorld?.icon || 'fa-dice-d20'}"></i></span>
         <span class="bt-world-name">{selectedWorld?.name || campId}</span>
         <span class="bt-world-chevron" aria-hidden="true">›</span>
       </Select.Trigger>
@@ -54,8 +54,8 @@
           <Select.Viewport class="bt-world-viewport">
             {#each worlds as w (w.id)}
               <Select.Item value={w.id} label={w.name} class="bt-world-item" aria-label={w.name}>
-                <span class="bt-world-item-icon" aria-hidden="true">{w.icon}</span>
-                <Select.ItemText class="bt-world-item-name">{w.name}</Select.ItemText>
+                <span class="bt-world-item-icon" aria-hidden="true"><i class="fa-solid {w.icon}"></i></span>
+                <span class="bt-world-item-name">{w.name}</span>
                 {#if w.id === campId}
                   <span class="bt-world-item-check" aria-hidden="true">✓</span>
                 {/if}
@@ -101,7 +101,7 @@
     ><i class="fa-solid fa-bullseye" aria-hidden="true"></i></button>
 
     <!-- Export menu -->
-    <ExportMenu {cards} {campName} {onExportCanvas} {onImportCanvas} onPrint={() => window.open('/help/reference?print=1', '_blank')} />
+    <ExportMenu {cards} {campName} {onExportCanvas} {onImportCanvas} {onExportModal} onPrint={() => window.open('/help/reference?print=1', '_blank')} />
 
     <!-- Overflow -->
     <DropdownMenu.Root>

@@ -1,4 +1,5 @@
 <script>
+  import OgmaTooltip from '../../shared/OgmaTooltip.svelte';
   let { data = {}, campName = '', catColor = 'var(--fs-section)' } = $props();
 
   const TC = { block: '#1565c0', hazard: '#c62828', distraction: '#b8860b' };
@@ -64,7 +65,9 @@
   </div>
 
   <div style="width:100px; flex-shrink:0; text-align:center">
-    <div style="font-size:11px; font-weight:800; letter-spacing:0.12em; color:{col}; text-transform:uppercase; margin-bottom:8px">{type_}</div>
+    <OgmaTooltip tip={type_ === 'block' ? 'Block: prevents an action or movement. Overcome at rating to get past.' : type_ === 'hazard' ? 'Hazard: deals stress on contact or failure. Has a Weapon rating.' : 'Distraction: forces a choice between two bad options.'}>
+      <div style="font-size:11px; font-weight:800; letter-spacing:0.12em; color:{col}; text-transform:uppercase; margin-bottom:8px">{type_}</div>
+    </OgmaTooltip>
     {#if rating != null}
       <div style="width:60px; height:60px; border-radius:50%; border:3px solid {col}; margin:0 auto; display:flex; align-items:center; justify-content:center; flex-direction:column; background:rgba(0,0,0,0.03)">
         <div style="font-size:22px; font-weight:900; color:{col}; line-height:1">{rating}</div>
@@ -73,8 +76,10 @@
     {/if}
     {#if data.weapon}
       <div style="margin-top:10px">
-        <div style="font-size:10px; color:var(--fs-text-muted); letter-spacing:0.1em">WEAPON</div>
-        <div style="font-size:20px; font-weight:800; color:#c62828">{data.weapon}</div>
+        <OgmaTooltip tip="Adds bonus shifts when the hazard hits. Weapon:2 means +2 shifts on top of the attack result.">
+          <div style="font-size:10px; color:var(--fs-text-muted); letter-spacing:0.1em">WEAPON</div>
+          <div style="font-size:20px; font-weight:800; color:#c62828">{data.weapon}</div>
+        </OgmaTooltip>
       </div>
     {/if}
   </div>

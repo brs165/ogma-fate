@@ -5,9 +5,9 @@
 
 <main class="wiki-content" id="main-content">
 
-    <div class="wiki-page-eyebrow">New to Ogma?</div>
+    <div class="wiki-page-eyebrow">New to Ogma</div>
     <h1>Start here — pick your path</h1>
-    <p class="wiki-page-desc">Ogma is a Fate Condensed generator suite. Before diving into the tool, pick the guide that matches where you're coming from. Five minutes of reading will save hours of confusion at the table.</p>
+    <p class="wiki-page-desc">Pick the guide that matches where you're coming from before using Ogma.</p>
 
     <div class="callout callout-tip">
       <div class="callout-title"><i class="fa-solid fa-caret-down" aria-hidden="true"></i> Already know Fate? Skip to the tool.</div>
@@ -16,23 +16,23 @@
 
     <h2>Choose your background</h2>
 
-    <div class="gen-grid" style="grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px">
-      <a href="#new-ttrpg" style="text-decoration:none" class="gen-card">
+    <div class="gen-grid gen-grid--2col">
+      <a href="#new-ttrpg" class="gen-card">
         <div class="gen-card-icon"><i class="fa-solid fa-seedling" aria-hidden="true"></i></div>
         <div class="gen-card-name">I've never played a TTRPG</div>
         <div class="gen-card-desc">Start from zero. What the game is, what dice do, what a GM does. No jargon.</div>
       </a>
-      <a href="#from-dnd" style="text-decoration:none" class="gen-card">
+      <a href="#from-dnd" class="gen-card">
         <div class="gen-card-icon"><i class="fa-solid fa-burst" aria-hidden="true"></i></div>
         <div class="gen-card-name">I play D&amp;D (4e, 5e, or similar)</div>
         <div class="gen-card-desc">You know TTRPGs. The three things D&amp;D taught you that will actively mislead you in Fate.</div>
       </a>
-      <a href="#from-other" style="text-decoration:none" class="gen-card">
+      <a href="#from-other" class="gen-card">
         <div class="gen-card-icon"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i></div>
         <div class="gen-card-name">I play other RPGs</div>
         <div class="gen-card-desc">PbtA, Savage Worlds, CoC, Blades — what Fate does differently and why it matters.</div>
       </a>
-      <a href="#run-better" style="text-decoration:none" class="gen-card">
+      <a href="#run-better" class="gen-card">
         <div class="gen-card-icon"><i class="fa-solid fa-masks-theater" aria-hidden="true"></i></div>
         <div class="gen-card-name">I know Fate — help me GM better</div>
         <div class="gen-card-desc">Scene framing, the compel rhythm, fail forward, Create Advantage cascades.</div>
@@ -41,12 +41,10 @@
 
     <h2 id="new-ttrpg"><i class="fa-solid fa-seedling" aria-hidden="true"></i> I've never played a TTRPG</h2>
 
-    <p>Imagine four people around a table. One of them — the <strong>Game Master (GM)</strong> — describes a world: a rain-soaked town, a locked door, a nervous stranger. The other three describe characters who live in that world. When something uncertain happens ("I try to pick the lock"), you roll dice. The dice don't tell you what happens — they tell you <em>how well it goes</em>. Everything else is a conversation.</p>
-
-    <p>That's a tabletop RPG. No board. No winning. Just collaborative storytelling with dice to keep it honest.</p>
+    <p>One person — the <strong>Game Master (GM)</strong> — describes a world. The others describe characters who live in it. When something uncertain happens ("I pick the lock"), you roll dice. The dice don't tell you what happens — they tell you <em>how well it goes</em>. No board. No winning. Just collaborative storytelling with dice.</p>
 
     <h3>What is Fate Condensed?</h3>
-    <p>Fate is one of many RPG systems. What makes Fate special: it cares more about <strong>who your character is</strong> than what they can do. Your character is described by short phrases called <strong>aspects</strong> — like <em>"Retired Detective Who Can't Stop Noticing Things"</em>. Those phrases are always true in the story, and they're also the engine that drives the game.</p>
+    <p>Fate cares about <strong>who your character is</strong>, not what they can do. Characters are described by short phrases called <strong>aspects</strong> — like <em>"Retired Detective Who Can't Stop Noticing Things."</em> Those phrases are always true and drive the game.</p>
 
     <h3>What you need to start</h3>
     <ul>
@@ -71,7 +69,7 @@
 
     <h2 id="from-dnd">&#9876; I play D&amp;D</h2>
 
-    <p>You already know what a TTRPG is. You understand skills, dice, and turn-based conflict. That foundation transfers. But Fate Condensed is a <em>fundamentally different kind of game</em>, and the habits that make you a good D&amp;D player will actively mislead you here. The shift isn't mechanical — it's philosophical.</p>
+    <p>Your TTRPG foundation transfers. But D&D habits will actively mislead you in Fate. The shift isn't mechanical — it's philosophical.</p>
 
     <h3>The three things that trip up D&amp;D players most</h3>
 
@@ -83,7 +81,7 @@
 
     <div class="callout callout-info">
       <div class="callout-title"><i class="fa-solid fa-book-open" aria-hidden="true"></i> The full transition guide</div>
-      <p>We have a comprehensive section-by-section guide covering every major D&amp;D &#8594; Fate difference: aspects vs ability scores, stress vs HP, fate points vs inspiration, popcorn initiative, Create Advantage, the three scene types, and an 8-question FAQ. <a href="/help/dnd-transition"><strong>Read the D&amp;D Transition Guide &#8594;</strong></a></p>
+      <p>Section-by-section: aspects vs ability scores, stress vs HP, fate points vs inspiration, popcorn initiative, Create Advantage, and an 8-question FAQ. <a href="/help/dnd-transition"><strong>D&amp;D Transition Guide &#8594;</strong></a></p>
     </div>
 
     <h2 id="from-other"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> I play other RPGs</h2>
@@ -108,19 +106,19 @@
 
     <h2 id="run-better"><i class="fa-solid fa-masks-theater" aria-hidden="true"></i> Help me run Fate better</h2>
 
-    <p>You understand the rules. You've read the book. Now you need to make it <em>work at the table</em>.</p>
+    <p>You know the rules. Now make them work at the table. <a href="https://fate-srd.com/fate-condensed/being-the-game-master" target="_blank" rel="noreferrer" class="srd-link">Fate SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></p>
 
-    <p><strong>Scene framing.</strong> Every scene needs a question. "Can the party get past the guards?" "Will the informant trust them?" If you can't state it in one sentence, the scene isn't focused enough. When the question is answered — the scene is over. Cut immediately.</p>
+    <p><strong>Scene framing.</strong> Every scene needs one question. "Can the party get past the guards?" When the question is answered, cut.</p>
 
-    <p><strong>Setting difficulty.</strong> Don't look up a chart. Ask: is this hard for this character? If it's routine, don't roll. If it's tough, set opposition at or slightly above their skill. The adjective ladder is a calibration tool, not a lookup table.</p>
+    <p><strong>Setting difficulty.</strong> Ask: is this hard for this character? Routine = don't roll. Tough = set opposition at or above their skill.</p>
 
-    <p><strong>The compel rhythm.</strong> If the story feels flat, you're not compelling enough. Every PC's Trouble should trigger at least once per session. If you're not handing out fate points, the players can't spend them, and the whole economy stalls. Compels are the accelerator pedal.</p>
+    <p><strong>The compel rhythm.</strong> Story feels flat? You're not compelling enough. Every PC's Trouble should fire at least once per session. Compels are the accelerator pedal.</p>
 
-    <p><strong>Fail forward, always.</strong> "Nothing happens" is never the result of a failed roll. Success at a cost is your best friend. "You pick the lock, but the alarm was on a separate circuit." Every failure changes the situation.</p>
+    <p><strong>Fail forward.</strong> "Nothing happens" is never a result. "You pick the lock, but the alarm was on a separate circuit." Every failure changes the situation.</p>
 
-    <p><strong>The Create Advantage cascade.</strong> The first time a player stacks three free invokes and drops a +10 hit, they'll never attack-every-round again. Don't explain it — engineer the first encounter so it happens naturally. Give them an enemy who's clearly too strong to hit directly.</p>
+    <p><strong>The Create Advantage cascade.</strong> Engineer the first encounter so stacking free invokes happens naturally. Give them an enemy too strong to hit directly. They'll figure it out.</p>
 
-    <p><strong>NPC shorthand.</strong> Minor NPCs: one aspect, one skill, 0–2 stress. Major NPCs: full aspects, skill pyramid, consequences. Spend prep time on majors and let Ogma handle the minors.</p>
+    <p><strong>NPC shorthand.</strong> Minor NPCs: one aspect, one skill, 0–2 stress. Major NPCs: full sheet. Let Ogma generate minors.</p>
 
     <h3>GM reference pages</h3>
     <ul>
@@ -130,6 +128,7 @@
     </ul>
 
     <h2>Quick reference — adjective ladder + stress</h2>
+    <div class="wiki-table-wrap">
     <table class="wiki-table">
       <thead><tr><th>Rating</th><th>Label</th><th>Stress model (FCon)</th></tr></thead>
       <tbody>
@@ -144,4 +143,20 @@
         <tr><td>+0</td><td>Mediocre</td></tr>
       </tbody>
     </table>
+    </div>
+
+    <div class="wiki-footer">
+      <div>
+        <a href="/help">Help Home</a> &nbsp;·&nbsp;
+        <a href="/">Open Ogma</a> &nbsp;·&nbsp;
+        <a href="/about">About</a> &nbsp;·&nbsp;
+        <a href="/license">Full Attribution</a> &nbsp;·&nbsp;
+        <a href="https://fate-srd.com/" target="_blank" rel="noreferrer">fate-srd.com</a>
+      </div>
+      <div class="wiki-footer-meta">
+        Fate&#8482; is a trademark of Evil Hat Productions, LLC &nbsp;·&nbsp;
+        D&amp;D&#174; is a trademark of Wizards of the Coast LLC &nbsp;·&nbsp;
+        Released under <a href="/license">CC BY 3.0</a>
+      </div>
+    </div>
 </main>

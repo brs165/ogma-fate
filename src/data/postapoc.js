@@ -6,7 +6,7 @@ export const CAMPAIGNS = { postapoc: {
     meta: {
       id: "postapoc", name: "The Long Road",
       tagline: "Scavenger World. The beautiful apocalypse - nature reclaims the ruins while the living pick through the lethal artifacts of everything that came before.",
-      icon: "◻", font: "'Inter', sans-serif",
+      icon: "fa-biohazard", font: "'Inter', sans-serif",
     },
     colors: {
       bg:"#090807", panel:"#100e0c", border:"#2a2018",

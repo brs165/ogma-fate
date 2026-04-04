@@ -9,9 +9,18 @@
     <h1>How to use Ogma</h1>
     <p class="wiki-page-desc">Three paths depending on what you need right now. Each takes about 2 minutes to read.</p>
 
+    <details class="learn-quickstart" open>
+      <summary class="learn-quickstart-toggle">Quick Start — 3 paths</summary>
+      <ol class="learn-quickstart-list">
+        <li><strong>Prep a session</strong> — use the Session Zero Wizard or roll generators directly.</li>
+        <li><strong>Run at the table</strong> — roll NPCs, compels, and complications mid-session. Press Space.</li>
+        <li><strong>Learn the rules</strong> — read "Learn Fate in 7 Steps" for the complete Fate Condensed walkthrough.</li>
+      </ol>
+    </details>
+
     <div id="prep" class="callout">
       <div class="callout-title"><i class="fa-solid fa-scroll" aria-hidden="true"></i> Path 1: Use Ogma to prep a session</div>
-      <p>You're a GM getting ready for game night. You want material you can use at the table.</p>
+      <p>You're prepping for game night and need material you can use at the table.</p>
       <ol>
         <li><strong>Pick a campaign world</strong> — choose one of the 8 worlds from the landing page, or use any world's generators for setting-agnostic content.</li>
         <li><strong>Pick a generator</strong> — the sidebar groups all 16 generators by category: NPCs, Scenes, Campaign, Encounters, and Toolbox. Start with whatever you need most.</li>
@@ -23,7 +32,7 @@
 
     <div id="gm-table" class="callout">
       <div class="callout-title"><i class="fa-solid fa-headphones" aria-hidden="true"></i> Path 2: Use Ogma as a GM at the table</div>
-      <p>Your session is live. You need something right now — an NPC name, a scene twist, an encounter complication.</p>
+      <p>Session is live. You need something right now — NPC name, scene twist, encounter complication.</p>
       <ol>
         <li><strong>Open your campaign page</strong> — if you prepped earlier, your saved cards are still there (saved automatically).</li>
         <li><strong>Export to your table</strong> — use Ogma JSON to save and re-import results, print/PDF for physical cards, or Markdown to share with other GMs.</li>
@@ -35,7 +44,7 @@
 
     <div id="player" class="callout">
       <div class="callout-title"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> Path 3: Use Ogma as a player</div>
-      <p>Your GM uses Ogma. Here's what you need to know.</p>
+      <p>Your GM uses Ogma. Three things to know.</p>
       <ol>
         <li><strong>Ask your GM for exports</strong> — your GM can share session content via Ogma JSON, printed cards, or Markdown files. Ogma generates the content; your table tool of choice displays it.</li>
         <li><strong>Explore the help pages</strong> — the <a href="/help/fate-mechanics">Fate Mechanics</a> page explains stress, consequences, aspects, and fate points. The <a href="/help/dnd-transition">D&amp;D Transition Guide</a> helps if you're coming from D&amp;D.</li>
@@ -46,5 +55,10 @@
     <div class="callout callout-tip">
       <div class="callout-title">Tip</div>
       <p>The info tabs below every generated result (<strong>What &middot; How &middot; In play</strong>) answer the three questions you'll have about any generator. Start with "What" to understand the mechanic, read "How" for GM running tips, and check "In play" for concrete invoke/compel examples.</p>
+    </div>
+
+    <div class="callout callout-scenario">
+      <div class="callout-title"><i class="fa-solid fa-compass" aria-hidden="true"></i> Related pages</div>
+      <p><a href="/help/generators">Generator Suite</a> — all 16 generators explained. <a href="/help/at-the-table">At the Table</a> — session workflow. <a href="/help/export-share">Export &amp; Share</a> — getting results out of Ogma.</p>
     </div>
 </main>

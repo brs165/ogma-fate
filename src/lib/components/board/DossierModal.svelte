@@ -2,6 +2,7 @@
   import { Dialog } from 'bits-ui';
   import { GENERATORS } from '../../engine.js';
   import { HELP_CONTENT } from '../../../data/shared.js';
+  import Cv4Card from '../cards/Cv4Card.svelte';
 
   const BOARD_TYPE_COLOR = {
     npc_minor:    {stripe:'#e8b83a', tc:'#b8860b', bg:'#fffbee'},
@@ -37,19 +38,29 @@
 <Dialog.Root {open} onOpenChange={(o) => { if (!o) handleClose(); }}>
   <Dialog.Portal>
     <Dialog.Overlay class="modal-overlay" />
-    <Dialog.Content class="modal-content bd-modal-compact" aria-describedby={undefined}>
+    <Dialog.Content class="modal-content bd-modal-compact bd-modal-card" aria-describedby={undefined}>
       <div class="bd-top">
         <Dialog.Title class="bd-title">{card?.title || ''}</Dialog.Title>
         {#if card}
           <div class="bd-badge" style="color:{C.tc}; border-color:{C.tc}; background:{C.bg}">
-            {genMeta.icon || ''}&nbsp;{genMeta.label || card.genId}
+            {#if genMeta.icon}<i class="fa-solid {genMeta.icon}" aria-hidden="true"></i>&nbsp;{/if}{genMeta.label || card.genId}
           </div>
         {/if}
         <Dialog.Close class="bd-close" aria-label="Close">✕</Dialog.Close>
       </div>
 
       {#if card}
+        <!-- Card front -->
+        <div class="bd-card-front">
+          <Cv4Card genId={card.genId} data={card.data} campName={campId} />
+        </div>
+
+        <!-- Guidance section below card -->
         <div class="bd-guidance">
+          <div class="bd-guidance-divider">
+            <i class="fa-solid fa-circle-info" aria-hidden="true"></i> GM Guidance
+          </div>
+
           {#if hc && hc.what}
             <div class="bd-guidance-what">{hc.what}</div>
           {/if}

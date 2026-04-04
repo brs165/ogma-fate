@@ -11,14 +11,8 @@
 
   let editTitle = $state(false);
   let editBody = $state(false);
-  let draftTitle = $state('Untitled');
+  let draftTitle = $state('');
   let draftBody = $state('');
-
-  // Sync draft values when data prop changes (avoids state_referenced_locally warning)
-  $effect(() => {
-    if (!editTitle) draftTitle = data.title || 'Untitled';
-    if (!editBody)  draftBody  = data.body  || '';
-  });
 
   let typeId = $derived(data.type || 'aspect');
   let typeEntry = $derived(CV4_CUSTOM_TYPES.find(t => t.id === typeId) || CV4_CUSTOM_TYPES[0]);
@@ -27,7 +21,6 @@
   function commitTitle() {
     editTitle = false;
     const val = draftTitle.trim() || 'Untitled';
-    draftTitle = val;
     if (val !== data.title) onUpdate({ title: val, body: data.body, type: data.type });
   }
   function commitBody() {
@@ -42,20 +35,23 @@
 
   function onTitleKeydown(e) {
     if (e.key === 'Enter') { e.preventDefault(); commitTitle(); }
-    if (e.key === 'Escape') { draftTitle = data.title || 'Untitled'; editTitle = false; }
+    if (e.key === 'Escape') { editTitle = false; }
   }
   function onBodyKeydown(e) {
-    if (e.key === 'Escape') { draftBody = data.body || ''; editBody = false; }
+    if (e.key === 'Escape') { editBody = false; }
   }
 
   let titleEl;
   let bodyEl;
 
-  function startEditTitle(e) { e.stopPropagation(); editTitle = true; }
-  function startEditBody(e) { e.stopPropagation(); editBody = true; }
+  // Initialize draft from current prop value when edit begins
+  function startEditTitle(e) { e.stopPropagation(); draftTitle = data.title || 'Untitled'; editTitle = true; }
+  function startEditBody(e)  { e.stopPropagation(); draftBody  = data.body  || '';          editBody  = true; }
 
-  $effect(() => { if (editTitle && titleEl) titleEl.focus(); });
-  $effect(() => { if (editBody && bodyEl) bodyEl.focus(); });
+  $effect(() => {
+    if (editTitle && titleEl) titleEl.focus();
+    else if (editBody && bodyEl) bodyEl.focus();
+  });
 </script>
 
 <!-- Type pill -->
@@ -85,7 +81,7 @@
     tabindex="0"
     aria-label="Click to edit card title"
     style="font-size:15px; font-weight:800; color:var(--fs-text); cursor:text; line-height:1.3; margin-bottom:8px"
-  >{#if draftTitle}{draftTitle}{:else}<span style="color:var(--fs-text-muted); font-style:italic">Untitled</span>{/if}</div>
+  >{#if data.title}{data.title}{:else}<span style="color:var(--fs-text-muted); font-style:italic">Untitled</span>{/if}</div>
 {/if}
 
 <!-- Body -->
@@ -108,6 +104,6 @@
     role="button"
     tabindex="0"
     aria-label="Click to edit card notes"
-    style="font-size:12px; color:{draftBody ? 'var(--fs-text-dim)' : 'var(--fs-text-muted)'}; font-style:{draftBody ? 'normal' : 'italic'}; line-height:1.55; cursor:text; white-space:pre-wrap; min-height:40px"
-  >{#if draftBody}{draftBody}{:else}Click to add notes…{/if}</div>
+    style="font-size:12px; color:{data.body ? 'var(--fs-text-dim)' : 'var(--fs-text-muted)'}; font-style:{data.body ? 'normal' : 'italic'}; line-height:1.55; cursor:text; white-space:pre-wrap; min-height:40px"
+  >{#if data.body}{data.body}{:else}Click to add notes…{/if}</div>
 {/if}

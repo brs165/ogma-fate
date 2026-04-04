@@ -2,12 +2,12 @@
 // Factory: createSessionStore(campId, campMeta, tables, prefs, showToast)
 import { writable, get } from 'svelte/store';
 import { generate, generateSeedPack, mergeUniversal, filteredTables, GENERATORS } from '../engine.js';
-import DB from '../db.js';
+import { DB } from '../db.js';
 
 const TOAST_MS = 2500;
 
 export function createSessionStore(campId, campMeta, tables, prefs, showToast) {
-  const activeGen       = writable('npc_minor');
+  const activeGen       = writable('seed');
   const result          = writable(null);
   const rolling         = writable(false);
   const history         = writable([]);
@@ -43,15 +43,19 @@ export function createSessionStore(campId, campMeta, tables, prefs, showToast) {
     }).catch(() => {});
   }
 
-  // Persist result to IDB whenever it changes
+  // Persist result to IDB whenever it changes (debounced)
+  let _sessionPersistTimer;
   result.subscribe(r => {
     if (!r || !DB) return;
-    DB.saveSession('fate_' + campId, {
-      result: r,
-      history: get(history),
-      activeGen: get(activeGen),
-    }).catch(err => console.warn('[Ogma] save:', err));
-    DB.saveSession('fate_last_camp', { id: campId }).catch(() => {});
+    clearTimeout(_sessionPersistTimer);
+    _sessionPersistTimer = setTimeout(() => {
+      DB.saveSession('fate_' + campId, {
+        result: r,
+        history: get(history),
+        activeGen: get(activeGen),
+      }).catch(err => console.warn('[Ogma] save:', err));
+      DB.saveSession('fate_last_camp', { id: campId }).catch(() => {});
+    }, 400);
   });
 
   function doGenerate() {

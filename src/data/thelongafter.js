@@ -6,7 +6,7 @@ export const CAMPAIGNS = { thelongafter: {
     meta: {
       id: "thelongafter", name: "The Long After",
       tagline: "The Past is High-Tech. Ancient Phade vaults litter a dying world - their magic is a malfunctioning UI, their monsters are maintenance drones, and the warlords who claim to speak for the gods are just better at reading the error messages.",
-      icon: "◈", font: "'Inter', sans-serif",
+      icon: "fa-compass", font: "'Inter', sans-serif",
     },
     colors: {
       bg:"#0b0905", panel:"#13100a", border:"#2a1f0f",

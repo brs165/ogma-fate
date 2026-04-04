@@ -5,16 +5,16 @@
   let { ctx = null, onClose = null, onGenerate = null, onTemplate = null, templates = [] } = $props();
 
   const CTX_ITEMS = [
-    { id: 'npc_minor',   icon: '\u{1F9D1}', label: 'Minor NPC' },
-    { id: 'npc_major',   icon: '\u{1F451}', label: 'Major NPC' },
-    { id: 'scene',       icon: '\u{1F525}', label: 'Scene Setup' },
-    { id: 'encounter',   icon: '\u2694',    label: 'Encounter' },
-    { id: 'compel',      icon: '\u21A9',    label: 'Compel' },
-    { id: 'custom',      icon: '\u270E',    label: 'Custom Card' },
-    { id: 'sticky',      icon: '\u{1F4DD}', label: 'Aspect Sticky' },
-    { id: 'boost',       icon: '\u26A1',    label: 'Boost' },
-    { id: 'label',       icon: '\u{1F516}', label: 'Section Label' },
-    { id: '__group__',   icon: '\u{1F5C2}', label: 'Scene Group' },
+    { id: 'npc_minor',   icon: 'fa-user', label: 'Minor NPC' },
+    { id: 'npc_major',   icon: 'fa-crown', label: 'Major NPC' },
+    { id: 'scene',       icon: 'fa-fire', label: 'Scene Setup' },
+    { id: 'encounter',   icon: 'fa-burst',    label: 'Encounter' },
+    { id: 'compel',      icon: 'fa-rotate-left',    label: 'Compel' },
+    { id: 'custom',      icon: 'fa-pen',    label: 'Custom Card' },
+    { id: 'sticky',      icon: 'fa-note-sticky', label: 'Aspect Sticky' },
+    { id: 'boost',       icon: 'fa-bolt',    label: 'Boost' },
+    { id: 'label',       icon: 'fa-bookmark', label: 'Section Label' },
+    { id: '__group__',   icon: 'fa-layer-group', label: 'Scene Group' },
   ];
 
   function generate(genId) {
@@ -45,7 +45,7 @@
         onclick={() => generate(g.id)}
         onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); generate(g.id); } }}
       >
-        <span class="board-ctx-icon" aria-hidden="true">{g.icon}</span>{g.label}
+        <span class="board-ctx-icon" aria-hidden="true"><i class="fa-solid {g.icon}"></i></span>{g.label}
       </div>
     {/each}
     <div class="board-ctx-sep" role="separator"></div>
@@ -59,7 +59,7 @@
           onclick={() => { onTemplate?.(t.id); onClose?.(); }}
           onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onTemplate?.(t.id); onClose?.(); } }}
         >
-          <span class="board-ctx-icon" aria-hidden="true">{t.icon}</span>
+          <span class="board-ctx-icon" aria-hidden="true"><i class="fa-solid {t.icon}"></i></span>
           <span>{t.label}</span>
           <span class="board-ctx-sub">{t.desc}</span>
         </div>

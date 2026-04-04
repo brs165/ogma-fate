@@ -1,5 +1,5 @@
 # Canvas Workshop — Native Canvas (v662+)
-# Date: March 2026 | Version: 2026.03.663 (migration in progress)
+# Date: March 2026 | Version: 2026.03.699
 
 > **SvelteFlow has been replaced** with a native pointer/wheel canvas.
 > All SvelteFlow-specific notes below are archived for reference only.
@@ -75,7 +75,7 @@ Key lessons that informed the native canvas design:
   is a pure function passed as prop, no component tree dependency.
 - **BUG-07 (plain arrays):** No longer relevant — native canvas doesn't use SF node arrays.
 
-### Remaining backlog (carry forward to native canvas)
-- **WC-02** Node groups / scene spatial grouping [M] — implement as CSS-only group
-  overlays on the canvas (no SvelteFlow NodeGroup needed)
-- **WC-05** Canvas templates — starter layouts [M]
+### Completed post-migration
+- **WC-02** ✅ Node groups — labelled regions with resize handles, tinted backgrounds (v670)
+- **WC-05** ✅ Canvas templates — Opening Scene, Investigation, Climax, Session Zero (v670)
+- **Canvas empty state** ✅ — context-aware hints for desktop/mobile, template grid (v699)

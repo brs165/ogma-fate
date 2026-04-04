@@ -5,11 +5,35 @@
 
 <main class="wiki-content" id="main-content">
 
-    <div class="wiki-page-eyebrow">Generator Suite</div>
+    <div class="wiki-page-eyebrow">Generators</div>
     <h1>16 generators. 8 worlds. 128 combinations.</h1>
-    <p class="wiki-page-desc">Every generator produces a mechanically complete, thematically correct Fate Condensed result. Each one is tuned to its campaign world — a Minor NPC in Shattered Kingdoms gets dark fantasy names and aspects; the same generator in Neon Abyss gets chrome and neon.</p>
+    <p class="wiki-page-desc">16 generators, each tuned to its campaign world. Same generator, different world = different flavour.</p>
 
-    <h2>How generators and campaigns combine</h2>
+    <details class="learn-quickstart" open>
+      <summary class="learn-quickstart-toggle">Quick Start — 5 generator essentials</summary>
+      <ol class="learn-quickstart-list">
+        <li><strong>16 generators</strong> — NPCs, Scenes, Encounters, Seeds, Factions, Compels, Consequences, and more.</li>
+        <li><strong>8 worlds</strong> — each has ~1,500 themed table entries. Same generator, different world = different flavour.</li>
+        <li><strong>Every card has GM guidance</strong> — click "GM GUIDANCE" on any result for running tips and rules refs.</li>
+        <li><strong>Seeds = adventure packs</strong> — one roll gives you a scene, NPCs, and complications ready to play.</li>
+        <li><strong>Space to roll, → Table to place</strong> — generate in the left panel, build your session on the canvas.</li>
+      </ol>
+    </details>
+
+    <nav class="wiki-toc" aria-label="On this page">
+      <div class="wiki-toc-title">On this page</div>
+      <a href="#how-generators-combine">How generators combine</a>
+      <a href="#characters">Characters</a>
+      <a href="#scenes">Scenes</a>
+      <a href="#pacing">Pacing</a>
+      <a href="#world">World</a>
+      <a href="#the-result-panel">The result panel</a>
+      <a href="#pinning-results">Pinning results</a>
+      <a href="#quick-prep-pack-prep">Quick Prep Pack</a>
+      <a href="#table-manager">Table Manager</a>
+    </nav>
+
+    <h2 id="how-generators-combine">How generators and campaigns combine</h2>
     <p>When you roll, Ogma pulls from <strong>two table layers</strong>:</p>
     <ul>
       <li><strong>Campaign-specific tables</strong> — names, aspects, factions, and world details tuned to your chosen world (e.g. Shattered Kingdoms' "Blight-touched" aspects).</li>
@@ -25,7 +49,7 @@
 
     <div class="callout callout-scenario">
       <div class="callout-title"><i class="fa-solid fa-gamepad" aria-hidden="true"></i> Scenario: Building a recurring villain</div>
-      <p>Select <em>Major NPC</em> and roll. You get a complete character: maybe "The Archivist of Broken Oaths" (high concept), "Debts I Cannot Repay" (trouble), three supporting aspects, ranked skills with ladder labels, two stunts (one +2 bonus, one once-per-scene), and a refresh of 3. (Two stunts sit within the three free stunt slots — no refresh penalty.) The For GM tab tells you to show their high concept in action before the PCs engage — let them win something small first so the stakes feel real.</p>
+      <p>Roll <em>Major NPC</em> and get a complete villain: high concept, trouble, three aspects, ranked skills, two stunts, and refresh 3. The <strong>For GM</strong> tab says: let them win something small before the PCs engage — so the stakes feel real when they clash.</p>
     </div>
 
     <h2 id="scenes">Scenes</h2>
@@ -54,36 +78,50 @@
     </div>
 
     <h2 id="the-result-panel">The result panel</h2>
-    <p>Every result card has a two-column reference sheet directly below it — always visible, no click required:</p>
+    <p>Every result has three tabs below it:</p>
     <ul>
-      <li><strong>What it is</strong> (left column) — what this generator produces and the relevant Fate Condensed rule with a direct SRD link.</li>
-      <li><strong>For GM</strong> (right column) — imperative running tips, invoke and compel examples from the FCon SRD and Book of Hanz.</li>
-    </ul>
-    <p>Two tabs appear below every result. <strong>What this is &middot; For GM</strong> shows what the generator produces and running tips. <strong>&#9876; D&amp;D?</strong> (when available) gives a side-by-side comparison for players coming from D&amp;D or Pathfinder.</p>
-    <ul>
-      <li><strong>What &middot; For GM</strong> — the default 2-column view above.</li>
-      <li><strong><i class="fa-solid fa-seedling" aria-hidden="true"></i> New here?</strong> — plain-language explanation for players new to Fate, with key term definitions.</li>
-      <li><strong>&#9876; D&amp;D?</strong> — side-by-side comparison of Fate and D&amp;D mechanics for GMs switching systems.</li>
+      <li><strong>What · For GM</strong> — what the generator produces + imperative running tips with SRD links.</li>
+      <li><strong><i class="fa-solid fa-seedling" aria-hidden="true"></i> New here?</strong> — plain-language explanation with key term definitions.</li>
+      <li><strong>&#9876; D&amp;D?</strong> — side-by-side comparison for GMs switching from D&amp;D or Pathfinder.</li>
     </ul>
 
-    <h2>Pinning results</h2>
-    <p>Press <kbd>P</kbd> or click the Save to Table Prep button on any result to pin it. Open pinned cards from the <strong>Binder</strong> section in the sidebar.</p>
-    <p>From History you can: re-view any card, copy or download as Markdown, export your whole session as an Ogma JSON file, or import a previously saved <code>.ogma.json</code> file.</p>
+    <h2 id="pinning-results">Pinning results</h2>
+    <p>Press <kbd>P</kbd> to pin any result. Open pinned cards in the <strong>Binder</strong> sidebar. From Binder: re-view, copy as Markdown, export as Ogma JSON, or import a saved <code>.ogma.json</code>.</p>
 
     <h2>Shareable links</h2>
-    <p>Press <kbd>L</kbd> or click the <i class="fa-solid fa-link" aria-hidden="true"></i> button to copy a shareable URL for the current result. The URL encodes a seed that reproduces the exact same result — share it in Discord, paste it into session notes, or send it to your co-GM. Anyone who opens the link sees the same card.</p>
+    <p>Press <kbd>L</kbd> to copy a shareable URL. It encodes the seed — anyone who opens it sees the same result.</p>
 
     <h2>Inspiration mode</h2>
-    <p>Press <kbd>I</kbd> to roll three results at once and pick the one you want. The other two fade as ghost cards. Great when a single roll isn't sparking anything — seeing three options simultaneously often unlocks the right direction.</p>
+    <p>Press <kbd>I</kbd> to roll three results at once. Pick one, the others fade. Useful when a single roll isn't sparking ideas.</p>
 
-    <h2 id="quick-prep-pack-prep">Quick Prep Pack prep</h2>
-    <p>In the <strong>Binder</strong> section of the sidebar, click <strong>Quick Prep Pack</strong> to generate an Adventure Seed + Countdown + Compel as a stacked 3-card packet. This is your Session 1 prep in one click — location, first threat, and a ready-to-offer complication.</p>
+    <h2 id="quick-prep-pack-prep">Quick Prep Pack</h2>
+    <p>In the <strong>Binder</strong> sidebar, click <strong>Quick Prep Pack</strong> for an Adventure Seed + Countdown + Compel in one click — location, threat, and a ready-to-offer complication.</p>
 
-    <h2>Table Manager</h2>
+    <h2 id="table-manager">Table Manager</h2>
     <p>Click the <i class="fa-solid fa-square-plus" aria-hidden="true"></i> icon in the action bar to open the Table Manager. You can:</p>
     <ul>
       <li><strong>Exclude</strong> any table from generation (e.g. if you've already used that faction name)</li>
       <li><strong>Lock</strong> a table to always use that entry (e.g. fix a PC's name)</li>
       <li><strong>Add custom entries</strong> that sit alongside the built-in content</li>
     </ul>
+
+    <div class="callout callout-scenario">
+      <div class="callout-title"><i class="fa-solid fa-compass" aria-hidden="true"></i> Related pages</div>
+      <p><a href="/help/fate-mechanics">Fate Mechanics</a> — the rules behind each generator. <a href="/help/at-the-table">At the Table</a> — using generated content during play. <a href="/help/customise">Customise</a> — filtering and extending generator tables.</p>
+    </div>
+
+    <div class="wiki-footer">
+      <div>
+        <a href="/help">Help Home</a> &nbsp;·&nbsp;
+        <a href="/">Open Ogma</a> &nbsp;·&nbsp;
+        <a href="/about">About</a> &nbsp;·&nbsp;
+        <a href="/license">Full Attribution</a> &nbsp;·&nbsp;
+        <a href="https://fate-srd.com/" target="_blank" rel="noreferrer">fate-srd.com</a>
+      </div>
+      <div class="wiki-footer-meta">
+        Fate&#8482; is a trademark of Evil Hat Productions, LLC &nbsp;·&nbsp;
+        D&amp;D&#174; is a trademark of Wizards of the Coast LLC &nbsp;·&nbsp;
+        Released under <a href="/license">CC BY 3.0</a>
+      </div>
+    </div>
 </main>

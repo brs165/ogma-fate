@@ -44,14 +44,9 @@ Canvas: Custom Card, Aspect Sticky, Boost, Section Label
 ## Surfaces
 
 ### Prep Canvas
-A freeform Svelte Flow canvas. Generate cards, arrange them spatially,
-draw connections between related elements. Everything persists to IndexedDB.
-Export to Markdown, JSON, or Excalidraw.
-
-### Play Mode
-Live session tracking on the same canvas. Turn bar, player FP and stress,
-GM fate pool, round counter, scene management. Players can join via room code
-and see the GM's canvas in read-only mode.
+A native pan/zoom canvas (pointer/wheel events + CSS transform). Generate cards,
+arrange them spatially, draw connections between related elements. Everything
+persists to IndexedDB. Export to Markdown, JSON, or Typst.
 
 ### Session Zero
 Guided flow: pick world → set player count → generate backstories →
@@ -64,7 +59,7 @@ adventure seed → opening scene → export character pack to canvas.
 | Layer | Technology |
 |-------|-----------|
 | Framework | SvelteKit + Svelte 5.51.0 (runes) |
-| Canvas | @xyflow/svelte (SvelteFlow) |
+| Canvas | Native pointer/wheel events + CSS transform |
 | UI primitives | bits-ui@2.16.3 |
 | Persistence | Dexie 4 (IndexedDB) |
 | Sync | WebSocket (PartySocket) |

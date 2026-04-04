@@ -10,17 +10,17 @@
 </svelte:head>
 
 <main class="wiki-content" id="main-content">
-  <a href="/help/learn-fate" class="wiki-back"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to Learn Fate in 7 Steps</a>
-  <div class="wiki-page-eyebrow">Learn</div>
+  <div class="wiki-breadcrumb"><a href="/help">Help</a> <span class="sep">/</span> <a href="/help/learn-fate">Learn Fate</a> <span class="sep">/</span> Deep Dive</div>
+  <div class="wiki-page-eyebrow">Deep Dive</div>
   <h1>Learn Fate — Deep Dive</h1>
-  <p class="wiki-page-desc">You know the 7 steps. Now learn how they feel at the table — through a guided scene, a full walkthrough, a strategy primer, and a session-one checklist.</p>
+  <p class="wiki-page-desc">How Fate feels at the table — guided scene, play-by-post walkthrough, strategy primer, and first session checklist.</p>
 
   <nav class="wiki-section" aria-label="Page sections" style="margin-bottom:32px">
     <div class="wiki-card-grid">
-      <a href="#tutorial"><span style="font-size:18px"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i></span><strong>Interactive Tutorial</strong><span class="wiki-card-sub">Guided scene: describe, roll, interpret</span></a>
-      <a href="#walkthrough"><span style="font-size:18px"><i class="fa-solid fa-book-open" aria-hidden="true"></i></span><strong>Play-by-Post</strong><span class="wiki-card-sub">A full scene played out beat by beat</span></a>
-      <a href="#strategy"><span style="font-size:18px"><i class="fa-solid fa-chess" aria-hidden="true"></i></span><strong>Strategy Guide</strong><span class="wiki-card-sub">Create Advantage, FP economy, conceding</span></a>
-      <a href="#checklist"><span style="font-size:18px"><i class="fa-solid fa-list-check" aria-hidden="true"></i></span><strong>First Session</strong><span class="wiki-card-sub">What to prep, what to skip, how to pace</span></a>
+      <a href="#tutorial"><span class="card-icon"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i></span><strong>Interactive Tutorial</strong><span class="wiki-card-sub">Guided scene: describe, roll, interpret</span></a>
+      <a href="#walkthrough"><span class="card-icon"><i class="fa-solid fa-book-open" aria-hidden="true"></i></span><strong>Play-by-Post</strong><span class="wiki-card-sub">A full scene played out beat by beat</span></a>
+      <a href="#strategy"><span class="card-icon"><i class="fa-solid fa-chess" aria-hidden="true"></i></span><strong>Strategy Guide</strong><span class="wiki-card-sub">Create Advantage, FP economy, conceding</span></a>
+      <a href="#checklist"><span class="card-icon"><i class="fa-solid fa-list-check" aria-hidden="true"></i></span><strong>First Session</strong><span class="wiki-card-sub">What to prep, what to skip, how to pace</span></a>
     </div>
   </nav>
 
@@ -29,7 +29,7 @@
   <!-- ══════════════════════════════════════════════════════════════════════ -->
   <div class="wiki-section" id="tutorial">
     <h2 class="wiki-section-title"><i class="fa-solid fa-graduation-cap" aria-hidden="true"></i> Interactive Tutorial — Your First Scene</h2>
-    <p>This walks you through a single Fate Condensed scene, step by step. At each beat, you'll describe what your character does, then roll dice to see what happens. The Teacher voice explains the <em>why</em> behind every mechanic as it comes up.</p>
+    <p>A single Fate Condensed scene, step by step. Describe what your character does, roll dice, see what happens. The Teacher explains each mechanic as it comes up.</p>
 
     <div class="callout callout-info" role="note">
       <div class="callout-title"><i class="fa-solid fa-user" aria-hidden="true"></i> Your character</div>
@@ -57,7 +57,7 @@
         <div class="callout callout-scenario" role="note">
           <div class="callout-title"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> Roll Stealth (+1)</div>
           <p>Roll 4dF and add your Stealth of +1. You need to beat Fair (+2).</p>
-          <HelpDiceRoller mode="basic" label="4dF + Stealth (+1)" />
+          <HelpDiceRoller mode="skill" skill={1} difficulty={2} label="Stealth +1" />
         </div>
 
         <div class="callout callout-info" role="note">
@@ -113,7 +113,7 @@
 
         <div class="callout callout-scenario" role="note">
           <div class="callout-title"><i class="fa-solid fa-dice-d20" aria-hidden="true"></i> Roll Athletics (+3)</div>
-          <HelpDiceRoller mode="basic" label="4dF + Athletics (+3)" />
+          <HelpDiceRoller mode="skill" skill={3} difficulty={2} label="Athletics +3" />
         </div>
 
         <div class="callout callout-tip" role="note">
@@ -193,7 +193,7 @@
   <!-- ══════════════════════════════════════════════════════════════════════ -->
   <div class="wiki-section" id="strategy">
     <h2 class="wiki-section-title"><i class="fa-solid fa-chess" aria-hidden="true"></i> Strategy Guide</h2>
-    <p>Fate looks simple, but there's deep tactical play hiding beneath the fiction. These are the strategies that separate a first-session player from a skilled one.</p>
+    <p>Strategies that separate a first-session player from a skilled one.</p>
 
     <h3 id="strat-ca"><i class="fa-solid fa-plus-circle" aria-hidden="true" style="color:var(--accent)"></i> Create Advantage — the action you should use most</h3>
     <p>In D&amp;D, the default action is Attack. In Fate, the default action should be <strong>Create Advantage</strong>. Here's why:</p>
@@ -205,28 +205,26 @@
     <p><strong>When NOT to:</strong> When the opposition is about to be Taken Out and one more shift finishes the job. When the scene is almost over and you need results now.</p>
 
     <h3 id="strat-fp"><i class="fa-solid fa-coins" aria-hidden="true" style="color:var(--accent)"></i> Fate point economy — the hidden game</h3>
-    <p>Fate points are the most important resource in the game. More important than skills, more important than stunts. The player who manages their FP well plays Fate better than everyone else at the table.</p>
+    <p>Fate points matter more than skills or stunts. FP management separates good players from great ones.</p>
     <div class="callout callout-dnd" role="note">
       <div class="callout-title"><i class="fa-solid fa-dragon" aria-hidden="true"></i> Coming from D&amp;D</div>
       <p>Fate points are like Inspiration, except you use them constantly, they flow both directions (GM gives and takes), and running out means you can't invoke <em>any</em> of your aspects. A PC with 0 FP is functionally weaker than their character sheet suggests.</p>
     </div>
     <p><strong>Earning FP:</strong> Accept compels (GM or self-compel). Start of session (refresh to 3). Concede a conflict (1 base + 1 per consequence taken).</p>
     <p><strong>Spending FP:</strong> Invoke an aspect for +2 or a reroll. Refuse a compel (costs 1 FP).</p>
-    <p><strong>The rhythm:</strong> Early in a session, accept compels aggressively — bank FP. Mid-session, spend FP on pivotal rolls. Late session, if you're at 0 FP, self-compel to earn one back. Never refuse a compel unless the complication would derail something you care about deeply.</p>
+    <p><strong>The rhythm:</strong> Early session — accept compels, bank FP. Mid session — spend on pivotal rolls. At 0 FP — self-compel. Refuse a compel only if the complication derails something you deeply care about.</p>
 
     <h3 id="strat-concede"><i class="fa-solid fa-flag" aria-hidden="true" style="color:var(--accent)"></i> Conceding — the strategic surrender</h3>
     <p>In D&amp;D, you fight until you win or die. In Fate, you <strong>concede</strong> — and it's one of the smartest things you can do.</p>
     <div class="callout callout-info" role="note">
       <div class="callout-title">Why concede?</div>
       <p><strong>You choose the terms.</strong> When you concede, you narrate how you lose — you escape, you surrender with dignity, you get captured but hide the evidence. If you're Taken Out (reduced to zero), the <em>GM</em> narrates what happens to you. Conceding gives you narrative control over your defeat.<br/><br/>
-      <strong>You earn FP.</strong> 1 fate point base, plus 1 extra per consequence you took during the conflict (FCon p.37). Took a Mild and a Moderate? That's 3 FP. Plus you're alive and still in the story.</p>
+      <strong>You earn FP.</strong> 1 fate point base, plus 1 extra per consequence you took during the conflict (<a href="https://fate-srd.com/fate-condensed/challenges-conflicts-and-contests" target="_blank" rel="noreferrer" class="srd-link">FCon SRD <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>). Took a Mild and a Moderate? That's 3 FP. Plus you're alive and still in the story.</p>
     </div>
     <p><strong>When to concede:</strong> When you've taken a Moderate or Severe consequence and the opposition still looks strong. When losing this fight doesn't mean losing the war. When the story is more interesting if you fail here and come back later.</p>
 
     <h3 id="strat-self"><i class="fa-solid fa-hand-point-right" aria-hidden="true" style="color:var(--accent)"></i> Self-compels — getting paid to make the story better</h3>
-    <p>You don't have to wait for the GM to compel you. You can compel <em>yourself</em>.</p>
-    <p><strong>How:</strong> Look at your aspects. Say: <em>"My Trouble is 'Can't Walk Away From a Broken Thing.' This engine is about to explode, but I think my character would try to fix it anyway. Can I compel myself?"</em> If the table agrees it fits, you earn 1 FP.</p>
-    <p><strong>Why this is powerful:</strong> You choose the timing. You choose the complication. You get a fate point for doing something your character would do anyway. GMs love self-compels because they create player-driven drama.</p>
+    <p>You can compel <em>yourself</em>. Say: <em>"My Trouble is 'Can't Walk Away From a Broken Thing' — I think Kira tries to fix this engine even though it's about to explode. Can I self-compel?"</em> Table agrees, you earn 1 FP. You choose the timing, you choose the complication.</p>
   </div>
 
   <!-- ══════════════════════════════════════════════════════════════════════ -->
@@ -236,7 +234,7 @@
     <h2 class="wiki-section-title"><i class="fa-solid fa-list-check" aria-hidden="true"></i> First Session Checklist</h2>
     <p>Running your first Fate Condensed session? Here's what to prepare, what to skip, and how to pace.</p>
 
-    <h3><i class="fa-solid fa-check" aria-hidden="true" style="color:#2e7d32"></i> Before the session (30 min prep)</h3>
+    <h3><i class="fa-solid fa-check icon-success" aria-hidden="true"></i> Before the session (30 min prep)</h3>
     <div class="callout callout-info" role="note">
       <div class="callout-title">What to prepare</div>
       <p><strong>One current issue</strong> — the thing that's already on fire. Write it as an aspect: <em>"The Water Supply Is Poisoned and Nobody Knows Why."</em><br/>
@@ -246,13 +244,13 @@
       <strong>Three scene aspects for your opening location</strong> — use Ogma's scene generator.</p>
     </div>
 
-    <h3><i class="fa-solid fa-xmark" aria-hidden="true" style="color:#c62828"></i> What to skip</h3>
+    <h3><i class="fa-solid fa-xmark icon-danger" aria-hidden="true"></i> What to skip</h3>
     <div class="callout callout-info" role="note">
       <div class="callout-title">Don't prepare these</div>
       <p><strong>Don't write a plot.</strong> Fate is not a scripted adventure. Prepare situations, not storylines.<br/>
       <strong>Don't plan more than 3 scenes.</strong> You won't use them. Players will go somewhere unexpected by scene 2.<br/>
       <strong>Don't stat out a big bad.</strong> For session one, minor NPCs and environmental challenges are enough. The antagonist can emerge from play.<br/>
-      <strong>Don't fill all stunt slots.</strong> Leave 1–2 blank for each PC. Fill them during play when a player says "I wish I could..."</p>
+      <strong>Don't fill all stunt slots.</strong> Leave 1–2 blank for each PC. Fill them during play when a player says "I wish I could..." — each stunt costs 1 Refresh (minimum Refresh 1), so pre-writing all slots locks Refresh before the character's playstyle is known.</p>
     </div>
 
     <h3><i class="fa-solid fa-clock" aria-hidden="true" style="color:var(--accent)"></i> Pacing the session</h3>
@@ -265,7 +263,7 @@
       <strong>Last 30 minutes:</strong> Wrap up. Ask each player: "What does your character do after?" Hand out milestone advances if earned.</p>
     </div>
 
-    <h3><i class="fa-solid fa-triangle-exclamation" aria-hidden="true" style="color:#b8860b"></i> Common first-session mistakes</h3>
+    <h3><i class="fa-solid fa-triangle-exclamation icon-warning" aria-hidden="true"></i> Common first-session mistakes</h3>
     <div class="callout callout-dnd" role="note">
       <div class="callout-title"><i class="fa-solid fa-dragon" aria-hidden="true"></i> D&amp;D habits to unlearn</div>
       <p><strong>"I search the room" syndrome:</strong> In Fate, don't passively investigate. <em>Declare what you want to find and why.</em> The GM sets difficulty based on how interesting failure would be.<br/><br/>
@@ -280,7 +278,22 @@
     </div>
   </div>
 
-  <div style="text-align:center; margin:32px 0">
-    <a href="/help/learn-fate" class="wiki-back" style="font-size:14px"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to Learn Fate in 7 Steps</a>
+  <div class="wiki-back-center">
+    <a href="/help/learn-fate" class="wiki-back"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to Learn Fate in 7 Steps</a>
+  </div>
+
+  <div class="wiki-footer">
+    <div>
+      <a href="/help">Help Home</a> &nbsp;·&nbsp;
+      <a href="/">Open Ogma</a> &nbsp;·&nbsp;
+      <a href="/about">About</a> &nbsp;·&nbsp;
+      <a href="/license">Full Attribution</a> &nbsp;·&nbsp;
+      <a href="https://fate-srd.com/" target="_blank" rel="noreferrer">fate-srd.com</a>
+    </div>
+    <div class="wiki-footer-meta">
+      Fate&#8482; is a trademark of Evil Hat Productions, LLC &nbsp;·&nbsp;
+      D&amp;D&#174; is a trademark of Wizards of the Coast LLC &nbsp;·&nbsp;
+      Released under <a href="/license">CC BY 3.0</a>
+    </div>
   </div>
 </main>

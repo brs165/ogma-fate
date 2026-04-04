@@ -11,7 +11,7 @@
   }
 </script>
 
-<div class="fs-clock-track">
+<div class="fs-clock-track" class:cd-triggered-shake={full}>
   <div class="fs-section-hdr" style="color:{labelColor}; border-color:{labelColor}">{labelText}</div>
   <div style="display:flex; gap:5px; flex-wrap:wrap; margin-bottom:4px" role="group" aria-label="Countdown clock boxes">
     {#each Array.from({ length: boxes }) as _, i (i)}
@@ -24,9 +24,7 @@
         aria-label="Clock box {i + 1}{ticked ? ' (ticked)' : ' (empty)'}"
         style="width:28px; height:28px; border-color:{borderColor}; background:{ticked ? bg : 'transparent'}; color:{ticked ? '#fff' : borderColor};"
       >
-        <Checkbox.Indicator>
-          {#if ticked}<i class="fa-solid fa-check" aria-hidden="true"></i>{/if}
-        </Checkbox.Indicator>
+        {#if ticked}<i class="fa-solid fa-check" aria-hidden="true"></i>{/if}
       </Checkbox.Root>
     {/each}
   </div>

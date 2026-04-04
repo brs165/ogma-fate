@@ -1,7 +1,19 @@
 <script>
   import { Accordion, Popover } from 'bits-ui';
 
+  let { activeGen = '' } = $props();
+
   let inspoPrompt = $state(null);
+
+  // Map generators to relevant help section (#12)
+  const GEN_TO_SECTION = {
+    npc_minor: 'npcs', npc_major: 'npcs', pc: 'basics', backstory: 'basics',
+    scene: 'conflict', encounter: 'conflict', complication: 'aspects',
+    compel: 'aspects', consequence: 'stress', challenge: 'conflict',
+    contest: 'conflict', obstacle: 'actions', countdown: 'conflict',
+    constraint: 'actions', seed: 'quickref', campaign: 'basics', faction: 'opposition',
+  };
+  let suggestedSection = $derived(GEN_TO_SECTION[activeGen] || '');
 
   const INSPO_PROMPTS = [
     'An NPC arrives with bad news.',
@@ -76,7 +88,7 @@
 </script>
 
 <div class="blp-body blp-help">
-  <Accordion.Root type="single" class="hp-accordion">
+  <Accordion.Root type="single" value={suggestedSection} class="hp-accordion">
     {#each sections as sec (sec.id)}
       <Accordion.Item value={sec.id} class="hp-item">
         <Accordion.Header>

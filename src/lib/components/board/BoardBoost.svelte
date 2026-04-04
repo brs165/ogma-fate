@@ -1,5 +1,6 @@
 <script>
   // ── BoardBoost — ephemeral boost card with 1 free invoke ─────────────────────
+  import { tick } from 'svelte';
   import OgmaTooltip from '../shared/OgmaTooltip.svelte';
   let { card = {}, onDelete = null, onUpdate = null, onDragStart = null, onInvoke = null } = $props();
   let editing = $state(false);
@@ -41,7 +42,7 @@
   }
 
   let textareaEl;
-  $effect(() => { if (editing && textareaEl) setTimeout(() => textareaEl && textareaEl.focus(), 0); });
+  $effect(() => { if (editing && textareaEl) tick().then(() => textareaEl?.focus()); });
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->

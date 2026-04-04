@@ -2,11 +2,20 @@
 // Factory: createCanvasStore(campCanvasKey, tables, showToast, onCardsChange)
 import { writable, get } from 'svelte/store';
 import { generate, mergeUniversal, filteredTables, GENERATORS } from '../engine.js';
-import DB from '../db.js';
+import { DB } from '../db.js';
 import { boardUid, extractCardTitle, extractCardSummary, extractCardTags, STICKY_COLORS } from '../helpers.js';
 
 // ── Session Zero pack generator (standalone, no store dependency) ─────────
-export function generateSzPack(pcDrafts, campId, campName, campData, mode) {
+/**
+ * Generate a full Session Zero card pack for the canvas.
+ * @param {Array} pcDrafts - [{name, hc, trouble, ...}] per player
+ * @param {string} campId - Campaign ID
+ * @param {string} campName - Display name
+ * @param {object} campData - Campaign data object (tables, meta)
+ * @param {string} mode - Creation mode ('standard'|'trio'|'flashback')
+ * @param {object} [gmPrep] - Optional GM prep data: {seed, scene, npc}
+ */
+export function generateSzPack(pcDrafts, campId, campName, campData, mode, gmPrep) {
   const tables = filteredTables(mergeUniversal(campData.tables || {}), {});
   const allCards = [];
   const CARD_W = 360, CARD_GAP = 24, COLS = 3;
@@ -17,12 +26,30 @@ export function generateSzPack(pcDrafts, campId, campName, campData, mode) {
     allCards.push({ id: boardUid(), genId: 'campaign', sourceCanvas: 'prep', title: campName + ' — Campaign Frame', summary: '', tags: [], data: frameData, x: 24, y: 24, z: Date.now(), ts: Date.now(), gmOnly: false });
   } catch(e) {}
 
-  // Per-PC cards
+  // GM Prep cards (seed, scene, NPC) — placed in top row after campaign frame
+  if (gmPrep) {
+    let gmX = 24 + CARD_W + CARD_GAP;
+    if (gmPrep.seed) {
+      allCards.push({ id: boardUid(), genId: 'seed', sourceCanvas: 'prep', title: gmPrep.seed.location || 'Adventure Seed', summary: gmPrep.seed.objective || '', tags: [], data: gmPrep.seed, x: gmX, y: 24, z: Date.now() + 0.1, ts: Date.now(), gmOnly: true });
+      gmX += CARD_W + CARD_GAP;
+    }
+    if (gmPrep.scene) {
+      allCards.push({ id: boardUid(), genId: 'scene', sourceCanvas: 'prep', title: 'Opening Scene', summary: '', tags: [], data: gmPrep.scene, x: gmX, y: 24, z: Date.now() + 0.2, ts: Date.now(), gmOnly: true });
+      gmX += CARD_W + CARD_GAP;
+    }
+    if (gmPrep.npc) {
+      allCards.push({ id: boardUid(), genId: 'npc_major', sourceCanvas: 'prep', title: gmPrep.npc.name || 'Opening NPC', summary: gmPrep.npc.aspects?.high_concept || '', tags: [], data: gmPrep.npc, x: gmX, y: 24, z: Date.now() + 0.3, ts: Date.now(), gmOnly: true });
+    }
+  }
+
+  // Per-PC cards — offset down if GM prep cards exist
+  const pcStartY = gmPrep ? 24 + 600 : 24;
+
   pcDrafts.forEach((pc, idx) => {
-    const col = (idx + 1) % COLS;
-    const row = Math.floor((idx + 1) / COLS);
+    const col = gmPrep ? (idx % COLS) : ((idx + 1) % COLS);
+    const row = gmPrep ? Math.floor(idx / COLS) : Math.floor((idx + 1) / COLS);
     const baseX = 24 + col * (CARD_W + CARD_GAP);
-    const baseY = 24 + row * 600;
+    const baseY = pcStartY + row * 600;
 
     let pcData = {};
     try { pcData = generate('pc', tables, 4, {}); } catch(e) {}
@@ -71,9 +98,13 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
     loaded.set(true);
   }
 
+  let _persistTimer;
   function persistCanvas(nextCards) {
     if (!DB) return;
-    DB.saveSession(campCanvasKey, { cards: nextCards, ts: Date.now() }).catch(() => {});
+    clearTimeout(_persistTimer);
+    _persistTimer = setTimeout(() => {
+      DB.saveSession(campCanvasKey, { cards: nextCards, ts: Date.now() }).catch(() => {});
+    }, 400);
     if (onCardsChange) onCardsChange(nextCards);
   }
 
@@ -250,14 +281,39 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
       summary: extractCardSummary(genId, data),
       tags: extractCardTags(genId, data),
       data,
-      x: x !== undefined ? x : 80,
-      y: y !== undefined ? y : 80,
+      x: x !== undefined ? x : lastPlaced.x,
+      y: y !== undefined ? y : lastPlaced.y,
       z: Date.now(),
       ts: Date.now(),
       gmOnly: false,
     };
+    if (x === undefined) {
+      lastPlaced.col = (lastPlaced.col + 1) % 3;
+      if (lastPlaced.col === 0) { lastPlaced.x = 60; lastPlaced.y += 420; } else { lastPlaced.x += 340; }
+    }
     mutate(prev => prev.concat([card]));
     if (showToast) showToast('Session Zero PC added to canvas');
+  }
+
+  function importCards(results) {
+    if (!results || !results.length) return 0;
+    var newCards = results.map(function(r, i) {
+      return {
+        id: boardUid(),
+        genId: r.generator || '',
+        title: extractCardTitle(r.generator || '', r.data || {}),
+        summary: extractCardSummary(r.generator || '', r.data || {}),
+        tags: extractCardTags(r.generator || '', r.data || {}),
+        data: r.data || {},
+        x: 80 + (i % 5) * 320,
+        y: 80 + Math.floor(i / 5) * 240,
+        z: Date.now() + i,
+        ts: r.ts || Date.now(),
+        gmOnly: false,
+      };
+    });
+    mutate(function(prev) { return prev.concat(newCards); });
+    return newCards.length;
   }
 
   function persistConnectors() {
@@ -332,6 +388,25 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
     mutate(prev => prev.concat([sticky]));
   }
 
+  function autoArrange() {
+    var current = get(cards);
+    if (!current.length) return;
+    var sorted = current.slice().sort(function(a, b) { return (a.ts || 0) - (b.ts || 0); });
+    var COLS = 3, CW = 680, CH = 440, PX = 60, PY = 60;
+    var next = current.map(function(c) {
+      var idx = sorted.indexOf(c);
+      return Object.assign({}, c, {
+        x: PX + (idx % COLS) * CW,
+        y: PY + Math.floor(idx / COLS) * CH,
+      });
+    });
+    cards.set(next);
+    persistCanvas(next);
+    lastPlaced.col = sorted.length % COLS;
+    lastPlaced.x = PX + lastPlaced.col * (lastPlaced.col > 0 ? 340 : 0);
+    lastPlaced.y = PY + Math.floor(sorted.length / COLS) * 420;
+  }
+
   return {
     cards, loaded, connectors, groups,
     getCards: () => get(cards),
@@ -342,6 +417,6 @@ export function createCanvasStore(campCanvasKey, tables, showToast, onCardsChang
     addGroup, updateGroup, deleteGroup,
     clearCanvas,
     addStickyWithText,
-    undoLast, exportCanvas, importCanvas,
+    undoLast, exportCanvas, importCanvas, importCards, autoArrange,
   };
 }

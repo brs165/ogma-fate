@@ -3,7 +3,7 @@
   import { DropdownMenu } from 'bits-ui';
   import { DB } from '../../db.js';
 
-  let { cards = [], campName = '', onExportCanvas = null, onImportCanvas = null, onPrint = null } = $props();
+  let { cards = [], campName = '', onExportCanvas = null, onImportCanvas = null, onExportModal = null, onPrint = null } = $props();
 
   let hasCards = $derived(cards.filter(c =>
     c.genId && c.genId !== 'sticky' && c.genId !== 'boost' && c.genId !== 'label'
@@ -24,46 +24,59 @@
 
   <DropdownMenu.Portal>
     <DropdownMenu.Content class="export-dd-content" sideOffset={6} align="end">
-      <DropdownMenu.Label class="export-dd-label">Export</DropdownMenu.Label>
-      <DropdownMenu.Separator class="export-dd-sep" />
+      <DropdownMenu.Group>
+        <DropdownMenu.GroupHeading class="export-dd-label">Export</DropdownMenu.GroupHeading>
+        <DropdownMenu.Separator class="export-dd-sep" />
 
-      <DropdownMenu.Item class="export-dd-item" onSelect={() => onExportCanvas?.()}>
-        <span class="export-dd-icon">{'{ }'}</span>
-        <span class="export-dd-body">
-          <span class="export-dd-name">JSON</span>
-          <span class="export-dd-sub">Canvas state — re-importable</span>
-        </span>
-      </DropdownMenu.Item>
-
-      {#if hasCards}
-        <DropdownMenu.Item class="export-dd-item" onSelect={doImagePack}>
-          <span class="export-dd-icon">▣</span>
+        <DropdownMenu.Item class="export-dd-item" onSelect={() => onExportCanvas?.()}>
+          <span class="export-dd-icon">{'{ }'}</span>
           <span class="export-dd-body">
-            <span class="export-dd-name">Image Pack</span>
-            <span class="export-dd-sub">PNG zip for Miro / Figma</span>
+            <span class="export-dd-name">JSON</span>
+            <span class="export-dd-sub">Canvas state — re-importable</span>
           </span>
         </DropdownMenu.Item>
-      {/if}
 
-      {#if hasCards}
-        <DropdownMenu.Item class="export-dd-item" onSelect={() => onPrint?.()}>
-          <span class="export-dd-icon">⎙</span>
+        {#if hasCards}
+          <DropdownMenu.Item class="export-dd-item" onSelect={doImagePack}>
+            <span class="export-dd-icon">▣</span>
+            <span class="export-dd-body">
+              <span class="export-dd-name">Image Pack</span>
+              <span class="export-dd-sub">PNG zip for Miro / Figma</span>
+            </span>
+          </DropdownMenu.Item>
+        {/if}
+
+        {#if hasCards}
+          <DropdownMenu.Item class="export-dd-item" onSelect={() => onPrint?.()}>
+            <span class="export-dd-icon">⎙</span>
+            <span class="export-dd-body">
+              <span class="export-dd-name">Print</span>
+              <span class="export-dd-sub">Printable A4 layout</span>
+            </span>
+          </DropdownMenu.Item>
+        {/if}
+
+        <DropdownMenu.Separator class="export-dd-sep" />
+
+        <DropdownMenu.Item class="export-dd-item" onSelect={() => onImportCanvas?.()}>
+          <span class="export-dd-icon">↑</span>
           <span class="export-dd-body">
-            <span class="export-dd-name">Print</span>
-            <span class="export-dd-sub">Printable A4 layout</span>
+            <span class="export-dd-name">Import</span>
+            <span class="export-dd-sub">Restore from .json file</span>
           </span>
         </DropdownMenu.Item>
-      {/if}
 
-      <DropdownMenu.Separator class="export-dd-sep" />
-
-      <DropdownMenu.Item class="export-dd-item" onSelect={() => onImportCanvas?.()}>
-        <span class="export-dd-icon">↑</span>
-        <span class="export-dd-body">
-          <span class="export-dd-name">Import</span>
-          <span class="export-dd-sub">Restore from .json file</span>
-        </span>
-      </DropdownMenu.Item>
+        {#if onExportModal}
+          <DropdownMenu.Separator class="export-dd-sep" />
+          <DropdownMenu.Item class="export-dd-item" onSelect={() => onExportModal()}>
+            <span class="export-dd-icon">&ctdot;</span>
+            <span class="export-dd-body">
+              <span class="export-dd-name">More formats...</span>
+              <span class="export-dd-sub">Markdown, Mermaid, Obsidian, etc.</span>
+            </span>
+          </DropdownMenu.Item>
+        {/if}
+      </DropdownMenu.Group>
     </DropdownMenu.Content>
   </DropdownMenu.Portal>
 </DropdownMenu.Root>

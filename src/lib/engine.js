@@ -141,7 +141,8 @@ function generateMinorNPC(t) {
   var aspects = weak ? [aspect1, weak] : [aspect1];
   var numSkills = rand(1, 2);
   var chosenSkills = pickN(ALL_SKILLS, numSkills);
-  var rating = rand(2, 3);
+  // FCon SRD: nameless NPCs cap at Fair (+2); Average (+1) to Fair (+2)
+  var rating = rand(1, 2);
   var skills = chosenSkills.map(function(s, i) { return {name: s, r: Math.max(1, rating - i)}; });
   var hasStunt = _rng() > 0.5;
   var bonusStunts = (t.stunts || []).filter(function(s) { return s.type === 'bonus'; });
@@ -206,11 +207,15 @@ function generateMajorNPC(t) {
     if (s.name === 'Physique') physR = s.r;
     if (s.name === 'Will') willR = s.r;
   });
+  // FCon: Major NPCs get standard consequence slots (Mild −2, Moderate −4, Severe −6).
+  // NPC peak is rand(3,4) so physR/willR never reach Superb (+5); [2,4,6] is always correct here.
+  var consequences = [2, 4, 6];
   return {
     name: name,
     aspects: {high_concept: high_concept, trouble: trouble, others: others},
     skills: skills, stunts: stunts,
     physical_stress: stressFromRating(physR), mental_stress: stressFromRating(willR),
+    consequences: consequences,
     // FCon p.10: 3 free stunt slots. Each stunt beyond 3 costs 1 Refresh. Minimum 1.
     refresh: Math.max(1, 3 - Math.max(0, stunts.length - 3)),
   };
@@ -449,6 +454,9 @@ export const UNIVERSAL_INJECT_KEYS = [
  */
 export function mergeUniversal(tables) {
   if (!tables) return {};
+  // Idempotency guard — if already merged (e.g. tables passed in from a cached result),
+  // return as-is rather than doubling every merged array.
+  if (tables.__merged) return tables;
   var u = UNIVERSAL || {};
   if (!u) return tables;
   var merged = {};
@@ -463,6 +471,8 @@ export function mergeUniversal(tables) {
   UNIVERSAL_INJECT_KEYS.forEach(function(key) {
     if (u[key]) merged[key] = u[key];
   });
+  // Mark as merged so double-calls are safe
+  Object.defineProperty(merged, '__merged', { value: true, enumerable: false });
   return merged;
 }
 
@@ -689,8 +699,11 @@ export function generatePC(t) {
     stunts: stunts,
     physical_stress: stressFromRating(physR),
     mental_stress:   stressFromRating(willR),
-    // PCs always get all 3 consequence slots (FCon p.12)
-    // WS-41: Superb (+5)+ Physique/Will grants extra mild (FCon p.12)
+    // PCs always get all 3 consequence slots (FCon p.12).
+    // WS-41: Superb (+5)+ Physique/Will grants an extra mild slot (FCon p.12).
+    // NOTE: The session-zero skill pyramid caps at Great (+4), so physR/willR >= 5
+    // is never reached by this generator. The branch exists for import/advancement
+    // scenarios where a caller passes a pre-built skill set with ratings above +4.
     consequences: (physR >= 5 || willR >= 5) ? [2, 4, 6, 2] : [2, 4, 6],
     extraMild: physR >= 5 || willR >= 5,
     // FCon p.10: refresh 3 at creation, 3 free stunt slots
@@ -732,10 +745,14 @@ function _generate(genId, t, partySize, opts) {
     case 'faction':      return generateFaction(t);
     case 'complication': return generateComplication(t);
     case 'backstory':    return generateBackstory(t);
+    case 'stunt':        return generateStunt(t);
     case 'obstacle':     return generateObstacle(t);
     case 'countdown':    return generateCountdown(t);
-    case 'constraint':   return generateConstraint(t);
-    case 'pc':           return generatePC(t);
+    case 'constraint':      return generateConstraint(t);
+    case 'pc':              return generatePC(t);
+    case 'npc_instant':     return generateNpcInstant(t, opts);
+    case 'scene_hook':      return generateSceneHook(t);
+    case 'location_flavor': return generateLocationFlavor(t);
     default: return {};
   }
 }
@@ -752,8 +769,13 @@ function _generate(genId, t, partySize, opts) {
  */
 function generateConsequence(t, opts) {
   var o = opts || {};
-  // F4: severity can be forced via opts.severity ('mild','moderate','severe') or random
-  var severity = o.severity || pick(['mild', 'mild', 'moderate', 'severe']);
+  // F4: severity can be forced via opts.severity ('mild','moderate','severe') or random.
+  // Validate against known values — unknown strings (e.g. typos) fall back to random
+  // rather than silently producing an empty aspect via pick(undefined).
+  var VALID_SEV = { mild: 1, moderate: 1, severe: 1 };
+  var severity = (o.severity && VALID_SEV[o.severity])
+    ? o.severity
+    : pick(['mild', 'mild', 'moderate', 'severe']);
   var aspect = pick(t['consequence_' + severity]);
   var context = pick(t.consequence_contexts);
   var compel_hook = pick(t.compel_situations);
@@ -826,6 +848,18 @@ function generateBackstory(t) {
     relationship: relationship,
     hook: hook,
   };
+}
+
+/**
+ * Generate a stunt: picks a random stunt from campaign tables or the universal pool.
+ * @param {object} t - Filtered world tables.
+ * @returns {object} Stunt result object.
+ */
+function generateStunt(t) {
+  var pool = (t.stunts || []).concat(UNIVERSAL && UNIVERSAL.stunts ? UNIVERSAL.stunts : []);
+  if (!pool.length) return { name: 'Unnamed Stunt', skill: 'varies', desc: 'No stunts available in this campaign.', type: 'bonus', tags: [] };
+  var s = pick(pool);
+  return { name: s.name || '', skill: s.skill || 'varies', desc: s.desc || s.description || '', type: s.type || 'bonus', tags: s.tags || [] };
 }
 
 // ════════════════════════════════════════════════════════════════════════
@@ -927,6 +961,109 @@ function generateConstraint(t) {
 }
 
 // ════════════════════════════════════════════════════════════════════════
+// GM INTERFACE GENERATORS (Phase 3)
+// ════════════════════════════════════════════════════════════════════════
+
+/**
+ * NPC Instant-Stat: quick NPC at a chosen power level.
+ * Returns name, high concept, optional trouble, peak skill, stress, optional stunt.
+ * @param {object} t - Filtered world tables.
+ * @param {object} [opts] - Options: { powerLevel: 'mook'|'average'|'fair'|'good'|'great' }
+ * @returns {object} NPC Instant result object.
+ */
+function generateNpcInstant(t, opts) {
+  var POWER = {
+    mook:    { peakRating: 1, aspects: 1, stress: 1, stunt: false },
+    average: { peakRating: 2, aspects: 2, stress: 2, stunt: false },
+    fair:    { peakRating: 3, aspects: 2, stress: 3, stunt: true  },
+    good:    { peakRating: 4, aspects: 3, stress: 4, stunt: true  },
+    great:   { peakRating: 5, aspects: 4, stress: 5, stunt: true  },
+  };
+  var powerLevel = (opts && opts.powerLevel) || 'average';
+  var p = POWER[powerLevel] || POWER.average;
+  var name = pick(t.names_first) + ' ' + pick(t.names_last);
+  var highConcept = fillTemplate(t.minor_concepts);
+  highConcept = highConcept.charAt(0).toUpperCase() + highConcept.slice(1);
+  var trouble = p.aspects >= 2 ? pick(t.troubles) : null;
+  if (trouble) trouble = trouble.charAt(0).toUpperCase() + trouble.slice(1);
+  var peakSkill = pick(ALL_SKILLS);
+  var bonusStunts = (t.stunts || []).filter(function(s) { return s.type === 'bonus'; });
+  var stunt = p.stunt && bonusStunts.length > 0
+    ? pickStuntsForSkills(bonusStunts, 1, [{name: peakSkill, r: p.peakRating}])[0] || null
+    : null;
+  return {
+    name: name,
+    highConcept: highConcept,
+    trouble: trouble,
+    peakSkill: { name: peakSkill, rating: p.peakRating },
+    stress: p.stress,
+    stunt: stunt,
+    powerLevel: powerLevel,
+  };
+}
+
+/**
+ * Scene Hook: generates a scene aspect with type and two compel suggestions.
+ * @param {object} t - Filtered world tables.
+ * @returns {object} Scene Hook result object.
+ */
+function generateSceneHook(t) {
+  var cats = ['scene_tone', 'scene_movement', 'scene_cover', 'scene_danger', 'scene_usable'];
+  var catKey = pick(cats);
+  var category = catKey.replace('scene_', '');
+  var aspectRaw = fillTemplate(t[catKey]);
+  var sceneAspect = aspectRaw ? aspectRaw.charAt(0).toUpperCase() + aspectRaw.slice(1) : 'Unusual Circumstances';
+  var compel1 = {
+    target: 'a PC with a related aspect',
+    pressure: pick(t.compel_situations || []) || 'The situation demands action',
+    consequence: pick(t.compel_consequences || []) || 'Things get worse',
+  };
+  var compel2 = {
+    target: 'the party as a whole',
+    pressure: pick(t.compel_situations || []) || 'An unexpected twist',
+    consequence: pick(t.compel_consequences || []) || 'A new complication arises',
+  };
+  var framing = t.scene_framing_questions || [];
+  return {
+    sceneAspect: sceneAspect,
+    aspectType: category,
+    compels: [compel1, compel2],
+    framingQuestion: framing.length > 0 ? pick(framing) : null,
+  };
+}
+
+/**
+ * Location Flavor: visual description, zones, and a hidden "discovery" aspect.
+ * @param {object} t - Filtered world tables.
+ * @returns {object} Location Flavor result object.
+ */
+function generateLocationFlavor(t) {
+  var location = pick(t.seed_locations) || 'An unremarkable place';
+  var toneRaw = fillTemplate(t.scene_tone);
+  var coverRaw = fillTemplate(t.scene_cover);
+  var tone = toneRaw ? toneRaw.charAt(0).toUpperCase() + toneRaw.slice(1) : '';
+  var cover = coverRaw ? coverRaw.charAt(0).toUpperCase() + coverRaw.slice(1) : '';
+  var description = tone + (tone && cover ? '. ' : '') + cover;
+  var usableRaw = fillTemplate(t.scene_usable);
+  var discoveryName = usableRaw ? usableRaw.charAt(0).toUpperCase() + usableRaw.slice(1) : 'Something Hidden';
+  var discoverSkills = ['Notice', 'Investigate', 'Lore'];
+  var hiddenDiscovery = {
+    name: discoveryName,
+    discoverSkill: pick(discoverSkills),
+    difficulty: rand(2, 4),
+  };
+  var zones = pickN(t.zones || [], rand(2, 3)).map(function(z) {
+    return { name: z[0], aspect: z[1], description: z[2] };
+  });
+  return {
+    location: location,
+    description: description,
+    hiddenDiscovery: hiddenDiscovery,
+    zones: zones,
+  };
+}
+
+// ════════════════════════════════════════════════════════════════════════
 // MARKDOWN EXPORT
 // ════════════════════════════════════════════════════════════════════════
 
@@ -950,6 +1087,11 @@ function mdStunt(s) {
   if (!s) return '';
   return '### ' + s.name + '\n**Skill:** ' + s.skill + ' \u00b7 `' +
     (s.type === 'special' ? 'ONCE/SCENE' : '+2 BONUS') + '`  \n' + s.desc;
+}
+var CON_NAMES = ['Mild', 'Moderate', 'Severe'];
+function mdConsequences(arr) {
+  var slots = arr || [2, 4, 6];
+  return slots.map(function(v, i) { return '| ' + (CON_NAMES[i] || 'Extra Mild') + ' | −' + v + ' |'; });
 }
 
 // ── Seed Pack: generate a full adventure as multiple typed cards ──────────
@@ -1036,9 +1178,8 @@ export function toMarkdown(genId, data, campName) {
         '**Mental:** ' + mdBoxes(d.mental_stress) + '\n',
         '| Consequence | Shift Value |',
         '|-------------|-------------|',
-        '| Mild        | −2          |',
-        '| Moderate    | −4          |',
-        '| Severe      | −6          |\n',
+      ]).concat(mdConsequences(d.consequences)).concat([
+        '',
         '**Refresh:** ' + d.refresh,
         MD_FOOTER,
       ]).join('\n');
@@ -1089,65 +1230,80 @@ export function toMarkdown(genId, data, campName) {
     case 'encounter': {
       var d = data;
       var oppLines = [];
-      d.opposition.forEach(function(o) {
-        oppLines.push('### ' + o.name + (o.qty > 1 ? ' ×' + o.qty : '') + ' `' + o.type.toUpperCase() + '`');
-        o.aspects.forEach(function(a) { oppLines.push('*' + a + '*'); });
-        oppLines.push('**Skills:** ' + o.skills.map(function(s) { return '+' + s.r + ' ' + s.name; }).join(', '));
+      (d.opposition||[]).forEach(function(o) {
+        oppLines.push('### ' + o.name + (o.qty > 1 ? ' ×' + o.qty : '') + ' `' + (o.type||'').toUpperCase() + '`');
+        (o.aspects||[]).forEach(function(a) { oppLines.push('*' + a + '*'); });
+        oppLines.push('**Skills:** ' + (o.skills||[]).map(function(s) { return '+' + s.r + ' ' + s.name; }).join(', '));
         if (o.stunt) oppLines.push('**Stunt:** ' + o.stunt);
         oppLines.push('**Stress:** ' + mdBoxes(o.stress));
         oppLines.push('');
       });
-      return [
+      var lines = [
         '# Encounter', '> *' + campName + '*\n',
-        '## Situation Aspects',
-      ].concat(d.aspects.map(function(a) { return '- *' + a + '*'; })).concat([
-        '\n## Zones',
-      ]).concat(d.zones.map(function(z) {
-        return '- **' + z.name + '**' + (z.aspect ? ' - *' + z.aspect + '*' : '');
-      })).concat(['\n## Opposition']).concat(oppLines).concat([
-        '## GM Fate Points',
-        '●'.repeat(d.gm_fate_points) + ' *(= number of PCs)*\n',
+        '## Scene Aspects',
+      ];
+      (d.aspects||[]).forEach(function(a) { lines.push('- *' + (typeof a === 'string' ? a : (a.name||'')) + '*'); });
+      lines.push('\n## Opposition');
+      lines = lines.concat(oppLines);
+      lines.push(
         '## Stakes',
         '| | Condition |',
         '|--|-----------|',
-        '| **Victory** | ' + d.victory + ' |',
-        '| **Defeat** | ' + d.defeat + ' |',
-        '| **Twist** | *' + d.twist + '* |',
-        MD_FOOTER,
-      ]).join('\n');
+        '| **Win** | ' + (d.victory||'') + ' |',
+        '| **Lose** | ' + (d.defeat||'') + ' |',
+      );
+      if (d.twist) { lines.push('\n## Twist', '*' + d.twist + '*'); }
+      if ((d.zones||[]).length) {
+        lines.push('\n## Zones');
+        d.zones.forEach(function(z) {
+          lines.push('- **' + (z.name||'') + '**' + (z.aspect ? ' - *' + z.aspect + '*' : ''));
+        });
+      }
+      if (d.gm_fate_points) {
+        lines.push('\n## GM Fate Points', '●'.repeat(d.gm_fate_points) + ' *(= number of PCs)*');
+      }
+      lines.push(MD_FOOTER);
+      return lines.join('\n');
     }
     case 'seed': {
       var d = data;
-      var sceneLines = d.scenes.map(function(s) {
+      var sceneLines = (d.scenes||[]).map(function(s) {
         return '### Scene ' + s.num + ' - ' + s.type + '\n' + s.brief;
       }).join('\n\n');
-      var oppLines = d.opposition.map(function(o) {
-        return '- **' + o.name + '** (' + (o.type === 'major' ? 'Major NPC' : 'Mook') + (o.qty > 1 ? ' ×' + o.qty : '') + ') - *' + o.aspects.join(', ') + '*'
-          + '\n  Skills: ' + o.skills.map(function(s) { return '+' + s.r + ' ' + s.name; }).join(', ')
+      var oppLines = (d.opposition||[]).map(function(o) {
+        return '- **' + o.name + '** (' + (o.type === 'major' ? 'Major NPC' : 'Mook') + (o.qty > 1 ? ' ×' + o.qty : '') + ') - *' + (o.aspects||[]).join(', ') + '*'
+          + '\n  Skills: ' + (o.skills||[]).map(function(s) { return '+' + s.r + ' ' + s.name; }).join(', ')
           + ' · Stress: ' + o.stress;
       }).join('\n');
-      return [
+      var lines = [
         '# Adventure Seed', '> *' + campName + '*\n',
-        '## Premise',
-        '**Location:** ' + d.location,
-        '**Objective:** ' + d.objective,
-        '**Complication:** ' + d.complication,
-        '\n## Three Scene Sketch',
+        '## Objective',
+        d.objective,
+        '\n## Location',
+        d.location,
+      ];
+      if (d.issue) { lines.push('\n## Issue in Play', d.issue); }
+      if (d.setting_asp) { lines.push('\n## Setting Aspect', '*' + d.setting_asp + '*'); }
+      lines.push(
+        '\n## Complication',
+        d.complication,
+        '\n## 3-Scene Skeleton',
         sceneLines,
-        '\n## Opposition',
-        oppLines,
+      );
+      if (d.twist) { lines.push('\n## Twist', '*' + d.twist + '*'); }
+      lines.push(
         '\n## Stakes',
         '| | Condition |',
         '|--|-----------|',
-        '| **Victory** | ' + d.victory + ' |',
-        '| **Defeat** | ' + d.defeat + ' |',
-        '| **Twist** | *' + d.twist + '* |',
-        '\n## Campaign Anchor',
-        '**Setting Aspect:** *' + d.setting_asp + '*',
-        '**Active Issue:** ' + d.issue,
+        '| **Win** | ' + (d.victory||'') + ' |',
+        '| **Lose** | ' + (d.defeat||'') + ' |',
+      );
+      if (oppLines) { lines.push('\n## Opposition', oppLines); }
+      lines.push(
         '\n> Prep Scene 1 in full. Scenes 2 and 3 are targets - follow the players. State victory/defeat before the first roll.',
         MD_FOOTER,
-      ].join('\n\n');
+      );
+      return lines.join('\n\n');
     }
     case 'compel': {
       var d = data;
@@ -1230,13 +1386,15 @@ export function toMarkdown(genId, data, campName) {
     }
     case 'faction': {
       var d = data;
+      var f = d.face || {};
+      var faceLine = typeof f === 'string' ? f : ('**' + (f.name||'') + '** - ' + (f.role||''));
       return [
         '# Faction: ' + d.name, '> *' + campName + '*\n',
-        '**Goal:** ' + d.goal,
-        '**Method:** ' + d.method,
-        '**Weakness:** ' + d.weakness,
-        '\n## Named Face',
-        '**' + d.face.name + '** - ' + d.face.role,
+        '## Goal', d.goal,
+        '\n## Method', d.method,
+        '\n## Weakness', d.weakness,
+        '\n## The Face',
+        faceLine,
         MD_FOOTER,
       ].join('\n\n');
     }
@@ -1281,7 +1439,7 @@ export function toMarkdown(genId, data, campName) {
         '**Physical:** ' + physBoxes + '  ',
         '**Mental:** ' + mentBoxes + '\n',
         '**Refresh:** ' + (d.refresh||3) + '  ',
-        '**Consequences:** Mild (−2) · Moderate (−4) · Severe (−6)',
+        '**Consequences:** ' + (d.consequences||[2,4,6]).map(function(v,i){ return (CON_NAMES[i]||'Extra Mild') + ' (−' + v + ')'; }).join(' · '),
         '\n## Session Zero Questions',
         (d.questions||[]).map(function(q,i){ return (i+1) + '. ' + q; }).join('\n'),
         MD_FOOTER,
@@ -1299,6 +1457,18 @@ export function toMarkdown(genId, data, campName) {
         d.hook,
         MD_FOOTER,
       ].join('\n\n');
+    }
+    case 'stunt': {
+      var d = data;
+      return [
+        '# Stunt: ' + d.name,
+        '> *' + campName + '*\n',
+        '**Skill:** ' + d.skill,
+        '**Type:** ' + (d.type || 'bonus'),
+        '\n' + d.desc,
+        d.tags && d.tags.length ? '\n**Tags:** ' + d.tags.join(', ') : '',
+        MD_FOOTER,
+      ].filter(function(l){return l!=='';}).join('\n');
     }
     case 'obstacle': {
       var d = data;
@@ -1387,6 +1557,59 @@ export function toMarkdown(genId, data, campName) {
           MD_FOOTER,
         ].join('\n\n');
       }
+    }
+    case 'npc_instant': {
+      var di = data;
+      var lines = ['# ' + (di.name || 'NPC') + ' (' + (di.powerLevel || 'average') + ')'];
+      if (campName) lines[0] += '\n*' + campName + '*';
+      lines.push('\n## Aspects');
+      lines.push('**High Concept:** ' + (di.highConcept || ''));
+      if (di.trouble) lines.push('**Trouble:** ' + di.trouble);
+      lines.push('\n## Peak Skill');
+      lines.push('**+' + (di.peakSkill ? di.peakSkill.rating : 0) + '** ' + (di.peakSkill ? di.peakSkill.name : ''));
+      lines.push('\n## Stress');
+      lines.push(mdBoxes(di.stress || 1));
+      if (di.stunt) { lines.push('\n## Stunt'); lines.push(mdStunt(di.stunt)); }
+      lines.push(MD_FOOTER);
+      return lines.join('\n');
+    }
+    case 'scene_hook': {
+      var dh = data;
+      var lines = ['# Scene Hook'];
+      if (campName) lines[0] += '\n*' + campName + '*';
+      lines.push('\n## Scene Aspect (' + (dh.aspectType || 'tone') + ')');
+      lines.push('**' + (dh.sceneAspect || '') + '**');
+      if (dh.compels && dh.compels.length) {
+        lines.push('\n## Compel Suggestions');
+        dh.compels.forEach(function(c, i) {
+          lines.push('### Compel ' + (i + 1) + ' — ' + c.target);
+          lines.push('**Pressure:** ' + c.pressure);
+          lines.push('**Consequence:** ' + c.consequence);
+        });
+      }
+      if (dh.framingQuestion) lines.push('\n**Framing:** ' + dh.framingQuestion);
+      lines.push(MD_FOOTER);
+      return lines.join('\n');
+    }
+    case 'location_flavor': {
+      var dl = data;
+      var lines = ['# ' + (dl.location || 'Location')];
+      if (campName) lines[0] += '\n*' + campName + '*';
+      lines.push('\n## Description');
+      lines.push(dl.description || '');
+      if (dl.hiddenDiscovery) {
+        lines.push('\n## Hidden Discovery (GM Only)');
+        lines.push('**Aspect:** ' + dl.hiddenDiscovery.name);
+        lines.push('**Discover:** ' + dl.hiddenDiscovery.discoverSkill + ' at +' + dl.hiddenDiscovery.difficulty);
+      }
+      if (dl.zones && dl.zones.length) {
+        lines.push('\n## Zones');
+        dl.zones.forEach(function(z) {
+          lines.push('- **' + (z.name || '') + '** — ' + (z.aspect || ''));
+        });
+      }
+      lines.push(MD_FOOTER);
+      return lines.join('\n');
     }
     default: return '';
   }
@@ -1525,7 +1748,7 @@ function toMermaid(genId, data, campName) {
         '  G[' + mq('\uD83C\uDFAF Goal: ' + (data.goal || '')) + ']',
         '  M[' + mq('\u2694 Method: ' + (data.method || '')) + ']',
         '  W[' + mq('\u26A0 Weakness: ' + (data.weakness || '')) + ']',
-        '  P[' + mq('\uD83D\uDC64 Face: ' + (data.face || '')) + ']',
+        '  P[' + mq('\uD83D\uDC64 Face: ' + (typeof data.face === 'string' ? data.face : ((data.face||{}).name||''))) + ']',
         '  F --> G',
         '  G --> M',
         '  F --> W',
@@ -1559,20 +1782,26 @@ function toMermaid(genId, data, campName) {
 
     // ── Seed ──────────────────────────────────────────────────────────────
     case 'seed': {
-      return [
+      var lines = [
         'flowchart TD',
-        '  A[\uD83C\uDF31 Situation\\n' + mq(data.location || data.situation || '') + ']',
-        '  B[\uD83C\uDFAF Objective\\n' + mq(data.objective || '') + ']',
+        '  OBJ[\uD83C\uDFAF Objective\\n' + mq(data.objective || '') + ']',
+        '  LOC[\uD83C\uDF31 Location\\n' + mq(data.location || '') + ']',
+      ];
+      lines.push('  OBJ --> LOC');
+      if (data.issue) { lines.push('  ISS["Issue: ' + ms(data.issue) + '"]', '  LOC --> ISS'); }
+      lines.push(
         '  C[\u26A0 Complication\\n' + mq(data.complication || '') + ']',
-        '  D[\uD83D\uDD0D Twist\\n' + mq(data.twist || '') + ']',
-        '  E[\u2714 Win: ' + mq(data.victory || data.stakes_good || '') + ']',
-        '  F[\u2716 Lose: ' + mq(data.defeat || data.stakes_bad || '') + ']',
-        '  A --> B',
-        '  B --> C',
-        '  C --> D',
-        '  D --> E',
-        '  D --> F',
-      ].join('\n');
+        '  ' + (data.issue ? 'ISS' : 'LOC') + ' --> C',
+      );
+      if (data.twist) { lines.push('  D[\uD83D\uDD0D Twist\\n' + mq(data.twist) + ']', '  C --> D'); }
+      var prev = data.twist ? 'D' : 'C';
+      lines.push(
+        '  E[\u2714 Win: ' + mq(data.victory || '') + ']',
+        '  F[\u2716 Lose: ' + mq(data.defeat || '') + ']',
+        '  ' + prev + ' --> E',
+        '  ' + prev + ' --> F',
+      );
+      return lines.join('\n');
     }
 
     // ── Campaign ──────────────────────────────────────────────────────────
@@ -1594,19 +1823,25 @@ function toMermaid(genId, data, campName) {
     // ── Encounter ─────────────────────────────────────────────────────────
     case 'encounter': {
       var opp = data.opposition || [];
-      var lines = [
-        'graph TD',
-        '  WIN[\u2714 ' + mq(data.victory || '') + ']',
-        '  LOSE[\u2716 ' + mq(data.defeat || '') + ']',
-      ];
+      var lines = ['graph TD'];
       opp.forEach(function(o, i) {
         var n = o.name || o;
         var q = o.qty && o.qty > 1 ? '\u00d7' + o.qty + ' ' : '';
         lines.push('  O' + i + '["' + ms(q + n) + '"]');
+      });
+      lines.push(
+        '  WIN[\u2714 ' + mq(data.victory || '') + ']',
+        '  LOSE[\u2716 ' + mq(data.defeat || '') + ']',
+      );
+      opp.forEach(function(o, i) {
         lines.push('  O' + i + ' --> WIN');
         lines.push('  O' + i + ' --> LOSE');
       });
       if (data.twist) lines.push('  T["\\u21A9 Twist: ' + ms(data.twist) + '"]');
+      (data.zones||[]).forEach(function(z, i) {
+        var n = typeof z === 'string' ? z : (z.name || '');
+        lines.push('  Z' + i + '["' + ms(n) + '"]');
+      });
       return lines.join('\n');
     }
 
@@ -1813,7 +2048,7 @@ function toObsidianMD(genId, data, campName) {
       lines.push('**Physical** ' + '\u25a1 '.repeat(data.physical_stress||3).trim() +
         '   **Mental** ' + '\u25a1 '.repeat(data.mental_stress||3).trim() +
         '   **Refresh** ' + (data.refresh||3));
-      lines.push('*Consequences: Mild \u22122 / Moderate \u22124 / Severe \u22126*');
+      lines.push('*Consequences: ' + (data.consequences||[2,4,6]).map(function(v,i){ return (CON_NAMES[i]||'Extra Mild') + ' \u2212' + v; }).join(' / ') + '*');
       if (isPC && data.questions && data.questions.length) {
         lines.push('', '## Session Zero', '');
         data.questions.forEach(function(q, i){ lines.push((i+1) + '. *' + q + '*'); });
@@ -1831,21 +2066,30 @@ function toObsidianMD(genId, data, campName) {
       return lines.join('\n');
     }
     case 'faction': {
+      var f = data.face || {};
+      var faceText = typeof f === 'string' ? f : ((f.name||'') + (f.role ? ' — ' + f.role : ''));
       return ['# ' + data.name, '*Faction' + (campName ? ' \u00b7 ' + campName : '') + '*', '',
         callout('abstract', 'Goal', data.goal||''), '',
         callout('example', 'Method', data.method||''), '',
         callout('danger', 'Weakness', data.weakness||''), '',
-        callout('info', 'Face', data.face||''),
+        callout('info', 'The Face', faceText),
       ].join('\n');
     }
     case 'seed': {
-      return ['# ' + (data.location || 'Adventure Seed'), '*Seed' + (campName ? ' \u00b7 ' + campName : '') + '*', '',
+      var scenes = (data.scenes||[]).map(function(s){ return '**' + s.type + ':** ' + s.brief; }).join('\n');
+      var opp = (data.opposition||[]).map(function(o){ return '- **' + o.name + '** ×' + (o.qty||1) + ' — ' + (o.skills||[]).map(function(s){return '+'+s.r+' '+s.name;}).join(', '); }).join('\n');
+      var lines = ['# ' + (data.location || 'Adventure Seed'), '*Seed' + (campName ? ' \u00b7 ' + campName : '') + '*', '',
         callout('abstract', 'Objective', data.objective||''), '',
-        callout('warning', 'Complication', data.complication||''), '',
-        callout('danger', 'Twist', data.twist||''), '',
-        '**Win:** ' + (data.victory || data.stakes_good||''),
-        '**Lose:** ' + (data.defeat || data.stakes_bad||''),
-      ].join('\n');
+        '**Location:** ' + (data.location||''), '',
+      ];
+      if (data.issue) { lines.push(callout('note', 'Issue in Play', data.issue), ''); }
+      if (data.setting_asp) { lines.push('**Setting Aspect:** *' + data.setting_asp + '*', ''); }
+      lines.push(callout('warning', 'Complication', data.complication||''), '');
+      if (scenes) { lines.push('## 3-Scene Skeleton', scenes, ''); }
+      if (data.twist) { lines.push(callout('danger', 'Twist', data.twist), ''); }
+      lines.push('**Win:** ' + (data.victory||''), '**Lose:** ' + (data.defeat||''));
+      if (opp) { lines.push('', '## Opposition', opp); }
+      return lines.join('\n');
     }
     case 'campaign': {
       var cur = data.current || {}; var imp = data.impending || {}; var setting = data.setting || [];
@@ -1915,7 +2159,7 @@ function toTypst(genId, data, campName) {
       var phBoxes = Array(data.physical_stress||3).fill('#sb').join(' ');
       var mnBoxes = Array(data.mental_stress||3).fill('#sb').join(' ');
       body += '#grid(columns: (auto, auto, auto, auto, auto), gutter: 6pt, [*PHYSICAL*], [' + phBoxes + '], [*MENTAL*], [' + mnBoxes + '], [*REFRESH ' + (data.refresh||3) + '*])\n';
-      body += '#text(fill: muted, size: 8pt)[Consequences: Mild \u22122 / Moderate \u22124 / Severe \u22126]\n';
+      body += '#text(fill: muted, size: 8pt)[Consequences: ' + (data.consequences||[2,4,6]).map(function(v,i){ return (CON_NAMES[i]||'Extra Mild') + ' \u2212' + v; }).join(' / ') + ']\n';
       if (isPC && data.questions && data.questions.length) {
         body += '\n*SESSION ZERO*\n#v(3pt)\n';
         data.questions.forEach(function(q, i){ body += '#block(stroke: (left: 2pt + rgb("#dddddd")), inset: (left: 8pt, y: 4pt), below: 4pt)[' + (i+1) + '. #text(style: "italic")[' + esc(q) + ']]\n'; });
@@ -2007,7 +2251,7 @@ export function toPlainText(genId, data, campName) {
       }
       out += '\u251c' + hr('\u2500') + '\u2524\n';
       out += row('PHYSICAL  '+stressBoxes(data.physical_stress||3)+'   MENTAL  '+stressBoxes(data.mental_stress||3));
-      out += row('REFRESH '+(data.refresh||3)+'   Mild \u22122 / Moderate \u22124 / Severe \u22126');
+      out += row('REFRESH '+(data.refresh||3)+'   '+(data.consequences||[2,4,6]).map(function(v,i){ return (CON_NAMES[i]||'Extra Mild')+' \u2212'+v; }).join(' / '));
       if (isPC && data.questions && data.questions.length) {
         out += '\u251c' + hr('\u2500') + '\u2524\n'; out += row('SESSION ZERO');
         data.questions.forEach(function(q,i){ wrap((i+1)+'. '+q,'   ',W-2).split('\n').forEach(function(l,li){ out+=row(li===0?(i+1)+'. '+l.slice(3):l); }); });
@@ -2015,17 +2259,40 @@ export function toPlainText(genId, data, campName) {
       break;
     }
     case 'faction': {
+      var f = data.face || {};
+      var faceStr = typeof f === 'string' ? f : ((f.name||'') + (f.role ? ' - ' + f.role : ''));
       out += row(data.name||''); out += row('');
-      out += row('GOAL     '+(data.goal||'')); out += row('METHOD   '+(data.method||''));
-      out += row('WEAKNESS '+(data.weakness||'')); out += row('FACE     '+(data.face||''));
+      wrap('GOAL: '+(data.goal||''),'',W-2).split('\n').forEach(function(l){out+=row(l);});
+      out += row('');
+      wrap('METHOD: '+(data.method||''),'',W-2).split('\n').forEach(function(l){out+=row(l);});
+      out += row('');
+      wrap('WEAKNESS: '+(data.weakness||''),'',W-2).split('\n').forEach(function(l){out+=row(l);});
+      out += row('');
+      out += row('FACE: '+faceStr);
       break;
     }
     case 'seed': {
       out += row(data.location||data.situation||''); out += row('');
-      out += row('OBJECTIVE    '+(data.objective||'')); out += row('COMPLICATION '+(data.complication||''));
-      out += row('TWIST        '+(data.twist||'')); out += row('');
+      wrap('OBJECTIVE: '+(data.objective||''),'',W-2).split('\n').forEach(function(l){out+=row(l);});
+      out += row('LOCATION: '+(data.location||''));
+      if (data.issue) { out += row('ISSUE: '+(data.issue)); }
+      if (data.setting_asp) { out += row('SETTING ASP: '+(data.setting_asp)); }
+      out += row('');
+      wrap('COMPLICATION: '+(data.complication||''),'',W-2).split('\n').forEach(function(l){out+=row(l);});
+      out += row('');
+      (data.scenes||[]).forEach(function(s){
+        wrap(s.type+': '+s.brief,'',W-2).split('\n').forEach(function(l){out+=row(l);});
+      });
+      if (data.twist) { out += row(''); out += row('TWIST: '+(data.twist)); }
+      out += row('');
       out += row('WIN  '+(data.victory||data.stakes_good||''));
       out += row('LOSE '+(data.defeat||data.stakes_bad||''));
+      if ((data.opposition||[]).length) {
+        out += row('');
+        (data.opposition).forEach(function(o){
+          out += row(o.name+' x'+(o.qty||1)+' ('+(o.type||'')+')');
+        });
+      }
       break;
     }
     default: {
@@ -2150,3 +2417,146 @@ export function parseOgmaJSON(str) {
 
 export { GENERATORS };
 export { toBatchMermaid, toBatchObsidianMD, toBatchTypst };
+
+// ════════════════════════════════════════════════════════════════════════
+// SESSION ZERO WIZARD — suggestion helpers
+// ════════════════════════════════════════════════════════════════════════
+
+/**
+ * Suggest a skill pyramid for a PC based on high concept and trouble text.
+ * Uses keyword matching to bias skill selection toward thematically appropriate
+ * skills, then fills remaining slots randomly to complete the pyramid.
+ *
+ * Pyramid: 1×Great(+4), 2×Good(+3), 3×Fair(+2), 4×Average(+1) = 10 rated skills.
+ *
+ * @param {string} hc - High concept text (may be empty).
+ * @param {string} trouble - Trouble text (may be empty).
+ * @param {object} [t] - Filtered world tables (unused for now, reserved for future).
+ * @returns {Array<{name:string, r:number}>} 10 skills with ratings.
+ */
+export function suggestSkillPyramid(hc, trouble, t) {
+  // Keyword → skill affinity map (lowercase keywords → skill names)
+  var AFFINITY = {
+    fight: 'Fight', combat: 'Fight', warrior: 'Fight', knight: 'Fight', soldier: 'Fight', sword: 'Fight', blade: 'Fight', martial: 'Fight',
+    shoot: 'Shoot', sniper: 'Shoot', gun: 'Shoot', archer: 'Shoot', marksman: 'Shoot', rifle: 'Shoot', ranged: 'Shoot',
+    stealth: 'Stealth', thief: 'Stealth', shadow: 'Stealth', hidden: 'Stealth', spy: 'Stealth', assassin: 'Stealth', covert: 'Stealth',
+    burglary: 'Burglary', burglar: 'Burglary', lock: 'Burglary', security: 'Burglary', vault: 'Burglary', break: 'Burglary',
+    drive: 'Drive', pilot: 'Drive', driver: 'Drive', vehicle: 'Drive', ship: 'Drive', mechanic: 'Drive', rider: 'Drive',
+    athletics: 'Athletics', acrobat: 'Athletics', climb: 'Athletics', run: 'Athletics', agile: 'Athletics', scout: 'Athletics',
+    physique: 'Physique', strong: 'Physique', tough: 'Physique', brute: 'Physique', endure: 'Physique', muscle: 'Physique',
+    will: 'Will', determined: 'Will', stubborn: 'Will', resolve: 'Will', unshakeable: 'Will', mental: 'Will',
+    empathy: 'Empathy', healer: 'Empathy', medic: 'Empathy', counselor: 'Empathy', empath: 'Empathy', read: 'Empathy',
+    rapport: 'Rapport', diplomat: 'Rapport', charming: 'Rapport', negotiat: 'Rapport', persuad: 'Rapport', trust: 'Rapport',
+    provoke: 'Provoke', intimidat: 'Provoke', menac: 'Provoke', threaten: 'Provoke', fear: 'Provoke', warlord: 'Provoke',
+    deceive: 'Deceive', liar: 'Deceive', con: 'Deceive', trick: 'Deceive', disguise: 'Deceive', fraud: 'Deceive',
+    investigate: 'Investigate', detective: 'Investigate', inspector: 'Investigate', clue: 'Investigate', forensic: 'Investigate', evidence: 'Investigate',
+    notice: 'Notice', watchful: 'Notice', alert: 'Notice', percep: 'Notice', aware: 'Notice', vigilant: 'Notice',
+    lore: 'Lore', scholar: 'Lore', wizard: 'Lore', arcane: 'Lore', magic: 'Lore', ancient: 'Lore', occult: 'Lore', witch: 'Lore',
+    academics: 'Academics', doctor: 'Academics', professor: 'Academics', scien: 'Academics', medic: 'Academics', surgeon: 'Academics', knowledge: 'Academics', teacher: 'Academics',
+    contacts: 'Contacts', connected: 'Contacts', network: 'Contacts', fixer: 'Contacts', broker: 'Contacts', trader: 'Contacts',
+    crafts: 'Crafts', engineer: 'Crafts', build: 'Crafts', repair: 'Crafts', artificer: 'Crafts', inventor: 'Crafts', tinker: 'Crafts',
+    resources: 'Resources', wealthy: 'Resources', merchant: 'Resources', rich: 'Resources', noble: 'Resources', prince: 'Resources', collector: 'Resources',
+  };
+
+  var text = ((hc || '') + ' ' + (trouble || '')).toLowerCase();
+  var words = text.split(/\W+/).filter(function(w) { return w.length > 2; });
+
+  // Score each skill by keyword hits
+  var scores = {};
+  ALL_SKILLS.forEach(function(s) { scores[s] = 0; });
+  words.forEach(function(w) {
+    // Check each affinity keyword — support partial matching (startsWith)
+    Object.keys(AFFINITY).forEach(function(kw) {
+      if (w.indexOf(kw) === 0 || kw.indexOf(w) === 0) {
+        scores[AFFINITY[kw]] += 1;
+      }
+    });
+  });
+
+  // Sort by score descending, then shuffle ties
+  var ranked = ALL_SKILLS.slice().sort(function(a, b) {
+    var diff = scores[b] - scores[a];
+    if (diff !== 0) return diff;
+    return _rng() - 0.5; // random tiebreaker
+  });
+
+  // Build pyramid: top 10 skills
+  var chosen = ranked.slice(0, 10);
+  return [
+    { name: chosen[0], r: 4 },
+    { name: chosen[1], r: 3 }, { name: chosen[2], r: 3 },
+    { name: chosen[3], r: 2 }, { name: chosen[4], r: 2 }, { name: chosen[5], r: 2 },
+    { name: chosen[6], r: 1 }, { name: chosen[7], r: 1 }, { name: chosen[8], r: 1 }, { name: chosen[9], r: 1 },
+  ];
+}
+
+/**
+ * Suggest aspects for a PC using world tables. Returns multiple options for a given slot.
+ *
+ * @param {string} slot - 'high_concept' | 'trouble' | 'relationship' | 'free'
+ * @param {object} t - Filtered world tables.
+ * @param {number} [count=4] - How many suggestions to return.
+ * @returns {string[]} Array of suggested aspect phrases.
+ */
+export function suggestAspects(slot, t, count) {
+  var n = count || 4;
+  if (!t) return [];
+
+  switch (slot) {
+    case 'high_concept': {
+      var pool = t.pc_high_concepts || t.major_concepts;
+      if (!pool || !pool.length) return [];
+      // Use fillTemplate for variety-matrix tables, pick for plain arrays
+      if (Array.isArray(pool) && typeof pool[0] === 'string') return pickN(pool, n);
+      var out = [];
+      for (var i = 0; i < n * 3 && out.length < n; i++) {
+        var a = fillTemplate(pool);
+        if (a && out.indexOf(a) === -1) out.push(a);
+      }
+      return out;
+    }
+    case 'trouble': {
+      var pool = t.troubles || [];
+      if (!pool.length) return [];
+      return pickN(pool, n);
+    }
+    case 'relationship': {
+      // Generate from other_aspects or backstory relationship tables
+      var pool = t.backstory_relationship
+        ? (Array.isArray(t.backstory_relationship) ? t.backstory_relationship : [t.backstory_relationship])
+        : [];
+      if (pool.length) return pickN(pool, n);
+      // Fallback: generate from other_aspects
+      var out = [];
+      for (var i = 0; i < n * 3 && out.length < n; i++) {
+        var a = fillTemplate(t.other_aspects);
+        if (a && out.indexOf(a) === -1) out.push(a);
+      }
+      return out;
+    }
+    case 'free':
+    default: {
+      var out = [];
+      for (var i = 0; i < n * 3 && out.length < n; i++) {
+        var a = fillTemplate(t.other_aspects);
+        if (a && out.indexOf(a) === -1) out.push(a);
+      }
+      return out;
+    }
+  }
+}
+
+/**
+ * Suggest stunts filtered to match a set of skills. Returns stunt objects.
+ *
+ * @param {Array<{name:string, r:number}>} skills - PC's assigned skills.
+ * @param {object} t - Filtered world tables.
+ * @param {number} [count=6] - How many suggestions to return.
+ * @returns {Array<{name:string, skill:string, desc:string, type:string}>}
+ */
+export function suggestStunts(skills, t, count) {
+  var n = count || 6;
+  var pool = (t && t.stunts ? t.stunts : []).concat(UNIVERSAL && UNIVERSAL.stunts ? UNIVERSAL.stunts : []);
+  if (!pool.length) return [];
+  return pickStuntsForSkills(pool, n, skills || []);
+}

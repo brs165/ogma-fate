@@ -1,5 +1,6 @@
 <script>
-  import { RadioGroup } from 'bits-ui';
+  import { RadioGroup, Checkbox } from 'bits-ui';
+  import OgmaTooltip from '../../shared/OgmaTooltip.svelte';
 
   let { data = {}, campName = '', catColor = 'var(--fs-section)', cardState = {}, onUpdate = () => {} } = $props();
 
@@ -19,6 +20,13 @@
     if (side === 'a') onUpdate({ scoreA: Math.min(sA + 1, victories) });
     else              onUpdate({ scoreB: Math.min(sB + 1, victories) });
   }
+  function toggleVictory(side, idx) {
+    const cur = side === 'a' ? sA : sB;
+    const next = idx < cur ? idx : idx + 1;
+    const clamped = Math.min(next, victories);
+    if (side === 'a') onUpdate({ scoreA: clamped });
+    else              onUpdate({ scoreB: clamped });
+  }
   function reset(e) { e.stopPropagation(); onUpdate({ scoreA: 0, scoreB: 0 }); }
 </script>
 
@@ -31,6 +39,9 @@
 {/if}
 
 <!-- Score panels -->
+<OgmaTooltip tip="Victory track — each exchange, both sides roll. The winner marks a victory. First to {victories} victories wins the contest (FCon p.24).">
+  <div class="fs-section-hdr" style="cursor:help; margin-bottom:6px" tabindex="0">VICTORIES (first to {victories})</div>
+</OgmaTooltip>
 <div class="fs-section-gap" style="display:flex; gap:8px">
   {#each [{ side: sideA, col: colA, score: sA, won: winA, key: 'a' }, { side: sideB, col: colB, score: sB, won: winB, key: 'b' }] as row}
     <div style="flex:1; background:{row.won ? 'color-mix(in srgb,' + row.col + ' 10%,transparent)' : 'var(--fs-bg-inset)'}; border:1.5px solid {row.won ? row.col : 'var(--fs-border)'}; border-radius:4px; padding:8px; transition:all .2s">
@@ -40,16 +51,19 @@
         style="width:100%; background:none; border:none; cursor:pointer; color:{row.col}; font-size:11px; font-weight:700; text-align:center; padding:0 0 6px; font-family:var(--font-mono); letter-spacing:0.06em"
       >
         {row.side.label} {row.won ? '✓ WON' : '+ victory'}
+        {#if row.won}<span class="contest-trophy" aria-hidden="true">🏆</span>{/if}
       </button>
-      <div style="display:flex; gap:4px; justify-content:center" aria-label="{row.side.label} victories: {row.score} of {victories}">
+      <div class="fs-stress-boxes contest-victory-track" style="justify-content:center" aria-label="{row.side.label} victories: {row.score} of {victories}">
         {#each Array.from({length: victories}) as _, j}
-          <div
-            class="{j < row.score ? 'contest-box-filled' : ''}"
-            style="width:22px; height:22px; border-radius:3px; background:{j < row.score ? row.col : 'transparent'}; border:2px solid {row.col}; transition:all .15s; display:flex; align-items:center; justify-content:center"
-            aria-hidden="true"
+          {@const filled = j < row.score}
+          <Checkbox.Root
+            checked={filled}
+            onCheckedChange={() => toggleVictory(row.key, j)}
+            aria-label="{row.side.label} victory {j + 1}{filled ? ' (won)' : ' (empty)'}"
+            style="border-color:{row.col}; background:{filled ? row.col : 'transparent'}; color:{filled ? '#fff' : row.col};"
           >
-            {#if j < row.score}<i class="fa-solid fa-check" aria-hidden="true" style="font-size:10px; color:#fff"></i>{/if}
-          </div>
+            {#if filled}<i class="fa-solid fa-check" aria-hidden="true"></i>{/if}
+          </Checkbox.Root>
         {/each}
       </div>
       {#if row.side.skills}

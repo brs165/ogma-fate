@@ -40,8 +40,6 @@ import Dexie from 'dexie';
       help_level:              'new_fate',
       gm_mode:                 true,
       intro_seen:              {},
-      coach_canvas_dismissed:  false,
-      coach_play_dismissed:    false,
       pwa_nudge_dismissed:     false,
       safari_warn_dismissed:   false,
       ios_install_dismissed:   false,
@@ -72,6 +70,12 @@ import Dexie from 'dexie';
         }
       });
     } catch(e) {}
+
+    // Clean up orphaned keys from earlier schema versions
+    var ORPHANED = ['coach_canvas_dismissed', 'coach_play_dismissed'];
+    ORPHANED.forEach(function(k) {
+      if (prefs[k] !== undefined) { delete prefs[k]; changed = true; }
+    });
 
     if (!prefs._v) { prefs._v = LS_VERSION; changed = true; }
     if (changed) savePrefs(prefs);
@@ -400,7 +404,7 @@ export const DB = {
           reader.onload = function(ev) {
             try {
               var data = JSON.parse(ev.target.result);
-              if (!data.ogma) return reject(new Error('Not an Ogma file'));
+              if (data.format !== 'ogma') return reject(new Error('Not an Ogma file'));
               resolve(data);
             } catch(err) { reject(err); }
           };
@@ -488,7 +492,10 @@ export const DB = {
           for (var pi=0;pi<phy;pi++) phyBoxes += '<span class="stress-box phy"></span>';
           for (var mi=0;mi<men;mi++) menBoxes += '<span class="stress-box men"></span>';
           if (phy || men) rows.push('<div class="pc-stress">PHY ' + phyBoxes + '&nbsp;&nbsp;MEN ' + menBoxes + '</div>');
-          rows.push('<div class="pc-stress" style="font-size:7pt;color:#666">Mild □ 2  Moderate □ 4  Severe □ 6 &nbsp;|&nbsp; Refresh: ' + (data.refresh || 3) + '</div>');
+          var conSlots = data.consequences || [2, 4, 6];
+          var conLabels = ['Mild', 'Moderate', 'Severe'];
+          var conStr = conSlots.map(function(v, i) { return (conLabels[i] || 'Extra Mild') + ' □ ' + v; }).join('  ');
+          rows.push('<div class="pc-stress" style="font-size:7pt;color:#666">' + conStr + ' &nbsp;|&nbsp; Refresh: ' + (data.refresh || 3) + '</div>');
         }
 
         else if (genId === 'scene') {
@@ -658,7 +665,9 @@ export const DB = {
           for(var i=0;i<physN;i++) physB += '<span class="stress-box phy"></span>';
           for(var j=0;j<mentN;j++) mentB += '<span class="stress-box men"></span>';
           rows.push('<div class="pc-stress">PHYSICAL ' + physB + ' &nbsp; MENTAL ' + mentB + '  &nbsp; REFRESH <strong>' + (data.refresh||3) + '</strong></div>');
-          rows.push('<div class="pc-row asp-other" style="font-size:10px;opacity:.7">Consequences: Mild −2 / Moderate −4 / Severe −6</div>');
+          var conSlots2 = data.consequences || [2, 4, 6];
+          var conLabels2 = ['Mild', 'Moderate', 'Severe'];
+          rows.push('<div class="pc-row asp-other" style="font-size:10px;opacity:.7">Consequences: ' + conSlots2.map(function(v, i) { return (conLabels2[i] || 'Extra Mild') + ' −' + v; }).join(' / ') + '</div>');
           if (Array.isArray(data.questions) && data.questions.length) {
             rows.push('<div class="pc-stunt-hdr">SESSION ZERO</div>');
             data.questions.forEach(function(q,i){ rows.push('<div class="pc-row asp-other">'+(i+1)+'. '+esc(q)+'</div>'); });
@@ -819,7 +828,9 @@ export const DB = {
           for(var i=0;i<physN;i++) physB+='<span class="stress-box phy"></span>';
           for(var j=0;j<mentN;j++) mentB+='<span class="stress-box men"></span>';
           rows.push('<div class="pc-stress">PHYSICAL '+physB+' &nbsp; MENTAL '+mentB+' &nbsp; REFRESH <strong>'+(data.refresh||3)+'</strong></div>');
-          rows.push('<div class="pc-row asp-other" style="font-size:10px;opacity:.7">Consequences: Mild &minus;2 / Moderate &minus;4 / Severe &minus;6</div>');
+          var conSlots3 = data.consequences || [2, 4, 6];
+          var conLabels3 = ['Mild', 'Moderate', 'Severe'];
+          rows.push('<div class="pc-row asp-other" style="font-size:10px;opacity:.7">Consequences: ' + conSlots3.map(function(v, i) { return (conLabels3[i] || 'Extra Mild') + ' &minus;' + v; }).join(' / ') + '</div>');
           if (genId==='pc' && Array.isArray(data.questions) && data.questions.length) {
             rows.push('<div class="pc-stunt-hdr">SESSION ZERO</div>');
             data.questions.forEach(function(q,i){ rows.push('<div class="pc-row asp-other">'+(i+1)+'. '+esc(q)+'</div>'); });
@@ -1034,5 +1045,3 @@ export const DB = {
     },
 
   };
-
-export default DB;

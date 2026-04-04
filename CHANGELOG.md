@@ -2,6 +2,124 @@
 
 ---
 
+## [2026.04.822] — April 2026 — RetroUI Full UX Overhaul
+
+### Design system — RetroUI aesthetic (matching retroui-svelte.netlify.app)
+- `--glass-blur` and `--glass-blur-sm` set to `none` — all glass morphism panels replaced with solid backgrounds; backdrop-filter disabled across topbar, sidebar, bottom nav, modals, toast, canvas cards, floating panels, landing nav
+- Hard offset box-shadow system replaces all blur-based shadows throughout the app:
+  - `--fd-stamp-shadow: 3px 3px 0 color-mix(in srgb,var(--accent-dim) 70%,rgba(0,0,0,0.88))`
+  - `--fd-stamp-shadow-hover: 5px 5px 0 ...` — shadows are **campaign-accent tinted** and shift color automatically per world
+  - `--glass-shadow` updated to same hard offset formula
+- Dark mode panels solidified: `--panel rgba(22,19,15,0.90)`, `--panel-raised rgba(30,26,20,0.97)` (was near-transparent)
+- Border opacity increased across dark and light mode: 0.18/0.30/0.48 (was 0.10/0.16/0.26) for crisper, more visible edges
+- `--fd-stamp-radius` and `--glass-radius-sm` bumped to 4px — consistent sharp retro corners
+
+### Components updated
+- **Buttons** (`.btn`): 2px border (was 1.5px); active state uses accent-tinted hard shadow instead of rgba black
+- **Topbar / sidebar / sb-slim-bar / bottom-nav**: 2px `border-mid` borders (was 1px glass-border)
+- **Hist panel**: accent-colored side shadow (`-4px 0 0 var(--accent-dim)`) replaces soft box-shadow
+- **Modal, card, result-panel, toast, qf-box, fp-tracker, floater**: 2px `border-mid` + hard stamp shadow
+- **Landing topnav + dropdown**: 2px border; dropdown uses hard shadow instead of soft glow
+- **Roll button** (`.btn-roll`): glow shadows (`0 0 10px/18px/6px color-mix(...)`) replaced with `3px/5px/1px hard offset` accent shadows; active state translates 2px down+right (RetroUI press effect)
+- **Canvas cards** (`.cc`): 2px border, 4px radius, hard stamp shadow; hover shows directional accent shadow instead of glow ring; drag-active scales as before
+- **Fate-sheet shadow** (`--fs-shadow`): hard 3px offset (was blurred); `.fd-card` hover translates cleanly without rotation
+
+---
+
+## [2026.04.821] — April 2026 — Forest Green Theme + Typography + PWA
+
+### Forest Green default theme
+- Default accent changed from amber/brown to forest green: `--accent:#52A875`, `--accent-dim:#3A7A56`, `--gold:#66BB6A`
+- Light mode green: `--accent:#2E7D32`, `--accent-dim:#1B5E20` — WCAG AAA contrast on both modes
+- Fate-sheet section/badge tokens updated to forest green: `--fs-section:#0e3820`, `--fs-badge-bg:#2E7D32`, `--fs-hdr-default` gradient
+- `--asp-character` preserved as amber (`#C8944A`) — semantic distinctness from `--asp-boost` green
+
+### Typography — RetroUI fonts
+- Added **Archivo Black** (display/hero headings) + **Space Grotesk 300–700** (UI/mono) to Google Fonts import
+- Font variable stack: `--font-display` → Archivo Black, `--font-ui`/`--font-mono` → Space Grotesk
+- `--font-camp: var(--font-ui)` (was `var(--font-display)`) — prevents Archivo Black cascading to all app-shell text
+- 4 elements with small/italic contexts reverted from `--font-display` → `--font-ui`
+- 3 hardcoded `'Jost'...` strings normalised to CSS variables
+
+### PWA branding
+- `app.html` `theme-color` meta: amber → `#0e2818` (forest green)
+- `manifest.json` `theme_color`: `#0E0C09` → `#0e2818`
+- Google Fonts preconnect hints added to `app.html`
+
+### Offline caching
+- `static/sw.js` fetch handler extended to intercept `fonts.googleapis.com` and `fonts.gstatic.com` — Google Fonts now cached at runtime for offline use
+
+
+
+### Progressive onboarding (25 recommendations from simulated play sessions)
+- First-visit welcome banner with Learn Fate / Session Zero CTAs (`visit_counts` infrastructure)
+- Ctrl+K coach mark appears after 3rd visit, dismissible with localStorage persistence
+- First-roll annotation: highlights result sections with brief explanations for new users
+- Auto-expand "New here?" tab in GM Guidance for users with `help_level === 'new_fate'`
+- `autoGuidance` prop made reactive via `$effect` (was only capturing initial value)
+- Help level auto-upgrade: `new_fate` → `familiar` after 5 visits
+- Mobile FAB hint toast after first "Send to Table" action on mobile
+
+### Contextual help
+- HelpPanel auto-expands section matching active generator (GEN_TO_SECTION mapping)
+- Quick Start `<details open>` summaries on all 8 help pages (5 bullet-point essentials)
+- "Share this guide" button on Learn Fate with Web Share API + clipboard fallback
+
+### Canvas & mobile
+- Canvas templates surfaced in gen-column empty state (4 template grid for mobile discovery)
+- Context-aware empty state in OgmaCanvas via `embedded` prop (mobile vs desktop hints)
+- Session Zero handoff retry loop (up to 20 attempts × 100ms) replacing fixed 500ms timeout
+- `Board.dropTemplateFromParent()` exported for Campaign.svelte template access
+
+### CSS
+- ~218 lines of onboarding component CSS (`.onb-banner`, `.onb-coach`, `.onb-first-roll`, etc.)
+- Mobile responsive overrides at `@media (max-width: 480px)` for all onboarding components
+- Removed duplicate `.cp-table-fab` and `.cp-mobile-sheet-*` CSS blocks
+- ARIA roles: `role="note"` for informational banners, `role="status"` for FAB hint
+
+---
+
+## [2026.03.691] — March 2026 — Code Audit
+
+### 8 issues fixed
+- Character creation infinite loop: `pcDrafts.push()` mutation inside `$effect` → immutable `Array.from` rebuild
+- Export selection reset on card change
+- Event listener leak in reduced-motion `matchMedia` handler
+- Debounced store persistence (was writing to IDB on every keystroke)
+- `Math.min/max` stack overflow with large arrays → loop-based implementation
+- Mobile table rewrite: single-Board architecture with bottom-sheet overlay
+- Duplicate CSS blocks consolidated
+- Session Zero wizard step validation edge case
+
+---
+
+## [2026.03.680] — March 2026 — Svelte 5 Runes Compliance Audit
+
+### Critical fixes
+- `Scene.svelte`: added missing `$props()` declaration — `data`, `cardState`, and `onUpdate` were used but never declared, causing runtime errors on free-invoke toggle and card render
+- `Campaign.svelte`: `unsubs = $state([])` → `let unsubs = []` — cleanup array proxied unnecessarily (matches existing `Board.svelte` pattern)
+
+### Reactive state hygiene
+- `ExportPanel.svelte`: promoted `sel` from plain `let` to `$state({})` for explicit reactive intent; removed `void exportable.length` dependency-tracking hack
+- `CommandPalette.svelte`: replaced `void filtered` hack with `filtered.length` reference
+- `Cv4Card.svelte`: replaced `void genId; void data` hacks with direct bare references; promoted `cardState` from plain `let` to `$state.raw({})` — always replaced wholesale, no deep proxy needed; demoted `mq` from `$state()` to plain `let` (DOM object, set once in `onMount`)
+- `character-creation/+page.svelte`: replaced `pcDrafts.push()` mutation inside `$effect` with immutable `Array.from` rebuild to avoid stale proxy reads
+
+### Effect hygiene
+- `Custom.svelte`: removed sync `$effect` that wrote `draftTitle`/`draftBody` from props; replaced with explicit draft initialization in `startEditTitle`/`startEditBody`; display branches now read `data.title`/`data.body` directly
+- `help/+layout.svelte`: replaced `void currentPath` hack with bare `currentPath` reference
+
+### Performance
+- `BoardBoost.svelte`, `BoardSticky.svelte`: replaced `setTimeout(..., 0)` focus with `tick().then()` for guaranteed post-render DOM timing
+
+### Snippet adoption
+- `NpcMajor.svelte`: extracted `{#snippet conRow(label, cls)}` to replace 3 hardcoded identical consequence rows — first `{#snippet}` usage in the card layer
+
+### Docs
+- All docs updated: component inventory corrected (75 total, 47 components), SvelteFlow references purged, `$state.raw` guidance added, outdated architecture tables fixed
+
+---
+
 ## [2026.03.677] — March 2026 — Sprint 6: Bits UI + Delight Pass
 
 ### Bits UI upgrades

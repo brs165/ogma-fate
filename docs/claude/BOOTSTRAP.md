@@ -35,7 +35,7 @@ Add others per task (e.g. `src/lib/stores/canvasStore.js`, `src/lib/components/b
 | `docs/claude/CANVAS-WORKSHOP.md` | Canvas sprint status |
 | `src/lib/engine.js` | Pure-function generator. No Svelte imports. |
 | `src/lib/db.js` | Dexie 4 IDB wrapper. No Svelte imports. |
-| `src/lib/stores/` | 6 stores: canvas, play, binder, sync, session, chrome |
+| `src/lib/stores/` | 3 stores: canvas, session, chrome |
 | `src/lib/components/board/Board.svelte` | Main app shell |
 | `src/data/` | 8 campaign data files + shared/universal/index |
 | `src/routes/+layout.js` | `ssr=false, prerender=false` |
@@ -47,8 +47,8 @@ Add others per task (e.g. `src/lib/stores/canvasStore.js`, `src/lib/components/b
 
 ## 4. Stack facts (critical)
 
-**Svelte 5 runes — 76 files, zero legacy:**
-- `$state()` on every mutable `let` — never plain `let` for reassigned vars
+**Svelte 5 runes — 78 files, zero legacy:**
+- `$state()` for mutable state; `$state.raw()` for objects always replaced wholesale (no deep proxy)
 - `$props()` for all component props — never `export let`
 - `onclick=` not `on:click=` — Svelte 5 event syntax
 - `$derived(expr)` — expression only, never a wrapping `() => {}`
@@ -91,21 +91,19 @@ src/lib/components/
 │                         Complication, Backstory, Obstacle, Countdown,
 │                         Constraint, Custom, Pc
 ├── cards/           4    StressRow, ClockTrack, Cv4Card, BackPanel
-├── board/          20    Board, BoardCard, BoardSticky, BoardBoost, BoardLabel,
-│                         TurnBar, PlayerRow, CombatTracker, PlayPanel, BinderPanel,
-│                         DossierModal, Topbar, ExportMenu, ExportPanel, HelpPanel,
-│                         StuntPanel, MobileList, CommandPalette,
-│                         CanvasContextMenu, GenerateFAB
+├── board/          19    Board, OgmaCanvas, BoardCard, BoardSticky, BoardBoost,
+│                         BoardLabel, BoardGroup, Topbar, AddMenu, DossierModal,
+│                         ExportMenu, ExportModal, ExportPanel, HelpPanel, StuntPanel,
+│                         MobileList, CommandPalette, CanvasContextMenu, GenerateFAB
 ├── campaign/        3    Campaign, FatePointTracker, Landing
 ├── dice/            1    DicePanel
 ├── panels/          1    LeftPanel
-├── player/          1    PlayerSurface
-└── shared/          2    HelpDiceRoller, Footer
+└── shared/          3    HelpDiceRoller, Footer, OgmaTooltip
 
-src/routes/         27    route pages/layouts
+src/routes/         29    route pages/layouts
 ```
 
-> NOTE: `src/lib/components/board/nodes/` and `nodeTypes.js` deleted in v662. `OgmaCanvas.svelte` added in v663.
+> Deleted in v662: `board/nodes/` (4 files) + `nodeTypes.js`. Deleted in v665: TurnBar, PlayerRow, CombatTracker, PlayPanel, BinderPanel, PlayerSurface (play mode removed).
 
 ---
 
@@ -122,12 +120,13 @@ npx vite build               # Must print "✔ done"
 ## 7. Zip delivery
 
 ```bash
-# BUILD SCRIPT RULE:
-# - `npx vite build` for test builds — NO version bump
+# BUILD RULE — DO NOT use npm run build for test builds
+# - `npx vite build` for all test/intermediate builds — NO version bump
 # - `bash scripts/bump-version.sh` ONCE only, immediately before the final zip
+#   The script auto-commits the bump — it CANNOT be accidentally lost.
 
 # Source zip (for GitHub push)
-bash scripts/bump-version.sh
+bash scripts/bump-version.sh   # bumps + auto-commits
 zip -rq YYYY-MM-NNN.zip . \
   -x "node_modules/*" -x ".svelte-kit/*" -x "build/*" -x ".git/*"
 
@@ -136,7 +135,7 @@ npx vite build
 cd build && zip -rq ../ogma-offline-YYYY-MM-NNN.zip .
 ```
 
-Current version: `2026.03.677`
+Current version: `2026.04.822`
 
 ---
 
@@ -152,6 +151,12 @@ Current version: `2026.03.677`
 8. `@xyflow/svelte` is removed — do not import from it
 
 
-## Next sprint
+## Recent work
 
-Sprint 16 — FCon rules correctness. See ROADMAP.md.
+- v822 — RetroUI full UX overhaul (hard offset shadows, solid panels, 2px borders, campaign accent shadows)
+- v821 — Forest Green default theme + Archivo Black / Space Grotesk typography + PWA branding + Google Fonts offline cache
+- v815 — JIT tooltips (OgmaTooltip on 15 card elements), /help/mistakes page, generator cross-links
+- v814 — Help content revamp (prev/next nav, SRD links, mobile polish, Wiki→Help rename)
+- v699 — Onboarding system (25 recommendations from play session reports)
+
+See `docs/claude/PROJECT_MEMORY.md` for full backlog.

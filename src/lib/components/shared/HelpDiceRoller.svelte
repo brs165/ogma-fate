@@ -1,5 +1,5 @@
 <script>
-  let { mode = 'basic', skill = 0, label = '' } = $props();
+  let { mode = 'basic', skill = 0, label = '', difficulty = 0, noOutcome = false } = $props();
   const ADJECTIVES = [
     [-4, 'Abysmal',    '#FF3B30'],
     [-3, 'Terrible',   '#FF6B4A'],
@@ -32,11 +32,11 @@
     return face === '+' ? 1 : face === '-' ? -1 : 0;
   }
 
-  function outcomeLabel(raw, sk) {
-    const total = raw + sk;
-    if (total >= 3) return 'Success with Style';
-    if (total >= 1) return 'Success';
-    if (total === 0) return 'Tie';
+  function outcomeLabel(raw, sk, diff) {
+    const margin = raw + sk - diff;
+    if (margin >= 3) return 'Success with Style';
+    if (margin >= 1) return 'Success';
+    if (margin === 0) return 'Tie';
     return 'Fail';
   }
 
@@ -68,8 +68,8 @@
         const raw = newFaces.reduce((s, f) => s + dieValue(f), 0);
         const total = raw + skill;
         const adj = getAdj(total);
-        const outcome = outcomeLabel(raw, skill);
-        result = { total, adj, outcome };
+        const outcome = outcomeLabel(raw, skill, difficulty);
+        result = { raw, total, adj, outcome };
         rolling = false;
         btnLabel = 'Roll again';
       }
@@ -87,6 +87,8 @@
     return face;
   }
 
+  function fmt(n) { return (n >= 0 ? '+' : '') + n; }
+
   let skillText = $derived((skill >= 0 ? '+' : '') + skill);
   let displayLabel = $derived(label || (mode === 'skill' ? '4DF — SKILL ROLL' : '4DF — RAW ROLL'));
 </script>
@@ -95,7 +97,7 @@
   <div class="dr-top">
     <span class="dr-label">{displayLabel}</span>
     {#if mode === 'skill'}
-      <span class="dr-label">—</span>
+      <span class="dr-sep" aria-hidden="true">·</span>
       <span class="dr-skill-badge"><span class="dr-skill-val">{skillText}</span></span>
     {/if}
   </div>
@@ -110,11 +112,37 @@
     {/each}
   </div>
 
+  {#if result && mode === 'skill'}
+    <div class="dr-formula" aria-label="Roll calculation">
+      <div class="dr-f-part">
+        <span class="dr-f-num">{fmt(result.raw)}</span>
+        <span class="dr-f-tag">dice</span>
+      </div>
+      <span class="dr-f-op">+</span>
+      <div class="dr-f-part">
+        <span class="dr-f-num dr-f-skill">{fmt(skill)}</span>
+        <span class="dr-f-tag">skill</span>
+      </div>
+      <span class="dr-f-op">=</span>
+      <div class="dr-f-part">
+        <span class="dr-f-num dr-f-tot">{fmt(result.total)}</span>
+        <span class="dr-f-tag">total</span>
+      </div>
+      {#if difficulty !== 0}
+        <span class="dr-f-op">vs</span>
+        <div class="dr-f-part">
+          <span class="dr-f-num dr-f-target">{fmt(difficulty)}</span>
+          <span class="dr-f-tag">target</span>
+        </div>
+      {/if}
+    </div>
+  {/if}
+
   <div class="dr-result-row" aria-live="polite">
     {#if result}
-      <span class="dr-total" style="color:{result.adj.color}">{result.total >= 0 ? '+' : ''}{result.total}</span>
+      <span class="dr-total" style="color:{result.adj.color}">{fmt(result.total)}</span>
       <span class="dr-adj" style="color:{result.adj.color}">{result.adj.label}</span>
-      {#if mode === 'skill'}
+      {#if mode === 'skill' && !noOutcome}
         <span class="dr-outcome">{result.outcome}</span>
       {/if}
     {:else}

@@ -18,18 +18,24 @@
   import Complication from './fronts/Complication.svelte';
   import Pc          from './fronts/Pc.svelte';
   import Backstory   from './fronts/Backstory.svelte';
+  import Stunt       from './fronts/Stunt.svelte';
   import Obstacle    from './fronts/Obstacle.svelte';
   import Countdown   from './fronts/Countdown.svelte';
-  import Constraint  from './fronts/Constraint.svelte';
-  import Custom      from './fronts/Custom.svelte';
+  import Constraint      from './fronts/Constraint.svelte';
+  import NpcInstant      from './fronts/NpcInstant.svelte';
+  import SceneHook       from './fronts/SceneHook.svelte';
+  import LocationFlavor  from './fronts/LocationFlavor.svelte';
+  import Custom          from './fronts/Custom.svelte';
 
   const FRONTS = {
     npc_minor: NpcMinor, npc_major: NpcMajor, faction: Faction,
     scene: Scene, campaign: Campaign, encounter: Encounter,
     seed: Seed, compel: Compel, challenge: Challenge,
     contest: Contest, consequence: Consequence, complication: Complication,
-    pc: Pc, backstory: Backstory, obstacle: Obstacle,
-    countdown: Countdown, constraint: Constraint, custom: Custom,
+    pc: Pc, backstory: Backstory, stunt: Stunt, obstacle: Obstacle,
+    countdown: Countdown, constraint: Constraint,
+    npc_instant: NpcInstant, scene_hook: SceneHook, location_flavor: LocationFlavor,
+    custom: Custom,
   };
 
   // ── Generator meta ──────────────────────────────────────────────────────
@@ -48,10 +54,14 @@
     complication: { icon: 'fa-solid fa-triangle-exclamation', label: 'Complication' },
     pc:           { icon: 'fa-solid fa-star',              label: 'Player Character' },
     backstory:    { icon: 'fa-solid fa-book-open',         label: 'PC Backstory' },
+    stunt:        { icon: 'fa-solid fa-wand-magic-sparkles', label: 'Stunt' },
     obstacle:     { icon: 'fa-solid fa-shield-halved',     label: 'Obstacle' },
     countdown:    { icon: 'fa-solid fa-hourglass-half',    label: 'Countdown' },
     constraint:   { icon: 'fa-solid fa-lock',              label: 'Constraint' },
-    custom:       { icon: 'fa-solid fa-pen-to-square',     label: 'Custom' },
+    npc_instant:     { icon: 'fa-solid fa-bolt-lightning',     label: 'Instant NPC' },
+    scene_hook:      { icon: 'fa-solid fa-anchor',            label: 'Scene Hook' },
+    location_flavor: { icon: 'fa-solid fa-map-location-dot',  label: 'Location Flavor' },
+    custom:          { icon: 'fa-solid fa-pen-to-square',     label: 'Custom' },
   };
 
   // ── Campaign header gradient map ────────────────────────────────────────
@@ -67,16 +77,18 @@
   };
 
   // ── Props ────────────────────────────────────────────────────────────────
-  let { genId = 'npc_minor', campName = '', data = {}, onUpdate = null, savedCardState = null } = $props();
+  let { genId = 'npc_minor', campName = '', data = {}, onUpdate = null, savedCardState = null, autoGuidance = false } = $props();
 
   // ── UI state ─────────────────────────────────────────────────────────────
   let guidanceOpen = $state(false);
+  // React to autoGuidance prop changes (#12)
+  $effect(() => { if (autoGuidance) guidanceOpen = true; });
   let hovered = $state(false);
   let visible = $state(true);
   let reduced = $state(false);
 
   // ── Reduced-motion listener ───────────────────────────────────────────────
-  let mq = $state();
+  let mq;
   onMount(() => {
     try {
       mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -91,7 +103,7 @@
   let fadeTimer;
   $effect(() => {
     if (!reduced) {
-      void genId; void data;
+      genId; data;
       visible = false;
       clearTimeout(fadeTimer);
       fadeTimer = setTimeout(() => { visible = true; }, 30);
@@ -109,7 +121,8 @@
   let sectionColor = $derived('var(--fs-section)');
 
   // ── Interactive card state ────────────────────────────────────────────────
-  let cardState = (() => {
+  // $state.raw: always replaced wholesale via updState — no deep proxy needed
+  let cardState = $state.raw((() => {
     const pMax = typeof data.physical_stress === 'number' ? data.physical_stress
                : typeof data.stress          === 'number' ? data.stress : 0;
     const mMax = typeof data.mental_stress   === 'number' ? data.mental_stress : 0;
@@ -119,7 +132,7 @@
       cdFilled: 0, scoreA: 0, scoreB: 0, treated: false,
     };
     return savedCardState ? Object.assign({}, defaults, savedCardState) : defaults;
-  })();
+  })());
 
   function updState(patch) {
     cardState = Object.assign({}, cardState, patch);

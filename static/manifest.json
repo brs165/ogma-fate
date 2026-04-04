@@ -5,7 +5,7 @@
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0E0C09",
-  "theme_color": "#0E0C09",
+  "theme_color": "#0e2818",
   "orientation": "any",
   "categories": ["games", "utilities"],
   "icons": [

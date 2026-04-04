@@ -12,10 +12,11 @@
 .wiki-sidebar-link .icon{font-size:14px;flex-shrink:0;width:18px;text-align:center;font-style:normal}
 .wiki-sidebar-divider{height:1px;background:var(--border);margin:8px 12px}
 .wiki-content{flex:1;min-width:0;max-width:740px;padding:32px 32px 80px;margin:0 auto}
-@media(max-width:768px){.wiki-sidebar{display:none}.wiki-content{padding:20px 16px 60px}}
+@media(max-width:768px){.wiki-content{padding:20px 16px 60px}}
 kbd{display:inline-block;background:var(--panel);border:1px solid var(--border-mid);border-radius:4px;padding:1px 7px;font-family:var(--font-mono);font-size:11px;color:var(--text);box-shadow:0 1px 0 var(--border-mid);white-space:nowrap}
 .wiki-content h1{font-size:var(--text-2xl);font-weight:900;color:var(--text);margin:0 0 8px;letter-spacing:-0.03em;font-family:var(--font-display)}
-.wiki-content h2{font-size:var(--text-xl);font-weight:800;color:var(--text);margin:40px 0 12px;padding-bottom:8px;border-bottom:1.5px solid var(--border-mid);font-family:var(--font-display)}
+.wiki-content h2{font-size:var(--text-xl);font-weight:800;color:var(--text);margin:40px 0 12px;padding-bottom:8px;border-bottom:1.5px solid var(--border-mid);font-family:var(--font-display);scroll-margin-top:72px}
+.wiki-content [id].step-block,.wiki-content [id].wiki-section{scroll-margin-top:72px}
 .wiki-content h2:first-of-type{margin-top:24px}
 .wiki-content h3{font-size:var(--text-lg);font-weight:700;color:var(--text);margin:28px 0 10px;font-family:var(--font-display)}
 .wiki-content h4{font-size:var(--text-base);font-weight:700;color:var(--text);margin:20px 0 8px}
@@ -90,3 +91,33 @@ kbd{display:inline-block;background:var(--panel);border:1px solid var(--border-m
 .wiki-sidebar-child .learn-step-dot{width:6px;height:6px;border-radius:50%;border:1.5px solid var(--border-mid);flex-shrink:0;transition:all .15s}
 .wiki-sidebar-child.done .learn-step-dot{background:var(--c-green);border-color:var(--c-green)}
 .wiki-sidebar-child.active .learn-step-dot{background:var(--accent);border-color:var(--accent)}
+/* ── Main column wrapper (flex child of wiki-shell) ──────────────────── */
+.wiki-main-col{flex:1;min-width:0;display:flex;flex-direction:column}
+/* ── Prev / Next page navigation ─────────────────────────────────────── */
+.wiki-prev-next{max-width:740px;width:100%;margin:0 auto;padding:0 32px 40px;display:flex;justify-content:space-between;gap:16px;border-top:1px solid var(--border);padding-top:20px}
+.wiki-prev-next-link{font-size:var(--text-sm);color:var(--text-muted);text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:color .12s}
+.wiki-prev-next-link:hover{color:var(--accent)}
+@media(max-width:768px){.wiki-prev-next{padding:0 16px 32px;padding-top:16px}}
+/* ── On this page (TOC) ──────────────────────────────────────────────── */
+.wiki-toc{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--glass-radius-sm);padding:14px 18px;margin:0 0 24px}
+.wiki-toc-title{font-size:10px;font-weight:800;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;font-family:var(--font-mono)}
+.wiki-toc a{display:block;font-size:var(--text-sm);color:var(--text-dim);text-decoration:none;padding:3px 0;line-height:1.5}
+.wiki-toc a:hover{color:var(--accent)}
+/* ── Mobile table scroll wrapper ─────────────────────────────────────── */
+.wiki-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:16px 0}
+.wiki-table-wrap .wiki-table{margin:0}
+@media(max-width:768px){.wiki-table-wrap .wiki-table{min-width:480px}}
+/* ── External SRD link styling ───────────────────────────────────────── */
+.srd-link{white-space:nowrap}
+.srd-link .fa-arrow-up-right-from-square{font-size:9px;margin-left:2px;opacity:0.7}
+/* ── Breadcrumb navigation ───────────────────────────────────────────── */
+.wiki-breadcrumb{font-size:11px;color:var(--text-muted);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.wiki-breadcrumb a{color:var(--text-muted);text-decoration:none}
+.wiki-breadcrumb a:hover{color:var(--accent)}
+.wiki-breadcrumb .sep{opacity:0.5}
+/* ── Mobile sidebar slide-in ─────────────────────────────────────────── */
+@media(max-width:768px){
+  .wiki-sidebar{display:flex;flex-direction:column;position:fixed;left:0;top:52px;z-index:100;transform:translateX(-100%);transition:transform .2s ease}
+  .wiki-sidebar.mn-open{transform:translateX(0)}
+  .callout{padding:10px 12px}
+}
