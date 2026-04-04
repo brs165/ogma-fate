@@ -1,0 +1,43 @@
+# pcs.yaml — Player Character definitions
+# One entry per PC. At least one PC is required for import.
+# Skills use the Fate Condensed ladder: +4 Great (peak), +3 Good, +2 Fair, +1 Average
+# Standard 19 skills: Academics, Athletics, Burglary, Contacts, Crafts, Deceive,
+#   Drive, Empathy, Fight, Investigate, Lore, Notice, Physique, Provoke,
+#   Rapport, Resources, Shoot, Stealth, Will
+
+pcs:
+  - name: "Character Name"           # Full name as it appears on the card (required)
+    player: "Player Name"            # Real-world player name (optional, shown in header)
+    high_concept: "High Concept Aspect"   # Core identity aspect (required)
+    trouble: "Trouble Aspect"             # Complication aspect (required)
+    relationship: null               # Relationship aspect — set to null or omit if none
+                                     # e.g. "I Owe Them My Life"
+    aspects: []                      # Additional aspects beyond the above (usually 0-1 in FCon)
+                                     # e.g.: ["Aspect One", "Aspect Two"]
+    skills:                          # Flat map of skill name to numeric rating (required)
+      Fight: 4                       # Peak skill at +4
+      Athletics: 3                   # Multiple skills can share a rating
+      Physique: 3
+      Notice: 2
+      Provoke: 2
+      Will: 1
+      Shoot: 1
+    stunts:                          # List of stunts (0-3 typical; each costs 1 Refresh)
+      - name: "Stunt Name"
+        description: >-
+          Because [specific ability], I get [benefit] when [trigger condition].
+    refresh: 3                       # Starting Refresh (usually 3; subtract 1 per stunt beyond free slots)
+    fate_points: 3                   # Starting Fate Points (should equal Refresh at session start)
+    stress:                          # Optional: pre-set stress box states (true = marked)
+      physical: [false, false]       # Length auto-calculated from Physique (2, 3, or 4 boxes)
+      mental: [false, false]         # Length auto-calculated from Will
+    description: null                # Optional flavour text shown on card
+    notes:
+      relationship_mechanic: null    # Optional: mechanical note about the relationship aspect
+
+  # ── Second PC (copy and fill in) ─────────────────────────
+  # - name: "Second Character"
+  #   player: "Player Two"
+  #   high_concept: "..."
+  #   trouble: "..."
+  #   ...

@@ -1,0 +1,25 @@
+# scene.yaml — Current scene definition
+# This defines the active scene displayed in the center panel.
+# Update this file between sessions to reflect where the party is.
+
+scene:
+  name: "Scene Name"                  # Short evocative name shown as scene header (required)
+  description: >-                     # Longer GM description (not shown in UI, for reference)
+    Describe the scene in full here. What does it look like?
+    What is the atmosphere? What are the immediate threats or opportunities?
+  aspects:                            # Situation aspects active in this scene (2-4 typical)
+    - "Aspect One"
+    - "Aspect Two"
+    - "Aspect Three"
+  stakes: "What is at risk if the party fails or delays?"  # Shown below scene aspects
+  zones:                              # Physical zones for this scene (optional but recommended)
+    - name: "Zone Name"
+      description: "What's here and what tactical options it offers"
+    - name: "Another Zone"
+      description: "..."
+  active_threats:                     # Current threats — shown to AI for context
+    - "Threat or pressure the party faces"
+  gm_notes: >-                        # Private GM notes (used by AI but not displayed in UI)
+    What do you want to happen here?
+    What compels are set up? What secrets could be revealed?
+    What's the NPC agenda in this scene?

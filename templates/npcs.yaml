@@ -1,0 +1,29 @@
+# npcs.yaml — Non-Player Character definitions
+# NPCs appear in the Intel panel and can be used for AI dialogue generation.
+# Unlike PCs, NPCs have a simplified stat block — focus on story role, not mechanics.
+
+npcs:
+  - name: "NPC Name"                  # Full name (required)
+    role: "Role / Title"              # One-line descriptor, e.g. "Village Elder" (required)
+    aspects:                          # 1-3 aspects; first two shown on NPC card
+      - "High Concept Aspect"
+      - "Trouble or Secret"
+    personality: >-                   # Paragraph describing voice, mannerisms, worldview
+      Describe how this NPC speaks and behaves. What are their verbal tics?
+      Are they guarded, expansive, anxious? What do they care about most?
+      This text is injected directly into dialogue prompts.
+    current_goal: "What they want right now in the story"
+    disposition: "neutral"            # neutral | friendly | wary | hostile | desperate | enigmatic
+    knows:                            # Secrets or knowledge this NPC holds
+      - "Something they know that others don't"
+      - "A hidden agenda or past event"
+
+  # ── Second NPC (copy and fill in) ───────────────────────
+  # - name: "Another NPC"
+  #   role: "..."
+  #   aspects: ["...", "..."]
+  #   personality: >-
+  #     ...
+  #   current_goal: "..."
+  #   disposition: "neutral"
+  #   knows: []

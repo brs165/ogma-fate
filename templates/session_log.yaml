@@ -1,0 +1,36 @@
+# session_log.yaml — Session history and active story threads
+# current_session: the session number currently in play
+# current_threads: the active story threads (shown in Intel panel)
+# sessions: historical session records (used by AI for context)
+
+session_log:
+  current_session: 1
+
+  current_threads:
+    - name: "Thread Name"             # Short thread name (required)
+      status: "active"               # active | seeded | hidden | resolved
+      last_development: "What last happened with this thread"
+      next_beat: "What the GM plans to happen next with this thread"
+
+    # ── Additional threads ──────────────────────────────
+    # - name: "Another Thread"
+    #   status: "seeded"
+    #   last_development: "..."
+    #   next_beat: "..."
+
+  sessions: []
+  # Sessions are added here after each session using the Recap Generator.
+  # Paste the YAML output from the recap tool here.
+  # Example session record:
+  #
+  # sessions:
+  #   - number: 1
+  #     title: "Session One — The Hook"
+  #     summary: >-
+  #       What happened in narrative form.
+  #     key_moments:
+  #       - "A key moment"
+  #       - "Another key moment"
+  #     open_questions:
+  #       - "What does this mean for the party?"
+  #       - "Who is the hooded figure?"

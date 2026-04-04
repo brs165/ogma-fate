@@ -1,0 +1,27 @@
+# campaign.yaml — required file in every campaign package
+# This file defines your campaign's identity and provides context to the AI co-GM.
+# All fields marked (required) must be present; others are optional.
+
+name: "My Campaign"                   # Display name shown in the selector (required)
+slug: "my-campaign"                   # URL-safe ID: lowercase letters, numbers, hyphens only (required)
+                                      # Must be unique — no two campaigns can share a slug.
+genre: "fantasy"                      # Free text genre tag: fantasy, sci-fi, horror, etc. (required)
+tone: |                               # 1-3 sentence tone guide injected into every AI prompt (required)
+  Describe the mood and feel of your campaign here.
+  What is the emotional register? What themes recur?
+  This shapes every AI response — be specific.
+setting_summary: |                    # 2-5 sentence world summary for AI context (required)
+  Describe your world and situation here.
+  Who are the key factions or powers? What is the central conflict?
+  What do the characters know vs. what is hidden?
+  Keep it tight — this is injected into every AI call.
+custom_skills: null                   # null = use the standard Fate Condensed 19-skill list
+                                      # To override: list skill names as a YAML sequence, e.g.:
+                                      #   custom_skills:
+                                      #     - "Sail"
+                                      #     - "Alchemy"
+                                      #     - "Streetwise"
+skill_cap: 4                          # Peak skill rating for PCs (default Great +4)
+                                      # Set higher for more powerful campaigns (e.g. 5 for Superb)
+session_number: 1                     # Current session number (update between sessions)
+created: "2026-01-01"                 # ISO date when campaign was created (YYYY-MM-DD)
